@@ -203,7 +203,7 @@ if ( ! class_exists( 'CTCC_Public' ) ) { // Don't initialise if there's already 
 				} ?>
 			
 				<script type="text/javascript">
-					jQuery(document).ready(function($){
+					function depsLoaded() {
 						<?php if ( isset ( $_GET['cookie'] ) ) { ?>
 							catapultDeleteCookie('catAccCookies');
 						<?php } ?>
@@ -239,13 +239,25 @@ if ( ! class_exists( 'CTCC_Public' ) ) { // Don't initialise if there's already 
 								if ( scroll > <?php echo $height; ?> ) {
 									ctccCloseNotification();
 								}
-							});	
+							});
 						<?php } ?>
 						<?php  if ( ! empty ( $options['first_page'] ) ) {
 							// Add some script if the notification only displays on the first page ?>
 							ctccFirstPage();
 						<?php  } ?>
-					});
+					}
+
+					function checkDeps() {
+						if (typeof jQuery !== "undefined" && typeof catapultReadCookie !== "undefined") {
+							depsLoaded();
+						} else {
+							setTimeout(function() {
+								checkDeps();
+							}, 100);
+						}
+					}
+
+					checkDeps();
 				</script>
 			
 			<?php }
