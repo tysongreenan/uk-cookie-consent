@@ -2,8 +2,8 @@
 Contributors: termly, Catapult_Themes, husobj, jraczynski, JLNNN
 Tags: cookie law, cookie consent, gdpr, eu privacy directive, cookie banner, cookie compliance, cookie notice, eu cookie law, cookie notification, cookies, wpml, geo ip
 Requires at least: 4.3
-Tested up to: 5.0.1
-Stable tag: 2.3.14
+Tested up to: 5.2.2
+Stable tag: 2.3.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,10 @@ Yes, we offer many customization options, from the position of your banner, to t
 5. Example settings page
 
 ## Changelog
+
+### 2.3.16
+* Updated: tested to 5.2.2
+* wait for jQuery
 
 ### 2.3.15
 * Updated: tested to 5.0.1
