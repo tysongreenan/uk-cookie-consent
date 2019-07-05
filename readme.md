@@ -1,10 +1,10 @@
 # GDPR Cookie Consent Banner
-Contributors: termly, Catapult_Themes, husobj, jraczynski, JLNNN
-Tags: cookie law, cookie consent, gdpr, eu privacy directive, cookie banner, cookie compliance, cookie notice, eu cookie law, cookie notification, cookies, wpml, geo ip
-Requires at least: 4.3
-Tested up to: 5.2.2
-Stable tag: 2.3.16
-License: GPLv2 or later
+Contributors: termly, Catapult_Themes, husobj, jraczynski, JLNNN  
+Tags: cookie law, cookie consent, gdpr, eu privacy directive, cookie banner, cookie compliance, cookie notice, eu cookie law, cookie notification, cookies, wpml, geo ip  
+Requires at least: 4.3  
+Tested up to: 5.2.2  
+Stable tag: 2.3.18  
+License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Our easy to use cookie consent plugin can assist in your GDPR and ePrivacy Directive compliance efforts.
@@ -54,7 +54,7 @@ Importantly, the plug-in does not disable cookies on your site or prevent the us
 
 ## Frequently Asked Questions
 
-= Where can I find out more about this plug-in? =
+### Where can I find out more about this plug-in?
 You can find out more about the plug-in on [its plug-in page](http://catapultthemes.com/cookie-consent/).
 ### Is there a demo of this plugin?
 Yes, feel free to have a look at [the demo here](http://cookieconsent.catapultthemes.com/). You can reset the cookie by [going to this URL](http://cookieconsent.catapultthemes.com/?cookie=delete).
@@ -73,6 +73,13 @@ Yes, we offer many customization options, from the position of your banner, to t
 5. Example settings page
 
 ## Changelog
+
+### 2.3.18
+* updated readme.md
+* updated license in composer.json
+
+### 2.3.17
+* added composer.json
 
 ### 2.3.16
 * Updated: tested to 5.2.2
