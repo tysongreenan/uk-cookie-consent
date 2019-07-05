@@ -1,0 +1,12 @@
+{
+    "name": "jlnnn/uk-cookie-consent",
+    "description": "Our easy to use cookie consent plugin can assist in your GDPR and ePrivacy Directive compliance efforts.",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Julian Stock",
+            "email": "julian.stock@shinefour.de"
+        }
+    ],
+    "require": {}
+}
