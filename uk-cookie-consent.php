@@ -3,7 +3,7 @@
 Plugin Name: GDPR Cookie Consent Banner
 Plugin URI: https://termly.io/products/
 Description: Our easy to use cookie consent plugin can assist in your GDPR and ePrivacy Directive compliance efforts.
-Version: 2.3.17
+Version: 2.3.18
 Author: termly
 Author URI: https://termly.io/
 Text Domain: uk-cookie-consent
