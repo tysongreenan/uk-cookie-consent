@@ -788,21 +788,6 @@ if ( ! class_exists ( 'CTCC_Admin' ) ) {
 						</form>
 					</div><!-- .ctdb-inner-wrap -->
 
-					<div class="ctdb-banners">
-						<div class="ctdb-banner">
-							<a href="https://catapultthemes.com/downloads/showcase/?utm_source=plugin_ad&utm_medium=wp_plugin&utm_content=cookieconsent&utm_campaign=themes"><img src="<?php echo CTCC_PLUGIN_URL . 'assets/images/showcase-banner-ad.jpg'; ?>" alt="" ></a>
-						</div>
-						<div class="ctdb-banner hide-dbpro">
-							<a href="https://discussionboard.pro/?utm_source=plugin_ad&utm_medium=wp_plugin&utm_content=cookieconsent&utm_campaign=dbpro"><img src="<?php echo CTCC_PLUGIN_URL . 'assets/images/dbpro-ad-view.png'; ?>" alt="" ></a>
-						</div>
-						<div class="ctdb-banner">
-							<a href="https://catapultthemes.com/downloads/sliderify-pro/?utm_source=plugin_ad&utm_medium=wp_plugin&utm_content=cookieconsent&utm_campaign=themes"><img src="<?php echo CTCC_PLUGIN_URL . 'assets/images/mgs-banner-ad.png'; ?>" alt="" ></a>
-						</div>
-						<div class="ctdb-banner">
-							<a href="http://superheroslider.catapultthemes.com/?utm_source=plugin_ad&utm_medium=wp_plugin&utm_content=cookieconsent&utm_campaign=superhero"><img src="<?php echo CTCC_PLUGIN_URL . 'assets/images/superhero-ad1.png'; ?>" alt="" ></a>
-						</div>
-					</div>
-
 				</div><!-- .ctdb-outer-wrap -->
 			</div><!-- .wrap -->
 			<?php
