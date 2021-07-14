@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: GDPR Cookie Consent Banner
-Plugin URI: https://termly.io/products/
+Plugin URI: https://termly.io/wordpress-plugin/
 Description: Our easy to use cookie consent plugin can assist in your GDPR and ePrivacy Directive compliance efforts.
-Version: 2.3.18
+Version: 2.4
 Author: termly
 Author URI: https://termly.io/
 Text Domain: uk-cookie-consent
@@ -13,6 +13,113 @@ Domain Path: /languages
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/**
+ * Disable auto updates for this plugin even if already enabled.
+ *
+ * @param boolean $update Update or not.
+ * @param object  $item The data about the item being updated.
+ * @return boolean
+ */
+function ctcc_disable_auto_update_plugins( $update, $item ) {
+
+	$plugins = array( 'uk-cookie-consent' );
+	if ( in_array( $item->slug, $plugins, true ) ) {
+
+		$update = false;
+
+	}
+
+	return $update;
+
+}
+add_filter( 'auto_update_plugin', 'ctcc_disable_auto_update_plugins', 10, 2 );
+
+/**
+ * Disable the ability to enable auto updates once the plugin is enabled.
+ *
+ * @param array $all_plugins All plugin data.
+ * @return array
+ */
+function ctcc_disable_auto_update_plugins_list( $all_plugins = [] ) {
+
+	$all_plugins['uk-cookie-consent/uk-cookie-consent.php']['update-supported'] = false;
+
+	return $all_plugins;
+
+}
+add_filter( 'all_plugins', 'ctcc_disable_auto_update_plugins_list' );
+
+/**
+ * Checks the readme file on the .org repository for an update message.
+ *
+ * @param array  $args An array of plugin metadata.
+ * @param object $response An array of metadata about the available plugin update.
+ * @return void
+ */
+function ctcc_plugin_update_message( $args, $response ) {
+
+	if ( isset( $args['update'] ) && $args['update'] ) {
+
+		$transient_name = 'ctcc_upgrade_notice_' . $response->new_version;
+		$upgrade_notice = get_transient( $transient_name );
+
+		if ( false === $upgrade_notice ) {
+
+			$readme = wp_safe_remote_get(
+				'https://plugins.svn.wordpress.org/uk-cookie-consent/trunk/readme.txt'
+			);
+
+			if ( ! is_wp_error( $readme ) && ! empty( $readme['body'] ) ) {
+
+				$version_parts     = explode( '.', $response->new_version );
+				$check_for_notices = array(
+					$version_parts[0] . '.0', // Major.
+					$version_parts[0] . '.0.0', // Major.
+					$version_parts[0] . '.' . $version_parts[1], // Minor.
+					$version_parts[0] . '.' . $version_parts[1] . '.' . $version_parts[2], // Patch.
+				);
+				$notice_regexp     = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*' . preg_quote( $response->new_version ) . '\s*=|$)~Uis';
+				$upgrade_notice    = '';
+
+				foreach ( $check_for_notices as $check_version ) {
+					if ( version_compare( $args['Version'], $check_version, '>' ) ) {
+						continue;
+					}
+
+					$matches = null;
+					if ( preg_match( $notice_regexp, $readme['body'], $matches ) ) {
+						$notices = (array) preg_split( '~[\r\n]+~', trim( $matches[2] ) );
+
+						if ( version_compare( trim( $matches[1] ), $check_version, '=' ) ) {
+							$upgrade_notice .= '<p class="ctcc_plugin_upgrade_notice">';
+
+							$upgrade_notice .= sprintf(
+								'<strong>Version %s</strong>:<br />',
+								esc_html( trim( $matches[1] ) )
+							);
+
+							foreach ( $notices as $index => $line ) {
+								$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line );
+							}
+
+							$upgrade_notice .= '</p>';
+						}
+						break;
+					}
+				}
+
+				set_transient( $transient_name, wp_kses_post( $upgrade_notice ), DAY_IN_SECONDS );
+
+			}
+
+		}
+
+		echo wp_kses_post( rtrim( $upgrade_notice, '</p>' ) );
+	}
+}
+add_action( 'in_plugin_update_message-uk-cookie-consent/uk-cookie-consent.php', 'ctcc_plugin_update_message', 10, 2 );
+
 /**
  * Define constants
  **/
@@ -41,7 +148,7 @@ require_once dirname( __FILE__ ) . '/public/customizer.php';
 
 
 function ctcc_load_plugin_textdomain() {
-    load_plugin_textdomain( 'uk-cookie-consent', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+	load_plugin_textdomain( 'uk-cookie-consent', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 add_action( 'plugins_loaded', 'ctcc_load_plugin_textdomain' );
 
