@@ -329,9 +329,11 @@ if ( ! class_exists( 'CTCC_Public' ) ) { // Don't initialise if there's already 
 				if ( $ctcc_styles_settings['position'] != 'top-bar' && $ctcc_styles_settings['position'] != 'bottom-bar' ) {
 					$heading_text = wp_kses ( $ctcc_content_settings['heading_text'], $allowed );
 					$heading_text = apply_filters( 'ctcc_heading_text', $heading_text );
-					$content .= sprintf ( '<h3>%s</h3>',
-						$heading_text
-					);
+					if ( strlen ( $heading_text ) > 0 ) {
+						$content .= sprintf ( '<h3>%s</h3>',
+							$heading_text
+						);
+					}
 				}
 			
 				// Make the Read More link
