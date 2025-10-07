@@ -1,0 +1,361 @@
+<!-- Example of Generated Code with Scripts -->
+<!-- This is what the "Complete Code" tab will generate when you add scripts -->
+
+<!-- Cookie Consent Banner - Complete Code -->
+<!-- Copy and paste this entire code block into your website's <head> section -->
+
+<style>
+/* Cookie Consent Banner Styles */
+#cookie-consent-banner {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+}
+
+#cookie-consent-banner * {
+  box-sizing: border-box;
+}
+
+#cookie-consent-banner button {
+  transition: all 0.2s ease;
+}
+
+#cookie-consent-banner button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+#cookie-consent-banner a {
+  transition: opacity 0.2s ease;
+}
+
+#cookie-consent-banner a:hover {
+  opacity: 0.8;
+}
+
+#cookie-consent-banner input[type="checkbox"] {
+  accent-color: #3b82f6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #cookie-consent-banner {
+    padding: 16px;
+  }
+  
+  #cookie-consent-banner h3 {
+    font-size: 16px !important;
+  }
+  
+  #cookie-consent-banner p {
+    font-size: 13px !important;
+  }
+  
+  #cookie-consent-banner button {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+  
+  #cookie-consent-banner div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+</style>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent-banner" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+">
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="flex: 1;">
+      <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">
+        We use cookies
+      </h3>
+      
+      <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">
+        This website uses cookies to enhance your browsing experience and provide personalized content.
+      </p>
+      
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="accept-cookies" style="
+          background-color: #3b82f6;
+          color: #ffffff;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          font-weight: 500;
+        ">
+          Accept All
+        </button>
+        
+        <button id="reject-cookies" style="
+          background-color: transparent;
+          color: #3b82f6;
+          border: 1px solid #3b82f6;
+          padding: 8px 16px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          font-weight: 500;
+        ">
+          Reject
+        </button>
+        
+        <button id="preferences-cookies" style="
+          background-color: transparent;
+          color: #60a5fa;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          font-weight: 500;
+        ">
+          Preferences
+        </button>
+      </div>
+      
+      <div id="cookie-preferences" style="
+        margin-top: 16px;
+        padding: 12px;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        display: none;
+      ">
+        <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
+              <input type="checkbox" checked disabled style="margin-right: 8px;">
+              Strictly Necessary
+            </label>
+            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Essential for website functionality and security</p>
+          </div>
+          
+          <div>
+            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
+              <input type="checkbox" id="functionality-cookies" style="margin-right: 8px;">
+              Functionality
+            </label>
+            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Remember your choices and preferences</p>
+          </div>
+          
+          <div>
+            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
+              <input type="checkbox" id="analytics-cookies" style="margin-right: 8px;">
+              Tracking & Performance
+            </label>
+            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Analytics and performance monitoring (Google Analytics, Microsoft Clarity)</p>
+          </div>
+          
+          <div>
+            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
+              <input type="checkbox" id="marketing-cookies" style="margin-right: 8px;">
+              Targeting & Advertising
+            </label>
+            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Personalized ads and marketing (Facebook Pixel, Google Ads)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Cookie Consent Banner JavaScript
+(function() {
+  'use strict';
+  
+  const banner = document.getElementById('cookie-consent-banner');
+  const acceptBtn = document.getElementById('accept-cookies');
+  const rejectBtn = document.getElementById('reject-cookies');
+  const preferencesBtn = document.getElementById('preferences-cookies');
+  const preferencesPanel = document.getElementById('cookie-preferences');
+  
+  const COOKIE_NAME = 'cookie_consent';
+  const COOKIE_EXPIRY = 30; // days
+  
+  // Check if user has already made a choice
+  function hasConsent() {
+    return document.cookie.includes(COOKIE_NAME + '=');
+  }
+  
+  // Set cookie
+  function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+  }
+  
+  // Hide banner
+  function hideBanner() {
+    if (banner) {
+      banner.style.display = 'none';
+    }
+  }
+  
+  // Show banner
+  function showBanner() {
+    if (banner) {
+      banner.style.display = 'block';
+    }
+  }
+  
+  // Accept all cookies
+  function acceptAll() {
+    const consent = {
+      essential: true,
+      functionality: true,
+      analytics: true,
+      marketing: true
+    };
+    
+    setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+    
+    // Google Consent Mode v2
+    if (typeof gtag !== 'undefined') {
+      gtag('consent', 'update', {
+        'analytics_storage': 'granted',
+        'ad_storage': 'granted',
+        'ad_user_data': 'granted',
+        'ad_personalization': 'granted'
+      });
+    }
+    
+    // Load all scripts
+    loadScriptsByConsent(consent);
+    
+    hideBanner();
+  }
+  
+  // Reject all cookies
+  function rejectAll() {
+    const consent = {
+      essential: true,
+      functionality: false,
+      analytics: false,
+      marketing: false
+    };
+    
+    setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+    
+    // Google Consent Mode v2
+    if (typeof gtag !== 'undefined') {
+      gtag('consent', 'update', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+      });
+    }
+    
+    // Load only essential scripts
+    loadScriptsByConsent(consent);
+    
+    hideBanner();
+  }
+  
+  // Save preferences
+  function savePreferences() {
+    const functionality = document.getElementById('functionality-cookies')?.checked || false;
+    const analytics = document.getElementById('analytics-cookies')?.checked || false;
+    const marketing = document.getElementById('marketing-cookies')?.checked || false;
+    
+    const consent = {
+      essential: true,
+      functionality: functionality,
+      analytics: analytics,
+      marketing: marketing
+    };
+    
+    setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+    
+    // Google Consent Mode v2
+    if (typeof gtag !== 'undefined') {
+      gtag('consent', 'update', {
+        'analytics_storage': analytics ? 'granted' : 'denied',
+        'ad_storage': marketing ? 'granted' : 'denied',
+        'ad_user_data': marketing ? 'granted' : 'denied',
+        'ad_personalization': marketing ? 'granted' : 'denied'
+      });
+    }
+    
+    // Load scripts based on consent
+    loadScriptsByConsent(consent);
+    
+    hideBanner();
+  }
+  
+  // Load scripts based on user consent
+  function loadScriptsByConsent(consent) {
+    // Strictly necessary scripts (always loaded)
+    // Session Management
+    // Essential session management
+    if (!sessionStorage.getItem('sessionId')) {
+      sessionStorage.setItem('sessionId', Date.now().toString());
+    }
+    
+    // Functionality scripts
+    if (consent.functionality) {
+      // Your functionality scripts will be loaded here
+    }
+    
+    // Analytics scripts
+    if (consent.analytics) {
+      // Your Google Analytics, Microsoft Clarity, etc. will be loaded here
+      // Example:
+      // gtag('config', 'GA_MEASUREMENT_ID');
+    }
+    
+    // Marketing scripts
+    if (consent.marketing) {
+      // Your Facebook Pixel, Google Ads, etc. will be loaded here
+      // Example:
+      // fbq('track', 'PageView');
+    }
+  }
+  
+  // Toggle preferences panel
+  function togglePreferences() {
+    if (preferencesPanel) {
+      const isVisible = preferencesPanel.style.display !== 'none';
+      preferencesPanel.style.display = isVisible ? 'none' : 'block';
+    }
+  }
+  
+  // Event listeners
+  if (acceptBtn) acceptBtn.addEventListener('click', acceptAll);
+  if (rejectBtn) rejectBtn.addEventListener('click', rejectAll);
+  if (preferencesBtn) preferencesBtn.addEventListener('click', togglePreferences);
+  
+  // Auto-show banner
+  if (!hasConsent()) {
+    showBanner();
+  } else {
+    hideBanner();
+  }
+  
+  // Initialize Google Consent Mode
+  if (typeof gtag !== 'undefined') {
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+  }
+})();
+</script>
+
+<!-- End Cookie Consent Banner -->
