@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Copy, Download, ExternalLink, RefreshCw } from 'lucide-react'
+import { Copy, Download, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 interface TrackingScript {
@@ -73,6 +73,12 @@ interface BannerConfig {
     googleConsentMode: boolean
     customCSS: string
     customJS: string
+    performance?: {
+      deferNonCriticalScripts?: boolean
+      useRequestIdleCallback?: boolean
+      lazyLoadAnalytics?: boolean
+      inlineCriticalCSS?: boolean
+    }
   }
 }
 
@@ -85,23 +91,81 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  // Function to regenerate code
   const regenerateCode = async () => {
     setIsGenerating(true)
-    // Add a small delay to show the loading state
     await new Promise(resolve => setTimeout(resolve, 500))
     setCodeVersion(prev => prev + 1)
     setIsGenerating(false)
     toast.success('Code regenerated successfully!')
   }
 
+  // Helper function to safely encode script code for embedding
+  const encodeScriptCode = (scriptCode: string): string => {
+    if (!scriptCode || !scriptCode.trim()) return ''
+    
+    // Remove HTML comments and script tags
+    let clean = scriptCode
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<script[^>]*>/gi, '')
+      .replace(/<\/script>/gi, '')
+      .trim()
+    
+    // Escape special characters for safe embedding in JavaScript strings
+    return clean
+      .replace(/\\/g, '\\\\')  // Escape backslashes
+      .replace(/`/g, '\\`')    // Escape backticks
+      .replace(/\$/g, '\\$')   // Escape dollar signs
+      .replace(/\n/g, '\\n')   // Escape newlines
+      .replace(/\r/g, '\\r')   // Escape carriage returns
+      .replace(/\t/g, '\\t')   // Escape tabs
+  }
+
+  // Helper function to generate script loading code
+  const generateScriptLoaders = (scripts: TrackingScript[], category: string): string => {
+    const enabledScripts = scripts.filter(s => s.enabled && s.scriptCode.trim())
+    if (enabledScripts.length === 0) return ''
+    
+    return enabledScripts.map(script => {
+      const escaped = encodeScriptCode(script.scriptCode)
+      const varName = `${category}_${script.id.replace(/[^a-zA-Z0-9]/g, '_')}`
+      
+      // Check if it's an external script URL
+      const isExternalScript = script.scriptCode.includes('src=') || script.scriptCode.includes('http')
+      
+      if (isExternalScript) {
+        // Handle external scripts
+        const srcMatch = script.scriptCode.match(/src=["']([^"']+)["']/)
+        if (srcMatch) {
+          return `      // ${script.name} (External)
+      try {
+        var scriptEl_${varName} = document.createElement('script');
+        scriptEl_${varName}.src = '${srcMatch[1]}';
+        scriptEl_${varName}.async = true;
+        document.head.appendChild(scriptEl_${varName});
+        console.log('Loading external script: ${script.name}');
+      } catch(e) {
+        console.error('Error loading external script ${script.name}:', e);
+      }`
+        }
+      }
+      
+      // Handle inline scripts
+      return `      // ${script.name}
+      try {
+        var scriptEl_${varName} = document.createElement('script');
+        scriptEl_${varName}.textContent = \`${escaped}\`;
+        document.head.appendChild(scriptEl_${varName});
+        console.log('Loaded script: ${script.name}');
+      } catch(e) {
+        console.error('Error loading ${script.name}:', e);
+      }`
+    }).join('\n\n')
+  }
+
   const generateHTML = () => {
     const logoElement = config.branding.logo.enabled && config.branding.logo.url
       ? `<img src="${config.branding.logo.url}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
       : ''
-
-    const logoPosition = config.branding.logo.position === 'center' ? 'center' : 
-                        config.branding.logo.position === 'right' ? 'flex-end' : 'flex-start'
 
     const privacyPolicyLink = config.branding.privacyPolicy.url
       ? `<a href="${config.branding.privacyPolicy.url}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${config.colors.link}; text-decoration: underline;">${config.branding.privacyPolicy.text}</a>`
@@ -143,22 +207,18 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     const getLayoutStyles = () => {
       let styles = ''
       
-      // Width handling
       if (config.layout.width === 'custom' && config.layout.customWidth) {
         styles += `width: ${config.layout.customWidth}px;`
       } else if (config.layout.width === 'container') {
         styles += `max-width: ${config.layout.maxWidth || 1200}px; margin: 0 auto;`
       }
       
-      // Border radius
       if (config.layout.borderRadius > 0) {
         styles += `border-radius: ${config.layout.borderRadius}px;`
       }
       
-      // Padding
       styles += `padding: ${config.layout.padding}px;`
       
-      // Shadow
       switch (config.layout.shadow) {
         case 'small':
           styles += 'box-shadow: 0 2px 4px rgba(0,0,0,0.1);'
@@ -177,539 +237,229 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     const getAnimationStyles = () => {
       switch (config.layout.animation) {
         case 'fade':
-          return 'animation: fadeIn 0.5s ease-out;'
+          return 'animation: cookieFadeIn 0.5s ease-out;'
         case 'slide':
-          return 'animation: slideIn 0.5s ease-out;'
+          return 'animation: cookieSlideIn 0.5s ease-out;'
         case 'bounce':
-          return 'animation: bounceIn 0.6s ease-out;'
+          return 'animation: cookieBounceIn 0.6s ease-out;'
         case 'pulse':
-          return 'animation: pulse 2s infinite;'
+          return 'animation: cookiePulse 2s infinite;'
         default:
           return ''
       }
     }
 
-    return `<!-- Cookie Consent Banner -->
-<div id="cookie-consent-banner" role="dialog" aria-live="polite" style="
-  position: fixed;
-  ${getPositionStyles()}
-  background-color: ${config.colors.background};
-  color: ${config.colors.text};
-  ${getLayoutStyles()}
-  z-index: 10000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  ${getAnimationStyles()}
-  display: none;
-">
+    return `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${config.colors.background}; color: ${config.colors.text}; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
-    ${(config.position.includes('floating') || config.position.includes('modal')) ? `
-    <button id="close-banner" style="
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: none;
-      border: none;
-      color: ${config.colors.text};
-      font-size: 18px;
-      cursor: pointer;
-      padding: 4px;
-      line-height: 1;
-      opacity: 0.7;
-    " aria-label="Close banner">
-      ×
-    </button>
-    ` : ''}
+    ${(config.position.includes('floating') || config.position.includes('modal')) ? `<button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>` : ''}
     
-    <div style="display: flex; align-items: flex-start; gap: 16px;">
-    ${config.branding.logo.position === 'left' ? logoElement : ''}
-    
-    <div style="flex: 1;">
-      ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
+    <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+      ${config.branding.logo.position === 'left' ? logoElement : ''}
       
-      <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">
-        ${config.text.title}
-      </h3>
-      
-      <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">
-        ${config.text.message}
-        ${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}
-      </p>
-      
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button id="accept-cookies" style="
-          background-color: ${config.colors.button};
-          color: ${config.colors.buttonText};
-          border: none;
-          padding: 8px 16px;
-          border-radius: 4px;
-          font-size: 14px;
-          cursor: pointer;
-          font-weight: 500;
-        ">
-          ${config.text.acceptButton}
-        </button>
+      <div style="flex: 1; min-width: 250px;">
+        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        <button id="reject-cookies" style="
-          background-color: transparent;
-          color: ${config.colors.button};
-          border: 1px solid ${config.colors.button};
-          padding: 8px 16px;
-          border-radius: 4px;
-          font-size: 14px;
-          cursor: pointer;
-          font-weight: 500;
-        ">
-          ${config.text.rejectButton}
-        </button>
+        <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${config.text.title}</h3>
+        
+        <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">${config.text.message}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="cookie-accept-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.acceptButton}</button>
+          
+          <button id="cookie-reject-btn" style="background-color: transparent; color: ${config.colors.button}; border: 1px solid ${config.colors.button}; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.rejectButton}</button>
+          
+          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${config.colors.link}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.preferencesButton}</button>` : ''}
+        </div>
         
         ${config.behavior.showPreferences ? `
-        <button id="preferences-cookies" style="
-          background-color: transparent;
-          color: ${config.colors.link};
-          border: none;
-          padding: 8px 16px;
-          border-radius: 4px;
-          font-size: 14px;
-          cursor: pointer;
-          font-weight: 500;
-        ">
-          ${config.text.preferencesButton}
-        </button>
+        <div id="cookie-preferences-panel" style="margin-top: 16px; padding: 16px; background-color: rgba(255,255,255,0.1); border-radius: 8px; display: none;">
+          <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: not-allowed; opacity: 0.7;"><input type="checkbox" checked disabled style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Strictly Necessary</strong><br><small style="opacity: 0.8;">Essential for website functionality</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-func-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Functionality</strong><br><small style="opacity: 0.8;">Remember preferences and choices</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-analytics-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Analytics</strong><br><small style="opacity: 0.8;">Help us improve our website</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-marketing-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Marketing</strong><br><small style="opacity: 0.8;">Personalized ads and content</small></span></label>
+          </div>
+          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+            <button id="cookie-save-prefs-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Save</button>
+            <button id="cookie-cancel-prefs-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Cancel</button>
+          </div>
+        </div>
         ` : ''}
       </div>
       
-      <div id="cookie-preferences" style="
-        margin-top: 16px;
-        padding: 12px;
-        background-color: rgba(255,255,255,0.1);
-        border-radius: 4px;
-        display: none;
-      ">
-        <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div>
-            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
-              <input type="checkbox" checked disabled style="margin-right: 8px;">
-              Strictly Necessary
-            </label>
-            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Essential for website functionality and security</p>
-          </div>
-          
-          <div>
-            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
-              <input type="checkbox" id="functionality-cookies" style="margin-right: 8px;">
-              Functionality
-            </label>
-            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Remember your choices and preferences</p>
-          </div>
-          
-          <div>
-            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
-              <input type="checkbox" id="analytics-cookies" style="margin-right: 8px;">
-              Tracking & Performance
-            </label>
-            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Analytics and performance monitoring (Google Analytics, Microsoft Clarity)</p>
-          </div>
-          
-          <div>
-            <label style="display: flex; align-items: center; font-size: 13px; font-weight: 500;">
-              <input type="checkbox" id="marketing-cookies" style="margin-right: 8px;">
-              Targeting & Advertising
-            </label>
-            <p style="font-size: 11px; opacity: 0.75; margin: 4px 0 0 24px;">Personalized ads and marketing (Facebook Pixel, Google Ads)</p>
-          </div>
-        </div>
-        
-        <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
-          <button id="save-preferences" style="
-            background-color: ${config.colors.button};
-            color: ${config.colors.buttonText};
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: 500;
-          ">
-            Save Preferences
-          </button>
-          <button id="cancel-preferences" style="
-            background-color: transparent;
-            color: ${config.colors.text};
-            border: 1px solid ${config.colors.text};
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: 500;
-          ">
-            Cancel
-          </button>
-        </div>
-      </div>
+      ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
-    
-    ${config.branding.logo.position === 'right' ? logoElement : ''}
-  </div>
   </div>
 </div>`
   }
 
   const generateJavaScript = () => {
-    return `// Cookie Consent Banner JavaScript
-(function() {
+    const strictlyNecessaryLoaders = generateScriptLoaders(config.scripts.strictlyNecessary, 'strict')
+    const functionalityLoaders = generateScriptLoaders(config.scripts.functionality, 'func')
+    const analyticsLoaders = generateScriptLoaders(config.scripts.trackingPerformance, 'analytics')
+    const marketingLoaders = generateScriptLoaders(config.scripts.targetingAdvertising, 'marketing')
+
+    return `(function() {
   'use strict';
   
-  // Wait for DOM to be ready before accessing elements
-  function initializeCookieBanner() {
-    const banner = document.getElementById('cookie-consent-banner');
-    const acceptBtn = document.getElementById('accept-cookies');
-    const rejectBtn = document.getElementById('reject-cookies');
-    const preferencesBtn = document.getElementById('preferences-cookies');
-    const preferencesPanel = document.getElementById('cookie-preferences');
-    const closeBtn = document.getElementById('close-banner');
-    
-    const COOKIE_NAME = 'cookie_consent';
-    const COOKIE_EXPIRY = ${config.behavior.cookieExpiry}; // days
-    
-    // Check if user has already made a choice
-    function hasConsent() {
-      const cookies = document.cookie.split(';');
-      return cookies.some(cookie => cookie.trim().startsWith(COOKIE_NAME + '='));
-    }
-    
-    // Get consent data from cookie
-    function getConsentData() {
-      const cookies = document.cookie.split(';');
-      const consentCookie = cookies.find(cookie => cookie.trim().startsWith(COOKIE_NAME + '='));
-      if (consentCookie) {
-        try {
-          const consentValue = consentCookie.split('=')[1];
-          return JSON.parse(decodeURIComponent(consentValue));
-        } catch (e) {
-          console.warn('Failed to parse consent cookie:', e);
-          return null;
-        }
-      }
-      return null;
-    }
+  var COOKIE_NAME = 'cookie_consent';
+  var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
   
-    // Set cookie
-    function setCookie(name, value, days) {
-      const expires = new Date();
-      expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-      const secureFlag = location.protocol === 'https:' ? ';Secure' : '';
-      document.cookie = name + '=' + encodeURIComponent(JSON.stringify(value)) + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax' + secureFlag;
-    }
-    
-    // Hide banner
-    function hideBanner() {
-      if (banner) {
-        banner.style.display = 'none';
-      }
-    }
-    
-    // Show banner
-    function showBanner() {
-      if (banner) {
-        banner.style.display = 'block';
-      }
-    }
-  
-    // Accept all cookies
-    function acceptAll() {
-      const consent = {
-        essential: true,
-        functionality: true,
-        analytics: true,
-        marketing: true
-      };
-      
-      setCookie(COOKIE_NAME, consent, COOKIE_EXPIRY);
-      ${config.advanced.googleConsentMode ? `
-      // Google Consent Mode v2
-      if (typeof gtag !== 'undefined') {
-        gtag('consent', 'update', {
-          'analytics_storage': 'granted',
-          'ad_storage': 'granted',
-          'ad_user_data': 'granted',
-          'ad_personalization': 'granted'
-        });
-      }
-      ` : ''}
-      
-      // Load all scripts
-      loadScriptsByConsent(consent);
-      
-      hideBanner();
-      ${config.advanced.customJS ? `\n      // Custom JavaScript\n      ${config.advanced.customJS}` : ''}
-    }
-  
-  // Reject all cookies
-  function rejectAll() {
-    const consent = {
-      essential: true,
-      functionality: false,
-      analytics: false,
-      marketing: false
-    };
-    
-    setCookie(COOKIE_NAME, consent, COOKIE_EXPIRY);
-    ${config.advanced.googleConsentMode ? `
-    // Google Consent Mode v2
-    if (typeof gtag !== 'undefined') {
-      gtag('consent', 'update', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied'
-      });
-    }
-    ` : ''}
-    
-    // Load only essential scripts
-    loadScriptsByConsent(consent);
-    
-    hideBanner();
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
   }
   
-  // Save preferences
-  function savePreferences() {
-    const functionality = document.getElementById('functionality-cookies')?.checked || false;
-    const analytics = document.getElementById('analytics-cookies')?.checked || false;
-    const marketing = document.getElementById('marketing-cookies')?.checked || false;
-    
-    const consent = {
-      essential: true,
-      functionality: functionality,
-      analytics: analytics,
-      marketing: marketing
-    };
-    
-    setCookie(COOKIE_NAME, consent, COOKIE_EXPIRY);
-    
-    ${config.advanced.googleConsentMode ? `
-    // Google Consent Mode v2
-    if (typeof gtag !== 'undefined') {
-      gtag('consent', 'update', {
-        'analytics_storage': analytics ? 'granted' : 'denied',
-        'ad_storage': marketing ? 'granted' : 'denied',
-        'ad_user_data': marketing ? 'granted' : 'denied',
-        'ad_personalization': marketing ? 'granted' : 'denied'
-      });
-    }
-    ` : ''}
-    
-    // Load scripts based on consent
-    loadScriptsByConsent(consent);
-    
-    hideBanner();
+  function setCookie(name, value, days) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    var secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
   }
   
-
-    // Helper function to execute script code safely
-    function executeScript(scriptCode, scriptName) {
+  function getConsent() {
+    var cookie = getCookie(COOKIE_NAME);
+    if (cookie) {
       try {
-        console.log('Executing script:', scriptName);
-        
-        // Remove all script tags and HTML comments
-        let cleanCode = scriptCode.trim();
-        
-        // Remove HTML comments
-        cleanCode = cleanCode.replace(/<!--[\s\S]*?-->/g, '');
-        
-        // Remove all <script> and </script> tags completely
-        cleanCode = cleanCode.replace(/<\/?script[^>]*>/gi, '');
-        
-        // Handle external script URLs (look for src= in the original code)
-        if (scriptCode.includes('src=')) {
-          const srcMatch = scriptCode.match(/src=["']([^"']+)["']/);
-          if (srcMatch) {
-            console.log('Loading external script:', srcMatch[1]);
-            const script = document.createElement('script');
-            script.src = srcMatch[1];
-            script.async = true;
-            document.head.appendChild(script);
-            return;
-          }
-        }
-        
-        // Execute inline JavaScript (now clean of script tags)
-        if (cleanCode) {
-          console.log('Executing inline script for:', scriptName);
-          // Create dynamic script element for safer execution
-          const script = document.createElement('script');
-          script.textContent = cleanCode;
-          document.head.appendChild(script);
-          document.head.removeChild(script);
-        }
-      } catch (error) {
-        console.error('Error executing script "' + scriptName + '":', error);
+        return JSON.parse(cookie);
+      } catch(e) {
+        return null;
       }
     }
-
-  // Load scripts based on user consent with performance optimizations
-  function loadScriptsByConsent(consent) {
+    return null;
+  }
+  
+  function saveConsent(consent) {
+    setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+    loadScripts(consent);
+  }
+  
+  function loadScripts(consent) {
     console.log('Loading scripts with consent:', consent);
     
-    // Strictly necessary scripts (always loaded immediately)
-    ${config.scripts.strictlyNecessary.filter(script => script.enabled && script.scriptCode.trim()).map(script => {
-      const cleanCode = script.scriptCode.trim()
-      // Remove script tags BEFORE escaping to prevent browser parsing issues
-      const noScriptTags = cleanCode.replace(/<\/?script[^>]*>/gi, '').replace(/<!--[\s\S]*?-->/g, '')
-      const escapedCode = noScriptTags.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/<\/script>/gi, '<\\/script>')
-      return cleanCode ? `    // ${script.name}\n    console.log('Loading strictly necessary script: ${script.name}');\n    executeScript(\`${escapedCode}\`, '${script.name}');` : ''
-    }).filter(code => code).join('\n\n')}
+    // Strictly necessary (always loaded)
+${strictlyNecessaryLoaders || '    // No strictly necessary scripts configured'}
     
-    // Non-critical scripts loaded with performance optimizations
-    const loadNonCriticalScripts = () => {
-      // Functionality scripts (deferred)
-      if (consent.functionality) {
-        ${config.scripts.functionality.filter(script => script.enabled && script.scriptCode.trim()).map(script => {
-          const cleanCode = script.scriptCode.trim()
-          // Remove script tags BEFORE escaping to prevent browser parsing issues
-          const noScriptTags = cleanCode.replace(/<\/?script[^>]*>/gi, '').replace(/<!--[\s\S]*?-->/g, '')
-          const escapedCode = noScriptTags.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/<\/script>/gi, '<\\/script>')
-          return cleanCode ? `        // ${script.name}\n        console.log('Loading functionality script: ${script.name}');\n        executeScript(\`${escapedCode}\`, '${script.name}');` : ''
-        }).filter(code => code).join('\n\n        ')}
-      }
-      
-      // Analytics scripts (deferred + lazy loaded)
-      if (consent.analytics) {
-        ${config.scripts.trackingPerformance.filter(script => script.enabled && script.scriptCode.trim()).map(script => {
-          const cleanCode = script.scriptCode.trim()
-          // Remove script tags BEFORE escaping to prevent browser parsing issues
-          const noScriptTags = cleanCode.replace(/<\/?script[^>]*>/gi, '').replace(/<!--[\s\S]*?-->/g, '')
-          const escapedCode = noScriptTags.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/<\/script>/gi, '<\\/script>')
-          return cleanCode ? `        // ${script.name}\n        console.log('Loading analytics script: ${script.name}');\n        executeScript(\`${escapedCode}\`, '${script.name}');` : ''
-        }).filter(code => code).join('\n\n        ')}
-      }
-      
-      // Marketing scripts (deferred + lazy loaded)
-      if (consent.marketing) {
-        ${config.scripts.targetingAdvertising.filter(script => script.enabled && script.scriptCode.trim()).map(script => {
-          const cleanCode = script.scriptCode.trim()
-          // Remove script tags BEFORE escaping to prevent browser parsing issues
-          const noScriptTags = cleanCode.replace(/<\/?script[^>]*>/gi, '').replace(/<!--[\s\S]*?-->/g, '')
-          const escapedCode = noScriptTags.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/<\/script>/gi, '<\\/script>')
-          return cleanCode ? `        // ${script.name}\n        console.log('Loading marketing script: ${script.name}');\n        executeScript(\`${escapedCode}\`, '${script.name}');` : ''
-        }).filter(code => code).join('\n\n        ')}
-      }
-    };
-    
-    // Load non-critical scripts with performance optimizations
-    ${(config.advanced.performance?.deferNonCriticalScripts ?? true) ? `
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadNonCriticalScripts);
-    } else {
-      // Use requestIdleCallback for better performance, fallback to setTimeout
-      ${(config.advanced.performance?.useRequestIdleCallback ?? true) ? `
-      if (window.requestIdleCallback) {
-        requestIdleCallback(loadNonCriticalScripts, { timeout: 2000 });
-      } else {
-        setTimeout(loadNonCriticalScripts, 100);
-      }
-      ` : `
-      setTimeout(loadNonCriticalScripts, 100);
-      `}
+    // Functionality scripts
+    if (consent.functionality) {
+${functionalityLoaders || '      // No functionality scripts configured'}
     }
-    ` : `
-    // Load immediately (performance optimizations disabled)
-    loadNonCriticalScripts();
-    `}
-  }
-  
-  // Toggle preferences panel
-  function togglePreferences() {
-    if (preferencesPanel) {
-      const isVisible = preferencesPanel.style.display !== 'none';
-      preferencesPanel.style.display = isVisible ? 'none' : 'block';
-    }
-  }
-  
-  // Event listeners
-  if (acceptBtn) acceptBtn.addEventListener('click', acceptAll);
-  if (rejectBtn) rejectBtn.addEventListener('click', rejectAll);
-  if (preferencesBtn) preferencesBtn.addEventListener('click', togglePreferences);
-  if (closeBtn) closeBtn.addEventListener('click', hideBanner);
-  
-  // Save and cancel preferences buttons
-  const savePrefsBtn = document.getElementById('save-preferences');
-  const cancelPrefsBtn = document.getElementById('cancel-preferences');
-  if (savePrefsBtn) savePrefsBtn.addEventListener('click', savePreferences);
-  if (cancelPrefsBtn) cancelPrefsBtn.addEventListener('click', () => {
-    if (preferencesPanel) preferencesPanel.style.display = 'none';
-  });
-  
-  // Dismiss on scroll
-  ${config.behavior.dismissOnScroll ? `
-  let scrollTimer;
-  window.addEventListener('scroll', function() {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(function() {
-      if (!hasConsent()) {
-        hideBanner();
-      }
-    }, 1000);
-  });
-  ` : ''}
-  
-  // Load existing preferences and show banner
-  function initializeBanner() {
-    const existingConsent = getConsentData();
     
-    if (existingConsent) {
-      // Load existing consent preferences
-      const functionalityCheckbox = document.getElementById('functionality-cookies');
-      const analyticsCheckbox = document.getElementById('analytics-cookies');
-      const marketingCheckbox = document.getElementById('marketing-cookies');
-      
-      if (functionalityCheckbox) functionalityCheckbox.checked = existingConsent.functionality;
-      if (analyticsCheckbox) analyticsCheckbox.checked = existingConsent.analytics;
-      if (marketingCheckbox) marketingCheckbox.checked = existingConsent.marketing;
-      
-      // Load scripts based on existing consent
-      loadScriptsByConsent(existingConsent);
-      hideBanner();
-    } else {
-      // Show banner for new users
-      ${config.behavior.autoShow ? 'showBanner();' : ''}
+    // Analytics scripts  
+    if (consent.analytics) {
+${analyticsLoaders || '      // No analytics scripts configured'}
     }
-  }
-  
-    // Initialize banner
-    initializeBanner();
     
-    // Initialize Google Consent Mode
+    // Marketing scripts
+    if (consent.marketing) {
+${marketingLoaders || '      // No marketing scripts configured'}
+    }
+    
     ${config.advanced.googleConsentMode ? `
+    // Google Consent Mode v2
     if (typeof gtag !== 'undefined') {
-      gtag('consent', 'default', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied'
+      gtag('consent', 'update', {
+        'analytics_storage': consent.analytics ? 'granted' : 'denied',
+        'ad_storage': consent.marketing ? 'granted' : 'denied',
+        'ad_user_data': consent.marketing ? 'granted' : 'denied',
+        'ad_personalization': consent.marketing ? 'granted' : 'denied'
       });
     }
     ` : ''}
   }
   
-  // Start the cookie banner when DOM is ready
+  function init() {
+    var banner = document.getElementById('cookie-consent-banner');
+    var acceptBtn = document.getElementById('cookie-accept-btn');
+    var rejectBtn = document.getElementById('cookie-reject-btn');
+    var prefsBtn = document.getElementById('cookie-preferences-btn');
+    var closeBtn = document.getElementById('cookie-close-btn');
+    var prefsPanel = document.getElementById('cookie-preferences-panel');
+    var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
+    var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
+    
+    if (!banner) return;
+    
+    var existingConsent = getConsent();
+    
+    if (existingConsent) {
+      loadScripts(existingConsent);
+      return;
+    }
+    
+    ${config.behavior.autoShow ? 'banner.style.display = "block";' : ''}
+    
+    if (acceptBtn) {
+      acceptBtn.onclick = function() {
+        saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+        banner.style.display = 'none';
+      };
+    }
+    
+    if (rejectBtn) {
+      rejectBtn.onclick = function() {
+        saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
+        banner.style.display = 'none';
+      };
+    }
+    
+    if (closeBtn) {
+      closeBtn.onclick = function() {
+        banner.style.display = 'none';
+      };
+    }
+    
+    if (prefsBtn && prefsPanel) {
+      prefsBtn.onclick = function() {
+        prefsPanel.style.display = prefsPanel.style.display === 'none' ? 'block' : 'none';
+      };
+    }
+    
+    if (savePrefsBtn) {
+      savePrefsBtn.onclick = function() {
+        var func = document.getElementById('cookie-func-toggle');
+        var analytics = document.getElementById('cookie-analytics-toggle');
+        var marketing = document.getElementById('cookie-marketing-toggle');
+        
+        saveConsent({
+          essential: true,
+          functionality: func ? func.checked : false,
+          analytics: analytics ? analytics.checked : false,
+          marketing: marketing ? marketing.checked : false
+        });
+        
+        banner.style.display = 'none';
+      };
+    }
+    
+    if (cancelPrefsBtn && prefsPanel) {
+      cancelPrefsBtn.onclick = function() {
+        prefsPanel.style.display = 'none';
+      };
+    }
+    
+    ${config.behavior.dismissOnScroll ? `
+    var scrolled = false;
+    window.addEventListener('scroll', function() {
+      if (!scrolled && window.pageYOffset > 100) {
+        scrolled = true;
+        banner.style.display = 'none';
+      }
+    });
+    ` : ''}
+  }
+  
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeCookieBanner);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initializeCookieBanner();
+    init();
   }
 })();`
   }
 
   const generateCSS = () => {
-    return `/* Cookie Consent Banner Styles */
-#cookie-consent-banner {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.5;
-}
-
-#cookie-consent-banner * {
+    return `#cookie-consent-banner * {
   box-sizing: border-box;
 }
 
@@ -722,65 +472,34 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   transform: translateY(-1px);
 }
 
-#cookie-consent-banner a {
-  transition: opacity 0.2s ease;
-}
-
-#cookie-consent-banner a:hover {
-  opacity: 0.8;
-}
-
-#cookie-consent-banner input[type="checkbox"] {
-  accent-color: ${config.colors.button};
-}
-
-/* Animation keyframes */
-@keyframes fadeIn {
+@keyframes cookieFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes slideIn {
-  from { 
-    transform: translateX(100%); 
-    opacity: 0; 
-  }
-  to { 
-    transform: translateX(0); 
-    opacity: 1; 
-  }
+@keyframes cookieSlideIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes bounceIn {
-  0% { 
-    transform: scale(0.3); 
-    opacity: 0; 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
-  70% { 
-    transform: scale(0.9); 
-  }
-  100% { 
-    transform: scale(1); 
-    opacity: 1; 
-  }
+@keyframes cookieBounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes pulse {
-  0%, 100% { 
-    transform: scale(1); 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
+@keyframes cookiePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   #cookie-consent-banner {
-    padding: 16px;
+    padding: 16px !important;
+    left: 0 !important;
+    right: 0 !important;
+    max-width: none !important;
   }
   
   #cookie-consent-banner h3 {
@@ -792,59 +511,25 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   }
   
   #cookie-consent-banner button {
-    padding: 6px 12px !important;
+    padding: 8px 12px !important;
     font-size: 13px !important;
-  }
-  
-  #cookie-consent-banner div[style*="display: flex"] {
-    flex-direction: column !important;
-    gap: 8px !important;
   }
 }
 
-/* Custom CSS */
 ${config.advanced.customCSS}`
   }
 
   const generateCompleteCode = () => {
-    const html = generateHTML()
-    const js = generateJavaScript()
-    const css = generateCSS()
-    
-    // Ensure the JavaScript is properly closed
-    const completeJS = js.endsWith('})();') ? js : js + '\n})();'
-    
-    return `<!-- Cookie Consent Banner - Performance Optimized -->
-<!-- IMPORTANT: Copy the CSS and JavaScript to your <head> section, and the HTML to your <body> section -->
-
-<!-- ===== COPY TO <head> SECTION ===== -->
-${(config.advanced.performance?.inlineCriticalCSS ?? true) ? `
-<!-- Critical CSS (inline for faster rendering) -->
+    return `<!-- Cookie Consent Banner - Copy this entire block -->
 <style>
-${css}
+${generateCSS()}
 </style>
-` : `
-<!-- CSS (external for better caching) -->
-<link rel="stylesheet" href="data:text/css;base64,${btoa(css)}">
-`}
 
-<!-- JavaScript (deferred for better performance) -->
 <script>
-${completeJS}
+${generateJavaScript()}
 </script>
 
-<!-- ===== COPY TO <body> SECTION (before closing </body> tag) ===== -->
-<!-- Banner HTML (minimal, non-blocking) -->
-${html}
-
-<!-- Performance Optimizations:
-${(config.advanced.performance?.deferNonCriticalScripts ?? true) ? '- Non-critical scripts are deferred using requestIdleCallback' : '- All scripts load immediately'}
-${(config.advanced.performance?.useRequestIdleCallback ?? true) ? '- Scripts load during browser idle time' : '- Scripts load with standard timing'}
-${(config.advanced.performance?.lazyLoadAnalytics ?? true) ? '- Analytics scripts are lazy loaded' : '- Analytics scripts load normally'}
-${(config.advanced.performance?.inlineCriticalCSS ?? true) ? '- Critical CSS is inlined to prevent render blocking' : '- CSS is loaded externally for better caching'}
-- Strictly necessary scripts always load immediately
--->
-
+${generateHTML()}
 <!-- End Cookie Consent Banner -->`
   }
 
@@ -874,7 +559,8 @@ ${(config.advanced.performance?.inlineCriticalCSS ?? true) ? '- Critical CSS is 
 
   const downloadCode = () => {
     const code = getCode()
-    const filename = `cookie-banner-${activeTab}.${activeTab === 'html' ? 'html' : activeTab === 'js' ? 'js' : 'css'}`
+    const ext = activeTab === 'complete' ? 'html' : activeTab === 'html' ? 'html' : activeTab === 'js' ? 'js' : 'css'
+    const filename = `cookie-banner-${activeTab}.${ext}`
     
     const blob = new Blob([code], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -891,87 +577,46 @@ ${(config.advanced.performance?.inlineCriticalCSS ?? true) ? '- Critical CSS is 
 
   return (
     <div className="space-y-4">
-      {/* Tab Navigation */}
       <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-        <button
-          onClick={() => setActiveTab('complete')}
-          className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'complete'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Complete Code
-        </button>
-        <button
-          onClick={() => setActiveTab('html')}
-          className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'html'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          HTML
-        </button>
-        <button
-          onClick={() => setActiveTab('js')}
-          className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'js'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          JavaScript
-        </button>
-        <button
-          onClick={() => setActiveTab('css')}
-          className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'css'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          CSS
-        </button>
+        {['complete', 'html', 'js', 'css'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as any)}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              activeTab === tab
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {tab === 'complete' ? 'Complete Code' : tab.toUpperCase()}
+          </button>
+        ))}
       </div>
 
-      {/* Code Display */}
       <Card>
         <CardContent className="p-0">
           <div className="flex items-center justify-between p-3 border-b bg-muted/30">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-xs text-muted-foreground">
-                Code generated {codeVersion > 0 ? `(v${codeVersion})` : '(initial)'}
+                {activeTab === 'complete' ? 'Paste this code before closing </body> tag' : `${activeTab.toUpperCase()} only`}
               </span>
             </div>
-            {codeVersion > 0 && (
-              <span className="text-xs text-green-600 font-medium">
-                ✓ Updated
-              </span>
-            )}
           </div>
-          <pre className="p-4 text-sm overflow-x-auto bg-muted/50 rounded-lg">
-            <code className="language-html">{getCode()}</code>
+          <pre className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-96">
+            <code>{getCode()}</code>
           </pre>
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
       <div className="flex space-x-2">
-        <Button 
-          onClick={regenerateCode} 
-          variant="default" 
-          size="sm" 
-          disabled={isGenerating}
-          className="flex-1"
-        >
+        <Button onClick={regenerateCode} variant="default" size="sm" disabled={isGenerating} className="flex-1">
           <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-          {isGenerating ? 'Generating...' : 'Generate Code'}
+          {isGenerating ? 'Generating...' : 'Regenerate'}
         </Button>
         <Button onClick={copyToClipboard} size="sm" className="flex-1">
           <Copy className="mr-2 h-4 w-4" />
-          Copy Code
+          Copy
         </Button>
         <Button onClick={downloadCode} variant="outline" size="sm" className="flex-1">
           <Download className="mr-2 h-4 w-4" />
@@ -979,24 +624,14 @@ ${(config.advanced.performance?.inlineCriticalCSS ?? true) ? '- Critical CSS is 
         </Button>
       </div>
 
-      {/* Instructions */}
-      <div className="text-xs text-muted-foreground space-y-1">
-        {activeTab === 'complete' && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-green-800 font-medium">🎉 Complete Code Ready!</p>
-            <p className="text-green-700">Click <strong>"Generate Code"</strong> to refresh the code after making changes.</p>
-            <p className="text-green-700 mt-2"><strong>📋 Copy Instructions:</strong></p>
-            <ul className="text-green-700 text-sm mt-1 ml-4 list-disc">
-              <li>Copy the <strong>CSS and JavaScript</strong> to your website's <code>&lt;head&gt;</code> section</li>
-              <li>Copy the <strong>HTML</strong> to your website's <code>&lt;body&gt;</code> section (before closing <code>&lt;/body&gt;</code> tag)</li>
-            </ul>
-            <p className="text-green-700 mt-2"><strong>⚠️ Important:</strong> If you see code displayed on your website, you pasted the HTML in the wrong place!</p>
-          </div>
-        )}
-        <p><strong>Complete Code:</strong> Everything in one block - CSS/JS to &lt;head&gt;, HTML to &lt;body&gt;</p>
-        <p><strong>HTML:</strong> Just the banner HTML structure (paste in &lt;body&gt;)</p>
-        <p><strong>JavaScript:</strong> Just the functionality code (paste in &lt;head&gt;)</p>
-        <p><strong>CSS:</strong> Just the styling code (paste in &lt;head&gt;)</p>
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm font-medium text-blue-900 mb-2">📋 Installation Instructions:</p>
+        <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
+          <li><strong>Copy the "Complete Code"</strong> above (click the Copy button)</li>
+          <li><strong>Paste it in your website</strong> just before the closing <code>&lt;/body&gt;</code> tag</li>
+          <li><strong>Save and refresh</strong> your website to see the banner</li>
+        </ol>
+        <p className="text-xs text-blue-700 mt-2">⚠️ If you see raw code on your page, you pasted it in the wrong place. Make sure it's inside your HTML file, not in a text editor or CMS text field.</p>
       </div>
     </div>
   )
