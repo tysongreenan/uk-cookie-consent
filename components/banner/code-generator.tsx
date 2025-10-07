@@ -110,14 +110,8 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       .replace(/<\/script>/gi, '')
       .trim()
     
-    // Escape special characters for safe embedding in JavaScript strings
-    return clean
-      .replace(/\\/g, '\\\\')  // Escape backslashes
-      .replace(/`/g, '\\`')    // Escape backticks
-      .replace(/\$/g, '\\$')   // Escape dollar signs
-      .replace(/\n/g, '\\n')   // Escape newlines
-      .replace(/\r/g, '\\r')   // Escape carriage returns
-      .replace(/\t/g, '\\t')   // Escape tabs
+    // Base64 encode to avoid any parsing issues
+    return btoa(unescape(encodeURIComponent(clean)))
   }
 
   // Helper function to generate script loading code
@@ -149,11 +143,12 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
         }
       }
       
-      // Handle inline scripts
+      // Handle inline scripts - decode Base64 and execute
       return `      // ${script.name}
       try {
+        var scriptCode_${varName} = atob('${escaped}');
         var scriptEl_${varName} = document.createElement('script');
-        scriptEl_${varName}.textContent = \`${escaped}\`;
+        scriptEl_${varName}.textContent = scriptCode_${varName};
         document.head.appendChild(scriptEl_${varName});
         console.log('Loaded script: ${script.name}');
       } catch(e) {
@@ -577,6 +572,34 @@ ${generateHTML()}
 
   return (
     <div className="space-y-4">
+      {/* Instructions at the top */}
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm font-medium text-blue-900 mb-2">📋 Installation Instructions:</p>
+        <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
+          <li><strong>Click the "Copy" button</strong> below to copy the complete code</li>
+          <li><strong>Paste it in your website</strong> just before the closing <code>&lt;/body&gt;</code> tag</li>
+          <li><strong>Save and refresh</strong> your website to see the banner</li>
+        </ol>
+        <p className="text-xs text-blue-700 mt-2">⚠️ If you see raw code on your page, you pasted it in the wrong place. Make sure it's inside your HTML file, not in a text editor or CMS text field.</p>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex space-x-2">
+        <Button onClick={copyToClipboard} size="sm" className="flex-1">
+          <Copy className="mr-2 h-4 w-4" />
+          Copy Code
+        </Button>
+        <Button onClick={regenerateCode} variant="outline" size="sm" disabled={isGenerating} className="flex-1">
+          <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
+          {isGenerating ? 'Generating...' : 'Regenerate'}
+        </Button>
+        <Button onClick={downloadCode} variant="outline" size="sm" className="flex-1">
+          <Download className="mr-2 h-4 w-4" />
+          Download
+        </Button>
+      </div>
+
+      {/* Tab Navigation */}
       <div className="flex space-x-1 bg-muted p-1 rounded-lg">
         {['complete', 'html', 'js', 'css'].map(tab => (
           <button
@@ -593,6 +616,7 @@ ${generateHTML()}
         ))}
       </div>
 
+      {/* Code Display */}
       <Card>
         <CardContent className="p-0">
           <div className="flex items-center justify-between p-3 border-b bg-muted/30">
@@ -608,31 +632,6 @@ ${generateHTML()}
           </pre>
         </CardContent>
       </Card>
-
-      <div className="flex space-x-2">
-        <Button onClick={regenerateCode} variant="default" size="sm" disabled={isGenerating} className="flex-1">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-          {isGenerating ? 'Generating...' : 'Regenerate'}
-        </Button>
-        <Button onClick={copyToClipboard} size="sm" className="flex-1">
-          <Copy className="mr-2 h-4 w-4" />
-          Copy
-        </Button>
-        <Button onClick={downloadCode} variant="outline" size="sm" className="flex-1">
-          <Download className="mr-2 h-4 w-4" />
-          Download
-        </Button>
-      </div>
-
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm font-medium text-blue-900 mb-2">📋 Installation Instructions:</p>
-        <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
-          <li><strong>Copy the "Complete Code"</strong> above (click the Copy button)</li>
-          <li><strong>Paste it in your website</strong> just before the closing <code>&lt;/body&gt;</code> tag</li>
-          <li><strong>Save and refresh</strong> your website to see the banner</li>
-        </ol>
-        <p className="text-xs text-blue-700 mt-2">⚠️ If you see raw code on your page, you pasted it in the wrong place. Make sure it's inside your HTML file, not in a text editor or CMS text field.</p>
-      </div>
     </div>
   )
 }
