@@ -16,16 +16,16 @@
 
 ## Step 2: Configure Environment Variables
 
-In Vercel dashboard, go to **Settings > Environment Variables** and add:
+In Vercel dashboard, go to **Settings > Environment Variables** and add each variable manually:
 
-### Required Variables:
-```
-NEXTAUTH_URL=https://your-app-name.vercel.app
-NEXTAUTH_SECRET=your-secret-key-here
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
-DATABASE_URL=your-database-connection-string
-```
+### Required Variables (add one by one):
+1. **NEXTAUTH_URL** = `https://your-app-name.vercel.app`
+2. **NEXTAUTH_SECRET** = `eyfPsm9Es79RLP+uvYj6WpgNQ6W38Bi+Kw5xbcc2x+M=`
+3. **SUPABASE_URL** = `your-supabase-url`
+4. **SUPABASE_ANON_KEY** = `your-supabase-anon-key`
+5. **DATABASE_URL** = `your-database-connection-string`
+
+**Important**: Add these as individual environment variables, not as secrets.
 
 ### How to get these values:
 

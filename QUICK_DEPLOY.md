@@ -20,14 +20,14 @@ openssl rand -base64 32
 - Settings > API > Copy URL and anon key
 - Settings > Database > Copy connection string
 
-### 3. Add to Vercel:
-```
-NEXTAUTH_URL=https://your-app-name.vercel.app
-NEXTAUTH_SECRET=[generated-secret]
-SUPABASE_URL=[from-supabase]
-SUPABASE_ANON_KEY=[from-supabase]
-DATABASE_URL=[from-supabase]
-```
+### 3. Add to Vercel (one by one):
+- **NEXTAUTH_URL** = `https://your-app-name.vercel.app`
+- **NEXTAUTH_SECRET** = `eyfPsm9Es79RLP+uvYj6WpgNQ6W38Bi+Kw5xbcc2x+M=`
+- **SUPABASE_URL** = `[from-supabase]`
+- **SUPABASE_ANON_KEY** = `[from-supabase]`
+- **DATABASE_URL** = `[from-supabase]`
+
+**Note**: Add these as Environment Variables, not as Secrets.
 
 ## Deploy (2 minutes)
 - [ ] Click "Deploy" in Vercel
