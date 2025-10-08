@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Settings, BarChart3, Code, Palette, Edit, Trash2, Eye } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
@@ -90,144 +91,146 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Cookie Consent Builder</h1>
-            <p className="text-muted-foreground">Welcome back, {session.user?.name || session.user?.email}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => signOut()}>
-              Sign Out
-            </Button>
+      {/* Top Navigation */}
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo and Brand */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">CC</span>
+                </div>
+                <h1 className="text-xl font-bold">Cookie Consent Builder</h1>
+              </div>
+            </div>
+
+            {/* Profile Dropdown */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium">
+                    {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
+                  </span>
+                </div>
+                <div className="text-sm">
+                  <div className="font-medium">{session.user?.name || 'User'}</div>
+                  <div className="text-muted-foreground text-xs">{session.user?.email}</div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Your Projects</h2>
-          <p className="text-muted-foreground">Create and manage your cookie consent banners</p>
-        </div>
+      <div className="flex">
+        {/* Sidebar Navigation */}
+        <aside className="w-64 bg-white border-r min-h-screen">
+          <nav className="p-4 space-y-2">
+            <Link href="/dashboard" className="flex items-center space-x-3 p-2 rounded-lg bg-primary text-primary-foreground">
+              <div className="w-5 h-5"></div>
+              <span className="font-medium">Dashboard</span>
+            </Link>
+            <Link href="/dashboard/settings" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
+              <div className="w-5 h-5"></div>
+              <span>Settings</span>
+            </Link>
+          </nav>
+        </aside>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Link href="/dashboard/builder">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">New Project</CardTitle>
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {/* Project Creation Form */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-4">
+              <Input
+                placeholder="Enter project name"
+                className="flex-1 max-w-md"
+                id="project-name"
+              />
+              <Link href="/dashboard/builder">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Start New Project
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Projects Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold">Your Projects</h2>
+              <p className="text-muted-foreground">Manage your cookie consent banners</p>
+            </div>
+            
+            {/* Search and Sort */}
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Input
+                  placeholder="Search projects..."
+                  className="w-64 pl-8"
+                />
+                <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                  🔍
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Create a new cookie consent banner project
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/dashboard/builder">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-2">
-                  <Palette className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Banner Builder</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Design and customize your consent banner
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
-
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Analytics</CardTitle>
               </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                View banner performance and consent rates
-              </CardDescription>
-            </CardContent>
-          </Card>
+              <Button variant="outline" size="sm">
+                Sort
+              </Button>
+            </div>
+          </div>
 
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-2">
-                <Settings className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Settings</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Manage your account and preferences
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Projects List */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Your Banners</h3>
-          
+          {/* Projects Grid */}
           {isLoading ? (
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-2 text-muted-foreground">Loading banners...</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-2 text-muted-foreground">Loading projects...</p>
+            </div>
           ) : banners.length === 0 ? (
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <div className="text-muted-foreground mb-4">
-                    <Plus className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No banners yet</p>
-                  </div>
-                  <Button >
-                    <Link href="/dashboard/builder">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Your First Banner
-                    </Link>
-                  </Button>
+            <div className="text-center py-12">
+              <div className="text-muted-foreground mb-6">
+                <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                  <Plus className="h-8 w-8 opacity-50" />
                 </div>
-              </CardContent>
-            </Card>
+                <h3 className="text-lg font-medium mb-2">No projects yet</h3>
+                <p className="text-sm">Create your first cookie consent banner to get started</p>
+              </div>
+              <Link href="/dashboard/builder">
+                <Button size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Banner
+                </Button>
+              </Link>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {banners.map((banner) => (
-                <Card key={banner.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{banner.name}</CardTitle>
-                        <CardDescription>
-                          Created {new Date(banner.createdAt).toLocaleDateString()}
-                        </CardDescription>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        {banner.isActive && (
-                          <div className="w-2 h-2 bg-green-500 rounded-full" title="Active"></div>
-                        )}
+                <Card key={banner.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
+                  <div className="relative">
+                    {/* Project Thumbnail */}
+                    <div className="aspect-video bg-gray-100 rounded-t-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                          <span className="text-2xl">🍪</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Cookie Banner</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="text-sm text-muted-foreground">
+                    
+                    {/* Project Info */}
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-medium text-sm truncate">{banner.name}</h3>
+                        {banner.isActive && (
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 ml-2" title="Active"></div>
+                        )}
+                      </div>
+                      
+                      <div className="text-xs text-muted-foreground space-y-1">
                         <p>Position: {banner.config.position}</p>
                         <p>Theme: {banner.config.theme}</p>
                         <p>Scripts: {
@@ -237,8 +240,10 @@ export default function DashboardPage() {
                           (banner.config.scripts?.targetingAdvertising?.length || 0)
                         } configured</p>
                       </div>
-                      <div className="flex space-x-2 pt-2">
-                        <Button  size="sm" className="flex-1">
+                      
+                      {/* Actions */}
+                      <div className="flex space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="sm" className="flex-1" asChild>
                           <Link href={`/dashboard/builder?edit=${banner.id}`}>
                             <Edit className="mr-1 h-3 w-3" />
                             Edit
@@ -254,13 +259,13 @@ export default function DashboardPage() {
                         </Button>
                       </div>
                     </div>
-                  </CardContent>
+                  </div>
                 </Card>
               ))}
             </div>
           )}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   )
 }

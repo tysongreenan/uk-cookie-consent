@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Mail, Lock, User } from 'lucide-react'
 import Link from 'next/link'
 
@@ -99,8 +100,7 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <Input
-                type="password"
+              <PasswordInput
                 placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -109,8 +109,7 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <Input
-                type="password"
+              <PasswordInput
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

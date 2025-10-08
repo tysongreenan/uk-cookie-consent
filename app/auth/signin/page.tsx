@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Mail, Lock } from 'lucide-react'
 import Link from 'next/link'
 
@@ -68,8 +69,7 @@ export default function SignInPage() {
               />
             </div>
             <div>
-              <Input
-                type="password"
+              <PasswordInput
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

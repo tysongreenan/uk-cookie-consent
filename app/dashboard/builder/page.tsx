@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -95,6 +95,178 @@ if (!sessionStorage.getItem('sessionId')) {
       inlineCriticalCSS: true
     }
   }
+}
+
+// Common script database for autocomplete
+const COMMON_SCRIPTS = {
+  'strictly-necessary': [
+    'Session Management',
+    'Security Headers',
+    'CSRF Protection',
+    'Authentication',
+    'Load Balancing',
+    'Cookie Consent',
+    'GDPR Compliance',
+    'SSL Certificate',
+    'Firewall Protection',
+    'Rate Limiting'
+  ],
+  'functionality': [
+    'User Preferences',
+    'Language Selection',
+    'Theme Settings',
+    'Form Validation',
+    'Local Storage',
+    'Shopping Cart',
+    'User Authentication',
+    'Search Functionality',
+    'Notifications',
+    'Accessibility Tools'
+  ],
+  'tracking-performance': [
+    'Google Analytics',
+    'Google Analytics 4',
+    'Microsoft Clarity',
+    'Hotjar',
+    'Mixpanel',
+    'Amplitude',
+    'Segment',
+    'PostHog',
+    'Plausible',
+    'Fathom Analytics',
+    'Adobe Analytics',
+    'Piwik Pro',
+    'Matomo',
+    'Snowplow',
+    'Heap Analytics',
+    'Kissmetrics',
+    'Crazy Egg',
+    'FullStory',
+    'LogRocket',
+    'Sentry',
+    'New Relic',
+    'DataDog',
+    'Cloudflare Analytics',
+    'Vercel Analytics',
+    'Netlify Analytics'
+  ],
+  'targeting-advertising': [
+    'Facebook Pixel',
+    'Google Ads',
+    'Google Tag Manager',
+    'LinkedIn Insight Tag',
+    'Twitter Pixel',
+    'Pinterest Tag',
+    'TikTok Pixel',
+    'Snapchat Pixel',
+    'Pinterest Conversion',
+    'Bing Ads',
+    'YouTube Analytics',
+    'Instagram Pixel',
+    'Reddit Pixel',
+    'Quora Pixel',
+    'Outbrain Pixel',
+    'Taboola Pixel',
+    'Criteo Pixel',
+    'The Trade Desk',
+    'Amazon DSP',
+    'Google Marketing Platform',
+    'Adobe Experience Platform',
+    'Salesforce Marketing Cloud',
+    'HubSpot Tracking',
+    'Mailchimp Tracking',
+    'Klaviyo Tracking',
+    'Intercom',
+    'Zendesk Chat',
+    'Drift',
+    'Crisp',
+    'Tidio',
+    'LiveChat',
+    'Olark',
+    'Freshchat'
+  ]
+}
+
+// Smart input component with autocomplete
+const SmartScriptInput = ({ 
+  value, 
+  onChange, 
+  category, 
+  placeholder = "Script name" 
+}: { 
+  value: string
+  onChange: (value: string) => void
+  category: keyof typeof COMMON_SCRIPTS
+  placeholder?: string
+}) => {
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [filteredScripts, setFilteredScripts] = useState<string[]>([])
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+
+    // Only show suggestions after user stops typing for 300ms
+    if (value.trim() && value.length >= 2) {
+      typingTimeoutRef.current = setTimeout(() => {
+        const suggestions = COMMON_SCRIPTS[category].filter(script =>
+          script.toLowerCase().includes(value.toLowerCase()) && 
+          script.toLowerCase() !== value.toLowerCase()
+        )
+        console.log(`Autocomplete for ${category}:`, { value, suggestions })
+        setFilteredScripts(suggestions)
+        setShowSuggestions(suggestions.length > 0)
+      }, 300)
+    } else {
+      setShowSuggestions(false)
+      setFilteredScripts([])
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [value, category])
+
+  return (
+    <div className="relative">
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => {
+          // Only show suggestions on focus if we already have filtered results
+          if (value.trim() && value.length >= 2 && filteredScripts.length > 0) {
+            setShowSuggestions(true)
+          }
+        }}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+        placeholder={placeholder}
+        className="font-medium border-0 p-0 h-auto"
+      />
+      {showSuggestions && filteredScripts.length > 0 && value.trim() && (
+        <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1 max-h-32 overflow-y-auto">
+          {filteredScripts.map((script, index) => (
+            <button
+              key={index}
+              className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              onMouseDown={(e) => {
+                e.preventDefault()
+                onChange(script)
+                setShowSuggestions(false)
+              }}
+            >
+              {script}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function BannerBuilderPage() {
@@ -256,29 +428,29 @@ export default function BannerBuilderPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">
-                {isEditing ? 'Edit Banner' : 'Banner Builder'}
-              </h1>
-              <p className="text-muted-foreground">
-                {isEditing ? 'Update your cookie consent banner' : 'Create and customize your cookie consent banner'}
-              </p>
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+                <Link href="/dashboard">
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+              <div className="h-6 w-px bg-border"></div>
+                <Input
+                  value={config.name}
+                  onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Banner name"
+                  className="text-lg font-semibold border-0 p-0 h-auto bg-transparent focus:bg-white focus:border focus:px-2 focus:py-1 focus:rounded"
+                />
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" onClick={handleSave} disabled={isLoading}>
-              <Save className="mr-2 h-4 w-4" />
-              {isEditing ? 'Update Banner' : 'Save Banner'}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button onClick={handleSave} disabled={isLoading} size="sm">
+                <Save className="h-4 w-4" />
+                {isLoading ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -289,83 +461,188 @@ export default function BannerBuilderPage() {
           {/* Configuration Panel */}
           <div className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="design">Design</TabsTrigger>
-                <TabsTrigger value="content">Content</TabsTrigger>
-                <TabsTrigger value="scripts">Scripts</TabsTrigger>
-                <TabsTrigger value="behavior">Behavior</TabsTrigger>
-                <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger value="advanced">Advanced</TabsTrigger>
-              </TabsList>
+              <div className="flex items-center justify-between mb-6">
+                <TabsList className="grid w-auto grid-cols-4" role="tablist" aria-label="Banner configuration steps">
+                  <TabsTrigger 
+                    value="design" 
+                    role="tab"
+                    aria-selected={activeTab === 'design'}
+                    aria-controls="design-panel"
+                  >
+                    Design
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="content" 
+                    role="tab"
+                    aria-selected={activeTab === 'content'}
+                    aria-controls="content-panel"
+                  >
+                    Content
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="scripts" 
+                    role="tab"
+                    aria-selected={activeTab === 'scripts'}
+                    aria-controls="scripts-panel"
+                  >
+                    Scripts
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="behavior" 
+                    role="tab"
+                    aria-selected={activeTab === 'behavior'}
+                    aria-controls="behavior-panel"
+                  >
+                    Behavior
+                  </TabsTrigger>
+                </TabsList>
+                
+                <div className="text-sm text-muted-foreground">
+                  {activeTab === 'design' ? 'Step 1 of 4' : 
+                   activeTab === 'content' ? 'Step 2 of 4' : 
+                   activeTab === 'scripts' ? 'Step 3 of 4' : 'Step 4 of 4'}
+                </div>
+              </div>
 
               {/* Design Tab */}
-              <TabsContent value="design" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Basic Settings</CardTitle>
-                    <CardDescription>Configure the basic appearance of your banner</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="banner-name">Banner Name</Label>
-                      <Input
-                        id="banner-name"
-                        value={config.name}
-                        onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="My Cookie Banner"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="position">Position & Layout</Label>
-                      <Select value={config.position} onValueChange={(value: any) => updateConfig('position', value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="top">Top Bar (Full Width)</SelectItem>
-                          <SelectItem value="bottom">Bottom Bar (Full Width)</SelectItem>
-                          <SelectItem value="floating-bottom-right">Floating - Bottom Right</SelectItem>
-                          <SelectItem value="floating-bottom-left">Floating - Bottom Left</SelectItem>
-                          <SelectItem value="floating-top-right">Floating - Top Right</SelectItem>
-                          <SelectItem value="floating-top-left">Floating - Top Left</SelectItem>
-                          <SelectItem value="modal-center">Modal - Center</SelectItem>
-                          <SelectItem value="modal-bottom">Modal - Bottom</SelectItem>
-                          <SelectItem value="modal-top">Modal - Top</SelectItem>
-                          <SelectItem value="slide-in-right">Slide In - Right</SelectItem>
-                          <SelectItem value="slide-in-left">Slide In - Left</SelectItem>
-                          <SelectItem value="slide-in-top">Slide In - Top</SelectItem>
-                          <SelectItem value="slide-in-bottom">Slide In - Bottom</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+              <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
 
-                    <div>
-                      <Label htmlFor="theme">Theme</Label>
-                      <Select value={config.theme} onValueChange={handleThemeChange}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="light">Light</SelectItem>
-                          <SelectItem value="dark">Dark</SelectItem>
-                          <SelectItem value="custom">Custom</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Brand Style</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
+                        <Select value={config.theme} onValueChange={handleThemeChange}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="light">Light</SelectItem>
+                            <SelectItem value="dark">Dark</SelectItem>
+                            <SelectItem value="custom">Custom</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="bg-color" className="text-sm font-medium">Background</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="bg-color"
+                                type="color"
+                                value={config.colors.background}
+                                onChange={(e) => updateConfig('colors', { background: e.target.value })}
+                                className="w-12 h-8 p-1 border rounded"
+                              />
+                              <Input
+                                value={config.colors.background}
+                                onChange={(e) => updateConfig('colors', { background: e.target.value })}
+                                placeholder="#ffffff"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="text-color" className="text-sm font-medium">Text</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="text-color"
+                                type="color"
+                                value={config.colors.text}
+                                onChange={(e) => updateConfig('colors', { text: e.target.value })}
+                                className="w-12 h-8 p-1 border rounded"
+                              />
+                              <Input
+                                value={config.colors.text}
+                                onChange={(e) => updateConfig('colors', { text: e.target.value })}
+                                placeholder="#000000"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="button-color" className="text-sm font-medium">Button</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="button-color"
+                                type="color"
+                                value={config.colors.button}
+                                onChange={(e) => updateConfig('colors', { button: e.target.value })}
+                                className="w-12 h-8 p-1 border rounded"
+                              />
+                              <Input
+                                value={config.colors.button}
+                                onChange={(e) => updateConfig('colors', { button: e.target.value })}
+                                placeholder="#3b82f6"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="button-text-color" className="text-sm font-medium">Button Text</Label>
+                            <div className="flex items-center space-x-2">
+                              <Input
+                                id="button-text-color"
+                                type="color"
+                                value={config.colors.buttonText}
+                                onChange={(e) => updateConfig('colors', { buttonText: e.target.value })}
+                                className="w-12 h-8 p-1 border rounded"
+                              />
+                              <Input
+                                value={config.colors.buttonText}
+                                onChange={(e) => updateConfig('colors', { buttonText: e.target.value })}
+                                placeholder="#ffffff"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
                 {/* Layout Settings */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Layout Settings</CardTitle>
-                    <CardDescription>Customize the banner's layout, spacing, and visual effects</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="width">Width</Label>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Layout & Spacing</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Position Settings */}
+                      <div className="space-y-3">
+                        <Label htmlFor="position" className="text-sm font-medium">Position</Label>
+                        <Select value={config.position} onValueChange={(value: any) => updateConfig('position', value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="top">Top Bar (Full Width)</SelectItem>
+                            <SelectItem value="bottom">Bottom Bar (Full Width)</SelectItem>
+                            <SelectItem value="floating-bottom-right">Floating - Bottom Right</SelectItem>
+                            <SelectItem value="floating-bottom-left">Floating - Bottom Left</SelectItem>
+                            <SelectItem value="floating-top-right">Floating - Top Right</SelectItem>
+                            <SelectItem value="floating-top-left">Floating - Top Left</SelectItem>
+                            <SelectItem value="modal-center">Modal - Center</SelectItem>
+                            <SelectItem value="modal-bottom">Modal - Bottom</SelectItem>
+                            <SelectItem value="modal-top">Modal - Top</SelectItem>
+                            <SelectItem value="slide-in-right">Slide In - Right</SelectItem>
+                            <SelectItem value="slide-in-left">Slide In - Left</SelectItem>
+                            <SelectItem value="slide-in-top">Slide In - Top</SelectItem>
+                            <SelectItem value="slide-in-bottom">Slide In - Bottom</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Width Settings */}
+                      <div className="space-y-3">
+                        <Label htmlFor="width" className="text-sm font-medium">Width</Label>
+                      <div className="grid grid-cols-2 gap-4">
                         <Select value={config.layout.width} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, width: value })}>
                           <SelectTrigger>
                             <SelectValue />
@@ -376,76 +653,83 @@ export default function BannerBuilderPage() {
                             <SelectItem value="custom">Custom Width</SelectItem>
                           </SelectContent>
                         </Select>
+                        
+                        {config.layout.width === 'custom' && (
+                          <div>
+                            <Input
+                              id="custom-width"
+                              type="number"
+                              value={config.layout.customWidth || 400}
+                              onChange={(e) => updateConfig('layout', { ...config.layout, customWidth: parseInt(e.target.value) || 400 })}
+                              placeholder="400"
+                            />
+                          </div>
+                        )}
                       </div>
-                      
-                      {config.layout.width === 'custom' && (
+                    </div>
+
+                    {/* Spacing Settings */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Spacing & Effects</Label>
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="custom-width">Custom Width (px)</Label>
+                          <Label htmlFor="border-radius" className="text-xs">Border Radius (px)</Label>
                           <Input
-                            id="custom-width"
+                            id="border-radius"
                             type="number"
-                            value={config.layout.customWidth || 400}
-                            onChange={(e) => updateConfig('layout', { ...config.layout, customWidth: parseInt(e.target.value) || 400 })}
-                            placeholder="400"
+                            value={config.layout.borderRadius}
+                            onChange={(e) => updateConfig('layout', { ...config.layout, borderRadius: parseInt(e.target.value) || 0 })}
+                            placeholder="8"
+                            className="mt-1"
                           />
                         </div>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="border-radius">Border Radius (px)</Label>
-                        <Input
-                          id="border-radius"
-                          type="number"
-                          value={config.layout.borderRadius}
-                          onChange={(e) => updateConfig('layout', { ...config.layout, borderRadius: parseInt(e.target.value) || 0 })}
-                          placeholder="8"
-                        />
+                        
+                        <div>
+                          <Label htmlFor="padding" className="text-xs">Padding (px)</Label>
+                          <Input
+                            id="padding"
+                            type="number"
+                            value={config.layout.padding}
+                            onChange={(e) => updateConfig('layout', { ...config.layout, padding: parseInt(e.target.value) || 20 })}
+                            placeholder="20"
+                            className="mt-1"
+                          />
+                        </div>
                       </div>
                       
-                      <div>
-                        <Label htmlFor="padding">Padding (px)</Label>
-                        <Input
-                          id="padding"
-                          type="number"
-                          value={config.layout.padding}
-                          onChange={(e) => updateConfig('layout', { ...config.layout, padding: parseInt(e.target.value) || 20 })}
-                          placeholder="20"
-                        />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="margin" className="text-xs">Margin (px)</Label>
+                          <Input
+                            id="margin"
+                            type="number"
+                            value={config.layout.margin}
+                            onChange={(e) => updateConfig('layout', { ...config.layout, margin: parseInt(e.target.value) || 20 })}
+                            placeholder="20"
+                            className="mt-1"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="shadow" className="text-xs">Shadow</Label>
+                          <Select value={config.layout.shadow} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, shadow: value })}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">None</SelectItem>
+                              <SelectItem value="small">Small</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="large">Large</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="margin">Margin (px)</Label>
-                        <Input
-                          id="margin"
-                          type="number"
-                          value={config.layout.margin}
-                          onChange={(e) => updateConfig('layout', { ...config.layout, margin: parseInt(e.target.value) || 20 })}
-                          placeholder="20"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="shadow">Shadow</Label>
-                        <Select value={config.layout.shadow} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, shadow: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="small">Small</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="large">Large</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="animation">Animation</Label>
+                    {/* Animation */}
+                    <div className="space-y-3">
+                      <Label htmlFor="animation" className="text-sm font-medium">Animation</Label>
                       <Select value={config.layout.animation} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, animation: value })}>
                         <SelectTrigger>
                           <SelectValue />
@@ -462,109 +746,71 @@ export default function BannerBuilderPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Colors</CardTitle>
-                    <CardDescription>Customize the color scheme</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="bg-color">Background</Label>
-                        <Input
-                          id="bg-color"
-                          type="color"
-                          value={config.colors.background}
-                          onChange={(e) => updateConfig('colors', { background: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="text-color">Text</Label>
-                        <Input
-                          id="text-color"
-                          type="color"
-                          value={config.colors.text}
-                          onChange={(e) => updateConfig('colors', { text: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="button-color">Button</Label>
-                        <Input
-                          id="button-color"
-                          type="color"
-                          value={config.colors.button}
-                          onChange={(e) => updateConfig('colors', { button: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="button-text-color">Button Text</Label>
-                        <Input
-                          id="button-text-color"
-                          type="color"
-                          value={config.colors.buttonText}
-                          onChange={(e) => updateConfig('colors', { buttonText: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
               {/* Content Tab */}
-              <TabsContent value="content" className="space-y-6">
+              <TabsContent value="content" className="space-y-6" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Banner Text</CardTitle>
-                    <CardDescription>Customize the text content of your banner</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="title">Title</Label>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="title" className="text-sm font-medium">Title</Label>
                       <Input
                         id="title"
                         value={config.text.title}
                         onChange={(e) => updateConfig('text', { title: e.target.value })}
                         placeholder="We use cookies"
+                        className="mt-1"
                       />
                     </div>
                     
-                    <div>
-                      <Label htmlFor="message">Message</Label>
-                      <Input
+                    <div className="space-y-3">
+                      <Label htmlFor="message" className="text-sm font-medium">Message</Label>
+                      <textarea
                         id="message"
                         value={config.text.message}
                         onChange={(e) => updateConfig('text', { message: e.target.value })}
-                        placeholder="This website uses cookies..."
+                        placeholder="This website uses cookies to enhance your browsing experience and provide personalized content."
+                        className="w-full h-20 p-3 border rounded-md resize-none"
                       />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="accept-text">Accept Button</Label>
-                        <Input
-                          id="accept-text"
-                          value={config.text.acceptButton}
-                          onChange={(e) => updateConfig('text', { acceptButton: e.target.value })}
-                          placeholder="Accept All"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="reject-text">Reject Button</Label>
-                        <Input
-                          id="reject-text"
-                          value={config.text.rejectButton}
-                          onChange={(e) => updateConfig('text', { rejectButton: e.target.value })}
-                          placeholder="Reject"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="preferences-text">Preferences Button</Label>
-                        <Input
-                          id="preferences-text"
-                          value={config.text.preferencesButton}
-                          onChange={(e) => updateConfig('text', { preferencesButton: e.target.value })}
-                          placeholder="Preferences"
-                        />
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Button Text</Label>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="accept-text" className="text-xs">Accept Button</Label>
+                          <Input
+                            id="accept-text"
+                            value={config.text.acceptButton}
+                            onChange={(e) => updateConfig('text', { acceptButton: e.target.value })}
+                            placeholder="Accept All"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="reject-text" className="text-xs">Reject Button</Label>
+                          <Input
+                            id="reject-text"
+                            value={config.text.rejectButton}
+                            onChange={(e) => updateConfig('text', { rejectButton: e.target.value })}
+                            placeholder="Reject"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="preferences-text" className="text-xs">Preferences Button</Label>
+                          <Input
+                            id="preferences-text"
+                            value={config.text.preferencesButton}
+                            onChange={(e) => updateConfig('text', { preferencesButton: e.target.value })}
+                            placeholder="Preferences"
+                            className="mt-1"
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -573,7 +819,6 @@ export default function BannerBuilderPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Branding</CardTitle>
-                    <CardDescription>Add your logo and privacy policy link</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -639,13 +884,10 @@ export default function BannerBuilderPage() {
               </TabsContent>
 
               {/* Scripts Tab */}
-              <TabsContent value="scripts" className="space-y-6">
+              <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
                 <Card>
                   <CardHeader>
                     <CardTitle>Tracking Scripts</CardTitle>
-                    <CardDescription>
-                      Add your existing tracking scripts. They will only load after users accept the appropriate cookie consent.
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Strictly Necessary Scripts */}
@@ -653,101 +895,110 @@ export default function BannerBuilderPage() {
                       <h4 className="font-medium mb-3 flex items-center">
                         <Shield className="mr-2 h-4 w-4 text-green-600" />
                         Strictly Necessary Scripts
-                        <Badge variant="secondary" className="ml-2">Always Loaded</Badge>
                         {config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
                           <Badge variant="default" className="ml-2">
-                            {config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length} inserted
+                            {config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length}
                           </Badge>
                         )}
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Essential scripts for website functionality (session management, security, etc.)
-                      </p>
                       <div className="space-y-3">
                         {config.scripts.strictlyNecessary.map((script, index) => (
-                          <div key={script.id} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <Input
-                                value={script.name}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.strictlyNecessary]
-                                  newScripts[index].name = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                  }))
-                                }}
-                                placeholder="Script name (e.g., Session Management)"
-                                className="font-medium"
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newScripts = config.scripts.strictlyNecessary.filter((_, i) => i !== index)
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                  }))
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <textarea
-                              value={script.scriptCode}
-                              onChange={(e) => {
-                                const newScripts = [...config.scripts.strictlyNecessary]
-                                newScripts[index].scriptCode = e.target.value
-                                setConfig(prev => ({
-                                  ...prev,
-                                  scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                }))
-                              }}
-                              placeholder="Paste your script code here..."
-                              className="w-full h-24 p-2 text-sm font-mono border rounded"
-                            />
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="text-xs text-muted-foreground">
-                                {script.scriptCode.trim() && script.enabled 
-                                  ? '✅ Script inserted and will be included in generated code' 
-                                  : script.scriptCode.trim() 
-                                    ? '📋 Script code ready - click "Insert Script" to add to generated code' 
-                                    : '⚠️ Paste your script code above to get started'
-                                }
+                          <div key={script.id} className="border rounded-lg">
+                            <div className="flex items-center justify-between p-3">
+                              <div className="flex items-center space-x-3">
+                                <SmartScriptInput
+                                  value={script.name}
+                                  onChange={(value) => {
+                                    const newScripts = [...config.scripts.strictlyNecessary]
+                                    newScripts[index].name = value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                    }))
+                                  }}
+                                  category="strictly-necessary"
+                                  placeholder="Script name"
+                                />
+                                {script.scriptCode.trim() && (
+                                  <Badge variant={script.enabled ? "default" : "secondary"}>
+                                    {script.enabled ? 'Active' : 'Inactive'}
+                                  </Badge>
+                                )}
                               </div>
                               <div className="flex items-center space-x-2">
                                 {script.scriptCode.trim() ? (
-                                  <Button
-                                    size="sm"
-                                    variant={script.enabled ? "default" : "outline"}
-                                    onClick={() => {
-                                      const newScripts = [...config.scripts.strictlyNecessary]
-                                      newScripts[index].enabled = !newScripts[index].enabled
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                      }))
-                                      toast.success(
-                                        newScripts[index].enabled 
-                                          ? `"${script.name || 'Script'}" inserted into generated code!`
-                                          : `"${script.name || 'Script'}" removed from generated code!`
-                                      )
-                                    }}
-                                  >
-                                    {script.enabled ? '✓ Inserted' : 'Insert Script'}
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled
-                                  >
-                                    Insert Script
-                                  </Button>
-                                )}
+                                  script.enabled ? (
+                                    <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                      <span>Live</span>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const newScripts = [...config.scripts.strictlyNecessary]
+                                        newScripts[index].enabled = true
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                        }))
+                                        toast.success(`"${script.name || 'Script'}" added to generated code!`)
+                                      }}
+                                    >
+                                      Add Script
+                                    </Button>
+                                  )
+                                ) : null}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newScripts = config.scripts.strictlyNecessary.filter((_, i) => i !== index)
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                    }))
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
+                            {script.scriptCode.trim() && (
+                              <div className="px-3 pb-3">
+                                <textarea
+                                  value={script.scriptCode}
+                                  onChange={(e) => {
+                                    const newScripts = [...config.scripts.strictlyNecessary]
+                                    newScripts[index].scriptCode = e.target.value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                    }))
+                                  }}
+                                  placeholder="Paste your script code here..."
+                                  className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                />
+                              </div>
+                            )}
+                            {!script.scriptCode.trim() && (
+                              <div className="px-3 pb-3">
+                                <textarea
+                                  value={script.scriptCode}
+                                  onChange={(e) => {
+                                    const newScripts = [...config.scripts.strictlyNecessary]
+                                    newScripts[index].scriptCode = e.target.value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                    }))
+                                  }}
+                                  placeholder="Paste your script code here..."
+                                  className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                />
+                              </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -781,100 +1032,90 @@ export default function BannerBuilderPage() {
                       <h4 className="font-medium mb-3 flex items-center">
                         <Settings className="mr-2 h-4 w-4 text-blue-600" />
                         Functionality Scripts
-                        <Badge variant="secondary" className="ml-2">User Choice</Badge>
                         {config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
                           <Badge variant="default" className="ml-2">
-                            {config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length} inserted
+                            {config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length}
                           </Badge>
                         )}
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Scripts that remember user choices and preferences
-                      </p>
                       <div className="space-y-3">
                         {config.scripts.functionality.map((script, index) => (
-                          <div key={script.id} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <Input
-                                value={script.name}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.functionality]
-                                  newScripts[index].name = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, functionality: newScripts }
-                                  }))
-                                }}
-                                placeholder="Script name (e.g., User Preferences)"
-                                className="font-medium"
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newScripts = config.scripts.functionality.filter((_, i) => i !== index)
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, functionality: newScripts }
-                                  }))
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <textarea
-                              value={script.scriptCode}
-                              onChange={(e) => {
-                                const newScripts = [...config.scripts.functionality]
-                                newScripts[index].scriptCode = e.target.value
-                                setConfig(prev => ({
-                                  ...prev,
-                                  scripts: { ...prev.scripts, functionality: newScripts }
-                                }))
-                              }}
-                              placeholder="Paste your script code here..."
-                              className="w-full h-24 p-2 text-sm font-mono border rounded"
-                            />
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="text-xs text-muted-foreground">
-                                {script.scriptCode.trim() && script.enabled 
-                                  ? '✅ Script inserted and will be included in generated code' 
-                                  : script.scriptCode.trim() 
-                                    ? '📋 Script code ready - click "Insert Script" to add to generated code' 
-                                    : '⚠️ Paste your script code above to get started'
-                                }
+                          <div key={script.id} className="border rounded-lg">
+                            <div className="flex items-center justify-between p-3">
+                              <div className="flex items-center space-x-3">
+                                <SmartScriptInput
+                                  value={script.name}
+                                  onChange={(value) => {
+                                    const newScripts = [...config.scripts.functionality]
+                                    newScripts[index].name = value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, functionality: newScripts }
+                                    }))
+                                  }}
+                                  category="functionality"
+                                  placeholder="Script name"
+                                />
+                                {script.scriptCode.trim() && (
+                                  <Badge variant={script.enabled ? "default" : "secondary"}>
+                                    {script.enabled ? 'Active' : 'Inactive'}
+                                  </Badge>
+                                )}
                               </div>
                               <div className="flex items-center space-x-2">
                                 {script.scriptCode.trim() ? (
-                                  <Button
-                                    size="sm"
-                                    variant={script.enabled ? "default" : "outline"}
-                                    onClick={() => {
-                                      const newScripts = [...config.scripts.functionality]
-                                      newScripts[index].enabled = !newScripts[index].enabled
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, functionality: newScripts }
-                                      }))
-                                      toast.success(
-                                        newScripts[index].enabled 
-                                          ? `"${script.name || 'Script'}" inserted into generated code!`
-                                          : `"${script.name || 'Script'}" removed from generated code!`
-                                      )
-                                    }}
-                                  >
-                                    {script.enabled ? '✓ Inserted' : 'Insert Script'}
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled
-                                  >
-                                    Insert Script
-                                  </Button>
-                                )}
+                                  script.enabled ? (
+                                    <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                      <span>Live</span>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const newScripts = [...config.scripts.functionality]
+                                        newScripts[index].enabled = true
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, functionality: newScripts }
+                                        }))
+                                        toast.success(`"${script.name || 'Script'}" added to generated code!`)
+                                      }}
+                                    >
+                                      Add Script
+                                    </Button>
+                                  )
+                                ) : null}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newScripts = config.scripts.functionality.filter((_, i) => i !== index)
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, functionality: newScripts }
+                                    }))
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
+                            </div>
+                            <div className="px-3 pb-3">
+                              <textarea
+                                value={script.scriptCode}
+                                onChange={(e) => {
+                                  const newScripts = [...config.scripts.functionality]
+                                  newScripts[index].scriptCode = e.target.value
+                                  setConfig(prev => ({
+                                    ...prev,
+                                    scripts: { ...prev.scripts, functionality: newScripts }
+                                  }))
+                                }}
+                                placeholder="Paste your script code here..."
+                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                              />
                             </div>
                           </div>
                         ))}
@@ -909,100 +1150,90 @@ export default function BannerBuilderPage() {
                       <h4 className="font-medium mb-3 flex items-center">
                         <BarChart3 className="mr-2 h-4 w-4 text-yellow-600" />
                         Tracking & Performance Scripts
-                        <Badge variant="secondary" className="ml-2">User Choice</Badge>
                         {config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
                           <Badge variant="default" className="ml-2">
-                            {config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length} inserted
+                            {config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length}
                           </Badge>
                         )}
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Analytics and performance monitoring (Google Analytics, Microsoft Clarity, etc.)
-                      </p>
                       <div className="space-y-3">
                         {config.scripts.trackingPerformance.map((script, index) => (
-                          <div key={script.id} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <Input
-                                value={script.name}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.trackingPerformance]
-                                  newScripts[index].name = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, trackingPerformance: newScripts }
-                                  }))
-                                }}
-                                placeholder="Script name (e.g., Google Analytics)"
-                                className="font-medium"
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newScripts = config.scripts.trackingPerformance.filter((_, i) => i !== index)
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, trackingPerformance: newScripts }
-                                  }))
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <textarea
-                              value={script.scriptCode}
-                              onChange={(e) => {
-                                const newScripts = [...config.scripts.trackingPerformance]
-                                newScripts[index].scriptCode = e.target.value
-                                setConfig(prev => ({
-                                  ...prev,
-                                  scripts: { ...prev.scripts, trackingPerformance: newScripts }
-                                }))
-                              }}
-                              placeholder="Paste your Google Analytics or other tracking script here..."
-                              className="w-full h-24 p-2 text-sm font-mono border rounded"
-                            />
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="text-xs text-muted-foreground">
-                                {script.scriptCode.trim() && script.enabled 
-                                  ? '✅ Script inserted and will be included in generated code' 
-                                  : script.scriptCode.trim() 
-                                    ? '📋 Script code ready - click "Insert Script" to add to generated code' 
-                                    : '⚠️ Paste your script code above to get started'
-                                }
+                          <div key={script.id} className="border rounded-lg">
+                            <div className="flex items-center justify-between p-3">
+                              <div className="flex items-center space-x-3">
+                                <SmartScriptInput
+                                  value={script.name}
+                                  onChange={(value) => {
+                                    const newScripts = [...config.scripts.trackingPerformance]
+                                    newScripts[index].name = value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                    }))
+                                  }}
+                                  category="tracking-performance"
+                                  placeholder="Script name"
+                                />
+                                {script.scriptCode.trim() && (
+                                  <Badge variant={script.enabled ? "default" : "secondary"}>
+                                    {script.enabled ? 'Active' : 'Inactive'}
+                                  </Badge>
+                                )}
                               </div>
                               <div className="flex items-center space-x-2">
                                 {script.scriptCode.trim() ? (
-                                  <Button
-                                    size="sm"
-                                    variant={script.enabled ? "default" : "outline"}
-                                    onClick={() => {
-                                      const newScripts = [...config.scripts.trackingPerformance]
-                                      newScripts[index].enabled = !newScripts[index].enabled
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, trackingPerformance: newScripts }
-                                      }))
-                                      toast.success(
-                                        newScripts[index].enabled 
-                                          ? `"${script.name || 'Script'}" inserted into generated code!`
-                                          : `"${script.name || 'Script'}" removed from generated code!`
-                                      )
-                                    }}
-                                  >
-                                    {script.enabled ? '✓ Inserted' : 'Insert Script'}
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled
-                                  >
-                                    Insert Script
-                                  </Button>
-                                )}
+                                  script.enabled ? (
+                                    <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                      <span>Live</span>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const newScripts = [...config.scripts.trackingPerformance]
+                                        newScripts[index].enabled = true
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                        }))
+                                        toast.success(`"${script.name || 'Script'}" added to generated code!`)
+                                      }}
+                                    >
+                                      Add Script
+                                    </Button>
+                                  )
+                                ) : null}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newScripts = config.scripts.trackingPerformance.filter((_, i) => i !== index)
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                    }))
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
+                            </div>
+                            <div className="px-3 pb-3">
+                              <textarea
+                                value={script.scriptCode}
+                                onChange={(e) => {
+                                  const newScripts = [...config.scripts.trackingPerformance]
+                                  newScripts[index].scriptCode = e.target.value
+                                  setConfig(prev => ({
+                                    ...prev,
+                                    scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                  }))
+                                }}
+                                placeholder="Paste your script code here..."
+                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                              />
                             </div>
                           </div>
                         ))}
@@ -1037,100 +1268,90 @@ export default function BannerBuilderPage() {
                       <h4 className="font-medium mb-3 flex items-center">
                         <Target className="mr-2 h-4 w-4 text-red-600" />
                         Targeting & Advertising Scripts
-                        <Badge variant="secondary" className="ml-2">User Choice</Badge>
                         {config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
                           <Badge variant="default" className="ml-2">
-                            {config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length} inserted
+                            {config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length}
                           </Badge>
                         )}
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Marketing and advertising scripts (Facebook Pixel, Google Ads, etc.)
-                      </p>
                       <div className="space-y-3">
                         {config.scripts.targetingAdvertising.map((script, index) => (
-                          <div key={script.id} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <Input
-                                value={script.name}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.targetingAdvertising]
-                                  newScripts[index].name = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, targetingAdvertising: newScripts }
-                                  }))
-                                }}
-                                placeholder="Script name (e.g., Facebook Pixel)"
-                                className="font-medium"
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newScripts = config.scripts.targetingAdvertising.filter((_, i) => i !== index)
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, targetingAdvertising: newScripts }
-                                  }))
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <textarea
-                              value={script.scriptCode}
-                              onChange={(e) => {
-                                const newScripts = [...config.scripts.targetingAdvertising]
-                                newScripts[index].scriptCode = e.target.value
-                                setConfig(prev => ({
-                                  ...prev,
-                                  scripts: { ...prev.scripts, targetingAdvertising: newScripts }
-                                }))
-                              }}
-                              placeholder="Paste your Facebook Pixel or other advertising script here..."
-                              className="w-full h-24 p-2 text-sm font-mono border rounded"
-                            />
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="text-xs text-muted-foreground">
-                                {script.scriptCode.trim() && script.enabled 
-                                  ? '✅ Script inserted and will be included in generated code' 
-                                  : script.scriptCode.trim() 
-                                    ? '📋 Script code ready - click "Insert Script" to add to generated code' 
-                                    : '⚠️ Paste your script code above to get started'
-                                }
+                          <div key={script.id} className="border rounded-lg">
+                            <div className="flex items-center justify-between p-3">
+                              <div className="flex items-center space-x-3">
+                                <SmartScriptInput
+                                  value={script.name}
+                                  onChange={(value) => {
+                                    const newScripts = [...config.scripts.targetingAdvertising]
+                                    newScripts[index].name = value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                    }))
+                                  }}
+                                  category="targeting-advertising"
+                                  placeholder="Script name"
+                                />
+                                {script.scriptCode.trim() && (
+                                  <Badge variant={script.enabled ? "default" : "secondary"}>
+                                    {script.enabled ? 'Active' : 'Inactive'}
+                                  </Badge>
+                                )}
                               </div>
                               <div className="flex items-center space-x-2">
                                 {script.scriptCode.trim() ? (
-                                  <Button
-                                    size="sm"
-                                    variant={script.enabled ? "default" : "outline"}
-                                    onClick={() => {
-                                      const newScripts = [...config.scripts.targetingAdvertising]
-                                      newScripts[index].enabled = !newScripts[index].enabled
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, targetingAdvertising: newScripts }
-                                      }))
-                                      toast.success(
-                                        newScripts[index].enabled 
-                                          ? `"${script.name || 'Script'}" inserted into generated code!`
-                                          : `"${script.name || 'Script'}" removed from generated code!`
-                                      )
-                                    }}
-                                  >
-                                    {script.enabled ? '✓ Inserted' : 'Insert Script'}
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled
-                                  >
-                                    Insert Script
-                                  </Button>
-                                )}
+                                  script.enabled ? (
+                                    <div className="flex items-center space-x-1 text-green-600 text-sm font-medium">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                      <span>Live</span>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        const newScripts = [...config.scripts.targetingAdvertising]
+                                        newScripts[index].enabled = true
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                        }))
+                                        toast.success(`"${script.name || 'Script'}" added to generated code!`)
+                                      }}
+                                    >
+                                      Add Script
+                                    </Button>
+                                  )
+                                ) : null}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newScripts = config.scripts.targetingAdvertising.filter((_, i) => i !== index)
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                    }))
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
+                            </div>
+                            <div className="px-3 pb-3">
+                              <textarea
+                                value={script.scriptCode}
+                                onChange={(e) => {
+                                  const newScripts = [...config.scripts.targetingAdvertising]
+                                  newScripts[index].scriptCode = e.target.value
+                                  setConfig(prev => ({
+                                    ...prev,
+                                    scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                  }))
+                                }}
+                                placeholder="Paste your script code here..."
+                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                              />
                             </div>
                           </div>
                         ))}
@@ -1164,11 +1385,10 @@ export default function BannerBuilderPage() {
               </TabsContent>
 
               {/* Behavior Tab */}
-              <TabsContent value="behavior" className="space-y-6">
+              <TabsContent value="behavior" className="space-y-6" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
                 <Card>
                   <CardHeader>
                     <CardTitle>Banner Behavior</CardTitle>
-                    <CardDescription>Configure how the banner behaves</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -1363,6 +1583,7 @@ export default function BannerBuilderPage() {
                 </Card>
               </TabsContent>
             </Tabs>
+
           </div>
 
           {/* Preview Panel */}
@@ -1373,7 +1594,7 @@ export default function BannerBuilderPage() {
                   <Eye className="mr-2 h-5 w-5" />
                   Live Preview
                 </CardTitle>
-                <CardDescription>See how your banner will look</CardDescription>
+
               </CardHeader>
               <CardContent>
                 <BannerPreview config={config} />
@@ -1384,9 +1605,9 @@ export default function BannerBuilderPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Code className="mr-2 h-5 w-5" />
-                  Generated Code
+                  Copy This Code To Your Website
                 </CardTitle>
-                <CardDescription>Copy this code to your website</CardDescription>
+            
               </CardHeader>
               <CardContent>
                 <CodeGenerator config={config} />
