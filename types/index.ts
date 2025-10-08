@@ -1,7 +1,7 @@
 export interface BannerConfig {
   // Basic settings
   name: string
-  position: 'top' | 'bottom' | 'floating'
+  position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'
   theme: 'light' | 'dark' | 'custom'
   
   // Colors
@@ -47,23 +47,46 @@ export interface BannerConfig {
     }
   }
   
+  // Layout
+  layout: {
+    width: 'full' | 'container' | 'custom'
+    customWidth?: number
+    maxWidth?: number
+    borderRadius: number
+    padding: number
+    margin: number
+    shadow: 'none' | 'small' | 'medium' | 'large'
+    animation: 'none' | 'fade' | 'slide' | 'bounce' | 'pulse'
+  }
+  
+  // Scripts
+  scripts: {
+    strictlyNecessary: TrackingScript[]
+    functionality: TrackingScript[]
+    trackingPerformance: TrackingScript[]
+    targetingAdvertising: TrackingScript[]
+  }
+  
   // Advanced
   advanced: {
     googleConsentMode: boolean
     customCSS: string
     customJS: string
+    performance?: {
+      deferNonCriticalScripts?: boolean
+      useRequestIdleCallback?: boolean
+      lazyLoadAnalytics?: boolean
+      inlineCriticalCSS?: boolean
+    }
   }
 }
 
 export interface TrackingScript {
   id: string
   name: string
-  scriptContent: string
-  consentLevel: 'strictly-necessary' | 'analytics' | 'marketing' | 'preferences'
-  isEnabled: boolean
-  projectId: string
-  createdAt: Date
-  updatedAt: Date
+  category: 'strictly-necessary' | 'functionality' | 'tracking-performance' | 'targeting-advertising'
+  scriptCode: string
+  enabled: boolean
 }
 
 export interface Project {
