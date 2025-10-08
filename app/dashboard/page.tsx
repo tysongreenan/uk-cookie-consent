@@ -114,8 +114,8 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-            <Link href="/dashboard/builder">
+          <Link href="/dashboard/builder">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-center space-x-2">
                   <Plus className="h-5 w-5 text-primary" />
@@ -127,11 +127,11 @@ export default function DashboardPage() {
                   Create a new cookie consent banner project
                 </CardDescription>
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
 
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-            <Link href="/dashboard/builder">
+          <Link href="/dashboard/builder">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-center space-x-2">
                   <Palette className="h-5 w-5 text-primary" />
@@ -143,8 +143,8 @@ export default function DashboardPage() {
                   Design and customize your consent banner
                 </CardDescription>
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
 
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow">
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                     <Plus className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>No banners yet</p>
                   </div>
-                  <Button asChild>
+                  <Button >
                     <Link href="/dashboard/builder">
                       <Plus className="mr-2 h-4 w-4" />
                       Create Your First Banner
@@ -238,7 +238,7 @@ export default function DashboardPage() {
                         } configured</p>
                       </div>
                       <div className="flex space-x-2 pt-2">
-                        <Button asChild size="sm" className="flex-1">
+                        <Button  size="sm" className="flex-1">
                           <Link href={`/dashboard/builder?edit=${banner.id}`}>
                             <Edit className="mr-1 h-3 w-3" />
                             Edit

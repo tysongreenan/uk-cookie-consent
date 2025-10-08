@@ -134,7 +134,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   const getLayoutStyles = () => {
-    const baseStyles = {
+    const baseStyles: any = {
       borderRadius: `${config.layout.borderRadius}px`,
       padding: `${config.layout.padding}px`,
       margin: `${config.layout.margin}px`,

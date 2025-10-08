@@ -16,76 +16,7 @@ import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'react-hot-toast'
-
-interface TrackingScript {
-  id: string
-  name: string
-  category: 'strictly-necessary' | 'functionality' | 'tracking-performance' | 'targeting-advertising'
-  scriptCode: string
-  enabled: boolean
-}
-
-interface BannerConfig {
-  name: string
-  position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'
-  theme: 'light' | 'dark' | 'custom'
-  colors: {
-    background: string
-    text: string
-    button: string
-    buttonText: string
-    link: string
-  }
-  text: {
-    title: string
-    message: string
-    acceptButton: string
-    rejectButton: string
-    preferencesButton: string
-  }
-  behavior: {
-    autoShow: boolean
-    dismissOnScroll: boolean
-    showPreferences: boolean
-    cookieExpiry: number
-  }
-  branding: {
-    logo: {
-      enabled: boolean
-      url: string
-      position: 'left' | 'right' | 'center' | 'hidden'
-      maxWidth: number
-      maxHeight: number
-    }
-    privacyPolicy: {
-      url: string
-      text: string
-      openInNewTab: boolean
-      required: boolean
-    }
-  }
-  layout: {
-    width: 'full' | 'container' | 'custom'
-    customWidth?: number
-    maxWidth?: number
-    borderRadius: number
-    padding: number
-    margin: number
-    shadow: 'none' | 'small' | 'medium' | 'large'
-    animation: 'none' | 'fade' | 'slide' | 'bounce' | 'pulse'
-  }
-  scripts: {
-    strictlyNecessary: TrackingScript[]
-    functionality: TrackingScript[]
-    trackingPerformance: TrackingScript[]
-    targetingAdvertising: TrackingScript[]
-  }
-  advanced: {
-    googleConsentMode: boolean
-    customCSS: string
-    customJS: string
-  }
-}
+import { BannerConfig, TrackingScript } from '@/types'
 
 const defaultConfig: BannerConfig = {
   name: 'My Cookie Banner',
@@ -233,7 +164,7 @@ export default function BannerBuilderPage() {
   const updateConfig = (section: keyof BannerConfig, updates: any) => {
     setConfig(prev => ({
       ...prev,
-      [section]: { ...prev[section], ...updates }
+      [section]: { ...(prev[section] as any), ...updates }
     }))
   }
 

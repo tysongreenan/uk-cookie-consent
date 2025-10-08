@@ -157,8 +157,8 @@ export interface CreateBannerForm {
 
 export interface CreateScriptForm {
   name: string
-  scriptContent: string
-  consentLevel: TrackingScript['consentLevel']
+  scriptCode: string
+  category: TrackingScript['category']
 }
 
 // API Response types
