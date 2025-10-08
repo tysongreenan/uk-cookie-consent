@@ -4,7 +4,7 @@ Copy these to Vercel dashboard > Settings > Environment Variables:
 
 ```
 NEXTAUTH_URL=https://your-app-name.vercel.app
-NEXTAUTH_SECRET=your-secret-key-here
+NEXTAUTH_SECRET=eyfPsm9Es79RLP+uvYj6WpgNQ6W38Bi+Kw5xbcc2x+M=
 SUPABASE_URL=your-supabase-project-url
 SUPABASE_ANON_KEY=your-supabase-anon-key
 DATABASE_URL=postgresql://postgres:[password]@[host]:5432/postgres
