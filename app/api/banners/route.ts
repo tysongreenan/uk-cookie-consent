@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { bannerRateLimit } from '@/lib/rate-limit'
+import { sanitizeBannerName, sanitizeBannerConfig } from '@/lib/sanitize'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,6 +12,23 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit
+    const rateLimitResult = await bannerRateLimit.check(request);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': '10',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+            'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
+          }
+        }
+      );
+    }
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -26,6 +45,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Sanitize input data
+    const sanitizedName = sanitizeBannerName(bannerData.name);
+    const sanitizedConfig = sanitizeBannerConfig(bannerData.config);
+
+    if (!sanitizedName) {
+      return NextResponse.json(
+        { error: 'Invalid banner name' },
+        { status: 400 }
+      )
+    }
+
     // Generate a secure ID
     const bannerId = crypto.randomUUID()
 
@@ -35,8 +65,8 @@ export async function POST(request: NextRequest) {
       .insert({
         id: bannerId,
         userId: session.user.id,
-        name: bannerData.name,
-        config: JSON.stringify(bannerData.config),
+        name: sanitizedName,
+        config: JSON.stringify(sanitizedConfig),
         isActive: bannerData.isActive || false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

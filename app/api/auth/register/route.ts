@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { createClient } from '@supabase/supabase-js'
+import { authRateLimit } from '@/lib/rate-limit'
+import { sanitizeEmail, sanitizeUserName, validatePassword } from '@/lib/sanitize'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,28 +11,40 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit
+    const rateLimitResult = await authRateLimit.check(request);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Too many registration attempts. Please try again later.' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+            'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
+          }
+        }
+      );
+    }
+
     const { email, name, password } = await request.json()
 
-    // Validate input
-    if (!email || !password) {
+    // Sanitize and validate input
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedName = name ? sanitizeUserName(name) : '';
+    const passwordValidation = validatePassword(password);
+
+    if (!sanitizedEmail) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Valid email is required' },
         { status: 400 }
       )
     }
 
-    if (password.length < 8) {
+    if (!passwordValidation.valid) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
-        { status: 400 }
-      )
-    }
-
-    // Check password complexity
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
-    if (!passwordRegex.test(password)) {
-      return NextResponse.json(
-        { error: 'Password must contain at least one lowercase letter, one uppercase letter, and one number' },
+        { error: passwordValidation.errors.join('. ') },
         { status: 400 }
       )
     }
@@ -39,7 +53,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUser, error: checkError } = await supabase
       .from('User')
       .select('id')
-      .eq('email', email)
+      .eq('email', sanitizedEmail)
       .single()
 
     if (existingUser) {
@@ -60,8 +74,8 @@ export async function POST(request: NextRequest) {
       .from('User')
       .insert({
         id: userId,
-        email,
-        name: name || null,
+        email: sanitizedEmail,
+        name: sanitizedName || null,
         password: hashedPassword,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

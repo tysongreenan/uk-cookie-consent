@@ -55,21 +55,41 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 60 * 60, // Update session every hour
+  },
+  jwt: {
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id
+        token.iat = Math.floor(Date.now() / 1000) // Issued at
       }
       return token
     },
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.id,
-      },
-    }),
+    session: ({ session, token }) => {
+      // Check if session is expired
+      const now = Math.floor(Date.now() / 1000);
+      const tokenAge = now - (token.iat as number);
+      
+      if (tokenAge > 24 * 60 * 60) { // 24 hours
+        // Return a minimal session to avoid null return
+        return {
+          user: { id: '', email: '', name: '', image: null },
+          expires: new Date().toISOString(),
+        };
+      }
+      
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+        },
+      };
+    },
   },
   pages: {
     signIn: '/auth/signin',
