@@ -115,6 +115,17 @@ export function LiveCookieBanner() {
     function saveConsent(consent: any) {
       setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY)
       console.log('Cookie consent saved:', consent)
+      
+      // Update Google Tag Manager consent
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          'event': 'cookie_consent_update',
+          'analytics_storage': consent.analytics ? 'granted' : 'denied',
+          'ad_storage': consent.marketing ? 'granted' : 'denied',
+          'ad_user_data': consent.marketing ? 'granted' : 'denied',
+          'ad_personalization': consent.marketing ? 'granted' : 'denied'
+        })
+      }
     }
 
     // Initialize banner
