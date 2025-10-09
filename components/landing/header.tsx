@@ -12,29 +12,35 @@ export function Header() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold text-xl">Cookie Consent Builder</span>
+            <span className="font-bold text-xl">Cookie Banner Generator</span>
           </Link>
         </div>
         
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
-              href="/features"
+              href="#how-it-works"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="#features"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Features
             </Link>
             <Link
-              href="/pricing"
+              href="/about"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              Pricing
+              About
             </Link>
             <Link
-              href="/docs"
+              href="#faq"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              Docs
+              FAQ
             </Link>
           </nav>
           

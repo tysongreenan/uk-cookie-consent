@@ -2,44 +2,78 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="border-t py-6 md:py-0">
-      <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built by{' '}
-            <Link
-              href="https://twitter.com/shadcn"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              Cookie Consent Builder
+    <footer className="border-t py-12 md:py-16">
+      <div className="container">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <Link href="/" className="mb-4 inline-block font-bold text-xl">
+              Cookie Banner Generator
             </Link>
-            . The source code is available on{' '}
-            <Link
-              href="https://github.com/shadcn-ui/ui"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              GitHub
-            </Link>
-            .
-          </p>
+            <p className="text-sm text-muted-foreground max-w-md">
+              Unlimited, branded cookie banners that match your website. GDPR & PIPEDA compliant. Built in Canada.
+            </p>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h3 className="mb-4 text-sm font-semibold">Product</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/#how-it-works" className="text-muted-foreground hover:text-foreground">
+                  How It Works
+                </Link>
+              </li>
+              <li>
+                <Link href="/#features" className="text-muted-foreground hover:text-foreground">
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link href="/#faq" className="text-muted-foreground hover:text-foreground">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
+                  Dashboard
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="mb-4 text-sm font-semibold">Company</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/about" className="text-muted-foreground hover:text-foreground">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-muted-foreground hover:text-foreground">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-muted-foreground hover:text-foreground">
+                  Terms of Service
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/privacy"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Terms of Service
-          </Link>
+
+        <div className="mt-12 border-t pt-8">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <p className="text-center text-sm text-muted-foreground md:text-left">
+              © {new Date().getFullYear()} Cookie Banner Generator. Made with ❤️ in Canada.
+            </p>
+            <p className="text-center text-xs text-muted-foreground md:text-right">
+              First 1,000 accounts free — forever
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
-import { Mail, Lock, User } from 'lucide-react'
+import { Mail, Lock, User, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SignUpPage() {
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +18,14 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  // Pre-fill email from query parameter
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) {
+      setEmail(decodeURIComponent(emailParam))
+    }
+  }, [searchParams])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,13 +71,23 @@ export default function SignUpPage() {
     }
   }
 
+  const isFromLanding = searchParams.get('email')
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          {isFromLanding && (
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              <Sparkles className="h-4 w-4" />
+              <span>Almost there! Just a few more details...</span>
+            </div>
+          )}
           <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
           <CardDescription>
-            Get started with Cookie Consent Builder today
+            {isFromLanding 
+              ? 'Join the first 1,000 and get lifetime free access' 
+              : 'Get started with Cookie Consent Builder today'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
