@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://www.cookie-banner.ca/sitemap.xml
 
 # Block admin and API routes from search engines
 User-agent: *
