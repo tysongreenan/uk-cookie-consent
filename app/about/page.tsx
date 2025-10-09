@@ -84,21 +84,34 @@ export default function AboutPage() {
           <section className="rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-8 md:p-10">
             <h2 className="mb-6 text-3xl font-bold">Who&apos;s Behind This?</h2>
             
-            <div className="space-y-4 text-lg leading-relaxed">
-              <p>Hey — I&apos;m the founder of Cookie-Banner.ca.</p>
+            <div className="space-y-6">
+              {/* Photo */}
+              <div className="mx-auto max-w-md">
+                <img 
+                  src="/tyson-girlfriend-universal.jpg" 
+                  alt="Tyson Greenan with his girlfriend at Universal Park"
+                  className="w-full rounded-lg shadow-lg"
+                />
+                <p className="mt-2 text-center text-sm text-muted-foreground italic">
+                  Tyson Greenan with his girlfriend at Universal Park
+                </p>
+              </div>
+              
+              <div className="space-y-4 text-lg leading-relaxed">
+                <p>Hey — I&apos;m Tyson Greenan, co-founder of Cookie-Banner.ca.</p>
               
               <p>
-                I&apos;m a Canadian builder who doesn&apos;t believe in copying what&apos;s already out there. 
-                I believe in seeing the gap, challenging the default, and shipping things that make sense.
+                We&apos;re Canadian builders who don&apos;t believe in copying what&apos;s already out there. 
+                We believe in seeing the gap, challenging the default, and shipping things that make sense.
               </p>
               
               <p>
-                I&apos;m not interested in fake urgency, growth hacks, or legal fear-mongering.<br />
-                <span className="font-semibold">I&apos;m interested in clarity, creativity, and control.</span>
+                We&apos;re not interested in fake urgency, growth hacks, or legal fear-mongering.<br />
+                <span className="font-semibold">We&apos;re interested in clarity, creativity, and control.</span>
               </p>
               
               <div className="my-8 space-y-4 rounded-lg bg-background/80 p-6">
-                <p className="font-semibold text-foreground">This product is built on the same values I run on:</p>
+                <p className="font-semibold text-foreground">This product is built on the same values we run on:</p>
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
