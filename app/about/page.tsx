@@ -82,17 +82,17 @@ export default function AboutPage() {
             <div className="space-y-6">
               <div className="mx-auto max-w-md">
                 <img 
-                  src="/tyson-girlfriend-universal.jpg" 
-                  alt="Tyson Greenan with his girlfriend at Universal Park"
+                  src="/tyson-girlfriend-universal.webp" 
+                  alt="Tyson Greenan with Emily Trenchard"
                   className="w-full rounded-lg shadow-lg"
                 />
                 <p className="mt-2 text-center text-sm text-muted-foreground italic">
-                  Tyson Greenan with his girlfriend at Universal Park
+                  Tyson Greenan with Emily Trenchard
                 </p>
               </div>
               
               <div className="space-y-4 text-lg leading-relaxed">
-                <p>Hey — I&apos;m Tyson Greenan, co-founder of Cookie-Banner.ca.</p>
+                <p>Hey — I&apos;m Tyson Greenan, co-founder of Cookie-Banner.ca, along with Emily Trenchard.</p>
               
                 <p>
                   We&apos;re Canadian builders who don&apos;t believe in copying what&apos;s already out there. 
