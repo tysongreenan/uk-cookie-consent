@@ -286,6 +286,9 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
   </div>
+  <div style="text-align: center; margin-top: 8px; font-size: 9px; opacity: 0.4; line-height: 1.2;">
+    <a href="https://cookie-banner.ca" style="color: inherit; text-decoration: none;" rel="nofollow">cookie banner</a>
+  </div>
 </div>`
   }
 
