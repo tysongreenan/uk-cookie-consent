@@ -36,7 +36,6 @@ export default function AboutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-4xl py-16">
-        {/* Back link */}
         <Link 
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -45,17 +44,14 @@ export default function AboutPage() {
           Back to Home
         </Link>
 
-        {/* Header */}
         <div className="mb-12">
           <h1 className="mb-6 font-heading text-4xl font-bold leading-tight sm:text-5xl">
             About Cookie-Banner.ca
           </h1>
         </div>
 
-        {/* Content */}
         <div className="prose prose-gray max-w-none space-y-12 dark:prose-invert">
           
-          {/* Section 1: Born From Frustration */}
           <section>
             <h2 className="mb-6 text-3xl font-bold">Born From Frustration. Built For Freedom.</h2>
             
@@ -80,12 +76,10 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Section 2: Who's Behind This */}
           <section className="rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-8 md:p-10">
             <h2 className="mb-6 text-3xl font-bold">Who&apos;s Behind This?</h2>
             
             <div className="space-y-6">
-              {/* Photo */}
               <div className="mx-auto max-w-md">
                 <img 
                   src="/tyson-girlfriend-universal.jpg" 
@@ -100,49 +94,50 @@ export default function AboutPage() {
               <div className="space-y-4 text-lg leading-relaxed">
                 <p>Hey — I&apos;m Tyson Greenan, co-founder of Cookie-Banner.ca.</p>
               
-              <p>
-                We&apos;re Canadian builders who don&apos;t believe in copying what&apos;s already out there. 
-                We believe in seeing the gap, challenging the default, and shipping things that make sense.
-              </p>
-              
-              <p>
-                We&apos;re not interested in fake urgency, growth hacks, or legal fear-mongering.<br />
-                <span className="font-semibold">We&apos;re interested in clarity, creativity, and control.</span>
-              </p>
-              
-              <div className="my-8 space-y-4 rounded-lg bg-background/80 p-6">
-                <p className="font-semibold text-foreground">This product is built on the same values we run on:</p>
+                <p>
+                  We&apos;re Canadian builders who don&apos;t believe in copying what&apos;s already out there. 
+                  We believe in seeing the gap, challenging the default, and shipping things that make sense.
+                </p>
                 
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
-                    <div>
-                      <p className="font-semibold">Freedom over fear</p>
-                      <p className="text-muted-foreground">You should never feel boxed in by compliance.</p>
-                    </div>
-                  </div>
+                <p>
+                  We&apos;re not interested in fake urgency, growth hacks, or legal fear-mongering.<br />
+                  <span className="font-semibold">We&apos;re interested in clarity, creativity, and control.</span>
+                </p>
+                
+                <div className="my-8 space-y-4 rounded-lg bg-background/80 p-6">
+                  <p className="font-semibold text-foreground">This product is built on the same values we run on:</p>
                   
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
-                    <div>
-                      <p className="font-semibold">Creativity over compliance</p>
-                      <p className="text-muted-foreground">Design matters. Brand matters. Your site should still look and feel like you.</p>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div>
+                        <p className="font-semibold">Freedom over fear</p>
+                        <p className="text-muted-foreground">You should never feel boxed in by compliance.</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
-                    <div>
-                      <p className="font-semibold">Transparency over tricks</p>
-                      <p className="text-muted-foreground">No bait, no switch, no &quot;gotcha&quot; pricing.</p>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div>
+                        <p className="font-semibold">Creativity over compliance</p>
+                        <p className="text-muted-foreground">Design matters. Brand matters. Your site should still look and feel like you.</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
-                    <div>
-                      <p className="font-semibold">Community over clout</p>
-                      <p className="text-muted-foreground">I&apos;d rather serve 1,000 loyal customers than chase vanity downloads.</p>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div>
+                        <p className="font-semibold">Transparency over tricks</p>
+                        <p className="text-muted-foreground">No bait, no switch, no &quot;gotcha&quot; pricing.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div>
+                        <p className="font-semibold">Community over clout</p>
+                        <p className="text-muted-foreground">I&apos;d rather serve 1,000 loyal customers than chase vanity downloads.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -150,7 +145,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Section 3: What We Believe */}
           <section>
             <h2 className="mb-6 text-3xl font-bold">What We Believe</h2>
             
@@ -188,7 +182,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Section 4: Why We're Free */}
           <section className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 p-8 md:p-10">
             <h2 className="mb-6 text-3xl font-bold">Why We&apos;re Free (for the First 1,000)</h2>
             
@@ -211,7 +204,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Section 5: The Vision */}
           <section>
             <h2 className="mb-6 text-3xl font-bold">The Vision Moving Forward</h2>
             
@@ -256,7 +248,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Section 6: If You're Still Reading */}
           <section className="rounded-xl bg-foreground p-8 text-background md:p-10">
             <h2 className="mb-6 text-3xl font-bold">If You&apos;re Still Reading, You&apos;re One of Us.</h2>
             
@@ -280,7 +271,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* Final CTA */}
           <section className="text-center">
             <div className="inline-block rounded-xl border-2 border-primary bg-primary/5 p-8">
               <p className="mb-4 text-xl font-bold">
@@ -300,4 +290,3 @@ export default function AboutPage() {
     </div>
   )
 }
-
