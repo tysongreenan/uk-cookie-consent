@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate a simple ID
-    const bannerId = 'banner_' + Math.random().toString(36).substr(2, 9)
+    // Generate a secure ID
+    const bannerId = crypto.randomUUID()
 
     // Save banner to database
     const { data: banner, error } = await supabase

@@ -19,9 +19,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
+        { error: 'Password must be at least 8 characters' },
+        { status: 400 }
+      )
+    }
+
+    // Check password complexity
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+    if (!passwordRegex.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one lowercase letter, one uppercase letter, and one number' },
         { status: 400 }
       )
     }
@@ -43,8 +52,8 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Generate a simple ID
-    const userId = 'user_' + Math.random().toString(36).substr(2, 9)
+    // Generate a secure ID
+    const userId = crypto.randomUUID()
 
     // Create user
     const { data: user, error: insertError } = await supabase
