@@ -275,9 +275,14 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
             <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-analytics-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Analytics</strong><br><small style="opacity: 0.8;">Help us improve our website</small></span></label>
             <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-marketing-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Marketing</strong><br><small style="opacity: 0.8;">Personalized ads and content</small></span></label>
           </div>
-          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
-            <button id="cookie-save-prefs-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Save</button>
-            <button id="cookie-cancel-prefs-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Cancel</button>
+          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+            <div style="font-size: 8px; opacity: 0.3;">
+              <a href="https://cookie-banner.ca" style="color: inherit; text-decoration: none;" rel="nofollow">cookie banner</a>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button id="cookie-save-prefs-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Save</button>
+              <button id="cookie-cancel-prefs-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Cancel</button>
+            </div>
           </div>
         </div>
         ` : ''}
@@ -285,9 +290,6 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
-  </div>
-  <div style="text-align: center; margin-top: 8px; font-size: 9px; opacity: 0.4; line-height: 1.2;">
-    <a href="https://cookie-banner.ca" style="color: inherit; text-decoration: none;" rel="nofollow">cookie banner</a>
   </div>
 </div>`
   }
