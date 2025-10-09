@@ -83,12 +83,19 @@ export default function SignUpPage() {
               <span>Almost there! Just a few more details...</span>
             </div>
           )}
-          <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-          <CardDescription>
-            {isFromLanding 
-              ? 'Join the first 1,000 and get lifetime free access' 
-              : 'Get started with Cookie Consent Builder today'}
-          </CardDescription>
+              <div className="mx-auto mb-4">
+                <img 
+                  src="/logos/logo.svg" 
+                  alt="Cookie Banner Generator" 
+                  className="h-12 w-auto mx-auto"
+                />
+              </div>
+              <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
+              <CardDescription>
+                {isFromLanding 
+                  ? 'Join the first 1,000 and get lifetime free access' 
+                  : 'Get started with Cookie Banner Generator today'}
+              </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (

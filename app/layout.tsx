@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
   description: 'Create unlimited cookie banners custom-branded to your site. Fully compliant with GDPR & PIPEDA. First 1,000 accounts free — no card needed.',
+  icons: {
+    icon: '/logos/logo.svg',
+    shortcut: '/logos/logo.svg',
+    apple: '/logos/logo.svg',
+  },
   keywords: [
     'cookie banner',
     'cookie consent',

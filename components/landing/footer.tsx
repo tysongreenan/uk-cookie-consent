@@ -5,11 +5,15 @@ export function Footer() {
     <footer className="border-t py-12 md:py-16">
       <div className="container">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="mb-4 inline-block font-bold text-xl">
-              Cookie Banner Generator
-            </Link>
+                  {/* Brand */}
+                  <div className="lg:col-span-2">
+                    <Link href="/" className="mb-4 inline-block">
+                      <img 
+                        src="/logos/logo.svg" 
+                        alt="Cookie Banner Generator" 
+                        className="h-8 w-auto"
+                      />
+                    </Link>
             <p className="text-sm text-muted-foreground max-w-md">
               Unlimited, branded cookie banners that match your website. GDPR & PIPEDA compliant. Built in Canada.
             </p>

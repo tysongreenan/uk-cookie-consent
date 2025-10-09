@@ -131,7 +131,11 @@ export default function DashboardPage() {
         <aside className="w-64 bg-white border-r min-h-screen">
           <nav className="p-4 space-y-2">
             <Link href="/dashboard" className="flex items-center space-x-3 p-2 rounded-lg bg-primary text-primary-foreground">
-              <div className="w-5 h-5"></div>
+              <img 
+                src="/logos/logo.svg" 
+                alt="Cookie Banner Generator" 
+                className="w-5 h-5 text-white"
+              />
               <span className="font-medium">Dashboard</span>
             </Link>
             <Link href="/dashboard/settings" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
