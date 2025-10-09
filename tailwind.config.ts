@@ -51,6 +51,16 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Brand Colors
+        brand: {
+          teal: "hsl(var(--brand-teal))",
+          red: "hsl(var(--brand-red))",
+          green: "hsl(var(--brand-green))",
+          purple: "hsl(var(--brand-purple))",
+          pink: "hsl(var(--brand-pink))",
+          blue: "hsl(var(--brand-blue))",
+          neutral: "hsl(var(--brand-neutral))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

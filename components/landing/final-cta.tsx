@@ -23,7 +23,7 @@ export function FinalCTA() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-purple-600 to-pink-600 py-20 md:py-28">
+    <section className="relative overflow-hidden bg-gradient-to-br from-brand-teal via-brand-purple to-brand-pink py-20 md:py-28">
       {/* Background pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
       
@@ -44,7 +44,7 @@ export function FinalCTA() {
 
           <div className="mx-auto max-w-md">
             {session ? (
-              <Button asChild size="lg" className="w-full bg-white text-primary hover:bg-white/90 text-lg font-semibold h-14">
+              <Button asChild size="lg" className="w-full bg-white text-brand-teal hover:bg-white/90 text-lg font-semibold h-14">
                 <Link href="/dashboard">
                   Go to Dashboard
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -64,7 +64,7 @@ export function FinalCTA() {
                   <Button 
                     type="submit" 
                     size="lg" 
-                    className="h-14 bg-white px-8 text-base font-semibold text-primary hover:bg-white/90"
+                    className="h-14 bg-white px-8 text-base font-semibold text-brand-teal hover:bg-white/90"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Loading...' : 'Claim My Free Account'}

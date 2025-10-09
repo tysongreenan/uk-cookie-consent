@@ -71,7 +71,7 @@ export default function AboutPage() {
               </div>
               
               <p>I looked around and thought:</p>
-              <p className="text-2xl font-bold text-primary">&quot;Why are we settling for this?&quot;</p>
+              <p className="text-2xl font-bold text-brand-red">&quot;Why are we settling for this?&quot;</p>
               <p>So I built something better.</p>
             </div>
           </section>
@@ -109,7 +109,7 @@ export default function AboutPage() {
                   
                   <div className="space-y-4">
                     <div className="flex items-start gap-4">
-                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/20 text-brand-teal">✓</div>
                       <div>
                         <p className="font-semibold">Freedom over fear</p>
                         <p className="text-muted-foreground">You should never feel boxed in by compliance.</p>
@@ -117,7 +117,7 @@ export default function AboutPage() {
                     </div>
                     
                     <div className="flex items-start gap-4">
-                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/20 text-brand-teal">✓</div>
                       <div>
                         <p className="font-semibold">Creativity over compliance</p>
                         <p className="text-muted-foreground">Design matters. Brand matters. Your site should still look and feel like you.</p>
@@ -125,7 +125,7 @@ export default function AboutPage() {
                     </div>
                     
                     <div className="flex items-start gap-4">
-                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/20 text-brand-teal">✓</div>
                       <div>
                         <p className="font-semibold">Transparency over tricks</p>
                         <p className="text-muted-foreground">No bait, no switch, no &quot;gotcha&quot; pricing.</p>
@@ -133,7 +133,7 @@ export default function AboutPage() {
                     </div>
                     
                     <div className="flex items-start gap-4">
-                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">✓</div>
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/20 text-brand-teal">✓</div>
                       <div>
                         <p className="font-semibold">Community over clout</p>
                         <p className="text-muted-foreground">I&apos;d rather serve 1,000 loyal customers than chase vanity downloads.</p>
@@ -176,13 +176,13 @@ export default function AboutPage() {
                 </div>
               </div>
               
-              <p className="rounded-lg bg-primary/10 p-6 font-semibold">
+              <p className="rounded-lg bg-brand-teal/10 p-6 font-semibold">
                 And we believe Canada deserves tools made for its own standards — like <strong>PIPEDA</strong> and <strong>CASL</strong>, not just EU-centric GDPR clones.
               </p>
             </div>
           </section>
 
-          <section className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 p-8 md:p-10">
+          <section className="rounded-xl border-2 border-brand-teal/20 bg-gradient-to-br from-brand-teal/5 to-brand-purple/5 p-8 md:p-10">
             <h2 className="mb-6 text-3xl font-bold">Why We&apos;re Free (for the First 1,000)</h2>
             
             <div className="space-y-4 text-lg leading-relaxed">
@@ -218,15 +218,15 @@ export default function AboutPage() {
                 <p className="mb-4 font-semibold">Coming next:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <span className="mt-1 text-primary">→</span>
+                    <span className="mt-1 text-brand-teal">→</span>
                     <span><strong>Brand-sync AI</strong> (so banners really match your site)</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1 text-primary">→</span>
+                    <span className="mt-1 text-brand-teal">→</span>
                     <span><strong>Language detection & accessibility enhancements</strong></span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="mt-1 text-primary">→</span>
+                    <span className="mt-1 text-brand-teal">→</span>
                     <span><strong>Multi-site management</strong> with no per-domain fees</span>
                   </li>
                 </ul>
@@ -238,7 +238,7 @@ export default function AboutPage() {
                 We&apos;ll follow the same compass we started with:
               </p>
               
-              <div className="my-6 rounded-lg bg-primary/10 p-6 text-center">
+              <div className="my-6 rounded-lg bg-brand-teal/10 p-6 text-center">
                 <p className="text-xl font-bold">
                   Build what we wish existed.<br />
                   Ship it with honesty.<br />
@@ -272,11 +272,11 @@ export default function AboutPage() {
           </section>
 
           <section className="text-center">
-            <div className="inline-block rounded-xl border-2 border-primary bg-primary/5 p-8">
+            <div className="inline-block rounded-xl border-2 border-brand-teal bg-brand-teal/5 p-8">
               <p className="mb-4 text-xl font-bold">
                 🧠 First 1,000 accounts are free — for life.
               </p>
-              <Button asChild size="lg" className="text-base">
+              <Button asChild size="lg" className="text-base bg-brand-red hover:bg-brand-red/90 text-white">
                 <Link href="/auth/signup">
                   Claim Yours Now
                   <ArrowRight className="ml-2 h-5 w-5" />

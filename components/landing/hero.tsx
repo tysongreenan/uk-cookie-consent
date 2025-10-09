@@ -76,7 +76,7 @@ export function Hero() {
                   <Button 
                     type="submit" 
                     size="lg" 
-                    className="h-12 px-8 text-base font-semibold"
+                    className="h-12 px-8 text-base font-semibold bg-brand-red hover:bg-brand-red/90 text-white"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Loading...' : 'Claim Your Free Banner'}
