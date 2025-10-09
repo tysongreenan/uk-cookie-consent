@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
 import { Sparkles } from 'lucide-react'
 import Link from 'next/link'
@@ -89,35 +88,6 @@ export function Hero() {
               </form>
             )}
           </div>
-        </div>
-
-        {/* Preview Banner */}
-        <div className="mt-16 max-w-5xl mx-auto">
-          <Card className="overflow-hidden border-2 shadow-2xl">
-            <CardContent className="p-0">
-              <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 text-white md:p-8">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="flex flex-1 items-start space-x-4">
-                    <div className="hidden h-10 w-10 shrink-0 rounded-lg bg-white/20 backdrop-blur-sm sm:block"></div>
-                    <div className="flex-1">
-                      <h3 className="mb-2 text-lg font-semibold md:text-xl">We use cookies</h3>
-                      <p className="text-sm opacity-90 md:text-base">
-                        This website uses cookies to enhance your browsing experience and provide personalized content.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <button className="rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-purple-600 transition-all hover:bg-white/90">
-                      Accept All
-                    </button>
-                    <button className="rounded-lg border-2 border-white/30 bg-white/10 px-6 py-2.5 text-sm font-semibold backdrop-blur-sm transition-all hover:bg-white/20">
-                      Preferences
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </section>
