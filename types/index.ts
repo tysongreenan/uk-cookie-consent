@@ -13,6 +13,9 @@ export interface BannerConfig {
     link: string
   }
   
+  // Language
+  language: 'en' | 'fr' | 'auto'
+  
   // Text content
   text: {
     title: string
@@ -44,6 +47,12 @@ export interface BannerConfig {
       text: string
       openInNewTab: boolean
       required: boolean
+    }
+    footerLink: {
+      enabled: boolean
+      text: string
+      position: 'floating' | 'inline'
+      floatingPosition?: 'bottom-left' | 'bottom-right'
     }
   }
   

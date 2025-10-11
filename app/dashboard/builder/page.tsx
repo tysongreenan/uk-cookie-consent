@@ -22,6 +22,7 @@ const defaultConfig: BannerConfig = {
   name: 'My Cookie Banner',
   position: 'bottom',
   theme: 'dark',
+  language: 'auto',
   colors: {
     background: '#1f2937',
     text: '#ffffff',
@@ -55,6 +56,12 @@ const defaultConfig: BannerConfig = {
       text: 'Privacy Policy',
       openInNewTab: true,
       required: false
+    },
+    footerLink: {
+      enabled: true,
+      text: 'Cookie Settings',
+      position: 'floating',
+      floatingPosition: 'bottom-left'
     }
   },
   layout: {
@@ -753,6 +760,38 @@ export default function BannerBuilderPage() {
 
                 <Card>
                   <CardHeader>
+                    <CardTitle>Language</CardTitle>
+                    <CardDescription>
+                      Choose your banner language. Auto-detect will show English for English browsers and French for French browsers (required for Quebec Law 25).
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="language">Banner Language</Label>
+                      <Select 
+                        value={config.language} 
+                        onValueChange={(value: any) => updateConfig('language', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="auto">Auto-detect (Recommended)</SelectItem>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="fr">Français (French)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {config.language === 'auto' && '🇨🇦 Language will be detected from user\'s browser. Perfect for Canadian sites serving English and French users.'}
+                        {config.language === 'en' && 'Banner will always show in English.'}
+                        {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
                     <CardTitle>Banner Text</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -879,6 +918,93 @@ export default function BannerBuilderPage() {
                         placeholder="https://example.com/privacy-policy"
                       />
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Cookie Settings Link</CardTitle>
+                    <CardDescription>
+                      Add a persistent link for users to change their cookie preferences anytime (required for compliance).
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="footer-link-enabled"
+                        checked={config.branding.footerLink.enabled}
+                        onCheckedChange={(checked) => updateConfig('branding', { 
+                          footerLink: { ...config.branding.footerLink, enabled: checked }
+                        })}
+                      />
+                      <Label htmlFor="footer-link-enabled">Enable Cookie Settings Link</Label>
+                    </div>
+
+                    {config.branding.footerLink.enabled && (
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="footer-link-text">Link Text</Label>
+                          <Input
+                            id="footer-link-text"
+                            value={config.branding.footerLink.text}
+                            onChange={(e) => updateConfig('branding', { 
+                              footerLink: { ...config.branding.footerLink, text: e.target.value }
+                            })}
+                            placeholder="Cookie Settings"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="footer-link-position">Position</Label>
+                          <Select 
+                            value={config.branding.footerLink.position} 
+                            onValueChange={(value: any) => updateConfig('branding', { 
+                              footerLink: { ...config.branding.footerLink, position: value }
+                            })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="floating">Floating Button (Recommended)</SelectItem>
+                              <SelectItem value="inline">Inline HTML (For Footer)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {config.branding.footerLink.position === 'floating' && (
+                          <div>
+                            <Label htmlFor="floating-position">Floating Position</Label>
+                            <Select 
+                              value={config.branding.footerLink.floatingPosition || 'bottom-left'} 
+                              onValueChange={(value: any) => updateConfig('branding', { 
+                                footerLink: { ...config.branding.footerLink, floatingPosition: value }
+                              })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                                <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {config.branding.footerLink.position === 'inline' && (
+                          <div className="mt-4 p-4 bg-muted rounded-lg">
+                            <p className="text-sm font-medium mb-2">Add this to your website footer:</p>
+                            <code className="block p-3 bg-background rounded text-xs overflow-x-auto">
+                              {`<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${config.branding.footerLink.text}</a>`}
+                            </code>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              This link will reopen the cookie banner when clicked.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
