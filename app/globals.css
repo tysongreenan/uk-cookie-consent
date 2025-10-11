@@ -276,288 +276,172 @@
   }
 }
 
-/* Blog Post Readability Enhancements */
+/* Blog Post Styling - Match Main Site */
 .prose {
-  /* H1 - Main Title (LARGEST) */
+  /* H1 - Main Title */
   h1 {
-    font-size: 3.5rem !important;
-    line-height: 1.1 !important;
-    margin-top: 2rem !important;
-    margin-bottom: 3rem !important;
-    color: hsl(var(--primary)) !important;
-    text-align: center;
-    border-bottom: 4px solid hsl(var(--primary));
-    padding-bottom: 1rem;
-  }
-  
-  /* H2 - Section Headers (LARGE) */
-  h2 {
     font-size: 2.5rem !important;
     line-height: 1.2 !important;
-    margin-top: 4rem !important;
+    margin-top: 2rem !important;
     margin-bottom: 2rem !important;
-    color: hsl(var(--brand-red)) !important;
-    border-bottom: 3px solid hsl(var(--brand-red));
-    padding-bottom: 0.75rem;
+    color: hsl(var(--primary)) !important;
+    font-weight: 700;
   }
   
-  /* H3 - Subsection Headers (MEDIUM) */
-  h3 {
+  /* H2 - Section Headers */
+  h2 {
     font-size: 2rem !important;
     line-height: 1.3 !important;
     margin-top: 3rem !important;
     margin-bottom: 1.5rem !important;
-    color: hsl(var(--brand-teal)) !important;
-    border-left: 4px solid hsl(var(--brand-teal));
-    padding-left: 1rem;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 600;
   }
   
-  /* H4 - Minor Headers (SMALLER) */
-  h4 {
+  /* H3 - Subsection Headers */
+  h3 {
     font-size: 1.5rem !important;
     line-height: 1.4 !important;
     margin-top: 2.5rem !important;
     margin-bottom: 1rem !important;
-    color: hsl(var(--primary)) !important;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 600;
   }
   
-  /* TL;DR Box - About Us Style */
+  /* H4 - Minor Headers */
+  h4 {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+    margin-top: 2rem !important;
+    margin-bottom: 0.75rem !important;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 600;
+  }
+  
+  /* TL;DR Box - Clean Style */
   h2:first-of-type {
-    background: linear-gradient(135deg, hsl(var(--brand-teal) / 0.1) 0%, hsl(var(--brand-purple) / 0.1) 50%, hsl(var(--brand-pink) / 0.1) 100%);
-    border: 3px solid hsl(var(--brand-teal)) !important;
-    border-radius: 16px;
-    padding: 2rem 2.5rem;
-    margin: 3rem 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    position: relative;
-    font-size: 2rem !important;
-    color: hsl(var(--brand-teal)) !important;
-    text-align: center;
-    font-weight: 800;
+    background: hsl(var(--muted) / 0.3);
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-size: 1.5rem !important;
+    color: hsl(var(--foreground)) !important;
+    text-align: left;
+    font-weight: 600;
   }
   
-  h2:first-of-type::before {
-    content: '';
-    position: absolute;
-    left: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 2rem;
-    background: hsl(var(--brand-teal));
-    border-radius: 2px;
-  }
-  
-  /* Style the content right after TL;DR - About Us Style */
+  /* Style the content right after TL;DR - Clean Style */
   h2:first-of-type + p,
   h2:first-of-type + p + p,
   h2:first-of-type + p + ul,
   h2:first-of-type + p + p + ul,
   h2:first-of-type + p + p + p {
-    background: hsl(var(--muted) / 0.3);
-    border: 1px solid hsl(var(--border));
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin: 1rem 0 !important;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Make HR after TL;DR very prominent */
-  h2:first-of-type ~ hr:first-of-type {
-    border: none;
-    height: 4px;
-    background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--brand-purple)), hsl(var(--brand-pink)));
-    margin: 3rem 0;
-    border-radius: 2px;
-  }
-  
-  /* Section dividers between major topics - only for non-TL;DR H2s */
-  h2:not(:first-of-type) {
-    position: relative;
-  }
-  
-  h2:not(:first-of-type)::before {
-    content: '';
-    position: absolute;
-    top: -1rem;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, hsl(var(--primary) / 0.2), transparent);
-  }
-  
-  /* Make checkmarks and X marks in lists stand out - About Us Style */
-  ul li strong:first-child,
-  ol li strong:first-child {
-    font-size: 1.2em;
-    margin-right: 0.5rem;
-  }
-  
-  /* Clean list items with visual indicators */
-  ul li:has(strong:first-child),
-  ol li:has(strong:first-child) {
-    background: hsl(var(--muted) / 0.1);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    border-left: 3px solid hsl(var(--brand-teal) / 0.5);
-    transition: all 0.2s ease;
-  }
-  
-  ul li:has(strong:first-child):hover,
-  ol li:has(strong:first-child):hover {
     background: hsl(var(--muted) / 0.2);
-    border-left-color: hsl(var(--brand-teal));
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0 !important;
+    font-size: 1rem;
+    line-height: 1.6;
   }
   
-  /* Clean arrow lists */
-  ul li:has(span:first-child:contains('→')),
-  ol li:has(span:first-child:contains('→')) {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
+  /* Paragraphs */
+  p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin: 1.5rem 0;
+    color: hsl(var(--foreground) / 0.9);
   }
   
-  ul li:has(span:first-child:contains('→')) span:first-child,
-  ol li:has(span:first-child:contains('→')) span:first-child {
-    color: hsl(var(--brand-teal));
-    font-weight: 600;
-    margin-top: 0.125rem;
-    flex-shrink: 0;
-    font-size: 0.9em;
-  }
-  
-  /* Highlight "What You Need" and "Quick Summary" sections */
-  p:has(strong:first-child) {
-    font-size: 1.15rem;
-    font-weight: 500;
-  }
-  
-  /* Code examples with better contrast */
-  code:not(pre code) {
-    background: hsl(var(--brand-teal) / 0.1);
-    color: hsl(var(--brand-teal));
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.375rem;
-    font-weight: 600;
-    font-size: 0.95em;
-    border: 1px solid hsl(var(--brand-teal) / 0.2);
-  }
-  
-  /* Pre-formatted code blocks */
-  pre {
-    margin: 3rem 0;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid hsl(var(--primary));
-  }
-  
-  /* Better list spacing and styling */
+  /* Lists */
   ul, ol {
-    margin: 2rem 0;
+    margin: 1.5rem 0;
   }
   
   ul > li, ol > li {
-    margin: 1rem 0;
-    line-height: 1.8;
-    padding-left: 0.5rem;
+    margin: 0.75rem 0;
+    line-height: 1.6;
+    font-size: 1.125rem;
   }
   
-  /* Callout boxes (blockquotes) - About Us Style */
-  blockquote {
-    font-style: normal;
-    font-weight: 500;
-    margin: 3rem 0;
-    background: hsl(var(--muted) / 0.3);
-    border-left: 4px solid hsl(var(--brand-teal));
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  
-  /* Key points boxes like About Us */
-  p:has(strong:first-child:contains('Key Points:')),
-  p:has(strong:first-child:contains('What You Need:')),
-  p:has(strong:first-child:contains('Quick Summary:')) {
-    background: linear-gradient(135deg, hsl(var(--brand-teal) / 0.05) 0%, hsl(var(--brand-purple) / 0.05) 100%);
-    border: 2px solid hsl(var(--brand-teal) / 0.2);
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Important callouts like About Us */
-  p:has(strong:contains('Important:')),
-  p:has(strong:contains('Note:')),
-  p:has(strong:contains('Warning:')),
-  p:has(strong:contains('Pro Tip:')) {
-    background: hsl(var(--brand-red) / 0.05);
-    border: 2px solid hsl(var(--brand-red) / 0.2);
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  /* Strong text - make it POP */
-  strong {
-    font-weight: 800;
-    color: hsl(var(--foreground));
-    position: relative;
-  }
-  
-  /* Tables */
-  table {
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 3rem 0;
-  }
-  
-  th {
-    background: hsl(var(--primary) / 0.1);
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-  }
-  
-  /* Horizontal rules as section breaks */
-  hr {
-    border: none;
-    height: 2px;
-    background: linear-gradient(to right, transparent, hsl(var(--border)), transparent);
-    margin: 4rem 0;
-  }
-  
-  /* Links with better visibility */
+  /* Links */
   a {
+    color: hsl(var(--primary));
     text-decoration: underline;
-    text-decoration-color: hsl(var(--primary) / 0.4);
-    text-underline-offset: 0.3em;
-    text-decoration-thickness: 2px;
+    text-decoration-color: hsl(var(--primary) / 0.3);
+    text-underline-offset: 0.2em;
     transition: all 0.2s;
   }
   
   a:hover {
-    text-decoration-color: hsl(var(--brand-red));
     color: hsl(var(--brand-red));
+    text-decoration-color: hsl(var(--brand-red));
   }
   
-  /* Example/Warning boxes */
-  p:has(em:first-child:contains('Example')),
-  p:has(strong:contains('Example')),
-  p:has(strong:contains('Bad')),
-  p:has(strong:contains('Good')) {
+  /* Strong text */
+  strong {
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+  
+  /* Code */
+  code:not(pre code) {
     background: hsl(var(--muted));
-    padding: 1rem 1.5rem;
+    color: hsl(var(--foreground));
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+  
+  /* Pre-formatted code blocks */
+  pre {
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+  
+  /* Blockquotes */
+  blockquote {
+    font-style: normal;
+    margin: 2rem 0;
+    background: hsl(var(--muted) / 0.5);
     border-left: 4px solid hsl(var(--primary));
-    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+  
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 2rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+  }
+  
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  
+  th {
+    background: hsl(var(--muted));
+    font-weight: 600;
+  }
+  
+  /* Horizontal rules */
+  hr {
+    border: none;
+    height: 1px;
+    background: hsl(var(--border));
+    margin: 3rem 0;
   }
 }

@@ -10,11 +10,11 @@ published: true
 ## TL;DR (Too Long; Didn't Read)
 
 **Quick Summary:**
-- ✅ **Why:** Canadian law (PIPEDA + CASL) requires cookie consent
-- ✅ **Who:** Any website with Canadian users
-- ✅ **Penalty:** Up to $10 million under CASL
-- ✅ **Quebec:** Even stricter (Law 25) - up to $25M or 4% revenue
-- ✅ **Solution:** Cookie banner with accept/reject/customize options
+- **Why:** Canadian law (PIPEDA + CASL) requires cookie consent
+- **Who:** Any website with Canadian users
+- **Penalty:** Up to $10 million under CASL
+- **Quebec:** Even stricter (Law 25) - up to $25M or 4% revenue
+- **Solution:** Cookie banner with accept/reject/customize options
 
 **What You Need:**
 1. Cookie banner that appears BEFORE tracking loads
@@ -39,10 +39,10 @@ If you run a website in Canada or target Canadian users, you need to understand 
 
 **PIPEDA** is Canada's federal privacy law that applies to private-sector organizations. Under PIPEDA, you must:
 
-- ✅ Get **meaningful consent** before collecting personal information
-- ✅ Explain **why** you're collecting data and **how** you'll use it
-- ✅ Give users control over their data
-- ✅ Protect personal information with appropriate safeguards
+- Get **meaningful consent** before collecting personal information
+- Explain **why** you're collecting data and **how** you'll use it
+- Give users control over their data
+- Protect personal information with appropriate safeguards
 
 **What this means for cookies:** If your cookies collect personal information (like IP addresses, device IDs, or browsing behavior), you need explicit consent.
 
@@ -50,9 +50,9 @@ If you run a website in Canada or target Canadian users, you need to understand 
 
 While **CASL** primarily deals with email marketing, it also applies to tracking technologies. Key requirements:
 
-- ✅ Get consent before installing software (including tracking scripts) on someone's device
-- ✅ Clearly identify your organization
-- ✅ Provide an easy way to opt-out
+- Get consent before installing software (including tracking scripts) on someone's device
+- Clearly identify your organization
+- Provide an easy way to opt-out
 
 **What this means for cookies:** Marketing and advertising cookies fall under CASL's "software" definition.
 
@@ -60,15 +60,15 @@ While **CASL** primarily deals with email marketing, it also applies to tracking
 
 Quebec has its own privacy law, **Bill 64 (Law 25)**, which is even stricter than PIPEDA:
 
-- ✅ Requires **explicit consent** for cookies (not just implied)
-- ✅ Mandates **opt-in** (not opt-out) for non-essential cookies
-- ✅ Includes **significant fines** for non-compliance
+- Requires **explicit consent** for cookies (not just implied)
+- Mandates **opt-in** (not opt-out) for non-essential cookies
+- Includes **significant fines** for non-compliance
 
 If you have users in Quebec, you need to follow the stricter standard.
 
 ## What Types of Cookies Require Consent?
 
-### ✅ Strictly Necessary Cookies (No Consent Required)
+### Strictly Necessary Cookies (No Consent Required)
 
 These cookies are essential for your website to function:
 
@@ -79,7 +79,7 @@ These cookies are essential for your website to function:
 
 You **don't** need consent for these, but you should still disclose them in your privacy policy.
 
-### ⚠️ Functional Cookies (Consent Recommended)
+### Functional Cookies (Consent Recommended)
 
 These enhance user experience but aren't strictly necessary:
 
@@ -89,7 +89,7 @@ These enhance user experience but aren't strictly necessary:
 
 While technically allowed, it's best practice to get consent.
 
-### ❌ Analytics & Performance Cookies (Consent Required)
+### Analytics & Performance Cookies (Consent Required)
 
 These track user behavior and require explicit consent:
 
@@ -98,7 +98,7 @@ These track user behavior and require explicit consent:
 - Microsoft Clarity
 - Custom analytics
 
-### ❌ Marketing & Advertising Cookies (Consent Required)
+### Marketing & Advertising Cookies (Consent Required)
 
 These are used for targeting and require explicit consent:
 
@@ -112,16 +112,16 @@ These are used for targeting and require explicit consent:
 ### 1. **Make it Visible and Clear**
 
 Your cookie banner must be:
-- ✅ Shown **before** cookies are set
-- ✅ Written in **plain language**
-- ✅ Easy to **understand and dismiss**
+- Shown **before** cookies are set
+- Written in **plain language**
+- Easy to **understand and dismiss**
 
 ### 2. **Provide Granular Choices**
 
 Users must be able to:
-- ✅ Accept all cookies
-- ✅ Reject non-essential cookies
-- ✅ Choose specific cookie categories
+- Accept all cookies
+- Reject non-essential cookies
+- Choose specific cookie categories
 
 **Bad example:** "By continuing to browse, you consent to cookies."
 **Good example:** "We use cookies for analytics and advertising. You can accept all or customize your preferences."
@@ -129,44 +129,44 @@ Users must be able to:
 ### 3. **Don't Use Pre-Ticked Boxes**
 
 Under PIPEDA and Law 25:
-- ❌ Pre-ticked consent boxes are **not valid**
-- ✅ Users must **actively opt-in** to non-essential cookies
+- Pre-ticked consent boxes are **not valid**
+- Users must **actively opt-in** to non-essential cookies
 
 ### 4. **Make it Easy to Withdraw Consent**
 
 Users must be able to:
-- ✅ Change their cookie preferences anytime
-- ✅ Find cookie settings easily (footer link is common)
-- ✅ Revoke consent without penalty
+- Change their cookie preferences anytime
+- Find cookie settings easily (footer link is common)
+- Revoke consent without penalty
 
 ### 5. **Keep Records**
 
 You should document:
-- ✅ When consent was given
-- ✅ What the user consented to
-- ✅ Version of your cookie policy at the time
+- When consent was given
+- What the user consented to
+- Version of your cookie policy at the time
 
 ## Common Mistakes to Avoid
 
-### ❌ Mistake #1: Loading Cookies Before Consent
+### Mistake #1: Loading Cookies Before Consent
 
 Many websites load Google Analytics or Facebook Pixel immediately, then show a cookie banner. This is **not compliant**.
 
 **Solution:** Use a consent management platform that only loads tracking scripts after user consent.
 
-### ❌ Mistake #2: Using a "Scroll = Consent" Banner
+### Mistake #2: Using a "Scroll = Consent" Banner
 
 Banners that imply scrolling equals consent are **not valid** under Canadian law.
 
 **Solution:** Require explicit action (button click) to accept cookies.
 
-### ❌ Mistake #3: Hiding the Reject Button
+### Mistake #3: Hiding the Reject Button
 
 Making the "Accept" button prominent while hiding or de-emphasizing the "Reject" option is a **dark pattern** and may violate PIPEDA.
 
 **Solution:** Make both accept and reject options equally visible.
 
-### ❌ Mistake #4: No Cookie Policy
+### Mistake #4: No Cookie Policy
 
 A banner alone isn't enough. You need a detailed **cookie policy** that explains:
 
@@ -175,7 +175,7 @@ A banner alone isn't enough. You need a detailed **cookie policy** that explains
 - How long they last
 - How users can control them
 
-### ❌ Mistake #5: Copying a US or EU Banner
+### Mistake #5: Copying a US or EU Banner
 
 US websites often have weaker cookie consent requirements. EU banners (GDPR) are closer but still different from Canadian requirements.
 
@@ -214,10 +214,10 @@ Under Bill 64:
 
 Look for cookie banner tools that:
 
-- ✅ Are designed for **Canadian compliance** (PIPEDA, CASL, Law 25)
-- ✅ Block cookies until consent is given
-- ✅ Offer granular controls
-- ✅ Are easy to customize and brand
+- Are designed for **Canadian compliance** (PIPEDA, CASL, Law 25)
+- Block cookies until consent is given
+- Offer granular controls
+- Are easy to customize and brand
 
 ### Option 2: DIY (Not Recommended)
 

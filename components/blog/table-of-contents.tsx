@@ -19,19 +19,19 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
 
   useEffect(() => {
-    // Extract headings from the HTML content
+    // Extract only H2 headings from the HTML content
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
-    const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6')
+    const headings = doc.querySelectorAll('h2')
     
     const items: TOCItem[] = []
     headings.forEach((heading, index) => {
       const id = heading.id || `heading-${index}`
       const text = heading.textContent || ''
-      const level = parseInt(heading.tagName.charAt(1))
+      const level = 2 // All items are H2
       
       // Skip the first H2 (TL;DR) as it's already highlighted
-      if (level === 2 && index === 0 && text.toLowerCase().includes('tl;dr')) {
+      if (index === 0 && text.toLowerCase().includes('tl;dr')) {
         return
       }
       
@@ -66,27 +66,21 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   if (tocItems.length === 0) return null
 
   return (
-    <Card className="sticky top-24 mb-8 bg-muted/30 border-brand-teal/20">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <List className="h-4 w-4 text-brand-teal" />
-          <h3 className="font-semibold text-sm text-foreground">Table of Contents</h3>
+    <Card className="sticky top-24 mb-8 bg-background border border-border">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <List className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-foreground">Table of Contents</h3>
         </div>
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           {tocItems.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className={`block text-sm transition-colors hover:text-brand-teal ${
+              className={`block text-sm transition-colors hover:text-primary ${
                 activeId === item.id 
-                  ? 'text-brand-teal font-semibold' 
-                  : 'text-muted-foreground'
-              } ${
-                item.level === 1 ? 'pl-0 font-bold' :
-                item.level === 2 ? 'pl-2' :
-                item.level === 3 ? 'pl-4' :
-                item.level === 4 ? 'pl-6' :
-                'pl-8'
+                  ? 'text-primary font-semibold' 
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {item.text}
