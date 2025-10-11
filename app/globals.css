@@ -275,3 +275,101 @@
     background-color: hsl(var(--brand-green) / 0.9);
   }
 }
+
+/* Blog Post Readability Enhancements */
+.prose {
+  /* Better spacing for readability */
+  line-height: 1.8;
+  font-size: 1.125rem;
+  
+  /* Improve visual hierarchy */
+  h2::before {
+    content: '';
+    display: block;
+    margin-top: 3rem;
+  }
+  
+  /* Highlight important checkmarks */
+  li:has(> span:first-child:contains('✅')),
+  li:has(> span:first-child:contains('❌')) {
+    padding-left: 0.5rem;
+  }
+  
+  /* Style inline code better */
+  code:not(pre code) {
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    font-size: 0.9em;
+  }
+  
+  /* Make examples stand out */
+  pre {
+    margin: 2rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Better spacing for lists */
+  ul, ol {
+    margin: 1.5rem 0;
+  }
+  
+  ul > li, ol > li {
+    margin: 0.75rem 0;
+    line-height: 1.75;
+  }
+  
+  /* Style blockquotes as callout boxes */
+  blockquote {
+    font-style: normal;
+    font-weight: 400;
+    margin: 2rem 0;
+  }
+  
+  /* TL;DR section - make it stand out */
+  h2:first-of-type {
+    background: linear-gradient(to right, hsl(var(--primary) / 0.1), hsl(var(--brand-purple) / 0.1), hsl(var(--brand-pink) / 0.1));
+    border-left: 4px solid hsl(var(--primary));
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Make strong text more prominent */
+  strong {
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+  
+  /* Better table styling */
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  th {
+    background: hsl(var(--muted));
+    font-weight: 700;
+  }
+  
+  /* Better horizontal rule */
+  hr {
+    border-top: 2px solid hsl(var(--border));
+    margin: 3rem 0;
+  }
+  
+  /* Links more visible */
+  a {
+    text-decoration-color: hsl(var(--primary) / 0.3);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 0.2s;
+  }
+  
+  a:hover {
+    text-decoration-color: hsl(var(--primary));
+  }
+}

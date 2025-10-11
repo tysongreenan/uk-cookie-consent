@@ -161,7 +161,24 @@ export default async function BlogPostPage({
 
           {/* Post Content */}
           <div
-            className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-heading prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-base prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-sm prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-ul:my-6 prose-ol:my-6 prose-li:my-2"
+            className="prose prose-lg max-w-none dark:prose-invert 
+                       prose-headings:font-heading prose-headings:font-bold prose-headings:scroll-mt-20
+                       prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-border
+                       prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-4 prose-h3:text-primary
+                       prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-3
+                       prose-p:text-lg prose-p:leading-relaxed prose-p:my-6
+                       prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+                       prose-strong:text-foreground prose-strong:font-bold
+                       prose-code:text-sm prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-primary
+                       prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-4 prose-pre:my-6
+                       prose-ul:my-6 prose-ul:space-y-2
+                       prose-ol:my-6 prose-ol:space-y-2
+                       prose-li:text-lg prose-li:leading-relaxed prose-li:my-2
+                       prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:rounded-r-lg
+                       prose-hr:my-12 prose-hr:border-border
+                       prose-table:my-8 prose-table:border-collapse
+                       prose-th:bg-muted prose-th:p-4 prose-th:text-left prose-th:font-bold
+                       prose-td:p-4 prose-td:border prose-td:border-border"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 

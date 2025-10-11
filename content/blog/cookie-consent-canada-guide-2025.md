@@ -7,6 +7,26 @@ tags: ["PIPEDA", "CASL", "Canada", "Privacy Law", "Cookie Consent"]
 published: true
 ---
 
+## TL;DR (Too Long; Didn't Read)
+
+**Quick Summary:**
+- ✅ **Why:** Canadian law (PIPEDA + CASL) requires cookie consent
+- ✅ **Who:** Any website with Canadian users
+- ✅ **Penalty:** Up to $10 million under CASL
+- ✅ **Quebec:** Even stricter (Law 25) - up to $25M or 4% revenue
+- ✅ **Solution:** Cookie banner with accept/reject/customize options
+
+**What You Need:**
+1. Cookie banner that appears BEFORE tracking loads
+2. Clear "Accept All" and "Reject" buttons
+3. Granular category controls (analytics, marketing, etc.)
+4. Privacy policy link
+5. Easy way to withdraw consent later
+
+[Get Canadian-compliant cookie banner →](https://www.cookie-banner.ca/auth/signup)
+
+---
+
 ## Why Cookie Consent Matters in Canada
 
 If you run a website in Canada or target Canadian users, you need to understand cookie consent laws. Unlike the US, Canada has strict privacy regulations that require you to get consent before tracking user data.

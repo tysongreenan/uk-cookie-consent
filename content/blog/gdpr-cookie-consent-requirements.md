@@ -7,6 +7,27 @@ tags: ["GDPR", "Cookie Consent", "Privacy Law", "Europe", "Compliance"]
 published: true
 ---
 
+## TL;DR (Too Long; Didn't Read)
+
+**Quick Summary:**
+- ✅ **What:** GDPR requires explicit consent for cookies in Europe
+- ✅ **Applies to:** Any website with EU visitors (yes, even if you're not in Europe)
+- ✅ **Key Rule:** Get consent BEFORE setting cookies
+- ✅ **Penalty:** Up to €20 million or 4% of revenue
+- ✅ **Must-Haves:** Accept/Reject buttons, granular choices, privacy policy link
+
+**6 Core Requirements:**
+1. Consent must be freely given (no pre-ticked boxes)
+2. Consent must be specific (per category)
+3. Consent must be informed (explain what cookies do)
+4. Consent must be unambiguous (active opt-in)
+5. Consent before cookies (block until accepted)
+6. Easy to withdraw consent (one-click access)
+
+[Get GDPR-compliant cookie banner →](https://www.cookie-banner.ca/auth/signup)
+
+---
+
 ## What is GDPR and Why Does It Matter for Cookies?
 
 The **General Data Protection Regulation (GDPR)** is Europe's comprehensive privacy law that went into effect on May 25, 2018. If your website has visitors from the EU — even if you're based elsewhere — you need to comply with GDPR.
