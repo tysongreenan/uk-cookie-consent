@@ -161,23 +161,23 @@ export default async function BlogPostPage({
 
           {/* Post Content */}
           <div
-            className="prose prose-lg max-w-none dark:prose-invert 
-                       prose-headings:font-heading prose-headings:font-bold prose-headings:scroll-mt-20
-                       prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-border
-                       prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-4 prose-h3:text-primary
-                       prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-3
-                       prose-p:text-lg prose-p:leading-relaxed prose-p:my-6
-                       prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-                       prose-strong:text-foreground prose-strong:font-bold
-                       prose-code:text-sm prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-primary
-                       prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-4 prose-pre:my-6
-                       prose-ul:my-6 prose-ul:space-y-2
-                       prose-ol:my-6 prose-ol:space-y-2
-                       prose-li:text-lg prose-li:leading-relaxed prose-li:my-2
-                       prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:rounded-r-lg
-                       prose-hr:my-12 prose-hr:border-border
+            className="prose prose-xl max-w-none dark:prose-invert 
+                       prose-headings:font-heading prose-headings:font-black prose-headings:scroll-mt-20
+                       prose-h2:text-4xl sm:prose-h2:text-5xl prose-h2:mt-20 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b-4 prose-h2:border-primary prose-h2:text-primary
+                       prose-h3:text-3xl sm:prose-h3:text-4xl prose-h3:mt-16 prose-h3:mb-6 prose-h3:text-brand-red
+                       prose-h4:text-2xl sm:prose-h4:text-3xl prose-h4:mt-12 prose-h4:mb-4 prose-h4:text-brand-teal
+                       prose-p:text-lg prose-p:leading-relaxed prose-p:my-6 prose-p:text-foreground/90
+                       prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-brand-red
+                       prose-strong:text-foreground prose-strong:font-extrabold
+                       prose-code:text-sm prose-code:bg-primary/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-primary prose-code:font-semibold
+                       prose-pre:bg-muted prose-pre:border-2 prose-pre:border-primary/20 prose-pre:rounded-lg prose-pre:p-6 prose-pre:my-8
+                       prose-ul:my-8 prose-ul:space-y-3
+                       prose-ol:my-8 prose-ol:space-y-3
+                       prose-li:text-lg prose-li:leading-relaxed prose-li:my-3
+                       prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:my-8 prose-blockquote:rounded-r-lg prose-blockquote:font-medium
+                       prose-hr:my-16 prose-hr:border-2 prose-hr:border-border
                        prose-table:my-8 prose-table:border-collapse
-                       prose-th:bg-muted prose-th:p-4 prose-th:text-left prose-th:font-bold
+                       prose-th:bg-primary/10 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:text-primary
                        prose-td:p-4 prose-td:border prose-td:border-border"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
