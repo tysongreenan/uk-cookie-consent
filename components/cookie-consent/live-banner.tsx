@@ -121,6 +121,31 @@ export function LiveCookieBanner() {
       setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY)
       console.log('Cookie consent saved:', consent)
       
+      // Update Google Analytics consent mode (gtag) - with retry for deferred loading
+      const updateGtagConsent = () => {
+        if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+          (window as any).gtag('consent', 'update', {
+            'analytics_storage': consent.analytics ? 'granted' : 'denied',
+            'ad_storage': consent.marketing ? 'granted' : 'denied',
+            'ad_user_data': consent.marketing ? 'granted' : 'denied',
+            'ad_personalization': consent.marketing ? 'granted' : 'denied'
+          })
+          console.log('✅ Google Analytics consent updated:', consent)
+          return true
+        }
+        return false
+      }
+      
+      // Try immediately, then retry every 500ms for up to 5 seconds if GA not loaded yet
+      if (!updateGtagConsent()) {
+        let retries = 0
+        const retryInterval = setInterval(() => {
+          if (updateGtagConsent() || retries++ > 10) {
+            clearInterval(retryInterval)
+          }
+        }, 500)
+      }
+      
       // Update Google Tag Manager consent
       if (typeof window !== 'undefined' && (window as any).dataLayer) {
         (window as any).dataLayer.push({
@@ -130,6 +155,7 @@ export function LiveCookieBanner() {
           'ad_user_data': consent.marketing ? 'granted' : 'denied',
           'ad_personalization': consent.marketing ? 'granted' : 'denied'
         })
+        console.log('✅ GTM consent updated:', consent)
       }
     }
 
