@@ -28,6 +28,10 @@ export const translations = {
     
     // Always active
     alwaysActive: 'Always Active',
+    
+    // Additional UI elements
+    close: 'Close',
+    learnMore: 'Learn more',
   },
   fr: {
     title: 'Nous utilisons des cookies',
@@ -57,6 +61,10 @@ export const translations = {
     
     // Always active
     alwaysActive: 'Toujours actif',
+    
+    // Additional UI elements
+    close: 'Fermer',
+    learnMore: 'En savoir plus',
   }
 }
 
@@ -64,6 +72,12 @@ export type Language = keyof typeof translations
 
 export function getTranslation(language: Language, key: keyof typeof translations.en): string {
   return translations[language][key] || translations.en[key]
+}
+
+// Get all translations for a language
+export function getAllTranslations(language: 'en' | 'fr' | 'auto') {
+  const selectedLanguage: Language = language === 'auto' ? detectLanguage() : language
+  return translations[selectedLanguage]
 }
 
 // Auto-detect browser language

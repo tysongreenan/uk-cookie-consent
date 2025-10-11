@@ -275,12 +275,12 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
         
         ${config.behavior.showPreferences ? `
         <div id="cookie-preferences-panel" style="margin-top: 16px; padding: 16px; background-color: rgba(255,255,255,0.1); border-radius: 8px; display: none;">
-          <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
+          <h4 id="prefs-title" style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
           <div style="display: flex; flex-direction: column; gap: 12px;">
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: not-allowed; opacity: 0.7;"><input type="checkbox" checked disabled style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Strictly Necessary</strong><br><small style="opacity: 0.8;">Essential for website functionality</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-func-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Functionality</strong><br><small style="opacity: 0.8;">Remember preferences and choices</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-analytics-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Analytics</strong><br><small style="opacity: 0.8;">Help us improve our website</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-marketing-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Marketing</strong><br><small style="opacity: 0.8;">Personalized ads and content</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: not-allowed; opacity: 0.7;"><input type="checkbox" checked disabled style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-necessary">Strictly Necessary</strong><br><small id="cat-necessary-desc" style="opacity: 0.8;">Essential for website functionality</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-func-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-functionality">Functionality</strong><br><small id="cat-functionality-desc" style="opacity: 0.8;">Remember preferences and choices</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-analytics-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-analytics">Analytics</strong><br><small id="cat-analytics-desc" style="opacity: 0.8;">Help us improve our website</small></span></label>
+            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-marketing-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-marketing">Marketing</strong><br><small id="cat-marketing-desc" style="opacity: 0.8;">Personalized ads and content</small></span></label>
           </div>
           <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: space-between; align-items: center;">
             <div style="font-size: 8px; opacity: 0.3;">
@@ -335,6 +335,102 @@ ${config.branding.footerLink.enabled && config.branding.footerLink.position === 
   
   var COOKIE_NAME = 'cookie_consent';
   var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
+  
+  // Language translations
+  var TRANSLATIONS = {
+    en: {
+      title: "${config.text.title.replace(/"/g, '\\"')}",
+      message: "${config.text.message.replace(/"/g, '\\"')}",
+      acceptButton: "${config.text.acceptButton.replace(/"/g, '\\"')}",
+      rejectButton: "${config.text.rejectButton.replace(/"/g, '\\"')}",
+      preferencesButton: "${config.text.preferencesButton.replace(/"/g, '\\"')}",
+      footerLink: "${config.branding.footerLink.text.replace(/"/g, '\\"')}",
+      preferencesTitle: "Cookie Preferences",
+      strictlyNecessary: "Strictly Necessary",
+      strictlyNecessaryDesc: "Essential for website functionality",
+      functionality: "Functionality",
+      functionalityDesc: "Remember preferences and choices",
+      analytics: "Analytics",
+      analyticsDesc: "Help us improve our website",
+      marketing: "Marketing",
+      marketingDesc: "Personalized ads and content",
+      saveButton: "Save",
+      cancelButton: "Cancel"
+    },
+    fr: {
+      title: "Nous utilisons des cookies",
+      message: "Ce site web utilise des cookies pour améliorer votre expérience de navigation et fournir du contenu personnalisé.",
+      acceptButton: "Accepter tout",
+      rejectButton: "Rejeter",
+      preferencesButton: "Préférences",
+      footerLink: "Paramètres des cookies",
+      preferencesTitle: "Préférences des cookies",
+      strictlyNecessary: "Strictement nécessaire",
+      strictlyNecessaryDesc: "Essentiel pour le fonctionnement du site",
+      functionality: "Fonctionnalité",
+      functionalityDesc: "Mémoriser les préférences et les choix",
+      analytics: "Analytique",
+      analyticsDesc: "Nous aider à améliorer notre site",
+      marketing: "Marketing",
+      marketingDesc: "Publicités et contenu personnalisés",
+      saveButton: "Enregistrer",
+      cancelButton: "Annuler"
+    }
+  };
+  
+  function detectLanguage() {
+    ${config.language === 'auto' ? `
+    var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    return browserLang.startsWith('fr') ? 'fr' : 'en';
+    ` : `
+    return '${config.language}';
+    `}
+  }
+  
+  function applyTranslations() {
+    var lang = detectLanguage();
+    var trans = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    
+    // Main banner text
+    var title = document.getElementById('cookie-title');
+    var message = document.getElementById('cookie-message');
+    var acceptBtn = document.getElementById('cookie-accept-btn');
+    var rejectBtn = document.getElementById('cookie-reject-btn');
+    var prefsBtn = document.getElementById('cookie-preferences-btn');
+    var floatBtn = document.getElementById('cookie-settings-float');
+    
+    if (title) title.textContent = trans.title;
+    if (message) message.textContent = trans.message;
+    if (acceptBtn) acceptBtn.textContent = trans.acceptButton;
+    if (rejectBtn) rejectBtn.textContent = trans.rejectButton;
+    if (prefsBtn) prefsBtn.textContent = trans.preferencesButton;
+    if (floatBtn) floatBtn.textContent = trans.footerLink;
+    
+    // Preferences panel
+    var prefsTitle = document.getElementById('prefs-title');
+    var catNecessary = document.getElementById('cat-necessary');
+    var catNecessaryDesc = document.getElementById('cat-necessary-desc');
+    var catFunctionality = document.getElementById('cat-functionality');
+    var catFunctionalityDesc = document.getElementById('cat-functionality-desc');
+    var catAnalytics = document.getElementById('cat-analytics');
+    var catAnalyticsDesc = document.getElementById('cat-analytics-desc');
+    var catMarketing = document.getElementById('cat-marketing');
+    var catMarketingDesc = document.getElementById('cat-marketing-desc');
+    var saveBtn = document.getElementById('cookie-save-prefs-btn');
+    var cancelBtn = document.getElementById('cookie-cancel-prefs-btn');
+    
+    if (prefsTitle) prefsTitle.textContent = trans.preferencesTitle;
+    if (catNecessary) catNecessary.textContent = trans.strictlyNecessary;
+    if (catNecessaryDesc) catNecessaryDesc.textContent = trans.strictlyNecessaryDesc;
+    if (catFunctionality) catFunctionality.textContent = trans.functionality;
+    if (catFunctionalityDesc) catFunctionalityDesc.textContent = trans.functionalityDesc;
+    if (catAnalytics) catAnalytics.textContent = trans.analytics;
+    if (catAnalyticsDesc) catAnalyticsDesc.textContent = trans.analyticsDesc;
+    if (catMarketing) catMarketing.textContent = trans.marketing;
+    if (catMarketingDesc) catMarketingDesc.textContent = trans.marketingDesc;
+    if (saveBtn) saveBtn.textContent = trans.saveButton;
+    if (cancelBtn) cancelBtn.textContent = trans.cancelButton;
+  }
   
   ${config.branding.footerLink.enabled ? `
   // Global function for inline cookie settings links
@@ -420,6 +516,9 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
     
     if (!banner) return;
+    
+    // Apply language translations
+    applyTranslations();
     
     var existingConsent = getConsent();
     

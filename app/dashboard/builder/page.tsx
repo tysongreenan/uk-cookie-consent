@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript } from '@/types'
 import { applyTranslations } from '@/lib/translations'
+import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 
 const defaultConfig: BannerConfig = {
   name: 'My Cookie Banner',
@@ -1247,7 +1248,45 @@ export default function BannerBuilderPage() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="px-3 pb-3">
+                            <div className="px-3 pb-3 space-y-3">
+                              {!script.scriptCode.trim() && (
+                                <div>
+                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                  <Select onValueChange={(templateKey) => {
+                                    const template = scriptTemplates[templateKey]
+                                    if (template && template.category === 'functionality') {
+                                      const newScripts = [...config.scripts.functionality]
+                                      newScripts[index].scriptCode = template.scriptCode
+                                      newScripts[index].name = template.name
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, functionality: newScripts }
+                                      }))
+                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
+                                    }
+                                  }}>
+                                    <SelectTrigger className="text-xs h-9">
+                                      <SelectValue placeholder="Select a template (Intercom, Zendesk, etc.)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {Object.entries(scriptTemplates)
+                                        .filter(([_, template]) => template.category === 'functionality')
+                                        .map(([key, template]) => (
+                                          <SelectItem key={key} value={key} className="text-xs">
+                                            <div className="flex flex-col">
+                                              <span className="font-medium">{template.name}</span>
+                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
+                                            </div>
+                                          </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <p className="text-[10px] text-muted-foreground mt-1">
+                                    💡 Templates include setup instructions - just replace placeholder IDs
+                                  </p>
+                                </div>
+                              )}
+                              
                               <textarea
                                 value={script.scriptCode}
                                 onChange={(e) => {
@@ -1258,8 +1297,8 @@ export default function BannerBuilderPage() {
                                     scripts: { ...prev.scripts, functionality: newScripts }
                                   }))
                                 }}
-                                placeholder="Paste your script code here..."
-                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                placeholder="Paste your script code here or select a template above..."
+                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
                               />
                             </div>
                           </div>
@@ -1365,7 +1404,45 @@ export default function BannerBuilderPage() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="px-3 pb-3">
+                            <div className="px-3 pb-3 space-y-3">
+                              {!script.scriptCode.trim() && (
+                                <div>
+                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                  <Select onValueChange={(templateKey) => {
+                                    const template = scriptTemplates[templateKey]
+                                    if (template && template.category === 'tracking-performance') {
+                                      const newScripts = [...config.scripts.trackingPerformance]
+                                      newScripts[index].scriptCode = template.scriptCode
+                                      newScripts[index].name = template.name
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                      }))
+                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
+                                    }
+                                  }}>
+                                    <SelectTrigger className="text-xs h-9">
+                                      <SelectValue placeholder="Select a template (Google Analytics, Hotjar, etc.)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {Object.entries(scriptTemplates)
+                                        .filter(([_, template]) => template.category === 'tracking-performance')
+                                        .map(([key, template]) => (
+                                          <SelectItem key={key} value={key} className="text-xs">
+                                            <div className="flex flex-col">
+                                              <span className="font-medium">{template.name}</span>
+                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
+                                            </div>
+                                          </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <p className="text-[10px] text-muted-foreground mt-1">
+                                    💡 Templates include setup instructions - just replace placeholder IDs
+                                  </p>
+                                </div>
+                              )}
+                              
                               <textarea
                                 value={script.scriptCode}
                                 onChange={(e) => {
@@ -1376,8 +1453,8 @@ export default function BannerBuilderPage() {
                                     scripts: { ...prev.scripts, trackingPerformance: newScripts }
                                   }))
                                 }}
-                                placeholder="Paste your script code here..."
-                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                placeholder="Paste your script code here or select a template above..."
+                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
                               />
                             </div>
                           </div>
@@ -1483,7 +1560,45 @@ export default function BannerBuilderPage() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="px-3 pb-3">
+                            <div className="px-3 pb-3 space-y-3">
+                              {!script.scriptCode.trim() && (
+                                <div>
+                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                  <Select onValueChange={(templateKey) => {
+                                    const template = scriptTemplates[templateKey]
+                                    if (template && template.category === 'targeting-advertising') {
+                                      const newScripts = [...config.scripts.targetingAdvertising]
+                                      newScripts[index].scriptCode = template.scriptCode
+                                      newScripts[index].name = template.name
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                      }))
+                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
+                                    }
+                                  }}>
+                                    <SelectTrigger className="text-xs h-9">
+                                      <SelectValue placeholder="Select a template (Facebook Pixel, Google Ads, etc.)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {Object.entries(scriptTemplates)
+                                        .filter(([_, template]) => template.category === 'targeting-advertising')
+                                        .map(([key, template]) => (
+                                          <SelectItem key={key} value={key} className="text-xs">
+                                            <div className="flex flex-col">
+                                              <span className="font-medium">{template.name}</span>
+                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
+                                            </div>
+                                          </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <p className="text-[10px] text-muted-foreground mt-1">
+                                    💡 Templates include setup instructions - just replace placeholder IDs
+                                  </p>
+                                </div>
+                              )}
+                              
                               <textarea
                                 value={script.scriptCode}
                                 onChange={(e) => {
@@ -1494,8 +1609,8 @@ export default function BannerBuilderPage() {
                                     scripts: { ...prev.scripts, targetingAdvertising: newScripts }
                                   }))
                                 }}
-                                placeholder="Paste your script code here..."
-                                className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                placeholder="Paste your script code here or select a template above..."
+                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
                               />
                             </div>
                           </div>
