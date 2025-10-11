@@ -6,6 +6,7 @@ import { Clock, Calendar, ArrowLeft, ArrowRight, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { TableOfContents } from '@/components/blog/table-of-contents'
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
@@ -100,7 +101,7 @@ export default async function BlogPostPage({
 
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <article className="container max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+        <article className="container max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           {/* Back Button */}
           <Link
             href="/blog"
@@ -159,31 +160,48 @@ export default async function BlogPostPage({
             </div>
           )}
 
-          {/* Post Content */}
-          <div
-            className="prose prose-xl max-w-none dark:prose-invert 
-                       prose-headings:font-heading prose-headings:font-black prose-headings:scroll-mt-20
-                       prose-h1:text-5xl sm:prose-h1:text-6xl prose-h1:mt-20 prose-h1:mb-12 prose-h1:text-primary prose-h1:leading-tight
-                       prose-h2:text-3xl sm:prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-3 prose-h2:border-b-2 prose-h2:border-primary/30 prose-h2:text-brand-red prose-h2:leading-tight
-                       prose-h3:text-2xl sm:prose-h3:text-3xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:text-brand-teal prose-h3:leading-tight
-                       prose-h4:text-xl sm:prose-h4:text-2xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:text-primary prose-h4:leading-tight
-                       prose-h5:text-lg sm:prose-h5:text-xl prose-h5:mt-8 prose-h5:mb-3 prose-h5:text-foreground prose-h5:leading-tight
-                       prose-h6:text-base sm:prose-h6:text-lg prose-h6:mt-6 prose-h6:mb-2 prose-h6:text-foreground prose-h6:leading-tight
-                       prose-p:text-lg prose-p:leading-relaxed prose-p:my-6 prose-p:text-foreground/90
-                       prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-brand-red
-                       prose-strong:text-foreground prose-strong:font-extrabold
-                       prose-code:text-sm prose-code:bg-primary/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-primary prose-code:font-semibold
-                       prose-pre:bg-muted prose-pre:border-2 prose-pre:border-primary/20 prose-pre:rounded-lg prose-pre:p-6 prose-pre:my-8
-                       prose-ul:my-8 prose-ul:space-y-3
-                       prose-ol:my-8 prose-ol:space-y-3
-                       prose-li:text-lg prose-li:leading-relaxed prose-li:my-3
-                       prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:my-8 prose-blockquote:rounded-r-lg prose-blockquote:font-medium
-                       prose-hr:my-16 prose-hr:border-2 prose-hr:border-border
-                       prose-table:my-8 prose-table:border-collapse
-                       prose-th:bg-primary/10 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:text-primary
-                       prose-td:p-4 prose-td:border prose-td:border-border"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          {/* Mobile Table of Contents */}
+          <div className="mb-8 lg:hidden">
+            <TableOfContents content={post.content} />
+          </div>
+
+          {/* Content Layout with Table of Contents */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              <div
+                className="prose prose-xl max-w-none dark:prose-invert 
+                           prose-headings:font-heading prose-headings:font-black prose-headings:scroll-mt-20
+                           prose-h1:text-5xl sm:prose-h1:text-6xl prose-h1:mt-20 prose-h1:mb-12 prose-h1:text-primary prose-h1:leading-tight
+                           prose-h2:text-3xl sm:prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-3 prose-h2:border-b-2 prose-h2:border-primary/30 prose-h2:text-brand-red prose-h2:leading-tight
+                           prose-h3:text-2xl sm:prose-h3:text-3xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:text-brand-teal prose-h3:leading-tight
+                           prose-h4:text-xl sm:prose-h4:text-2xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:text-primary prose-h4:leading-tight
+                           prose-h5:text-lg sm:prose-h5:text-xl prose-h5:mt-8 prose-h5:mb-3 prose-h5:text-foreground prose-h5:leading-tight
+                           prose-h6:text-base sm:prose-h6:text-lg prose-h6:mt-6 prose-h6:mb-2 prose-h6:text-foreground prose-h6:leading-tight
+                           prose-p:text-lg prose-p:leading-relaxed prose-p:my-6 prose-p:text-foreground/90
+                           prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-brand-red
+                           prose-strong:text-foreground prose-strong:font-extrabold
+                           prose-code:text-sm prose-code:bg-primary/10 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-primary prose-code:font-semibold
+                           prose-pre:bg-muted prose-pre:border-2 prose-pre:border-primary/20 prose-pre:rounded-lg prose-pre:p-6 prose-pre:my-8
+                           prose-ul:my-8 prose-ul:space-y-3
+                           prose-ol:my-8 prose-ol:space-y-3
+                           prose-li:text-lg prose-li:leading-relaxed prose-li:my-3
+                           prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:my-8 prose-blockquote:rounded-r-lg prose-blockquote:font-medium
+                           prose-hr:my-16 prose-hr:border-2 prose-hr:border-border
+                           prose-table:my-8 prose-table:border-collapse
+                           prose-th:bg-primary/10 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:text-primary
+                           prose-td:p-4 prose-td:border prose-td:border-border"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            </div>
+            
+            {/* Table of Contents Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="hidden lg:block">
+                <TableOfContents content={post.content} />
+              </div>
+            </div>
+          </div>
 
           {/* CTA Section */}
           <div className="mt-12 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 p-6 sm:p-8">

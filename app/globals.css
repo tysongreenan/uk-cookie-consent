@@ -337,12 +337,15 @@
   }
   
   h2:first-of-type::before {
-    content: '⚡';
+    content: '';
     position: absolute;
     left: 1.5rem;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 2.5rem;
+    width: 4px;
+    height: 2rem;
+    background: hsl(var(--brand-teal));
+    border-radius: 2px;
   }
   
   /* Style the content right after TL;DR - About Us Style */
@@ -392,34 +395,39 @@
     margin-right: 0.5rem;
   }
   
-  /* About Us style list items with checkmarks */
-  ul li:has(span:first-child:contains('✅')),
-  ul li:has(span:first-child:contains('❌')),
-  ol li:has(span:first-child:contains('✅')),
-  ol li:has(span:first-child:contains('❌')) {
-    background: hsl(var(--muted) / 0.2);
+  /* Clean list items with visual indicators */
+  ul li:has(strong:first-child),
+  ol li:has(strong:first-child) {
+    background: hsl(var(--muted) / 0.1);
     border-radius: 8px;
-    padding: 1rem 1.5rem;
-    margin: 0.75rem 0;
-    border-left: 4px solid hsl(var(--brand-teal));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0;
+    border-left: 3px solid hsl(var(--brand-teal) / 0.5);
+    transition: all 0.2s ease;
   }
   
-  /* About Us style arrow lists */
+  ul li:has(strong:first-child):hover,
+  ol li:has(strong:first-child):hover {
+    background: hsl(var(--muted) / 0.2);
+    border-left-color: hsl(var(--brand-teal));
+  }
+  
+  /* Clean arrow lists */
   ul li:has(span:first-child:contains('→')),
   ol li:has(span:first-child:contains('→')) {
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.75rem 0;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
   }
   
   ul li:has(span:first-child:contains('→')) span:first-child,
   ol li:has(span:first-child:contains('→')) span:first-child {
     color: hsl(var(--brand-teal));
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 0.125rem;
     flex-shrink: 0;
+    font-size: 0.9em;
   }
   
   /* Highlight "What You Need" and "Quick Summary" sections */

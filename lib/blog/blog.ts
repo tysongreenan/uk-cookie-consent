@@ -5,6 +5,42 @@ import { remark } from 'remark'
 import html from 'remark-html'
 import readingTime from 'reading-time'
 
+// Simple slug function for headings
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .trim()
+}
+
+// Custom remark plugin to add IDs to headings
+function remarkHeadingIds() {
+  return (tree: any) => {
+    const visit = (node: any) => {
+      if (node.type === 'heading') {
+        const text = node.children
+          .filter((child: any) => child.type === 'text')
+          .map((child: any) => child.value)
+          .join('')
+        
+        if (text) {
+          node.data = node.data || {}
+          node.data.hProperties = node.data.hProperties || {}
+          node.data.hProperties.id = slugify(text)
+        }
+      }
+      
+      if (node.children) {
+        node.children.forEach(visit)
+      }
+    }
+    
+    visit(tree)
+  }
+}
+
 const postsDirectory = path.join(process.cwd(), 'content/blog')
 
 export interface BlogPost {
@@ -79,8 +115,9 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     const fileContents = fs.readFileSync(fullPath, 'utf8')
     const { data, content } = matter(fileContents)
 
-    // Convert markdown to HTML
+    // Convert markdown to HTML with heading IDs
     const processedContent = await remark()
+      .use(remarkHeadingIds)
       .use(html, { sanitize: false })
       .process(content)
     const contentHtml = processedContent.toString()
