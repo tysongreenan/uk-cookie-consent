@@ -40,6 +40,12 @@ export function Header() {
               Features
             </Link>
             <Link
+              href="/blog"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Blog
+            </Link>
+            <Link
               href="/about"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
@@ -98,6 +104,13 @@ export function Header() {
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
               Features
+            </Link>
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Blog
             </Link>
             <Link
               href="/about"
