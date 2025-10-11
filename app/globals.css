@@ -321,20 +321,19 @@
     color: hsl(var(--primary)) !important;
   }
   
-  /* TL;DR Box - Make it IMPOSSIBLE to miss */
+  /* TL;DR Box - About Us Style */
   h2:first-of-type {
-    background: linear-gradient(135deg, hsl(var(--brand-red) / 0.15) 0%, hsl(var(--brand-purple) / 0.15) 50%, hsl(var(--brand-pink) / 0.15) 100%);
-    border: 4px solid hsl(var(--brand-red)) !important;
+    background: linear-gradient(135deg, hsl(var(--brand-teal) / 0.1) 0%, hsl(var(--brand-purple) / 0.1) 50%, hsl(var(--brand-pink) / 0.1) 100%);
+    border: 3px solid hsl(var(--brand-teal)) !important;
     border-radius: 16px;
-    padding: 2.5rem 3rem;
-    margin: 4rem 0;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    padding: 2rem 2.5rem;
+    margin: 3rem 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     position: relative;
-    font-size: 2.5rem !important;
-    color: hsl(var(--brand-red)) !important;
+    font-size: 2rem !important;
+    color: hsl(var(--brand-teal)) !important;
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-weight: 800;
   }
   
   h2:first-of-type::before {
@@ -346,19 +345,20 @@
     font-size: 2.5rem;
   }
   
-  /* Style the content right after TL;DR */
+  /* Style the content right after TL;DR - About Us Style */
   h2:first-of-type + p,
   h2:first-of-type + p + p,
   h2:first-of-type + p + ul,
   h2:first-of-type + p + p + ul,
   h2:first-of-type + p + p + p {
-    background: white;
-    border: 2px solid hsl(var(--border));
-    border-radius: 8px;
+    background: hsl(var(--muted) / 0.3);
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
     padding: 1.5rem 2rem;
-    margin: 0 0 1rem 0 !important;
+    margin: 1rem 0 !important;
     font-size: 1.1rem;
     line-height: 1.8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
   
   /* Make HR after TL;DR very prominent */
@@ -385,11 +385,41 @@
     background: linear-gradient(to right, transparent, hsl(var(--primary) / 0.2), transparent);
   }
   
-  /* Make checkmarks and X marks in lists stand out */
+  /* Make checkmarks and X marks in lists stand out - About Us Style */
   ul li strong:first-child,
   ol li strong:first-child {
     font-size: 1.2em;
     margin-right: 0.5rem;
+  }
+  
+  /* About Us style list items with checkmarks */
+  ul li:has(span:first-child:contains('✅')),
+  ul li:has(span:first-child:contains('❌')),
+  ol li:has(span:first-child:contains('✅')),
+  ol li:has(span:first-child:contains('❌')) {
+    background: hsl(var(--muted) / 0.2);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 0.75rem 0;
+    border-left: 4px solid hsl(var(--brand-teal));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* About Us style arrow lists */
+  ul li:has(span:first-child:contains('→')),
+  ol li:has(span:first-child:contains('→')) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+  }
+  
+  ul li:has(span:first-child:contains('→')) span:first-child,
+  ol li:has(span:first-child:contains('→')) span:first-child {
+    color: hsl(var(--brand-teal));
+    font-weight: bold;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
   }
   
   /* Highlight "What You Need" and "Quick Summary" sections */
@@ -427,13 +457,41 @@
     padding-left: 0.5rem;
   }
   
-  /* Callout boxes (blockquotes) */
+  /* Callout boxes (blockquotes) - About Us Style */
   blockquote {
     font-style: normal;
     font-weight: 500;
     margin: 3rem 0;
-    background: hsl(var(--primary) / 0.05);
+    background: hsl(var(--muted) / 0.3);
+    border-left: 4px solid hsl(var(--brand-teal));
+    border-radius: 12px;
+    padding: 2rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Key points boxes like About Us */
+  p:has(strong:first-child:contains('Key Points:')),
+  p:has(strong:first-child:contains('What You Need:')),
+  p:has(strong:first-child:contains('Quick Summary:')) {
+    background: linear-gradient(135deg, hsl(var(--brand-teal) / 0.05) 0%, hsl(var(--brand-purple) / 0.05) 100%);
+    border: 2px solid hsl(var(--brand-teal) / 0.2);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Important callouts like About Us */
+  p:has(strong:contains('Important:')),
+  p:has(strong:contains('Note:')),
+  p:has(strong:contains('Warning:')),
+  p:has(strong:contains('Pro Tip:')) {
+    background: hsl(var(--brand-red) / 0.05);
+    border: 2px solid hsl(var(--brand-red) / 0.2);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
   
   /* Strong text - make it POP */
