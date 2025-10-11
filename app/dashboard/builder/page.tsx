@@ -309,9 +309,22 @@ export default function BannerBuilderPage() {
       const data = await response.json()
       
       if (response.ok) {
-        // Ensure performance settings exist for backward compatibility
+        // Ensure all settings exist for backward compatibility (migration for old banners)
         const bannerConfig = {
           ...data.banner.config,
+          // Add missing language field
+          language: data.banner.config.language || 'auto',
+          // Add missing branding fields
+          branding: {
+            ...data.banner.config.branding,
+            footerLink: data.banner.config.branding?.footerLink || {
+              enabled: true,
+              text: 'Cookie Settings',
+              position: 'floating',
+              floatingPosition: 'bottom-left'
+            }
+          },
+          // Ensure performance settings exist
           advanced: {
             ...data.banner.config.advanced,
             performance: {
@@ -952,23 +965,30 @@ export default function BannerBuilderPage() {
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="footer-link-enabled"
-                        checked={config.branding.footerLink.enabled}
+                        checked={config.branding?.footerLink?.enabled ?? true}
                         onCheckedChange={(checked) => updateConfig('branding', { 
-                          footerLink: { ...config.branding.footerLink, enabled: checked }
+                          footerLink: { 
+                            ...(config.branding?.footerLink || {
+                              text: 'Cookie Settings',
+                              position: 'floating',
+                              floatingPosition: 'bottom-left'
+                            }), 
+                            enabled: checked 
+                          }
                         })}
                       />
                       <Label htmlFor="footer-link-enabled">Enable Cookie Settings Link</Label>
                     </div>
 
-                    {config.branding.footerLink.enabled && (
+                    {config.branding?.footerLink?.enabled && (
                       <div className="space-y-4">
                         <div>
                           <Label htmlFor="footer-link-text">Link Text</Label>
                           <Input
                             id="footer-link-text"
-                            value={config.branding.footerLink.text}
+                            value={config.branding?.footerLink?.text || 'Cookie Settings'}
                             onChange={(e) => updateConfig('branding', { 
-                              footerLink: { ...config.branding.footerLink, text: e.target.value }
+                              footerLink: { ...(config.branding?.footerLink || {}), text: e.target.value }
                             })}
                             placeholder="Cookie Settings"
                           />
@@ -977,9 +997,9 @@ export default function BannerBuilderPage() {
                         <div>
                           <Label htmlFor="footer-link-position">Position</Label>
                           <Select 
-                            value={config.branding.footerLink.position} 
+                            value={config.branding?.footerLink?.position || 'floating'} 
                             onValueChange={(value: any) => updateConfig('branding', { 
-                              footerLink: { ...config.branding.footerLink, position: value }
+                              footerLink: { ...(config.branding?.footerLink || {}), position: value }
                             })}
                           >
                             <SelectTrigger>
@@ -992,13 +1012,13 @@ export default function BannerBuilderPage() {
                           </Select>
                         </div>
 
-                        {config.branding.footerLink.position === 'floating' && (
+                        {config.branding?.footerLink?.position === 'floating' && (
                           <div>
                             <Label htmlFor="floating-position">Floating Position</Label>
                             <Select 
-                              value={config.branding.footerLink.floatingPosition || 'bottom-left'} 
+                              value={config.branding?.footerLink?.floatingPosition || 'bottom-left'} 
                               onValueChange={(value: any) => updateConfig('branding', { 
-                                footerLink: { ...config.branding.footerLink, floatingPosition: value }
+                                footerLink: { ...(config.branding?.footerLink || {}), floatingPosition: value }
                               })}
                             >
                               <SelectTrigger>
@@ -1012,11 +1032,11 @@ export default function BannerBuilderPage() {
                           </div>
                         )}
 
-                        {config.branding.footerLink.position === 'inline' && (
+                        {config.branding?.footerLink?.position === 'inline' && (
                           <div className="mt-4 p-4 bg-muted rounded-lg">
                             <p className="text-sm font-medium mb-2">Add this to your website footer:</p>
                             <code className="block p-3 bg-background rounded text-xs overflow-x-auto">
-                              {`<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${config.branding.footerLink.text}</a>`}
+                              {`<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${config.branding?.footerLink?.text || 'Cookie Settings'}</a>`}
                             </code>
                             <p className="text-xs text-muted-foreground mt-2">
                               This link will reopen the cookie banner when clicked.
