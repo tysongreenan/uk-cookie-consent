@@ -17,6 +17,7 @@ import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript } from '@/types'
+import { applyTranslations } from '@/lib/translations'
 
 const defaultConfig: BannerConfig = {
   name: 'My Cookie Banner',
@@ -345,6 +346,24 @@ export default function BannerBuilderPage() {
       ...prev,
       [section]: { ...(prev[section] as any), ...updates }
     }))
+  }
+
+  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'auto') => {
+    setConfig(prev => ({
+      ...prev,
+      language: newLanguage
+    }))
+    
+    // If user selects specific language (not auto), apply translations
+    if (newLanguage !== 'auto') {
+      const translations = applyTranslations(newLanguage)
+      setConfig(prev => ({
+        ...prev,
+        language: newLanguage,
+        text: translations
+      }))
+      toast.success(`Banner text updated to ${newLanguage === 'fr' ? 'French' : 'English'}`)
+    }
   }
 
   const handleThemeChange = (theme: 'light' | 'dark' | 'custom') => {
@@ -770,7 +789,7 @@ export default function BannerBuilderPage() {
                       <Label htmlFor="language">Banner Language</Label>
                       <Select 
                         value={config.language} 
-                        onValueChange={(value: any) => updateConfig('language', value)}
+                        onValueChange={handleLanguageChange}
                       >
                         <SelectTrigger>
                           <SelectValue />

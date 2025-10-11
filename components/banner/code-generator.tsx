@@ -18,6 +18,7 @@ interface BannerConfig {
   name: string
   position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'
   theme: 'light' | 'dark' | 'custom'
+  language: 'en' | 'fr' | 'auto'
   colors: {
     background: string
     text: string
@@ -51,6 +52,12 @@ interface BannerConfig {
       text: string
       openInNewTab: boolean
       required: boolean
+    }
+    footerLink: {
+      enabled: boolean
+      text: string
+      position: 'floating' | 'inline'
+      floatingPosition?: 'bottom-left' | 'bottom-right'
     }
   }
   layout: {
