@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TableOfContents } from '@/components/blog/table-of-contents'
+import { ReadingProgress } from '@/components/blog/reading-progress'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 
@@ -102,6 +103,7 @@ export default async function BlogPostPage({
       />
 
       <div className="min-h-screen bg-background">
+        <ReadingProgress />
         <Header />
         <main className="container max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           {/* Back Button */}
@@ -161,6 +163,7 @@ export default async function BlogPostPage({
               />
             </div>
           )}
+
 
           {/* Mobile Table of Contents */}
           <div className="mb-8 lg:hidden">

@@ -68,44 +68,54 @@ If you have users in Quebec, you need to follow the stricter standard.
 
 ## What Types of Cookies Require Consent?
 
-### Strictly Necessary Cookies (No Consent Required)
+Understanding cookie categories is crucial for Canadian compliance. Here's a breakdown of what requires consent and what doesn't:
 
-These cookies are essential for your website to function:
+### 1. Strictly Necessary Cookies (No Consent Required)
 
-- Session management
-- Authentication
-- Security features
-- Load balancing
+These cookies are essential for your website to function properly:
 
-You **don't** need consent for these, but you should still disclose them in your privacy policy.
+**Examples:**
+- Session management (keeping users logged in)
+- Authentication (verifying user identity)
+- Security features (preventing fraud)
+- Load balancing (distributing traffic)
+- Shopping cart functionality
 
-### Functional Cookies (Consent Recommended)
+**Key Point:** You **don't** need consent for these, but you must still disclose them in your privacy policy.
+
+### 2. Functional Cookies (Consent Recommended)
 
 These enhance user experience but aren't strictly necessary:
 
-- Language preferences
-- Theme settings
-- Shopping cart persistence
+**Examples:**
+- Language preferences (English/French)
+- Theme settings (dark mode, light mode)
+- Shopping cart persistence (remembering items)
+- User interface preferences
 
-While technically allowed, it's best practice to get consent.
+**Best Practice:** While technically allowed without consent, it's recommended to get user permission.
 
-### Analytics & Performance Cookies (Consent Required)
+### 3. Analytics & Performance Cookies (Consent Required)
 
-These track user behavior and require explicit consent:
+These track user behavior and **always require explicit consent**:
 
-- Google Analytics
-- Hotjar
-- Microsoft Clarity
-- Custom analytics
+**Examples:**
+- Google Analytics (page views, user behavior)
+- Hotjar (user recordings, heatmaps)
+- Microsoft Clarity (session recordings)
+- Custom analytics (conversion tracking)
 
-### Marketing & Advertising Cookies (Consent Required)
+**Important:** Even "anonymized" analytics typically require consent under Canadian law.
 
-These are used for targeting and require explicit consent:
+### 4. Marketing & Advertising Cookies (Consent Required)
 
-- Google Ads
-- Facebook Pixel
-- Retargeting pixels
-- Affiliate tracking
+These are used for targeting and advertising - **always require consent**:
+
+**Examples:**
+- Google Ads (conversion tracking, remarketing)
+- Facebook Pixel (audience building, ad optimization)
+- Retargeting pixels (showing ads to previous visitors)
+- Affiliate tracking (commission tracking)
 
 ## How to Make Your Cookie Banner Compliant
 
