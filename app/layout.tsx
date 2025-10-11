@@ -72,27 +72,33 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Google Tag Manager */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5LGTBVXZ');`,
-          }}
-        />
-        
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5"></script>
+        {/* Deferred Google Tag Manager - loads after page is interactive */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Defer GTM until page is fully loaded
+              window.addEventListener('load', function() {
+                setTimeout(function() {
+                  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                  })(window,document,'script','dataLayer','GTM-5LGTBVXZ');
+                }, 1000); // 1 second delay after load
+              });
+            `,
+          }}
+        />
+        
+        {/* Deferred Google Analytics - loads after page is interactive */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Initialize dataLayer and consent before GA loads
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
               
-              // Initialize GA with consent mode
+              // Set default consent to denied
               gtag('consent', 'default', {
                 'analytics_storage': 'denied',
                 'ad_storage': 'denied',
@@ -100,8 +106,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 'ad_personalization': 'denied'
               });
               
-              gtag('config', 'G-QM1L8P6TT5', {
-                'anonymize_ip': true
+              // Defer loading GA script until after page load
+              window.addEventListener('load', function() {
+                setTimeout(function() {
+                  var script = document.createElement('script');
+                  script.async = true;
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5';
+                  document.head.appendChild(script);
+                  
+                  script.onload = function() {
+                    gtag('js', new Date());
+                    gtag('config', 'G-QM1L8P6TT5', {
+                      'anonymize_ip': true
+                    });
+                  };
+                }, 1000); // 1 second delay after load
               });
             `,
           }}
