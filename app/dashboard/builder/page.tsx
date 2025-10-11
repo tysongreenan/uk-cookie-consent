@@ -1270,56 +1270,66 @@ export default function BannerBuilderPage() {
                             </div>
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
-                                <div>
-                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                <div className="p-3 bg-muted/50 rounded-lg border">
+                                  <Label className="text-xs font-medium mb-2 block">💬 What functionality are you adding?</Label>
                                   <Select onValueChange={(templateKey) => {
                                     const template = scriptTemplates[templateKey]
-                                    if (template && template.category === 'functionality') {
+                                    if (template) {
                                       const newScripts = [...config.scripts.functionality]
-                                      newScripts[index].scriptCode = template.scriptCode
                                       newScripts[index].name = template.name
                                       setConfig(prev => ({
                                         ...prev,
                                         scripts: { ...prev.scripts, functionality: newScripts }
                                       }))
-                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
                                     }
                                   }}>
                                     <SelectTrigger className="text-xs h-9">
-                                      <SelectValue placeholder="Select a template (Intercom, Zendesk, etc.)" />
+                                      <SelectValue placeholder="Select tool (Intercom, Zendesk, etc.)" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {Object.entries(scriptTemplates)
                                         .filter(([_, template]) => template.category === 'functionality')
                                         .map(([key, template]) => (
                                           <SelectItem key={key} value={key} className="text-xs">
-                                            <div className="flex flex-col">
-                                              <span className="font-medium">{template.name}</span>
-                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
-                                            </div>
+                                            {template.name}
                                           </SelectItem>
                                         ))}
                                     </SelectContent>
                                   </Select>
-                                  <p className="text-[10px] text-muted-foreground mt-1">
-                                    💡 Templates include setup instructions - just replace placeholder IDs
-                                  </p>
+                                  {script.name && scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || ''] && (
+                                    <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded text-xs space-y-2">
+                                      <p className="font-medium text-primary">
+                                        📍 Where to find your {script.name} code:
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        {scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || '']?.instructions}
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        Copy the tracking code and paste it in the box below.
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
-                              <textarea
-                                value={script.scriptCode}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.functionality]
-                                  newScripts[index].scriptCode = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, functionality: newScripts }
-                                  }))
-                                }}
-                                placeholder="Paste your script code here or select a template above..."
-                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
-                              />
+                              <div>
+                                <Label className="text-xs font-medium mb-2 block">
+                                  {script.scriptCode.trim() ? 'Script Code:' : 'Paste your script code here:'}
+                                </Label>
+                                <textarea
+                                  value={script.scriptCode}
+                                  onChange={(e) => {
+                                    const newScripts = [...config.scripts.functionality]
+                                    newScripts[index].scriptCode = e.target.value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, functionality: newScripts }
+                                    }))
+                                  }}
+                                  placeholder={`Paste your ${script.name || 'functionality'} code here...`}
+                                  className="w-full h-32 p-3 text-xs font-mono border rounded resize-none focus:ring-2 focus:ring-primary"
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1426,56 +1436,66 @@ export default function BannerBuilderPage() {
                             </div>
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
-                                <div>
-                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                <div className="p-3 bg-muted/50 rounded-lg border">
+                                  <Label className="text-xs font-medium mb-2 block">📊 What are you tracking?</Label>
                                   <Select onValueChange={(templateKey) => {
                                     const template = scriptTemplates[templateKey]
-                                    if (template && template.category === 'tracking-performance') {
+                                    if (template) {
                                       const newScripts = [...config.scripts.trackingPerformance]
-                                      newScripts[index].scriptCode = template.scriptCode
                                       newScripts[index].name = template.name
                                       setConfig(prev => ({
                                         ...prev,
                                         scripts: { ...prev.scripts, trackingPerformance: newScripts }
                                       }))
-                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
                                     }
                                   }}>
                                     <SelectTrigger className="text-xs h-9">
-                                      <SelectValue placeholder="Select a template (Google Analytics, Hotjar, etc.)" />
+                                      <SelectValue placeholder="Select tool (Google Analytics, Hotjar, etc.)" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {Object.entries(scriptTemplates)
                                         .filter(([_, template]) => template.category === 'tracking-performance')
                                         .map(([key, template]) => (
                                           <SelectItem key={key} value={key} className="text-xs">
-                                            <div className="flex flex-col">
-                                              <span className="font-medium">{template.name}</span>
-                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
-                                            </div>
+                                            {template.name}
                                           </SelectItem>
                                         ))}
                                     </SelectContent>
                                   </Select>
-                                  <p className="text-[10px] text-muted-foreground mt-1">
-                                    💡 Templates include setup instructions - just replace placeholder IDs
-                                  </p>
+                                  {script.name && scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || ''] && (
+                                    <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded text-xs space-y-2">
+                                      <p className="font-medium text-primary">
+                                        📍 Where to find your {script.name} code:
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        {scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || '']?.instructions}
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        Copy the tracking code and paste it in the box below.
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
-                              <textarea
-                                value={script.scriptCode}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.trackingPerformance]
-                                  newScripts[index].scriptCode = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, trackingPerformance: newScripts }
-                                  }))
-                                }}
-                                placeholder="Paste your script code here or select a template above..."
-                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
-                              />
+                              <div>
+                                <Label className="text-xs font-medium mb-2 block">
+                                  {script.scriptCode.trim() ? 'Script Code:' : 'Paste your tracking code here:'}
+                                </Label>
+                                <textarea
+                                  value={script.scriptCode}
+                                  onChange={(e) => {
+                                    const newScripts = [...config.scripts.trackingPerformance]
+                                    newScripts[index].scriptCode = e.target.value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, trackingPerformance: newScripts }
+                                    }))
+                                  }}
+                                  placeholder={`Paste your ${script.name || 'tracking'} code here...`}
+                                  className="w-full h-32 p-3 text-xs font-mono border rounded resize-none focus:ring-2 focus:ring-primary"
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1582,56 +1602,66 @@ export default function BannerBuilderPage() {
                             </div>
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
-                                <div>
-                                  <Label className="text-xs font-medium mb-2 block">📝 Quick Insert Template:</Label>
+                                <div className="p-3 bg-muted/50 rounded-lg border">
+                                  <Label className="text-xs font-medium mb-2 block">🎯 What are you advertising with?</Label>
                                   <Select onValueChange={(templateKey) => {
                                     const template = scriptTemplates[templateKey]
-                                    if (template && template.category === 'targeting-advertising') {
+                                    if (template) {
                                       const newScripts = [...config.scripts.targetingAdvertising]
-                                      newScripts[index].scriptCode = template.scriptCode
                                       newScripts[index].name = template.name
                                       setConfig(prev => ({
                                         ...prev,
                                         scripts: { ...prev.scripts, targetingAdvertising: newScripts }
                                       }))
-                                      toast.success(`✅ Inserted ${template.name} template! Replace placeholder IDs with your actual values.`, { duration: 4000 })
                                     }
                                   }}>
                                     <SelectTrigger className="text-xs h-9">
-                                      <SelectValue placeholder="Select a template (Facebook Pixel, Google Ads, etc.)" />
+                                      <SelectValue placeholder="Select tool (Facebook Pixel, Google Ads, etc.)" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {Object.entries(scriptTemplates)
                                         .filter(([_, template]) => template.category === 'targeting-advertising')
                                         .map(([key, template]) => (
                                           <SelectItem key={key} value={key} className="text-xs">
-                                            <div className="flex flex-col">
-                                              <span className="font-medium">{template.name}</span>
-                                              <span className="text-muted-foreground text-[10px]">{template.description}</span>
-                                            </div>
+                                            {template.name}
                                           </SelectItem>
                                         ))}
                                     </SelectContent>
                                   </Select>
-                                  <p className="text-[10px] text-muted-foreground mt-1">
-                                    💡 Templates include setup instructions - just replace placeholder IDs
-                                  </p>
+                                  {script.name && scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || ''] && (
+                                    <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded text-xs space-y-2">
+                                      <p className="font-medium text-primary">
+                                        📍 Where to find your {script.name} code:
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        {scriptTemplates[Object.keys(scriptTemplates).find(k => scriptTemplates[k].name === script.name) || '']?.instructions}
+                                      </p>
+                                      <p className="text-muted-foreground">
+                                        Copy the tracking code and paste it in the box below.
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
-                              <textarea
-                                value={script.scriptCode}
-                                onChange={(e) => {
-                                  const newScripts = [...config.scripts.targetingAdvertising]
-                                  newScripts[index].scriptCode = e.target.value
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    scripts: { ...prev.scripts, targetingAdvertising: newScripts }
-                                  }))
-                                }}
-                                placeholder="Paste your script code here or select a template above..."
-                                className="w-full h-24 p-2 text-xs font-mono border rounded resize-none"
-                              />
+                              <div>
+                                <Label className="text-xs font-medium mb-2 block">
+                                  {script.scriptCode.trim() ? 'Script Code:' : 'Paste your tracking code here:'}
+                                </Label>
+                                <textarea
+                                  value={script.scriptCode}
+                                  onChange={(e) => {
+                                    const newScripts = [...config.scripts.targetingAdvertising]
+                                    newScripts[index].scriptCode = e.target.value
+                                    setConfig(prev => ({
+                                      ...prev,
+                                      scripts: { ...prev.scripts, targetingAdvertising: newScripts }
+                                    }))
+                                  }}
+                                  placeholder={`Paste your ${script.name || 'advertising'} code here...`}
+                                  className="w-full h-32 p-3 text-xs font-mono border rounded resize-none focus:ring-2 focus:ring-primary"
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
