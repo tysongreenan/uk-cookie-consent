@@ -298,7 +298,30 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
   </div>
-</div>`
+</div>
+
+${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+<!-- Floating Cookie Settings Button -->
+<div id="cookie-settings-float" style="
+  position: fixed;
+  ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'}
+  z-index: 999998;
+  background: ${config.colors.button};
+  color: ${config.colors.buttonText};
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border: none;
+  display: none;
+  transition: all 0.2s ease;
+" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">
+  ${config.branding.footerLink.text}
+</div>
+` : ''}`
   }
 
   const generateJavaScript = () => {
@@ -312,6 +335,16 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   
   var COOKIE_NAME = 'cookie_consent';
   var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
+  
+  ${config.branding.footerLink.enabled ? `
+  // Global function for inline cookie settings links
+  window.showCookiePreferences = function() {
+    var banner = document.getElementById('cookie-consent-banner');
+    if (banner) {
+      banner.style.display = 'block';
+    }
+  };
+  ` : ''}
   
   function getCookie(name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -392,6 +425,18 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     
     if (existingConsent) {
       loadScripts(existingConsent);
+      
+      ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+      // Show cookie settings floating button after consent is given
+      var floatBtn = document.getElementById('cookie-settings-float');
+      if (floatBtn) {
+        floatBtn.style.display = 'block';
+        floatBtn.onclick = function() {
+          banner.style.display = 'block';
+        };
+      }
+      ` : ''}
+      
       return;
     }
     
@@ -401,6 +446,16 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       acceptBtn.onclick = function() {
         saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
         banner.style.display = 'none';
+        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        // Show floating cookie settings button after accepting
+        var floatBtn = document.getElementById('cookie-settings-float');
+        if (floatBtn) {
+          floatBtn.style.display = 'block';
+          floatBtn.onclick = function() {
+            banner.style.display = 'block';
+          };
+        }
+        ` : ''}
       };
     }
     
@@ -408,6 +463,16 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       rejectBtn.onclick = function() {
         saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
         banner.style.display = 'none';
+        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        // Show floating cookie settings button after rejecting (so user can change mind)
+        var floatBtn = document.getElementById('cookie-settings-float');
+        if (floatBtn) {
+          floatBtn.style.display = 'block';
+          floatBtn.onclick = function() {
+            banner.style.display = 'block';
+          };
+        }
+        ` : ''}
       };
     }
     

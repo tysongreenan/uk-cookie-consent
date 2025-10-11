@@ -390,12 +390,35 @@ export function BannerPreview({ config }: BannerPreviewProps) {
         </div>
       </div>
 
+      {/* Floating Cookie Settings Button (Preview) */}
+      {config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' && !isVisible && (
+        <div
+          className="fixed z-40 px-4 py-2 rounded cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5"
+          style={{
+            background: config.colors.button,
+            color: config.colors.buttonText,
+            [config.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
+            bottom: '20px',
+            fontSize: '14px',
+            fontWeight: 500
+          }}
+          onClick={() => setIsVisible(true)}
+        >
+          {config.branding.footerLink.text}
+        </div>
+      )}
+
       {/* Preview Controls */}
       <div className="text-xs text-muted-foreground space-y-1">
         <p>Position: {config.position}</p>
         <p>Theme: {config.theme}</p>
         <p>Auto-show: {config.behavior.autoShow ? 'Yes' : 'No'}</p>
         <p>Cookie expiry: {config.behavior.cookieExpiry} days</p>
+        {config.branding.footerLink.enabled && (
+          <p className="text-primary font-medium">
+            Footer Link: {config.branding.footerLink.position === 'floating' ? '✓ Floating button enabled' : '✓ Inline HTML available'}
+          </p>
+        )}
       </div>
     </div>
   )
