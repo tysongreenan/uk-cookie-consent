@@ -134,6 +134,8 @@ export default function DashboardPage() {
               <img 
                 src="/logos/logo.svg" 
                 alt="Cookie Banner Generator" 
+                width="20"
+                height="20"
                 className="w-5 h-5 text-white"
               />
               <span className="font-medium">Dashboard</span>

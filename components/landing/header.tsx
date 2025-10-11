@@ -15,6 +15,8 @@ export function Header() {
                     <img 
                       src="/logos/logo.svg" 
                       alt="Cookie Banner Generator" 
+                      width="120"
+                      height="32"
                       className="h-8 w-auto"
                     />
                   </Link>

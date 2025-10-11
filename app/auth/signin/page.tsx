@@ -49,6 +49,8 @@ export default function SignInPage() {
             <img 
               src="/logos/logo.svg" 
               alt="Cookie Banner Generator" 
+              width="180"
+              height="48"
               className="h-12 w-auto mx-auto"
             />
           </div>
