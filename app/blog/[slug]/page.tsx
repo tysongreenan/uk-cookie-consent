@@ -163,9 +163,12 @@ export default async function BlogPostPage({
           <div
             className="prose prose-xl max-w-none dark:prose-invert 
                        prose-headings:font-heading prose-headings:font-black prose-headings:scroll-mt-20
-                       prose-h2:text-4xl sm:prose-h2:text-5xl prose-h2:mt-20 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b-4 prose-h2:border-primary prose-h2:text-primary
-                       prose-h3:text-3xl sm:prose-h3:text-4xl prose-h3:mt-16 prose-h3:mb-6 prose-h3:text-brand-red
-                       prose-h4:text-2xl sm:prose-h4:text-3xl prose-h4:mt-12 prose-h4:mb-4 prose-h4:text-brand-teal
+                       prose-h1:text-5xl sm:prose-h1:text-6xl prose-h1:mt-20 prose-h1:mb-12 prose-h1:text-primary prose-h1:leading-tight
+                       prose-h2:text-3xl sm:prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-3 prose-h2:border-b-2 prose-h2:border-primary/30 prose-h2:text-brand-red prose-h2:leading-tight
+                       prose-h3:text-2xl sm:prose-h3:text-3xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:text-brand-teal prose-h3:leading-tight
+                       prose-h4:text-xl sm:prose-h4:text-2xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:text-primary prose-h4:leading-tight
+                       prose-h5:text-lg sm:prose-h5:text-xl prose-h5:mt-8 prose-h5:mb-3 prose-h5:text-foreground prose-h5:leading-tight
+                       prose-h6:text-base sm:prose-h6:text-lg prose-h6:mt-6 prose-h6:mb-2 prose-h6:text-foreground prose-h6:leading-tight
                        prose-p:text-lg prose-p:leading-relaxed prose-p:my-6 prose-p:text-foreground/90
                        prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-brand-red
                        prose-strong:text-foreground prose-strong:font-extrabold
