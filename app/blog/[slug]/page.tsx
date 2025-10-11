@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TableOfContents } from '@/components/blog/table-of-contents'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
@@ -100,8 +102,8 @@ export default async function BlogPostPage({
       />
 
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <article className="container max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <Header />
+        <main className="container max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           {/* Back Button */}
           <Link
             href="/blog"
@@ -257,6 +259,8 @@ export default async function BlogPostPage({
             </div>
           </section>
         )}
+        </main>
+        <Footer />
       </div>
     </>
   )

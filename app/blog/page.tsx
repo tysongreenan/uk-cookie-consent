@@ -4,6 +4,8 @@ import { getAllPosts } from '@/lib/blog/blog'
 import { Clock, Calendar, ArrowRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
 
 export const metadata: Metadata = {
   title: 'Blog - Cookie Banner Insights | Cookie Banner Generator',
@@ -25,8 +27,10 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="border-b bg-gradient-to-b from-background to-muted/20 px-4 py-12 sm:px-6 sm:py-16 md:py-20">
+      <Header />
+      <main>
+        {/* Header */}
+        <section className="border-b bg-gradient-to-b from-background to-muted/20 px-4 py-12 sm:px-6 sm:py-16 md:py-20">
         <div className="container max-w-4xl">
           <div className="text-center">
             <h1 className="mb-4 font-heading text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl">
@@ -113,6 +117,8 @@ export default function BlogPage() {
           )}
         </div>
       </section>
+      </main>
+      <Footer />
     </div>
   )
 }
