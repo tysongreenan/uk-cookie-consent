@@ -1,6 +1,7 @@
 import { Hero } from '@/components/landing/hero'
 import { HowItWorks } from '@/components/landing/how-it-works'
 import { ValueStack } from '@/components/landing/value-stack'
+import { InteractiveDemo } from '@/components/landing/interactive-demo'
 import { WhyFree } from '@/components/landing/why-free'
 import { SEOTextBlock } from '@/components/landing/seo-text-block'
 import { FinalCTA } from '@/components/landing/final-cta'
@@ -28,6 +29,11 @@ export default function HomePage() {
         {/* Section 3: What You Get (Value Stack) */}
         <section id="features">
           <ValueStack />
+        </section>
+        
+        {/* Section 3.5: Interactive Demo */}
+        <section id="demo">
+          <InteractiveDemo />
         </section>
         
         {/* Section 4: Why It's Free */}
