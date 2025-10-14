@@ -96,13 +96,13 @@ export async function POST(request: NextRequest) {
       try {
         const bannerId = crypto.randomUUID()
         // Convert demo script format to dashboard format
-        const trackingScripts = (bannerConfig.trackingScripts || []).map(script => ({
+        const trackingScripts = (bannerConfig.trackingScripts || []).map((script: any) => ({
           ...script,
           category: 'tracking-performance',
           enabled: true
         }))
         
-        const advertisingScripts = (bannerConfig.advertisingScripts || []).map(script => ({
+        const advertisingScripts = (bannerConfig.advertisingScripts || []).map((script: any) => ({
           ...script,
           category: 'targeting-advertising',
           enabled: true
