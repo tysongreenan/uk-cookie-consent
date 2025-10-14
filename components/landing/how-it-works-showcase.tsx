@@ -395,22 +395,22 @@ export function HowItWorksShowcase() {
                             <div className="text-blue-400">&lt;!-- Google Tag Manager --&gt;</div>
                             <div>&lt;script&gt;</div>
                             <div>&nbsp;&nbsp;(function(w,d,s,l,i){'{'}</div>
-                            <div>&nbsp;&nbsp;&nbsp;&nbsp;w[l]=w[l]||[];w[l].push({'{"'}{'gtm.start'}{'"'}:</div>
-                            <div>&nbsp;&nbsp;&nbsp;&nbsp;new Date().getTime(),event:'gtm.js'});</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;w[l]=w[l]||[];w[l].push({'{'}'gtm.start'{'}':</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;new Date().getTime(),event:{'{'}'gtm.js'{'}'}{'{'}});</div>
                             <div>&nbsp;&nbsp;var f=d.getElementsByTagName(s)[0],</div>
-                            <div>&nbsp;&nbsp;j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';</div>
-                            <div>&nbsp;&nbsp;j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;</div>
+                            <div>&nbsp;&nbsp;j=d.createElement(s),dl=l!={'{'}'dataLayer'{'}'}?{'{'}'&l='{'}':+l:{'{'}'{'{'}};</div>
+                            <div>&nbsp;&nbsp;j.async=true;j.src={'{'}'https://www.googletagmanager.com/gtm.js?id='{'}':+i+dl;</div>
                             <div>&nbsp;&nbsp;f.parentNode.insertBefore(j,f);</div>
-                            <div>&nbsp;&nbsp;{'}'})(window,document,'script','dataLayer','GTM-XXXXXX');</div>
+                            <div>&nbsp;&nbsp;{'}'})(window,document,{'{'}'script'{'}'},{'{'}'dataLayer'{'}'},{'{'}'GTM-XXXXXX'{'}'});</div>
                             <div>&lt;/script&gt;</div>
                             
                             <div className="text-blue-400 mt-2">&lt;!-- Microsoft Clarity --&gt;</div>
                             <div>&lt;script type="text/javascript"&gt;</div>
                             <div>&nbsp;&nbsp;(function(c,l,a,r,i,t,y){'{'}</div>
                             <div>&nbsp;&nbsp;&nbsp;&nbsp;c[a]=c[a]||function(){'{'}(c[a].q=c[a].q||[]).push(arguments){'}'};</div>
-                            <div>&nbsp;&nbsp;&nbsp;&nbsp;t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;t=l.createElement(r);t.async=1;t.src={'{'}'https://www.clarity.ms/tag/'{'}':+i;</div>
                             <div>&nbsp;&nbsp;&nbsp;&nbsp;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);</div>
-                            <div>&nbsp;&nbsp;{'}'})(window, document, "clarity", "script", "XXXXXXXXXX");</div>
+                            <div>&nbsp;&nbsp;{'}'})(window, document, {'{'}'clarity'{'}'}, {'{'}'script'{'}'}, {'{'}'XXXXXXXXXX'{'}'});</div>
                             <div>&lt;/script&gt;</div>
                           </div>
                         )}
