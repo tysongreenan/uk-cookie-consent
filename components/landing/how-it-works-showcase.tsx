@@ -262,22 +262,23 @@ export function HowItWorksShowcase() {
                       </div>
 
                       {/* Animated Cookie Banner */}
-                      <div
-                        className={`absolute z-50 transition-all duration-700 ease-in-out ${
-                          currentAnimation.position === 'top' 
-                            ? 'top-4 left-4 right-4' 
-                            : currentAnimation.position === 'floating'
-                            ? 'top-1/2 right-4 transform -translate-y-1/2 max-w-sm'
-                            : 'bottom-4 left-4 right-4'
-                        }`}
-                        style={{
-                          backgroundColor: currentAnimation.colors.bg,
-                          color: currentAnimation.colors.text,
-                          borderRadius: '8px',
-                          padding: '16px',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                        }}
-                      >
+                      {'position' in currentAnimation && 'colors' in currentAnimation && (
+                        <div
+                          className={`absolute z-50 transition-all duration-700 ease-in-out ${
+                            currentAnimation.position === 'top' 
+                              ? 'top-4 left-4 right-4' 
+                              : currentAnimation.position === 'floating'
+                              ? 'top-1/2 right-4 transform -translate-y-1/2 max-w-sm'
+                              : 'bottom-4 left-4 right-4'
+                          }`}
+                          style={{
+                            backgroundColor: currentAnimation.colors.bg,
+                            color: currentAnimation.colors.text,
+                            borderRadius: '8px',
+                            padding: '16px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                          }}
+                        >
                         <h3 className="font-semibold text-base mb-2">
                           We use cookies
                         </h3>
@@ -311,7 +312,8 @@ export function HowItWorksShowcase() {
                             Reject
                           </Button>
                         </div>
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 )}
