@@ -150,7 +150,10 @@ export function InteractiveHowItWorks() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <steps[activeStep - 1].icon className="h-5 w-5 text-primary" />
+                    {(() => {
+                      const IconComponent = steps[activeStep - 1].icon
+                      return <IconComponent className="h-5 w-5 text-primary" />
+                    })()}
                     {steps[activeStep - 1].title}
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
