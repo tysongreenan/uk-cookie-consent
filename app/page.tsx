@@ -1,5 +1,4 @@
 import { Hero } from '@/components/landing/hero'
-import { HowItWorksShowcase } from '@/components/landing/how-it-works-showcase'
 import { ValueStack } from '@/components/landing/value-stack'
 import { InteractiveDemo } from '@/components/landing/interactive-demo'
 import { WhyFree } from '@/components/landing/why-free'
@@ -21,19 +20,14 @@ export default function HomePage() {
         {/* Section 1: Hero — Hook + Offer */}
         <Hero />
         
-        {/* Section 2: How It Works */}
-        <section id="how-it-works">
-          <HowItWorksShowcase />
+        {/* Section 2: Build Your First Banner */}
+        <section id="build-banner">
+          <InteractiveDemo />
         </section>
         
         {/* Section 3: What You Get (Value Stack) */}
         <section id="features">
           <ValueStack />
-        </section>
-        
-        {/* Section 3.5: Interactive Demo */}
-        <section id="demo">
-          <InteractiveDemo />
         </section>
         
         {/* Section 4: Why It's Free */}
