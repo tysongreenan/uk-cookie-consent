@@ -1,5 +1,5 @@
 import { Hero } from '@/components/landing/hero'
-import { HowItWorks } from '@/components/landing/how-it-works'
+import { HowItWorksShowcase } from '@/components/landing/how-it-works-showcase'
 import { ValueStack } from '@/components/landing/value-stack'
 import { InteractiveDemo } from '@/components/landing/interactive-demo'
 import { WhyFree } from '@/components/landing/why-free'
@@ -23,7 +23,7 @@ export default function HomePage() {
         
         {/* Section 2: How It Works */}
         <section id="how-it-works">
-          <HowItWorks />
+          <HowItWorksShowcase />
         </section>
         
         {/* Section 3: What You Get (Value Stack) */}

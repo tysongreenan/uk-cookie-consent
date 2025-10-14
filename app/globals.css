@@ -88,6 +88,74 @@
   animation: bounce-in 0.6s ease-out;
 }
 
+/* Hero banner showcase animations */
+@keyframes banner-cycle {
+  0%, 20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25%, 45% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  50%, 70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75%, 95% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes banner-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes banner-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(42, 98, 112, 0.1);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(42, 98, 112, 0.2);
+  }
+}
+
+.animate-banner-cycle {
+  animation: banner-cycle 8s ease-in-out infinite;
+}
+
+.animate-banner-float {
+  animation: banner-float 3s ease-in-out infinite;
+}
+
+.animate-banner-glow {
+  animation: banner-glow 2s ease-in-out infinite;
+}
+
+/* Custom scale utilities */
+.scale-98 {
+  transform: scale(0.98);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-banner-cycle,
+  .animate-banner-float,
+  .animate-banner-glow {
+    animation: none;
+  }
+}
+
 @layer base {
   :root {
     /* Brand Colors */

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, name, password } = await request.json()
+    const { email, name, password, bannerConfig } = await request.json()
 
     // Sanitize and validate input
     const sanitizedEmail = sanitizeEmail(email);
@@ -89,6 +89,62 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to create account. Please try again.' },
         { status: 500 }
       )
+    }
+
+    // Create banner if bannerConfig is provided
+    if (bannerConfig) {
+      try {
+        const bannerId = crypto.randomUUID()
+        // Convert demo script format to dashboard format
+        const trackingScripts = (bannerConfig.trackingScripts || []).map(script => ({
+          ...script,
+          category: 'tracking-performance',
+          enabled: true
+        }))
+        
+        const advertisingScripts = (bannerConfig.advertisingScripts || []).map(script => ({
+          ...script,
+          category: 'targeting-advertising',
+          enabled: true
+        }))
+
+        const bannerConfigJson = {
+          theme: bannerConfig.theme || 'modern',
+          position: bannerConfig.position || 'bottom',
+          language: bannerConfig.language || 'en',
+          title: bannerConfig.title || 'We use cookies',
+          message: bannerConfig.message || 'This website uses cookies to enhance your experience.',
+          acceptText: bannerConfig.accept || 'Accept',
+          rejectText: bannerConfig.reject || 'Decline',
+          scripts: {
+            strictlyNecessary: [],
+            functionality: [],
+            trackingPerformance: trackingScripts,
+            targetingAdvertising: advertisingScripts
+          }
+        }
+
+        const { error: bannerError } = await supabase
+          .from('ConsentBanner')
+          .insert({
+            id: bannerId,
+            userId: user.id,
+            name: `${bannerConfig.website || 'My Website'} Cookie Banner`,
+            config: bannerConfigJson,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          })
+
+        if (bannerError) {
+          console.error('Banner creation error:', bannerError)
+        } else {
+          console.log('✅ Banner created successfully for user:', user.id)
+        }
+      } catch (error) {
+        console.error('Banner creation error:', error)
+        // Don't fail the registration if banner creation fails
+      }
     }
 
     return NextResponse.json({

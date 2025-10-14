@@ -122,10 +122,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Parse config JSON for each banner
+    // Config is already an object, no need to parse
     const parsedBanners = banners.map(banner => ({
       ...banner,
-      config: JSON.parse(banner.config)
+      config: typeof banner.config === 'string' ? JSON.parse(banner.config) : banner.config
     }))
 
     return NextResponse.json({

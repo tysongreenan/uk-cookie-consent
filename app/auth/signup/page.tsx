@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -19,11 +20,24 @@ export default function SignUpPage() {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  // Pre-fill email from query parameter
+  // Pre-fill email from query parameter or banner config
   useEffect(() => {
     const emailParam = searchParams.get('email')
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam))
+    } else {
+      // Check for banner config in localStorage
+      const bannerConfig = localStorage.getItem('bannerConfig')
+      if (bannerConfig) {
+        try {
+          const config = JSON.parse(bannerConfig)
+          if (config.email) {
+            setEmail(config.email)
+          }
+        } catch (error) {
+          console.error('Error parsing banner config:', error)
+        }
+      }
     }
   }, [searchParams])
 
@@ -45,6 +59,19 @@ export default function SignUpPage() {
     }
 
     try {
+      // Get banner config from localStorage if available
+      let bannerConfig = null
+      if (typeof window !== 'undefined') {
+        const storedConfig = localStorage.getItem('bannerConfig')
+        if (storedConfig) {
+          try {
+            bannerConfig = JSON.parse(storedConfig)
+          } catch (error) {
+            console.error('Error parsing banner config:', error)
+          }
+        }
+      }
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
@@ -54,13 +81,31 @@ export default function SignUpPage() {
           email,
           name,
           password,
+          bannerConfig, // Include banner configuration
         }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        router.push('/auth/signin?message=Account created successfully')
+        // Clear banner config from localStorage after successful signup
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('bannerConfig')
+        }
+        
+        // Automatically sign in the user
+        const signInResult = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        })
+
+        if (signInResult?.ok) {
+          router.push('/dashboard?message=Welcome! Your account has been created and you are now signed in.')
+        } else {
+          // If auto sign-in fails, redirect to sign-in page
+          router.push('/auth/signin?message=Account created successfully. Please sign in.')
+        }
       } else {
         setError(data.error || 'Failed to create account')
       }
@@ -71,7 +116,14 @@ export default function SignUpPage() {
     }
   }
 
-  const isFromLanding = searchParams.get('email')
+  const [isFromLanding, setIsFromLanding] = useState(false)
+
+  // Check if user is coming from landing page
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    const hasBannerConfig = typeof window !== 'undefined' && localStorage.getItem('bannerConfig')
+    setIsFromLanding(!!emailParam || !!hasBannerConfig)
+  }, [searchParams])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
