@@ -361,7 +361,7 @@ export function HowItWorksShowcase() {
                         </div>
 
                         {/* Cookie Banner Code - appears with animation */}
-                        {currentAnimation.showCode && (
+                        {'showCode' in currentAnimation && currentAnimation.showCode && (
                           <div className="space-y-1 mt-4 border-l-2 border-green-500 pl-4 animate-pulse">
                             <div className="text-green-400">&lt;!-- Cookie Consent Banner --&gt;</div>
                             <div>&lt;script&gt;</div>
@@ -390,7 +390,7 @@ export function HowItWorksShowcase() {
                         )}
 
                         {/* Integration Scripts - appear after code */}
-                        {currentAnimation.showScripts && (
+                        {'showScripts' in currentAnimation && currentAnimation.showScripts && (
                           <div className="space-y-1 mt-4 border-l-2 border-blue-500 pl-4 animate-pulse">
                             <div className="text-blue-400">&lt;!-- Google Tag Manager --&gt;</div>
                             <div>&lt;script&gt;</div>
@@ -438,7 +438,7 @@ export function HowItWorksShowcase() {
                             </div>
 
                             {/* Code Input Area */}
-                            {currentAnimation.showCode && (
+                            {'showCode' in currentAnimation && currentAnimation.showCode && (
                               <div className="border border-gray-300 rounded-lg p-3 bg-gray-50 animate-pulse">
                                 <textarea
                                   className="w-full h-24 text-xs font-mono bg-transparent border-none resize-none focus:outline-none"
@@ -459,7 +459,7 @@ export function HowItWorksShowcase() {
                             )}
 
                             {/* Copy Button */}
-                            {currentAnimation.showCode && (
+                            {'showCode' in currentAnimation && currentAnimation.showCode && (
                               <div className="flex justify-between items-center">
                                 <Button
                                   onClick={handleCopy}
@@ -474,7 +474,7 @@ export function HowItWorksShowcase() {
                             )}
 
                             {/* Integration Scripts */}
-                            {currentAnimation.showScripts && (
+                            {'showScripts' in currentAnimation && currentAnimation.showScripts && (
                               <div className="space-y-2 mt-4 animate-pulse">
                                 <div className="text-xs text-gray-600 font-medium">Analytics Integration</div>
                                 <div className="space-y-2">
