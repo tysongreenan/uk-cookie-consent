@@ -907,7 +907,44 @@ export default function BannerBuilderPage() {
                     {config.branding.logo.enabled && (
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="logo-url">Logo URL</Label>
+                          <Label htmlFor="logo-upload">Upload Logo</Label>
+                          <div className="mt-2">
+                            <input
+                              id="logo-upload"
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                  const reader = new FileReader()
+                                  reader.onload = (event) => {
+                                    const result = event.target?.result as string
+                                    updateConfig('branding', { 
+                                      logo: { ...config.branding.logo, url: result }
+                                    })
+                                  }
+                                  reader.readAsDataURL(file)
+                                }
+                              }}
+                              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                            />
+                          </div>
+                          {config.branding.logo.url && (
+                            <div className="mt-3">
+                              <img
+                                src={config.branding.logo.url}
+                                alt="Logo preview"
+                                className="max-w-32 max-h-12 object-contain border rounded"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="logo-url">Or Logo URL</Label>
                           <Input
                             id="logo-url"
                             value={config.branding.logo.url}

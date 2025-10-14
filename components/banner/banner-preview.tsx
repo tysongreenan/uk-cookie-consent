@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
 
 interface BannerConfig {
   name: string
@@ -84,10 +85,20 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   const handlePreferences = () => {
-    setShowPreferences(!showPreferences)
+    setShowPreferences(true)
   }
 
   const handleClose = () => {
+    setIsVisible(false)
+  }
+
+  const handleAcceptAll = () => {
+    setShowPreferences(false)
+    setIsVisible(false)
+  }
+
+  const handleConfirmChoices = () => {
+    setShowPreferences(false)
     setIsVisible(false)
   }
 
@@ -326,47 +337,6 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                   )}
                 </div>
 
-                {showPreferences && (
-                  <div className="mt-4 p-3 rounded border" style={{ 
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    borderColor: 'rgba(255,255,255,0.2)'
-                  }}>
-                    <h4 className="font-medium mb-3">Cookie Preferences</h4>
-                    <div className="space-y-3 text-sm">
-                      <div>
-                        <label className="flex items-center">
-                          <input type="checkbox" defaultChecked disabled className="mr-2" />
-                          <span className="font-medium">Strictly Necessary</span>
-                        </label>
-                        <p className="text-xs opacity-75 ml-6">Essential for website functionality and security</p>
-                      </div>
-                      
-                      <div>
-                        <label className="flex items-center">
-                          <input type="checkbox" id="functionality-cookies" className="mr-2" />
-                          <span className="font-medium">Functionality</span>
-                        </label>
-                        <p className="text-xs opacity-75 ml-6">Remember your choices and preferences</p>
-                      </div>
-                      
-                      <div>
-                        <label className="flex items-center">
-                          <input type="checkbox" id="analytics-cookies" className="mr-2" />
-                          <span className="font-medium">Tracking & Performance</span>
-                        </label>
-                        <p className="text-xs opacity-75 ml-6">Analytics and performance monitoring (Google Analytics, Microsoft Clarity)</p>
-                      </div>
-                      
-                      <div>
-                        <label className="flex items-center">
-                          <input type="checkbox" id="marketing-cookies" className="mr-2" />
-                          <span className="font-medium">Targeting & Advertising</span>
-                        </label>
-                        <p className="text-xs opacity-75 ml-6">Personalized ads and marketing (Facebook Pixel, Google Ads)</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {config.branding.logo.position === 'right' && config.branding.logo.enabled && config.branding.logo.url && (
@@ -407,6 +377,16 @@ export function BannerPreview({ config }: BannerPreviewProps) {
           {config.branding.footerLink.text}
         </div>
       )}
+
+      {/* Preferences Modal */}
+      <PreferencesModal
+        config={config}
+        isVisible={showPreferences}
+        onClose={() => setShowPreferences(false)}
+        onAcceptAll={handleAcceptAll}
+        onConfirmChoices={handleConfirmChoices}
+        domain="cookie-banner.ca"
+      />
 
       {/* Preview Controls */}
       <div className="text-xs text-muted-foreground space-y-1">

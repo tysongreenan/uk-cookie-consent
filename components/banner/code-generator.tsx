@@ -273,32 +273,132 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
           ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${config.colors.link}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.preferencesButton}</button>` : ''}
         </div>
         
-        ${config.behavior.showPreferences ? `
-        <div id="cookie-preferences-panel" style="margin-top: 16px; padding: 16px; background-color: rgba(255,255,255,0.1); border-radius: 8px; display: none;">
-          <h4 id="prefs-title" style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">Cookie Preferences</h4>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: not-allowed; opacity: 0.7;"><input type="checkbox" checked disabled style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-necessary">Strictly Necessary</strong><br><small id="cat-necessary-desc" style="opacity: 0.8;">Essential for website functionality</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-func-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-functionality">Functionality</strong><br><small id="cat-functionality-desc" style="opacity: 0.8;">Remember preferences and choices</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-analytics-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-analytics">Analytics</strong><br><small id="cat-analytics-desc" style="opacity: 0.8;">Help us improve our website</small></span></label>
-            <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-marketing-toggle" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong id="cat-marketing">Marketing</strong><br><small id="cat-marketing-desc" style="opacity: 0.8;">Personalized ads and content</small></span></label>
-          </div>
-          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: space-between; align-items: center;">
-            <div style="font-size: 8px; opacity: 0.3;">
-              <a href="https://cookie-banner.ca" style="color: inherit; text-decoration: none;" rel="nofollow">cookie banner</a>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button id="cookie-save-prefs-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Save</button>
-              <button id="cookie-cancel-prefs-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500;">Cancel</button>
-            </div>
-          </div>
-        </div>
-        ` : ''}
       </div>
       
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
   </div>
 </div>
+
+${config.behavior.showPreferences ? `
+<!-- Preferences Modal -->
+<div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
+  <div style="background: white; border-radius: 8px; width: 100%; max-width: 448px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+    <!-- Header -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid #e5e7eb;">
+      ${config.branding.logo.enabled && config.branding.logo.url ? `
+      <img src="${config.branding.logo.url}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px;" onerror="this.style.display='none'" />
+      ` : ''}
+      
+      <button id="cookie-prefs-close-btn" style="margin-left: auto; padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: #6b7280; font-size: 20px; line-height: 1;" aria-label="Close">
+        ×
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
+      <!-- Title -->
+      <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 12px 0;">
+        Privacy Center
+      </h2>
+      
+      <!-- Description -->
+      <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px 0; line-height: 1.5;">
+        By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
+      </p>
+
+      <!-- Accept All Button -->
+      <button id="cookie-accept-all-btn" style="width: 100%; height: 48px; margin-bottom: 24px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
+        ACCEPT ALL
+      </button>
+
+      <!-- Cookie Preferences Section -->
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-weight: bold; color: #111827; margin: 0 0 16px 0;">
+          Manage cookie preferences
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Strictly Necessary -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f9fafb;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px; color: #9ca3af; font-size: 20px;">›</span>
+              <div>
+                <div style="font-weight: 500; color: #111827;">Strictly Necessary Cookies</div>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Always active</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Functionality -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px; color: #9ca3af; font-size: 20px;">›</span>
+              <div style="font-weight: 500; color: #111827;">Functional Cookies</div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+              <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+              <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+            </label>
+          </div>
+
+          <!-- Performance -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px; color: #9ca3af; font-size: 20px;">›</span>
+              <div style="font-weight: 500; color: #111827;">Performance Cookies</div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+              <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+              <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+            </label>
+          </div>
+
+          <!-- Targeting -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px; color: #9ca3af; font-size: 20px;">›</span>
+              <div style="font-weight: 500; color: #111827;">Targeting Cookies</div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+              <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+              <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+            </label>
+          </div>
+
+          <!-- Social Media -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px; color: #9ca3af; font-size: 20px;">›</span>
+              <div style="font-weight: 500; color: #111827;">Social Media Cookies</div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+              <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+              <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Button -->
+      <button id="cookie-confirm-choices-btn" style="width: 100%; height: 48px; margin-bottom: 16px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
+        CONFIRM MY CHOICES
+      </button>
+
+      <!-- Powered by -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <p style="font-size: 12px; color: #6b7280; margin: 0;">
+          Powered by <span style="font-weight: 600; color: #059669;">cookie-banner.ca</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+` : ''}
 
 ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
 <!-- Floating Cookie Settings Button -->
@@ -581,34 +681,64 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       };
     }
     
-    if (prefsBtn && prefsPanel) {
+    ${config.behavior.showPreferences ? `
+    if (prefsBtn) {
       prefsBtn.onclick = function() {
-        prefsPanel.style.display = prefsPanel.style.display === 'none' ? 'block' : 'none';
+        var modal = document.getElementById('cookie-preferences-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+        }
       };
     }
     
-    if (savePrefsBtn) {
-      savePrefsBtn.onclick = function() {
-        var func = document.getElementById('cookie-func-toggle');
-        var analytics = document.getElementById('cookie-analytics-toggle');
-        var marketing = document.getElementById('cookie-marketing-toggle');
+    // Modal event handlers
+    var modal = document.getElementById('cookie-preferences-modal');
+    var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
+    var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
+    var confirmChoicesBtn = document.getElementById('cookie-confirm-choices-btn');
+    
+    if (modalCloseBtn) {
+      modalCloseBtn.onclick = function() {
+        modal.style.display = 'none';
+      };
+    }
+    
+    if (acceptAllBtn) {
+      acceptAllBtn.onclick = function() {
+        saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+        banner.style.display = 'none';
+        modal.style.display = 'none';
+      };
+    }
+    
+    if (confirmChoicesBtn) {
+      confirmChoicesBtn.onclick = function() {
+        var func = document.getElementById('cookie-func-toggle-modal');
+        var performance = document.getElementById('cookie-performance-toggle-modal');
+        var targeting = document.getElementById('cookie-targeting-toggle-modal');
+        var social = document.getElementById('cookie-social-toggle-modal');
         
         saveConsent({
           essential: true,
           functionality: func ? func.checked : false,
-          analytics: analytics ? analytics.checked : false,
-          marketing: marketing ? marketing.checked : false
+          analytics: performance ? performance.checked : false,
+          marketing: (targeting ? targeting.checked : false) || (social ? social.checked : false)
         });
         
         banner.style.display = 'none';
+        modal.style.display = 'none';
       };
     }
     
-    if (cancelPrefsBtn && prefsPanel) {
-      cancelPrefsBtn.onclick = function() {
-        prefsPanel.style.display = 'none';
+    // Close modal when clicking outside
+    if (modal) {
+      modal.onclick = function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
       };
     }
+    ` : ''}
     
     ${config.behavior.dismissOnScroll ? `
     var scrolled = false;
@@ -665,6 +795,24 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   50% { transform: scale(1.05); }
 }
 
+/* Toggle Switch Styles */
+input:checked + span {
+  background-color: #3b82f6 !important;
+}
+
+input:checked + span:before {
+  transform: translateX(20px);
+}
+
+input:focus + span {
+  box-shadow: 0 0 1px #3b82f6;
+}
+
+/* Modal Styles */
+#cookie-preferences-modal {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 @media (max-width: 768px) {
   #cookie-consent-banner {
     padding: 16px !important;
@@ -684,6 +832,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   #cookie-consent-banner button {
     padding: 8px 12px !important;
     font-size: 13px !important;
+  }
+  
+  #cookie-preferences-modal > div {
+    margin: 0 !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
   }
 }
 
