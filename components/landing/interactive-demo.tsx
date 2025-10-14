@@ -62,7 +62,7 @@ export function InteractiveDemo() {
   const currentText = translations[language]
 
   const generateCode = () => {
-    let config = {
+    let config: any = {
       title: currentText.title,
       message: currentText.message,
       acceptButton: currentText.accept,
