@@ -289,12 +289,7 @@ ${config.behavior.showPreferences ? `
       ${config.branding.logo.enabled && config.branding.logo.url ? `
       <img src="${config.branding.logo.url}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
       ` : `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-          <span style="color: white; font-weight: bold; font-size: 14px;">CB</span>
-        </div>
-        <span style="font-weight: 600; color: #111827;">Cookie Settings</span>
-      </div>
+      <span style="font-weight: 600; color: #111827;">Cookie Settings</span>
       `}
       
       <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: #6b7280; font-size: 20px; line-height: 1; flex-shrink: 0;" aria-label="Close">
@@ -411,7 +406,7 @@ ${config.behavior.showPreferences ? `
         <!-- Powered by -->
         <div style="text-align: center;">
           <p style="font-size: 12px; color: #6b7280; margin: 0;">
-            Powered by <span style="font-weight: 600; color: #059669;">cookie-banner.ca</span>
+            Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: #6b7280; text-decoration: none;" onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#6b7280'">cookie-banner.ca</a>
           </p>
         </div>
       </div>

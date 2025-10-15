@@ -85,12 +85,7 @@ export function PreferencesModal({
               }}
             />
           ) : (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CB</span>
-              </div>
-              <span className="font-semibold text-gray-900">Cookie Settings</span>
-            </div>
+            <span className="font-semibold text-gray-900">Cookie Settings</span>
           )}
           
           <button
@@ -229,7 +224,14 @@ export function PreferencesModal({
             <div className="text-center">
               <p className="text-xs text-gray-500">
                 Powered by{' '}
-                <span className="font-semibold text-green-600">{domain}</span>
+                <a 
+                  href="https://cookie-banner.ca/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-semibold text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  cookie-banner.ca
+                </a>
               </p>
             </div>
           </div>
