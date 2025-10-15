@@ -5,41 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { X, Sparkles, Zap, Gift, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useAnnouncement } from '@/lib/announcement-context'
 
 export function UpdateAnnouncement() {
-  const [isVisible, setIsVisible] = useState(false)
+  const { isVisible, setIsVisible } = useAnnouncement()
   const [showParticles, setShowParticles] = useState(false)
 
   useEffect(() => {
-    // Show announcement after 2 seconds
-    const timer = setTimeout(() => {
-      setIsVisible(true)
+    if (isVisible) {
       setShowParticles(true)
-    }, 2000)
-
-    // Hide particles after 4 seconds
-    const particleTimer = setTimeout(() => {
-      setShowParticles(false)
-    }, 6000)
-
-    return () => {
-      clearTimeout(timer)
-      clearTimeout(particleTimer)
+      // Hide particles after 4 seconds
+      const particleTimer = setTimeout(() => {
+        setShowParticles(false)
+      }, 4000)
+      return () => clearTimeout(particleTimer)
     }
-  }, [])
+  }, [isVisible])
 
   const handleDismiss = () => {
     setIsVisible(false)
-    localStorage.setItem('update-announcement-dismissed', 'true')
   }
-
-  useEffect(() => {
-    // Check if user has dismissed this before
-    const dismissed = localStorage.getItem('update-announcement-dismissed')
-    if (dismissed === 'true') {
-      setIsVisible(false)
-    }
-  }, [])
 
   return (
     <AnimatePresence>
@@ -49,7 +34,7 @@ export function UpdateAnnouncement() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -100 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="fixed top-0 left-0 right-0 z-50"
+          className="relative z-50"
         >
           {/* Background with gradient */}
           <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white shadow-2xl">
@@ -179,3 +164,4 @@ export function UpdateAnnouncement() {
     </AnimatePresence>
   )
 }
+

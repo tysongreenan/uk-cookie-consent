@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
 import { UpdateAnnouncement } from '@/components/landing/update-announcement'
+import { AnnouncementProvider } from '@/lib/announcement-context'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -138,21 +139,23 @@ export default function RootLayout({
           />
         </noscript>
         
-        <Providers>
-          <UpdateAnnouncement />
-          {children}
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: 'hsl(var(--card))',
-                color: 'hsl(var(--card-foreground))',
-                border: '1px solid hsl(var(--border))',
-              },
-            }}
-          />
-        </Providers>
+        <AnnouncementProvider>
+          <Providers>
+            <UpdateAnnouncement />
+            {children}
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: 'hsl(var(--card))',
+                  color: 'hsl(var(--card-foreground))',
+                  border: '1px solid hsl(var(--border))',
+                },
+              }}
+            />
+          </Providers>
+        </AnnouncementProvider>
       </body>
     </html>
   )
