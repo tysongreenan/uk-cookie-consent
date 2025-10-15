@@ -50,18 +50,14 @@ export default function DashboardPage() {
 
   const fetchBanners = async () => {
     try {
-      console.log('Fetching banners for user:', session?.user?.id)
       const response = await fetch('/api/banners')
       const data = await response.json()
-      
-      console.log('Banners API response:', { status: response.status, data })
       
       if (response.ok) {
         setBanners(data.banners || [])
         // Check if any banners need migration
         const hasOutdated = (data.banners || []).some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
-        console.log('Banners loaded:', data.banners?.length || 0)
       } else {
         console.error('Failed to fetch banners:', data.error)
         setBanners([])
@@ -137,15 +133,6 @@ export default function DashboardPage() {
     banner.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Filter out banners with invalid configs and log for debugging
-  const validBanners = filteredBanners.filter(banner => {
-    if (!banner.config) {
-      console.warn('Banner with invalid config:', banner.id, banner.name)
-      return false
-    }
-    return true
-  })
-
   if (status === 'loading') {
     return (
       <DashboardLayout>
@@ -200,9 +187,9 @@ export default function DashboardPage() {
               <CardTitle className="text-sm font-medium">Total Banners</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{validBanners.length}</div>
+              <div className="text-2xl font-bold">{filteredBanners.length}</div>
               <p className="text-xs text-muted-foreground">
-                {validBanners.filter(b => b.isActive).length} active
+                {filteredBanners.filter(b => b.isActive).length} active
               </p>
             </CardContent>
           </Card>
@@ -213,7 +200,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {validBanners.filter(b => b.isActive).length}
+                {filteredBanners.filter(b => b.isActive).length}
               </div>
               <p className="text-xs text-muted-foreground">
                 Currently deployed
@@ -227,7 +214,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                {validBanners.filter(b => needsMigration(b.config)).length}
+                {filteredBanners.filter(b => needsMigration(b.config)).length}
               </div>
               <p className="text-xs text-muted-foreground">
                 Need attention
@@ -299,7 +286,7 @@ export default function DashboardPage() {
               </Card>
             ))}
           </div>
-        ) : validBanners.length === 0 ? (
+        ) : filteredBanners.length === 0 ? (
           <Card className="p-12 text-center">
             <CardContent>
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -326,7 +313,7 @@ export default function DashboardPage() {
           </Card>
         ) : (
           <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-            {validBanners.map((banner) => (
+            {filteredBanners.map((banner) => (
               <BannerCard
                 key={banner.id}
                 banner={banner}

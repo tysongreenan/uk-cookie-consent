@@ -99,16 +99,27 @@ export async function GET(request: NextRequest) {
 
     // Transform banners to match Webflow extension format
     const transformedBanners = banners.map(banner => {
-      const config = banner.config || {}
+      // Parse config if it's a JSON string
+      let config = banner.config || {}
+      if (typeof config === 'string') {
+        try {
+          config = JSON.parse(config)
+        } catch (error) {
+          console.error('Error parsing banner config:', error)
+          config = {}
+        }
+      }
+
       return {
         id: banner.id,
         name: banner.name,
-        title: config.title || 'We use cookies',
-        message: config.message || 'This website uses cookies to enhance your browsing experience.',
-        primaryColor: config.primaryColor || '#0073e6',
-        textColor: config.textColor || '#ffffff',
-        acceptButton: config.acceptText || 'Accept All',
-        preferencesButton: config.preferencesText || 'Cookie Settings',
+        config: config, // Include the parsed config for migration checks
+        title: config.title || config.text?.title || 'We use cookies',
+        message: config.message || config.text?.message || 'This website uses cookies to enhance your browsing experience.',
+        primaryColor: config.primaryColor || config.colors?.button || '#0073e6',
+        textColor: config.textColor || config.colors?.text || '#ffffff',
+        acceptButton: config.acceptText || config.text?.acceptButton || 'Accept All',
+        preferencesButton: config.preferencesText || config.text?.preferencesButton || 'Cookie Settings',
         position: config.position || 'bottom',
         theme: config.theme || 'dark',
         isActive: banner.isActive,
