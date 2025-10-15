@@ -78,21 +78,10 @@ export default function RoadmapPage() {
   const [newSuggestion, setNewSuggestion] = useState({ title: '', description: '', category: '' })
   const [voting, setVoting] = useState<number | null>(null)
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session) {
-      router.push('/auth/signin')
-      return
-    }
-  }, [session, status, router])
-
   // Fetch roadmap items
   useEffect(() => {
-    if (session) {
-      fetchRoadmapItems()
-    }
-  }, [session])
+    fetchRoadmapItems()
+  }, [])
 
   const fetchRoadmapItems = async () => {
     try {
@@ -111,7 +100,11 @@ export default function RoadmapPage() {
   }
 
   const handleVote = async (itemId: number, currentVoted: boolean) => {
-    if (!session) return
+    if (!session) {
+      // Redirect to login if not authenticated
+      router.push('/auth/signin?callbackUrl=/roadmap')
+      return
+    }
 
     setVoting(itemId)
     try {
@@ -187,11 +180,6 @@ export default function RoadmapPage() {
     )
   }
 
-  // Don't render if not authenticated (will redirect)
-  if (!session) {
-    return null
-  }
-
   const sortedItems = [...items].sort((a, b) => b.vote_count - a.vote_count)
 
   return (
@@ -212,11 +200,21 @@ export default function RoadmapPage() {
             </p>
             <Button 
               size="lg" 
-              onClick={() => setShowSuggestForm(true)}
+              onClick={() => {
+                if (!session) {
+                  router.push('/auth/signin?callbackUrl=/roadmap')
+                } else {
+                  setShowSuggestForm(true)
+                }
+              }}
               className="mb-4"
+              title={!session ? "Sign in to suggest features" : undefined}
             >
               <Plus className="w-5 h-5 mr-2" />
               Suggest a Feature
+              {!session && (
+                <span className="text-xs opacity-70 ml-2">(Login required)</span>
+              )}
             </Button>
           </div>
         </div>
@@ -324,9 +322,13 @@ export default function RoadmapPage() {
                             onClick={() => handleVote(item.id, item.userVoted)}
                             disabled={voting === item.id}
                             className="flex items-center space-x-2"
+                            title={!session ? "Sign in to vote on features" : undefined}
                           >
                             <ThumbsUp className="w-4 h-4" />
                             <span>{item.vote_count}</span>
+                            {!session && (
+                              <span className="text-xs opacity-70">(Login to vote)</span>
+                            )}
                           </Button>
                         </div>
                       </div>
@@ -407,10 +409,19 @@ export default function RoadmapPage() {
               <Button 
                 size="lg" 
                 variant="secondary"
-                onClick={() => setShowSuggestForm(true)}
+                onClick={() => {
+                  if (!session) {
+                    router.push('/auth/signin?callbackUrl=/roadmap')
+                  } else {
+                    setShowSuggestForm(true)
+                  }
+                }}
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Suggest Feature
+                {!session && (
+                  <span className="text-xs opacity-70 ml-2">(Login required)</span>
+                )}
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <a href="mailto:greenantyson@gmail.com">
