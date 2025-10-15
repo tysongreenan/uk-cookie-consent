@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
+import { UpdateAnnouncement } from '@/components/landing/update-announcement'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -138,6 +139,7 @@ export default function RootLayout({
         </noscript>
         
         <Providers>
+          <UpdateAnnouncement />
           {children}
           <Toaster 
             position="top-right"

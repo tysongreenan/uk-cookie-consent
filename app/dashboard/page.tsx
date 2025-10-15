@@ -11,6 +11,8 @@ import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
 import { needsMigration } from '@/lib/banner-migration'
+import { NewBadge } from '@/components/ui/new-badge'
+import { CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
 
 interface Banner {
   id: string
@@ -246,7 +248,12 @@ export default function DashboardPage() {
                     {/* Project Info */}
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-medium text-sm truncate">{banner.name}</h3>
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-medium text-sm truncate">{banner.name}</h3>
+                          {banner.config.version === CURRENT_BANNER_VERSION && (
+                            <NewBadge variant="pulse" size="sm" />
+                          )}
+                        </div>
                         {banner.isActive && (
                           <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 ml-2" title="Active"></div>
                         )}
