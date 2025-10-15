@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import { UpdateNotification } from '@/components/dashboard/update-notification'
+import { needsMigration } from '@/lib/banner-migration'
 
 interface Banner {
   id: string
@@ -24,6 +26,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const [banners, setBanners] = useState<Banner[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -44,6 +47,9 @@ export default function DashboardPage() {
       
       if (response.ok) {
         setBanners(data.banners)
+        // Check if any banners need migration
+        const hasOutdated = data.banners.some((banner: Banner) => needsMigration(banner.config))
+        setHasOutdatedBanners(hasOutdated)
       } else {
         console.error('Failed to fetch banners:', data.error)
       }
@@ -149,6 +155,16 @@ export default function DashboardPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-6">
+          {/* Update Notification */}
+          <UpdateNotification
+            isVisible={hasOutdatedBanners}
+            onDismiss={() => setHasOutdatedBanners(false)}
+            onUpdateBanner={() => {
+              // Scroll to banners section
+              document.querySelector('.banners-grid')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+          />
+
           {/* Project Creation Form */}
           <div className="mb-8">
             <div className="flex items-center space-x-4">
@@ -213,7 +229,7 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="banners-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {banners.map((banner) => (
                 <Card key={banner.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
                   <div className="relative">

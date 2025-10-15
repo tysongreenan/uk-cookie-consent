@@ -1,4 +1,8 @@
 export interface BannerConfig {
+  // Version tracking
+  version?: string
+  lastUpdated?: string
+  
   // Basic settings
   name: string
   position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'

@@ -19,8 +19,11 @@ import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
+import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
 
 const defaultConfig: BannerConfig = {
+  version: '2.0.0',
+  lastUpdated: new Date().toISOString(),
   name: 'My Cookie Banner',
   position: 'bottom',
   theme: 'dark',
@@ -309,31 +312,36 @@ export default function BannerBuilderPage() {
       const data = await response.json()
       
       if (response.ok) {
-        // Ensure all settings exist for backward compatibility (migration for old banners)
-        const bannerConfig = {
-          ...data.banner.config,
-          // Add missing language field
-          language: data.banner.config.language || 'auto',
-          // Add missing branding fields
-          branding: {
-            ...data.banner.config.branding,
-            footerLink: data.banner.config.branding?.footerLink || {
-              enabled: true,
-              text: 'Cookie Settings',
-              position: 'floating',
-              floatingPosition: 'bottom-left'
-            }
-          },
-          // Ensure performance settings exist
-          advanced: {
-            ...data.banner.config.advanced,
-            performance: {
-              deferNonCriticalScripts: true,
-              useRequestIdleCallback: true,
-              lazyLoadAnalytics: true,
-              inlineCriticalCSS: true,
-              ...data.banner.config.advanced?.performance
-            }
+        // Check if banner needs migration
+        const originalConfig = data.banner.config
+        const needsUpdate = needsMigration(originalConfig)
+        
+        let bannerConfig = originalConfig
+        
+        if (needsUpdate) {
+          // Migrate to latest version
+          bannerConfig = migrateBannerConfig(originalConfig)
+          const migrationNotes = getMigrationNotes(originalConfig.version || '1.0.0', bannerConfig.version!)
+          
+          // Show migration notification
+          toast.success(
+            `🎉 Banner updated with new features! ${migrationNotes.length > 0 ? migrationNotes[0] : 'Enhanced preferences modal added.'}`,
+            { duration: 6000 }
+          )
+          
+          // Auto-save the migrated configuration
+          try {
+            await fetch(`/api/banners/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: data.banner.name,
+                config: bannerConfig,
+                isActive: data.banner.isActive
+              })
+            })
+          } catch (error) {
+            console.error('Failed to save migrated banner:', error)
           }
         }
         

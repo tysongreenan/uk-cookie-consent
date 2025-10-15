@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,11 +36,16 @@ export async function GET(
       )
     }
 
+    // Parse config and check if migration is needed
+    const config = JSON.parse(banner.config)
+    const migratedConfig = needsMigration(config) ? migrateBannerConfig(config) : config
+
     return NextResponse.json({
       success: true,
       banner: {
         ...banner,
-        config: JSON.parse(banner.config)
+        config: migratedConfig,
+        needsMigration: needsMigration(config)
       }
     })
 
