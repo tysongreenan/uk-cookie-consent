@@ -1,18 +1,22 @@
 'use client'
 
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, Filter, Grid, List } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
 import { needsMigration } from '@/lib/banner-migration'
 import { NewBadge } from '@/components/ui/new-badge'
 import { CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
+import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
+import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
+import { BannerCard } from '@/components/dashboard/banner-card'
+import { Badge } from '@/components/ui/badge'
 
 interface Banner {
   id: string
@@ -29,6 +33,8 @@ export default function DashboardPage() {
   const [banners, setBanners] = useState<Banner[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -82,14 +88,59 @@ export default function DashboardPage() {
     }
   }
 
+  const toggleBanner = async (bannerId: string, isActive: boolean) => {
+    try {
+      const response = await fetch(`/api/banners/${bannerId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isActive }),
+      })
+      
+      if (response.ok) {
+        toast.success(`Banner ${isActive ? 'activated' : 'deactivated'}`)
+        fetchBanners()
+      } else {
+        toast.error('Failed to update banner status')
+      }
+    } catch (error) {
+      console.error('Error updating banner:', error)
+      toast.error('Failed to update banner status')
+    }
+  }
+
+  const copyBannerCode = async (bannerId: string) => {
+    try {
+      const response = await fetch(`/api/banners/${bannerId}/code`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        await navigator.clipboard.writeText(data.code)
+        toast.success('Banner code copied to clipboard')
+      } else {
+        toast.error('Failed to copy banner code')
+      }
+    } catch (error) {
+      console.error('Error copying banner code:', error)
+      toast.error('Failed to copy banner code')
+    }
+  }
+
+  const filteredBanners = banners.filter(banner =>
+    banner.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Loading...</p>
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">Loading...</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     )
   }
 
@@ -98,203 +149,180 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Navigation */}
-      <header className="border-b bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo and Brand */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">CC</span>
-                </div>
-                <h1 className="text-xl font-bold">Cookie Consent Builder</h1>
-              </div>
-            </div>
+    <DashboardLayout>
+      <div className="p-6 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ label: 'Dashboard' }]} />
 
-            {/* Profile Dropdown */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium">
-                    {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
-                  </span>
-                </div>
-                <div className="text-sm">
-                  <div className="font-medium">{session.user?.name || 'User'}</div>
-                  <div className="text-muted-foreground text-xs">{session.user?.email}</div>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => signOut()}>
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex">
-        {/* Sidebar Navigation */}
-        <aside className="w-64 bg-white border-r min-h-screen">
-          <nav className="p-4 space-y-2">
-            <Link href="/dashboard" className="flex items-center space-x-3 p-2 rounded-lg bg-primary text-primary-foreground">
-              <img 
-                src="/logos/logo.svg" 
-                alt="Cookie Banner Generator" 
-                width="20"
-                height="20"
-                className="w-5 h-5 text-white"
-              />
-              <span className="font-medium">Dashboard</span>
-            </Link>
-            <Link href="/dashboard/settings" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-              <div className="w-5 h-5"></div>
-              <span>Settings</span>
-            </Link>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          {/* Update Notification */}
-          <UpdateNotification
+        {/* Update Notification */}
+        {hasOutdatedBanners && (
+          <UpdateNotification 
             isVisible={hasOutdatedBanners}
             onDismiss={() => setHasOutdatedBanners(false)}
-            onUpdateBanner={() => {
-              // Scroll to banners section
-              document.querySelector('.banners-grid')?.scrollIntoView({ behavior: 'smooth' })
-            }}
           />
+        )}
 
-          {/* Project Creation Form */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Cookie Banners</h1>
+            <p className="text-muted-foreground">
+              Manage and customize your GDPR-compliant cookie consent banners
+            </p>
+          </div>
+          <Button asChild size="lg">
+            <Link href="/dashboard/builder">
+              <Plus className="w-5 h-5 mr-2" />
+              Create New Banner
+            </Link>
+          </Button>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Banners</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{banners.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {banners.filter(b => b.isActive).length} active
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Banners</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {banners.filter(b => b.isActive).length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Currently deployed
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Updated</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">
+                {banners.filter(b => needsMigration(b.config)).length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Need attention
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Compliance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">100%</div>
+              <p className="text-xs text-muted-foreground">
+                GDPR & PIPEDA ready
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Enter project name"
-                className="flex-1 max-w-md"
-                id="project-name"
+                placeholder="Search banners..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
               />
-              <Link href="/dashboard/builder">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Start New Project
-                </Button>
-              </Link>
             </div>
+            <Button variant="outline" size="sm">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
           </div>
-
-          {/* Projects Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold">Your Projects</h2>
-              <p className="text-muted-foreground">Manage your cookie consent banners</p>
-            </div>
-            
-            {/* Search and Sort */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Input
-                  placeholder="Search projects..."
-                  className="w-64 pl-8"
-                />
-                <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                  🔍
-                </div>
-              </div>
-              <Button variant="outline" size="sm">
-                Sort
-              </Button>
-            </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+            >
+              <Grid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="w-4 h-4" />
+            </Button>
           </div>
+        </div>
 
-          {/* Projects Grid */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading projects...</p>
-            </div>
-          ) : banners.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-muted-foreground mb-6">
-                <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                  <Plus className="h-8 w-8 opacity-50" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-                <p className="text-sm">Create your first cookie consent banner to get started</p>
+        {/* Banners Grid/List */}
+        {isLoading ? (
+          <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-32 bg-muted rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : filteredBanners.length === 0 ? (
+          <Card className="p-12 text-center">
+            <CardContent>
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-muted-foreground" />
               </div>
-              <Link href="/dashboard/builder">
-                <Button size="lg">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Your First Banner
+              <h3 className="text-lg font-semibold mb-2">
+                {searchTerm ? 'No banners found' : 'No banners yet'}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm 
+                  ? `No banners match "${searchTerm}". Try adjusting your search.`
+                  : 'Create your first cookie consent banner to get started'
+                }
+              </p>
+              {!searchTerm && (
+                <Button asChild>
+                  <Link href="/dashboard/builder">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Your First Banner
+                  </Link>
                 </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="banners-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {banners.map((banner) => (
-                <Card key={banner.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
-                  <div className="relative">
-                    {/* Project Thumbnail */}
-                    <div className="aspect-video bg-gray-100 rounded-t-lg flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                          <span className="text-2xl">🍪</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Cookie Banner</p>
-                      </div>
-                    </div>
-                    
-                    {/* Project Info */}
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-medium text-sm truncate">{banner.name}</h3>
-                          {banner.config.version === CURRENT_BANNER_VERSION && (
-                            <NewBadge variant="pulse" size="sm" />
-                          )}
-                        </div>
-                        {banner.isActive && (
-                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 ml-2" title="Active"></div>
-                        )}
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <p>Position: {banner.config.position}</p>
-                        <p>Theme: {banner.config.theme}</p>
-                        <p>Scripts: {
-                          (banner.config.scripts?.strictlyNecessary?.length || 0) +
-                          (banner.config.scripts?.functionality?.length || 0) +
-                          (banner.config.scripts?.trackingPerformance?.length || 0) +
-                          (banner.config.scripts?.targetingAdvertising?.length || 0)
-                        } configured</p>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" className="flex-1" asChild>
-                          <Link href={`/dashboard/builder?edit=${banner.id}`}>
-                            <Edit className="mr-1 h-3 w-3" />
-                            Edit
-                          </Link>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => deleteBanner(banner.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </main>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            {filteredBanners.map((banner) => (
+              <BannerCard
+                key={banner.id}
+                banner={banner}
+                onToggle={toggleBanner}
+                onDelete={deleteBanner}
+                onCopy={copyBannerCode}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
