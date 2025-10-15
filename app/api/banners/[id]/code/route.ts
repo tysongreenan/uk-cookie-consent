@@ -169,9 +169,14 @@ export async function GET(
 
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
-      .select('id, config, userId')
+      .select(`
+        id, 
+        config, 
+        projectId,
+        Project!inner(userId)
+      `)
       .eq('id', params.id)
-      .eq('userId', user.userId)
+      .eq('Project.userId', user.userId)
       .single()
 
     if (error || !banner) {

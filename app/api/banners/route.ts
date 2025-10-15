@@ -53,10 +53,20 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Query banners through Project table since ConsentBanner doesn't have userId yet
     const { data: banners, error } = await supabase
       .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt')
-      .eq('userId', user.userId)
+      .select(`
+        id, 
+        name, 
+        config, 
+        isActive, 
+        createdAt, 
+        updatedAt,
+        projectId,
+        Project!inner(userId)
+      `)
+      .eq('Project.userId', user.userId)
       .order('createdAt', { ascending: false })
 
     if (error) {
@@ -140,13 +150,65 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // First, get or create a project for this user
+    let projectId: string
+    const { data: existingProject, error: projectError } = await supabase
+      .from('Project')
+      .select('id')
+      .eq('userId', user.userId)
+      .single()
+
+    if (projectError || !existingProject) {
+      // Create a new project if none exists
+      projectId = crypto.randomUUID()
+      const { error: createProjectError } = await supabase
+        .from('Project')
+        .insert({
+          id: projectId,
+          name: 'My Cookie Banners',
+          userId: user.userId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        })
+
+      if (createProjectError) {
+        console.error('Error creating project:', createProjectError)
+        return NextResponse.json(
+          { error: 'Failed to create project' },
+          { status: 500 }
+        )
+      }
+    } else {
+      projectId = existingProject.id
+    }
+
+    // Generate basic code for the banner
+    const code = `<div id="cookie-banner-${bannerId}">
+  <div class="cookie-banner-content">
+    <h3>${config.title}</h3>
+    <p>${config.message}</p>
+    <button onclick="acceptCookies('${bannerId}')">${config.acceptText}</button>
+    <button onclick="showPreferences('${bannerId}')">${config.preferencesText}</button>
+  </div>
+</div>
+<script>
+function acceptCookies(bannerId) {
+  document.getElementById('cookie-banner-' + bannerId).style.display = 'none';
+  // Add your cookie acceptance logic here
+}
+function showPreferences(bannerId) {
+  // Add your preferences modal logic here
+}
+</script>`
+
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .insert({
         id: bannerId,
-        userId: user.userId,
+        projectId: projectId,
         name: `${bannerData.title} Banner`,
         config: config,
+        code: code,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

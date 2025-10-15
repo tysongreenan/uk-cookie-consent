@@ -20,12 +20,21 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get the specific banner
+    // Get the specific banner through Project table
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt')
+      .select(`
+        id, 
+        name, 
+        config, 
+        isActive, 
+        createdAt, 
+        updatedAt,
+        projectId,
+        Project!inner(userId)
+      `)
       .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('Project.userId', session.user.id)
       .single()
 
     if (error) {

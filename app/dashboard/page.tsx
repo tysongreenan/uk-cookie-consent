@@ -50,19 +50,25 @@ export default function DashboardPage() {
 
   const fetchBanners = async () => {
     try {
+      console.log('Fetching banners for user:', session?.user?.id)
       const response = await fetch('/api/banners')
       const data = await response.json()
       
+      console.log('Banners API response:', { status: response.status, data })
+      
       if (response.ok) {
-        setBanners(data.banners)
+        setBanners(data.banners || [])
         // Check if any banners need migration
-        const hasOutdated = data.banners.some((banner: Banner) => banner.config && needsMigration(banner.config))
+        const hasOutdated = (data.banners || []).some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
+        console.log('Banners loaded:', data.banners?.length || 0)
       } else {
         console.error('Failed to fetch banners:', data.error)
+        setBanners([])
       }
     } catch (error) {
       console.error('Error fetching banners:', error)
+      setBanners([])
     } finally {
       setIsLoading(false)
     }
