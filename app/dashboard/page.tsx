@@ -168,9 +168,6 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Cookie Banners</h1>
-            <p className="text-muted-foreground">
-              Manage and customize your GDPR-compliant cookie consent banners
-            </p>
           </div>
           <Button asChild size="lg">
             <Link href="/dashboard/builder">
@@ -180,60 +177,6 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Banners</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{filteredBanners.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {filteredBanners.filter(b => b.isActive).length} active
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Banners</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {filteredBanners.filter(b => b.isActive).length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Currently deployed
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Updated</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {filteredBanners.filter(b => needsMigration(b.config)).length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Need attention
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Compliance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">100%</div>
-              <p className="text-xs text-muted-foreground">
-                GDPR & PIPEDA ready
-              </p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Filters and Search */}
         <div className="flex items-center justify-between">
