@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
 
@@ -23,10 +25,27 @@ async function verifyToken(request: NextRequest) {
   }
 }
 
+// Helper function to get user from either session or JWT token
+async function getUser(request: NextRequest) {
+  // Try NextAuth session first (for dashboard)
+  const session = await getServerSession(authOptions)
+  if (session?.user?.id) {
+    return { userId: session.user.id, source: 'session' }
+  }
+
+  // Fallback to JWT token (for Webflow extension)
+  const jwtUser = await verifyToken(request)
+  if (jwtUser?.userId) {
+    return { userId: jwtUser.userId, source: 'jwt' }
+  }
+
+  return null
+}
+
 // GET /api/banners - Get user's banners
 export async function GET(request: NextRequest) {
   try {
-    const user = await verifyToken(request)
+    const user = await getUser(request)
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -68,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(transformedBanners)
+    return NextResponse.json({ banners: transformedBanners })
 
   } catch (error) {
     console.error('Get banners error:', error)
@@ -82,7 +101,7 @@ export async function GET(request: NextRequest) {
 // POST /api/banners - Create a new banner
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyToken(request)
+    const user = await getUser(request)
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },

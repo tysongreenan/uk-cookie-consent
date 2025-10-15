@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { 
@@ -75,16 +76,18 @@ export function DashboardHeader({ onMenuToggle, isSidebarOpen = true }: HeaderPr
         {/* Right side - Notifications, Theme, User */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5" />
-            {notifications > 0 && (
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-              >
-                {notifications}
-              </Badge>
-            )}
+          <Button variant="ghost" size="sm" className="relative" asChild>
+            <Link href="/roadmap">
+              <Bell className="h-5 w-5" />
+              {notifications > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {notifications}
+                </Badge>
+              )}
+            </Link>
           </Button>
 
           {/* Theme Toggle */}

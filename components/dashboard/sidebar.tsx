@@ -41,27 +41,6 @@ const navigationItems: NavItem[] = [
     badge: 'new'
   },
   {
-    title: 'Analytics',
-    href: '/dashboard/analytics',
-    icon: BarChart3,
-  },
-  {
-    title: 'Templates',
-    href: '/dashboard/templates',
-    icon: FileText,
-  },
-  {
-    title: 'Integrations',
-    href: '/dashboard/integrations',
-    icon: Code,
-    badge: 'new'
-  },
-  {
-    title: 'Team',
-    href: '/dashboard/team',
-    icon: Users,
-  },
-  {
     title: 'Settings',
     href: '/dashboard/settings',
     icon: Settings,
@@ -73,6 +52,11 @@ const supportItems: NavItem[] = [
     title: 'Documentation',
     href: '/docs',
     icon: FileText,
+  },
+  {
+    title: 'Roadmap',
+    href: '/roadmap',
+    icon: BarChart3,
   },
   {
     title: 'Support',
@@ -184,15 +168,15 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-4 border-t border-border">
-        <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+        <Link href="/roadmap" className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
             <Globe className="w-4 h-4 text-primary-foreground" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">Upgrade to Pro</p>
-            <p className="text-xs text-muted-foreground">Unlock all features</p>
+            <p className="text-sm font-medium">New Updates</p>
+            <p className="text-xs text-muted-foreground">See our roadmap</p>
           </div>
-        </div>
+        </Link>
       </div>
     </aside>
   )
