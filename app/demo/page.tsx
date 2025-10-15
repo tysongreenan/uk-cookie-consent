@@ -22,31 +22,34 @@ export default function DemoPage() {
           </div>
 
           {/* Video Container */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="aspect-video w-full relative">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube-nocookie.com/embed/6wZ947TgoUE?si=GBdWjX6fJygSY9rf"
-                title="Cookie Banner Generator Webflow Extension Demo"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                className="rounded-lg"
-              />
-              {/* Fallback message if video is blocked */}
-              <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <div className="text-center p-6">
-                  <p className="text-gray-600 mb-4">Video not loading?</p>
+          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-8 mb-6">
+                <div className="text-white">
+                  <div className="text-6xl mb-4">▶️</div>
+                  <h3 className="text-2xl font-bold mb-2">Watch the Demo Video</h3>
+                  <p className="text-red-100 mb-6">
+                    See how easy it is to create GDPR and PIPEDA compliant cookie banners in Webflow
+                  </p>
                   <a
                     href="https://www.youtube.com/watch?v=6wZ947TgoUE"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+                    className="inline-flex items-center bg-white text-red-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg"
                   >
+                    <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
                     Watch on YouTube
                   </a>
+                </div>
+              </div>
+              
+              {/* Alternative: Direct link for easy copying */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm text-gray-600 mb-2">Direct video link:</p>
+                <div className="bg-white border rounded-lg p-3 font-mono text-sm text-gray-800 break-all">
+                  https://www.youtube.com/watch?v=6wZ947TgoUE
                 </div>
               </div>
             </div>
