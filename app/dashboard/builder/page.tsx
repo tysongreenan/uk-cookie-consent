@@ -20,6 +20,7 @@ import { BannerConfig, TrackingScript } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
+import { NewBadge } from '@/components/ui/new-badge'
 
 const defaultConfig: BannerConfig = {
   version: '2.0.0',
@@ -540,8 +541,12 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'behavior'}
                     aria-controls="behavior-panel"
+                    className="relative"
                   >
-                    Behavior
+                    <span className="flex items-center space-x-1">
+                      <span>Behavior</span>
+                      <NewBadge variant="glow" size="sm" />
+                    </span>
                   </TabsTrigger>
                 </TabsList>
                 
@@ -881,14 +886,17 @@ export default function BannerBuilderPage() {
                             className="mt-1"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="preferences-text" className="text-xs">Preferences Button</Label>
+                        <div className="relative">
+                          <div className="flex items-center space-x-1 mb-1">
+                            <Label htmlFor="preferences-text" className="text-xs">Preferences Button</Label>
+                            <NewBadge variant="glow" size="sm" />
+                          </div>
                           <Input
                             id="preferences-text"
                             value={config.text.preferencesButton}
                             onChange={(e) => updateConfig('text', { preferencesButton: e.target.value })}
                             placeholder="Preferences"
-                            className="mt-1"
+                            className="mt-1 border-purple-200 focus:border-purple-400 focus:ring-purple-200"
                           />
                         </div>
                       </div>
@@ -1741,9 +1749,13 @@ export default function BannerBuilderPage() {
 
               {/* Behavior Tab */}
               <TabsContent value="behavior" className="space-y-6" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
-                <Card>
+                <Card className="relative">
                   <CardHeader>
-                    <CardTitle>Banner Behavior</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Banner Behavior</CardTitle>
+                      <NewBadge variant="sparkle" size="sm" />
+                    </div>
+                    <CardDescription>Configure how the banner behaves and interacts with users</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -1764,13 +1776,23 @@ export default function BannerBuilderPage() {
                       <Label htmlFor="dismiss-scroll">Dismiss on scroll</Label>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="show-preferences"
-                        checked={config.behavior.showPreferences}
-                        onCheckedChange={(checked) => updateConfig('behavior', { showPreferences: checked })}
-                      />
-                      <Label htmlFor="show-preferences">Show preferences button</Label>
+                    <div className="relative p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100">
+                      <div className="absolute top-2 right-2">
+                        <NewBadge variant="pulse" size="sm" />
+                      </div>
+                      <div className="flex items-center space-x-2 pr-16">
+                        <Switch
+                          id="show-preferences"
+                          checked={config.behavior.showPreferences}
+                          onCheckedChange={(checked) => updateConfig('behavior', { showPreferences: checked })}
+                        />
+                        <Label htmlFor="show-preferences" className="font-medium">
+                          Show preferences button
+                        </Label>
+                      </div>
+                      <p className="text-xs text-purple-600 mt-2 ml-6">
+                        ✨ Enables the advanced preferences modal with cookie category toggles
+                      </p>
                     </div>
 
                     <div>
@@ -1945,11 +1967,20 @@ export default function BannerBuilderPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Eye className="mr-2 h-5 w-5" />
-                  Live Preview
-                </CardTitle>
-
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center">
+                    <Eye className="mr-2 h-5 w-5" />
+                    Live Preview
+                  </CardTitle>
+                  {config.behavior.showPreferences && (
+                    <NewBadge variant="sparkle" size="sm" />
+                  )}
+                </div>
+                {config.behavior.showPreferences && (
+                  <CardDescription className="text-purple-600">
+                    ✨ Try clicking the "Preferences" button to see the new modal!
+                  </CardDescription>
+                )}
               </CardHeader>
               <CardContent>
                 <BannerPreview config={config} />
