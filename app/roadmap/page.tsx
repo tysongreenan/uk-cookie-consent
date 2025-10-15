@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Metadata } from 'next'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -23,74 +24,24 @@ import {
   ArrowRight
 } from 'lucide-react'
 
-const roadmapItems = [
-  {
-    id: 1,
-    title: 'Advanced Analytics Dashboard',
-    description: 'Comprehensive analytics showing consent rates, user interactions, and conversion metrics.',
-    category: 'analytics',
-    status: 'planned',
-    votes: 47,
-    userVoted: false,
-    icon: BarChart3,
-    color: 'blue'
-  },
-  {
-    id: 2,
-    title: 'Team Collaboration Features',
-    description: 'Invite team members, assign roles, and collaborate on banner projects together.',
-    category: 'collaboration',
-    status: 'planned',
-    votes: 32,
-    userVoted: false,
-    icon: Users,
-    color: 'green'
-  },
-  {
-    id: 3,
-    title: 'Multi-Language Support',
-    description: 'Built-in translations for 20+ languages with automatic locale detection.',
-    category: 'localization',
-    status: 'in-progress',
-    votes: 28,
-    userVoted: true,
-    icon: Globe,
-    color: 'purple'
-  },
-  {
-    id: 4,
-    title: 'Advanced Compliance Tools',
-    description: 'Automated compliance checking, privacy policy generators, and legal document templates.',
-    category: 'compliance',
-    status: 'planned',
-    votes: 41,
-    userVoted: false,
-    icon: Shield,
-    color: 'red'
-  },
-  {
-    id: 5,
-    title: 'Custom CSS Editor',
-    description: 'Advanced styling options with live preview and CSS customization.',
-    category: 'design',
-    status: 'planned',
-    votes: 19,
-    userVoted: false,
-    icon: Settings,
-    color: 'orange'
-  },
-  {
-    id: 6,
-    title: 'A/B Testing Framework',
-    description: 'Test different banner designs and messages to optimize conversion rates.',
-    category: 'optimization',
-    status: 'planned',
-    votes: 35,
-    userVoted: false,
-    icon: Zap,
-    color: 'yellow'
-  }
-]
+// This will be populated from the API
+const iconMap = {
+  'analytics': BarChart3,
+  'collaboration': Users,
+  'localization': Globe,
+  'compliance': Shield,
+  'design': Settings,
+  'optimization': Zap
+}
+
+const colorMap = {
+  'analytics': 'blue',
+  'collaboration': 'green',
+  'localization': 'purple',
+  'compliance': 'red',
+  'design': 'orange',
+  'optimization': 'yellow'
+}
 
 const statusConfig = {
   'in-progress': { label: 'In Progress', color: 'bg-blue-500', icon: Clock },
@@ -107,36 +58,141 @@ const categoryConfig = {
   'optimization': { label: 'Optimization', color: 'bg-yellow-100 text-yellow-800' }
 }
 
+interface RoadmapItem {
+  id: number
+  title: string
+  description: string
+  category: string
+  status: string
+  vote_count: number
+  userVoted: boolean
+  priority: number
+}
+
 export default function RoadmapPage() {
-  const [items, setItems] = useState(roadmapItems)
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [items, setItems] = useState<RoadmapItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [showSuggestForm, setShowSuggestForm] = useState(false)
   const [newSuggestion, setNewSuggestion] = useState({ title: '', description: '', category: '' })
+  const [voting, setVoting] = useState<number | null>(null)
 
-  const handleVote = (itemId: number) => {
-    setItems(items.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          votes: item.userVoted ? item.votes - 1 : item.votes + 1,
-          userVoted: !item.userVoted
-        }
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session) {
+      router.push('/auth/signin')
+      return
+    }
+  }, [session, status, router])
+
+  // Fetch roadmap items
+  useEffect(() => {
+    if (session) {
+      fetchRoadmapItems()
+    }
+  }, [session])
+
+  const fetchRoadmapItems = async () => {
+    try {
+      const response = await fetch('/api/roadmap')
+      if (response.ok) {
+        const data = await response.json()
+        setItems(data.items)
+      } else {
+        console.error('Failed to fetch roadmap items')
       }
-      return item
-    }))
-  }
-
-  const handleSubmitSuggestion = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (newSuggestion.title && newSuggestion.description) {
-      // Here you would typically send to your backend
-      console.log('New suggestion:', newSuggestion)
-      setNewSuggestion({ title: '', description: '', category: '' })
-      setShowSuggestForm(false)
-      // Show success message
+    } catch (error) {
+      console.error('Error fetching roadmap items:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const sortedItems = [...items].sort((a, b) => b.votes - a.votes)
+  const handleVote = async (itemId: number, currentVoted: boolean) => {
+    if (!session) return
+
+    setVoting(itemId)
+    try {
+      const response = await fetch('/api/roadmap/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          roadmapItemId: itemId,
+          action: currentVoted ? 'unvote' : 'vote'
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        // Update the item with new vote count and status
+        setItems(items.map(item => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              vote_count: data.voteCount,
+              userVoted: data.userVoted
+            }
+          }
+          return item
+        }))
+      } else {
+        console.error('Failed to vote')
+      }
+    } catch (error) {
+      console.error('Error voting:', error)
+    } finally {
+      setVoting(null)
+    }
+  }
+
+  const handleSubmitSuggestion = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newSuggestion.title || !newSuggestion.description || !session) return
+
+    try {
+      const response = await fetch('/api/roadmap/suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newSuggestion),
+      })
+
+      if (response.ok) {
+        setNewSuggestion({ title: '', description: '', category: '' })
+        setShowSuggestForm(false)
+        // Show success message
+        alert('Thank you for your suggestion! We\'ll review it and may add it to our roadmap.')
+      } else {
+        console.error('Failed to submit suggestion')
+      }
+    } catch (error) {
+      console.error('Error submitting suggestion:', error)
+    }
+  }
+
+  // Show loading state
+  if (status === 'loading' || loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading roadmap...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!session) {
+    return null
+  }
+
+  const sortedItems = [...items].sort((a, b) => b.vote_count - a.vote_count)
 
   return (
     <div className="min-h-screen bg-background">
@@ -229,9 +285,11 @@ export default function RoadmapPage() {
           <div className="max-w-6xl mx-auto">
             <div className="grid gap-6">
               {sortedItems.map((item) => {
-                const StatusIcon = statusConfig[item.status].icon
-                const statusColor = statusConfig[item.status].color
-                const categoryInfo = categoryConfig[item.category]
+                const StatusIcon = statusConfig[item.status as keyof typeof statusConfig]?.icon || Lightbulb
+                const statusColor = statusConfig[item.status as keyof typeof statusConfig]?.color || 'bg-gray-500'
+                const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
+                const ItemIcon = iconMap[item.category as keyof typeof iconMap] || Settings
+                const itemColor = colorMap[item.category as keyof typeof colorMap] || 'blue'
                 
                 return (
                   <Card key={item.id} className="hover:shadow-lg transition-shadow">
@@ -239,19 +297,19 @@ export default function RoadmapPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4 flex-1">
                           <div className="flex-shrink-0">
-                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-${item.color}-100`}>
-                              <item.icon className={`w-6 h-6 text-${item.color}-600`} />
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-${itemColor}-100`}>
+                              <ItemIcon className={`w-6 h-6 text-${itemColor}-600`} />
                             </div>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               <CardTitle className="text-xl">{item.title}</CardTitle>
-                              <Badge className={categoryInfo.color}>
-                                {categoryInfo.label}
+                              <Badge className={categoryInfo?.color || 'bg-gray-100 text-gray-800'}>
+                                {categoryInfo?.label || 'Other'}
                               </Badge>
                               <Badge variant="outline" className="flex items-center">
                                 <StatusIcon className="w-3 h-3 mr-1" />
-                                {statusConfig[item.status].label}
+                                {statusConfig[item.status as keyof typeof statusConfig]?.label || 'Planned'}
                               </Badge>
                             </div>
                             <CardDescription className="text-base">
@@ -263,11 +321,12 @@ export default function RoadmapPage() {
                           <Button
                             variant={item.userVoted ? "default" : "outline"}
                             size="sm"
-                            onClick={() => handleVote(item.id)}
+                            onClick={() => handleVote(item.id, item.userVoted)}
+                            disabled={voting === item.id}
                             className="flex items-center space-x-2"
                           >
                             <ThumbsUp className="w-4 h-4" />
-                            <span>{item.votes}</span>
+                            <span>{item.vote_count}</span>
                           </Button>
                         </div>
                       </div>
