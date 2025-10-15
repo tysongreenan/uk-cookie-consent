@@ -8,6 +8,65 @@ export const CURRENT_BANNER_VERSION = '2.0.0'
  * This ensures backward compatibility and adds new features to existing banners
  */
 export function migrateBannerConfig(config: any): BannerConfig {
+  // Handle null, undefined, or invalid configs
+  if (!config || typeof config !== 'object') {
+    // Return a default config for invalid inputs
+    return {
+      version: CURRENT_BANNER_VERSION,
+      lastUpdated: new Date().toISOString(),
+      name: 'My Cookie Banner',
+      position: 'bottom',
+      theme: 'dark',
+      language: 'auto',
+      colors: {
+        background: '#1f2937',
+        text: '#ffffff',
+        button: '#3b82f6',
+        buttonText: '#ffffff',
+        link: '#60a5fa'
+      },
+      text: {
+        title: 'We use cookies',
+        message: 'This website uses cookies to enhance your browsing experience.',
+        acceptButton: 'Accept All',
+        rejectButton: 'Reject',
+        preferencesButton: 'Preferences'
+      },
+      behavior: {
+        autoShow: true,
+        dismissOnScroll: false,
+        showPreferences: true,
+        cookieExpiry: 30
+      },
+      branding: {
+        logo: { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 },
+        privacyPolicy: { url: '', text: 'Privacy Policy', openInNewTab: true, required: false },
+        footerLink: { enabled: true, text: 'Cookie Settings', position: 'floating', floatingPosition: 'bottom-left' }
+      },
+      layout: {
+        width: 'full', customWidth: 400, maxWidth: 1200, borderRadius: 8,
+        padding: 20, margin: 20, shadow: 'medium', animation: 'fade'
+      },
+      scripts: {
+        strictlyNecessary: [],
+        functionality: [],
+        trackingPerformance: [],
+        targetingAdvertising: []
+      },
+      advanced: {
+        googleConsentMode: true,
+        customCSS: '',
+        customJS: '',
+        performance: {
+          deferNonCriticalScripts: true,
+          useRequestIdleCallback: true,
+          lazyLoadAnalytics: true,
+          inlineCriticalCSS: true
+        }
+      }
+    }
+  }
+
   let migratedConfig = { ...config }
 
   // Add version tracking if missing
@@ -109,6 +168,11 @@ if (!sessionStorage.getItem('sessionId')) {
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
+  // Handle null, undefined, or invalid configs
+  if (!config || typeof config !== 'object') {
+    return true // Treat invalid configs as needing migration
+  }
+  
   return !config.version || config.version !== CURRENT_BANNER_VERSION
 }
 
