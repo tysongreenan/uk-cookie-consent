@@ -33,17 +33,6 @@ const navigationItems: NavItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-  },
-  {
-    title: 'Banner Builder',
-    href: '/dashboard/builder',
-    icon: Palette,
-    badge: 'new'
-  },
-  {
-    title: 'Settings',
-    href: '/dashboard/settings',
-    icon: Settings,
   }
 ]
 
