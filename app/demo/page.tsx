@@ -23,11 +23,11 @@ export default function DemoPage() {
 
           {/* Video Container */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="aspect-video w-full">
+            <div className="aspect-video w-full relative">
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/6wZ947TgoUE?si=fNCNdEpBiy29mACC"
+                src="https://www.youtube.com/embed/6wZ947TgoUE?rel=0&modestbranding=1"
                 title="Cookie Banner Generator Webflow Extension Demo"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -35,6 +35,20 @@ export default function DemoPage() {
                 allowFullScreen
                 className="rounded-lg"
               />
+              {/* Fallback message if video is blocked */}
+              <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <div className="text-center p-6">
+                  <p className="text-gray-600 mb-4">Video not loading?</p>
+                  <a
+                    href="https://www.youtube.com/watch?v=6wZ947TgoUE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Watch on YouTube
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
