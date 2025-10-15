@@ -1,0 +1,18 @@
+{
+  "name": "Cookie Banner Generator",
+  "id": "3e646fc5c6056410a15ddcd6af1eb53e3724fc855387fe62e9aea287f859ee4f",
+  "version": "1.0.0",
+  "description": "Create GDPR-compliant cookie consent banners directly in Webflow",
+  "author": {
+    "name": "Cookie Banner Pro",
+    "email": "support@cookiebanner.com"
+  },
+  "permissions": [
+    "read:design",
+    "write:design"
+  ],
+  "entry": {
+    "designer": "public/index.html"
+  },
+  "url": "https://68eef6a74e7935c27e2272ac.webflow-ext.com"
+}

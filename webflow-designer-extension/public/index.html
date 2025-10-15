@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Banner Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="header">
+                <h1>🍪 Cookie Banner Generator</h1>
+                <p>Create GDPR-compliant cookie consent banners for your Webflow site</p>
+            </div>
+
+            <!-- Login Section -->
+            <div id="login-section" class="section">
+                <h2>Sign In</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                    <p class="signup-link">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+                </form>
+            </div>
+
+            <!-- Signup Section -->
+            <div id="signup-section" class="section hidden">
+                <h2>Create Account</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name">Name</label>
+                        <input type="text" id="signup-name" required placeholder="Your Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                    <p class="signup-link">Already have an account? <a href="#" id="show-login">Sign in</a></p>
+                </form>
+            </div>
+
+            <!-- Banner Builder Section -->
+            <div id="banner-builder" class="section hidden">
+                <div class="builder-header">
+                    <h2>Banner Builder</h2>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
+                </div>
+
+                <!-- Banner Preview -->
+                <div class="preview-section">
+                    <h3>Preview</h3>
+                    <div id="banner-preview" class="banner-preview">
+                        <div class="banner-content">
+                            <div class="banner-text">
+                                <h4>We use cookies</h4>
+                                <p>We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.</p>
+                            </div>
+                            <div class="banner-buttons">
+                                <button class="btn-accept">Accept All</button>
+                                <button class="btn-settings">Cookie Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customization Options -->
+                <div class="customization-section">
+                    <h3>Customize Your Banner</h3>
+                    
+                    <div class="form-group">
+                        <label for="banner-title">Banner Title</label>
+                        <input type="text" id="banner-title" value="We use cookies">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-text">Banner Text</label>
+                        <textarea id="banner-text" rows="3">We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic.</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="primary-color">Primary Color</label>
+                            <input type="color" id="primary-color" value="#0073e6">
+                        </div>
+                        <div class="form-group">
+                            <label for="text-color">Text Color</label>
+                            <input type="color" id="text-color" value="#ffffff">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="accept-text">Accept Button Text</label>
+                            <input type="text" id="accept-text" value="Accept All">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-text">Settings Button Text</label>
+                            <input type="text" id="settings-text" value="Cookie Settings">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="banner-position">Position</label>
+                        <select id="banner-position">
+                            <option value="bottom">Bottom</option>
+                            <option value="top">Top</option>
+                            <option value="center">Center</option>
+                        </select>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="generate-code" class="btn-primary">Generate Code</button>
+                        <button id="insert-banner" class="btn-secondary">Insert into Page</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Code Section -->
+            <div id="code-section" class="section hidden">
+                <div class="code-header">
+                    <h3>Generated Code</h3>
+                    <button id="copy-code" class="btn-secondary">Copy Code</button>
+                </div>
+                <pre id="generated-code" class="code-block"></pre>
+                <p class="code-instructions">
+                    Copy this code and paste it into your Webflow project's custom code section or embed element.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="index.js"></script>
+</body>
+</html>

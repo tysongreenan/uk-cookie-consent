@@ -1,97 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { bannerRateLimit } from '@/lib/rate-limit'
-import { sanitizeBannerName, sanitizeBannerConfig } from '@/lib/sanitize'
+import jwt from 'jsonwebtoken'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export async function POST(request: NextRequest) {
+// Helper function to verify JWT token
+async function verifyToken(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null
+  }
+
+  const token = authHeader.substring(7)
   try {
-    // Check rate limit
-    const rateLimitResult = await bannerRateLimit.check(request);
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please slow down.' },
-        { 
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': '10',
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-            'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
-          }
-        }
-      );
-    }
+    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET!) as any
+    return decoded
+  } catch (error) {
+    return null
+  }
+}
 
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const bannerData = await request.json()
-    
-    // Validate required fields
-    if (!bannerData.name || !bannerData.config) {
+// GET /api/banners - Get user's banners
+export async function GET(request: NextRequest) {
+  try {
+    const user = await verifyToken(request)
+    if (!user) {
       return NextResponse.json(
-        { error: 'Banner name and configuration are required' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
-    // Sanitize input data
-    const sanitizedName = sanitizeBannerName(bannerData.name);
-    const sanitizedConfig = sanitizeBannerConfig(bannerData.config);
-
-    if (!sanitizedName) {
-      return NextResponse.json(
-        { error: 'Invalid banner name' },
-        { status: 400 }
-      )
-    }
-
-    // Generate a secure ID
-    const bannerId = crypto.randomUUID()
-
-    // Save banner to database
-    const { data: banner, error } = await supabase
+    const { data: banners, error } = await supabase
       .from('ConsentBanner')
-      .insert({
-        id: bannerId,
-        userId: session.user.id,
-        name: sanitizedName,
-        config: JSON.stringify(sanitizedConfig),
-        isActive: bannerData.isActive || false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      })
       .select('id, name, config, isActive, createdAt, updatedAt')
-      .single()
+      .eq('userId', user.userId)
+      .order('createdAt', { ascending: false })
 
     if (error) {
-      console.error('Database error:', error)
+      console.error('Error fetching banners:', error)
       return NextResponse.json(
-        { error: 'Failed to save banner' },
+        { error: 'Failed to fetch banners' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      banner: {
-        ...banner,
-        config: JSON.parse(banner.config)
+    // Transform banners to match Webflow extension format
+    const transformedBanners = banners.map(banner => {
+      const config = banner.config || {}
+      return {
+        id: banner.id,
+        name: banner.name,
+        title: config.title || 'We use cookies',
+        message: config.message || 'This website uses cookies to enhance your browsing experience.',
+        primaryColor: config.primaryColor || '#0073e6',
+        textColor: config.textColor || '#ffffff',
+        acceptButton: config.acceptText || 'Accept All',
+        preferencesButton: config.preferencesText || 'Cookie Settings',
+        position: config.position || 'bottom',
+        theme: config.theme || 'dark',
+        isActive: banner.isActive,
+        createdAt: banner.createdAt,
+        updatedAt: banner.updatedAt
       }
     })
 
+    return NextResponse.json(transformedBanners)
+
   } catch (error) {
-    console.error('Save banner error:', error)
+    console.error('Get banners error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -99,42 +79,91 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+// POST /api/banners - Create a new banner
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await verifyToken(request)
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    // Get all banners for the user
-    const { data: banners, error } = await supabase
+    const bannerData = await request.json()
+    
+    // Validate required fields
+    if (!bannerData.title || !bannerData.message) {
+      return NextResponse.json(
+        { error: 'Title and message are required' },
+        { status: 400 }
+      )
+    }
+
+    const bannerId = crypto.randomUUID()
+    
+    // Transform Webflow extension format to internal format
+    const config = {
+      theme: bannerData.theme || 'dark',
+      position: bannerData.position || 'bottom',
+      title: bannerData.title,
+      message: bannerData.message,
+      acceptText: bannerData.acceptButton || 'Accept All',
+      preferencesText: bannerData.preferencesButton || 'Cookie Settings',
+      primaryColor: bannerData.primaryColor || '#0073e6',
+      textColor: bannerData.textColor || '#ffffff',
+      language: 'en',
+      scripts: {
+        strictlyNecessary: [],
+        functionality: [],
+        trackingPerformance: [],
+        targetingAdvertising: []
+      }
+    }
+
+    const { data: banner, error } = await supabase
       .from('ConsentBanner')
+      .insert({
+        id: bannerId,
+        userId: user.userId,
+        name: `${bannerData.title} Banner`,
+        config: config,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })
       .select('id, name, config, isActive, createdAt, updatedAt')
-      .eq('userId', session.user.id)
-      .order('updatedAt', { ascending: false })
+      .single()
 
     if (error) {
-      console.error('Database error:', error)
+      console.error('Error creating banner:', error)
       return NextResponse.json(
-        { error: 'Failed to fetch banners' },
+        { error: 'Failed to create banner' },
         { status: 500 }
       )
     }
 
-    // Config is already an object, no need to parse
-    const parsedBanners = banners.map(banner => ({
-      ...banner,
-      config: typeof banner.config === 'string' ? JSON.parse(banner.config) : banner.config
-    }))
+    // Return in Webflow extension format
+    const transformedBanner = {
+      id: banner.id,
+      name: banner.name,
+      title: config.title,
+      message: config.message,
+      primaryColor: config.primaryColor,
+      textColor: config.textColor,
+      acceptButton: config.acceptText,
+      preferencesButton: config.preferencesText,
+      position: config.position,
+      theme: config.theme,
+      isActive: banner.isActive,
+      createdAt: banner.createdAt,
+      updatedAt: banner.updatedAt
+    }
 
-    return NextResponse.json({
-      success: true,
-      banners: parsedBanners
-    })
+    return NextResponse.json(transformedBanner, { status: 201 })
 
   } catch (error) {
-    console.error('Fetch banners error:', error)
+    console.error('Create banner error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
