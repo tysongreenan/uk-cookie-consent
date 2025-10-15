@@ -167,7 +167,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">CookieBanner</h1>
           </div>
           <Button asChild size="lg">
             <Link href="/dashboard/builder">
