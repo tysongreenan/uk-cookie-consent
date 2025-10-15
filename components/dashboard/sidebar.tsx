@@ -30,7 +30,7 @@ interface NavItem {
 
 const navigationItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Cookie Banner',
     href: '/dashboard',
     icon: LayoutDashboard,
   }
