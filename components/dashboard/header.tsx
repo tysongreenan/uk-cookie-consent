@@ -4,18 +4,14 @@ import { useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { 
-  Search, 
   Bell, 
   Moon, 
   Sun, 
   User, 
   Settings, 
   LogOut, 
-  ChevronDown,
-  Menu,
-  X
+  ChevronDown
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -28,12 +24,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 
-interface HeaderProps {
-  onMenuToggle?: () => void
-  isSidebarOpen?: boolean
-}
+interface HeaderProps {}
 
-export function DashboardHeader({ onMenuToggle, isSidebarOpen = true }: HeaderProps) {
+export function DashboardHeader({}: HeaderProps) {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
   const [notifications] = useState(3) // Mock notification count
@@ -43,34 +36,16 @@ export function DashboardHeader({ onMenuToggle, isSidebarOpen = true }: HeaderPr
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b border-border bg-background">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        {/* Left side - Menu toggle and Search */}
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onMenuToggle}
-            className="lg:hidden"
-          >
-            {isSidebarOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
-
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search banners, templates..."
-              className="w-64 pl-10 pr-4"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hidden lg:block">
-              ⌘K
+        {/* Left side - Logo */}
+        <div className="flex items-center">
+          <Link href="/dashboard" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <User className="w-5 h-5 text-primary-foreground" />
             </div>
-          </div>
+            <span className="font-semibold text-lg">CookieBanner</span>
+          </Link>
         </div>
 
         {/* Right side - Notifications, Theme, User */}
