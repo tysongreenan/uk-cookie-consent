@@ -340,10 +340,10 @@ ${config.behavior.showPreferences ? `
                 <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Functional Cookies</div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
-                <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
@@ -355,10 +355,10 @@ ${config.behavior.showPreferences ? `
                 <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Performance Cookies</div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
-                <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
@@ -370,10 +370,10 @@ ${config.behavior.showPreferences ? `
                 <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Targeting Cookies</div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
-                <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
@@ -385,10 +385,10 @@ ${config.behavior.showPreferences ? `
                 <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Social Media Cookies</div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
-                <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
@@ -733,15 +733,29 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         var targeting = document.getElementById('cookie-targeting-toggle-modal');
         var social = document.getElementById('cookie-social-toggle-modal');
         
-        saveConsent({
+        var consent = {
           essential: true,
           functionality: func ? func.checked : false,
           analytics: performance ? performance.checked : false,
           marketing: (targeting ? targeting.checked : false) || (social ? social.checked : false)
-        });
+        };
+        
+        console.log('User confirmed cookie preferences:', consent);
+        saveConsent(consent);
         
         banner.style.display = 'none';
         modal.style.display = 'none';
+        
+        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        // Show floating cookie settings button after confirming preferences
+        var floatBtn = document.getElementById('cookie-settings-float');
+        if (floatBtn) {
+          floatBtn.style.display = 'block';
+          floatBtn.onclick = function() {
+            banner.style.display = 'block';
+          };
+        }
+        ` : ''}
       };
     }
     
@@ -753,6 +767,32 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         }
       };
     }
+    
+    // Make toggle switches functional
+    var toggles = [
+      { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
+      { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
+      { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
+      { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
+    ];
+    
+    toggles.forEach(function(toggle) {
+      var input = document.getElementById(toggle.input);
+      var slider = document.getElementById(toggle.slider);
+      var thumb = document.getElementById(toggle.thumb);
+      
+      if (input && slider && thumb) {
+        input.addEventListener('change', function() {
+          if (this.checked) {
+            slider.style.backgroundColor = '#3b82f6';
+            thumb.style.transform = 'translateX(20px)';
+          } else {
+            slider.style.backgroundColor = '#ccc';
+            thumb.style.transform = 'translateX(0)';
+          }
+        });
+      }
+    });
     ` : ''}
     
     ${config.behavior.dismissOnScroll ? `

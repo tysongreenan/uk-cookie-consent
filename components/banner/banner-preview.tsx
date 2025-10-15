@@ -97,7 +97,40 @@ export function BannerPreview({ config }: BannerPreviewProps) {
     setIsVisible(false)
   }
 
-  const handleConfirmChoices = () => {
+  const handleConfirmChoices = (preferences: {
+    strictlyNecessary: boolean
+    functionality: boolean
+    trackingPerformance: boolean
+    targetingAdvertising: boolean
+    socialMedia: boolean
+  }) => {
+    console.log('Cookie preferences confirmed:', preferences)
+    
+    // Here you would typically:
+    // 1. Save the preferences to localStorage or cookies
+    // 2. Load/unload scripts based on preferences
+    // 3. Update Google Analytics consent mode
+    // 4. Trigger any other tracking scripts based on user choices
+    
+    // For demo purposes, we'll just log the preferences
+    if (preferences.functionality) {
+      console.log('✅ Functionality cookies enabled')
+    } else {
+      console.log('❌ Functionality cookies disabled')
+    }
+    
+    if (preferences.trackingPerformance) {
+      console.log('✅ Performance/tracking cookies enabled')
+    } else {
+      console.log('❌ Performance/tracking cookies disabled')
+    }
+    
+    if (preferences.targetingAdvertising || preferences.socialMedia) {
+      console.log('✅ Marketing/advertising cookies enabled')
+    } else {
+      console.log('❌ Marketing/advertising cookies disabled')
+    }
+    
     setShowPreferences(false)
     setIsVisible(false)
   }

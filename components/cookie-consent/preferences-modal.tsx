@@ -36,7 +36,13 @@ interface PreferencesModalProps {
   isVisible: boolean
   onClose: () => void
   onAcceptAll: () => void
-  onConfirmChoices: () => void
+  onConfirmChoices: (preferences: {
+    strictlyNecessary: boolean
+    functionality: boolean
+    trackingPerformance: boolean
+    targetingAdvertising: boolean
+    socialMedia: boolean
+  }) => void
   domain?: string
 }
 
@@ -208,17 +214,17 @@ export function PreferencesModal({
 
           {/* Footer with buttons */}
           <div className="p-6 pt-0 border-t border-gray-100 bg-gray-50">
-            {/* Confirm Button */}
-            <Button
-              onClick={onConfirmChoices}
-              className="w-full mb-4 h-12 text-base font-medium rounded-lg"
-              style={{
-                backgroundColor: config.colors.button,
-                color: config.colors.buttonText,
-              }}
-            >
-              CONFIRM MY CHOICES
-            </Button>
+          {/* Confirm Button */}
+          <Button
+            onClick={() => onConfirmChoices(cookiePreferences)}
+            className="w-full mb-4 h-12 text-base font-medium rounded-lg"
+            style={{
+              backgroundColor: config.colors.button,
+              color: config.colors.buttonText,
+            }}
+          >
+            CONFIRM MY CHOICES
+          </Button>
 
             {/* Powered by */}
             <div className="text-center">
