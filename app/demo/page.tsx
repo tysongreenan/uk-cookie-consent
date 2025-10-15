@@ -27,7 +27,7 @@ export default function DemoPage() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/6wZ947TgoUE?rel=0&modestbranding=1"
+                src="https://www.youtube-nocookie.com/embed/6wZ947TgoUE?si=GBdWjX6fJygSY9rf"
                 title="Cookie Banner Generator Webflow Extension Demo"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
