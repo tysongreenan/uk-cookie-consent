@@ -68,14 +68,14 @@ export function PreferencesModal({
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200">
-          {config.branding.logo.enabled && config.branding.logo.url && (
+          {config.branding.logo.enabled && config.branding.logo.url ? (
             <img
               src={config.branding.logo.url}
               alt="Logo"
-              className="h-8 object-contain"
+              className="h-8 object-contain flex-shrink-0"
               style={{
                 maxWidth: `${config.branding.logo.maxWidth}px`,
                 maxHeight: `${config.branding.logo.maxHeight}px`,
@@ -84,134 +84,154 @@ export function PreferencesModal({
                 e.currentTarget.style.display = 'none'
               }}
             />
+          ) : (
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">CB</span>
+              </div>
+              <span className="font-semibold text-gray-900">Cookie Settings</span>
+            </div>
           )}
           
           <button
             onClick={onClose}
-            className="ml-auto p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
           >
             <X className="h-5 w-5 text-gray-600" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 pt-4 flex-1 overflow-y-auto">
-          {/* Title */}
-          <h2 className="text-xl font-bold text-gray-900 mb-3">
-            Privacy Center
-          </h2>
-          
-          {/* Description */}
-          <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-            By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
-          </p>
-
-          {/* Accept All Button */}
-          <Button
-            onClick={onAcceptAll}
-            className="w-full mb-6 h-12 text-base font-medium rounded-lg"
-            style={{
-              backgroundColor: config.colors.button,
-              color: config.colors.buttonText,
-            }}
-          >
-            ACCEPT ALL
-          </Button>
-
-          {/* Cookie Preferences Section */}
-          <div className="mb-6">
-            <h3 className="font-bold text-gray-900 mb-4">
-              Manage cookie preferences
-            </h3>
+        <div className="flex flex-col h-full max-h-[calc(90vh-80px)]">
+          <div className="p-6 pt-4 flex-1 overflow-y-auto">
+            {/* Title */}
+            <h2 className="text-xl font-bold text-gray-900 mb-3">
+              Privacy Center
+            </h2>
             
-            <div className="space-y-4">
-              {/* Strictly Necessary */}
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <div className="flex items-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900">Strictly Necessary Cookies</div>
-                    <div className="text-xs text-gray-500 mt-1">Always active</div>
-                  </div>
-                </div>
-              </div>
+            {/* Description */}
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
+            </p>
 
-              {/* Functionality */}
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900">Functional Cookies</div>
-                  </div>
-                </div>
-                <Switch
-                  checked={cookiePreferences.functionality}
-                  onCheckedChange={() => handleToggle('functionality')}
-                />
-              </div>
+            {/* Accept All Button */}
+            <Button
+              onClick={onAcceptAll}
+              className="w-full mb-6 h-12 text-base font-medium rounded-lg"
+              style={{
+                backgroundColor: config.colors.button,
+                color: config.colors.buttonText,
+              }}
+            >
+              ACCEPT ALL
+            </Button>
 
-              {/* Performance */}
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900">Performance Cookies</div>
+            {/* Cookie Preferences Section */}
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-4">
+                Manage cookie preferences
+              </h3>
+              
+              <div className="space-y-3">
+                {/* Strictly Necessary */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900">Strictly Necessary Cookies</div>
+                      <div className="text-xs text-gray-500 mt-1">Always active</div>
+                    </div>
                   </div>
                 </div>
-                <Switch
-                  checked={cookiePreferences.trackingPerformance}
-                  onCheckedChange={() => handleToggle('trackingPerformance')}
-                />
-              </div>
 
-              {/* Targeting */}
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900">Targeting Cookies</div>
+                {/* Functionality */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900">Functional Cookies</div>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 ml-3">
+                    <Switch
+                      checked={cookiePreferences.functionality}
+                      onCheckedChange={() => handleToggle('functionality')}
+                    />
                   </div>
                 </div>
-                <Switch
-                  checked={cookiePreferences.targetingAdvertising}
-                  onCheckedChange={() => handleToggle('targetingAdvertising')}
-                />
-              </div>
 
-              {/* Social Media */}
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900">Social Media Cookies</div>
+                {/* Performance */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900">Performance Cookies</div>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 ml-3">
+                    <Switch
+                      checked={cookiePreferences.trackingPerformance}
+                      onCheckedChange={() => handleToggle('trackingPerformance')}
+                    />
                   </div>
                 </div>
-                <Switch
-                  checked={cookiePreferences.socialMedia}
-                  onCheckedChange={() => handleToggle('socialMedia')}
-                />
+
+                {/* Targeting */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900">Targeting Cookies</div>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 ml-3">
+                    <Switch
+                      checked={cookiePreferences.targetingAdvertising}
+                      onCheckedChange={() => handleToggle('targetingAdvertising')}
+                    />
+                  </div>
+                </div>
+
+                {/* Social Media */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900">Social Media Cookies</div>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 ml-3">
+                    <Switch
+                      checked={cookiePreferences.socialMedia}
+                      onCheckedChange={() => handleToggle('socialMedia')}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Confirm Button */}
-          <Button
-            onClick={onConfirmChoices}
-            className="w-full mb-4 h-12 text-base font-medium rounded-lg"
-            style={{
-              backgroundColor: config.colors.button,
-              color: config.colors.buttonText,
-            }}
-          >
-            CONFIRM MY CHOICES
-          </Button>
+          {/* Footer with buttons */}
+          <div className="p-6 pt-0 border-t border-gray-100 bg-gray-50">
+            {/* Confirm Button */}
+            <Button
+              onClick={onConfirmChoices}
+              className="w-full mb-4 h-12 text-base font-medium rounded-lg"
+              style={{
+                backgroundColor: config.colors.button,
+                color: config.colors.buttonText,
+              }}
+            >
+              CONFIRM MY CHOICES
+            </Button>
 
-          {/* Powered by */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              Powered by{' '}
-              <span className="font-semibold text-green-600">{domain}</span>
-            </p>
+            {/* Powered by */}
+            <div className="text-center">
+              <p className="text-xs text-gray-500">
+                Powered by{' '}
+                <span className="font-semibold text-green-600">{domain}</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
