@@ -77,14 +77,21 @@ export async function GET(request: NextRequest) {
       } else {
         const projectIds = projects.map(p => p.id)
         
-        // Get banners for these projects
+        // Get banners for these projects with userId from Project table
         const result = await supabase
           .from('ConsentBanner')
-          .select('id, name, config, isActive, createdAt, updatedAt, projectId')
+          .select(`
+            id, name, config, isActive, createdAt, updatedAt, projectId,
+            Project!inner(userId)
+          `)
           .in('projectId', projectIds)
           .order('createdAt', { ascending: false })
         
-        banners = result.data
+        // Transform the result to match the expected structure
+        banners = result.data?.map(banner => ({
+          ...banner,
+          userId: banner.Project?.userId
+        })) || []
         error = result.error
       }
     }
