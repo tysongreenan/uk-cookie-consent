@@ -541,16 +541,16 @@ export default function BannerBuilderPage() {
           <div className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="flex items-center justify-between mb-6">
-                <TabsList className="grid w-auto grid-cols-5" role="tablist" aria-label="Banner configuration steps">
+                <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground gap-1" role="tablist" aria-label="Banner configuration steps">
                   <TabsTrigger 
                     value="compliance" 
                     role="tab"
                     aria-selected={activeTab === 'compliance'}
                     aria-controls="compliance-panel"
-                    className="relative"
+                    className="relative px-3 py-1.5"
                   >
                     <span className="flex items-center space-x-1">
-                      <Shield className="h-4 w-4" />
+                      <Shield className="h-3.5 w-3.5" />
                       <span>Compliance</span>
                       <NewBadge variant="sparkle" size="sm" />
                     </span>
@@ -584,7 +584,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'behavior'}
                     aria-controls="behavior-panel"
-                    className="relative"
+                    className="relative px-3 py-1.5"
                   >
                     <span className="flex items-center space-x-1">
                       <span>Behavior</span>
