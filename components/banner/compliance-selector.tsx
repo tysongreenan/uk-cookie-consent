@@ -90,7 +90,10 @@ export function ComplianceSelector({ selectedFramework, onFrameworkChange }: Com
               
               <CardContent className="pt-0">
                 <p className="text-sm text-muted-foreground mb-4">
-                  {description}
+                  {framework === 'pipeda' && 'Canada\'s federal privacy law. Less strict than GDPR, allows implied consent.'}
+                  {framework === 'gdpr' && 'EU\'s strict privacy law. Requires explicit opt-in consent and granular controls.'}
+                  {framework === 'ccpa' && 'California privacy law. Opt-out based with clear disclosure requirements.'}
+                  {framework === 'custom' && 'Custom framework for specific regional or multi-jurisdictional needs.'}
                 </p>
                 
                 <div className="space-y-2">
@@ -146,6 +149,13 @@ export function ComplianceSelector({ selectedFramework, onFrameworkChange }: Com
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-6">
+              <h4 className="font-semibold mb-3">Overview</h4>
+              <p className="text-sm text-muted-foreground">
+                {getFrameworkDescription(showDetails)}
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-semibold mb-3">Key Requirements</h4>
