@@ -41,7 +41,7 @@ export function NewBadge({
           ease: "easeInOut"
         }}
       >
-        <div className={`${baseClasses} bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg`}>
+        <div className={`${baseClasses} !bg-gradient-to-r !from-purple-600 !to-pink-600 !text-white shadow-lg`} style={{background: 'linear-gradient(to right, rgb(147 51 234), rgb(219 39 119))'}}>
           <Zap className="w-3 h-3 mr-1" />
           {children}
         </div>
@@ -65,7 +65,7 @@ export function NewBadge({
           ease: "easeInOut"
         }}
       >
-        <div className={`${baseClasses} bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg`}>
+        <div className={`${baseClasses} !bg-gradient-to-r !from-blue-600 !to-cyan-600 !text-white shadow-lg`} style={{background: 'linear-gradient(to right, rgb(37 99 235), rgb(8 145 178))'}}>
           <Sparkles className="w-3 h-3 mr-1" />
           {children}
         </div>
@@ -76,7 +76,7 @@ export function NewBadge({
   if (variant === 'sparkle') {
     return (
       <motion.div className="relative">
-        <div className={`${baseClasses} bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-lg`}>
+        <div className={`${baseClasses} !bg-gradient-to-r !from-yellow-500 !to-orange-600 !text-white shadow-lg`} style={{background: 'linear-gradient(to right, rgb(234 179 8), rgb(234 88 12))'}}>
           <Star className="w-3 h-3 mr-1" />
           {children}
         </div>
@@ -99,7 +99,7 @@ export function NewBadge({
   }
 
   return (
-    <div className={`${baseClasses} bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg`}>
+    <div className={`${baseClasses} !bg-gradient-to-r !from-green-600 !to-emerald-600 !text-white shadow-lg`} style={{background: 'linear-gradient(to right, rgb(22 163 74), rgb(5 150 105))'}}>
       {children}
     </div>
   )
