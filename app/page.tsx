@@ -7,13 +7,11 @@ import { FinalCTA } from '@/components/landing/final-cta'
 import { CookieBannerFAQ } from '@/components/faq/cookie-banner-faq'
 import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
-import { StructuredData } from '@/components/seo/structured-data'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData />
       <LiveCookieBanner />
       <Header />
       <main>

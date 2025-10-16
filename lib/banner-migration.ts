@@ -14,6 +14,16 @@ export function migrateBannerConfig(config: any): BannerConfig {
     return {
       version: CURRENT_BANNER_VERSION,
       lastUpdated: new Date().toISOString(),
+      compliance: {
+        framework: 'pipeda',
+        requiresExplicitConsent: false,
+        requiresOptIn: false,
+        requiresGranularConsent: false,
+        requiresPrivacyPolicy: true,
+        requiresDataRetentionPolicy: false,
+        maxPenalty: 'Reputation damage and Privacy Commissioner findings',
+        consentExpiry: 24,
+      },
       name: 'My Cookie Banner',
       position: 'bottom',
       theme: 'dark',
@@ -91,6 +101,20 @@ export function migrateBannerConfig(config: any): BannerConfig {
  */
 function migrateToV2(config: any): any {
   const migrated = { ...config }
+
+  // Add compliance framework if missing
+  if (!migrated.compliance) {
+    migrated.compliance = {
+      framework: 'pipeda',
+      requiresExplicitConsent: false,
+      requiresOptIn: false,
+      requiresGranularConsent: false,
+      requiresPrivacyPolicy: true,
+      requiresDataRetentionPolicy: false,
+      maxPenalty: 'Reputation damage and Privacy Commissioner findings',
+      consentExpiry: 24,
+    }
+  }
 
   // Ensure language field exists
   if (!migrated.language) {

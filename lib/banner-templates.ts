@@ -285,6 +285,11 @@ export function getLegalText(framework: ComplianceFramework, section: 'banner' |
       banner: 'We collect and use personal information as described in our Privacy Policy. California residents have additional privacy rights, including the right to opt-out of the sale of personal information.',
       preferences: 'Manage your privacy settings. California residents can opt-out of the sale of personal information and access their data.',
       privacy: 'California residents have the right to know, delete, and opt-out of the sale of personal information under CCPA.'
+    },
+    custom: {
+      banner: 'We use cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content. You can manage your preferences or learn more in our Privacy Policy.',
+      preferences: 'Customize your cookie preferences. You can enable or disable different types of cookies below.',
+      privacy: 'You have the right to access, correct, and request deletion of your personal information. Contact us to exercise these rights.'
     }
   }
   
