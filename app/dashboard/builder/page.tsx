@@ -549,7 +549,7 @@ export default function BannerBuilderPage() {
                     aria-controls="compliance-panel"
                     className="relative px-3 py-1.5 data-[state=active]:!bg-transparent data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
-                    <span className="flex items-center space-x-1">
+                    <span className="flex items-center space-x-1 bg-transparent">
                       <Shield className="h-3.5 w-3.5" />
                       <span>Compliance</span>
                       <NewBadge variant="sparkle" size="sm" />
@@ -586,9 +586,9 @@ export default function BannerBuilderPage() {
                     aria-controls="behavior-panel"
                     className="relative px-3 py-1.5 data-[state=active]:!bg-transparent data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
-                    <span className="flex items-center space-x-1">
+                    <span className="flex items-center space-x-1 bg-transparent">
                       <span>Behavior</span>
-                      <NewBadge variant="glow" size="sm" />
+                      <NewBadge variant="sparkle" size="sm" />
                     </span>
                   </TabsTrigger>
                 </TabsList>
