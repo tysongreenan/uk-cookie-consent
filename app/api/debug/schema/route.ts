@@ -17,7 +17,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const debugInfo = {
+    const debugInfo: {
+      user: {
+        id: string
+        email: string | null | undefined
+      }
+      tables: { [key: string]: any }
+    } = {
       user: {
         id: session.user.id,
         email: session.user.email
