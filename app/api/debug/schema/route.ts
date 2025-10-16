@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         email: string | null | undefined
       }
       tables: { [key: string]: any }
+      userProjects?: any
     } = {
       user: {
         id: session.user.id,
