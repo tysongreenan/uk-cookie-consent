@@ -9,19 +9,15 @@ published: true
 
 ## TL;DR (Too Long; Didn't Read)
 
-**Quick Summary:**
-- **Why:** Canadian law (PIPEDA + CASL) requires cookie consent
-- **Who:** Any website with Canadian users
-- **Penalty:** Up to $10 million under CASL
-- **Quebec:** Even stricter (Law 25) - up to $25M or 4% revenue
-- **Solution:** Cookie banner with accept/reject/customize options
+### Quick Summary
+Canadian law (PIPEDA + CASL) requires cookie consent for any website with Canadian users. Penalties can reach up to $10 million under CASL, with Quebec's Law 25 being even stricter at up to $25 million or 4% of revenue. The solution is a compliant cookie banner with accept/reject/customize options.
 
-**What You Need:**
-1. Cookie banner that appears BEFORE tracking loads
-2. Clear "Accept All" and "Reject" buttons
-3. Granular category controls (analytics, marketing, etc.)
-4. Privacy policy link
-5. Easy way to withdraw consent later
+### What You Need
+1. **Cookie banner** that appears before tracking loads
+2. **Clear buttons** for "Accept All" and "Reject"
+3. **Granular controls** for different cookie categories (analytics, marketing, etc.)
+4. **Privacy policy link** prominently displayed
+5. **Easy consent withdrawal** mechanism for users
 
 [Get Canadian-compliant cookie banner →](https://www.cookie-banner.ca/auth/signup)
 
@@ -37,7 +33,7 @@ If you run a website in Canada or target Canadian users, you need to understand 
 
 ### PIPEDA (Personal Information Protection and Electronic Documents Act)
 
-**PIPEDA** is Canada's federal privacy law that applies to private-sector organizations. Under PIPEDA, you must:
+PIPEDA is Canada's federal privacy law that applies to private-sector organizations. Under PIPEDA, you must:
 
 - Get **meaningful consent** before collecting personal information
 - Explain **why** you're collecting data and **how** you'll use it
@@ -48,7 +44,7 @@ If you run a website in Canada or target Canadian users, you need to understand 
 
 ### CASL (Canada's Anti-Spam Legislation)
 
-While **CASL** primarily deals with email marketing, it also applies to tracking technologies. Key requirements:
+While CASL primarily deals with email marketing, it also applies to tracking technologies. Key requirements:
 
 - Get consent before installing software (including tracking scripts) on someone's device
 - Clearly identify your organization
@@ -58,7 +54,7 @@ While **CASL** primarily deals with email marketing, it also applies to tracking
 
 ### Provincial Laws (Quebec's Law 25)
 
-Quebec has its own privacy law, **Bill 64 (Law 25)**, which is even stricter than PIPEDA:
+Quebec has its own privacy law, Bill 64 (Law 25), which is even stricter than PIPEDA:
 
 - Requires **explicit consent** for cookies (not just implied)
 - Mandates **opt-in** (not opt-out) for non-essential cookies
@@ -81,7 +77,7 @@ These cookies are essential for your website to function properly:
 - Load balancing (distributing traffic)
 - Shopping cart functionality
 
-**Key Point:** You **don't** need consent for these, but you must still disclose them in your privacy policy.
+**Key Point:** You don't need consent for these, but you must still disclose them in your privacy policy.
 
 ### 2. Functional Cookies (Consent Recommended)
 
@@ -97,7 +93,7 @@ These enhance user experience but aren't strictly necessary:
 
 ### 3. Analytics & Performance Cookies (Consent Required)
 
-These track user behavior and **always require explicit consent**:
+These track user behavior and always require explicit consent:
 
 **Examples:**
 - Google Analytics (page views, user behavior)
@@ -109,7 +105,7 @@ These track user behavior and **always require explicit consent**:
 
 ### 4. Marketing & Advertising Cookies (Consent Required)
 
-These are used for targeting and advertising - **always require consent**:
+These are used for targeting and advertising and always require consent:
 
 **Examples:**
 - Google Ads (conversion tracking, remarketing)
@@ -122,11 +118,11 @@ These are used for targeting and advertising - **always require consent**:
 ### 1. **Make it Visible and Clear**
 
 Your cookie banner must be:
-- Shown **before** cookies are set
-- Written in **plain language**
-- Easy to **understand and dismiss**
+- Shown before cookies are set
+- Written in plain language
+- Easy to understand and dismiss
 
-### 2. **Provide Granular Choices**
+### 2. Provide Granular Choices
 
 Users must be able to:
 - Accept all cookies
@@ -136,20 +132,20 @@ Users must be able to:
 **Bad example:** "By continuing to browse, you consent to cookies."
 **Good example:** "We use cookies for analytics and advertising. You can accept all or customize your preferences."
 
-### 3. **Don't Use Pre-Ticked Boxes**
+### 3. Don't Use Pre-Ticked Boxes
 
 Under PIPEDA and Law 25:
-- Pre-ticked consent boxes are **not valid**
-- Users must **actively opt-in** to non-essential cookies
+- Pre-ticked consent boxes are not valid
+- Users must actively opt-in to non-essential cookies
 
-### 4. **Make it Easy to Withdraw Consent**
+### 4. Make it Easy to Withdraw Consent
 
 Users must be able to:
 - Change their cookie preferences anytime
 - Find cookie settings easily (footer link is common)
 - Revoke consent without penalty
 
-### 5. **Keep Records**
+### 5. Keep Records
 
 You should document:
 - When consent was given
@@ -160,25 +156,25 @@ You should document:
 
 ### Mistake #1: Loading Cookies Before Consent
 
-Many websites load Google Analytics or Facebook Pixel immediately, then show a cookie banner. This is **not compliant**.
+Many websites load Google Analytics or Facebook Pixel immediately, then show a cookie banner. This is not compliant.
 
 **Solution:** Use a consent management platform that only loads tracking scripts after user consent.
 
 ### Mistake #2: Using a "Scroll = Consent" Banner
 
-Banners that imply scrolling equals consent are **not valid** under Canadian law.
+Banners that imply scrolling equals consent are not valid under Canadian law.
 
 **Solution:** Require explicit action (button click) to accept cookies.
 
 ### Mistake #3: Hiding the Reject Button
 
-Making the "Accept" button prominent while hiding or de-emphasizing the "Reject" option is a **dark pattern** and may violate PIPEDA.
+Making the "Accept" button prominent while hiding or de-emphasizing the "Reject" option is a dark pattern and may violate PIPEDA.
 
 **Solution:** Make both accept and reject options equally visible.
 
 ### Mistake #4: No Cookie Policy
 
-A banner alone isn't enough. You need a detailed **cookie policy** that explains:
+A banner alone isn't enough. You need a detailed cookie policy that explains:
 
 - What cookies you use
 - Why you use them

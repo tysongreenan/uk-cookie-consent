@@ -16,15 +16,27 @@ import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'react-hot-toast'
-import { BannerConfig, TrackingScript } from '@/types'
+import { BannerConfig, TrackingScript, ComplianceFramework } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
 import { NewBadge } from '@/components/ui/new-badge'
+import { ComplianceSelector } from '@/components/banner/compliance-selector'
+import { getBannerTemplate } from '@/lib/banner-templates'
 
 const defaultConfig: BannerConfig = {
   version: '2.0.0',
   lastUpdated: new Date().toISOString(),
+  compliance: {
+    framework: 'pipeda',
+    requiresExplicitConsent: false,
+    requiresOptIn: false,
+    requiresGranularConsent: false,
+    requiresPrivacyPolicy: true,
+    requiresDataRetentionPolicy: false,
+    maxPenalty: 'Reputation damage and Privacy Commissioner findings',
+    consentExpiry: 24,
+  },
   name: 'My Cookie Banner',
   position: 'bottom',
   theme: 'dark',
@@ -288,7 +300,7 @@ export default function BannerBuilderPage() {
   const searchParams = useSearchParams()
   const [config, setConfig] = useState<BannerConfig>(defaultConfig)
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState('design')
+  const [activeTab, setActiveTab] = useState('compliance')
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
@@ -369,6 +381,24 @@ export default function BannerBuilderPage() {
       ...prev,
       [section]: { ...(prev[section] as any), ...updates }
     }))
+  }
+
+  const handleComplianceFrameworkChange = (framework: ComplianceFramework) => {
+    const template = getBannerTemplate(framework)
+    
+    setConfig(prev => ({
+      ...prev,
+      compliance: template.compliance,
+      text: template.text,
+      colors: template.colors,
+      behavior: {
+        ...prev.behavior,
+        showPreferences: template.compliance.requiresGranularConsent,
+        cookieExpiry: template.compliance.consentExpiry
+      }
+    }))
+    
+    toast.success(`Switched to ${framework.toUpperCase()} compliance template`)
   }
 
   const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'auto') => {
@@ -511,7 +541,20 @@ export default function BannerBuilderPage() {
           <div className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="flex items-center justify-between mb-6">
-                <TabsList className="grid w-auto grid-cols-4" role="tablist" aria-label="Banner configuration steps">
+                <TabsList className="grid w-auto grid-cols-5" role="tablist" aria-label="Banner configuration steps">
+                  <TabsTrigger 
+                    value="compliance" 
+                    role="tab"
+                    aria-selected={activeTab === 'compliance'}
+                    aria-controls="compliance-panel"
+                    className="relative"
+                  >
+                    <span className="flex items-center space-x-1">
+                      <Shield className="h-4 w-4" />
+                      <span>Compliance</span>
+                      <NewBadge variant="sparkle" size="sm" />
+                    </span>
+                  </TabsTrigger>
                   <TabsTrigger 
                     value="design" 
                     role="tab"
@@ -551,11 +594,20 @@ export default function BannerBuilderPage() {
                 </TabsList>
                 
                 <div className="text-sm text-muted-foreground">
-                  {activeTab === 'design' ? 'Step 1 of 4' : 
-                   activeTab === 'content' ? 'Step 2 of 4' : 
-                   activeTab === 'scripts' ? 'Step 3 of 4' : 'Step 4 of 4'}
+                  {activeTab === 'compliance' ? 'Step 1 of 5' :
+                   activeTab === 'design' ? 'Step 2 of 5' : 
+                   activeTab === 'content' ? 'Step 3 of 5' : 
+                   activeTab === 'scripts' ? 'Step 4 of 5' : 'Step 5 of 5'}
                 </div>
               </div>
+
+              {/* Compliance Tab */}
+              <TabsContent value="compliance" className="space-y-6" id="compliance-panel" role="tabpanel" aria-labelledby="compliance-tab">
+                <ComplianceSelector
+                  selectedFramework={config.compliance.framework}
+                  onFrameworkChange={handleComplianceFrameworkChange}
+                />
+              </TabsContent>
 
               {/* Design Tab */}
               <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">

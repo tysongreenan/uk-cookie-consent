@@ -29,23 +29,22 @@ export default function BlogPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main>
-        {/* Header */}
-        <section className="border-b bg-gradient-to-b from-background to-muted/20 px-4 py-12 sm:px-6 sm:py-16 md:py-20">
-        <div className="container max-w-4xl">
-          <div className="text-center">
-            <h1 className="mb-4 font-heading text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl">
-              Cookie Compliance Insights
-            </h1>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Stay informed about cookie consent laws, privacy regulations, and best practices for website compliance.
-            </p>
+        {/* Hero Section */}
+        <section className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="mx-auto max-w-4xl px-4 py-16">
+            <div className="text-center">
+              <h1 className="mb-6 font-heading text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                Cookie Compliance Insights
+              </h1>
+              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                Stay informed about cookie consent laws, privacy regulations, and best practices for website compliance.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Blog Posts Grid */}
-      <section className="container px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto max-w-6xl">
+      <section className="mx-auto max-w-4xl px-4 py-12">
           {posts.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-muted-foreground">No blog posts yet. Check back soon!</p>
@@ -115,7 +114,6 @@ export default function BlogPage() {
               ))}
             </div>
           )}
-        </div>
       </section>
       </main>
       <Footer />

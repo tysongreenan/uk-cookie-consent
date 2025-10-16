@@ -154,7 +154,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         {/* Breadcrumbs */}
-        <Breadcrumbs items={[{ label: 'Dashboard' }]} />
+        <Breadcrumbs items={[{ label: 'Cookie Banner' }]} />
 
         {/* Update Notification */}
         {hasOutdatedBanners && (
@@ -165,10 +165,7 @@ export default function DashboardPage() {
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">CookieBanner</h1>
-          </div>
+        <div className="flex items-center justify-start">
           <Button asChild size="lg">
             <Link href="/dashboard/builder">
               <Plus className="w-5 h-5 mr-2" />

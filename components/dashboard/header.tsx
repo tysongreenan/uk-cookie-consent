@@ -37,17 +37,8 @@ export function DashboardHeader({}: HeaderProps) {
 
   return (
     <header className="w-full border-b border-border bg-background">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        {/* Left side - Logo */}
-        <div className="flex items-center">
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <User className="w-5 h-5 text-primary-foreground" />
-            </div>
-          </Link>
-        </div>
-
-        {/* Right side - Notifications, Theme, User */}
+      <div className="flex h-16 items-center justify-end px-4 sm:px-6">
+        {/* Notifications, Theme, User */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative" asChild>

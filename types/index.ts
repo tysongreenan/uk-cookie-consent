@@ -1,7 +1,23 @@
+export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'custom'
+
+export interface ComplianceRequirements {
+  framework: ComplianceFramework
+  requiresExplicitConsent: boolean // GDPR: true, PIPEDA: false (can use implied consent)
+  requiresOptIn: boolean // GDPR: true (opt-in), PIPEDA: false (can use opt-out)
+  requiresGranularConsent: boolean // GDPR: true, PIPEDA: false
+  requiresPrivacyPolicy: boolean // Both: true
+  requiresDataRetentionPolicy: boolean // GDPR: true, PIPEDA: false
+  maxPenalty: string // GDPR: €20M, PIPEDA: Reputation damage
+  consentExpiry: number // GDPR: 12 months, PIPEDA: 24 months
+}
+
 export interface BannerConfig {
   // Version tracking
   version?: string
   lastUpdated?: string
+  
+  // Compliance
+  compliance: ComplianceRequirements
   
   // Basic settings
   name: string

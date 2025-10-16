@@ -1,4 +1,5 @@
-import { Metadata } from 'next'
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,11 +16,8 @@ import {
   Copy,
   Check
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
-export const metadata: Metadata = {
-  title: 'Documentation - Cookie Banner Generator',
-  description: 'Learn how to create and integrate GDPR-compliant cookie consent banners with our step-by-step documentation.',
-}
 
 const steps = [
   {
@@ -54,7 +52,7 @@ const steps = [
     icon: Zap,
     content: [
       'Copy the generated HTML/JavaScript code from your dashboard',
-      'Paste it into your website\'s `<head>` section',
+      'Paste it into your website\'s `<body>` section (before closing `</body>` tag)',
       'Test the banner on your live website',
       'Verify that scripts load only after user consent'
     ]
@@ -73,7 +71,7 @@ const steps = [
   }
 ]
 
-const codeExample = `<!-- Add this code to your website's <head> section -->
+const codeExample = `<!-- Add this code to your website's <body> section (before closing </body> tag) -->
 <script>
 (function() {
   // Cookie Banner Configuration
@@ -193,7 +191,7 @@ export default function DocsPage() {
                   HTML Integration
                 </CardTitle>
                 <CardDescription>
-                  Copy and paste this code into your website's head section
+                  Copy and paste this code into your website's body section (before closing &lt;/body&gt; tag)
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -205,7 +203,14 @@ export default function DocsPage() {
                     size="sm" 
                     variant="outline" 
                     className="absolute top-2 right-2"
-                    onClick={() => navigator.clipboard.writeText(codeExample)}
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(codeExample)
+                        toast.success('Code copied to clipboard!')
+                      } catch (error) {
+                        toast.error('Failed to copy code')
+                      }
+                    }}
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Copy

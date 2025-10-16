@@ -54,6 +54,7 @@ export interface BlogPost {
   content: string
   readingTime: string
   published: boolean
+  schema?: any
 }
 
 export interface BlogPostMetadata {
@@ -135,6 +136,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       content: contentHtml,
       readingTime: stats.text,
       published: data.published !== false,
+      schema: data.schema || null,
     }
   } catch (error) {
     return null
