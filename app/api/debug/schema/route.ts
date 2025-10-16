@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
       }
       tables: { [key: string]: any }
       userProjects?: any
+      allBanners?: any
     } = {
       user: {
         id: session.user.id,
