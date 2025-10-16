@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform banners to match Webflow extension format
-    const transformedBanners = banners.map(banner => {
+    const transformedBanners = (banners || []).map(banner => {
       // Parse config if it's a JSON string
       let config = banner.config || {}
       if (typeof config === 'string') {
