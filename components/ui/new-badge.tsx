@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
 import { Sparkles, Zap, Star } from 'lucide-react'
 
 interface NewBadgeProps {
@@ -42,10 +41,10 @@ export function NewBadge({
           ease: "easeInOut"
         }}
       >
-        <Badge className={`${baseClasses} bg-gradient-to-r from-purple-500 to-pink-500 text-white`}>
+        <div className={`${baseClasses} bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg`}>
           <Zap className="w-3 h-3 mr-1" />
           {children}
-        </Badge>
+        </div>
       </motion.div>
     )
   }
@@ -66,10 +65,10 @@ export function NewBadge({
           ease: "easeInOut"
         }}
       >
-        <Badge className={`${baseClasses} bg-gradient-to-r from-blue-500 to-cyan-500 text-white`}>
+        <div className={`${baseClasses} bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg`}>
           <Sparkles className="w-3 h-3 mr-1" />
           {children}
-        </Badge>
+        </div>
       </motion.div>
     )
   }
@@ -77,10 +76,10 @@ export function NewBadge({
   if (variant === 'sparkle') {
     return (
       <motion.div className="relative">
-        <Badge className={`${baseClasses} bg-gradient-to-r from-yellow-400 to-orange-500 text-white`}>
+        <div className={`${baseClasses} bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-lg`}>
           <Star className="w-3 h-3 mr-1" />
           {children}
-        </Badge>
+        </div>
         <motion.div
           className="absolute -top-1 -right-1"
           animate={{ 
@@ -100,9 +99,9 @@ export function NewBadge({
   }
 
   return (
-    <Badge className={`${baseClasses} bg-gradient-to-r from-green-500 to-emerald-500 text-white`}>
+    <div className={`${baseClasses} bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg`}>
       {children}
-    </Badge>
+    </div>
   )
 }
 
