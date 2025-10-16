@@ -88,9 +88,9 @@ export async function GET(request: NextRequest) {
           .order('createdAt', { ascending: false })
         
         // Transform the result to match the expected structure
-        banners = result.data?.map(banner => ({
+        banners = result.data?.map((banner: any) => ({
           ...banner,
-          userId: banner.Project?.userId
+          userId: banner.Project?.userId || user.userId
         })) || []
         error = result.error
       }
