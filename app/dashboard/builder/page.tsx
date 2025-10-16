@@ -547,7 +547,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'compliance'}
                     aria-controls="compliance-panel"
-                    className="relative px-3 py-1.5 data-[state=active]:!bg-transparent data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
+                    className="relative px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
                     <span className="flex items-center space-x-1 bg-transparent">
                       <Shield className="h-3.5 w-3.5" />
@@ -560,6 +560,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'design'}
                     aria-controls="design-panel"
+                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
                     Design
                   </TabsTrigger>
@@ -568,6 +569,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'content'}
                     aria-controls="content-panel"
+                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
                     Content
                   </TabsTrigger>
@@ -576,6 +578,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'scripts'}
                     aria-controls="scripts-panel"
+                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
                     Scripts
                   </TabsTrigger>
@@ -584,7 +587,7 @@ export default function BannerBuilderPage() {
                     role="tab"
                     aria-selected={activeTab === 'behavior'}
                     aria-controls="behavior-panel"
-                    className="relative px-3 py-1.5 data-[state=active]:!bg-transparent data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
+                    className="relative px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
                   >
                     <span className="flex items-center space-x-1 bg-transparent">
                       <span>Behavior</span>
