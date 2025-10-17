@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's current team from session
     const session = await getServerSession(authOptions)
-    let currentTeamId = session?.user?.currentTeamId || session?.user?.current_team_id
+    let currentTeamId = session?.user?.currentTeamId || (session?.user as any)?.current_team_id
 
     // If user doesn't have a team, create one for them
     if (!currentTeamId && session?.user) {
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user has permission to create banners (edit permission)
     const session = await getServerSession(authOptions)
-    let currentTeamId = session?.user?.current_team_id
+    let currentTeamId = (session?.user as any)?.current_team_id
     let userRole = session?.user?.userRole
 
     // If user doesn't have a team, create one for them

@@ -86,7 +86,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             rememberMe: credentials.rememberMe === 'true',
-            currentTeamId: teamMember?.Team?.id || null,
+            currentTeamId: teamMember?.Team?.[0]?.id || teamMember?.team_id || null,
             userRole: teamMember?.role || 'owner'
           }
         } catch (error) {
