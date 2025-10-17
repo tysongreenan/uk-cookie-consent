@@ -36,6 +36,8 @@ import {
 import { toast } from 'react-hot-toast'
 import { TeamMember, TeamInvitation, TeamRole, InvitationStatus } from '@/types'
 import { InviteMemberModal } from '@/components/dashboard/invite-member-modal'
+import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
+import { canAccessFeature } from '@/lib/plan-restrictions'
 
 interface TeamMemberWithUser {
   id: string
@@ -81,6 +83,7 @@ export default function TeamSettingsPage() {
   const [invitations, setInvitations] = useState<TeamInvitationWithInviter[]>([])
   const [teamName, setTeamName] = useState('')
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
@@ -332,6 +335,15 @@ export default function TeamSettingsPage() {
           Manage your team members, invitations, and team settings.
         </p>
       </div>
+
+      {/* Plan Gate */}
+      {!canAccessFeature(userPlan, 'hasTeamCollaboration') && (
+        <UpgradePrompt 
+          feature="Team Collaboration"
+          description="Invite team members, set role-based permissions, and collaborate on banners"
+          variant="banner"
+        />
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>

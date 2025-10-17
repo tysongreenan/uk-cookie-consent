@@ -35,6 +35,8 @@ import {
 import { toast } from 'react-hot-toast'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
+import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
+import { canAccessFeature } from '@/lib/plan-restrictions'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -74,14 +76,34 @@ export default function AnalyticsPage() {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
   const [embedCode, setEmbedCode] = useState('')
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
+  const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   
   useEffect(() => {
     if (session) {
+      fetchUserPlan()
       fetchAnalytics()
       generateEmbedCode()
       checkAnalyticsStatus()
     }
   }, [session])
+  
+  async function fetchUserPlan() {
+    if (!session?.user?.id) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('User')
+        .select('planTier')
+        .eq('id', session.user.id)
+        .single()
+      
+      if (data?.planTier) {
+        setUserPlan(data.planTier as 'free' | 'pro' | 'enterprise')
+      }
+    } catch (error) {
+      console.error('Error fetching user plan:', error)
+    }
+  }
   
   async function fetchAnalytics() {
     if (!session?.user?.id) return
@@ -223,6 +245,15 @@ export default function AnalyticsPage() {
             </Button>
           </div>
         </div>
+        
+        {/* Plan Gate */}
+        {!canAccessFeature(userPlan, 'hasInternalAnalytics') && (
+          <UpgradePrompt 
+            feature="Analytics Dashboard"
+            description="Track impressions, acceptance rates, and traffic estimation with detailed analytics"
+            variant="banner"
+          />
+        )}
         
         {!analyticsEnabled ? (
           <Card className="p-8 text-center">

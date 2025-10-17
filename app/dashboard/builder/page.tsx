@@ -24,6 +24,8 @@ import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/ba
 import { NewBadge } from '@/components/ui/new-badge'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
+import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
+import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 
 const defaultConfig: BannerConfig = {
   version: '2.0.0',
@@ -314,6 +316,7 @@ export default function BannerBuilderPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
+  const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
 
   useEffect(() => {
     if (!session) {
@@ -845,21 +848,45 @@ export default function BannerBuilderPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
+                            {/* Standard layouts (Free) */}
                             <SelectItem value="top">Top Bar (Full Width)</SelectItem>
                             <SelectItem value="bottom">Bottom Bar (Full Width)</SelectItem>
                             <SelectItem value="floating-bottom-right">Floating - Bottom Right</SelectItem>
                             <SelectItem value="floating-bottom-left">Floating - Bottom Left</SelectItem>
                             <SelectItem value="floating-top-right">Floating - Top Right</SelectItem>
                             <SelectItem value="floating-top-left">Floating - Top Left</SelectItem>
-                            <SelectItem value="modal-center">Modal - Center</SelectItem>
-                            <SelectItem value="modal-bottom">Modal - Bottom</SelectItem>
-                            <SelectItem value="modal-top">Modal - Top</SelectItem>
-                            <SelectItem value="slide-in-right">Slide In - Right</SelectItem>
-                            <SelectItem value="slide-in-left">Slide In - Left</SelectItem>
-                            <SelectItem value="slide-in-top">Slide In - Top</SelectItem>
-                            <SelectItem value="slide-in-bottom">Slide In - Bottom</SelectItem>
+                            
+                            {/* Pro layouts */}
+                            {canAccessFeature(userPlan, 'hasCustomLayouts') ? (
+                              <>
+                                <SelectItem value="modal-center">Modal - Center</SelectItem>
+                                <SelectItem value="modal-bottom">Modal - Bottom</SelectItem>
+                                <SelectItem value="modal-top">Modal - Top</SelectItem>
+                                <SelectItem value="slide-in-right">Slide In - Right</SelectItem>
+                                <SelectItem value="slide-in-left">Slide In - Left</SelectItem>
+                                <SelectItem value="slide-in-top">Slide In - Top</SelectItem>
+                                <SelectItem value="slide-in-bottom">Slide In - Bottom</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="modal-center" disabled>Modal - Center (Pro)</SelectItem>
+                                <SelectItem value="modal-bottom" disabled>Modal - Bottom (Pro)</SelectItem>
+                                <SelectItem value="modal-top" disabled>Modal - Top (Pro)</SelectItem>
+                                <SelectItem value="slide-in-right" disabled>Slide In - Right (Pro)</SelectItem>
+                                <SelectItem value="slide-in-left" disabled>Slide In - Left (Pro)</SelectItem>
+                                <SelectItem value="slide-in-top" disabled>Slide In - Top (Pro)</SelectItem>
+                                <SelectItem value="slide-in-bottom" disabled>Slide In - Bottom (Pro)</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
+                        {!canAccessFeature(userPlan, 'hasCustomLayouts') && (
+                          <UpgradePrompt 
+                            feature="Custom Layouts"
+                            description="Modal, slide-in, and other advanced layouts"
+                            variant="inline"
+                          />
+                        )}
                       </div>
 
                       {/* Width Settings */}

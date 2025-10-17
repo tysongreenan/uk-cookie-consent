@@ -296,3 +296,17 @@ export function hasTeamPermission(
 ): boolean {
   return TEAM_PERMISSIONS[userRole].includes(requiredPermission)
 }
+
+// Plan Management Types
+export type PlanTier = 'free' | 'pro' | 'enterprise'
+
+export interface PlanFeatures {
+  tier: PlanTier
+  maxWebsites: number | 'unlimited'
+  hasInternalAnalytics: boolean
+  hasTeamCollaboration: boolean
+  hasCustomLayouts: boolean
+  hasImageUpload: boolean
+  maxTeamMembers: number | 'unlimited'
+  supportLevel: 'community' | 'priority' | 'dedicated'
+}

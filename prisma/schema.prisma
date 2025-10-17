@@ -47,6 +47,10 @@ model User {
   currentTeamId String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  planTier String @default("free") // 'free', 'pro', 'enterprise'
+  upgradedAt DateTime?
+  stripeCustomerId String?
+  stripePaymentIntentId String?
 
   accounts Account[]
   sessions Session[]

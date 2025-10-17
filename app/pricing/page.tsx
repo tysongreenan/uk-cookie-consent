@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Users, Building, Crown } from 'lucide-react'
+import { Check, Zap, Crown, BarChart3, Users, Palette, Upload, Shield, Clock } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -12,61 +11,46 @@ import Link from 'next/link'
 
 export default function PricingPage() {
   const { data: session } = useSession()
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
   
   const plans = [
     {
       name: 'Free',
       price: '$0',
       period: '',
-      description: 'Perfect for getting started',
+      description: 'Start free, upgrade when ready',
       features: [
-        'Unlimited banner customization',
-        'Script injection on consent',
-        'Up to 1 website',
-        'Basic compliance frameworks',
-        '❌ No analytics'
+        'Unlimited websites',
+        'GA4 integration (send events to Google Analytics)',
+        'All compliance frameworks (GDPR, CCPA, PIPEDA)',
+        'Standard layouts (Bottom, Top, Center, Side)',
+        'Basic customization',
+        'Community support'
       ],
-      cta: 'Get Started',
+      cta: 'Get Started Free',
       tier: 'free',
-      icon: <Zap className="w-6 h-6" />
+      icon: <Zap className="w-6 h-6" />,
+      ctaLink: '/auth/signup'
     },
     {
-      name: 'Starter',
-      price: billingCycle === 'yearly' ? '$8' : '$9',
-      period: '/month',
-      description: 'For individual websites',
+      name: 'Pro',
+      price: '$48.99',
+      period: ' one-time',
+      description: 'Everything you need, forever',
       features: [
         'Everything in Free',
-        '✅ Full analytics dashboard',
-        'Up to 5 websites',
-        'Acceptance rate tracking',
-        'Traffic estimation',
-        '30-day data retention',
-        'Email support'
+        'Analytics dashboard (impressions, acceptance rates)',
+        'Team collaboration (invite members, role-based permissions)',
+        'Custom layouts (Modal, Slide-in, Minimalist, etc.)',
+        'Image upload for logos',
+        'Advanced customization',
+        'Priority email support',
+        'Lifetime updates included'
       ],
-      cta: 'Start Free Trial',
-      tier: 'starter',
-      icon: <Users className="w-6 h-6" />,
-      popular: true
-    },
-    {
-      name: 'Agency',
-      price: billingCycle === 'yearly' ? '$16' : '$19',
-      period: '/month',
-      description: 'For agencies & multi-site businesses',
-      features: [
-        'Everything in Starter',
-        'Up to 25 websites',
-        billingCycle === 'yearly' ? 'Just $0.64 per site' : 'Just $0.76 per site',
-        'Consolidated dashboard',
-        'Priority support',
-        'Custom branding',
-        'API access'
-      ],
-      cta: 'Start Free Trial',
-      tier: 'agency',
-      icon: <Building className="w-6 h-6" />
+      cta: 'Upgrade to Pro',
+      tier: 'pro',
+      icon: <Crown className="w-6 h-6" />,
+      popular: true,
+      ctaLink: '/upgrade'
     },
     {
       name: 'Enterprise',
@@ -74,8 +58,8 @@ export default function PricingPage() {
       period: '',
       description: 'For large organizations',
       features: [
-        'Everything in Agency',
-        'Unlimited websites',
+        'Everything in Pro',
+        'Unlimited team members',
         'White-label solution',
         'Dedicated support',
         'Custom integrations',
@@ -84,7 +68,8 @@ export default function PricingPage() {
       ],
       cta: 'Contact Sales',
       tier: 'enterprise',
-      icon: <Crown className="w-6 h-6" />
+      icon: <Shield className="w-6 h-6" />,
+      ctaLink: 'mailto:sales@cookie-banner.ca'
     }
   ]
   
@@ -95,76 +80,63 @@ export default function PricingPage() {
       <div className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
+          <h1 className="text-4xl font-bold mb-4">Start Free, Upgrade Once, Own Forever</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Stay compliant and understand your true website traffic
+            No subscriptions. No hidden fees. Just simple, transparent pricing.
           </p>
           
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <span className={`text-sm ${billingCycle === 'monthly' ? 'font-semibold' : 'text-muted-foreground'}`}>
-              Monthly
-            </span>
-            <button
-              onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
-              className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  billingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-            <span className={`text-sm ${billingCycle === 'yearly' ? 'font-semibold' : 'text-muted-foreground'}`}>
-              Yearly
-            </span>
-            {billingCycle === 'yearly' && (
-              <Badge variant="secondary" className="ml-2">
-                Save 20%
-              </Badge>
-            )}
+          <div className="flex items-center justify-center space-x-4 mb-8">
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              One-time payment
+            </Badge>
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              Lifetime updates
+            </Badge>
+            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+              No recurring fees
+            </Badge>
           </div>
         </div>
         
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {plans.map((plan) => (
             <PricingCard key={plan.name} {...plan} />
           ))}
         </div>
         
-        {/* Why Analytics Section */}
+        {/* Value Proposition Section */}
         <div className="bg-muted/50 rounded-2xl p-8 mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">Why add analytics?</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Why Pro is a No-Brainer</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📊</span>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">💰</span>
               </div>
-              <h3 className="font-semibold mb-2">Understand True Traffic</h3>
+              <h3 className="font-semibold mb-2">Save Money</h3>
               <p className="text-sm text-muted-foreground">
-                Your Google Analytics is missing 20-40% of visitors who reject cookies. 
-                See the real numbers and make data-driven decisions.
+                $48.99 once vs competitors charging $9-19/month. 
+                You save money after just 3-6 months.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">✅</span>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🚀</span>
               </div>
-              <h3 className="font-semibold mb-2">Prove Compliance</h3>
+              <h3 className="font-semibold mb-2">Future-Proof</h3>
               <p className="text-sm text-muted-foreground">
-                GDPR/CCPA requires proof of consent. Get automated compliance reporting 
-                and audit trails for legal protection.
+                Lifetime updates included. New features, 
+                compliance updates, and improvements forever.
               </p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">👥</span>
               </div>
-              <h3 className="font-semibold mb-2">Optimize Your Banner</h3>
+              <h3 className="font-semibold mb-2">Team Ready</h3>
               <p className="text-sm text-muted-foreground">
-                Test different copy and designs. Track acceptance rates to improve 
-                results and maximize consent rates.
+                Invite team members, collaborate on banners, 
+                and manage permissions. Perfect for agencies.
               </p>
             </div>
           </div>
@@ -175,31 +147,39 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">How does the analytics tracking work?</h3>
+              <h3 className="font-semibold mb-2">What happens after I upgrade to Pro?</h3>
               <p className="text-sm text-muted-foreground">
-                We provide a lightweight JavaScript snippet that tracks banner impressions, 
-                user decisions, and timing. All data is anonymized and stored securely.
+                You'll immediately get access to all Pro features including analytics dashboard, 
+                team collaboration, custom layouts, and image uploads. Your account will be 
+                upgraded instantly after payment.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Can I upgrade or downgrade anytime?</h3>
+              <h3 className="font-semibold mb-2">Do I get lifetime updates?</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! You can change your plan at any time. Upgrades take effect immediately, 
-                and downgrades take effect at the next billing cycle.
+                Yes! All future features, compliance updates, and improvements are included 
+                in your one-time payment. No additional charges ever.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What happens to my data if I cancel?</h3>
+              <h3 className="font-semibold mb-2">Can I invite team members with Pro?</h3>
               <p className="text-sm text-muted-foreground">
-                Your banner configurations are preserved, but analytics data is deleted 
-                after 30 days. You can export your data before canceling.
+                Absolutely! Pro includes unlimited team members with role-based permissions. 
+                Perfect for agencies and businesses with multiple team members.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Do you offer custom enterprise plans?</h3>
+              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! Contact our sales team for custom pricing, dedicated support, 
-                and enterprise features like white-labeling and on-premise deployment.
+                We accept all major credit cards, debit cards, and PayPal through our secure 
+                Stripe payment processor.
+              </p>
+            </div>
+            <div className="border rounded-lg p-6">
+              <h3 className="font-semibold mb-2">Is there a free trial for Pro?</h3>
+              <p className="text-sm text-muted-foreground">
+                You can use the Free plan with unlimited websites and GA4 integration. 
+                Upgrade to Pro when you need advanced features like analytics and team collaboration.
               </p>
             </div>
           </div>
@@ -220,7 +200,8 @@ function PricingCard({
   cta, 
   tier, 
   icon,
-  popular 
+  popular,
+  ctaLink
 }: {
   name: string
   price: string
@@ -231,16 +212,18 @@ function PricingCard({
   tier: string
   icon: React.ReactNode
   popular?: boolean
+  ctaLink?: string
 }) {
   const isFree = tier === 'free'
   const isEnterprise = tier === 'enterprise'
+  const isPro = tier === 'pro'
   
   return (
     <Card className={`relative ${popular ? 'border-primary shadow-lg scale-105' : ''}`}>
       {popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
           <Badge className="bg-primary text-primary-foreground px-4 py-1">
-            Most Popular
+            Best Value
           </Badge>
         </div>
       )}
@@ -263,10 +246,10 @@ function PricingCard({
         <ul className="space-y-3">
           {features.map((feature, i) => (
             <li key={i} className="flex items-start gap-3 text-sm">
-              <div className={`mt-0.5 ${feature.startsWith('❌') ? 'text-red-500' : 'text-green-500'}`}>
-                {feature.startsWith('❌') ? '❌' : <Check className="w-4 h-4" />}
+              <div className="text-green-500 mt-0.5">
+                <Check className="w-4 h-4" />
               </div>
-              <span>{feature.replace(/^[✅❌]\s*/, '')}</span>
+              <span>{feature}</span>
             </li>
           ))}
         </ul>
@@ -277,15 +260,13 @@ function PricingCard({
           size="lg"
         >
           {isEnterprise ? (
-            <a href="mailto:sales@cookie-banner.ca" className="w-full">
+            <a href={ctaLink} className="w-full">
               {cta}
             </a>
-          ) : isFree ? (
-            <Link href="/auth/signup" className="w-full">
+          ) : (
+            <Link href={ctaLink || '#'} className="w-full">
               {cta}
             </Link>
-          ) : (
-            cta
           )}
         </Button>
       </CardContent>
