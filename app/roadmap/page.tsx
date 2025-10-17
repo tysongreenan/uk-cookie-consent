@@ -277,65 +277,184 @@ export default function RoadmapPage() {
         </div>
       )}
 
-      {/* Roadmap Items */}
+      {/* Kanban Board */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid gap-6">
-              {sortedItems.map((item) => {
-                const StatusIcon = statusConfig[item.status as keyof typeof statusConfig]?.icon || Lightbulb
-                const statusColor = statusConfig[item.status as keyof typeof statusConfig]?.color || 'bg-gray-500'
-                const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
-                const ItemIcon = iconMap[item.category as keyof typeof iconMap] || Settings
-                const itemColor = colorMap[item.category as keyof typeof colorMap] || 'blue'
-                
-                return (
-                  <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-4 flex-1">
-                          <div className="flex-shrink-0">
-                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-${itemColor}-100`}>
-                              <ItemIcon className={`w-6 h-6 text-${itemColor}-600`} />
+          <div className="max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Planned Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold">Planned</h3>
+                  <Badge variant="outline" className="ml-auto">
+                    {sortedItems.filter(item => item.status === 'planned').length}
+                  </Badge>
+                </div>
+                <div className="space-y-4">
+                  {sortedItems
+                    .filter(item => item.status === 'planned')
+                    .map((item) => {
+                      const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
+                      const ItemIcon = iconMap[item.category as keyof typeof iconMap] || Settings
+                      const itemColor = colorMap[item.category as keyof typeof colorMap] || 'blue'
+                      
+                      return (
+                        <Card key={item.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${itemColor}-100 flex-shrink-0`}>
+                                <ItemIcon className={`w-4 h-4 text-${itemColor}-600`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-sm font-semibold leading-tight mb-1">
+                                  {item.title}
+                                </CardTitle>
+                                <Badge className={categoryInfo?.color || 'bg-gray-100 text-gray-800'} >
+                                  {categoryInfo?.label || 'Other'}
+                                </Badge>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <CardTitle className="text-xl">{item.title}</CardTitle>
-                              <Badge className={categoryInfo?.color || 'bg-gray-100 text-gray-800'}>
-                                {categoryInfo?.label || 'Other'}
-                              </Badge>
-                              <Badge variant="outline" className="flex items-center">
-                                <StatusIcon className="w-3 h-3 mr-1" />
-                                {statusConfig[item.status as keyof typeof statusConfig]?.label || 'Planned'}
-                              </Badge>
-                            </div>
-                            <CardDescription className="text-base">
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                               {item.description}
-                            </CardDescription>
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0 ml-4">
-                          <Button
-                            variant={item.userVoted ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handleVote(item.id, item.userVoted)}
-                            disabled={voting === item.id}
-                            className="flex items-center space-x-2"
-                            title={!session ? "Sign in to vote on features" : undefined}
-                          >
-                            <ThumbsUp className="w-4 h-4" />
-                            <span>{item.vote_count}</span>
-                            {!session && (
-                              <span className="text-xs opacity-70">(Login to vote)</span>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                )
-              })}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant={item.userVoted ? "default" : "outline"}
+                                onClick={() => handleVote(item.id, item.userVoted)}
+                                disabled={voting === item.id}
+                                className="flex items-center space-x-1"
+                                title={!session ? "Sign in to vote on features" : undefined}
+                              >
+                                <ThumbsUp className="w-3 h-3" />
+                                <span className="text-xs">{item.vote_count}</span>
+                              </Button>
+                              <span className="text-xs text-muted-foreground">
+                                Priority {item.priority}
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                </div>
+              </div>
+
+              {/* In Progress Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold">In Progress</h3>
+                  <Badge variant="outline" className="ml-auto">
+                    {sortedItems.filter(item => item.status === 'in-progress').length}
+                  </Badge>
+                </div>
+                <div className="space-y-4">
+                  {sortedItems
+                    .filter(item => item.status === 'in-progress')
+                    .map((item) => {
+                      const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
+                      const ItemIcon = iconMap[item.category as keyof typeof iconMap] || Settings
+                      const itemColor = colorMap[item.category as keyof typeof colorMap] || 'blue'
+                      
+                      return (
+                        <Card key={item.id} className="hover:shadow-lg transition-shadow cursor-pointer border-blue-200">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${itemColor}-100 flex-shrink-0`}>
+                                <ItemIcon className={`w-4 h-4 text-${itemColor}-600`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-sm font-semibold leading-tight mb-1">
+                                  {item.title}
+                                </CardTitle>
+                                <Badge className={categoryInfo?.color || 'bg-gray-100 text-gray-800'} >
+                                  {categoryInfo?.label || 'Other'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                              {item.description}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant={item.userVoted ? "default" : "outline"}
+                                onClick={() => handleVote(item.id, item.userVoted)}
+                                disabled={voting === item.id}
+                                className="flex items-center space-x-1"
+                                title={!session ? "Sign in to vote on features" : undefined}
+                              >
+                                <ThumbsUp className="w-3 h-3" />
+                                <span className="text-xs">{item.vote_count}</span>
+                              </Button>
+                              <span className="text-xs text-muted-foreground">
+                                Priority {item.priority}
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                </div>
+              </div>
+
+              {/* Completed Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold">Completed</h3>
+                  <Badge variant="outline" className="ml-auto">
+                    {sortedItems.filter(item => item.status === 'completed').length}
+                  </Badge>
+                </div>
+                <div className="space-y-4">
+                  {sortedItems
+                    .filter(item => item.status === 'completed')
+                    .map((item) => {
+                      const categoryInfo = categoryConfig[item.category as keyof typeof categoryConfig]
+                      const ItemIcon = iconMap[item.category as keyof typeof iconMap] || Settings
+                      const itemColor = colorMap[item.category as keyof typeof colorMap] || 'blue'
+                      
+                      return (
+                        <Card key={item.id} className="hover:shadow-lg transition-shadow cursor-pointer border-green-200">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${itemColor}-100 flex-shrink-0`}>
+                                <ItemIcon className={`w-4 h-4 text-${itemColor}-600`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-sm font-semibold leading-tight mb-1">
+                                  {item.title}
+                                </CardTitle>
+                                <Badge className={categoryInfo?.color || 'bg-gray-100 text-gray-800'} >
+                                  {categoryInfo?.label || 'Other'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                              {item.description}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3 text-green-600" />
+                                <span className="text-xs text-green-600 font-medium">Completed</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {item.vote_count} votes
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                </div>
+              </div>
             </div>
           </div>
         </div>

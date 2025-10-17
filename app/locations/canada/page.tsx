@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
+import { CanadianComplianceSection } from '@/components/compliance/canadian-compliance-section'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -282,6 +283,9 @@ export default function CanadaCompliancePage() {
           </div>
         </div>
       </section>
+
+      {/* Canadian Compliance Features */}
+      <CanadianComplianceSection />
 
       {/* Provincial Laws */}
       <section className="py-16 bg-gray-50">

@@ -2,8 +2,10 @@ import { Metadata } from 'next'
 import { Hero } from '@/components/landing/hero'
 import { ValueStack } from '@/components/landing/value-stack'
 import { InteractiveDemo } from '@/components/landing/interactive-demo'
+import { CanadianComplianceSection } from '@/components/compliance/canadian-compliance-section'
 import { WhyFree } from '@/components/landing/why-free'
 import { SEOTextBlock } from '@/components/landing/seo-text-block'
+import { RoadmapPreview } from '@/components/landing/roadmap-preview'
 import { FinalCTA } from '@/components/landing/final-cta'
 import { CookieBannerFAQ } from '@/components/faq/cookie-banner-faq'
 import { Footer } from '@/components/landing/footer'
@@ -30,8 +32,10 @@ export default function HomePage() {
         <Hero />
         <ValueStack />
         <InteractiveDemo />
+        <CanadianComplianceSection />
         <WhyFree />
         <SEOTextBlock />
+        <RoadmapPreview />
         <FinalCTA />
         <CookieBannerFAQ />
       </main>
