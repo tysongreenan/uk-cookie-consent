@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { NewBadge } from '@/components/ui/new-badge'
+import { TeamSwitcher } from '@/components/dashboard/team-switcher'
 
 interface NavItem {
   title: string
@@ -45,6 +46,11 @@ const navigationItems: NavItem[] = [
     title: 'Integrations',
     href: '/dashboard/integrations',
     icon: Target
+  },
+  {
+    title: 'Team Settings',
+    href: '/dashboard/team',
+    icon: Users
   }
 ]
 
@@ -148,6 +154,11 @@ export function Sidebar({ className }: SidebarProps) {
             <p className="text-xs text-muted-foreground">Pro Dashboard</p>
           </div>
         </Link>
+      </div>
+
+      {/* Team Switcher */}
+      <div className="p-4 border-b border-border">
+        <TeamSwitcher />
       </div>
 
       {/* Navigation */}

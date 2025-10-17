@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Plus, Search, Filter, Grid, List } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Search, Filter, Grid, List, Users, Crown, Shield, Edit, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
@@ -42,6 +43,7 @@ export function DashboardClient() {
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // 'grid' or 'list'
   const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
+  const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number } | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -52,6 +54,7 @@ export function DashboardClient() {
   useEffect(() => {
     if (session) {
       fetchBanners()
+      fetchTeamInfo()
     }
   }, [session])
 
@@ -74,6 +77,24 @@ export function DashboardClient() {
       setBanners([])
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchTeamInfo = async () => {
+    if (!session?.user?.currentTeamId) return
+
+    try {
+      const response = await fetch(`/api/teams/${session.user.currentTeamId}`)
+      const data = await response.json()
+      
+      if (response.ok && data.success) {
+        setTeamInfo({
+          name: data.data.name,
+          memberCount: data.data.memberCount || 1
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching team info:', error)
     }
   }
 
@@ -158,6 +179,36 @@ export function DashboardClient() {
     }
   }
 
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'owner':
+        return <Crown className="h-4 w-4 text-purple-600" />
+      case 'admin':
+        return <Shield className="h-4 w-4 text-blue-600" />
+      case 'editor':
+        return <Edit className="h-4 w-4 text-green-600" />
+      case 'viewer':
+        return <Eye className="h-4 w-4 text-gray-600" />
+      default:
+        return <Users className="h-4 w-4 text-gray-600" />
+    }
+  }
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'owner':
+        return 'bg-purple-100 text-purple-800'
+      case 'admin':
+        return 'bg-blue-100 text-blue-800'
+      case 'editor':
+        return 'bg-green-100 text-green-800'
+      case 'viewer':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
   const filteredBanners = banners.filter(banner =>
     banner.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -189,8 +240,41 @@ export function DashboardClient() {
           />
         )}
 
+        {/* Team Context */}
+        {teamInfo && (
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-blue-900">{teamInfo.name}</h3>
+                    <p className="text-sm text-blue-700">
+                      {teamInfo.memberCount} {teamInfo.memberCount === 1 ? 'member' : 'members'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {getRoleIcon(session?.user?.userRole || '')}
+                  <Badge className={getRoleBadgeColor(session?.user?.userRole || '')}>
+                    {session?.user?.userRole || 'member'}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Header */}
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Cookie Banners</h1>
+            <p className="text-muted-foreground">
+              {filteredBanners.length} {filteredBanners.length === 1 ? 'banner' : 'banners'} in your team
+            </p>
+          </div>
           <Button asChild size="lg">
             <Link href="/dashboard/builder">
               <Plus className="w-5 h-5 mr-2" />
