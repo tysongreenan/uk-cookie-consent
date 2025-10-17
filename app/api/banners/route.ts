@@ -150,14 +150,72 @@ export async function POST(request: NextRequest) {
 
     // Check if user has permission to create banners (edit permission)
     const session = await getServerSession(authOptions)
-    const currentTeamId = session?.user?.currentTeamId
-    const userRole = session?.user?.userRole
+    let currentTeamId = session?.user?.currentTeamId
+    let userRole = session?.user?.userRole
 
-    if (!currentTeamId) {
-      return NextResponse.json(
-        { error: 'No team selected' },
-        { status: 400 }
-      )
+    // If user doesn't have a team, create one for them
+    if (!currentTeamId && session?.user) {
+      try {
+        // Create a default team for the user
+        const { data: team, error: teamError } = await supabase
+          .from('Team')
+          .insert({
+            name: `${session.user.name || session.user.email}'s Team`,
+            ownerId: session.user.id
+          })
+          .select()
+          .single()
+
+        if (teamError) {
+          console.error('Error creating team:', teamError)
+          return NextResponse.json(
+            { error: 'Failed to create team' },
+            { status: 500 }
+          )
+        }
+
+        // Add user as owner of the team
+        const { error: memberError } = await supabase
+          .from('TeamMember')
+          .insert({
+            teamId: team.id,
+            userId: session.user.id,
+            role: 'owner',
+            joinedAt: new Date().toISOString()
+          })
+
+        if (memberError) {
+          console.error('Error adding user as team member:', memberError)
+          return NextResponse.json(
+            { error: 'Failed to add user to team' },
+            { status: 500 }
+          )
+        }
+
+        // Update user's currentTeamId
+        const { error: updateError } = await supabase
+          .from('User')
+          .update({ currentTeamId: team.id })
+          .eq('id', session.user.id)
+
+        if (updateError) {
+          console.error('Error updating user currentTeamId:', updateError)
+          return NextResponse.json(
+            { error: 'Failed to update user team' },
+            { status: 500 }
+          )
+        }
+
+        // Use the newly created team
+        currentTeamId = team.id
+        userRole = 'owner'
+      } catch (error) {
+        console.error('Error setting up team for user:', error)
+        return NextResponse.json(
+          { error: 'Failed to set up team' },
+          { status: 500 }
+        )
+      }
     }
 
     // Check if user has edit permission
@@ -171,9 +229,9 @@ export async function POST(request: NextRequest) {
     const bannerData = await request.json()
     
     // Validate required fields
-    if (!bannerData.title || !bannerData.message) {
+    if (!bannerData.name) {
       return NextResponse.json(
-        { error: 'Title and message are required' },
+        { error: 'Banner name is required' },
         { status: 400 }
       )
     }
