@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -224,7 +224,8 @@ export default function TeamSettingsPage() {
 
       if (data.success) {
         toast.success('Team created successfully!')
-        // Refresh the page to load the new team
+        // Force session update by signing in again
+        await signIn('credentials', { redirect: false })
         window.location.reload()
       } else {
         if (data.error?.includes('Could not find the table') || data.error?.includes('Team table')) {

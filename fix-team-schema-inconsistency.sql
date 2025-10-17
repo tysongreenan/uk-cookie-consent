@@ -3,31 +3,78 @@
 
 -- First, let's check what columns actually exist and fix any inconsistencies
 
--- Fix Team table to use snake_case consistently
-ALTER TABLE "Team" RENAME COLUMN "ownerId" TO "owner_id" IF EXISTS;
-ALTER TABLE "Team" RENAME COLUMN "createdAt" TO "created_at" IF EXISTS;
-ALTER TABLE "Team" RENAME COLUMN "updatedAt" TO "updated_at" IF EXISTS;
+-- Fix Team table to use snake_case consistently (only if columns exist)
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Team' AND column_name = 'ownerId') THEN
+        ALTER TABLE "Team" RENAME COLUMN "ownerId" TO "owner_id";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Team' AND column_name = 'createdAt') THEN
+        ALTER TABLE "Team" RENAME COLUMN "createdAt" TO "created_at";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Team' AND column_name = 'updatedAt') THEN
+        ALTER TABLE "Team" RENAME COLUMN "updatedAt" TO "updated_at";
+    END IF;
+END $$;
 
--- Fix TeamMember table to use snake_case consistently  
-ALTER TABLE "TeamMember" RENAME COLUMN "teamId" TO "team_id" IF EXISTS;
-ALTER TABLE "TeamMember" RENAME COLUMN "userId" TO "user_id" IF EXISTS;
-ALTER TABLE "TeamMember" RENAME COLUMN "invitedBy" TO "invited_by" IF EXISTS;
-ALTER TABLE "TeamMember" RENAME COLUMN "joinedAt" TO "joined_at" IF EXISTS;
-ALTER TABLE "TeamMember" RENAME COLUMN "createdAt" TO "created_at" IF EXISTS;
-ALTER TABLE "TeamMember" RENAME COLUMN "updatedAt" TO "updated_at" IF EXISTS;
+-- Fix TeamMember table to use snake_case consistently
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'teamId') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "teamId" TO "team_id";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'userId') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "userId" TO "user_id";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'invitedBy') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "invitedBy" TO "invited_by";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'joinedAt') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "joinedAt" TO "joined_at";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'createdAt') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "createdAt" TO "created_at";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamMember' AND column_name = 'updatedAt') THEN
+        ALTER TABLE "TeamMember" RENAME COLUMN "updatedAt" TO "updated_at";
+    END IF;
+END $$;
 
 -- Fix TeamInvitation table to use snake_case consistently
-ALTER TABLE "TeamInvitation" RENAME COLUMN "teamId" TO "team_id" IF EXISTS;
-ALTER TABLE "TeamInvitation" RENAME COLUMN "invitedBy" TO "invited_by" IF EXISTS;
-ALTER TABLE "TeamInvitation" RENAME COLUMN "expiresAt" TO "expires_at" IF EXISTS;
-ALTER TABLE "TeamInvitation" RENAME COLUMN "acceptedAt" TO "accepted_at" IF EXISTS;
-ALTER TABLE "TeamInvitation" RENAME COLUMN "createdAt" TO "created_at" IF EXISTS;
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamInvitation' AND column_name = 'teamId') THEN
+        ALTER TABLE "TeamInvitation" RENAME COLUMN "teamId" TO "team_id";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamInvitation' AND column_name = 'invitedBy') THEN
+        ALTER TABLE "TeamInvitation" RENAME COLUMN "invitedBy" TO "invited_by";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamInvitation' AND column_name = 'expiresAt') THEN
+        ALTER TABLE "TeamInvitation" RENAME COLUMN "expiresAt" TO "expires_at";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamInvitation' AND column_name = 'acceptedAt') THEN
+        ALTER TABLE "TeamInvitation" RENAME COLUMN "acceptedAt" TO "accepted_at";
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'TeamInvitation' AND column_name = 'createdAt') THEN
+        ALTER TABLE "TeamInvitation" RENAME COLUMN "createdAt" TO "created_at";
+    END IF;
+END $$;
 
 -- Fix User table to use snake_case consistently
-ALTER TABLE "User" RENAME COLUMN "currentTeamId" TO "current_team_id" IF EXISTS;
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'User' AND column_name = 'currentTeamId') THEN
+        ALTER TABLE "User" RENAME COLUMN "currentTeamId" TO "current_team_id";
+    END IF;
+END $$;
 
 -- Fix Project table to use snake_case consistently
-ALTER TABLE "Project" RENAME COLUMN "teamId" TO "team_id" IF EXISTS;
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'Project' AND column_name = 'teamId') THEN
+        ALTER TABLE "Project" RENAME COLUMN "teamId" TO "team_id";
+    END IF;
+END $$;
 
 -- Ensure all tables exist with correct structure
 CREATE TABLE IF NOT EXISTS "Team" (

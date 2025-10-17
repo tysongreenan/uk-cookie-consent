@@ -62,14 +62,16 @@ export const authOptions: NextAuthOptions = {
             .from('TeamMember')
             .select(`
               role,
+              team_id,
               Team!inner(
                 id,
                 name
               )
             `)
             .eq('user_id', user.id)
-            .eq('Team.owner_id', user.id)
-            .single()
+            .order('joined_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
           // Update last login time (only update existing fields)
           await supabase
@@ -84,7 +86,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             rememberMe: credentials.rememberMe === 'true',
-            currentTeamId: teamMember?.Team?.[0]?.id || null,
+            currentTeamId: teamMember?.Team?.id || null,
             userRole: teamMember?.role || 'owner'
           }
         } catch (error) {

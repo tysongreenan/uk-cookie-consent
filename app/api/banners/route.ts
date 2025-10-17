@@ -55,13 +55,79 @@ export async function GET(request: NextRequest) {
 
     // Get user's current team from session
     const session = await getServerSession(authOptions)
-    const currentTeamId = session?.user?.currentTeamId
+    let currentTeamId = session?.user?.currentTeamId || session?.user?.current_team_id
 
-    if (!currentTeamId) {
-      return NextResponse.json(
-        { error: 'No team selected' },
-        { status: 400 }
-      )
+    // If user doesn't have a team, create one for them
+    if (!currentTeamId && session?.user) {
+      try {
+        // Create a default team for the user
+        const teamId = crypto.randomUUID()
+        const memberId = crypto.randomUUID()
+        
+        const { data: team, error: teamError } = await supabase
+          .from('Team')
+          .insert({
+            id: teamId,
+            name: `${session.user.name || session.user.email}'s Team`,
+            owner_id: session.user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single()
+
+        if (teamError) {
+          console.error('Error creating team:', teamError)
+          return NextResponse.json(
+            { error: 'Failed to create team' },
+            { status: 500 }
+          )
+        }
+
+        // Add user as owner of the team
+        const { error: memberError } = await supabase
+          .from('TeamMember')
+          .insert({
+            id: memberId,
+            team_id: team.id,
+            user_id: session.user.id,
+            role: 'owner',
+            invited_by: session.user.id,
+            joined_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+
+        if (memberError) {
+          console.error('Error adding user as team member:', memberError)
+          // Clean up the team if member creation fails
+          await supabase.from('Team').delete().eq('id', team.id)
+          return NextResponse.json(
+            { error: 'Failed to add user to team' },
+            { status: 500 }
+          )
+        }
+
+        // Update user's current_team_id
+        const { error: updateError } = await supabase
+          .from('User')
+          .update({ current_team_id: team.id })
+          .eq('id', session.user.id)
+
+        if (updateError) {
+          console.error('Error updating user current_team_id:', updateError)
+          // Don't fail the request for this
+        }
+
+        // Use the newly created team
+        currentTeamId = team.id
+      } catch (error) {
+        console.error('Error setting up team for user:', error)
+        return NextResponse.json(
+          { error: 'Failed to set up team' },
+          { status: 500 }
+        )
+      }
     }
 
     // Get team's projects
