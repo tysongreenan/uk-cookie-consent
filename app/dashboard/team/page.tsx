@@ -93,7 +93,10 @@ export default function TeamSettingsPage() {
   }, [session])
 
   const fetchTeamData = async () => {
-    if (!session?.user?.currentTeamId) return
+    if (!session?.user?.currentTeamId) {
+      setLoading(false)
+      return
+    }
 
     try {
       // Fetch team details
@@ -206,6 +209,34 @@ export default function TeamSettingsPage() {
     }
   }
 
+  const createTeam = async () => {
+    setUpdating(true)
+    try {
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: `${session?.user?.name || session?.user?.email}'s Team`
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Team created successfully!')
+        // Refresh the page to load the new team
+        window.location.reload()
+      } else {
+        toast.error(data.error || 'Failed to create team')
+      }
+    } catch (error) {
+      console.error('Error creating team:', error)
+      toast.error('Failed to create team')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   const updateTeamName = async () => {
     if (!teamName.trim()) {
       toast.error('Team name cannot be empty')
@@ -310,6 +341,40 @@ export default function TeamSettingsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading team settings...</p>
         </div>
+      </div>
+    )
+  }
+
+  // Check if user doesn't have a team
+  if (!session?.user?.currentTeamId) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Team Settings</h1>
+          <p className="text-muted-foreground">
+            You're not currently part of any team.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Team Found</h3>
+            <p className="text-muted-foreground mb-6">
+              You're not currently part of any team. You can create a new team or wait for an invitation.
+            </p>
+            <div className="flex items-center justify-center space-x-4">
+              <Button onClick={createTeam} disabled={updating}>
+                {updating ? 'Creating...' : 'Create Team'}
+              </Button>
+              <Button onClick={() => router.push('/dashboard')} variant="outline">
+                Back to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
