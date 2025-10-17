@@ -42,7 +42,7 @@ async function getUser(request: NextRequest) {
   return null
 }
 
-// GET /api/banners - Get user's banners
+// GET /api/banners - Get team's banners
 export async function GET(request: NextRequest) {
   try {
     const user = await getUser(request)
@@ -53,48 +53,39 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Try to query banners directly first (in case they have userId field)
-    let { data: banners, error } = await supabase
-      .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt, userId')
-      .eq('userId', user.userId)
-      .order('createdAt', { ascending: false })
+    // Get user's current team from session
+    const session = await getServerSession(authOptions)
+    const currentTeamId = session?.user?.currentTeamId
 
-    // If that fails, try to get all banners and filter by project ownership
-    if (error && error.code === 'PGRST116') {
-      console.log('No userId field, trying alternative approach...')
-      
-      // Get user's projects first
-      const { data: projects, error: projectError } = await supabase
-        .from('Project')
-        .select('id')
-        .eq('userId', user.userId)
-
-      if (projectError || !projects || projects.length === 0) {
-        console.log('No projects found for user')
-        banners = []
-        error = null
-      } else {
-        const projectIds = projects.map(p => p.id)
-        
-        // Get banners for these projects with userId from Project table
-        const result = await supabase
-          .from('ConsentBanner')
-          .select(`
-            id, name, config, isActive, createdAt, updatedAt,
-            Project!inner(userId)
-          `)
-          .in('projectId', projectIds)
-          .order('createdAt', { ascending: false })
-        
-        // Transform the result to match the expected structure
-        banners = result.data?.map((banner: any) => ({
-          ...banner,
-          userId: banner.Project?.userId || user.userId
-        })) || []
-        error = result.error
-      }
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
     }
+
+    // Get team's projects
+    const { data: projects, error: projectError } = await supabase
+      .from('Project')
+      .select('id')
+      .eq('teamId', currentTeamId)
+
+    if (projectError || !projects || projects.length === 0) {
+      console.log('No projects found for team')
+      return NextResponse.json({ banners: [] })
+    }
+
+    const projectIds = projects.map(p => p.id)
+    
+    // Get banners for these projects
+    const { data: banners, error } = await supabase
+      .from('ConsentBanner')
+      .select(`
+        id, name, config, isActive, createdAt, updatedAt,
+        Project!inner(teamId)
+      `)
+      .in('projectId', projectIds)
+      .order('createdAt', { ascending: false })
 
     if (error) {
       console.error('Error fetching banners:', error)
@@ -157,6 +148,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if user has permission to create banners (edit permission)
+    const session = await getServerSession(authOptions)
+    const currentTeamId = session?.user?.currentTeamId
+    const userRole = session?.user?.userRole
+
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has edit permission
+    if (!['owner', 'admin', 'editor'].includes(userRole || '')) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to create banners' },
+        { status: 403 }
+      )
+    }
+
     const bannerData = await request.json()
     
     // Validate required fields
@@ -188,12 +199,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // First, get or create a project for this user
+    // First, get or create a project for this team
     let projectId: string
     const { data: existingProject, error: projectError } = await supabase
       .from('Project')
       .select('id')
-      .eq('userId', user.userId)
+      .eq('teamId', currentTeamId)
       .single()
 
     if (projectError || !existingProject) {
@@ -203,8 +214,9 @@ export async function POST(request: NextRequest) {
         .from('Project')
         .insert({
           id: projectId,
-          name: 'My Cookie Banners',
+          name: 'Team Cookie Banners',
           userId: user.userId,
+          teamId: currentTeamId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         })

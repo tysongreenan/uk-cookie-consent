@@ -57,6 +57,20 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          // Get user's current team and role
+          const { data: teamMember } = await supabase
+            .from('TeamMember')
+            .select(`
+              role,
+              Team!inner(
+                id,
+                name
+              )
+            `)
+            .eq('user_id', user.id)
+            .eq('Team.owner_id', user.id)
+            .single()
+
           // Update last login time (only update existing fields)
           await supabase
             .from('User')
@@ -69,7 +83,9 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
-            rememberMe: credentials.rememberMe === 'true'
+            rememberMe: credentials.rememberMe === 'true',
+            currentTeamId: teamMember?.Team?.id || null,
+            userRole: teamMember?.role || 'owner'
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -92,6 +108,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.iat = Math.floor(Date.now() / 1000) // Issued at
         token.rememberMe = (user as any).rememberMe || false
+        token.currentTeamId = (user as any).currentTeamId || null
+        token.userRole = (user as any).userRole || 'owner'
       }
       return token
     },
@@ -114,6 +132,8 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
+          currentTeamId: token.currentTeamId,
+          userRole: token.userRole,
         },
         expires: new Date(Date.now() + maxAge * 1000).toISOString(),
       };

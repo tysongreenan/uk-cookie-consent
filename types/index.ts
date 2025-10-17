@@ -218,3 +218,81 @@ export interface PaginatedResponse<T> {
     totalPages: number
   }
 }
+
+// Team Management Types
+export type TeamRole = 'owner' | 'admin' | 'editor' | 'viewer'
+export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked'
+export type TeamPermission = 'view' | 'edit' | 'delete' | 'admin' | 'owner'
+
+export interface Team {
+  id: string
+  name: string
+  ownerId: string
+  createdAt: Date
+  updatedAt: Date
+  members?: TeamMember[]
+  invitations?: TeamInvitation[]
+}
+
+export interface TeamMember {
+  id: string
+  teamId: string
+  userId: string
+  role: TeamRole
+  invitedBy?: string
+  joinedAt: Date
+  createdAt: Date
+  updatedAt: Date
+  user?: User
+  inviter?: User
+}
+
+export interface TeamInvitation {
+  id: string
+  teamId: string
+  email: string
+  role: Exclude<TeamRole, 'owner'> // Cannot invite as owner
+  token: string
+  invitedBy: string
+  expiresAt: Date
+  acceptedAt?: Date
+  status: InvitationStatus
+  createdAt: Date
+  team?: Team
+  inviter?: User
+}
+
+// Team Management Form Types
+export interface CreateTeamForm {
+  name: string
+}
+
+export interface UpdateTeamForm {
+  name?: string
+}
+
+export interface InviteMemberForm {
+  email: string
+  role: Exclude<TeamRole, 'owner'>
+  sendEmail?: boolean
+}
+
+export interface UpdateMemberRoleForm {
+  role: TeamRole
+}
+
+// Team Permission Matrix
+export const TEAM_PERMISSIONS: Record<TeamRole, TeamPermission[]> = {
+  owner: ['view', 'edit', 'delete', 'admin', 'owner'],
+  admin: ['view', 'edit', 'delete', 'admin'],
+  editor: ['view', 'edit'],
+  viewer: ['view']
+}
+
+// Helper function to check team permissions
+export function hasTeamPermission(
+  userRole: TeamRole,
+  requiredPermission: TeamPermission
+): boolean {
+  return TEAM_PERMISSIONS[userRole].includes(requiredPermission)
+}

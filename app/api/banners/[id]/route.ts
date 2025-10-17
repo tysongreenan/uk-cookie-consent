@@ -20,12 +20,23 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get the specific banner directly (ConsentBanner has userId field)
+    const currentTeamId = session.user.currentTeamId
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Get the banner and verify it belongs to user's team
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt, userId')
+      .select(`
+        id, name, config, isActive, createdAt, updatedAt,
+        Project!inner(teamId)
+      `)
       .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('Project.teamId', currentTeamId)
       .single()
 
     if (error) {
@@ -83,6 +94,24 @@ async function handleBannerUpdate(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const currentTeamId = session.user.currentTeamId
+    const userRole = session.user.userRole
+
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has edit permission
+    if (!['owner', 'admin', 'editor'].includes(userRole || '')) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to edit banners' },
+        { status: 403 }
+      )
+    }
+
     const bannerData = await request.json()
     
     // Validate required fields
@@ -93,12 +122,15 @@ async function handleBannerUpdate(
       )
     }
 
-    // First get the banner to verify ownership (ConsentBanner has userId field)
+    // First get the banner to verify it belongs to user's team
     const { data: existingBanner, error: fetchError } = await supabase
       .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt, userId')
+      .select(`
+        id,
+        Project!inner(teamId)
+      `)
       .eq('id', bannerId)
-      .eq('userId', session.user.id)
+      .eq('Project.teamId', currentTeamId)
       .single()
 
     if (fetchError || !existingBanner) {
@@ -157,12 +189,33 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // First verify ownership before deleting (ConsentBanner has userId field)
+    const currentTeamId = session.user.currentTeamId
+    const userRole = session.user.userRole
+
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has delete permission (admin or owner only)
+    if (!['owner', 'admin'].includes(userRole || '')) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to delete banners' },
+        { status: 403 }
+      )
+    }
+
+    // First verify banner belongs to user's team before deleting
     const { data: existingBanner, error: fetchError } = await supabase
       .from('ConsentBanner')
-      .select('id, userId')
+      .select(`
+        id,
+        Project!inner(teamId)
+      `)
       .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('Project.teamId', currentTeamId)
       .single()
 
     if (fetchError || !existingBanner) {
