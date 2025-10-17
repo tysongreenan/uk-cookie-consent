@@ -14,8 +14,12 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
+  title: {
+    default: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
+    template: '%s | Cookie Banner Generator'
+  },
   description: 'Create unlimited cookie banners custom-branded to your site. Fully compliant with GDPR & PIPEDA. First 1,000 accounts free — no card needed.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/logos/logo.svg',
     shortcut: '/logos/logo.svg',

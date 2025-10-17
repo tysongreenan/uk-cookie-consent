@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Shield,
   Code,
-  Globe
+  Globe,
+  Target
 } from 'lucide-react'
 import { useState } from 'react'
 import { NewBadge } from '@/components/ui/new-badge'
@@ -33,6 +34,17 @@ const navigationItems: NavItem[] = [
     title: 'Cookie Banner',
     href: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Analytics',
+    href: '/dashboard/analytics',
+    icon: BarChart3,
+    badge: 'new'
+  },
+  {
+    title: 'Integrations',
+    href: '/dashboard/integrations',
+    icon: Target
   }
 ]
 

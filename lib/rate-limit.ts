@@ -98,10 +98,15 @@ export class RateLimit {
   }
 }
 
-// Pre-configured rate limiters
+// Pre-configured enterprise rate limiters
 export const authRateLimit = new RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 5, // 5 attempts per 15 minutes
+});
+
+export const strictAuthRateLimit = new RateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 10, // 10 attempts per hour (stricter for suspicious activity)
 });
 
 export const apiRateLimit = new RateLimit({
@@ -112,4 +117,25 @@ export const apiRateLimit = new RateLimit({
 export const bannerRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 10, // 10 banner operations per minute
+});
+
+export const registrationRateLimit = new RateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 3, // 3 registrations per hour per IP
+});
+
+export const passwordResetRateLimit = new RateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 3, // 3 password reset attempts per hour
+});
+
+// Advanced rate limiting for different user types
+export const enterpriseRateLimit = new RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 100, // Higher limits for enterprise users
+});
+
+export const freeTierRateLimit = new RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30, // Lower limits for free tier
 });

@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         const result = await supabase
           .from('ConsentBanner')
           .select(`
-            id, name, config, isActive, createdAt, updatedAt, projectId,
+            id, name, config, isActive, createdAt, updatedAt,
             Project!inner(userId)
           `)
           .in('projectId', projectIds)

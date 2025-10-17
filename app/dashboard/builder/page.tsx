@@ -10,11 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript, ComplianceFramework } from '@/types'
 import { applyTranslations } from '@/lib/translations'
@@ -36,6 +37,15 @@ const defaultConfig: BannerConfig = {
     requiresDataRetentionPolicy: false,
     maxPenalty: 'Reputation damage and Privacy Commissioner findings',
     consentExpiry: 24,
+  },
+  integrations: {
+    googleAnalytics: {
+      enabled: false,
+      measurementId: '',
+      trackConsentEvents: true,
+      trackImpressions: true,
+      anonymizeIp: true
+    }
   },
   name: 'My Cookie Banner',
   position: 'bottom',
@@ -59,7 +69,7 @@ const defaultConfig: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: true,
-    cookieExpiry: 30
+    cookieExpiry: 182
   },
   branding: {
     logo: {
@@ -312,7 +322,7 @@ export default function BannerBuilderPage() {
   }, [session, router])
 
   useEffect(() => {
-    const editId = searchParams.get('edit')
+    const editId = searchParams.get('id') || searchParams.get('edit')
     if (editId && session) {
       loadBannerForEdit(editId)
     }
@@ -536,73 +546,164 @@ export default function BannerBuilderPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Configuration Panel */}
-          <div className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="flex items-center justify-between mb-6">
-                <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground gap-1" role="tablist" aria-label="Banner configuration steps">
-                  <TabsTrigger 
-                    value="compliance" 
-                    role="tab"
-                    aria-selected={activeTab === 'compliance'}
-                    aria-controls="compliance-panel"
-                    className="relative px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
-                  >
-                    <span className="flex items-center space-x-1 bg-transparent">
-                      <Shield className="h-3.5 w-3.5" />
-                      <span>Compliance</span>
-                      <NewBadge variant="sparkle" size="sm" />
+        {/* Configuration Panel */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-2">
+              <div className="sticky top-6">
+                {/* Progress */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {activeTab === 'compliance' ? 'Step 1 of 7' :
+                       activeTab === 'design' ? 'Step 2 of 7' : 
+                       activeTab === 'content' ? 'Step 3 of 7' : 
+                       activeTab === 'scripts' ? 'Step 4 of 7' : 
+                       activeTab === 'behavior' ? 'Step 5 of 7' : 
+                       activeTab === 'analytics' ? 'Step 6 of 7' : 'Step 7 of 7'}
                     </span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="design" 
-                    role="tab"
-                    aria-selected={activeTab === 'design'}
-                    aria-controls="design-panel"
-                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
-                  >
-                    Design
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="content" 
-                    role="tab"
-                    aria-selected={activeTab === 'content'}
-                    aria-controls="content-panel"
-                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
-                  >
-                    Content
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="scripts" 
-                    role="tab"
-                    aria-selected={activeTab === 'scripts'}
-                    aria-controls="scripts-panel"
-                    className="px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
-                  >
-                    Scripts
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="behavior" 
-                    role="tab"
-                    aria-selected={activeTab === 'behavior'}
-                    aria-controls="behavior-panel"
-                    className="relative px-3 py-1.5 data-[state=active]:!border-2 data-[state=active]:!border-primary data-[state=active]:!text-primary"
-                  >
-                    <span className="flex items-center space-x-1 bg-transparent">
-                      <span>Behavior</span>
-                      <NewBadge variant="sparkle" size="sm" />
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round((activeTab === 'compliance' ? 14.28 : 
+                                   activeTab === 'design' ? 28.57 : 
+                                   activeTab === 'content' ? 42.86 : 
+                                   activeTab === 'scripts' ? 57.14 : 
+                                   activeTab === 'behavior' ? 71.43 : 
+                                   activeTab === 'analytics' ? 85.71 : 100))}%
                     </span>
-                  </TabsTrigger>
-                </TabsList>
-                
-                <div className="text-sm text-muted-foreground">
-                  {activeTab === 'compliance' ? 'Step 1 of 5' :
-                   activeTab === 'design' ? 'Step 2 of 5' : 
-                   activeTab === 'content' ? 'Step 3 of 5' : 
-                   activeTab === 'scripts' ? 'Step 4 of 5' : 'Step 5 of 5'}
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${activeTab === 'compliance' ? 14.28 : 
+                                 activeTab === 'design' ? 28.57 : 
+                                 activeTab === 'content' ? 42.86 : 
+                                 activeTab === 'scripts' ? 57.14 : 
+                                 activeTab === 'behavior' ? 71.43 : 
+                                 activeTab === 'analytics' ? 85.71 : 100}%` 
+                      }}
+                    ></div>
+                  </div>
                 </div>
+
+                {/* Navigation Menu */}
+                <nav className="space-y-1">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Configuration Steps
+                  </div>
+                  
+                  <button
+                    onClick={() => setActiveTab('compliance')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'compliance'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span className="flex-1 text-left">Compliance</span>
+                    <NewBadge variant="sparkle" size="sm" />
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('design')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'design'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Palette className="h-4 w-4" />
+                    <span className="flex-1 text-left">Design</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('content')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'content'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Type className="h-4 w-4" />
+                    <span className="flex-1 text-left">Content</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('scripts')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'scripts'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Code className="h-4 w-4" />
+                    <span className="flex-1 text-left">Scripts</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('behavior')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'behavior'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span className="flex-1 text-left">Behavior</span>
+                    <NewBadge variant="sparkle" size="sm" />
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('analytics')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'analytics'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="flex-1 text-left">Analytics</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('code')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'code'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Code className="h-4 w-4" />
+                    <span className="flex-1 text-left">Code</span>
+                  </button>
+                </nav>
               </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="lg:col-span-6">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-foreground capitalize">
+                  {activeTab === 'compliance' ? 'Choose Compliance Framework' :
+                   activeTab === 'design' ? 'Customize Appearance' : 
+                   activeTab === 'content' ? 'Set Text & Messages' : 
+                   activeTab === 'scripts' ? 'Configure Tracking Scripts' : 
+                   activeTab === 'behavior' ? 'Set Banner Behavior' : 
+                   activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {activeTab === 'compliance' ? 'Select the privacy law that applies to your website. This will configure your banner\'s requirements and legal text.' :
+                   activeTab === 'design' ? 'Customize the visual appearance of your cookie consent banner.' :
+                   activeTab === 'content' ? 'Set the text, messages, and button labels for your banner.' :
+                   activeTab === 'scripts' ? 'Configure tracking scripts and cookie categories.' :
+                   activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
+                   activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
+                   'Copy the code below and paste it into your website to activate your cookie banner.'}
+                </p>
+              </div>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               {/* Compliance Tab */}
               <TabsContent value="compliance" className="space-y-6" id="compliance-panel" role="tabpanel" aria-labelledby="compliance-tab">
@@ -1990,6 +2091,108 @@ export default function BannerBuilderPage() {
                       <Label htmlFor="google-consent">Enable Google Consent Mode v2</Label>
                     </div>
 
+                    {/* Google Analytics 4 Configuration */}
+                    <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-blue-600" />
+                        <h3 className="font-semibold text-blue-900">Google Analytics 4</h3>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="ga4-enabled"
+                          checked={config.integrations?.googleAnalytics?.enabled ?? false}
+                          onCheckedChange={(checked) => updateConfig('integrations', {
+                            ...config.integrations,
+                            googleAnalytics: {
+                              ...config.integrations?.googleAnalytics,
+                              enabled: checked,
+                              measurementId: config.integrations?.googleAnalytics?.measurementId || '',
+                              trackConsentEvents: config.integrations?.googleAnalytics?.trackConsentEvents ?? true,
+                              anonymizeIp: config.integrations?.googleAnalytics?.anonymizeIp ?? true
+                            }
+                          })}
+                        />
+                        <Label htmlFor="ga4-enabled">Enable GA4 Tracking</Label>
+                      </div>
+
+                      {(config.integrations?.googleAnalytics?.enabled ?? false) && (
+                        <div className="space-y-3 pl-6">
+                          <div>
+                            <Label htmlFor="ga4-measurement-id" className="text-sm font-medium">
+                              Measurement ID
+                            </Label>
+                            <Input
+                              id="ga4-measurement-id"
+                              placeholder="G-XXXXXXXXXX"
+                              value={config.integrations?.googleAnalytics?.measurementId ?? ''}
+                              onChange={(e) => updateConfig('integrations', {
+                                ...config.integrations,
+                                googleAnalytics: {
+                                  ...config.integrations?.googleAnalytics,
+                                  measurementId: e.target.value.toUpperCase()
+                                }
+                              })}
+                              className="font-mono mt-1"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="ga4-track-events"
+                                checked={config.integrations?.googleAnalytics?.trackConsentEvents ?? true}
+                                onCheckedChange={(checked) => updateConfig('integrations', {
+                                  ...config.integrations,
+                                  googleAnalytics: {
+                                    ...config.integrations?.googleAnalytics,
+                                    trackConsentEvents: checked
+                                  }
+                                })}
+                              />
+                              <Label htmlFor="ga4-track-events" className="text-sm">
+                                Track Consent Events
+                              </Label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="ga4-track-impressions"
+                                checked={config.integrations?.googleAnalytics?.trackImpressions ?? true}
+                                onCheckedChange={(checked) => updateConfig('integrations', {
+                                  ...config.integrations,
+                                  googleAnalytics: {
+                                    ...config.integrations?.googleAnalytics,
+                                    trackImpressions: checked
+                                  }
+                                })}
+                              />
+                              <Label htmlFor="ga4-track-impressions" className="text-sm">
+                                Track Banner Impressions
+                              </Label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="ga4-anonymize-ip"
+                                checked={config.integrations?.googleAnalytics?.anonymizeIp ?? true}
+                                onCheckedChange={(checked) => updateConfig('integrations', {
+                                  ...config.integrations,
+                                  googleAnalytics: {
+                                    ...config.integrations?.googleAnalytics,
+                                    anonymizeIp: checked
+                                  }
+                                })}
+                              />
+                              <Label htmlFor="ga4-anonymize-ip" className="text-sm">
+                                Anonymize IP Addresses
+                              </Label>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <div>
                       <Label htmlFor="custom-css">Custom CSS</Label>
                       <textarea
@@ -2014,49 +2217,308 @@ export default function BannerBuilderPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
 
+              {/* Analytics Tab */}
+              <TabsContent value="analytics" className="space-y-6" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <BarChart3 className="mr-2 h-5 w-5" />
+                      Analytics Configuration
+                    </CardTitle>
+                    <CardDescription>
+                      View and verify your Google Analytics 4 integration settings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* GA4 Status */}
+                    <div className={`p-4 rounded-lg border ${config.integrations?.googleAnalytics?.measurementId ? 'bg-gradient-to-r from-blue-50 to-green-50 border-green-200' : 'bg-gradient-to-r from-blue-50 to-gray-50 border-gray-200'}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 rounded-full ${config.integrations?.googleAnalytics?.measurementId ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900">Google Analytics 4</h3>
+                            <p className="text-sm text-gray-600">
+                              {config.integrations?.googleAnalytics?.measurementId 
+                                ? '✅ Configured and ready' 
+                                : '⚠️ Add your Measurement ID below'}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant={config.integrations?.googleAnalytics?.measurementId ? 'default' : 'secondary'}>
+                          {config.integrations?.googleAnalytics?.measurementId ? 'Configured' : 'Not Set'}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* GA4 Configuration Input */}
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="ga4-measurement-id" className="text-sm font-medium">
+                          Measurement ID
+                        </Label>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Input
+                            id="ga4-measurement-id"
+                            placeholder="G-XXXXXXXXXX"
+                            value={config.integrations?.googleAnalytics?.measurementId || ''}
+                            onChange={(e) => updateConfig('integrations', {
+                              ...config.integrations,
+                              googleAnalytics: {
+                                ...config.integrations?.googleAnalytics,
+                                enabled: e.target.value.trim().length > 0,
+                                measurementId: e.target.value.toUpperCase(),
+                                trackConsentEvents: config.integrations?.googleAnalytics?.trackConsentEvents ?? true,
+                                anonymizeIp: config.integrations?.googleAnalytics?.anonymizeIp ?? true
+                              }
+                            })}
+                            className="font-mono"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const measurementId = config.integrations?.googleAnalytics?.measurementId || ''
+                              if (measurementId) {
+                                navigator.clipboard.writeText(measurementId)
+                                toast.success('Measurement ID copied to clipboard!')
+                              } else {
+                                toast.error('No Measurement ID to copy')
+                              }
+                            }}
+                            disabled={!config.integrations?.googleAnalytics?.measurementId}
+                          >
+                            <Code className="h-4 w-4 mr-1" />
+                            Copy
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Enter your Google Analytics 4 Measurement ID (starts with G-)
+                        </p>
+                      </div>
+
+                      {/* Advanced Settings */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Advanced Settings</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="ga4-track-events"
+                              checked={config.integrations?.googleAnalytics?.trackConsentEvents ?? true}
+                              onCheckedChange={(checked) => updateConfig('integrations', {
+                                ...config.integrations,
+                                googleAnalytics: {
+                                  ...config.integrations?.googleAnalytics,
+                                  enabled: config.integrations?.googleAnalytics?.enabled ?? false,
+                                  measurementId: config.integrations?.googleAnalytics?.measurementId || '',
+                                  trackConsentEvents: checked,
+                                  trackImpressions: config.integrations?.googleAnalytics?.trackImpressions ?? true,
+                                  anonymizeIp: config.integrations?.googleAnalytics?.anonymizeIp ?? true
+                                }
+                              })}
+                            />
+                            <Label htmlFor="ga4-track-events" className="text-sm">
+                              Track Consent Events
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="ga4-track-impressions-2"
+                              checked={config.integrations?.googleAnalytics?.trackImpressions ?? true}
+                              onCheckedChange={(checked) => updateConfig('integrations', {
+                                ...config.integrations,
+                                googleAnalytics: {
+                                  ...config.integrations?.googleAnalytics,
+                                  enabled: config.integrations?.googleAnalytics?.enabled ?? false,
+                                  measurementId: config.integrations?.googleAnalytics?.measurementId || '',
+                                  trackConsentEvents: config.integrations?.googleAnalytics?.trackConsentEvents ?? true,
+                                  trackImpressions: checked,
+                                  anonymizeIp: config.integrations?.googleAnalytics?.anonymizeIp ?? true
+                                }
+                              })}
+                            />
+                            <Label htmlFor="ga4-track-impressions-2" className="text-sm">
+                              Track Banner Impressions
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="ga4-anonymize-ip"
+                              checked={config.integrations?.googleAnalytics?.anonymizeIp ?? true}
+                              onCheckedChange={(checked) => updateConfig('integrations', {
+                                ...config.integrations,
+                                googleAnalytics: {
+                                  ...config.integrations?.googleAnalytics,
+                                  enabled: config.integrations?.googleAnalytics?.enabled ?? false,
+                                  measurementId: config.integrations?.googleAnalytics?.measurementId || '',
+                                  trackConsentEvents: config.integrations?.googleAnalytics?.trackConsentEvents ?? true,
+                                  trackImpressions: config.integrations?.googleAnalytics?.trackImpressions ?? true,
+                                  anonymizeIp: checked
+                                }
+                              })}
+                            />
+                            <Label htmlFor="ga4-anonymize-ip" className="text-sm">
+                              Anonymize IP Addresses
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Generated Code Preview */}
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Generated Code Preview</Label>
+                      <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                        <div className="text-green-400 mb-2">// Main Banner Script</div>
+                        <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${session?.user?.id}"></script>`}</div>
+                        
+                        {config.integrations?.googleAnalytics?.measurementId && (
+                          <>
+                            <div className="text-green-400 mt-4 mb-2">// Google Analytics 4 Integration</div>
+                            <div className="text-yellow-400">{`<script async src="https://www.googletagmanager.com/gtag/js?id=${config.integrations.googleAnalytics.measurementId}"></script>`}</div>
+                            <div className="text-purple-400">{`<script>gtag('config', '${config.integrations.googleAnalytics.measurementId}');</script>`}</div>
+                          </>
+                        )}
+                        
+                        {config.scripts && (
+                          <>
+                            <div className="text-green-400 mt-4 mb-2">// Custom Scripts</div>
+                            {config.scripts.strictlyNecessary?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
+                              <div className="text-blue-400">// Strictly Necessary: {config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                            )}
+                            {config.scripts.trackingPerformance?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
+                              <div className="text-yellow-400">// Tracking/Performance: {config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                            )}
+                            {config.scripts.functionality?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
+                              <div className="text-purple-400">// Functionality: {config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                            )}
+                            {config.scripts.targetingAdvertising?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
+                              <div className="text-red-400">// Targeting/Advertising: {config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="text-sm text-gray-600">
+                        {config.integrations?.googleAnalytics?.measurementId 
+                          ? 'Your GA4 integration is configured and will track consent events.' 
+                          : 'Enter your GA4 Measurement ID above to enable tracking.'}
+                      </div>
+                      <Button variant="outline" asChild>
+                        <Link href="/dashboard/integrations">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Advanced Settings
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Code Tab */}
+              <TabsContent value="code" className="space-y-6" id="code-panel" role="tabpanel" aria-labelledby="code-tab">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Code className="mr-2 h-5 w-5" />
+                      Implementation Code
+                    </CardTitle>
+                    <CardDescription>
+                      Copy and paste this code into your website to activate your cookie banner
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Instructions */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm font-bold">!</span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-blue-900 mb-1">Quick Setup Instructions</h4>
+                          <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                            <li>Copy the code below</li>
+                            <li>Paste it into the &lt;body&gt; section of your website</li>
+                            <li>Place it before the closing &lt;/body&gt; tag</li>
+                            <li>Your cookie banner will appear automatically</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Code Generator */}
+                    <div className="bg-white border rounded-lg overflow-hidden">
+                      <div className="bg-gray-50 px-4 py-3 border-b">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900 flex items-center">
+                            <Code className="mr-2 h-4 w-4" />
+                            Your Cookie Banner Code
+                          </h4>
+                          <div className="text-xs text-gray-500">
+                            Ready to implement
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-0">
+                        <CodeGenerator config={config} />
+                      </div>
+                    </div>
+
+                    {/* Success Message */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-green-900">All Set!</h4>
+                          <p className="text-sm text-green-700">
+                            Your cookie banner is configured and ready to deploy. Once you add the code to your website, 
+                            it will automatically comply with {config.compliance.framework.toUpperCase()} requirements.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Live Preview Area */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-6">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center">
+                        <Eye className="mr-2 h-5 w-5" />
+                        Live Preview
+                      </CardTitle>
+                      {config.behavior.showPreferences && (
+                        <NewBadge variant="sparkle" size="sm" />
+                      )}
+                    </div>
+                    {config.behavior.showPreferences && (
+                      <CardDescription className="text-purple-600">
+                        ✨ Try clicking the "Preferences" button to see the new modal!
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <BannerPreview config={config} />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
 
-          {/* Preview Panel */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center">
-                    <Eye className="mr-2 h-5 w-5" />
-                    Live Preview
-                  </CardTitle>
-                  {config.behavior.showPreferences && (
-                    <NewBadge variant="sparkle" size="sm" />
-                  )}
-                </div>
-                {config.behavior.showPreferences && (
-                  <CardDescription className="text-purple-600">
-                    ✨ Try clicking the "Preferences" button to see the new modal!
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <BannerPreview config={config} />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Code className="mr-2 h-5 w-5" />
-                  Copy This Code To Your Website
-                </CardTitle>
-            
-              </CardHeader>
-              <CardContent>
-                <CodeGenerator config={config} />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
+        </main>
     </div>
   )
 }

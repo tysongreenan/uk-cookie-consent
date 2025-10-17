@@ -108,6 +108,17 @@ export interface BannerConfig {
       inlineCriticalCSS?: boolean
     }
   }
+  
+  // Integrations
+  integrations?: {
+    googleAnalytics?: {
+      enabled: boolean
+      measurementId: string // e.g., "G-XXXXXXXXXX"
+      trackConsentEvents: boolean // Track accept/reject/dismiss as GA events
+      trackImpressions: boolean // Track banner impressions as GA events
+      anonymizeIp: boolean
+    }
+  }
 }
 
 export interface TrackingScript {

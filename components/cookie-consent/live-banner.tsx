@@ -91,7 +91,7 @@ export function LiveCookieBanner() {
 
     // Cookie functions (exactly like generated code)
     const COOKIE_NAME = 'cookie_consent'
-    const COOKIE_EXPIRY = 365
+    const COOKIE_EXPIRY = 182
 
     function getCookie(name: string) {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))

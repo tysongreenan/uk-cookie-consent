@@ -7,7 +7,9 @@ import {
 
 export function CookieBannerFAQ() {
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <section className="px-4 py-12 sm:px-6 sm:py-16 md:py-24">
+      <div className="container">
+        <div className="w-full max-w-4xl mx-auto">
       <div className="mb-12 text-center">
         <h2 className="mb-4 font-heading text-3xl font-bold sm:text-4xl md:text-5xl">
           Frequently Asked Questions
@@ -114,6 +116,8 @@ export function CookieBannerFAQ() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </div>
+        </div>
+      </div>
+    </section>
   )
 }

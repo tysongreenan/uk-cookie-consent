@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { createClient } from '@supabase/supabase-js'
-import { authRateLimit } from '@/lib/rate-limit'
+import { registrationRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail, sanitizeUserName, validatePassword } from '@/lib/sanitize'
 
 const supabase = createClient(
@@ -11,8 +11,8 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit
-    const rateLimitResult = await authRateLimit.check(request);
+    // Check registration rate limit
+    const rateLimitResult = await registrationRateLimit.check(request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many registration attempts. Please try again later.' },

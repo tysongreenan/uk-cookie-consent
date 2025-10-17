@@ -76,6 +76,15 @@ interface BannerConfig {
     trackingPerformance: TrackingScript[]
     targetingAdvertising: TrackingScript[]
   }
+  integrations?: {
+    googleAnalytics?: {
+      enabled: boolean
+      measurementId: string
+      trackConsentEvents: boolean
+      trackImpressions: boolean
+      anonymizeIp: boolean
+    }
+  }
   advanced: {
     googleConsentMode: boolean
     customCSS: string
@@ -445,11 +454,77 @@ ${config.branding.footerLink.enabled && config.branding.footerLink.position === 
     const analyticsLoaders = generateScriptLoaders(config.scripts.trackingPerformance, 'analytics')
     const marketingLoaders = generateScriptLoaders(config.scripts.targetingAdvertising, 'marketing')
 
+    // GA4 Integration
+    const ga4Integration = config.integrations?.googleAnalytics?.enabled && config.integrations?.googleAnalytics?.measurementId
+      ? `
+  // Google Analytics 4 Integration
+  var GA_MEASUREMENT_ID = '${config.integrations.googleAnalytics.measurementId}';
+  var GA_TRACK_CONSENT_EVENTS = ${config.integrations.googleAnalytics.trackConsentEvents};
+  var GA_TRACK_IMPRESSIONS = ${config.integrations.googleAnalytics.trackImpressions ?? true};
+  var GA_ANONYMIZE_IP = ${config.integrations.googleAnalytics.anonymizeIp};
+  
+  function initGA4() {
+    if (!GA_MEASUREMENT_ID) return;
+    
+    // Load GA4 script
+    var gaScript = document.createElement('script');
+    gaScript.async = true;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+    document.head.appendChild(gaScript);
+    
+    // Initialize gtag
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID, {
+      ${config.integrations.googleAnalytics.anonymizeIp ? "'anonymize_ip': true," : ''}
+      'cookie_flags': 'SameSite=None;Secure'
+    });
+    
+    console.log('Google Analytics 4 initialized with ID:', GA_MEASUREMENT_ID);
+  }
+  
+  function trackConsentEvent(action) {
+    if (!window.gtag) return;
+    
+    // Track consent events (accept/reject/dismiss)
+    if (GA_TRACK_CONSENT_EVENTS && (action === 'accept' || action === 'reject' || action === 'dismiss')) {
+      gtag('event', 'cookie_consent', {
+        'event_category': 'Cookie Consent',
+        'event_label': action,
+        'value': action === 'accept' ? 1 : 0
+      });
+      console.log('GA4 consent event tracked:', action);
+    }
+    
+    // Track banner impressions
+    if (GA_TRACK_IMPRESSIONS && action === 'impression') {
+      gtag('event', 'banner_impression', {
+        'event_category': 'Cookie Banner',
+        'event_label': 'banner_shown',
+        'value': 1
+      });
+      console.log('GA4 impression event tracked');
+    }
+  }`
+      : `
+  // GA4 Integration not configured
+  function initGA4() {
+    console.log('GA4 integration not configured');
+  }
+  
+  function trackConsentEvent(action) {
+    console.log('GA4 consent event not tracked (not configured):', action);
+  }`
+
     return `(function() {
   'use strict';
   
   var COOKIE_NAME = 'cookie_consent';
   var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
+  
+  ${ga4Integration}
   
   // Language translations
   var TRANSLATIONS = {
@@ -640,6 +715,11 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     if (existingConsent) {
       loadScripts(existingConsent);
       
+      // Initialize GA4 if analytics was accepted
+      if (existingConsent.analytics) {
+        initGA4();
+      }
+      
       ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
       // Show cookie settings floating button after consent is given
       var floatBtn = document.getElementById('cookie-settings-float');
@@ -654,11 +734,16 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       return;
     }
     
-    ${config.behavior.autoShow ? 'banner.style.display = "block";' : ''}
+    ${config.behavior.autoShow ? `
+    banner.style.display = 'block';
+    trackConsentEvent('impression'); // Track banner impression
+    ` : ''}
     
     if (acceptBtn) {
       acceptBtn.onclick = function() {
         saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+        initGA4(); // Initialize GA4
+        trackConsentEvent('accept'); // Track consent event
         banner.style.display = 'none';
         ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
         // Show floating cookie settings button after accepting
@@ -676,6 +761,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     if (rejectBtn) {
       rejectBtn.onclick = function() {
         saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
+        trackConsentEvent('reject'); // Track consent event (but don't init GA4)
         banner.style.display = 'none';
         ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
         // Show floating cookie settings button after rejecting (so user can change mind)

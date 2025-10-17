@@ -36,7 +36,7 @@ export const PIPEDA_TEMPLATE: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: false, // PIPEDA doesn't require granular controls
-    cookieExpiry: 24, // 24 months for PIPEDA
+    cookieExpiry: 182, // 6 months default
   },
   branding: {
     logo: {
@@ -121,7 +121,7 @@ export const GDPR_TEMPLATE: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: true, // GDPR requires granular controls
-    cookieExpiry: 12, // 12 months for GDPR
+    cookieExpiry: 182, // 6 months default
   },
   branding: {
     logo: {
@@ -206,7 +206,7 @@ export const CCPA_TEMPLATE: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: true, // CCPA requires granular controls
-    cookieExpiry: 12, // 12 months for CCPA
+    cookieExpiry: 182, // 6 months default
   },
   branding: {
     logo: {

@@ -39,9 +39,10 @@ interface BannerCardProps {
   onToggle: (id: string, isActive: boolean) => void
   onDelete: (id: string) => void
   onCopy: (id: string) => void
+  onCopyEmbed?: (id: string) => void
 }
 
-export function BannerCard({ banner, onToggle, onDelete, onCopy }: BannerCardProps) {
+export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: BannerCardProps) {
   const isUpdated = needsMigration(banner.config)
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -104,8 +105,15 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy }: BannerCardPro
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onCopy(banner.id)}>
                   <Copy className="mr-2 h-4 w-4" />
-                  Copy Code
+                  Copy Static Code
                 </DropdownMenuItem>
+                {onCopyEmbed && (
+                  <DropdownMenuItem onClick={() => onCopyEmbed(banner.id)}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Embed Code
+                    <NewBadge variant="sparkle" className="ml-2" />
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View Live

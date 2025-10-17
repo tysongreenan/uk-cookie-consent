@@ -14,16 +14,25 @@ export function migrateBannerConfig(config: any): BannerConfig {
     return {
       version: CURRENT_BANNER_VERSION,
       lastUpdated: new Date().toISOString(),
-      compliance: {
-        framework: 'pipeda',
-        requiresExplicitConsent: false,
-        requiresOptIn: false,
-        requiresGranularConsent: false,
-        requiresPrivacyPolicy: true,
-        requiresDataRetentionPolicy: false,
-        maxPenalty: 'Reputation damage and Privacy Commissioner findings',
-        consentExpiry: 24,
-      },
+    compliance: {
+      framework: 'pipeda',
+      requiresExplicitConsent: false,
+      requiresOptIn: false,
+      requiresGranularConsent: false,
+      requiresPrivacyPolicy: true,
+      requiresDataRetentionPolicy: false,
+      maxPenalty: 'Reputation damage and Privacy Commissioner findings',
+      consentExpiry: 24,
+    },
+    integrations: {
+      googleAnalytics: {
+        enabled: false,
+        measurementId: '',
+        trackConsentEvents: true,
+        trackImpressions: true,
+        anonymizeIp: true
+      }
+    },
       name: 'My Cookie Banner',
       position: 'bottom',
       theme: 'dark',
@@ -46,7 +55,7 @@ export function migrateBannerConfig(config: any): BannerConfig {
         autoShow: true,
         dismissOnScroll: false,
         showPreferences: true,
-        cookieExpiry: 30
+        cookieExpiry: 182
       },
       branding: {
         logo: { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 },
@@ -119,6 +128,19 @@ function migrateToV2(config: any): any {
   // Ensure language field exists
   if (!migrated.language) {
     migrated.language = 'auto'
+  }
+
+  // Add integrations if missing
+  if (!migrated.integrations) {
+    migrated.integrations = {
+      googleAnalytics: {
+        enabled: false,
+        measurementId: '',
+        trackConsentEvents: true,
+        trackImpressions: true,
+        anonymizeIp: true
+      }
+    }
   }
 
   // Ensure branding.footerLink exists with proper structure

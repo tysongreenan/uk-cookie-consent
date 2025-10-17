@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Block location-specific pages from indexing
+Disallow: /locations/
+
+# Allow main pages
+Allow: /
+Allow: /blog/
+Allow: /compliance/
+Allow: /integrations/
+Allow: /solutions/
+Allow: /compare/
+Allow: /tools/
+
+Sitemap: https://www.cookie-banner.ca/sitemap.xml

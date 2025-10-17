@@ -50,6 +50,24 @@ export function Header() {
               Blog
             </Link>
             <Link
+              href="/pricing"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/locations"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Locations
+            </Link>
+            <Link
+              href="/tools"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Tools
+            </Link>
+            <Link
               href="/about"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
@@ -115,6 +133,27 @@ export function Header() {
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
               Blog
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/locations"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Locations
+            </Link>
+            <Link
+              href="/tools"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Tools
             </Link>
             <Link
               href="/about"

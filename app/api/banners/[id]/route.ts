@@ -20,21 +20,12 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get the specific banner through Project table
+    // Get the specific banner directly (ConsentBanner has userId field)
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
-      .select(`
-        id, 
-        name, 
-        config, 
-        isActive, 
-        createdAt, 
-        updatedAt,
-        projectId,
-        Project!inner(userId)
-      `)
+      .select('id, name, config, isActive, createdAt, updatedAt, userId')
       .eq('id', params.id)
-      .eq('Project.userId', session.user.id)
+      .eq('userId', session.user.id)
       .single()
 
     if (error) {
@@ -71,6 +62,20 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return handleBannerUpdate(request, params.id)
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return handleBannerUpdate(request, params.id)
+}
+
+async function handleBannerUpdate(
+  request: NextRequest,
+  bannerId: string
+) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -88,6 +93,21 @@ export async function PUT(
       )
     }
 
+    // First get the banner to verify ownership (ConsentBanner has userId field)
+    const { data: existingBanner, error: fetchError } = await supabase
+      .from('ConsentBanner')
+      .select('id, name, config, isActive, createdAt, updatedAt, userId')
+      .eq('id', bannerId)
+      .eq('userId', session.user.id)
+      .single()
+
+    if (fetchError || !existingBanner) {
+      return NextResponse.json(
+        { error: 'Banner not found or unauthorized' },
+        { status: 404 }
+      )
+    }
+
     // Update banner in database
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
@@ -97,8 +117,7 @@ export async function PUT(
         isActive: bannerData.isActive || false,
         updatedAt: new Date().toISOString()
       })
-      .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('id', bannerId)
       .select('id, name, config, isActive, createdAt, updatedAt')
       .single()
 
@@ -138,12 +157,26 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // First verify ownership before deleting (ConsentBanner has userId field)
+    const { data: existingBanner, error: fetchError } = await supabase
+      .from('ConsentBanner')
+      .select('id, userId')
+      .eq('id', params.id)
+      .eq('userId', session.user.id)
+      .single()
+
+    if (fetchError || !existingBanner) {
+      return NextResponse.json(
+        { error: 'Banner not found or unauthorized' },
+        { status: 404 }
+      )
+    }
+
     // Delete banner from database
     const { error } = await supabase
       .from('ConsentBanner')
       .delete()
       .eq('id', params.id)
-      .eq('userId', session.user.id)
 
     if (error) {
       console.error('Database error:', error)
