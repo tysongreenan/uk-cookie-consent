@@ -25,6 +25,7 @@ export async function POST(
         team_id,
         email,
         role,
+        invited_by,
         expires_at,
         status,
         Team!inner(
@@ -151,10 +152,10 @@ export async function POST(
       success: true,
       data: {
         teamId: invitation.team_id,
-        teamName: invitation.Team.name,
+        teamName: invitation.Team[0]?.name || 'Unknown Team',
         role: invitation.role
       },
-      message: `Successfully joined ${invitation.Team.name} as ${invitation.role}`
+      message: `Successfully joined ${invitation.Team[0]?.name || 'Unknown Team'} as ${invitation.role}`
     })
 
   } catch (error) {
