@@ -387,10 +387,24 @@ export default function BannerBuilderPage() {
   }
 
   const updateConfig = (section: keyof BannerConfig, updates: any) => {
-    setConfig(prev => ({
-      ...prev,
-      [section]: { ...(prev[section] as any), ...updates }
-    }))
+    setConfig(prev => {
+      const currentValue = prev[section]
+      
+      // If the current value is a primitive (string, number, boolean) or null/undefined,
+      // replace it directly with the new value
+      if (typeof currentValue !== 'object' || currentValue === null) {
+        return {
+          ...prev,
+          [section]: updates
+        }
+      }
+      
+      // If the current value is an object, merge the updates
+      return {
+        ...prev,
+        [section]: { ...(currentValue as any), ...updates }
+      }
+    })
   }
 
   const handleComplianceFrameworkChange = (framework: ComplianceFramework) => {
