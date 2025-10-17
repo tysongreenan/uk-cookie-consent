@@ -29,6 +29,7 @@ export default function PricingPage() {
       cta: 'Get Started Free',
       tier: 'free',
       icon: <Zap className="w-6 h-6" />,
+      popular: true,
       ctaLink: '/auth/signup'
     },
     {
@@ -49,7 +50,6 @@ export default function PricingPage() {
       cta: 'Upgrade to Pro',
       tier: 'pro',
       icon: <Crown className="w-6 h-6" />,
-      popular: true,
       ctaLink: '/upgrade'
     },
     {
@@ -223,7 +223,7 @@ function PricingCard({
       {popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
           <Badge className="bg-primary text-primary-foreground px-4 py-1">
-            Best Value
+            {tier === 'free' ? 'Best Value' : 'Better Value'}
           </Badge>
         </div>
       )}

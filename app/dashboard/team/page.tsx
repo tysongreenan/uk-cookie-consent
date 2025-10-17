@@ -227,7 +227,11 @@ export default function TeamSettingsPage() {
         // Refresh the page to load the new team
         window.location.reload()
       } else {
-        toast.error(data.error || 'Failed to create team')
+        if (data.error?.includes('Could not find the table') || data.error?.includes('Team table')) {
+          toast.error('Team management tables not found. Please contact support to set up the database.')
+        } else {
+          toast.error(data.error || 'Failed to create team')
+        }
       }
     } catch (error) {
       console.error('Error creating team:', error)
