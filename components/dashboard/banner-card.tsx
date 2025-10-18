@@ -24,6 +24,7 @@ import {
 import Link from 'next/link'
 import { NewBadge } from '@/components/ui/new-badge'
 import { needsMigration } from '@/lib/banner-migration'
+import { BannerPreview } from '@/components/banner/banner-preview'
 
 interface Banner {
   id: string
@@ -135,13 +136,19 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
       <CardContent className="pt-0">
         <div className="space-y-4">
           {/* Banner Preview */}
-          <div className="aspect-video bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-muted-foreground/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                <Settings className="w-6 h-6 text-muted-foreground/50" />
+          <div className="aspect-video bg-muted/50 rounded-lg border border-border/50 overflow-hidden">
+            {banner.config ? (
+              <BannerPreview config={banner.config} />
+            ) : (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-muted-foreground/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Banner Preview</p>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground">Banner Preview</p>
-            </div>
+            )}
           </div>
 
           {/* Banner Info */}
