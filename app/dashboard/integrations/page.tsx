@@ -49,7 +49,7 @@ export default function IntegrationsPage() {
 
   const loadBannerConfig = async () => {
     try {
-      const response = await fetch('/api/banners')
+      const response = await fetch('/api/banners/simple')
       const data = await response.json()
       
       if (response.ok && data.banners && data.banners.length > 0) {
@@ -105,7 +105,7 @@ export default function IntegrationsPage() {
         }
       }
 
-      const updateResponse = await fetch(`/api/banners/${bannerId}`, {
+      const updateResponse = await fetch(`/api/banners/simple/${bannerId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

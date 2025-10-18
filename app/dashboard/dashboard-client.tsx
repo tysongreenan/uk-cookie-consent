@@ -43,7 +43,7 @@ export function DashboardClient() {
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // 'grid' or 'list'
   const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
-  const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number } | null>(null)
+  const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number; userRole: string } | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -60,7 +60,7 @@ export function DashboardClient() {
 
   const fetchBanners = async () => {
     try {
-      const response = await fetch('/api/banners')
+      const response = await fetch('/api/banners/simple')
       const data = await response.json()
       
       if (response.ok) {
@@ -90,7 +90,8 @@ export function DashboardClient() {
       if (response.ok && data.success) {
         setTeamInfo({
           name: data.data.name,
-          memberCount: data.data.memberCount || 1
+          memberCount: data.data.memberCount || 1,
+          userRole: data.data.userRole || 'owner'
         })
       }
     } catch (error) {
@@ -102,7 +103,7 @@ export function DashboardClient() {
     if (!confirm('Are you sure you want to delete this banner?')) return
 
     try {
-      const response = await fetch(`/api/banners/${bannerId}`, {
+      const response = await fetch(`/api/banners/simple/${bannerId}`, {
         method: 'DELETE',
       })
 
@@ -121,7 +122,7 @@ export function DashboardClient() {
 
   const toggleBanner = async (bannerId: string, isActive: boolean) => {
     try {
-      const response = await fetch(`/api/banners/${bannerId}`, {
+      const response = await fetch(`/api/banners/simple/${bannerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ export function DashboardClient() {
 
   const copyBannerCode = async (bannerId: string) => {
     try {
-      const response = await fetch(`/api/banners/${bannerId}/code`)
+      const response = await fetch(`/api/banners/simple/${bannerId}/code`)
       if (!response.ok) {
         throw new Error('Failed to fetch banner code')
       }
@@ -257,9 +258,9 @@ export function DashboardClient() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {getRoleIcon(session?.user?.userRole || '')}
-                  <Badge className={getRoleBadgeColor(session?.user?.userRole || '')}>
-                    {session?.user?.userRole || 'member'}
+                  {getRoleIcon(teamInfo.userRole || '')}
+                  <Badge className={getRoleBadgeColor(teamInfo.userRole || '')}>
+                    {teamInfo.userRole || 'member'}
                   </Badge>
                 </div>
               </div>

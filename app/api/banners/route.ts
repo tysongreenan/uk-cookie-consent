@@ -57,98 +57,94 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions)
     let currentTeamId = session?.user?.currentTeamId || (session?.user as any)?.current_team_id
 
-    // If user doesn't have a team, create one for them
+    console.log('🔍 Banners: User session:', session?.user?.id, 'currentTeamId:', currentTeamId)
+
+    // If user doesn't have a team, this should not happen for registered users
     if (!currentTeamId && session?.user) {
-      try {
-        // Create a default team for the user
-        const teamId = crypto.randomUUID()
-        const memberId = crypto.randomUUID()
-        
-        const { data: team, error: teamError } = await supabase
-          .from('Team')
-          .insert({
-            id: teamId,
-            name: `${session.user.name || session.user.email}'s Team`,
-            owner_id: session.user.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single()
-
-        if (teamError) {
-          console.error('Error creating team:', teamError)
-          return NextResponse.json(
-            { error: 'Failed to create team' },
-            { status: 500 }
-          )
-        }
-
-        // Add user as owner of the team
-        const { error: memberError } = await supabase
-          .from('TeamMember')
-          .insert({
-            id: memberId,
-            team_id: team.id,
-            user_id: session.user.id,
-            role: 'owner',
-            invited_by: session.user.id,
-            joined_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-
-        if (memberError) {
-          console.error('Error adding user as team member:', memberError)
-          // Clean up the team if member creation fails
-          await supabase.from('Team').delete().eq('id', team.id)
-          return NextResponse.json(
-            { error: 'Failed to add user to team' },
-            { status: 500 }
-          )
-        }
-
-        // Update user's current_team_id
-        const { error: updateError } = await supabase
+      console.warn('❌ Banners: User has no workspace - this should not happen for registered users:', session.user.id)
+      
+      // Check if workspace exists in database but session is not updated
+      const { data: existingTeamMember } = await supabase
+        .from('TeamMember')
+        .select('team_id, role')
+        .eq('user_id', session.user.id)
+        .limit(1)
+        .maybeSingle()
+      
+      if (existingTeamMember) {
+        console.log('✅ Banners: Found existing workspace in database:', existingTeamMember.team_id)
+        // Update the user's current_team_id in the database
+        await supabase
           .from('User')
-          .update({ current_team_id: team.id })
+          .update({ current_team_id: existingTeamMember.team_id })
           .eq('id', session.user.id)
-
-        if (updateError) {
-          console.error('Error updating user current_team_id:', updateError)
-          // Don't fail the request for this
-        }
-
-        // Use the newly created team
-        currentTeamId = team.id
-      } catch (error) {
-        console.error('Error setting up team for user:', error)
+        
+        currentTeamId = existingTeamMember.team_id
+        console.log('✅ Banners: Updated user current_team_id to:', currentTeamId)
+      } else {
+        console.error('❌ Banners: No workspace found for user - they need to contact support')
         return NextResponse.json(
-          { error: 'Failed to set up team' },
-          { status: 500 }
+          { error: 'No workspace found. Please contact support.' },
+          { status: 400 }
         )
       }
     }
 
-    // Get team's projects
-    const { data: projects, error: projectError } = await supabase
+    // Get user's own projects (workspace owner) and projects where user is a collaborator
+    const { data: ownProjects, error: ownProjectError } = await supabase
       .from('Project')
       .select('id')
-      .eq('teamId', currentTeamId)
+      .eq('team_id', currentTeamId)
 
-    if (projectError || !projects || projects.length === 0) {
-      console.log('No projects found for team')
+    // Also get projects where user is a team member (collaborator)
+    const { data: memberProjects, error: memberProjectError } = await supabase
+      .from('TeamMember')
+      .select(`
+        team_id,
+        Team!inner(
+          Project(id)
+        )
+      `)
+      .eq('user_id', session?.user?.id)
+
+    const allProjectIds = new Set<string>()
+    
+    // Add user's own projects (workspace owner)
+    if (ownProjects) {
+      ownProjects.forEach(p => allProjectIds.add(p.id))
+    }
+    
+    // Add projects where user is a collaborator
+    if (memberProjects) {
+      memberProjects.forEach(mp => {
+        if (mp.Team && Array.isArray(mp.Team)) {
+          mp.Team.forEach(team => {
+            if (team.Project && Array.isArray(team.Project)) {
+              team.Project.forEach(project => allProjectIds.add(project.id))
+            }
+          })
+        }
+      })
+    }
+
+    if (ownProjectError || memberProjectError) {
+      console.error('Error fetching projects:', ownProjectError || memberProjectError)
+      return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 })
+    }
+
+    if (allProjectIds.size === 0) {
+      console.log('No projects found for user')
       return NextResponse.json({ banners: [] })
     }
 
-    const projectIds = projects.map(p => p.id)
+    const projectIds = Array.from(allProjectIds)
     
     // Get banners for these projects
     const { data: banners, error } = await supabase
       .from('ConsentBanner')
       .select(`
         id, name, config, isActive, createdAt, updatedAt,
-        Project!inner(teamId)
+        Project!inner(team_id)
       `)
       .in('projectId', projectIds)
       .order('createdAt', { ascending: false })
@@ -219,76 +215,34 @@ export async function POST(request: NextRequest) {
     let currentTeamId = (session?.user as any)?.current_team_id
     let userRole = session?.user?.userRole
 
-    // If user doesn't have a team, create one for them
+    // If user doesn't have a team, this should not happen for registered users
     if (!currentTeamId && session?.user) {
-      try {
-        // Create a default team for the user
-        const teamId = crypto.randomUUID()
-        const memberId = crypto.randomUUID()
-        
-        const { data: team, error: teamError } = await supabase
-          .from('Team')
-          .insert({
-            id: teamId,
-            name: `${session.user.name || session.user.email}'s Team`,
-            owner_id: session.user.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single()
-
-        if (teamError) {
-          console.error('Error creating team:', teamError)
-          return NextResponse.json(
-            { error: 'Failed to create team' },
-            { status: 500 }
-          )
-        }
-
-        // Add user as owner of the team
-        const { error: memberError } = await supabase
-          .from('TeamMember')
-          .insert({
-            id: memberId,
-            team_id: team.id,
-            user_id: session.user.id,
-            role: 'owner',
-            invited_by: session.user.id,
-            joined_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-
-        if (memberError) {
-          console.error('Error adding user as team member:', memberError)
-          // Clean up the team if member creation fails
-          await supabase.from('Team').delete().eq('id', team.id)
-          return NextResponse.json(
-            { error: 'Failed to add user to team' },
-            { status: 500 }
-          )
-        }
-
-        // Update user's current_team_id
-        const { error: updateError } = await supabase
+      console.warn('❌ Banners POST: User has no workspace - this should not happen for registered users:', session.user.id)
+      
+      // Check if workspace exists in database but session is not updated
+      const { data: existingTeamMember } = await supabase
+        .from('TeamMember')
+        .select('team_id, role')
+        .eq('user_id', session.user.id)
+        .limit(1)
+        .maybeSingle()
+      
+      if (existingTeamMember) {
+        console.log('✅ Banners POST: Found existing workspace in database:', existingTeamMember.team_id)
+        // Update the user's current_team_id in the database
+        await supabase
           .from('User')
-          .update({ current_team_id: team.id })
+          .update({ current_team_id: existingTeamMember.team_id })
           .eq('id', session.user.id)
-
-        if (updateError) {
-          console.error('Error updating user current_team_id:', updateError)
-          // Don't fail the request for this
-        }
-
-        // Use the newly created team
-        currentTeamId = team.id
-        userRole = 'owner'
-      } catch (error) {
-        console.error('Error setting up team for user:', error)
+        
+        currentTeamId = existingTeamMember.team_id
+        userRole = existingTeamMember.role
+        console.log('✅ Banners POST: Updated user current_team_id to:', currentTeamId)
+      } else {
+        console.error('❌ Banners POST: No workspace found for user - they need to contact support')
         return NextResponse.json(
-          { error: 'Failed to set up team' },
-          { status: 500 }
+          { error: 'No workspace found. Please contact support.' },
+          { status: 400 }
         )
       }
     }
@@ -337,7 +291,7 @@ export async function POST(request: NextRequest) {
     const { data: existingProject, error: projectError } = await supabase
       .from('Project')
       .select('id')
-      .eq('teamId', currentTeamId)
+      .eq('team_id', currentTeamId)
       .single()
 
     if (projectError || !existingProject) {
@@ -349,7 +303,7 @@ export async function POST(request: NextRequest) {
           id: projectId,
           name: 'Team Cookie Banners',
           userId: user.userId,
-          teamId: currentTeamId,
+          team_id: currentTeamId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         })

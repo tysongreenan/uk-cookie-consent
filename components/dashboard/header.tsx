@@ -11,7 +11,8 @@ import {
   User, 
   Settings, 
   LogOut, 
-  ChevronDown
+  ChevronDown,
+  UserPlus
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -23,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
+import { InviteMemberModal } from './invite-member-modal'
+import { canAccessFeature } from '@/lib/plan-restrictions'
 
 interface HeaderProps {}
 
@@ -30,6 +33,11 @@ export function DashboardHeader({}: HeaderProps) {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
   const [notifications] = useState(3) // Mock notification count
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  
+  // Check if user has Pro plan (temporarily set to 'pro' for testing)
+  const userPlan = 'pro' // TODO: Get actual user plan from database
+  const canInvite = canAccessFeature(userPlan, 'hasTeamCollaboration')
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' })
@@ -37,8 +45,11 @@ export function DashboardHeader({}: HeaderProps) {
 
   return (
     <header className="w-full border-b border-border bg-background">
-      <div className="flex h-16 items-center justify-end px-4 sm:px-6">
-        {/* Notifications, Theme, User */}
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+        {/* Left side - empty since workspace switcher is now in sidebar */}
+        <div></div>
+
+        {/* Right side - Notifications, Invite, Theme, User */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative" asChild>
@@ -54,6 +65,27 @@ export function DashboardHeader({}: HeaderProps) {
               )}
             </Link>
           </Button>
+
+          {/* Invite Button */}
+          {canInvite ? (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowInviteModal(true)}
+              title="Invite collaborators to your workspace"
+            >
+              <UserPlus className="h-5 w-5" />
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              disabled
+              title="Upgrade to Pro to invite collaborators"
+            >
+              <UserPlus className="h-5 w-5" />
+            </Button>
+          )}
 
           {/* Theme Toggle */}
           <Button
@@ -106,6 +138,14 @@ export function DashboardHeader({}: HeaderProps) {
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <InviteMemberModal 
+          onClose={() => setShowInviteModal(false)}
+          onSuccess={() => setShowInviteModal(false)}
+        />
+      )}
     </header>
   )
 }

@@ -17,7 +17,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
-  Mail, 
   Copy, 
   CheckCircle, 
   XCircle, 
@@ -39,7 +38,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
   const { data: session } = useSession()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Exclude<TeamRole, 'owner'>>('editor')
-  const [sendEmail, setSendEmail] = useState(true)
+  // Removed sendEmail since we're using link-based invitations only
   const [loading, setLoading] = useState(false)
   const [inviteLink, setInviteLink] = useState('')
   const [inviteSent, setInviteSent] = useState(false)
@@ -52,20 +51,16 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
       return
     }
 
-    if (!session?.user?.currentTeamId) {
-      toast.error('No team selected')
-      return
-    }
+    // Workspace invitations don't require a team - they're tied to the user's workspace
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/teams/${session.user.currentTeamId}/invitations`, {
+      const response = await fetch('/api/workspace/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
-          role,
-          sendEmail
+          role
         })
       })
 
@@ -105,7 +100,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
       case 'viewer':
         return <Eye className="h-4 w-4 text-gray-600" />
       default:
-        return <Mail className="h-4 w-4 text-gray-600" />
+        return <LinkIcon className="h-4 w-4 text-gray-600" />
     }
   }
 
@@ -152,7 +147,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
           <div className="space-y-4">
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Mail className="h-4 w-4 text-green-600" />
+                <LinkIcon className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-800">{email}</span>
                 <Badge className={getRoleBadgeColor(role)}>
                   {role}
@@ -180,7 +175,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
                 </Button>
               </div>
               <p className="text-xs text-gray-600">
-                Share this link with {email} to join your team
+                Share this link with your collaborator to join your workspace
               </p>
             </div>
 
@@ -204,11 +199,11 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Mail className="h-5 w-5" />
+            <LinkIcon className="h-5 w-5" />
             <span>Invite Team Member</span>
           </DialogTitle>
           <DialogDescription>
-            Send an invitation to join your team with a specific role.
+            Generate a shareable link to invite someone to join your workspace with a specific role.
           </DialogDescription>
         </DialogHeader>
 
@@ -266,25 +261,12 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
             </p>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="send-email"
-              checked={sendEmail}
-              onCheckedChange={setSendEmail}
-            />
-            <Label htmlFor="send-email" className="text-sm">
-              Send email invitation
-            </Label>
-          </div>
-
-          {!sendEmail && (
-            <Alert>
-              <LinkIcon className="h-4 w-4" />
-              <AlertDescription>
-                An invite link will be generated that you can share manually.
-              </AlertDescription>
-            </Alert>
-          )}
+          <Alert>
+            <LinkIcon className="h-4 w-4" />
+            <AlertDescription>
+              A shareable invite link will be generated that you can send via email, Slack, or any other method.
+            </AlertDescription>
+          </Alert>
 
           <div className="flex space-x-2">
             <Button type="submit" disabled={loading} className="flex-1">
@@ -295,8 +277,8 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
                 </>
               ) : (
                 <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Send Invitation
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Generate Invite Link
                 </>
               )}
             </Button>

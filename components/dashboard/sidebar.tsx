@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { NewBadge } from '@/components/ui/new-badge'
-import { TeamSwitcher } from '@/components/dashboard/team-switcher'
+import { WorkspaceSwitcher } from '@/components/dashboard/workspace-switcher'
 
 interface NavItem {
   title: string
@@ -156,9 +156,9 @@ export function Sidebar({ className }: SidebarProps) {
         </Link>
       </div>
 
-      {/* Team Switcher */}
+      {/* Workspace Switcher */}
       <div className="p-4 border-b border-border">
-        <TeamSwitcher />
+        <WorkspaceSwitcher />
       </div>
 
       {/* Navigation */}

@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { requireTeamPermission } from '@/lib/team-permissions'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// GET /api/teams/[teamId]/members - List team members
+// GET /api/teams/[teamId]/members - Get team members
 export async function GET(
   request: NextRequest,
   { params }: { params: { teamId: string } }
@@ -17,72 +16,64 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { teamId } = params
 
-    // Check if user has permission to view team members
-    const permissionResult = await requireTeamPermission(
-      session.user.id,
-      teamId,
-      'view'
-    )
+    // Verify user is a member of this team
+    const { data: teamMember, error: memberError } = await supabase
+      .from('TeamMember')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .single()
 
-    if (!permissionResult.success) {
-      return NextResponse.json(
-        { error: permissionResult.error },
-        { status: 403 }
-      )
+    if (memberError || !teamMember) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    // Get team members with user details
+    // Get all team members with user details
     const { data: members, error } = await supabase
       .from('TeamMember')
       .select(`
         id,
+        user_id,
         role,
         joined_at,
-        created_at,
         User!inner(
-          id,
           name,
           email,
           image
         )
       `)
       .eq('team_id', teamId)
-      .order('joined_at', { ascending: false })
+      .order('joined_at', { ascending: true })
 
     if (error) {
       console.error('Error fetching team members:', error)
-      return NextResponse.json(
-        { error: 'Failed to fetch team members' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch team members' }, { status: 500 })
     }
 
-    const formattedMembers = members?.map(member => ({
+    // Transform the data to match our interface
+    const transformedMembers = members.map(member => ({
       id: member.id,
+      user_id: member.user_id,
       role: member.role,
-      joinedAt: member.joined_at,
-      createdAt: member.created_at,
-      user: member.User
-    })) || []
+      joined_at: member.joined_at,
+      user: {
+        name: member.User?.[0]?.name || null,
+        email: member.User?.[0]?.email || '',
+        image: member.User?.[0]?.image || null
+      }
+    }))
 
     return NextResponse.json({
       success: true,
-      data: formattedMembers
+      data: transformedMembers
     })
-
   } catch (error) {
-    console.error('Get team members error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Error in GET /api/teams/[teamId]/members:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -6,38 +6,32 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// GET /api/invitations/[token] - Get invitation details (public)
+// GET /api/invitations/[token] - Get invitation details
 export async function GET(
   request: NextRequest,
   { params }: { params: { token: string } }
 ) {
   try {
-    const { token } = params
-
-    // Get invitation details
     const { data: invitation, error } = await supabase
       .from('TeamInvitation')
       .select(`
-        id,
-        email,
-        role,
-        expires_at,
-        status,
-        created_at,
+        *,
         Team!inner(
           id,
-          name
+          name,
+          owner_id
         ),
-        User!inner(
+        InvitedBy:User!TeamInvitation_invited_by_fkey(
           id,
           name,
           email
         )
       `)
-      .eq('token', token)
+      .eq('token', params.token)
       .single()
 
-    if (error || !invitation) {
+    if (error) {
+      console.error('Error fetching invitation:', error)
       return NextResponse.json(
         { error: 'Invitation not found' },
         { status: 404 }
@@ -45,42 +39,24 @@ export async function GET(
     }
 
     // Check if invitation is expired
-    const now = new Date()
-    const expiresAt = new Date(invitation.expires_at)
-    
-    if (now > expiresAt) {
-      // Mark as expired
-      await supabase
-        .from('TeamInvitation')
-        .update({ status: 'expired' })
-        .eq('id', invitation.id)
-      
+    if (new Date(invitation.expires_at) < new Date()) {
       return NextResponse.json(
         { error: 'Invitation has expired' },
-        { status: 410 }
+        { status: 400 }
       )
     }
 
-    // Check if invitation is already accepted or revoked
+    // Check if invitation is already accepted
     if (invitation.status !== 'pending') {
       return NextResponse.json(
-        { error: `Invitation has been ${invitation.status}` },
-        { status: 410 }
+        { error: 'Invitation has already been processed' },
+        { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      data: {
-        id: invitation.id,
-        email: invitation.email,
-        role: invitation.role,
-        expiresAt: invitation.expires_at,
-        status: invitation.status,
-        createdAt: invitation.created_at,
-        team: invitation.Team,
-        inviter: invitation.User
-      }
+      invitation
     })
 
   } catch (error) {

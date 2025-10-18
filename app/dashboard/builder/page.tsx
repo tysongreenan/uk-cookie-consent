@@ -334,7 +334,7 @@ export default function BannerBuilderPage() {
   const loadBannerForEdit = async (id: string) => {
     setIsLoadingBanner(true)
     try {
-      const response = await fetch(`/api/banners/${id}`)
+      const response = await fetch(`/api/banners/simple/${id}`)
       const data = await response.json()
       
       if (response.ok) {
@@ -357,7 +357,7 @@ export default function BannerBuilderPage() {
           
           // Auto-save the migrated configuration
           try {
-            await fetch(`/api/banners/${id}`, {
+            await fetch(`/api/banners/simple/${id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -469,7 +469,7 @@ export default function BannerBuilderPage() {
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      const url = isEditing ? `/api/banners/${bannerId}` : '/api/banners'
+      const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
       const method = isEditing ? 'PUT' : 'POST'
       
       const response = await fetch(url, {

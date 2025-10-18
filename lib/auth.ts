@@ -1,3 +1,16 @@
+/**
+ * Authentication Configuration
+ * 
+ * Workspace Creation Flow:
+ * 1. Personal workspace is created during user registration (/api/auth/register) - SINGLE SOURCE OF TRUTH
+ * 2. Auth flow retrieves existing workspace - DOES NOT CREATE new workspaces
+ * 3. Banners route retrieves existing workspace - DOES NOT CREATE new workspaces  
+ * 4. Users can be invited to additional workspaces via invitation system
+ * 5. Users can switch between workspaces using workspace switcher
+ * 
+ * IMPORTANT: Only registration endpoint creates workspaces. All other endpoints only retrieve.
+ */
+
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { createClient } from '@supabase/supabase-js'
@@ -58,20 +71,39 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Get user's current team and role
-          const { data: teamMember } = await supabase
+          console.log('🔍 Auth: Looking up team for user:', user.id)
+          let { data: teamMember } = await supabase
             .from('TeamMember')
-            .select(`
-              role,
-              team_id,
-              Team!inner(
-                id,
-                name
-              )
-            `)
+            .select('role, team_id')
             .eq('user_id', user.id)
             .order('joined_at', { ascending: false })
             .limit(1)
             .maybeSingle()
+          
+          console.log('🔍 Auth: TeamMember query result:', teamMember)
+
+          // If user has no team, this should not happen for registered users
+          if (!teamMember) {
+            console.warn('❌ Auth: User has no workspace - this should not happen for registered users:', user.id)
+            
+            // As a fallback, check if workspace exists but query failed
+            const { data: fallbackCheck } = await supabase
+              .from('TeamMember')
+              .select('team_id, role')
+              .eq('user_id', user.id)
+              .limit(1)
+              .maybeSingle()
+            
+            if (fallbackCheck) {
+              console.log('✅ Auth: Found workspace via fallback check:', fallbackCheck.team_id)
+              teamMember = {
+                role: fallbackCheck.role,
+                team_id: fallbackCheck.team_id
+              }
+            } else {
+              console.error('❌ Auth: No workspace found for user - they need to contact support')
+            }
+          }
 
           // Update last login time (only update existing fields)
           await supabase
@@ -86,7 +118,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             rememberMe: credentials.rememberMe === 'true',
-            currentTeamId: teamMember?.Team?.[0]?.id || teamMember?.team_id || null,
+            currentTeamId: teamMember?.team_id || null,
             userRole: teamMember?.role || 'owner'
           }
         } catch (error) {

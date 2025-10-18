@@ -14,29 +14,29 @@ export async function POST(
   { params }: { params: { token: string } }
 ) {
   try {
-    const { token } = params
     const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'You must be logged in to accept an invitation' },
+        { status: 401 }
+      )
+    }
 
     // Get invitation details
-    const { data: invitation, error: inviteError } = await supabase
+    const { data: invitation, error: invitationError } = await supabase
       .from('TeamInvitation')
       .select(`
-        id,
-        team_id,
-        email,
-        role,
-        invited_by,
-        expires_at,
-        status,
+        *,
         Team!inner(
           id,
-          name
+          name,
+          owner_id
         )
       `)
-      .eq('token', token)
+      .eq('token', params.token)
       .single()
 
-    if (inviteError || !invitation) {
+    if (invitationError || !invitation) {
       return NextResponse.json(
         { error: 'Invitation not found' },
         { status: 404 }
@@ -44,48 +44,22 @@ export async function POST(
     }
 
     // Check if invitation is expired
-    const now = new Date()
-    const expiresAt = new Date(invitation.expires_at)
-    
-    if (now > expiresAt) {
-      // Mark as expired
-      await supabase
-        .from('TeamInvitation')
-        .update({ status: 'expired' })
-        .eq('id', invitation.id)
-      
+    if (new Date(invitation.expires_at) < new Date()) {
       return NextResponse.json(
         { error: 'Invitation has expired' },
-        { status: 410 }
-      )
-    }
-
-    // Check if invitation is already accepted or revoked
-    if (invitation.status !== 'pending') {
-      return NextResponse.json(
-        { error: `Invitation has been ${invitation.status}` },
-        { status: 410 }
-      )
-    }
-
-    // If user is not logged in, redirect to signup with token
-    if (!session?.user?.id) {
-      return NextResponse.json({
-        success: false,
-        redirect: `/auth/signup?invite=${token}`,
-        message: 'Please sign up or sign in to accept the invitation'
-      })
-    }
-
-    // Check if user email matches invitation email
-    if (session.user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
-      return NextResponse.json(
-        { error: 'This invitation is for a different email address' },
         { status: 400 }
       )
     }
 
-    // Check if user is already a member of the team
+    // Check if invitation is already processed
+    if (invitation.status !== 'pending') {
+      return NextResponse.json(
+        { error: 'Invitation has already been processed' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user is already a member of this team
     const { data: existingMember } = await supabase
       .from('TeamMember')
       .select('id')
@@ -95,17 +69,16 @@ export async function POST(
 
     if (existingMember) {
       return NextResponse.json(
-        { error: 'You are already a member of this team' },
+        { error: 'You are already a member of this workspace' },
         { status: 400 }
       )
     }
 
     // Add user to team
-    const memberId = crypto.randomUUID()
     const { error: memberError } = await supabase
       .from('TeamMember')
       .insert({
-        id: memberId,
+        id: crypto.randomUUID(),
         team_id: invitation.team_id,
         user_id: session.user.id,
         role: invitation.role,
@@ -118,44 +91,32 @@ export async function POST(
     if (memberError) {
       console.error('Error adding user to team:', memberError)
       return NextResponse.json(
-        { error: 'Failed to join team' },
+        { error: 'Failed to join workspace' },
         { status: 500 }
       )
     }
 
-    // Mark invitation as accepted
-    const { error: acceptError } = await supabase
+    // Update invitation status
+    const { error: updateError } = await supabase
       .from('TeamInvitation')
-      .update({
+      .update({ 
         status: 'accepted',
-        accepted_at: new Date().toISOString()
+        updated_at: new Date().toISOString()
       })
       .eq('id', invitation.id)
 
-    if (acceptError) {
-      console.error('Error marking invitation as accepted:', acceptError)
-      // Don't fail the request for this
-    }
-
-    // Set as user's current team
-    const { error: updateError } = await supabase
-      .from('User')
-      .update({ current_team_id: invitation.team_id })
-      .eq('id', session.user.id)
-
     if (updateError) {
-      console.error('Error updating user current team:', updateError)
+      console.error('Error updating invitation status:', updateError)
       // Don't fail the request for this
     }
+
+    // Don't auto-switch user's current workspace
+    // User can switch to the invited workspace via the workspace switcher
 
     return NextResponse.json({
       success: true,
-      data: {
-        teamId: invitation.team_id,
-        teamName: invitation.Team[0]?.name || 'Unknown Team',
-        role: invitation.role
-      },
-      message: `Successfully joined ${invitation.Team[0]?.name || 'Unknown Team'} as ${invitation.role}`
+      message: 'Successfully joined the workspace!',
+      team: invitation.Team
     })
 
   } catch (error) {

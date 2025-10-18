@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { CreateTeamForm } from '@/types'
+import { canAccessFeature } from '@/lib/plan-restrictions'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,6 +27,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Team name is required' },
         { status: 400 }
+      )
+    }
+
+    // Check if user has team collaboration access (Pro plan required)
+    const userPlan = 'pro' // TODO: Get actual user plan from database - temporarily set to 'pro' for testing
+    if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
+      return NextResponse.json(
+        { 
+          error: 'Team collaboration requires a Pro plan. Please upgrade to create teams.',
+          upgradeRequired: true,
+          feature: 'Team Collaboration'
+        },
+        { status: 403 }
       )
     }
 

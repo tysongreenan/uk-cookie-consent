@@ -91,6 +91,63 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Create personal workspace for new user
+    console.log('🏗️ Registration: Creating personal workspace for user:', user.id)
+    try {
+      const teamId = crypto.randomUUID()
+      const memberId = crypto.randomUUID()
+      const firstName = sanitizedName?.split(' ')[0] || sanitizedEmail.split('@')[0] || 'User'
+      console.log('🏗️ Registration: Generated teamId:', teamId, 'firstName:', firstName)
+      
+      // Create personal team/workspace
+      const { data: newTeam, error: teamError } = await supabase
+        .from('Team')
+        .insert({
+          id: teamId,
+          name: `${firstName}'s Workspace`,
+          owner_id: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select('id, name')
+        .single()
+
+      if (teamError) {
+        console.error('❌ Registration: Error creating personal workspace:', teamError)
+      } else {
+        console.log('✅ Registration: Team created successfully:', newTeam)
+        // Add user as owner of personal workspace
+        const { error: memberError } = await supabase
+          .from('TeamMember')
+          .insert({
+            id: memberId,
+            team_id: teamId,
+            user_id: user.id,
+            role: 'owner',
+            invited_by: user.id,
+            joined_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+
+        if (memberError) {
+          console.error('❌ Registration: Error adding user to workspace:', memberError)
+        } else {
+          console.log('✅ Registration: TeamMember created successfully')
+          // Set current_team_id for the user
+          await supabase
+            .from('User')
+            .update({ current_team_id: teamId })
+            .eq('id', user.id)
+          
+          console.log('✅ Registration: Personal workspace created for user:', user.id, 'teamId:', teamId)
+        }
+      }
+    } catch (error) {
+      console.error('Workspace creation error:', error)
+      // Don't fail registration if workspace creation fails
+    }
+
     // Create banner if bannerConfig is provided
     if (bannerConfig) {
       try {
