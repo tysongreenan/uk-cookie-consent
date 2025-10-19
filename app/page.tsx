@@ -1,7 +1,10 @@
 import { Metadata } from 'next'
 import { Hero } from '@/components/landing/hero'
 import { ValueStack } from '@/components/landing/value-stack'
-import { InteractiveDemo } from '@/components/landing/interactive-demo'
+import { LiveBannerRotator } from '@/components/landing/visuals/core/LiveBannerRotator'
+import { BrandColorPicker } from '@/components/landing/visuals/core/BrandColorPicker'
+import { SetupSpeedometer } from '@/components/landing/visuals/core/SetupSpeedometer'
+import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
 import { CanadianComplianceSection } from '@/components/compliance/canadian-compliance-section'
 import { WhyFree } from '@/components/landing/why-free'
 import { SEOTextBlock } from '@/components/landing/seo-text-block'
@@ -31,7 +34,51 @@ export default function HomePage() {
       <main>
         <Hero />
         <ValueStack />
-        <InteractiveDemo />
+        
+        {/* Live Banner Rotator - Shows different brand styles */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                See It In Action — Live Banner Examples
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Watch as we cycle through different brand styles. Each banner is fully customizable and GDPR compliant.
+              </p>
+            </div>
+            <LiveBannerRotator />
+          </div>
+        </section>
+
+        {/* Brand Color Picker - Interactive customization */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Customize Your Brand Colors
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Pick any color and see your banner update instantly. Perfect brand matching in seconds.
+              </p>
+            </div>
+            <BrandColorPicker />
+          </div>
+        </section>
+
+        {/* Speed Comparison - 5 min vs 3+ hours */}
+        <section className="py-16 bg-blue-50">
+          <div className="container mx-auto px-4">
+            <SetupSpeedometer />
+          </div>
+        </section>
+
+        {/* 3-Step Process */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <ThreeStepAnimation />
+          </div>
+        </section>
+
         <CanadianComplianceSection />
         <WhyFree />
         <SEOTextBlock />

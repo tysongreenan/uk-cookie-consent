@@ -4,6 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Code, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, Download, ExternalLink, Shield } from 'lucide-react'
+import { CodeCopyBlock } from '@/components/landing/visuals/integration/CodeCopyBlock'
+import { ThreeStepInstallation } from '@/components/landing/visuals/integration/ThreeStepInstallation'
+import { PluginComparisonTable } from '@/components/landing/visuals/integration/PluginComparisonTable'
+import { BeforeAfterSlider } from '@/components/landing/visuals/integration/BeforeAfterSlider'
 
 export const metadata: Metadata = {
   title: 'WordPress Cookie Banner Integration | GDPR Plugin Alternative 2025',
@@ -26,16 +30,23 @@ export default function WordPressIntegrationPage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-blue-500 text-white">WordPress Integration</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              WordPress Cookie Banner
-              <span className="block text-blue-200">Integration Guide</span>
+              WordPress Cookie Banner — Copy, Paste, Done in 5 Minutes
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Step-by-step WordPress cookie banner integration. Easy GDPR compliance without plugins. Better performance than Cookie Notice, CookieBot alternatives.
-            </p>
+            <div className="space-y-3 mb-8">
+              <p className="text-lg font-semibold text-white">
+                ✓ Save 3+ Hours vs WordPress Plugins
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Avoid $20K+ GDPR Fines Automatically
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Copy & Paste in 5 Minutes
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
                 <Code className="mr-2 h-5 w-5" />
-                Get WordPress Code
+                Create My WordPress Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <Download className="mr-2 h-5 w-5" />
@@ -52,11 +63,8 @@ export default function WordPressIntegrationPage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Why Choose Our WordPress Cookie Banner?
+                Why WordPress Needs Cookie Consent
               </h2>
-              <p className="text-xl text-gray-600">
-                Superior to popular WordPress cookie plugins in every way
-              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -68,6 +76,9 @@ export default function WordPressIntegrationPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <p className="text-lg font-semibold text-gray-900">
+                    Save 3+ Hours vs WordPress Plugins
+                  </p>
                   <p className="text-gray-600">
                     No plugin overhead. Our solution loads in under 50ms compared to 200ms+ for most WordPress cookie plugins.
                   </p>
@@ -148,128 +159,31 @@ export default function WordPressIntegrationPage() {
         </div>
       </section>
 
-      {/* Comparison Table */}
+      {/* Visual Before/After */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                WordPress Cookie Plugin Comparison
-              </h2>
-              <p className="text-xl text-gray-600">
-                See how we compare to popular WordPress cookie plugins
-              </p>
-            </div>
+          <BeforeAfterSlider />
+        </div>
+      </section>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Feature</th>
-                    <th className="border border-gray-300 px-4 py-3 text-center font-semibold bg-green-50">Our Solution</th>
-                    <th className="border border-gray-300 px-4 py-3 text-center font-semibold">Cookie Notice</th>
-                    <th className="border border-gray-300 px-4 py-3 text-center font-semibold">CookieBot</th>
-                    <th className="border border-gray-300 px-4 py-3 text-center font-semibold">GDPR Cookie Compliance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border border-gray-300 px-4 py-3 font-medium">Setup Time</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                      <span className="text-sm text-green-600">5 minutes</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">30+ minutes</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">45+ minutes</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">60+ minutes</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-3 font-medium">Performance Impact</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                      <span className="text-sm text-green-600">Minimal</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Moderate</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-red-500 mx-auto" />
-                      <span className="text-sm text-red-600">High</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Moderate</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-gray-300 px-4 py-3 font-medium">GDPR Compliance</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                    </td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-3 font-medium">Customization</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                      <span className="text-sm text-green-600">Unlimited</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Limited</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Limited</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Limited</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-gray-300 px-4 py-3 font-medium">Cost</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <span className="text-lg font-bold text-green-600">Free</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">Free</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <span className="text-lg font-bold text-red-600">$9-199/month</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">Free</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-3 font-medium">Plugin Conflicts</td>
-                    <td className="border border-gray-300 px-4 py-3 text-center bg-green-50">
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                      <span className="text-sm text-green-600">None</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Possible</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Possible</span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-3 text-center">
-                      <AlertTriangle className="h-5 w-5 text-orange-500 mx-auto" />
-                      <span className="text-sm text-orange-600">Possible</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+      {/* Code Integration */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <CodeCopyBlock />
+        </div>
+      </section>
+
+      {/* Installation Steps */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <ThreeStepInstallation />
+        </div>
+      </section>
+
+      {/* Plugin Comparison */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <PluginComparisonTable />
         </div>
       </section>
 

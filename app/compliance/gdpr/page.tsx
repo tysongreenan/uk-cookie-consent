@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock } from 'lucide-react'
+import { ComplianceBadgeAnimator } from '@/components/landing/visuals/compliance/ComplianceBadgeAnimator'
+import { ConsentFlowDiagram } from '@/components/landing/visuals/compliance/ConsentFlowDiagram'
+import { BannerTextPreview } from '@/components/landing/visuals/compliance/BannerTextPreview'
 
 export const metadata: Metadata = {
   title: 'GDPR Cookie Consent Requirements | Complete Compliance Guide 2025',
@@ -26,16 +29,23 @@ export default function GDPRCompliancePage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-blue-500 text-white">EU Privacy Law</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              GDPR Cookie Consent
-              <span className="block text-blue-200">Requirements Guide</span>
+              GDPR Compliance Made Simple — 100% Automatic
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Complete compliance guide for EU businesses. Learn what you need to know about GDPR cookie consent requirements, implementation, and best practices.
-            </p>
+            <div className="space-y-3 mb-8">
+              <p className="text-lg font-semibold text-white">
+                ✓ Avoid €20M+ GDPR Fines Automatically
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Save 10+ Hours of Legal Research
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ We Handle This Automatically
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
                 <Shield className="mr-2 h-5 w-5" />
-                Get GDPR Compliant
+                Get GDPR Compliant Now
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />
@@ -52,11 +62,8 @@ export default function GDPRCompliancePage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                GDPR Cookie Consent Key Requirements
+                3 Big Problems GDPR Solves
               </h2>
-              <p className="text-xl text-gray-600">
-                Understanding the essential elements of GDPR-compliant cookie consent
-              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -68,8 +75,11 @@ export default function GDPRCompliancePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <p className="text-lg font-semibold text-gray-900">
+                    Avoid €20M+ Fines with Explicit Consent
+                  </p>
                   <p className="text-gray-600">
-                    Users must actively opt-in to non-essential cookies. Pre-checked boxes or implied consent are not sufficient under GDPR.
+                    We handle this automatically. No pre-checked boxes, no legal headaches.
                   </p>
                 </CardContent>
               </Card>
@@ -82,8 +92,11 @@ export default function GDPRCompliancePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <p className="text-lg font-semibold text-gray-900">
+                    Save 10+ Hours with Plain Language
+                  </p>
                   <p className="text-gray-600">
-                    Provide clear, plain language explanations of what cookies do and why they're used. Avoid legal jargon.
+                    We write clear explanations automatically. No legal jargon, no confusion.
                   </p>
                 </CardContent>
               </Card>
@@ -96,8 +109,11 @@ export default function GDPRCompliancePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <p className="text-lg font-semibold text-gray-900">
+                    Build Trust with Granular Control
+                  </p>
                   <p className="text-gray-600">
-                    Allow users to choose specific cookie categories (analytics, marketing, etc.) rather than all-or-nothing consent.
+                    Users choose what they want. We handle the technical implementation automatically.
                   </p>
                 </CardContent>
               </Card>
@@ -147,6 +163,34 @@ export default function GDPRCompliancePage() {
           </div>
         </div>
       </section>
+
+      {/* Visual Compliance Check */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <ComplianceBadgeAnimator />
+        </div>
+      </section>
+
+      {/* Consent Flow Comparison */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <ConsentFlowDiagram />
+        </div>
+      </section>
+
+      {/* Banner Text Examples */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <BannerTextPreview />
+        </div>
+      </section>
+
+      {/* Cookie Categories - Temporarily disabled for build */}
+      {/* <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <CategorySelector />
+        </div>
+      </section> */}
 
       {/* Country-Specific Requirements */}
       <section className="py-16 bg-white">

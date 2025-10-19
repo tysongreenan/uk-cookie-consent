@@ -218,7 +218,8 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   const getAnimationClasses = () => {
-    switch (config.layout.animation) {
+    const animation = config.layout?.animation || 'fade'
+    switch (animation) {
       case 'fade':
         return 'animate-fade-in'
       case 'slide':
@@ -228,7 +229,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
       case 'pulse':
         return 'animate-pulse'
       default:
-        return ''
+        return 'animate-fade-in'
     }
   }
 

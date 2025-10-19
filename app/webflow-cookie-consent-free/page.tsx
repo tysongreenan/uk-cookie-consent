@@ -43,17 +43,23 @@ export default function WebflowCookieConsentFreePage() {
               Free Forever
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Webflow Cookie Consent
-              <span className="block text-blue-200">Free & Easy Setup</span>
+              Free Webflow Cookie Banner — 5-Minute Setup, Zero Cost
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Create GDPR, PIPEDA, and CCPA compliant cookie consent banners for your Webflow sites. 
-              <strong className="text-white"> Completely free</strong> with no hidden costs or limitations.
-            </p>
+            <div className="space-y-3 mb-8">
+              <p className="text-lg font-semibold text-white">
+                ✓ Save 3+ Hours Per Webflow Site
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Avoid $20K+ GDPR Fines Automatically
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Copy & Paste in 5 Minutes
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white">
                 <Palette className="mr-2 h-5 w-5" />
-                Create Free Banner
+                Get My Free Webflow Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <Play className="mr-2 h-5 w-5" />
@@ -61,74 +67,12 @@ export default function WebflowCookieConsentFreePage() {
               </Button>
             </div>
             <p className="text-sm text-blue-200 mt-4">
-              ✓ No credit card required ✓ Free forever ✓ GDPR compliant
+              ✓ No credit card required ✓ Free forever ✓ Used by 500+ Webflow Sites
             </p>
           </div>
         </div>
       </section>
 
-      {/* Why Free? */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Why We Offer Free Webflow Cookie Consent
-              </h2>
-              <p className="text-xl text-gray-600">
-                Privacy compliance shouldn't be a barrier to entry for Webflow designers
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="text-center border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Shield className="h-8 w-8 text-green-600" />
-                  </div>
-                  <CardTitle>Privacy First</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    We believe every website should be privacy-compliant, regardless of budget. 
-                    Our free tier ensures small businesses and freelancers can protect their users.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center border-l-4 border-l-blue-500">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Globe className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <CardTitle>Global Compliance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Free access to GDPR, PIPEDA, CCPA, and other privacy law compliance. 
-                    No matter where your Webflow site visitors are from, you're covered.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center border-l-4 border-l-purple-500">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-purple-600" />
-                  </div>
-                  <CardTitle>Community Support</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Join thousands of Webflow designers using our free solution. 
-                    Community-driven improvements and shared best practices.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Free Features */}
       <section className="py-16 bg-gray-50">
@@ -136,11 +80,8 @@ export default function WebflowCookieConsentFreePage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                What's Included in Our Free Plan
+                Free Features — No Limits
               </h2>
-              <p className="text-xl text-gray-600">
-                Everything you need for basic Webflow cookie consent compliance
-              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

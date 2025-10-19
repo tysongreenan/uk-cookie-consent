@@ -19,12 +19,12 @@ export default function PricingPage() {
       period: '',
       description: 'Start free, upgrade when ready',
       features: [
-        'Unlimited websites',
-        'GA4 integration (send events to Google Analytics)',
-        'All compliance frameworks (GDPR, CCPA, PIPEDA)',
-        'Standard layouts (Bottom, Top, Center, Side)',
-        'Basic customization',
-        'Community support'
+        'Save 3+ Hours Per Website Setup',
+        'Avoid $20K+ GDPR Fines Automatically',
+        'Works on Unlimited Websites',
+        'Copy & Paste in 5 Minutes',
+        'Match Your Brand Perfectly',
+        'Community Support'
       ],
       cta: 'Get Started Free',
       tier: 'free',
@@ -39,13 +39,13 @@ export default function PricingPage() {
       description: 'Everything you need, forever',
       features: [
         'Everything in Free',
-        'Analytics dashboard (impressions, acceptance rates)',
-        'Team collaboration (invite members, role-based permissions)',
-        'Custom layouts (Modal, Slide-in, Minimalist, etc.)',
-        'Image upload for logos',
-        'Advanced customization',
-        'Priority email support',
-        'Lifetime updates included'
+        'Save 10+ Hours with Analytics Dashboard',
+        'Invite Unlimited Team Members',
+        'Create Custom Layouts in Minutes',
+        'Upload Your Logo Instantly',
+        'Advanced Brand Customization',
+        'Priority Email Support',
+        'Lifetime Updates Included'
       ],
       cta: 'Upgrade to Pro',
       tier: 'pro',
@@ -59,12 +59,12 @@ export default function PricingPage() {
       description: 'For large organizations',
       features: [
         'Everything in Pro',
-        'Unlimited team members',
-        'White-label solution',
-        'Dedicated support',
-        'Custom integrations',
-        'SLA guarantee',
-        'On-premise deployment'
+        'Scale to Unlimited Team Members',
+        'White-Label for Your Clients',
+        'Dedicated Support Manager',
+        'Custom Integrations Built for You',
+        '99.9% Uptime SLA Guarantee',
+        'On-Premise Deployment Available'
       ],
       cta: 'Contact Sales',
       tier: 'enterprise',
@@ -80,20 +80,20 @@ export default function PricingPage() {
       <div className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Start Free, Upgrade Once, Own Forever</h1>
+          <h1 className="text-4xl font-bold mb-4">One Price. Unlimited Banners. Yours Forever.</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            No subscriptions. No hidden fees. Just simple, transparent pricing.
+            Save $200+ vs competitors. No subscriptions. No hidden fees.
           </p>
           
           <div className="flex items-center justify-center space-x-4 mb-8">
             <Badge variant="secondary" className="bg-green-100 text-green-800">
-              One-time payment
+              Save $200+ vs competitors
             </Badge>
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Lifetime updates
+              Lifetime updates included
             </Badge>
             <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              No recurring fees
+              No recurring fees ever
             </Badge>
           </div>
         </div>
@@ -107,13 +107,13 @@ export default function PricingPage() {
         
         {/* Value Proposition Section */}
         <div className="bg-muted/50 rounded-2xl p-8 mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">Why Pro is a No-Brainer</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Why Pro Pays for Itself</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💰</span>
               </div>
-              <h3 className="font-semibold mb-2">Save Money</h3>
+              <h3 className="font-semibold mb-2">Save $200+ Per Year</h3>
               <p className="text-sm text-muted-foreground">
                 $48.99 once vs competitors charging $9-19/month. 
                 You save money after just 3-6 months.
@@ -123,7 +123,7 @@ export default function PricingPage() {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🚀</span>
               </div>
-              <h3 className="font-semibold mb-2">Future-Proof</h3>
+              <h3 className="font-semibold mb-2">Never Pay Again</h3>
               <p className="text-sm text-muted-foreground">
                 Lifetime updates included. New features, 
                 compliance updates, and improvements forever.
@@ -133,7 +133,7 @@ export default function PricingPage() {
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">👥</span>
               </div>
-              <h3 className="font-semibold mb-2">Team Ready</h3>
+              <h3 className="font-semibold mb-2">Scale Your Team</h3>
               <p className="text-sm text-muted-foreground">
                 Invite team members, collaborate on banners, 
                 and manage permissions. Perfect for agencies.
@@ -269,6 +269,12 @@ function PricingCard({
             </Link>
           )}
         </Button>
+        
+        {isPro && (
+          <p className="text-xs text-center text-green-600 font-semibold mt-2">
+            ✓ 30-Day Money-Back Guarantee
+          </p>
+        )}
       </CardContent>
     </Card>
   )

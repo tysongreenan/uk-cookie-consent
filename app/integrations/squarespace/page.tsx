@@ -4,6 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Square, Code, Zap, Users, CheckCircle, ExternalLink, Download, Settings } from 'lucide-react'
+import { CodeCopyBlock } from '@/components/landing/visuals/integration/CodeCopyBlock'
+import { ThreeStepInstallation } from '@/components/landing/visuals/integration/ThreeStepInstallation'
+import { PluginComparisonTable } from '@/components/landing/visuals/integration/PluginComparisonTable'
+import { BeforeAfterSlider } from '@/components/landing/visuals/integration/BeforeAfterSlider'
 
 export const metadata: Metadata = {
   title: 'Squarespace Cookie Consent Integration | Code Injection Guide 2025',
@@ -26,12 +30,13 @@ export default function SquarespaceIntegrationPage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-green-500 text-white">Squarespace Integration</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Squarespace Cookie Consent
-              <span className="block text-green-200">Easy Code Integration</span>
+              Squarespace Cookie Banner — Copy, Paste, Done in 5 Minutes
             </h1>
-            <p className="text-xl md:text-2xl text-green-100 mb-8">
-              Complete Squarespace cookie consent integration guide. Code injection, template compatibility, e-commerce integration. GDPR, PIPEDA, CCPA compliant cookie banner for Squarespace sites.
-            </p>
+            <div className="text-xl md:text-2xl text-green-100 mb-8 space-y-2">
+              <div className="font-bold">✓ Save 3+ Hours vs Custom Development</div>
+              <div className="font-bold">✓ Avoid $20K+ GDPR Fines Automatically</div>
+              <div className="font-bold">✓ Works with All Squarespace Plans</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
                 <Square className="mr-2 h-5 w-5" />
@@ -46,103 +51,41 @@ export default function SquarespaceIntegrationPage() {
         </div>
       </section>
 
-      {/* Why Squarespace Needs Cookie Consent */}
+      {/* Visual Demo */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Why Squarespace Sites Need Cookie Consent
+                See It In Action
               </h2>
               <p className="text-xl text-gray-600">
-                Squarespace sites use various tracking and analytics tools that require compliance
+                Watch how easy it is to add cookie consent to your Squarespace site
               </p>
             </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Squarespace Code Injection</h3>
+                <CodeCopyBlock />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold mb-4">3-Step Installation</h3>
+                <ThreeStepInstallation />
+              </div>
+            </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Square className="h-6 w-6 text-green-500" />
-                    <CardTitle>Squarespace Analytics</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Built-in Squarespace Analytics and visitor insights require cookie consent under GDPR, PIPEDA, and CCPA.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="mb-12">
+              <h3 className="text-xl font-bold mb-4 text-center">Before vs After</h3>
+              <BeforeAfterSlider />
+            </div>
 
-              <Card className="border-l-4 border-l-blue-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Code className="h-6 w-6 text-blue-500" />
-                    <CardTitle>Custom Code Blocks</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Google Analytics, Facebook Pixel, and other tracking scripts added via code blocks require explicit consent.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-purple-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Users className="h-6 w-6 text-purple-500" />
-                    <CardTitle>E-commerce Tracking</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Squarespace Commerce uses cookies for cart tracking, conversion measurement, and customer analytics.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-6 w-6 text-orange-500" />
-                    <CardTitle>Form Submissions</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Contact forms, newsletter signups, and other data collection forms require proper consent handling.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-red-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Zap className="h-6 w-6 text-red-500" />
-                    <CardTitle>Third-Party Integrations</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Mailchimp, Zapier, and other Squarespace integrations often use cookies that require consent management.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-indigo-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-6 w-6 text-indigo-500" />
-                    <CardTitle>Global Compliance</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Squarespace sites serving international audiences must comply with multiple privacy laws and regulations.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="text-center">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                <Square className="mr-2 h-5 w-5" />
+                Build My Squarespace Banner
+              </Button>
             </div>
           </div>
         </div>

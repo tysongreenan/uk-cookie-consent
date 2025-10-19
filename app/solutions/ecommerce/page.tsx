@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ShoppingCart, TrendingUp, Shield, Zap, Users, Globe, BarChart3, CheckCircle, AlertTriangle, ExternalLink, Download } from 'lucide-react'
+import { ROICalculator } from '@/components/landing/visuals/solution/ROICalculator'
+import { EcommerceBannerDemo } from '@/components/landing/visuals/solution/EcommerceBannerDemo'
+import { SetupSpeedometer } from '@/components/landing/visuals/core/SetupSpeedometer'
 
 export const metadata: Metadata = {
   title: 'E-commerce Cookie Consent | Shopify GDPR Compliance Solution 2025',
@@ -26,21 +29,124 @@ export default function EcommerceSolutionPage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-purple-500 text-white">E-commerce Solution</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              E-commerce Cookie Consent
-              <span className="block text-purple-200">Made Simple</span>
+              E-commerce Cookie Consent — Protect Revenue, Stay Compliant
             </h1>
-            <p className="text-xl md:text-2xl text-purple-100 mb-8">
-              Complete cookie consent solution for online stores. Maintain conversion rates while ensuring GDPR, PIPEDA, and CCPA compliance across Shopify, WooCommerce, Magento, and more.
-            </p>
+            <div className="text-xl md:text-2xl text-purple-100 mb-8 space-y-2">
+              <div>✓ Maintain conversion rates while staying compliant</div>
+              <div>✓ Avoid $20K+ GDPR fines automatically</div>
+              <div>✓ 5-minute setup, zero maintenance</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-purple-600 hover:bg-purple-50">
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Get E-commerce Solution
+                Get My E-commerce Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <BarChart3 className="mr-2 h-5 w-5" />
-                See ROI Calculator
+                Calculate My ROI
               </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Demo */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                See E-commerce Cookie Consent In Action
+              </h2>
+              <p className="text-xl text-gray-600">
+                Watch how our solution works on a real e-commerce product page
+              </p>
+            </div>
+            
+            <EcommerceBannerDemo />
+          </div>
+        </div>
+      </section>
+
+      {/* ROI Calculator */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Calculate Your E-commerce ROI
+              </h2>
+              <p className="text-xl text-gray-600">
+                See how much you could save by avoiding compliance fines
+              </p>
+            </div>
+            
+            <ROICalculator industry="ecommerce" />
+          </div>
+        </div>
+      </section>
+
+      {/* Setup Speed */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Setup Speed Comparison
+              </h2>
+              <p className="text-xl text-gray-600">
+                See how fast our solution is compared to traditional methods
+              </p>
+            </div>
+            
+            <SetupSpeedometer />
+          </div>
+        </div>
+      </section>
+
+      {/* 3 Problems We Solve */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                3 Big Problems E-commerce Solves
+              </h2>
+              <p className="text-xl text-gray-600">
+                The main challenges online stores face with cookie consent
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="text-center p-6">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Conversion Rate Drops</h3>
+                <p className="text-gray-600">
+                  Generic cookie banners can reduce conversions by 15-25% due to poor user experience and unclear messaging.
+                </p>
+              </Card>
+
+              <Card className="text-center p-6">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Compliance Fines</h3>
+                <p className="text-gray-600">
+                  GDPR fines up to 4% of annual revenue, CCPA penalties up to $7,500 per violation, plus legal costs.
+                </p>
+              </Card>
+
+              <Card className="text-center p-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Analytics Loss</h3>
+                <p className="text-gray-600">
+                  Without proper consent, you lose crucial tracking data for Facebook Pixel, Google Ads, and conversion optimization.
+                </p>
+              </Card>
             </div>
           </div>
         </div>
@@ -717,15 +823,17 @@ export default function EcommerceSolutionPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Optimize Your E-commerce Store?
+              Join 1,000+ E-commerce Stores Already Protected
             </h2>
-            <p className="text-xl text-purple-100 mb-8">
-              Join thousands of online stores using our cookie consent solution. Maintain conversion rates while ensuring full compliance across all markets.
-            </p>
+            <div className="text-xl text-purple-100 mb-8 space-y-2">
+              <div>✓ Maintain conversion rates while staying compliant</div>
+              <div>✓ Avoid $20K+ GDPR fines automatically</div>
+              <div>✓ 5-minute setup, zero maintenance</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-purple-600 hover:bg-purple-50">
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Get E-commerce Solution
+                Get My E-commerce Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <Download className="mr-2 h-5 w-5" />

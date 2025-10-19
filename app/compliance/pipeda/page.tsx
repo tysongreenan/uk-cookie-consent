@@ -4,6 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, MapPin } from 'lucide-react'
+import { ComplianceBadgeAnimator } from '@/components/landing/visuals/compliance/ComplianceBadgeAnimator'
+import { ConsentFlowDiagram } from '@/components/landing/visuals/compliance/ConsentFlowDiagram'
+import { BannerTextPreview } from '@/components/landing/visuals/compliance/BannerTextPreview'
+import { BilingualBannerToggle } from '@/components/landing/visuals/compliance/BilingualBannerToggle'
 
 export const metadata: Metadata = {
   title: 'PIPEDA Cookie Consent Requirements | Canadian Privacy Law Guide 2025',
@@ -26,16 +30,23 @@ export default function PIPEDACompliancePage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-red-500 text-white">Canadian Privacy Law</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              PIPEDA Cookie Consent
-              <span className="block text-red-200">Requirements Guide</span>
+              PIPEDA Compliance Made Simple — 100% Automatic
             </h1>
-            <p className="text-xl md:text-2xl text-red-100 mb-8">
-              Complete compliance guide for Canadian businesses. Learn what you need to know about PIPEDA cookie consent requirements, implementation, and best practices.
-            </p>
+            <div className="space-y-3 mb-8">
+              <p className="text-lg font-semibold text-white">
+                ✓ Avoid $100K+ PIPEDA Fines Automatically
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ Save 10+ Hours of Legal Research
+              </p>
+              <p className="text-lg font-semibold text-white">
+                ✓ We Handle This Automatically
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-red-600 hover:bg-red-50">
                 <Shield className="mr-2 h-5 w-5" />
-                Get PIPEDA Compliant
+                Get PIPEDA Compliant Now
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />
@@ -46,194 +57,109 @@ export default function PIPEDACompliancePage() {
         </div>
       </section>
 
-      {/* PIPEDA Overview */}
+      {/* Visual Demo */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                What is PIPEDA?
+                See PIPEDA Compliance In Action
               </h2>
               <p className="text-xl text-gray-600">
-                Personal Information Protection and Electronic Documents Act - Canada's federal privacy law
+                Watch how our solution automatically handles Canadian privacy law compliance
               </p>
             </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Automatic Compliance Verification</h3>
+                <ComplianceBadgeAnimator />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold mb-4">Bilingual Banner Support</h3>
+                <BilingualBannerToggle />
+              </div>
+            </div>
 
-            <Card className="mb-12">
-              <CardContent className="p-8">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">PIPEDA Basics</h3>
-                    <ul className="space-y-3 text-gray-600">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Applies to private sector organizations in Canada</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Governs collection, use, and disclosure of personal information</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Less strict than GDPR - allows implied consent</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>Enforced by Privacy Commissioner of Canada</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Cookie Requirements</h3>
-                    <ul className="space-y-3 text-gray-600">
-                      <li className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                        <span>Notice required for cookie collection</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                        <span>Implied consent acceptable for some cookies</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                        <span>Explicit consent for sensitive data</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                        <span>Opt-out mechanism required</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Consent Flow Comparison</h3>
+                <ConsentFlowDiagram />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold mb-4">Banner Text Examples</h3>
+                <BannerTextPreview />
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Button size="lg" className="bg-red-600 hover:bg-red-700">
+                <Shield className="mr-2 h-5 w-5" />
+                Get PIPEDA Compliant Now
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* PIPEDA Principles */}
+      {/* How We Solve It */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                PIPEDA's 10 Privacy Principles
+                How We Solve PIPEDA Compliance — 3 Simple Steps
               </h2>
               <p className="text-xl text-gray-600">
-                Core principles that guide PIPEDA compliance for cookies and personal information
+                Get your Canadian business compliant in minutes, not months
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="border-l-4 border-l-blue-500">
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="text-center">
                 <CardHeader>
-                  <CardTitle className="text-lg">1. Accountability</CardTitle>
+                  <div className="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-4">1</div>
+                  <CardTitle>Automatic Detection</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Organizations are responsible for personal information under their control and must designate someone accountable for compliance.
+                  <p className="text-gray-600">
+                    Our system automatically detects Canadian visitors and applies the appropriate privacy law (PIPEDA, PIPA-BC, PIPA-AB, Quebec Bill 64).
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-green-500">
+              <Card className="text-center">
                 <CardHeader>
-                  <CardTitle className="text-lg">2. Identifying Purposes</CardTitle>
+                  <div className="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-4">2</div>
+                  <CardTitle>Bilingual Support</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Organizations must identify the purposes for collecting personal information before or at the time of collection.
+                  <p className="text-gray-600">
+                    Automatically shows English or French banners based on user location and preferences, meeting Quebec's language requirements.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-purple-500">
+              <Card className="text-center">
                 <CardHeader>
-                  <CardTitle className="text-lg">3. Consent</CardTitle>
+                  <div className="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-4">3</div>
+                  <CardTitle>Compliance Tracking</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Knowledge and consent of the individual are required for the collection, use, or disclosure of personal information.
+                  <p className="text-gray-600">
+                    Automatically logs all consent decisions and provides audit trails for Privacy Commissioner investigations.
                   </p>
                 </CardContent>
               </Card>
+            </div>
 
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">4. Limiting Collection</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Organizations must limit collection to what is necessary for the identified purposes and collect it fairly and lawfully.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-red-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">5. Limiting Use & Disclosure</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Personal information must not be used or disclosed for purposes other than those for which it was collected, except with consent or as required by law.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-indigo-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">6. Accuracy</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Personal information must be as accurate, complete, and up-to-date as necessary for the purposes for which it is to be used.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-pink-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">7. Safeguards</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Organizations must protect personal information against loss or theft, as well as unauthorized access, disclosure, copying, use, or modification.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-teal-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">8. Openness</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Organizations must make readily available to individuals specific information about their policies and practices relating to the management of personal information.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-yellow-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">9. Individual Access</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    Upon request, an individual must be informed of the existence, use, and disclosure of their personal information and be given access to that information.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-gray-500">
-                <CardHeader>
-                  <CardTitle className="text-lg">10. Challenging Compliance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    An individual must be able to challenge an organization's compliance with these principles and have the matter addressed by the organization.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="text-center mt-8">
+              <Button size="lg" className="bg-red-600 hover:bg-red-700">
+                <Shield className="mr-2 h-5 w-5" />
+                Start PIPEDA Compliance
+              </Button>
             </div>
           </div>
         </div>
@@ -616,13 +542,15 @@ export default function PIPEDACompliancePage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Ready to Get PIPEDA Compliant?
             </h2>
-            <p className="text-xl text-red-100 mb-8">
-              Our cookie consent solution makes Canadian privacy law compliance simple and automatic. Get started in minutes.
-            </p>
+            <div className="text-xl text-red-100 mb-8 space-y-2">
+              <div className="font-bold">✓ Automatic Canadian Law Detection</div>
+              <div className="font-bold">✓ Bilingual English/French Support</div>
+              <div className="font-bold">✓ Privacy Commissioner Audit Ready</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-red-600 hover:bg-red-50">
                 <Shield className="mr-2 h-5 w-5" />
-                Start Free Trial
+                Start PIPEDA Compliance
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />

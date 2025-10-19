@@ -7,7 +7,7 @@ export function WhyFree() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-6 text-center sm:mb-8">
           <h2 className="mb-3 font-heading text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
-            Why Is This Free?
+            Free Forever — No Catch
           </h2>
         </div>
 
@@ -19,19 +19,27 @@ export function WhyFree() {
               </div>
               
               <div className="space-y-4">
-                <p className="text-base leading-relaxed text-foreground sm:text-lg">
-                  We&apos;re building something better than the bloated tools out there — and we want to prove it. The first 1,000 people get full access, forever. No card. No spam. Just a chance to be part of a better solution.
-                </p>
+                <div className="space-y-3">
+                  <p className="text-lg font-semibold text-foreground">
+                    ✓ First 1,000 accounts get lifetime access
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">
+                    ✓ No credit card required
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">
+                    ✓ Cancel anytime
+                  </p>
+                </div>
                 
-                <div className="rounded-lg bg-primary/5 p-4 sm:p-6">
+                <div className="rounded-lg bg-green-50 border border-green-200 p-4 sm:p-6">
                   <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                    <Users className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
-                    <p className="text-sm font-semibold text-foreground sm:text-base">
+                    <Users className="h-4 w-4 text-green-600 sm:h-5 sm:w-5" />
+                    <p className="text-sm font-semibold text-green-800 sm:text-base">
                       Limited Time Offer
                     </p>
                   </div>
-                  <p className="text-sm text-muted-foreground sm:text-base">
-                    Once we hit 1,000 accounts, pricing kicks in. But you&apos;ll be grandfathered in at $0.
+                  <p className="text-sm text-green-700 sm:text-base">
+                    Once we hit 1,000 accounts, pricing kicks in. But you'll be grandfathered in at $0.
                   </p>
                 </div>
 

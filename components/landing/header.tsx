@@ -32,52 +32,28 @@ export function Header() {
         <div className="hidden md:flex md:flex-1 md:items-center md:justify-end md:space-x-6">
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
-              href="#how-it-works"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              How It Works
-            </Link>
-            <Link
-              href="#features"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              Features
-            </Link>
-            <Link
-              href="/blog"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              Blog
-            </Link>
-            <Link
               href="/pricing"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Pricing
             </Link>
             <Link
-              href="/locations"
+              href="/integrations"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              Locations
+              Integrations
             </Link>
             <Link
-              href="/tools"
+              href="/compliance"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              Tools
+              Compliance
             </Link>
             <Link
-              href="/about"
+              href="/support"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              About
-            </Link>
-            <Link
-              href="#faq"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              FAQ
+              Support
             </Link>
           </nav>
           
@@ -92,7 +68,7 @@ export function Header() {
                   <Link href="/auth/signin">Sign In</Link>
                 </Button>
                 <Button asChild size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
-                  <Link href="/auth/signup">Get Started</Link>
+                  <Link href="/auth/signup">Start Free</Link>
                 </Button>
               </>
             )}
@@ -114,27 +90,6 @@ export function Header() {
         <div className="md:hidden border-t bg-background">
           <nav className="container space-y-1 px-4 py-4">
             <Link
-              href="#how-it-works"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
-            >
-              How It Works
-            </Link>
-            <Link
-              href="#features"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
-            >
-              Features
-            </Link>
-            <Link
-              href="/blog"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
-            >
-              Blog
-            </Link>
-            <Link
               href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
@@ -142,32 +97,25 @@ export function Header() {
               Pricing
             </Link>
             <Link
-              href="/locations"
+              href="/integrations"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
-              Locations
+              Integrations
             </Link>
             <Link
-              href="/tools"
+              href="/compliance"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
-              Tools
+              Compliance
             </Link>
             <Link
-              href="/about"
+              href="/support"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
-              About
-            </Link>
-            <Link
-              href="#faq"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
-            >
-              FAQ
+              Support
             </Link>
             
             <div className="flex flex-col gap-2 pt-4">
@@ -181,7 +129,7 @@ export function Header() {
                     <Link href="/auth/signin">Sign In</Link>
                   </Button>
                   <Button asChild size="lg" className="w-full bg-brand-red hover:bg-brand-red/90 text-white">
-                    <Link href="/auth/signup">Get Started</Link>
+                    <Link href="/auth/signup">Start Free</Link>
                   </Button>
                 </>
               )}

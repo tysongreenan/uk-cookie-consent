@@ -7,6 +7,9 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { CanadianComplianceSection } from '@/components/compliance/canadian-compliance-section'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale } from 'lucide-react'
+import { CanadaMapCompliance } from '@/components/landing/visuals/location/CanadaMapCompliance'
+import { BilingualBannerToggle } from '@/components/landing/visuals/compliance/BilingualBannerToggle'
+import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
 
 export const metadata: Metadata = {
   title: 'Canada Cookie Consent | PIPEDA Compliance Guide 2025',
@@ -36,22 +39,77 @@ export default function CanadaCompliancePage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-red-500 text-white">Canada Compliance</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Canada Cookie Consent
-              <span className="block text-red-200">PIPEDA + Provincial Laws</span>
+              Cookie Consent for Canadian Websites — PIPEDA Ready
             </h1>
-            <p className="text-xl md:text-2xl text-red-100 mb-8">
-              Complete guide to Canadian cookie consent compliance. PIPEDA requirements, provincial privacy laws (Quebec Law 25, Alberta PIPA, BC PIPA), French-language support, and Canadian case studies.
-            </p>
+            <div className="text-xl md:text-2xl text-red-100 mb-8 space-y-2">
+              <div>✓ Avoid $100K+ PIPEDA fines automatically</div>
+              <div>✓ Bilingual support for Quebec Law 25</div>
+              <div>✓ 5-minute setup, zero maintenance</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-red-600 hover:bg-red-50">
                 <MapPin className="mr-2 h-5 w-5" />
-                Get Canadian Solution
+                Get My Canadian Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />
                 Download PIPEDA Guide
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Demo */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                See Canadian Privacy Laws In Action
+              </h2>
+              <p className="text-xl text-gray-600">
+                Interactive map showing privacy laws across Canadian provinces
+              </p>
+            </div>
+            
+            <CanadaMapCompliance />
+          </div>
+        </div>
+      </section>
+
+      {/* Bilingual Demo */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Bilingual Cookie Consent Demo
+              </h2>
+              <p className="text-xl text-gray-600">
+                See how our solution works in both English and French
+              </p>
+            </div>
+            
+            <BilingualBannerToggle />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                How It Works — 3 Simple Steps
+              </h2>
+              <p className="text-xl text-gray-600">
+                Get Canadian compliance in minutes, not months
+              </p>
+            </div>
+            
+            <ThreeStepAnimation />
           </div>
         </div>
       </section>
@@ -893,15 +951,17 @@ export default function CanadaCompliancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready for Canadian Privacy Compliance?
+              Join 1,000+ Canadian Websites Already Protected
             </h2>
-            <p className="text-xl text-red-100 mb-8">
-              Join Canadian organizations using our PIPEDA and provincial law compliant cookie consent solution. Bilingual support, regional compliance, and Canadian privacy expertise.
-            </p>
+            <div className="text-xl text-red-100 mb-8 space-y-2">
+              <div>✓ Avoid $100K+ PIPEDA fines automatically</div>
+              <div>✓ Bilingual support for Quebec Law 25</div>
+              <div>✓ 5-minute setup, zero maintenance</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-red-600 hover:bg-red-50">
                 <MapPin className="mr-2 h-5 w-5" />
-                Get Canadian Solution
+                Get My Canadian Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />

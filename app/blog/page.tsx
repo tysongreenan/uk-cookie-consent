@@ -1,11 +1,12 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllPosts } from '@/lib/blog/blog'
-import { Clock, Calendar, ArrowRight } from 'lucide-react'
+import { Clock, Calendar, ArrowRight, BookOpen, TrendingUp, Shield } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
+import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
 
 export const metadata: Metadata = {
   title: 'Blog - Cookie Banner Insights | Cookie Banner Generator',
@@ -34,11 +35,13 @@ export default function BlogPage() {
           <div className="mx-auto max-w-4xl px-4 py-16">
             <div className="text-center">
               <h1 className="mb-6 font-heading text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                Cookie Compliance Insights
+                Cookie Compliance Blog — Expert Insights
               </h1>
-              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                Stay informed about cookie consent laws, privacy regulations, and best practices for website compliance.
-              </p>
+              <div className="mx-auto max-w-2xl text-lg text-muted-foreground space-y-2">
+                <div>✓ Latest privacy law updates</div>
+                <div>✓ Step-by-step compliance guides</div>
+                <div>✓ Industry best practices</div>
+              </div>
             </div>
           </div>
         </section>
@@ -114,6 +117,72 @@ export default function BlogPage() {
               ))}
             </div>
           )}
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                How to Stay Compliant — 3 Simple Steps
+              </h2>
+              <p className="text-xl text-gray-600">
+                Follow our proven process to achieve full compliance
+              </p>
+            </div>
+            
+            <ThreeStepAnimation />
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Why Read Our Blog?
+              </h2>
+              <p className="text-xl text-gray-600">
+                Expert insights to keep you ahead of privacy regulations
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Expert Knowledge</h3>
+                <p className="text-gray-600">
+                  Written by privacy law experts with years of compliance experience
+                </p>
+              </div>
+
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Stay Updated</h3>
+                <p className="text-gray-600">
+                  Get the latest updates on privacy laws and compliance requirements
+                </p>
+              </div>
+
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Avoid Fines</h3>
+                <p className="text-gray-600">
+                  Learn how to protect your business from costly compliance violations
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       </main>
       <Footer />

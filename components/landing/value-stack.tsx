@@ -1,30 +1,32 @@
-import { Check, Repeat, Palette, FileText, Globe, Zap } from 'lucide-react'
+import { Check, Repeat, Palette, FileText, Globe, Zap, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 const features = [
   {
     icon: Repeat,
-    title: 'Unlimited cookie banners',
-    description: 'use on as many sites as you want',
+    title: 'Save 3+ Hours Per Website',
+    description: 'Unlimited banners across all your sites',
   },
   {
     icon: Palette,
-    title: 'Fully branded designs',
-    description: 'match your site\'s colors, fonts, and style',
+    title: 'Match Your Brand Perfectly',
+    description: 'Custom colors, fonts, and style in 2 clicks',
   },
   {
     icon: FileText,
-    title: 'Visual banner builder',
-    description: 'customize every detail with live preview',
+    title: 'Avoid $20K+ GDPR Fines',
+    description: 'Automatic compliance with all privacy laws',
   },
   {
     icon: Globe,
-    title: 'Works everywhere',
-    description: 'WordPress, Shopify, Webflow, and custom sites',
+    title: 'Works on Any Platform',
+    description: 'WordPress, Shopify, Webflow, custom sites',
   },
   {
     icon: Zap,
-    title: 'Fast and lightweight',
-    description: 'optimized code that won\'t slow down your site',
+    title: 'Zero Performance Impact',
+    description: 'Lightweight code that loads in milliseconds',
   },
 ]
 
@@ -35,10 +37,10 @@ export function ValueStack() {
         <div className="mx-auto max-w-4xl">
           <div className="mb-10 text-center sm:mb-12">
             <h2 className="mb-3 font-heading text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
-              What&apos;s Included
+              What You Get
             </h2>
             <p className="text-base text-muted-foreground sm:text-lg">
-              Everything you need to stay compliant and keep your brand consistent
+              Everything to stay compliant and save time
             </p>
           </div>
 
@@ -65,6 +67,16 @@ export function ValueStack() {
               </li>
             ))}
           </ul>
+          
+          {/* Mini CTA after benefits */}
+          <div className="mt-8 text-center">
+            <Button asChild size="lg" className="bg-brand-red hover:bg-brand-red/90 text-white">
+              <Link href="/dashboard">
+                Build Mine Like This
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

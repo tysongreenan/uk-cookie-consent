@@ -35,12 +35,20 @@ export function FinalCTA() {
           </div>
 
           <h2 className="mb-5 font-heading text-3xl font-bold text-white sm:text-4xl md:text-5xl lg:text-6xl sm:mb-6">
-            Get Started Free — No Limits, No Legal Headaches
+            Join 1,000+ Websites Already Protected
           </h2>
           
-          <p className="mb-8 text-base text-white/90 sm:text-lg md:text-xl sm:mb-10">
-            The first 1,000 accounts get everything, free for life. After that, it&apos;s gone.
-          </p>
+          <div className="mb-8 space-y-3 sm:mb-10">
+            <p className="text-lg font-semibold text-white">
+              ✓ Save 3+ Hours Per Website Setup
+            </p>
+            <p className="text-lg font-semibold text-white">
+              ✓ Avoid $20K+ GDPR Fines Automatically  
+            </p>
+            <p className="text-lg font-semibold text-white">
+              ✓ Copy & Paste in 5 Minutes
+            </p>
+          </div>
 
           <div className="mx-auto max-w-md">
             {session ? (
@@ -69,7 +77,7 @@ export function FinalCTA() {
                     className="h-12 w-full bg-white text-base font-semibold text-brand-teal hover:bg-white/90 sm:h-14 sm:text-lg"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Loading...' : 'Claim My Free Account'}
+                    {isLoading ? 'Loading...' : 'Start My Free Banner Now'}
                     <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </div>

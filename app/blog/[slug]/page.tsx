@@ -166,6 +166,16 @@ export default async function BlogPostPage({
                 </div>
               </div>
 
+              {/* Key Takeaways */}
+              <div className="bg-blue-50 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+                <h3 className="text-lg font-bold text-blue-900 mb-3">Key Takeaways:</h3>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <div>✓ Learn the latest compliance requirements</div>
+                  <div>✓ Get step-by-step implementation guide</div>
+                  <div>✓ Avoid common compliance mistakes</div>
+                </div>
+              </div>
+
               {/* Copy All Button */}
               <div className="flex justify-center mb-8">
                 <CopyAllButton content={post.content} />
@@ -231,14 +241,16 @@ export default async function BlogPostPage({
             <div className="mt-20 p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
               <div className="text-center">
                 <h3 className="mb-4 text-2xl font-bold text-gray-900">
-                  Ready to add a cookie banner to your site?
+                  Ready to Implement What You Learned?
                 </h3>
-                <p className="mb-6 text-gray-600 text-lg leading-relaxed">
-                  Get your free, compliant cookie banner in minutes. No credit card required.
-                </p>
+                <div className="mb-6 text-gray-600 text-lg leading-relaxed space-y-2">
+                  <div>✓ Get your free cookie banner in 5 minutes</div>
+                  <div>✓ No credit card required</div>
+                  <div>✓ Fully compliant with all privacy laws</div>
+                </div>
                 <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
                   <Link href="/auth/signup">
-                    Create Your Banner
+                    Create My Free Banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

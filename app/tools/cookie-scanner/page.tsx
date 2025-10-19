@@ -5,6 +5,9 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CookieScanner } from './cookie-scanner'
+import { ScannerAnimation } from '@/components/landing/visuals/tools/ScannerAnimation'
+import { CookieResultsVisual } from '@/components/landing/visuals/tools/CookieResultsVisual'
+import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
 
 export const metadata: Metadata = {
   title: 'Free Cookie Scanner | Website Cookie Audit Tool 2025',
@@ -27,12 +30,13 @@ export default function CookieScannerPage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-blue-500 text-white">Free Tool</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Free Cookie Scanner
-              <span className="block text-blue-200">Website Audit Tool</span>
+              Free Cookie Scanner — See What's Tracking Your Visitors
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Audit your website cookies for free. Find all cookies, analyze compliance, and get personalized recommendations for GDPR, PIPEDA, and CCPA compliance.
-            </p>
+            <div className="text-xl md:text-2xl text-blue-100 mb-8 space-y-2">
+              <div>✓ Instant scan reveals all cookies</div>
+              <div>✓ Risk analysis and compliance check</div>
+              <div>✓ 100% free, no registration required</div>
+            </div>
           </div>
         </div>
       </section>
@@ -54,6 +58,42 @@ export default function CookieScannerPage() {
                 <CookieScanner />
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Demo */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <ScannerAnimation />
+          </div>
+        </div>
+      </section>
+
+      {/* Results Demo */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <CookieResultsVisual />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                How It Works — 3 Simple Steps
+              </h2>
+              <p className="text-xl text-gray-600">
+                Get comprehensive cookie analysis in minutes
+              </p>
+            </div>
+            
+            <ThreeStepAnimation />
           </div>
         </div>
       </section>
@@ -413,15 +453,17 @@ export default function CookieScannerPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Need Help Implementing Cookie Consent?
+              Ready to Fix Your Cookie Compliance?
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              After scanning your website, get a custom cookie consent solution that addresses all compliance issues found.
-            </p>
+            <div className="text-xl text-blue-100 mb-8 space-y-2">
+              <div>✓ Get instant compliance solution</div>
+              <div>✓ Address all issues found in scan</div>
+              <div>✓ 5-minute setup, zero maintenance</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
                 <span className="mr-2">🍪</span>
-                Get Cookie Banner
+                Get My Cookie Banner
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <span className="mr-2">📋</span>

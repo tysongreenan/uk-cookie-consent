@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Shield, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, DollarSign } from 'lucide-react'
+import { ComplianceBadgeAnimator } from '@/components/landing/visuals/compliance/ComplianceBadgeAnimator'
+import { ConsentFlowDiagram } from '@/components/landing/visuals/compliance/ConsentFlowDiagram'
+import { BannerTextPreview } from '@/components/landing/visuals/compliance/BannerTextPreview'
 
 export const metadata: Metadata = {
   title: 'CCPA/CPRA Cookie Compliance | California Privacy Law Guide 2025',
@@ -26,20 +29,78 @@ export default function CCPACompliancePage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-yellow-500 text-white">California Privacy Law</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              CCPA/CPRA Cookie
-              <span className="block text-yellow-200">Compliance Guide</span>
+              CCPA Compliance Made Simple — 100% Automatic
             </h1>
-            <p className="text-xl md:text-2xl text-yellow-100 mb-8">
-              Complete compliance guide for California businesses. Learn CCPA/CPRA cookie requirements, "Do Not Sell" implementation, and consumer rights management.
-            </p>
+            <div className="text-xl md:text-2xl text-yellow-100 mb-8 space-y-2">
+              <div className="font-bold">✓ Avoid $7.5K+ CCPA Fines Automatically</div>
+              <div className="font-bold">✓ "Do Not Sell" Button Built-In</div>
+              <div className="font-bold">✓ California Visitor Auto-Detection</div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-yellow-600 hover:bg-yellow-50">
                 <Shield className="mr-2 h-5 w-5" />
-                Get CCPA Compliant
+                Get CCPA Compliant Now
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 <FileText className="mr-2 h-5 w-5" />
                 Download Checklist
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Demo */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                See CCPA Compliance In Action
+              </h2>
+              <p className="text-xl text-gray-600">
+                Watch how our solution automatically handles California privacy law compliance
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Automatic Compliance Verification</h3>
+                <ComplianceBadgeAnimator />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold mb-4">Consent Flow Comparison</h3>
+                <ConsentFlowDiagram />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Banner Text Examples</h3>
+                <BannerTextPreview />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold mb-4">"Do Not Sell" Button</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-white rounded-lg p-4 border-2 border-orange-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">California Privacy Rights</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      You have the right to opt-out of the sale of your personal information.
+                    </p>
+                    <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                      Do Not Sell My Personal Information
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Button size="lg" className="bg-yellow-600 hover:bg-yellow-700">
+                <Shield className="mr-2 h-5 w-5" />
+                Get CCPA Compliant Now
               </Button>
             </div>
           </div>
