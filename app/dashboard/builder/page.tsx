@@ -1388,7 +1388,9 @@ export default function BannerBuilderPage() {
                               <div className="px-3 pb-3 space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground mb-1 block">
-                                    Head Code (placed in &lt;head&gt; section)
+                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm') 
+                                      ? 'Head Code (Step 1: Paste in <head> section)' 
+                                      : 'Script Code'}
                                   </Label>
                                   <textarea
                                     value={script.scriptCode}
@@ -1400,35 +1402,51 @@ export default function BannerBuilderPage() {
                                         scripts: { ...prev.scripts, strictlyNecessary: newScripts }
                                       }))
                                     }}
-                                    placeholder="Paste your <head> script code here..."
+                                    placeholder="Paste your script code here..."
                                     className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
                                   />
                                 </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground mb-1 block">
-                                    Body Code (placed after &lt;body&gt; tag) - Optional
-                                  </Label>
-                                  <textarea
-                                    value={script.bodyCode || ''}
-                                    onChange={(e) => {
-                                      const newScripts = [...config.scripts.strictlyNecessary]
-                                      newScripts[index].bodyCode = e.target.value
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                      }))
-                                    }}
-                                    placeholder="Paste your <body> script code here (e.g., GTM noscript)..."
-                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
-                                  />
-                                </div>
+                                {(script.name.toLowerCase().includes('google tag manager') || 
+                                  script.name.toLowerCase().includes('gtm') ||
+                                  script.bodyCode) && (
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground mb-1 block">
+                                      {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')
+                                        ? 'Body Code (Step 2: Paste after <body> tag - Required for GTM)'
+                                        : 'Body Code (placed after <body> tag) - Optional'}
+                                    </Label>
+                                    {(script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')) && (
+                                      <p className="text-xs text-amber-600 mb-2 flex items-center">
+                                        <Info className="h-3 w-3 mr-1" />
+                                        Google Tag Manager requires both Head and Body codes to work properly
+                                      </p>
+                                    )}
+                                    <textarea
+                                      value={script.bodyCode || ''}
+                                      onChange={(e) => {
+                                        const newScripts = [...config.scripts.strictlyNecessary]
+                                        newScripts[index].bodyCode = e.target.value
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                        }))
+                                      }}
+                                      placeholder={script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')
+                                        ? 'Paste your GTM noscript code here (starts with <noscript><iframe...)'
+                                        : 'Paste your <body> script code here...'}
+                                      className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                    />
+                                  </div>
+                                )}
                               </div>
                             )}
                             {!script.scriptCode.trim() && (
                               <div className="px-3 pb-3 space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground mb-1 block">
-                                    Head Code (placed in &lt;head&gt; section)
+                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm') 
+                                      ? 'Head Code (Step 1: Paste in <head> section)' 
+                                      : 'Script Code'}
                                   </Label>
                                   <textarea
                                     value={script.scriptCode}
@@ -1440,28 +1458,35 @@ export default function BannerBuilderPage() {
                                         scripts: { ...prev.scripts, strictlyNecessary: newScripts }
                                       }))
                                     }}
-                                    placeholder="Paste your <head> script code here..."
+                                    placeholder="Paste your script code here..."
                                     className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
                                   />
                                 </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground mb-1 block">
-                                    Body Code (placed after &lt;body&gt; tag) - Optional
-                                  </Label>
-                                  <textarea
-                                    value={script.bodyCode || ''}
-                                    onChange={(e) => {
-                                      const newScripts = [...config.scripts.strictlyNecessary]
-                                      newScripts[index].bodyCode = e.target.value
-                                      setConfig(prev => ({
-                                        ...prev,
-                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                      }))
-                                    }}
-                                    placeholder="Paste your <body> script code here (e.g., GTM noscript)..."
-                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
-                                  />
-                                </div>
+                                {(script.name.toLowerCase().includes('google tag manager') || 
+                                  script.name.toLowerCase().includes('gtm')) && (
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground mb-1 block">
+                                      Body Code (Step 2: Paste after &lt;body&gt; tag - Required for GTM)
+                                    </Label>
+                                    <p className="text-xs text-amber-600 mb-2 flex items-center">
+                                      <Info className="h-3 w-3 mr-1" />
+                                      Google Tag Manager requires both Head and Body codes to work properly
+                                    </p>
+                                    <textarea
+                                      value={script.bodyCode || ''}
+                                      onChange={(e) => {
+                                        const newScripts = [...config.scripts.strictlyNecessary]
+                                        newScripts[index].bodyCode = e.target.value
+                                        setConfig(prev => ({
+                                          ...prev,
+                                          scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                        }))
+                                      }}
+                                      placeholder="Paste your GTM noscript code here (starts with <noscript><iframe...)"
+                                      className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                    />
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
