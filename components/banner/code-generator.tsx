@@ -1000,11 +1000,18 @@ ${generateJavaScript()}
   }
 
   const generateBodyCode = () => {
-    // Collect all body scripts (e.g., GTM noscript code)
+    // Collect all body scripts (e.g., GTM noscript code) from ALL categories
     const bodyScripts: string[] = []
     
-    // Add strictly necessary body scripts
-    config.scripts.strictlyNecessary.forEach((script) => {
+    // Check all script categories for body code
+    const allScriptCategories = [
+      ...config.scripts.strictlyNecessary,
+      ...config.scripts.functionality,
+      ...config.scripts.trackingPerformance,
+      ...config.scripts.targetingAdvertising
+    ]
+    
+    allScriptCategories.forEach((script) => {
       if (script.bodyCode && script.bodyCode.trim()) {
         bodyScripts.push(`\n<!-- ${script.name} (Body Code) -->\n${script.bodyCode.trim()}`)
       }
