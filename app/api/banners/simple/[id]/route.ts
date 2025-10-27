@@ -112,13 +112,13 @@ function rejectCookies() {
 </script>`
 
     // Update banner using direct SQL to bypass RLS issues
+    // Note: is_active parameter removed temporarily until SQL migration is run
     const { data, error } = await supabase.rpc('update_banner_simple', {
       banner_id: params.id,
       banner_name: bannerName,
       banner_config: bannerConfig,
       banner_code: code,
-      user_id: session.user.id,
-      is_active: bannerData.isActive !== undefined ? bannerData.isActive : null
+      user_id: session.user.id
     })
 
     if (error) {
