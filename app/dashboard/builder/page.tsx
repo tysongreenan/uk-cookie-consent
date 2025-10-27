@@ -317,6 +317,7 @@ export default function BannerBuilderPage() {
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
+  const loadedBannerRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!session) {
@@ -326,7 +327,9 @@ export default function BannerBuilderPage() {
 
   useEffect(() => {
     const editId = searchParams.get('id') || searchParams.get('edit')
-    if (editId && session) {
+    // Only load if we have an ID, session, and haven't already loaded this banner
+    if (editId && session && loadedBannerRef.current !== editId) {
+      loadedBannerRef.current = editId
       loadBannerForEdit(editId)
     }
   }, [searchParams, session])
