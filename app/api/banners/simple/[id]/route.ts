@@ -8,6 +8,46 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get single banner by ID
+    const { data, error } = await supabase.rpc('get_banners_simple', {
+      user_id: session.user.id
+    })
+
+    if (error) {
+      console.error('❌ Simple Get Single: Error fetching banner:', error)
+      return NextResponse.json({ error: 'Failed to fetch banner' }, { status: 500 })
+    }
+
+    // Find the specific banner by ID
+    const banner = data?.find((b: any) => b.id === params.id)
+    
+    if (!banner) {
+      return NextResponse.json({ error: 'Banner not found' }, { status: 404 })
+    }
+
+    console.log('✅ Simple Get Single: Banner fetched successfully:', params.id)
+    return NextResponse.json({ 
+      success: true, 
+      banner: banner
+    })
+
+  } catch (error) {
+    console.error('❌ Simple Get Single: Unexpected error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
