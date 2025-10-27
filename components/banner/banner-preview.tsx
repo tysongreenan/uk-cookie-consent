@@ -78,62 +78,66 @@ export function BannerPreview({ config }: BannerPreviewProps) {
 
   // Ensure config has all required properties with safe defaults
   const safeConfig: BannerConfig = {
-    ...config,
+    name: config.name || 'Cookie Banner',
     position: config.position || 'bottom',
-    colors: config.colors || {
-      background: '#ffffff',
-      text: '#000000',
-      button: '#007bff',
-      buttonText: '#ffffff',
-      link: '#007bff'
+    theme: config.theme || 'light',
+    language: config.language || 'en',
+    colors: {
+      background: config.colors?.background || '#ffffff',
+      text: config.colors?.text || '#000000',
+      button: config.colors?.button || '#007bff',
+      buttonText: config.colors?.buttonText || '#ffffff',
+      link: config.colors?.link || '#007bff'
     },
-    text: config.text || {
-      title: 'Cookie Consent',
-      message: 'We use cookies to improve your experience.',
-      acceptButton: 'Accept All',
-      rejectButton: 'Reject All',
-      preferencesButton: 'Preferences'
+    text: {
+      title: config.text?.title || 'Cookie Consent',
+      message: config.text?.message || 'We use cookies to improve your experience.',
+      acceptButton: config.text?.acceptButton || 'Accept All',
+      rejectButton: config.text?.rejectButton || 'Reject All',
+      preferencesButton: config.text?.preferencesButton || 'Preferences'
     },
-    behavior: config.behavior || {
-      autoShow: true,
-      dismissOnScroll: false,
-      showPreferences: true,
-      cookieExpiry: 365
+    behavior: {
+      autoShow: config.behavior?.autoShow ?? true,
+      dismissOnScroll: config.behavior?.dismissOnScroll ?? false,
+      showPreferences: config.behavior?.showPreferences ?? true,
+      cookieExpiry: config.behavior?.cookieExpiry || 365
     },
-    branding: config.branding || {
+    branding: {
       logo: {
-        enabled: false,
-        url: '',
-        position: 'left',
-        maxWidth: 100,
-        maxHeight: 50
+        enabled: config.branding?.logo?.enabled ?? false,
+        url: config.branding?.logo?.url || '',
+        position: config.branding?.logo?.position || 'left',
+        maxWidth: config.branding?.logo?.maxWidth || 100,
+        maxHeight: config.branding?.logo?.maxHeight || 50
       },
       privacyPolicy: {
-        url: '',
-        text: 'Privacy Policy',
-        openInNewTab: true,
-        required: false
+        url: config.branding?.privacyPolicy?.url || '',
+        text: config.branding?.privacyPolicy?.text || 'Privacy Policy',
+        openInNewTab: config.branding?.privacyPolicy?.openInNewTab ?? true,
+        required: config.branding?.privacyPolicy?.required ?? false
       },
       footerLink: {
-        enabled: false,
-        text: 'Cookie Settings',
-        position: 'floating',
-        floatingPosition: 'bottom-right'
+        enabled: config.branding?.footerLink?.enabled ?? false,
+        text: config.branding?.footerLink?.text || 'Cookie Settings',
+        position: config.branding?.footerLink?.position || 'floating',
+        floatingPosition: config.branding?.footerLink?.floatingPosition || 'bottom-right'
       }
     },
-    layout: config.layout || {
-      animation: 'fade',
-      borderRadius: 8,
-      padding: 20,
-      margin: 0,
-      width: 'full',
-      shadow: 'medium'
+    layout: {
+      animation: config.layout?.animation || 'fade',
+      borderRadius: config.layout?.borderRadius || 8,
+      padding: config.layout?.padding || 20,
+      margin: config.layout?.margin || 0,
+      width: config.layout?.width || 'full',
+      maxWidth: config.layout?.maxWidth,
+      customWidth: config.layout?.customWidth,
+      shadow: config.layout?.shadow || 'medium'
     },
-    advanced: config.advanced || {
-      enableAccessibility: true,
-      googleConsentMode: false,
-      customCSS: '',
-      customJS: ''
+    advanced: {
+      enableAccessibility: config.advanced?.enableAccessibility ?? true,
+      googleConsentMode: config.advanced?.googleConsentMode ?? false,
+      customCSS: config.advanced?.customCSS || '',
+      customJS: config.advanced?.customJS || ''
     }
   }
 
