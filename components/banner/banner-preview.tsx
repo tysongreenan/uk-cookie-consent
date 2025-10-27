@@ -76,6 +76,18 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [showPreferences, setShowPreferences] = useState(false)
 
+  // Ensure config has all required properties with safe defaults
+  const safeConfig = {
+    ...config,
+    position: safeConfig.position || 'bottom',
+    colors: safeConfig.colors || {},
+    text: safeConfig.text || {},
+    behavior: safeConfig.behavior || {},
+    branding: safeConfig.branding || {},
+    layout: safeConfig.layout || {},
+    advanced: safeConfig.advanced || {}
+  }
+
   const handleAccept = () => {
     setIsVisible(false)
   }
@@ -152,7 +164,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   const getPositionClasses = () => {
-    switch (config.position) {
+    switch (safeConfig.position) {
       case 'top':
         return 'top-0 left-0 right-0'
       case 'bottom':
@@ -186,21 +198,21 @@ export function BannerPreview({ config }: BannerPreviewProps) {
 
   const getLayoutStyles = () => {
     const baseStyles: any = {
-      borderRadius: `${config.layout.borderRadius}px`,
-      padding: `${config.layout.padding}px`,
-      margin: `${config.layout.margin}px`,
+      borderRadius: `${safeConfig.layout.borderRadius}px`,
+      padding: `${safeConfig.layout.padding}px`,
+      margin: `${safeConfig.layout.margin}px`,
     }
 
     // Width handling
-    if (config.layout.width === 'custom' && config.layout.customWidth) {
-      baseStyles.width = `${config.layout.customWidth}px`
-    } else if (config.layout.width === 'container') {
-      baseStyles.maxWidth = `${config.layout.maxWidth || 1200}px`
+    if (safeConfig.layout.width === 'custom' && safeConfig.layout.customWidth) {
+      baseStyles.width = `${safeConfig.layout.customWidth}px`
+    } else if (safeConfig.layout.width === 'container') {
+      baseStyles.maxWidth = `${safeConfig.layout.maxWidth || 1200}px`
       baseStyles.margin = '0 auto'
     }
 
     // Shadow handling
-    switch (config.layout.shadow) {
+    switch (safeConfig.layout.shadow) {
       case 'small':
         baseStyles.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
         break
@@ -218,7 +230,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   const getAnimationClasses = () => {
-    const animation = config.layout?.animation || 'fade'
+    const animation = safeConfig.layout?.animation || 'fade'
     switch (animation) {
       case 'fade':
         return 'animate-fade-in'
@@ -256,34 +268,34 @@ export function BannerPreview({ config }: BannerPreviewProps) {
         <div
           className={`absolute ${getPositionClasses()} ${getAnimationClasses()} z-50`}
           style={{
-            backgroundColor: config.colors.background,
-            color: config.colors.text,
+            backgroundColor: safeConfig.colors.background,
+            color: safeConfig.colors.text,
             ...getLayoutStyles(),
           }}
         >
           <div className="relative">
-            {(config.position.includes('floating') || config.position.includes('modal')) && (
+            {(safeConfig.position.includes('floating') || safeConfig.position.includes('modal')) && (
               <button
                 onClick={handleClose}
                 className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-                style={{ color: config.colors.text }}
+                style={{ color: safeConfig.colors.text }}
               >
                 <X className="h-4 w-4" />
               </button>
             )}
 
             <div className={`flex items-start ${
-              config.branding.logo.position === 'center' ? 'flex-col' : 'flex-row'
+              safeConfig.branding.logo.position === 'center' ? 'flex-col' : 'flex-row'
             }`}>
-              {config.branding.logo.position === 'left' && config.branding.logo.enabled && config.branding.logo.url && (
+              {safeConfig.branding.logo.position === 'left' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
                 <div className="flex items-center mr-3">
                   <img
-                    src={config.branding.logo.url}
+                    src={safeConfig.branding.logo.url}
                     alt="Logo"
                     className="object-contain"
                     style={{
-                      maxWidth: `${config.branding.logo.maxWidth}px`,
-                      maxHeight: `${config.branding.logo.maxHeight}px`,
+                      maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
+                      maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
                     }}
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
@@ -293,15 +305,15 @@ export function BannerPreview({ config }: BannerPreviewProps) {
               )}
               
               <div className="flex-1">
-                {config.branding.logo.position === 'center' && config.branding.logo.enabled && config.branding.logo.url && (
+                {safeConfig.branding.logo.position === 'center' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
                   <div className="flex items-center justify-center mb-2">
                     <img
-                      src={config.branding.logo.url}
+                      src={safeConfig.branding.logo.url}
                       alt="Logo"
                       className="object-contain"
                       style={{
-                        maxWidth: `${config.branding.logo.maxWidth}px`,
-                        maxHeight: `${config.branding.logo.maxHeight}px`,
+                        maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
+                        maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
                       }}
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
@@ -311,22 +323,22 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                 )}
                 
                 <h3 className="font-semibold text-lg mb-2">
-                  {config.text.title}
+                  {safeConfig.text.title}
                 </h3>
                 
                 <p className="text-sm mb-4 leading-relaxed">
-                  {config.text.message}
-                  {config.branding.privacyPolicy.url && (
+                  {safeConfig.text.message}
+                  {safeConfig.branding.privacyPolicy.url && (
                     <>
                       {' '}
                       <a
-                        href={config.branding.privacyPolicy.url}
-                        target={config.branding.privacyPolicy.openInNewTab ? '_blank' : '_self'}
-                        rel={config.branding.privacyPolicy.openInNewTab ? 'noopener noreferrer' : ''}
+                        href={safeConfig.branding.privacyPolicy.url}
+                        target={safeConfig.branding.privacyPolicy.openInNewTab ? '_blank' : '_self'}
+                        rel={safeConfig.branding.privacyPolicy.openInNewTab ? 'noopener noreferrer' : ''}
                         className="underline hover:no-underline"
-                        style={{ color: config.colors.link }}
+                        style={{ color: safeConfig.colors.link }}
                       >
-                        {config.branding.privacyPolicy.text}
+                        {safeConfig.branding.privacyPolicy.text}
                       </a>
                     </>
                   )}
@@ -337,12 +349,12 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                     onClick={handleAccept}
                     size="sm"
                     style={{
-                      backgroundColor: config.colors.button,
-                      color: config.colors.buttonText,
+                      backgroundColor: safeConfig.colors.button,
+                      color: safeConfig.colors.buttonText,
                     }}
                     className="hover:opacity-90"
                   >
-                    {config.text.acceptButton}
+                    {safeConfig.text.acceptButton}
                   </Button>
                   
                   <Button
@@ -350,38 +362,38 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                     variant="outline"
                     size="sm"
                     style={{
-                      borderColor: config.colors.button,
-                      color: config.colors.button,
+                      borderColor: safeConfig.colors.button,
+                      color: safeConfig.colors.button,
                     }}
                     className="hover:bg-opacity-10"
                   >
-                    {config.text.rejectButton}
+                    {safeConfig.text.rejectButton}
                   </Button>
 
-                  {config.behavior.showPreferences && (
+                  {safeConfig.behavior.showPreferences && (
                     <Button
                       onClick={handlePreferences}
                       variant="ghost"
                       size="sm"
-                      style={{ color: config.colors.link }}
+                      style={{ color: safeConfig.colors.link }}
                       className="hover:bg-opacity-10"
                     >
-                      {config.text.preferencesButton}
+                      {safeConfig.text.preferencesButton}
                     </Button>
                   )}
                 </div>
 
               </div>
 
-              {config.branding.logo.position === 'right' && config.branding.logo.enabled && config.branding.logo.url && (
+              {safeConfig.branding.logo.position === 'right' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
                 <div className="flex items-center ml-3">
                   <img
-                    src={config.branding.logo.url}
+                    src={safeConfig.branding.logo.url}
                     alt="Logo"
                     className="object-contain"
                     style={{
-                      maxWidth: `${config.branding.logo.maxWidth}px`,
-                      maxHeight: `${config.branding.logo.maxHeight}px`,
+                      maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
+                      maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
                     }}
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
@@ -395,20 +407,20 @@ export function BannerPreview({ config }: BannerPreviewProps) {
       </div>
 
       {/* Floating Cookie Settings Button (Preview) */}
-      {config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' && !isVisible && (
+      {safeConfig.branding.footerLink.enabled && safeConfig.branding.footerLink.position === 'floating' && !isVisible && (
         <div
           className="fixed z-40 px-4 py-2 rounded cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5"
           style={{
-            background: config.colors.button,
-            color: config.colors.buttonText,
-            [config.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
+            background: safeConfig.colors.button,
+            color: safeConfig.colors.buttonText,
+            [safeConfig.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
             bottom: '20px',
             fontSize: '14px',
             fontWeight: 500
           }}
           onClick={() => setIsVisible(true)}
         >
-          {config.branding.footerLink.text}
+          {safeConfig.branding.footerLink.text}
         </div>
       )}
 
@@ -424,13 +436,13 @@ export function BannerPreview({ config }: BannerPreviewProps) {
 
       {/* Preview Controls */}
       <div className="text-xs text-muted-foreground space-y-1">
-        <p>Position: {config.position}</p>
-        <p>Theme: {config.theme}</p>
-        <p>Auto-show: {config.behavior.autoShow ? 'Yes' : 'No'}</p>
-        <p>Cookie expiry: {config.behavior.cookieExpiry} days</p>
-        {config.branding.footerLink.enabled && (
+        <p>Position: {safeConfig.position}</p>
+        <p>Theme: {safeConfig.theme}</p>
+        <p>Auto-show: {safeConfig.behavior.autoShow ? 'Yes' : 'No'}</p>
+        <p>Cookie expiry: {safeConfig.behavior.cookieExpiry} days</p>
+        {safeConfig.branding.footerLink.enabled && (
           <p className="text-primary font-medium">
-            Footer Link: {config.branding.footerLink.position === 'floating' ? '✓ Floating button enabled' : '✓ Inline HTML available'}
+            Footer Link: {safeConfig.branding.footerLink.position === 'floating' ? '✓ Floating button enabled' : '✓ Inline HTML available'}
           </p>
         )}
       </div>
