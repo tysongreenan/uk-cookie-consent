@@ -987,8 +987,10 @@ ${config.advanced.customCSS}`
   }
 
   const generateHeadCode = () => {
-    return `<!-- Cookie Consent Banner - HEAD CODE -->
-<!-- Place this code in your <head> section -->
+    return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
+<!-- 🍁 Cookie Consent Banner - HEAD CODE (cookie-banner.ca)      🍁 -->
+<!-- 🍁 Place this code in your <head> section                    🍁 -->
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <style>
 ${generateCSS()}
 </style>
@@ -996,7 +998,9 @@ ${generateCSS()}
 <script>
 ${generateJavaScript()}
 </script>
-<!-- End HEAD CODE -->`
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
+<!-- 🍁 End HEAD CODE - Powered by cookie-banner.ca               🍁 -->
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->`
   }
 
   const generateBodyCode = () => {
@@ -1019,11 +1023,15 @@ ${generateJavaScript()}
     
     const bodyScriptsHTML = bodyScripts.length > 0 ? '\n\n' + bodyScripts.join('\n') : ''
     
-    return `<!-- Cookie Consent Banner - BODY CODE -->
-<!-- Place this code just before closing </body> tag -->${bodyScriptsHTML}
+    return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
+<!-- 🍁 Cookie Consent Banner - BODY CODE (cookie-banner.ca)      🍁 -->
+<!-- 🍁 Place this code just before closing </body> tag          🍁 -->
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->${bodyScriptsHTML}
 
 ${generateHTML()}
-<!-- End BODY CODE -->`
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
+<!-- 🍁 End BODY CODE - Powered by cookie-banner.ca               🍁 -->
+<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->`
   }
 
   const getCode = () => {
