@@ -103,7 +103,7 @@ interface CodeGeneratorProps {
 }
 
 export function CodeGenerator({ config }: CodeGeneratorProps) {
-  const [activeTab, setActiveTab] = useState<'complete' | 'html' | 'js' | 'css'>('complete')
+  const [activeTab, setActiveTab] = useState<'head' | 'body'>('head')
   const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -985,8 +985,9 @@ input:focus + span {
 ${config.advanced.customCSS}`
   }
 
-  const generateCompleteCode = () => {
-    return `<!-- Cookie Consent Banner - Copy this entire block -->
+  const generateHeadCode = () => {
+    return `<!-- Cookie Consent Banner - HEAD CODE -->
+<!-- Place this code in your <head> section -->
 <style>
 ${generateCSS()}
 </style>
@@ -994,23 +995,24 @@ ${generateCSS()}
 <script>
 ${generateJavaScript()}
 </script>
+<!-- End HEAD CODE -->`
+  }
 
+  const generateBodyCode = () => {
+    return `<!-- Cookie Consent Banner - BODY CODE -->
+<!-- Place this code just before closing </body> tag -->
 ${generateHTML()}
-<!-- End Cookie Consent Banner -->`
+<!-- End BODY CODE -->`
   }
 
   const getCode = () => {
     switch (activeTab) {
-      case 'complete':
-        return generateCompleteCode()
-      case 'html':
-        return generateHTML()
-      case 'js':
-        return generateJavaScript()
-      case 'css':
-        return generateCSS()
+      case 'head':
+        return generateHeadCode()
+      case 'body':
+        return generateBodyCode()
       default:
-        return generateCompleteCode()
+        return generateHeadCode()
     }
   }
 
@@ -1047,11 +1049,11 @@ ${generateHTML()}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm font-medium text-blue-900 mb-2">📋 Installation Instructions:</p>
         <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
-          <li><strong>Click the "Copy" button</strong> below to copy the complete code</li>
-          <li><strong>Paste it in your website</strong> just before the closing <code>&lt;/body&gt;</code> tag</li>
+          <li><strong>Copy "Head Code"</strong> and paste it in your <code>&lt;head&gt;</code> section</li>
+          <li><strong>Copy "Body Code"</strong> and paste it just before the closing <code>&lt;/body&gt;</code> tag</li>
           <li><strong>Save and refresh</strong> your website to see the banner</li>
         </ol>
-        <p className="text-xs text-blue-700 mt-2">⚠️ If you see raw code on your page, you pasted it in the wrong place. Make sure it's inside your HTML file, not in a text editor or CMS text field.</p>
+        <p className="text-xs text-blue-700 mt-2">💡 Use the tabs below to switch between Head Code and Body Code. Both are required for the banner to work!</p>
       </div>
 
       {/* Action Buttons */}
@@ -1072,17 +1074,21 @@ ${generateHTML()}
 
       {/* Tab Navigation */}
       <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-        {['complete', 'html', 'js', 'css'].map(tab => (
+        {[
+          { id: 'head', label: 'Head Code', icon: '📄' },
+          { id: 'body', label: 'Body Code', icon: '📋' }
+        ].map(tab => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab as any)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              activeTab === tab
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as 'head' | 'body')}
+            className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+              activeTab === tab.id
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {tab === 'complete' ? 'Complete Code' : tab.toUpperCase()}
+            <span className="mr-2">{tab.icon}</span>
+            {tab.label}
           </button>
         ))}
       </div>
@@ -1094,7 +1100,7 @@ ${generateHTML()}
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-xs text-muted-foreground">
-                {activeTab === 'complete' ? 'Paste this code before closing </body> tag' : `${activeTab.toUpperCase()} only`}
+                {activeTab === 'head' ? 'Paste this code in your <head> section' : 'Paste this code before closing </body> tag'}
               </span>
             </div>
           </div>
