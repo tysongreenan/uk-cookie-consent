@@ -416,11 +416,11 @@ export default function BannerBuilderPage() {
   const handleComplianceFrameworkChange = (framework: ComplianceFramework) => {
     const template = getBannerTemplate(framework)
     
+    // Only update compliance settings and required behavior changes
+    // Preserve user's colors, text, and other customizations
     setConfig(prev => ({
       ...prev,
       compliance: template.compliance,
-      text: template.text,
-      colors: template.colors,
       behavior: {
         ...prev.behavior,
         showPreferences: template.compliance.requiresGranularConsent,
@@ -428,7 +428,7 @@ export default function BannerBuilderPage() {
       }
     }))
     
-    toast.success(`Switched to ${framework.toUpperCase()} compliance template`)
+    toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
   const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'auto') => {
