@@ -53,17 +53,27 @@ export function DashboardClient() {
 
   useEffect(() => {
     if (session) {
-      fetchBanners()
-      fetchTeamInfo()
+      fetchBanners().catch(err => {
+        console.error('Failed to fetch banners:', err)
+        setIsLoading(false)
+      })
+      fetchTeamInfo().catch(err => {
+        console.error('Failed to fetch team info:', err)
+      })
     }
   }, [session])
 
   const fetchBanners = async () => {
     try {
       const response = await fetch('/api/banners/simple')
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
       
-      if (response.ok) {
+      if (response.ok && data.banners) {
         // Parse and validate banner configs
         const parsedBanners = (data.banners || []).map((banner: Banner) => {
           let config = banner.config
@@ -90,7 +100,8 @@ export function DashboardClient() {
           
           return {
             ...banner,
-            config
+            config,
+            name: banner.name || 'Untitled Banner'
           }
         })
         
@@ -99,11 +110,12 @@ export function DashboardClient() {
         const hasOutdated = parsedBanners.some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
       } else {
-        console.error('Failed to fetch banners:', data.error)
+        console.error('Failed to fetch banners:', data?.error || 'Unknown error')
         setBanners([])
       }
     } catch (error) {
       console.error('Error fetching banners:', error)
+      toast.error('Failed to load banners. Please refresh the page.')
       setBanners([])
     } finally {
       setIsLoading(false)
@@ -241,7 +253,7 @@ export function DashboardClient() {
   }
 
   const filteredBanners = banners.filter(banner =>
-    banner.name.toLowerCase().includes(searchTerm.toLowerCase())
+    banner.name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (status === 'loading') {
