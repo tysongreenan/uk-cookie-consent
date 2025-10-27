@@ -134,7 +134,6 @@ export function BannerPreview({ config }: BannerPreviewProps) {
       shadow: config.layout?.shadow || 'medium'
     },
     advanced: {
-      enableAccessibility: config.advanced?.enableAccessibility ?? true,
       googleConsentMode: config.advanced?.googleConsentMode ?? false,
       customCSS: config.advanced?.customCSS || '',
       customJS: config.advanced?.customJS || ''

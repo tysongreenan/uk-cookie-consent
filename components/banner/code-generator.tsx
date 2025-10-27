@@ -1027,7 +1027,7 @@ ${generateHTML()}
 
   const downloadCode = () => {
     const code = getCode()
-    const ext = activeTab === 'complete' ? 'html' : activeTab === 'html' ? 'html' : activeTab === 'js' ? 'js' : 'css'
+    const ext = 'html'
     const filename = `cookie-banner-${activeTab}.${ext}`
     
     const blob = new Blob([code], { type: 'text/plain' })
