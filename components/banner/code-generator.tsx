@@ -11,6 +11,7 @@ interface TrackingScript {
   name: string
   category: 'strictly-necessary' | 'functionality' | 'tracking-performance' | 'targeting-advertising'
   scriptCode: string
+  bodyCode?: string // Optional body code (e.g., for GTM noscript)
   enabled: boolean
 }
 
@@ -999,8 +1000,21 @@ ${generateJavaScript()}
   }
 
   const generateBodyCode = () => {
+    // Collect all body scripts (e.g., GTM noscript code)
+    const bodyScripts: string[] = []
+    
+    // Add strictly necessary body scripts
+    config.scripts.strictlyNecessary.forEach((script) => {
+      if (script.bodyCode && script.bodyCode.trim()) {
+        bodyScripts.push(`\n<!-- ${script.name} (Body Code) -->\n${script.bodyCode.trim()}`)
+      }
+    })
+    
+    const bodyScriptsHTML = bodyScripts.length > 0 ? '\n\n' + bodyScripts.join('\n') : ''
+    
     return `<!-- Cookie Consent Banner - BODY CODE -->
-<!-- Place this code just before closing </body> tag -->
+<!-- Place this code just before closing </body> tag -->${bodyScriptsHTML}
+
 ${generateHTML()}
 <!-- End BODY CODE -->`
   }
