@@ -1385,37 +1385,83 @@ export default function BannerBuilderPage() {
                               </div>
                             </div>
                             {script.scriptCode.trim() && (
-                              <div className="px-3 pb-3">
-                                <textarea
-                                  value={script.scriptCode}
-                                  onChange={(e) => {
-                                    const newScripts = [...config.scripts.strictlyNecessary]
-                                    newScripts[index].scriptCode = e.target.value
-                                    setConfig(prev => ({
-                                      ...prev,
-                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                    }))
-                                  }}
-                                  placeholder="Paste your script code here..."
-                                  className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
-                                />
+                              <div className="px-3 pb-3 space-y-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground mb-1 block">
+                                    Head Code (placed in &lt;head&gt; section)
+                                  </Label>
+                                  <textarea
+                                    value={script.scriptCode}
+                                    onChange={(e) => {
+                                      const newScripts = [...config.scripts.strictlyNecessary]
+                                      newScripts[index].scriptCode = e.target.value
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                      }))
+                                    }}
+                                    placeholder="Paste your <head> script code here..."
+                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground mb-1 block">
+                                    Body Code (placed after &lt;body&gt; tag) - Optional
+                                  </Label>
+                                  <textarea
+                                    value={script.bodyCode || ''}
+                                    onChange={(e) => {
+                                      const newScripts = [...config.scripts.strictlyNecessary]
+                                      newScripts[index].bodyCode = e.target.value
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                      }))
+                                    }}
+                                    placeholder="Paste your <body> script code here (e.g., GTM noscript)..."
+                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                  />
+                                </div>
                               </div>
                             )}
                             {!script.scriptCode.trim() && (
-                              <div className="px-3 pb-3">
-                                <textarea
-                                  value={script.scriptCode}
-                                  onChange={(e) => {
-                                    const newScripts = [...config.scripts.strictlyNecessary]
-                                    newScripts[index].scriptCode = e.target.value
-                                    setConfig(prev => ({
-                                      ...prev,
-                                      scripts: { ...prev.scripts, strictlyNecessary: newScripts }
-                                    }))
-                                  }}
-                                  placeholder="Paste your script code here..."
-                                  className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
-                                />
+                              <div className="px-3 pb-3 space-y-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground mb-1 block">
+                                    Head Code (placed in &lt;head&gt; section)
+                                  </Label>
+                                  <textarea
+                                    value={script.scriptCode}
+                                    onChange={(e) => {
+                                      const newScripts = [...config.scripts.strictlyNecessary]
+                                      newScripts[index].scriptCode = e.target.value
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                      }))
+                                    }}
+                                    placeholder="Paste your <head> script code here..."
+                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-muted-foreground mb-1 block">
+                                    Body Code (placed after &lt;body&gt; tag) - Optional
+                                  </Label>
+                                  <textarea
+                                    value={script.bodyCode || ''}
+                                    onChange={(e) => {
+                                      const newScripts = [...config.scripts.strictlyNecessary]
+                                      newScripts[index].bodyCode = e.target.value
+                                      setConfig(prev => ({
+                                        ...prev,
+                                        scripts: { ...prev.scripts, strictlyNecessary: newScripts }
+                                      }))
+                                    }}
+                                    placeholder="Paste your <body> script code here (e.g., GTM noscript)..."
+                                    className="w-full h-20 p-2 text-xs font-mono border rounded resize-none"
+                                  />
+                                </div>
                               </div>
                             )}
                           </div>
