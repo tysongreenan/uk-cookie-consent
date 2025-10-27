@@ -429,22 +429,23 @@ ${config.branding.footerLink.enabled && config.branding.footerLink.position === 
 <!-- Floating Cookie Settings Button -->
 <div id="cookie-settings-float" style="
   position: fixed;
-  ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'}
+  ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 16px; right: 16px;' : 'bottom: 16px; left: 16px;'}
   z-index: 999998;
-  background: ${config.colors.button};
-  color: ${config.colors.buttonText};
-  padding: 10px 16px;
-  border-radius: 4px;
+  background: rgba(107, 114, 128, 0.9);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 12px;
+  font-weight: 400;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border: none;
   display: none;
   transition: all 0.2s ease;
-" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">
-  ${config.branding.footerLink.text}
+  opacity: 0.7;
+" onmouseover="this.style.opacity='1'; this.style.background='rgba(107, 114, 128, 1)'" onmouseout="this.style.opacity='0.7'; this.style.background='rgba(107, 114, 128, 0.9)'">
+  🍪 ${config.branding.footerLink.text}
 </div>
 ` : ''}`
   }
@@ -727,7 +728,10 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       if (floatBtn) {
         floatBtn.style.display = 'block';
         floatBtn.onclick = function() {
-          banner.style.display = 'block';
+          var modal = document.getElementById('cookie-preferences-modal');
+          if (modal) {
+            modal.style.display = 'flex';
+          }
         };
       }
       ` : ''}
@@ -752,7 +756,10 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         if (floatBtn) {
           floatBtn.style.display = 'block';
           floatBtn.onclick = function() {
-            banner.style.display = 'block';
+            var modal = document.getElementById('cookie-preferences-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+            }
           };
         }
         ` : ''}
@@ -770,7 +777,10 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         if (floatBtn) {
           floatBtn.style.display = 'block';
           floatBtn.onclick = function() {
-            banner.style.display = 'block';
+            var modal = document.getElementById('cookie-preferences-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+            }
           };
         }
         ` : ''}
@@ -839,7 +849,10 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         if (floatBtn) {
           floatBtn.style.display = 'block';
           floatBtn.onclick = function() {
-            banner.style.display = 'block';
+            var modal = document.getElementById('cookie-preferences-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+            }
           };
         }
         ` : ''}
