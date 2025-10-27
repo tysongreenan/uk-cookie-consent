@@ -64,9 +64,39 @@ export function DashboardClient() {
       const data = await response.json()
       
       if (response.ok) {
-        setBanners(data.banners || [])
+        // Parse and validate banner configs
+        const parsedBanners = (data.banners || []).map((banner: Banner) => {
+          let config = banner.config
+          
+          // If config is a string, parse it
+          if (typeof config === 'string') {
+            try {
+              config = JSON.parse(config)
+            } catch (e) {
+              console.error('Error parsing banner config:', e)
+              config = null
+            }
+          }
+          
+          // Ensure config has required nested objects
+          if (config && typeof config === 'object') {
+            config.layout = config.layout || {}
+            config.colors = config.colors || {}
+            config.text = config.text || {}
+            config.behavior = config.behavior || {}
+            config.branding = config.branding || {}
+            config.advanced = config.advanced || {}
+          }
+          
+          return {
+            ...banner,
+            config
+          }
+        })
+        
+        setBanners(parsedBanners)
         // Check if any banners need migration
-        const hasOutdated = (data.banners || []).some((banner: Banner) => banner.config && needsMigration(banner.config))
+        const hasOutdated = parsedBanners.some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
       } else {
         console.error('Failed to fetch banners:', data.error)

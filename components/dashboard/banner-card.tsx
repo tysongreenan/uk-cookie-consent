@@ -137,8 +137,10 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
         <div className="space-y-4">
           {/* Banner Preview */}
           <div className="aspect-video bg-muted/50 rounded-lg border border-border/50 overflow-hidden">
-            {banner.config ? (
-              <BannerPreview config={banner.config} />
+            {banner.config && typeof banner.config === 'object' ? (
+              <div className="h-full w-full">
+                <BannerPreview config={banner.config} />
+              </div>
             ) : (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center">
