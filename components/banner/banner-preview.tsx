@@ -77,15 +77,64 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   const [showPreferences, setShowPreferences] = useState(false)
 
   // Ensure config has all required properties with safe defaults
-  const safeConfig = {
+  const safeConfig: BannerConfig = {
     ...config,
-    position: safeConfig.position || 'bottom',
-    colors: safeConfig.colors || {},
-    text: safeConfig.text || {},
-    behavior: safeConfig.behavior || {},
-    branding: safeConfig.branding || {},
-    layout: safeConfig.layout || {},
-    advanced: safeConfig.advanced || {}
+    position: config.position || 'bottom',
+    colors: config.colors || {
+      background: '#ffffff',
+      text: '#000000',
+      button: '#007bff',
+      buttonText: '#ffffff',
+      link: '#007bff'
+    },
+    text: config.text || {
+      title: 'Cookie Consent',
+      message: 'We use cookies to improve your experience.',
+      acceptButton: 'Accept All',
+      rejectButton: 'Reject All',
+      preferencesButton: 'Preferences'
+    },
+    behavior: config.behavior || {
+      autoShow: true,
+      dismissOnScroll: false,
+      showPreferences: true,
+      cookieExpiry: 365
+    },
+    branding: config.branding || {
+      logo: {
+        enabled: false,
+        url: '',
+        position: 'left',
+        maxWidth: 100,
+        maxHeight: 50
+      },
+      privacyPolicy: {
+        url: '',
+        text: 'Privacy Policy',
+        openInNewTab: true,
+        required: false
+      },
+      footerLink: {
+        enabled: false,
+        text: 'Cookie Settings',
+        position: 'floating',
+        floatingPosition: 'bottom-right'
+      }
+    },
+    layout: config.layout || {
+      animation: 'fade',
+      borderRadius: 8,
+      padding: 20,
+      margin: 0,
+      width: 'full',
+      shadow: 'medium'
+    },
+    advanced: config.advanced || {
+      enableAccessibility: true,
+      googleConsentMode: false,
+      customCSS: '',
+      customJS: ''
+    }
   }
 
   const handleAccept = () => {
