@@ -20,7 +20,34 @@ export async function PUT(
     }
 
     const bannerData = await request.json()
-    console.log('🎯 Simple Update: Banner data received:', bannerData)
+    console.log('🎯 Simple Update: Banner data received:', JSON.stringify(bannerData).slice(0, 200))
+
+    // Check if this is just a toggle request (only isActive field)
+    if ('isActive' in bannerData && Object.keys(bannerData).length === 1) {
+      // Use dedicated toggle function
+      const { data, error } = await supabase.rpc('toggle_banner_active', {
+        banner_id: params.id,
+        user_id: session.user.id,
+        is_active: bannerData.isActive
+      })
+
+      if (error) {
+        console.error('❌ Simple Toggle: Error toggling banner:', error)
+        return NextResponse.json({ error: 'Failed to toggle banner status' }, { status: 500 })
+      }
+
+      console.log('✅ Simple Toggle: Banner toggled successfully:', params.id)
+      return NextResponse.json({ 
+        success: true, 
+        bannerId: params.id,
+        isActive: bannerData.isActive,
+        message: 'Banner status updated successfully!' 
+      })
+    }
+
+    // Extract banner name and config for full updates
+    const bannerName = bannerData.name || bannerData.config?.name || 'Untitled Banner'
+    const bannerConfig = bannerData.config || bannerData
 
     // Generate updated code
     const code = `<div id="cookie-banner-${params.id}">
@@ -47,10 +74,11 @@ function rejectCookies() {
     // Update banner using direct SQL to bypass RLS issues
     const { data, error } = await supabase.rpc('update_banner_simple', {
       banner_id: params.id,
-      banner_name: bannerData.name || 'My Banner',
-      banner_config: bannerData.config || bannerData,
+      banner_name: bannerName,
+      banner_config: bannerConfig,
       banner_code: code,
-      user_id: session.user.id
+      user_id: session.user.id,
+      is_active: bannerData.isActive !== undefined ? bannerData.isActive : null
     })
 
     if (error) {

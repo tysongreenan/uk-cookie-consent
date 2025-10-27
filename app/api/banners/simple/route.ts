@@ -17,7 +17,16 @@ export async function POST(request: NextRequest) {
     }
 
     const bannerData = await request.json()
-    console.log('🎯 Simple Save: Banner data received:', bannerData)
+    console.log('🎯 Simple Save: Banner data received:', JSON.stringify(bannerData).slice(0, 200))
+
+    // Validate required fields
+    if (!bannerData.name && !bannerData.config?.name) {
+      return NextResponse.json({ error: 'Banner name is required' }, { status: 400 })
+    }
+
+    // Extract banner name and config
+    const bannerName = bannerData.name || bannerData.config?.name || 'Untitled Banner'
+    const bannerConfig = bannerData.config || bannerData
 
     // Generate banner ID and code
     const bannerId = crypto.randomUUID()
@@ -45,8 +54,8 @@ function rejectCookies() {
     // Create banner using direct SQL to bypass RLS issues
     const { data, error } = await supabase.rpc('create_banner_simple', {
       banner_id: bannerId,
-      banner_name: bannerData.title || 'My Banner',
-      banner_config: bannerData,
+      banner_name: bannerName,
+      banner_config: bannerConfig,
       banner_code: code,
       user_id: session.user.id
     })
