@@ -126,6 +126,7 @@ export interface TrackingScript {
   name: string
   category: 'strictly-necessary' | 'functionality' | 'tracking-performance' | 'targeting-advertising'
   scriptCode: string
+  bodyCode?: string // Optional body code (e.g., for GTM noscript)
   enabled: boolean
 }
 
