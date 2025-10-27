@@ -38,13 +38,6 @@ export function ComplianceSelector({ selectedFramework, onFrameworkChange }: Com
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Choose Your Compliance Framework</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Select the privacy law that applies to your website. This will configure your banner's requirements and legal text.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {frameworks.map((framework) => {
           const Icon = frameworkIcons[framework]
