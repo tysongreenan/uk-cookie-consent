@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.0.0'
+export const CURRENT_BANNER_VERSION = '2.1.0'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -60,7 +60,24 @@ export function migrateBannerConfig(config: any): BannerConfig {
       branding: {
         logo: { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 },
         privacyPolicy: { url: '', text: 'Privacy Policy', openInNewTab: true, required: false },
-        footerLink: { enabled: true, text: 'Cookie Settings', position: 'floating', floatingPosition: 'bottom-left' }
+        footerLink: { 
+          enabled: true, 
+          text: 'Cookie Settings', 
+          position: 'floating', 
+          floatingPosition: 'bottom-left',
+          style: 'floating',
+          floatingStyle: {
+            shape: 'pill',
+            size: 'small',
+            showText: true,
+            useCustomColors: false
+          },
+          inlineStyle: {
+            linkType: 'plain',
+            includeIcon: false,
+            includeLogo: false
+          }
+        }
       },
       layout: {
         width: 'full', customWidth: 400, maxWidth: 1200, borderRadius: 8,
@@ -96,6 +113,11 @@ export function migrateBannerConfig(config: any): BannerConfig {
   // Migration from v1.0.0 to v2.0.0
   if (migratedConfig.version === '1.0.0') {
     migratedConfig = migrateToV2(migratedConfig)
+  }
+
+  // Migration from v2.0.0 to v2.1.0
+  if (migratedConfig.version === '2.0.0') {
+    migratedConfig = migrateToV2_1(migratedConfig)
   }
 
   // Add current version and timestamp
@@ -211,6 +233,63 @@ if (!sessionStorage.getItem('sessionId')) {
 }
 
 /**
+ * Migration from v2.0.0 to v2.1.0 - Adds enhanced cookie settings management
+ */
+function migrateToV2_1(config: any): any {
+  const migrated = { ...config }
+
+  // Ensure branding.footerLink exists with enhanced structure (always enabled for compliance)
+  if (!migrated.branding) {
+    migrated.branding = {}
+  }
+  
+  if (!migrated.branding.footerLink) {
+    migrated.branding.footerLink = {
+      enabled: true,
+      text: 'Cookie Settings',
+      position: 'floating',
+      floatingPosition: 'bottom-left',
+      style: 'floating',
+      floatingStyle: {
+        shape: 'pill',
+        size: 'small',
+        showText: true,
+        useCustomColors: false
+      },
+      inlineStyle: {
+        linkType: 'plain',
+        includeIcon: false,
+        includeLogo: false
+      }
+    }
+  }
+
+  // Add new enhanced properties with sensible defaults
+  if (!migrated.branding.footerLink.style) {
+    migrated.branding.footerLink.style = 'floating' // Maintains current behavior
+  }
+
+  if (!migrated.branding.footerLink.floatingStyle) {
+    migrated.branding.footerLink.floatingStyle = {
+      shape: 'pill',
+      size: 'small',
+      showText: true,
+      useCustomColors: false
+    }
+  }
+
+  if (!migrated.branding.footerLink.inlineStyle) {
+    migrated.branding.footerLink.inlineStyle = {
+      linkType: 'plain',
+      includeIcon: false,
+      includeLogo: false
+    }
+  }
+
+  return migrated
+}
+
+/**
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
@@ -233,6 +312,13 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🎨 Enhanced cookie settings with better user experience')
     notes.push('⚡ Improved performance with optimized script loading')
     notes.push('🔧 Added session management and advanced tracking options')
+  }
+
+  if (oldVersion === '2.0.0' && newVersion === '2.1.0') {
+    notes.push('🍪 Enhanced cookie settings button with customizable shapes and sizes')
+    notes.push('🎨 Added logo overlay support for floating cookie settings button')
+    notes.push('📝 Added inline footer link HTML snippet generator')
+    notes.push('⚙️ New dedicated Cookie Settings tab in banner builder')
   }
 
   return notes

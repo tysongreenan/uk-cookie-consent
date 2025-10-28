@@ -2,7 +2,7 @@ import { BannerConfig, ComplianceFramework } from '@/types'
 import { getComplianceRequirements } from './compliance-frameworks'
 
 export const PIPEDA_TEMPLATE: BannerConfig = {
-  version: '2.0.0',
+  version: '2.1.0',
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'pipeda',
@@ -57,6 +57,18 @@ export const PIPEDA_TEMPLATE: BannerConfig = {
       text: 'Cookie Settings',
       position: 'floating',
       floatingPosition: 'bottom-left',
+      style: 'floating',
+      floatingStyle: {
+        shape: 'pill',
+        size: 'small',
+        showText: true,
+        useCustomColors: false
+      },
+      inlineStyle: {
+        linkType: 'plain',
+        includeIcon: false,
+        includeLogo: false
+      }
     },
   },
   layout: {
@@ -87,7 +99,7 @@ export const PIPEDA_TEMPLATE: BannerConfig = {
 }
 
 export const GDPR_TEMPLATE: BannerConfig = {
-  version: '2.0.0',
+  version: '2.1.0',
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'gdpr',
@@ -172,7 +184,7 @@ export const GDPR_TEMPLATE: BannerConfig = {
 }
 
 export const CCPA_TEMPLATE: BannerConfig = {
-  version: '2.0.0',
+  version: '2.1.0',
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'ccpa',

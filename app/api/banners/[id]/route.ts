@@ -140,12 +140,15 @@ async function handleBannerUpdate(
       )
     }
 
+    // Apply migration to config before saving
+    const migratedConfig = needsMigration(bannerData.config) ? migrateBannerConfig(bannerData.config) : bannerData.config
+
     // Update banner in database
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .update({
         name: bannerData.name,
-        config: JSON.stringify(bannerData.config),
+        config: JSON.stringify(migratedConfig),
         isActive: bannerData.isActive || false,
         updatedAt: new Date().toISOString()
       })
@@ -165,7 +168,7 @@ async function handleBannerUpdate(
       success: true,
       banner: {
         ...banner,
-        config: JSON.parse(banner.config)
+        config: migratedConfig
       }
     })
 

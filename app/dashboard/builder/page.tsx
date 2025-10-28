@@ -27,8 +27,137 @@ import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 
+// Helper function to generate inline footer link HTML
+function generateInlineFooterLinkHTML(footerLink: any): string {
+  const text = footerLink.text || 'Cookie Settings'
+  const linkType = footerLink.inlineStyle?.linkType || 'plain'
+  const includeIcon = footerLink.inlineStyle?.includeIcon || false
+  const includeLogo = footerLink.inlineStyle?.includeLogo || false
+  const customClass = footerLink.inlineStyle?.customClass || ''
+  
+  let html = ''
+  
+  switch (linkType) {
+    case 'plain':
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${text}</a>`
+      break
+    case 'button':
+      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
+      break
+    case 'icon-text':
+      const icon = includeIcon ? '🍪 ' : ''
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${icon}${text}</a>`
+      break
+    case 'custom':
+      const customIcon = includeIcon ? '🍪 ' : ''
+      const customLogo = includeLogo ? '<img src="YOUR_LOGO_URL" alt="Logo" style="height: 16px; margin-right: 4px;" />' : ''
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${customLogo}${customIcon}${text}</a>`
+      break
+    default:
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${text}</a>`
+  }
+  
+  return html
+}
+
+// Helper functions for live preview
+function generateFloatingButtonPreviewStyles(config: any): React.CSSProperties {
+  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
+  const shape = floatingStyle.shape || 'pill'
+  const size = floatingStyle.size || 'small'
+  const showText = floatingStyle.showText ?? true
+  const useCustomColors = floatingStyle.useCustomColors || false
+  const customColors = floatingStyle.customColors || {}
+  
+  // Size mapping
+  const sizeMap = {
+    small: { width: '40px', height: '40px', padding: '8px', fontSize: '12px' },
+    medium: { width: '48px', height: '48px', padding: '12px', fontSize: '14px' },
+    large: { width: '56px', height: '56px', padding: '16px', fontSize: '16px' }
+  }
+  
+  const sizeConfig = sizeMap[size as keyof typeof sizeMap] || sizeMap.small
+  
+  // Shape-based styles
+  let borderRadius = '4px'
+  if (shape === 'circle') {
+    borderRadius = '50%'
+  } else if (shape === 'pill') {
+    borderRadius = '20px'
+  }
+  
+  // Colors
+  const backgroundColor = useCustomColors && customColors.background 
+    ? customColors.background 
+    : config.branding?.primaryColor || '#3b82f6'
+  const textColor = useCustomColors && customColors.text 
+    ? customColors.text 
+    : '#ffffff'
+  const borderColor = useCustomColors && customColors.border 
+    ? customColors.border 
+    : backgroundColor
+  
+  return {
+    backgroundColor,
+    color: textColor,
+    border: `1px solid ${borderColor}`,
+    borderRadius,
+    padding: showText ? sizeConfig.padding : '8px',
+    width: showText ? 'auto' : sizeConfig.width,
+    height: showText ? 'auto' : sizeConfig.height,
+    minWidth: showText ? 'auto' : sizeConfig.width,
+    minHeight: showText ? 'auto' : sizeConfig.height,
+    fontSize: sizeConfig.fontSize,
+    fontWeight: '500',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    cursor: 'pointer',
+    userSelect: 'none',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+    transition: 'all 0.2s ease',
+    gap: '6px'
+  }
+}
+
+function generateFloatingButtonPreviewContent(config: any): React.ReactNode {
+  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
+  const showText = floatingStyle.showText ?? true
+  const text = config.branding?.footerLink?.text || 'Cookie Settings'
+  
+  // Check consent state for icon
+  const consentState = typeof window !== 'undefined' 
+    ? localStorage.getItem('cookie-consent-preview-state') || 'accepted'
+    : 'accepted'
+  
+  const hasAcceptedNonEssential = consentState === 'accepted'
+  
+  // Cookie icons (matching the code generator)
+  const cookieAcceptedIcon = (
+    <svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor">
+      <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q-25 0-42.5 17.5T280-420q0 25-17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/>
+    </svg>
+  )
+  
+  const cookieRejectedIcon = (
+    <svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor">
+      <path d="m815-260-58-58q18-31 29-66.5t14-73.5q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-49-2-90 10t-76 33l-57-57q61-42 137.5-58.5T563-872q-9 45 6 84.5t45 66.5q30 27 71 37t86-5q-31 69 11 118t96 51q8 72-9.5 138T815-260ZM340-360q-25 0-42.5-17.5T280-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360ZM819-28 701-146q-48 32-103.5 49T480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-62 17-117.5T146-701L27-820l57-57L876-85l-57 57ZM480-160q45 0 85.5-12t76.5-33L205-642q-21 36-33 76.5T160-480q0 133 93.5 226.5T480-160Zm-56-264Zm135-137Z"/>
+    </svg>
+  )
+  
+  return (
+    <>
+      <span id="cookie-icon">
+        {hasAcceptedNonEssential ? cookieAcceptedIcon : cookieRejectedIcon}
+      </span>
+      {showText && <span>{text}</span>}
+    </>
+  )
+}
+
 const defaultConfig: BannerConfig = {
-  version: '2.0.0',
+  version: '2.1.0',
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'pipeda',
@@ -91,7 +220,19 @@ const defaultConfig: BannerConfig = {
       enabled: true,
       text: 'Cookie Settings',
       position: 'floating',
-      floatingPosition: 'bottom-left'
+      floatingPosition: 'bottom-left',
+      style: 'floating',
+      floatingStyle: {
+        shape: 'pill',
+        size: 'small',
+        showText: true,
+        useCustomColors: false
+      },
+      inlineStyle: {
+        linkType: 'plain',
+        includeIcon: false,
+        includeLogo: false
+      }
     }
   },
   layout: {
@@ -575,32 +716,35 @@ export default function BannerBuilderPage() {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-muted-foreground">
-                      {activeTab === 'compliance' ? 'Step 1 of 7' :
-                       activeTab === 'design' ? 'Step 2 of 7' : 
-                       activeTab === 'content' ? 'Step 3 of 7' : 
-                       activeTab === 'scripts' ? 'Step 4 of 7' : 
-                       activeTab === 'behavior' ? 'Step 5 of 7' : 
-                       activeTab === 'analytics' ? 'Step 6 of 7' : 'Step 7 of 7'}
+                      {activeTab === 'compliance' ? 'Step 1 of 8' :
+                       activeTab === 'design' ? 'Step 2 of 8' : 
+                       activeTab === 'content' ? 'Step 3 of 8' : 
+                       activeTab === 'scripts' ? 'Step 4 of 8' : 
+                       activeTab === 'cookie-settings' ? 'Step 5 of 8' :
+                       activeTab === 'behavior' ? 'Step 6 of 8' : 
+                       activeTab === 'analytics' ? 'Step 7 of 8' : 'Step 8 of 8'}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {Math.round((activeTab === 'compliance' ? 14.28 : 
-                                   activeTab === 'design' ? 28.57 : 
-                                   activeTab === 'content' ? 42.86 : 
-                                   activeTab === 'scripts' ? 57.14 : 
-                                   activeTab === 'behavior' ? 71.43 : 
-                                   activeTab === 'analytics' ? 85.71 : 100))}%
+                      {Math.round((activeTab === 'compliance' ? 12.5 : 
+                                   activeTab === 'design' ? 25 : 
+                                   activeTab === 'content' ? 37.5 : 
+                                   activeTab === 'scripts' ? 50 : 
+                                   activeTab === 'cookie-settings' ? 62.5 :
+                                   activeTab === 'behavior' ? 75 : 
+                                   activeTab === 'analytics' ? 87.5 : 100))}%
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div 
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{ 
-                        width: `${activeTab === 'compliance' ? 14.28 : 
-                                 activeTab === 'design' ? 28.57 : 
-                                 activeTab === 'content' ? 42.86 : 
-                                 activeTab === 'scripts' ? 57.14 : 
-                                 activeTab === 'behavior' ? 71.43 : 
-                                 activeTab === 'analytics' ? 85.71 : 100}%` 
+                        width: `${activeTab === 'compliance' ? 12.5 : 
+                                 activeTab === 'design' ? 25 : 
+                                 activeTab === 'content' ? 37.5 : 
+                                 activeTab === 'scripts' ? 50 : 
+                                 activeTab === 'cookie-settings' ? 62.5 :
+                                 activeTab === 'behavior' ? 75 : 
+                                 activeTab === 'analytics' ? 87.5 : 100}%` 
                       }}
                     ></div>
                   </div>
@@ -662,6 +806,19 @@ export default function BannerBuilderPage() {
                   </button>
                   
                   <button
+                    onClick={() => setActiveTab('cookie-settings')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'cookie-settings'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span className="flex-1 text-left">Cookie Settings</span>
+                    <NewBadge variant="sparkle" size="sm" />
+                  </button>
+                  
+                  <button
                     onClick={() => setActiveTab('behavior')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'behavior'
@@ -709,6 +866,7 @@ export default function BannerBuilderPage() {
                    activeTab === 'design' ? 'Customize Appearance' : 
                    activeTab === 'content' ? 'Set Text & Messages' : 
                    activeTab === 'scripts' ? 'Configure Tracking Scripts' : 
+                   activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
                    activeTab === 'behavior' ? 'Set Banner Behavior' : 
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
                 </h2>
@@ -717,6 +875,7 @@ export default function BannerBuilderPage() {
                    activeTab === 'design' ? 'Customize the visual appearance of your cookie consent banner.' :
                    activeTab === 'content' ? 'Set the text, messages, and button labels for your banner.' :
                    activeTab === 'scripts' ? 'Configure tracking scripts and cookie categories.' :
+                   activeTab === 'cookie-settings' ? 'Configure how users can manage their cookie preferences after initial consent.' :
                    activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
                    activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
                    'Copy the code below and paste it into your website to activate your cookie banner.'}
@@ -1207,52 +1366,61 @@ export default function BannerBuilderPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Cookie Settings Link</CardTitle>
-                    <CardDescription>
-                      Add a persistent link for users to change their cookie preferences anytime (required for compliance).
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="footer-link-enabled"
-                        checked={config.branding?.footerLink?.enabled ?? true}
-                        onCheckedChange={(checked) => updateConfig('branding', { 
-                          footerLink: { 
-                            ...(config.branding?.footerLink || {
-                              text: 'Cookie Settings',
-                              position: 'floating',
-                              floatingPosition: 'bottom-left'
-                            }), 
-                            enabled: checked 
-                          }
-                        })}
-                      />
-                      <Label htmlFor="footer-link-enabled">Enable Cookie Settings Link</Label>
+              </TabsContent>
+
+              {/* Cookie Settings Tab */}
+        <TabsContent value="cookie-settings" className="space-y-6" id="cookie-settings-panel" role="tabpanel" aria-labelledby="cookie-settings-tab">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Configuration Panel */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cookie Settings Management</CardTitle>
+                  <CardDescription>
+                    Configure how users can manage their cookie preferences after initial consent. Choose between a floating button or inline footer link.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {/* Cookie Settings Management is mandatory */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <p className="text-sm text-blue-800 font-medium">Cookie Settings Management</p>
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Required for compliance. Users must be able to manage their cookie preferences after initial consent.
+                      </p>
                     </div>
 
-                    {config.branding?.footerLink?.enabled && (
-                      <div className="space-y-4">
+                    {(
+                      <div className="space-y-6">
+                        {/* Style Selection */}
                         <div>
-                          <Label htmlFor="footer-link-text">Link Text</Label>
-                          <Input
-                            id="footer-link-text"
-                            value={config.branding?.footerLink?.text || 'Cookie Settings'}
-                            onChange={(e) => updateConfig('branding', { 
-                              footerLink: { ...(config.branding?.footerLink || {}), text: e.target.value }
-                            })}
-                            placeholder="Cookie Settings"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="footer-link-position">Position</Label>
+                          <Label htmlFor="cookie-settings-style">Display Style</Label>
                           <Select 
-                            value={config.branding?.footerLink?.position || 'floating'} 
+                            value={config.branding?.footerLink?.style || 'floating'} 
                             onValueChange={(value: any) => updateConfig('branding', { 
-                              footerLink: { ...(config.branding?.footerLink || {}), position: value }
+                              footerLink: { 
+                                ...(config.branding?.footerLink || {}), 
+                                style: value,
+                                // Initialize new properties if switching to floating
+                                ...(value === 'floating' && !config.branding?.footerLink?.floatingStyle ? {
+                                  floatingStyle: {
+                                    shape: 'pill',
+                                    size: 'small',
+                                    showText: true,
+                                    useCustomColors: false
+                                  }
+                                } : {}),
+                                // Initialize new properties if switching to inline
+                                ...(value === 'inline' && !config.branding?.footerLink?.inlineStyle ? {
+                                  inlineStyle: {
+                                    linkType: 'plain',
+                                    includeIcon: false,
+                                    includeLogo: false
+                                  }
+                                } : {})
+                              }
                             })}
                           >
                             <SelectTrigger>
@@ -1260,49 +1428,426 @@ export default function BannerBuilderPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="floating">Floating Button (Recommended)</SelectItem>
-                              <SelectItem value="inline">Inline HTML (For Footer)</SelectItem>
+                              <SelectItem value="inline">Inline Footer Link</SelectItem>
+                              <SelectItem value="both">Both Options</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
-                        {config.branding?.footerLink?.position === 'floating' && (
-                          <div>
-                            <Label htmlFor="floating-position">Floating Position</Label>
-                            <Select 
-                              value={config.branding?.footerLink?.floatingPosition || 'bottom-left'} 
-                              onValueChange={(value: any) => updateConfig('branding', { 
-                                footerLink: { ...(config.branding?.footerLink || {}), floatingPosition: value }
-                              })}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="bottom-left">Bottom Left</SelectItem>
-                                <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                              </SelectContent>
-                            </Select>
+                        {/* Floating Button Configuration */}
+                        {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
+                          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                            <h4 className="font-medium flex items-center">
+                              <Settings className="h-4 w-4 mr-2" />
+                              Floating Button Settings
+                            </h4>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="floating-text">Button Text</Label>
+                                <Input
+                                  id="floating-text"
+                                  value={config.branding?.footerLink?.text || 'Cookie Settings'}
+                                  onChange={(e) => updateConfig('branding', { 
+                                    footerLink: { ...(config.branding?.footerLink || {}), text: e.target.value }
+                                  })}
+                                  placeholder="Cookie Settings"
+                                />
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor="floating-position">Position</Label>
+                                <Select 
+                                  value={config.branding?.footerLink?.floatingPosition || 'bottom-left'} 
+                                  onValueChange={(value: any) => updateConfig('branding', { 
+                                    footerLink: { ...(config.branding?.footerLink || {}), floatingPosition: value }
+                                  })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                                    <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="floating-shape">Shape</Label>
+                                <Select 
+                                  value={config.branding?.footerLink?.floatingStyle?.shape || 'pill'} 
+                                  onValueChange={(value: any) => updateConfig('branding', { 
+                                    footerLink: { 
+                                      ...(config.branding?.footerLink || {}), 
+                                      floatingStyle: { 
+                                        ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                        shape: value 
+                                      }
+                                    }
+                                  })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="circle">Circle (Icon Only)</SelectItem>
+                                    <SelectItem value="pill">Pill (Icon + Text)</SelectItem>
+                                    <SelectItem value="square">Square (Icon + Text)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              
+                              <div>
+                                <Label htmlFor="floating-size">Size</Label>
+                                <Select 
+                                  value={config.branding?.footerLink?.floatingStyle?.size || 'small'} 
+                                  onValueChange={(value: any) => updateConfig('branding', { 
+                                    footerLink: { 
+                                      ...(config.branding?.footerLink || {}), 
+                                      floatingStyle: { 
+                                        ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                        size: value 
+                                      }
+                                    }
+                                  })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="small">Small (40px)</SelectItem>
+                                    <SelectItem value="medium">Medium (48px)</SelectItem>
+                                    <SelectItem value="large">Large (56px)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="floating-show-text"
+                                checked={config.branding?.footerLink?.floatingStyle?.showText ?? true}
+                                onCheckedChange={(checked) => updateConfig('branding', { 
+                                  footerLink: { 
+                                    ...(config.branding?.footerLink || {}), 
+                                    floatingStyle: { 
+                                      ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                      showText: checked 
+                                    }
+                                  }
+                                })}
+                              />
+                              <Label htmlFor="floating-show-text">Show text with icon</Label>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="floating-custom-colors"
+                                checked={config.branding?.footerLink?.floatingStyle?.useCustomColors ?? false}
+                                onCheckedChange={(checked) => updateConfig('branding', { 
+                                  footerLink: { 
+                                    ...(config.branding?.footerLink || {}), 
+                                    floatingStyle: { 
+                                      ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                      useCustomColors: checked 
+                                    }
+                                  }
+                                })}
+                              />
+                              <Label htmlFor="floating-custom-colors">Use custom colors (otherwise matches banner button)</Label>
+                            </div>
+
+                            {config.branding?.footerLink?.floatingStyle?.useCustomColors && (
+                              <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                  <Label htmlFor="floating-bg-color">Background Color</Label>
+                                  <Input
+                                    id="floating-bg-color"
+                                    type="color"
+                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.background || '#6b7280'}
+                                    onChange={(e) => updateConfig('branding', { 
+                                      footerLink: { 
+                                        ...(config.branding?.footerLink || {}), 
+                                        floatingStyle: { 
+                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                          customColors: {
+                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                            background: e.target.value
+                                          }
+                                        }
+                                      }
+                                    })}
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="floating-text-color">Text Color</Label>
+                                  <Input
+                                    id="floating-text-color"
+                                    type="color"
+                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.text || '#ffffff'}
+                                    onChange={(e) => updateConfig('branding', { 
+                                      footerLink: { 
+                                        ...(config.branding?.footerLink || {}), 
+                                        floatingStyle: { 
+                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                          customColors: {
+                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                            text: e.target.value
+                                          }
+                                        }
+                                      }
+                                    })}
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="floating-border-color">Border Color</Label>
+                                  <Input
+                                    id="floating-border-color"
+                                    type="color"
+                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.border || '#6b7280'}
+                                    onChange={(e) => updateConfig('branding', { 
+                                      footerLink: { 
+                                        ...(config.branding?.footerLink || {}), 
+                                        floatingStyle: { 
+                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                          customColors: {
+                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                            border: e.target.value
+                                          }
+                                        }
+                                      }
+                                    })}
+                                  />
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
 
-                        {config.branding?.footerLink?.position === 'inline' && (
-                          <div className="mt-4 p-4 bg-muted rounded-lg">
-                            <p className="text-sm font-medium mb-2">Add this to your website footer:</p>
-                            <code className="block p-3 bg-background rounded text-xs overflow-x-auto">
-                              {`<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${config.branding?.footerLink?.text || 'Cookie Settings'}</a>`}
-                            </code>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              This link will reopen the cookie banner when clicked.
-                            </p>
+                        {/* Inline Footer Link Configuration */}
+                        {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
+                          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                            <h4 className="font-medium flex items-center">
+                              <Type className="h-4 w-4 mr-2" />
+                              Inline Footer Link Settings
+                            </h4>
+                            
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="inline-link-type">Link Style</Label>
+                                <Select 
+                                  value={config.branding?.footerLink?.inlineStyle?.linkType || 'plain'} 
+                                  onValueChange={(value: any) => updateConfig('branding', { 
+                                    footerLink: { 
+                                      ...(config.branding?.footerLink || {}), 
+                                      inlineStyle: { 
+                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
+                                        linkType: value 
+                                      }
+                                    }
+                                  })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="plain">Plain Text Link</SelectItem>
+                                    <SelectItem value="button">Button Style</SelectItem>
+                                    <SelectItem value="icon-text">Icon + Text</SelectItem>
+                                    <SelectItem value="custom">Custom Styled</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="inline-include-icon"
+                                  checked={config.branding?.footerLink?.inlineStyle?.includeIcon ?? false}
+                                  onCheckedChange={(checked) => updateConfig('branding', { 
+                                    footerLink: { 
+                                      ...(config.branding?.footerLink || {}), 
+                                      inlineStyle: { 
+                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
+                                        includeIcon: checked 
+                                      }
+                                    }
+                                  })}
+                                />
+                                <Label htmlFor="inline-include-icon">Include cookie icon</Label>
+                              </div>
+
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="inline-include-logo"
+                                  checked={config.branding?.footerLink?.inlineStyle?.includeLogo ?? false}
+                                  onCheckedChange={(checked) => updateConfig('branding', { 
+                                    footerLink: { 
+                                      ...(config.branding?.footerLink || {}), 
+                                      inlineStyle: { 
+                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
+                                        includeLogo: checked 
+                                      }
+                                    }
+                                  })}
+                                />
+                                <Label htmlFor="inline-include-logo">Include your logo (if uploaded)</Label>
+                              </div>
+
+                              {config.branding?.footerLink?.inlineStyle?.linkType === 'custom' && (
+                                <div>
+                                  <Label htmlFor="inline-custom-class">Custom CSS Class</Label>
+                                  <Input
+                                    id="inline-custom-class"
+                                    value={config.branding?.footerLink?.inlineStyle?.customClass || ''}
+                                    onChange={(e) => updateConfig('branding', { 
+                                      footerLink: { 
+                                        ...(config.branding?.footerLink || {}), 
+                                        inlineStyle: { 
+                                          ...(config.branding?.footerLink?.inlineStyle || {}), 
+                                          customClass: e.target.value 
+                                        }
+                                      }
+                                    })}
+                                    placeholder="my-custom-cookie-link"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Generated HTML Preview */}
+                              <div className="mt-4 p-4 bg-muted rounded-lg">
+                                <p className="text-sm font-medium mb-2">Generated HTML for your footer:</p>
+                                <code className="block p-3 bg-background rounded text-xs overflow-x-auto">
+                                  {generateInlineFooterLinkHTML(config.branding?.footerLink || {})}
+                                </code>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  Copy this code and paste it into your website footer where you want the link to appear.
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
                     )}
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </div>
 
-              {/* Scripts Tab */}
+              {/* Live Preview Panel */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Live Preview</CardTitle>
+                    <CardDescription>
+                      See how your cookie settings will look on your website
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {/* Floating Button Preview */}
+                      {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium">Floating Button Preview</h4>
+                          <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-8 bg-gray-50 min-h-[200px]">
+                            <div className="text-center text-sm text-gray-500 mb-4">
+                              Your website content would appear here
+                            </div>
+                            
+                            {/* Floating Button Preview */}
+                            <div 
+                              className="inline-block cursor-pointer transition-all duration-200 hover:scale-105"
+                              style={{
+                                ...generateFloatingButtonPreviewStyles(config),
+                                position: 'relative',
+                                top: 'auto',
+                                left: 'auto',
+                                right: 'auto',
+                                bottom: 'auto',
+                                transform: 'none',
+                                margin: '0 auto'
+                              }}
+                              onClick={() => {
+                                // Toggle consent state for preview
+                                const currentState = localStorage.getItem('cookie-consent-preview-state') || 'accepted';
+                                const newState = currentState === 'accepted' ? 'rejected' : 'accepted';
+                                localStorage.setItem('cookie-consent-preview-state', newState);
+                                // Force re-render by updating a dummy state
+                                setConfig({...config});
+                              }}
+                            >
+                              {generateFloatingButtonPreviewContent(config)}
+                            </div>
+                            
+                            <div className="text-center mt-4">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  const currentState = localStorage.getItem('cookie-consent-preview-state') || 'accepted';
+                                  const newState = currentState === 'accepted' ? 'rejected' : 'accepted';
+                                  localStorage.setItem('cookie-consent-preview-state', newState);
+                                  setConfig({...config});
+                                }}
+                              >
+                                Toggle Consent State
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Inline Footer Link Preview */}
+                      {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium">Inline Footer Link Preview</h4>
+                          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <div className="text-xs text-gray-500 mb-2">Footer area:</div>
+                            <div 
+                              className="inline-block"
+                              dangerouslySetInnerHTML={{ 
+                                __html: generateInlineFooterLinkHTML(config.branding?.footerLink) 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* HTML Snippet Preview */}
+                      {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium">Generated HTML Snippet</h4>
+                          <div className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+                            <pre>{generateInlineFooterLinkHTML(config.branding?.footerLink)}</pre>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(generateInlineFooterLinkHTML(config.branding?.footerLink));
+                              // You could add a toast notification here
+                            }}
+                          >
+                            Copy HTML Snippet
+                          </Button>
+                        </div>
+                      )}
+
+                      {!config.branding?.footerLink?.style && (
+                        <div className="text-center text-gray-500 py-8">
+                          <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p>Select a display style to see preview</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
                 <Card>
                   <CardHeader>

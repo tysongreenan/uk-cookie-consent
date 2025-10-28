@@ -59,7 +59,19 @@ export function BrandColorPicker() {
         enabled: false,
         text: 'Cookie Settings',
         position: 'floating' as const,
-        floatingPosition: 'bottom-right' as const
+        floatingPosition: 'bottom-right' as const,
+        style: 'floating' as const,
+        floatingStyle: {
+          shape: 'pill' as const,
+          size: 'small' as const,
+          showText: true,
+          useCustomColors: false
+        },
+        inlineStyle: {
+          linkType: 'plain' as const,
+          includeIcon: false,
+          includeLogo: false
+        }
       }
     },
     layout: {

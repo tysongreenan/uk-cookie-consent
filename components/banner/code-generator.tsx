@@ -103,6 +103,148 @@ interface CodeGeneratorProps {
   config: BannerConfig
 }
 
+// Helper function to generate floating button styles
+function generateFloatingButtonStyles(config: any): string {
+  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
+  const shape = floatingStyle.shape || 'pill'
+  const size = floatingStyle.size || 'small'
+  const useCustomColors = floatingStyle.useCustomColors || false
+  const customColors = floatingStyle.customColors || {}
+  
+  // Size mapping
+  const sizeMap = {
+    small: { width: '40px', height: '40px', padding: '8px', fontSize: '12px' },
+    medium: { width: '48px', height: '48px', padding: '12px', fontSize: '14px' },
+    large: { width: '56px', height: '56px', padding: '16px', fontSize: '16px' }
+  }
+  
+  const sizeProps = sizeMap[size as keyof typeof sizeMap] || sizeMap.small
+  
+  // Shape-specific styles
+  let borderRadius = '6px'
+  let width = 'auto'
+  let height = 'auto'
+  let padding = sizeProps.padding
+  
+  if (shape === 'circle') {
+    borderRadius = '50%'
+    width = sizeProps.width
+    height = sizeProps.height
+    padding = '0'
+  } else if (shape === 'square') {
+    borderRadius = '8px'
+    width = sizeProps.width
+    height = sizeProps.height
+    padding = '0'
+  }
+  
+  // Color handling
+  let backgroundColor = 'rgba(107, 114, 128, 0.9)'
+  let color = '#ffffff'
+  let border = 'none'
+  
+  if (useCustomColors) {
+    backgroundColor = customColors.background || 'rgba(107, 114, 128, 0.9)'
+    color = customColors.text || '#ffffff'
+    if (customColors.border) {
+      border = `1px solid ${customColors.border}`
+    }
+  } else {
+    // Use banner button colors
+    backgroundColor = config.colors?.button || '#3b82f6'
+    color = config.colors?.buttonText || '#ffffff'
+  }
+  
+  return `
+    background: ${backgroundColor};
+    color: ${color};
+    border: ${border};
+    padding: ${padding};
+    border-radius: ${borderRadius};
+    width: ${width};
+    height: ${height};
+    font-size: ${sizeProps.fontSize};
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  `
+}
+
+// Helper function to generate inline footer link HTML
+function generateInlineFooterLinkHTML(footerLink: any): string {
+  const text = footerLink.text || 'Cookie Settings'
+  const linkType = footerLink.inlineStyle?.linkType || 'plain'
+  const includeIcon = footerLink.inlineStyle?.includeIcon || false
+  const includeLogo = footerLink.inlineStyle?.includeLogo || false
+  const customClass = footerLink.inlineStyle?.customClass || ''
+
+  let html = ''
+
+  switch (linkType) {
+    case 'plain':
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${text}</a>`
+      break
+    case 'button':
+      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
+      break
+    case 'icon-text':
+      const icon = includeIcon ? '🍪 ' : ''
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${icon}${text}</a>`
+      break
+    case 'custom':
+      const customIcon = includeIcon ? '🍪 ' : ''
+      const customLogo = includeLogo ? '<img src="YOUR_LOGO_URL" alt="Logo" style="height: 16px; margin-right: 4px;" />' : ''
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${customLogo}${customIcon}${text}</a>`
+      break
+    default:
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${text}</a>`
+  }
+  return html
+}
+
+// Helper function to generate floating button content
+function generateFloatingButtonContent(config: any): string {
+  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
+  const shape = floatingStyle.shape || 'pill'
+  const showText = floatingStyle.showText !== false
+  const text = config.branding?.footerLink?.text || 'Cookie Settings'
+  const hasLogo = config.branding?.logo?.enabled && config.branding?.logo?.url
+  
+  // Cookie icons (embedded SVG)
+  const cookieAcceptedIcon = `<svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/></svg>`
+  
+  const cookieRejectedIcon = `<svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="m815-260-58-58q18-31 29-66.5t14-73.5q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-49-2-90 10t-76 33l-57-57q61-42 137.5-58.5T563-872q-9 45 6 84.5t45 66.5q30 27 71 37t86-5q-31 69 11 118t96 51q8 72-9.5 138T815-260ZM340-360q-25 0-42.5-17.5T280-420q0-25 17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360ZM819-28 701-146q-48 32-103.5 49T480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-62 17-117.5T146-701L27-820l57-57L876-85l-57 57ZM480-160q45 0 85.5-12t76.5-33L205-642q-21 36-33 76.5T160-480q0 133 93.5 226.5T480-160Zm-56-264Zm135-137Z"/></svg>`
+  
+  let content = ''
+  
+  if (shape === 'circle') {
+    // Circle shows only icon/logo
+    if (hasLogo) {
+      content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 20px; height: 20px; object-fit: contain;" />`
+    } else {
+      content = `<span id="cookie-icon">${cookieAcceptedIcon}</span>`
+    }
+  } else {
+    // Pill and square can show text
+    if (hasLogo) {
+      content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" />`
+      if (showText) {
+        content += `<span>${text}</span>`
+      }
+    } else {
+      content = `<span id="cookie-icon">${cookieAcceptedIcon}</span>`
+      if (showText) {
+        content += `<span style="margin-left: 4px;">${text}</span>`
+      }
+    }
+  }
+  
+  return content
+}
+
 export function CodeGenerator({ config }: CodeGeneratorProps) {
   const [activeTab, setActiveTab] = useState<'head' | 'body'>('head')
   const [codeVersion, setCodeVersion] = useState(0)
@@ -425,28 +567,29 @@ ${config.behavior.showPreferences ? `
 </div>
 ` : ''}
 
-${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
-<!-- Floating Cookie Settings Button -->
+${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
+<!-- Enhanced Floating Cookie Settings Button -->
 <div id="cookie-settings-float" style="
   position: fixed;
   ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 16px; right: 16px;' : 'bottom: 16px; left: 16px;'}
   z-index: 999998;
-  background: rgba(107, 114, 128, 0.9);
-  color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 6px;
+  ${generateFloatingButtonStyles(config)}
   cursor: pointer;
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 400;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: none;
   display: none;
   transition: all 0.2s ease;
   opacity: 0.7;
-" onmouseover="this.style.opacity='1'; this.style.background='rgba(107, 114, 128, 1)'" onmouseout="this.style.opacity='0.7'; this.style.background='rgba(107, 114, 128, 0.9)'">
-  🍪 ${config.branding.footerLink.text}
+" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+  ${generateFloatingButtonContent(config)}
 </div>
+` : ''}
+
+${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
+<!-- Inline Footer Link HTML Snippet -->
+<!-- Copy this HTML and paste it in your website footer where you want the cookie settings link to appear -->
+<!-- 
+${generateInlineFooterLinkHTML(config.branding.footerLink)}
+-->
 ` : ''}`
   }
 
@@ -634,6 +777,16 @@ ${config.branding.footerLink.enabled && config.branding.footerLink.position === 
   };
   ` : ''}
   
+  ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
+  // Initialize floating button icon on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    var consent = getConsent();
+    if (consent) {
+      updateFloatingButtonIcon(consent);
+    }
+  });
+  ` : ''}
+  
   function getCookie(name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -661,6 +814,30 @@ ${config.branding.footerLink.enabled && config.branding.footerLink.position === 
   function saveConsent(consent) {
     setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
     loadScripts(consent);
+    updateFloatingButtonIcon(consent);
+  }
+  
+  function updateFloatingButtonIcon(consent) {
+    var floatBtn = document.getElementById('cookie-settings-float');
+    if (!floatBtn) return;
+    
+    var iconElement = floatBtn.querySelector('#cookie-icon');
+    if (!iconElement) return;
+    
+    // Cookie icons (embedded SVG)
+    var cookieAcceptedIcon = '<svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/></svg>';
+    
+    var cookieRejectedIcon = '<svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="m815-260-58-58q18-31 29-66.5t14-73.5q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-49-2-90 10t-76 33l-57-57q61-42 137.5-58.5T563-872q-9 45 6 84.5t45 66.5q30 27 71 37t86-5q-31 69 11 118t96 51q8 72-9.5 138T815-260ZM340-360q-25 0-42.5-17.5T280-420q0-25 17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360ZM819-28 701-146q-48 32-103.5 49T480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-62 17-117.5T146-701L27-820l57-57L876-85l-57 57ZM480-160q45 0 85.5-12t76.5-33L205-642q-21 36-33 76.5T160-480q0 133 93.5 226.5T480-160Zm-56-264Zm135-137Z"/></svg>';
+    
+    // Determine if user has accepted any non-essential cookies
+    var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
+    
+    // Update icon based on consent state
+    if (hasAcceptedNonEssential) {
+      iconElement.innerHTML = cookieAcceptedIcon;
+    } else {
+      iconElement.innerHTML = cookieRejectedIcon;
+    }
   }
   
   function loadScripts(consent) {
@@ -722,7 +899,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         initGA4();
       }
       
-      ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+      ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
       // Show cookie settings floating button after consent is given
       var floatBtn = document.getElementById('cookie-settings-float');
       if (floatBtn) {
@@ -750,7 +927,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         initGA4(); // Initialize GA4
         trackConsentEvent('accept'); // Track consent event
         banner.style.display = 'none';
-        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
         // Show floating cookie settings button after accepting
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
@@ -771,7 +948,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
         trackConsentEvent('reject'); // Track consent event (but don't init GA4)
         banner.style.display = 'none';
-        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
         // Show floating cookie settings button after rejecting (so user can change mind)
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
@@ -843,7 +1020,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         banner.style.display = 'none';
         modal.style.display = 'none';
         
-        ${config.branding.footerLink.enabled && config.branding.footerLink.position === 'floating' ? `
+        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
         // Show floating cookie settings button after confirming preferences
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {

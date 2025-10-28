@@ -73,6 +73,24 @@ export interface BannerConfig {
       text: string
       position: 'floating' | 'inline'
       floatingPosition?: 'bottom-left' | 'bottom-right'
+      style?: 'floating' | 'inline' | 'both'
+      floatingStyle?: {
+        shape: 'circle' | 'pill' | 'square'
+        size: 'small' | 'medium' | 'large'
+        showText: boolean
+        useCustomColors: boolean
+        customColors?: {
+          background?: string
+          text?: string
+          border?: string
+        }
+      }
+      inlineStyle?: {
+        linkType: 'plain' | 'button' | 'icon-text' | 'custom'
+        includeIcon: boolean
+        includeLogo: boolean
+        customClass?: string
+      }
     }
   }
   
