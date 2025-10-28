@@ -401,7 +401,7 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
 
     return `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${config.colors.background}; color: ${config.colors.text}; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
-    ${(config.position.includes('floating') || config.position.includes('modal')) ? `<button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>` : ''}
+    <button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
     
     <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
@@ -409,9 +409,9 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       <div style="flex: 1; min-width: 250px;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${config.text.title}</h3>
+        <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${config.text.title}</h3>
         
-        <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">${config.text.message}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">${config.text.message}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
         
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="cookie-accept-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.acceptButton}</button>
@@ -449,7 +449,7 @@ ${config.behavior.showPreferences ? `
     <div style="display: flex; flex-direction: column; height: 100%; max-height: calc(90vh - 80px);">
       <div style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
         <!-- Title -->
-        <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 12px 0;">
+        <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 12px 0;">
           Privacy Center
         </h2>
         
@@ -475,8 +475,8 @@ ${config.behavior.showPreferences ? `
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
                 <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
                 <div style="min-width: 0; flex: 1;">
-                  <div style="font-weight: 500; color: #111827;">Strictly Necessary Cookies</div>
-                  <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Always active</div>
+                  <div id="cat-necessary" style="font-weight: 500; color: #111827;">Strictly Necessary Cookies</div>
+                  <div id="cat-necessary-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Always active</div>
                 </div>
               </div>
             </div>
@@ -485,7 +485,10 @@ ${config.behavior.showPreferences ? `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
                 <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
-                <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Functional Cookies</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div id="cat-functionality" style="font-weight: 500; color: #111827;">Functional Cookies</div>
+                  <div id="cat-functionality-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Remember preferences and choices</div>
+                </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
@@ -500,7 +503,10 @@ ${config.behavior.showPreferences ? `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
                 <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
-                <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Performance Cookies</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div id="cat-analytics" style="font-weight: 500; color: #111827;">Performance Cookies</div>
+                  <div id="cat-analytics-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Help us improve our website</div>
+                </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
@@ -515,7 +521,10 @@ ${config.behavior.showPreferences ? `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
                 <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
-                <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Targeting Cookies</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div id="cat-marketing" style="font-weight: 500; color: #111827;">Targeting Cookies</div>
+                  <div id="cat-marketing-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Personalized ads and content</div>
+                </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
@@ -966,6 +975,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     if (closeBtn) {
       closeBtn.onclick = function() {
         banner.style.display = 'none';
+        trackConsentEvent('dismiss');
       };
     }
     
