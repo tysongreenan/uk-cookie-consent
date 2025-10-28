@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.1.0'
+export const CURRENT_BANNER_VERSION = '2.0.1'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -314,11 +314,11 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🔧 Added session management and advanced tracking options')
   }
 
-  if (oldVersion === '2.0.0' && newVersion === '2.1.0') {
-    notes.push('🍪 Enhanced cookie settings button with customizable shapes and sizes')
-    notes.push('🎨 Added logo overlay support for floating cookie settings button')
-    notes.push('📝 Added inline footer link HTML snippet generator')
-    notes.push('⚙️ New dedicated Cookie Settings tab in banner builder')
+  if (oldVersion === '2.0.0' && newVersion === '2.0.1') {
+    notes.push('🎯 Perfect icon centering with Material Symbols integration')
+    notes.push('🛡️ Bulletproof CSS that resists external website interference')
+    notes.push('⏱️ Enhanced banner timing - floating button appears after consent')
+    notes.push('🔧 Improved toggle functionality and modal state management')
   }
 
   return notes

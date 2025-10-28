@@ -39,8 +39,7 @@ const navigationItems: NavItem[] = [
   {
     title: 'Analytics',
     href: '/dashboard/analytics',
-    icon: BarChart3,
-    badge: 'new'
+    icon: BarChart3
   },
   {
     title: 'Integrations',

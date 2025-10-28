@@ -1,6 +1,6 @@
 {
   "name": "cookie-consent-builder",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "A modern webapp for creating and managing cookie consent banners",
   "private": true,
   "scripts": {

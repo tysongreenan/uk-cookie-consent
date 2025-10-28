@@ -51,11 +51,11 @@ export function UpdateNotification({
   }
 
   const features = migrationNotes.length > 0 ? migrationNotes : [
-    '✨ Enhanced preferences modal with cookie category toggles',
-    '🎨 Improved user experience and better compliance',
-    '⚡ Advanced script management and performance optimizations',
-    '🛡️ Enhanced privacy controls and GDPR compliance',
-    '🚀 Faster loading and smoother animations'
+    '🎯 Perfect icon centering with Material Symbols integration',
+    '🛡️ Bulletproof CSS that resists external website interference',
+    '⏱️ Enhanced banner timing - floating button appears after consent',
+    '🔧 Improved toggle functionality and modal state management',
+    '✨ Better user experience with centered icons and smooth interactions'
   ]
 
   return (
@@ -138,7 +138,7 @@ export function UpdateNotification({
                     >
                       <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 shadow-md">
                         <Zap className="w-3 h-3 mr-1" />
-                        v2.0.0
+                        v2.0.1
                       </Badge>
                     </motion.div>
                   </div>
@@ -149,7 +149,7 @@ export function UpdateNotification({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                   >
-                    Your cookie banners have been <span className="font-semibold text-purple-600">automatically upgraded</span> with powerful new features:
+                    Your cookie banners have been <span className="font-semibold text-purple-600">automatically upgraded</span> with reliability improvements:
                   </motion.p>
                   
                   {/* Feature list with staggered animation */}
@@ -182,7 +182,7 @@ export function UpdateNotification({
                         onClick={onUpdateBanner}
                       >
                         <Settings className="w-4 h-4 mr-2" />
-                        Explore New Features
+                        View Improvements
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </motion.div>

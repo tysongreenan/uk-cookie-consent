@@ -97,7 +97,7 @@ export function UpdateAnnouncement() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
                       >
-                        🎉 Major Update: v2.0.0 is Here!
+                        🎉 Major Update: v2.0.1 is Here!
                       </motion.h2>
                       <motion.div
                         initial={{ opacity: 0, scale: 0 }}
@@ -116,7 +116,7 @@ export function UpdateAnnouncement() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
                     >
-                      Enhanced preferences modal, better UX, and advanced cookie management! 
+                      Perfect icon centering, bulletproof CSS, and enhanced banner timing! 
                       <span className="font-semibold text-yellow-200"> Try it now →</span>
                     </motion.p>
                   </div>
@@ -135,7 +135,7 @@ export function UpdateAnnouncement() {
                       className="bg-white text-purple-600 hover:bg-gray-100 font-semibold shadow-lg"
                     >
                       <Link href="/dashboard/builder">
-                        Try New Features
+                        Try Latest Updates
                         <ArrowRight className="w-4 h-4 ml-1" />
                       </Link>
                     </Button>
