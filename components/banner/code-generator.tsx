@@ -224,20 +224,21 @@ function generateFloatingButtonContent(config: any): string {
   let content = ''
   
   if (shape === 'circle') {
-    // Circle shows only cookie icon (not logo) for dynamic state changes
+    // Circle always shows only cookie icon (not logo) for dynamic state changes
     content = `${cookieAcceptedIcon}`
   } else {
-    // Pill and square can show text
-    if (hasLogo) {
+    // Pill and square respect the showText setting
+    if (showText && hasLogo) {
+      // Show logo + text when both are enabled
       content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" />`
-      if (showText) {
-        content += `<span>${text}</span>`
-      }
-    } else {
+      content += `<span>${text}</span>`
+    } else if (showText && !hasLogo) {
+      // Show icon + text when text is enabled but no logo
       content = `${cookieAcceptedIcon}`
-      if (showText) {
-        content += `<span style="margin-left: 4px;">${text}</span>`
-      }
+      content += `<span style="margin-left: 4px;">${text}</span>`
+    } else {
+      // Show only icon when text is disabled (regardless of logo setting)
+      content = `${cookieAcceptedIcon}`
     }
   }
   

@@ -168,21 +168,12 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   const cookieIcon = hasAcceptedNonEssential ? cookieAcceptedIcon : cookieRejectedIcon
   
   if (shape === 'circle') {
-    // Circle shows only icon/logo
-    if (hasLogo) {
-      return (
-        <img 
-          src={safeConfig.branding.logo.url} 
-          alt="Logo" 
-          style={{ width: '20px', height: '20px', objectFit: 'contain' }} 
-        />
-      )
-    } else {
-      return <span>{cookieIcon}</span>
-    }
+    // Circle always shows only cookie icon (not logo) for dynamic state changes
+    return <span>{cookieIcon}</span>
   } else {
-    // Pill and square can show text
-    if (hasLogo) {
+    // Pill and square respect the showText setting
+    if (showText && hasLogo) {
+      // Show logo + text when both are enabled
       return (
         <>
           <img 
@@ -190,16 +181,20 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
             alt="Logo" 
             style={{ width: '16px', height: '16px', objectFit: 'contain', marginRight: '4px' }} 
           />
-          {showText && <span>{text}</span>}
+          <span>{text}</span>
         </>
       )
-    } else {
+    } else if (showText && !hasLogo) {
+      // Show icon + text when text is enabled but no logo
       return (
         <>
           <span>{cookieIcon}</span>
-          {showText && <span style={{ marginLeft: '4px' }}>{text}</span>}
+          <span style={{ marginLeft: '4px' }}>{text}</span>
         </>
       )
+    } else {
+      // Show only icon when text is disabled (regardless of logo setting)
+      return <span>{cookieIcon}</span>
     }
   }
 }
