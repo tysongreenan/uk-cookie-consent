@@ -926,6 +926,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     ${config.behavior.autoShow ? `
     banner.style.display = 'block';
     trackConsentEvent('impression'); // Track banner impression
+    
+    // Hide floating button while main banner is showing
+    var floatBtn = document.getElementById('cookie-settings-float');
+    if (floatBtn) {
+      floatBtn.style.display = 'none';
+    }
     ` : ''}
     
     if (acceptBtn) {
