@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
@@ -148,15 +148,15 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   
   // Cookie icons (matching the code generator)
   const cookieAcceptedIcon = (
-    <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style={{display: 'block'}}>
-      <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q-25 0-42.5 17.5T280-420q0 25 17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/>
-    </svg>
+    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block'}}>
+      cookie
+    </span>
   )
   
   const cookieRejectedIcon = (
-    <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style={{display: 'block'}}>
-      <path d="m815-260-58-58q18-31 29-66.5t14-73.5q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-49-2-90 10t-76 33l-57-57q61-42 137.5-58.5T563-872q-9 45 6 84.5t45 66.5q30 27 71 37t86-5q-31 69 11 118t96 51q8 72-9.5 138T815-260ZM340-360q-25 0-42.5-17.5T280-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360ZM819-28 701-146q-48 32-103.5 49T480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-62 17-117.5T146-701L27-820l57-57L876-85l-57 57ZM480-160q45 0 85.5-12t76.5-33L205-642q-21 36-33 76.5T160-480q0 133 93.5 226.5T480-160Zm-56-264Zm135-137Z"/>
-    </svg>
+    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block'}}>
+      cookie_off
+    </span>
   )
   
   // Check consent state for icon
@@ -207,6 +207,45 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
 export function BannerPreview({ config }: BannerPreviewProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [showPreferences, setShowPreferences] = useState(false)
+
+  // Load Material Symbols CSS
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off'
+    document.head.appendChild(link)
+
+    const style = document.createElement('style')
+    style.textContent = `
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+        font-family: 'Material Symbols Outlined';
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: 'liga';
+      }
+    `
+    document.head.appendChild(style)
+
+    return () => {
+      document.head.removeChild(link)
+      document.head.removeChild(style)
+    }
+  }, [])
 
   // Ensure config has all required properties with safe defaults
   const safeConfig: BannerConfig = {
