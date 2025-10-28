@@ -225,7 +225,7 @@ function generateFloatingButtonContent(config: any): string {
     if (hasLogo) {
       content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 20px; height: 20px; object-fit: contain;" />`
     } else {
-      content = `<span id="cookie-icon">${cookieAcceptedIcon}</span>`
+      content = `${cookieAcceptedIcon}`
     }
   } else {
     // Pill and square can show text
@@ -235,7 +235,7 @@ function generateFloatingButtonContent(config: any): string {
         content += `<span>${text}</span>`
       }
     } else {
-      content = `<span id="cookie-icon">${cookieAcceptedIcon}</span>`
+      content = `${cookieAcceptedIcon}`
       if (showText) {
         content += `<span style="margin-left: 4px;">${text}</span>`
       }
@@ -821,9 +821,6 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
     var floatBtn = document.getElementById('cookie-settings-float');
     if (!floatBtn) return;
     
-    var iconElement = floatBtn.querySelector('#cookie-icon');
-    if (!iconElement) return;
-    
     // Cookie icons (embedded SVG)
     var cookieAcceptedIcon = '<svg width="16" height="16" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/></svg>';
     
@@ -834,9 +831,9 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
     
     // Update icon based on consent state
     if (hasAcceptedNonEssential) {
-      iconElement.innerHTML = cookieAcceptedIcon;
+      floatBtn.innerHTML = cookieAcceptedIcon;
     } else {
-      iconElement.innerHTML = cookieRejectedIcon;
+      floatBtn.innerHTML = cookieRejectedIcon;
     }
   }
   
@@ -904,10 +901,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       var floatBtn = document.getElementById('cookie-settings-float');
       if (floatBtn) {
         floatBtn.style.display = 'block';
+        updateFloatingButtonIcon(existingConsent);
         floatBtn.onclick = function() {
           var modal = document.getElementById('cookie-preferences-modal');
           if (modal) {
             modal.style.display = 'flex';
+            loadConsentIntoModal(existingConsent);
           }
         };
       }
@@ -932,10 +931,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
           floatBtn.style.display = 'block';
+          updateFloatingButtonIcon({ essential: true, functionality: true, analytics: true, marketing: true });
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
             if (modal) {
               modal.style.display = 'flex';
+              loadConsentIntoModal({ essential: true, functionality: true, analytics: true, marketing: true });
             }
           };
         }
@@ -953,10 +954,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
           floatBtn.style.display = 'block';
+          updateFloatingButtonIcon({ essential: true, functionality: false, analytics: false, marketing: false });
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
             if (modal) {
               modal.style.display = 'flex';
+              loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
             }
           };
         }
@@ -976,6 +979,13 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         var modal = document.getElementById('cookie-preferences-modal');
         if (modal) {
           modal.style.display = 'flex';
+          // Load current consent state into modal
+          var currentConsent = getConsent();
+          if (currentConsent) {
+            loadConsentIntoModal(currentConsent);
+          } else {
+            loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
+          }
         }
       };
     }
@@ -1025,10 +1035,12 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
           floatBtn.style.display = 'block';
+          updateFloatingButtonIcon(consent);
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
             if (modal) {
               modal.style.display = 'flex';
+              loadConsentIntoModal(consent);
             }
           };
         }
@@ -1046,30 +1058,66 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     }
     
     // Make toggle switches functional
-    var toggles = [
-      { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
-      { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
-      { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
-      { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
-    ];
-    
-    toggles.forEach(function(toggle) {
-      var input = document.getElementById(toggle.input);
-      var slider = document.getElementById(toggle.slider);
-      var thumb = document.getElementById(toggle.thumb);
+    function setupToggleSwitches() {
+      var toggles = [
+        { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
+        { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
+        { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
+        { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
+      ];
       
-      if (input && slider && thumb) {
-        input.addEventListener('change', function() {
-          if (this.checked) {
+      toggles.forEach(function(toggle) {
+        var input = document.getElementById(toggle.input);
+        var slider = document.getElementById(toggle.slider);
+        var thumb = document.getElementById(toggle.thumb);
+        
+        if (input && slider && thumb) {
+          // Set initial state
+          if (input.checked) {
             slider.style.backgroundColor = '#3b82f6';
             thumb.style.transform = 'translateX(20px)';
           } else {
             slider.style.backgroundColor = '#ccc';
             thumb.style.transform = 'translateX(0)';
           }
-        });
-      }
-    });
+          
+          // Add change event listener
+          input.addEventListener('change', function() {
+            if (this.checked) {
+              slider.style.backgroundColor = '#3b82f6';
+              thumb.style.transform = 'translateX(20px)';
+            } else {
+              slider.style.backgroundColor = '#ccc';
+              thumb.style.transform = 'translateX(0)';
+            }
+          });
+          
+          // Add click event listener to slider for better UX
+          slider.addEventListener('click', function() {
+            input.checked = !input.checked;
+            input.dispatchEvent(new Event('change'));
+          });
+        }
+      });
+    }
+    
+    function loadConsentIntoModal(consent) {
+      var func = document.getElementById('cookie-func-toggle-modal');
+      var performance = document.getElementById('cookie-performance-toggle-modal');
+      var targeting = document.getElementById('cookie-targeting-toggle-modal');
+      var social = document.getElementById('cookie-social-toggle-modal');
+      
+      if (func) func.checked = consent.functionality || false;
+      if (performance) performance.checked = consent.analytics || false;
+      if (targeting) targeting.checked = consent.marketing || false;
+      if (social) social.checked = consent.marketing || false;
+      
+      // Update visual state
+      setupToggleSwitches();
+    }
+    
+    // Initialize toggles
+    setupToggleSwitches();
     ` : ''}
     
     ${config.behavior.dismissOnScroll ? `

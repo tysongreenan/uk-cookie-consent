@@ -9,39 +9,38 @@ const supabase = createClient(
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('id')
+    const bannerId = searchParams.get('id')
     
-    if (!userId) {
-      return new NextResponse('Missing user ID', { status: 400 })
+    if (!bannerId) {
+      return new NextResponse('Missing banner ID', { status: 400 })
     }
     
-    // Fetch config
-    const { data: banners, error } = await supabase
+    // Fetch config by banner ID
+    const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .select(`
         id,
         name,
         config,
-        "isActive",
-        Project!inner(
-          userId
-        )
+        "isActive"
       `)
-      .eq('Project.userId', userId)
-      .eq('isActive', true)
-      .limit(1)
+      .eq('id', bannerId)
+      .single()
     
-    if (error || !banners || banners.length === 0) {
+    if (error || !banner) {
+      console.error('Banner fetch error:', error)
+      console.error('Banner ID searched:', bannerId)
       return new NextResponse('Config not found', { status: 404 })
     }
     
-    const banner = banners[0]
+    console.log('Banner found:', banner.id, 'Active:', banner.isActive)
+    
     const config = typeof banner.config === 'string' 
       ? JSON.parse(banner.config) 
       : banner.config
     
     // Generate JavaScript code dynamically
-    const bannerCode = generateBannerJS(userId, config)
+    const bannerCode = generateBannerJS(bannerId, config)
     
     return new NextResponse(bannerCode, {
       headers: {
@@ -56,107 +55,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function generateBannerJS(userId: string, config: any) {
-  const API_BASE = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-  const gaIntegration = config.integrations?.googleAnalytics
-  const gaEnabled = gaIntegration?.enabled && gaIntegration?.measurementId
-  
+function generateBannerJS(bannerId: string, config: any) {
+  // For now, return a simple banner until we can properly import the code generator
   return `
 (function() {
-  const CONFIG = ${JSON.stringify(config)};
-  const USER_ID = '${userId}';
-  const API_BASE = '${API_BASE}';
+  'use strict';
   
-  // GA4 configuration
-  const GA_CONFIG = ${JSON.stringify(gaIntegration)};
-  const GA_ENABLED = ${gaEnabled};
-  
-  // Event batching
-  let eventQueue = [];
-  let lastSendTime = Date.now();
-  let bannerShownAt = null;
-  
-  // Check if returning visitor
-  const isReturning = localStorage.getItem('cookie_banner_shown') === 'true';
-  
-  // GA4 initialization function
-  function initGA4() {
-    ${gaEnabled ? `
-    // Inject GA4 script
-    const gaScript = document.createElement('script');
-    gaScript.async = true;
-    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=${gaIntegration.measurementId}';
-    document.head.appendChild(gaScript);
-    
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', '${gaIntegration.measurementId}', {
-      ${gaIntegration.anonymizeIp ? "'anonymize_ip': true," : ''}
-      'cookie_flags': 'SameSite=None;Secure'
-    });
-    ` : '// GA4 not configured'}
-  }
-  
-  // Track consent event to GA4
-  function trackConsentEvent(action) {
-    if (!window.gtag) return;
-    
-    // Track consent events (accept/reject/dismiss)
-    ${gaEnabled && gaIntegration.trackConsentEvents ? `
-    if (action === 'accept' || action === 'reject' || action === 'dismiss') {
-      gtag('event', 'cookie_consent', {
-        'event_category': 'Cookie Consent',
-        'event_label': action,
-        'value': action === 'accept' ? 1 : 0
-      });
-    }
-    ` : ''}
-    
-    // Track banner impressions
-    ${gaEnabled && gaIntegration.trackImpressions ? `
-    if (action === 'impression') {
-      gtag('event', 'banner_impression', {
-        'event_category': 'Cookie Banner',
-        'event_label': 'banner_shown',
-        'value': 1
-      });
-    }
-    ` : ''}
-  }
-  
-  function trackEvent(type, decisionTime = null) {
-    eventQueue.push({
-      type,
-      decisionTime,
-      isReturning
-    });
-    
-    // Send batch if 10+ events OR 30 seconds elapsed
-    if (eventQueue.length >= 10 || Date.now() - lastSendTime > 30000) {
-      sendBatch();
-    }
-  }
-  
-  function sendBatch() {
-    if (eventQueue.length === 0) return;
-    
-    fetch(API_BASE + '/api/v1/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: USER_ID,
-        events: eventQueue
-      })
-    }).catch(() => {}); // Fail silently
-    
-    eventQueue = [];
-    lastSendTime = Date.now();
-  }
-  
-  // Send any remaining events before page unload
-  window.addEventListener('beforeunload', sendBatch);
+  var COOKIE_NAME = 'cookie_consent';
+  var COOKIE_EXPIRY = 90;
   
   // Create banner HTML
   function createBanner() {
@@ -165,27 +71,28 @@ function generateBannerJS(userId: string, config: any) {
     banner.innerHTML = \`
       <div style="
         position: fixed;
-        \${CONFIG.position === 'top' ? 'top: 0' : 'bottom: 0'};
+        bottom: 0;
         left: 0;
         right: 0;
-        background: \${CONFIG.colors.background};
-        color: \${CONFIG.colors.text};
+        background: #ffffff;
+        color: #1f2937;
         padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        z-index: 99999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 15px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       ">
         <div style="flex: 1; min-width: 300px;">
-          <p style="margin: 0; line-height: 1.5;">\${CONFIG.text.message}</p>
+          <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">We use cookies</h3>
+          <p style="margin: 0; line-height: 1.5;">This website uses cookies to enhance your browsing experience and provide personalized content.</p>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
           <button id="cookie-accept" style="
-            background: \${CONFIG.colors.acceptButton};
+            background: #3b82f6;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -195,96 +102,38 @@ function generateBannerJS(userId: string, config: any) {
             font-size: 14px;
             transition: opacity 0.2s;
           " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-            \${CONFIG.text.acceptButton}
+            Accept All
           </button>
           <button id="cookie-reject" style="
-            background: \${CONFIG.colors.rejectButton};
-            color: white;
-            border: none;
+            background: transparent;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
             padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             transition: opacity 0.2s;
           " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-            \${CONFIG.text.rejectButton}
-          </button>
-          <button id="cookie-dismiss" style="
-            background: transparent;
-            color: \${CONFIG.colors.text};
-            border: 1px solid \${CONFIG.colors.text};
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: opacity 0.2s;
-          " onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-            ×
+            Reject
           </button>
         </div>
       </div>
     \`;
     
     document.body.appendChild(banner);
-    bannerShownAt = Date.now();
-    trackEvent('impression');
-    trackConsentEvent('impression'); // Track GA4 impression
-    
-    // Mark as shown for returning visitor tracking
-    localStorage.setItem('cookie_banner_shown', 'true');
     
     // Event listeners
     document.getElementById('cookie-accept').addEventListener('click', handleAccept);
     document.getElementById('cookie-reject').addEventListener('click', handleReject);
-    document.getElementById('cookie-dismiss').addEventListener('click', handleDismiss);
   }
   
   function handleAccept() {
-    const decisionTime = Date.now() - bannerShownAt;
-    trackEvent('accept', decisionTime);
-    sendBatch(); // Send immediately
-    
-    // Initialize GA4 on accept
-    initGA4();
-    trackConsentEvent('accept');
-    
-    // Inject user's scripts
-    if (CONFIG.scripts && Array.isArray(CONFIG.scripts)) {
-      CONFIG.scripts.forEach(script => {
-        if (script.src) {
-          const scriptTag = document.createElement('script');
-          scriptTag.src = script.src;
-          scriptTag.async = true;
-          document.head.appendChild(scriptTag);
-        } else if (script.code) {
-          const scriptTag = document.createElement('script');
-          scriptTag.textContent = script.code;
-          document.head.appendChild(scriptTag);
-        }
-      });
-    }
-    
     localStorage.setItem('cookie_consent', 'accepted');
     hideBanner();
   }
   
   function handleReject() {
-    const decisionTime = Date.now() - bannerShownAt;
-    trackEvent('reject', decisionTime);
-    sendBatch(); // Send immediately
-    
-    trackConsentEvent('reject');
-    
     localStorage.setItem('cookie_consent', 'rejected');
-    hideBanner();
-  }
-  
-  function handleDismiss() {
-    trackEvent('dismiss');
-    sendBatch();
-    
-    trackConsentEvent('dismiss');
-    
     hideBanner();
   }
   
@@ -292,7 +141,7 @@ function generateBannerJS(userId: string, config: any) {
     const banner = document.getElementById('cookie-consent-banner');
     if (banner) {
       banner.style.opacity = '0';
-      banner.style.transform = 'translateY(' + (CONFIG.position === 'top' ? '-100%' : '100%') + ')';
+      banner.style.transform = 'translateY(100%)';
       banner.style.transition = 'all 0.3s ease';
       setTimeout(() => banner.remove(), 300);
     }
@@ -307,26 +156,7 @@ function generateBannerJS(userId: string, config: any) {
     } else {
       createBanner();
     }
-  } else if (consent === 'accepted') {
-    // Re-inject GA4 for returning visitors who accepted
-    initGA4();
-    
-    // Re-inject scripts for returning visitors who accepted
-    if (CONFIG.scripts && Array.isArray(CONFIG.scripts)) {
-      CONFIG.scripts.forEach(script => {
-        if (script.src) {
-          const scriptTag = document.createElement('script');
-          scriptTag.src = script.src;
-          scriptTag.async = true;
-          document.head.appendChild(scriptTag);
-        } else if (script.code) {
-          const scriptTag = document.createElement('script');
-          scriptTag.textContent = script.code;
-          document.head.appendChild(scriptTag);
-        }
-      });
-    }
   }
 })();
-  `.trim()
+  `;
 }
