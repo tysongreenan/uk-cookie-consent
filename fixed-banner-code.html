@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Cookie Banner Test</title>
+    
+    <style>
+#cookie-consent-banner * {
+  box-sizing: border-box;
+}
+
+#cookie-consent-banner button {
+  transition: all 0.2s ease;
+}
+
+#cookie-consent-banner button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+@keyframes cookieFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cookieSlideIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes cookieBounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes cookiePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Toggle Switch Styles */
+input:checked + span {
+  background-color: #3b82f6 !important;
+}
+
+input:checked + span:before {
+  transform: translateX(20px);
+}
+
+input:focus + span {
+  box-shadow: 0 0 1px #3b82f6;
+}
+
+/* Modal Styles */
+#cookie-preferences-modal {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@media (max-width: 768px) {
+  #cookie-consent-banner {
+    padding: 16px !important;
+    left: 0 !important;
+    right: 0 !important;
+    max-width: none !important;
+  }
+  
+  #cookie-consent-banner h3 {
+    font-size: 16px !important;
+  }
+  
+  #cookie-consent-banner p {
+    font-size: 13px !important;
+  }
+  
+  #cookie-consent-banner button {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+  
+  #cookie-preferences-modal > div {
+    margin: 0 !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  console.log('Cookie banner script starting...');
+  
+  var COOKIE_NAME = 'cookie_consent';
+  var COOKIE_EXPIRY = 90;
+  
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  
+  function setCookie(name, value, days) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    var secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
+  }
+  
+  function getConsent() {
+    var cookie = getCookie(COOKIE_NAME);
+    if (cookie) {
+      try {
+        return JSON.parse(cookie);
+      } catch(e) {
+        console.error('Error parsing consent cookie:', e);
+        return null;
+      }
+    }
+    return null;
+  }
+  
+  function saveConsent(consent) {
+    console.log('Saving consent:', consent);
+    setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+    updateFloatingButtonIcon(consent);
+  }
+  
+  function updateFloatingButtonIcon(consent) {
+    var floatBtn = document.getElementById('cookie-settings-float');
+    if (!floatBtn) {
+      console.log('Floating button not found');
+      return;
+    }
+    
+    // Cookie icons (embedded SVG) - properly sized and centered
+    var cookieAcceptedIcon = '<svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/></svg>';
+    
+    var cookieRejectedIcon = '<svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor"><path d="m815-260-58-58q18-31 29-66.5t14-73.5q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-49-2-90 10t-76 33l-57-57q61-42 137.5-58.5T563-872q-9 45 6 84.5t45 66.5q30 27 71 37t86-5q-31 69 11 118t96 51q8 72-9.5 138T815-260ZM340-360q-25 0-42.5-17.5T280-420q0-25 17.5-42.5T340-480q25 0 42.5 17.5T400-420q0 25-17.5 42.5T340-360ZM819-28 701-146q-48 32-103.5 49T480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-62 17-117.5T146-701L27-820l57-57L876-85l-57 57ZM480-160q45 0 85.5-12t76.5-33L205-642q-21 36-33 76.5T160-480q0 133 93.5 226.5T480-160Zm-56-264Zm135-137Z"/></svg>';
+    
+    // Determine if user has accepted any non-essential cookies
+    var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
+    
+    // Update icon based on consent state
+    if (hasAcceptedNonEssential) {
+      floatBtn.innerHTML = cookieAcceptedIcon;
+    } else {
+      floatBtn.innerHTML = cookieRejectedIcon;
+    }
+    
+    console.log('Floating button icon updated');
+  }
+  
+  function setupToggleSwitches() {
+    console.log('Setting up toggle switches...');
+    var toggles = [
+      { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
+      { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
+      { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
+      { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
+    ];
+    
+    toggles.forEach(function(toggle) {
+      var input = document.getElementById(toggle.input);
+      var slider = document.getElementById(toggle.slider);
+      var thumb = document.getElementById(toggle.thumb);
+      
+      console.log('Toggle elements found:', { input: !!input, slider: !!slider, thumb: !!thumb, name: toggle.input });
+      
+      if (input && slider && thumb) {
+        // Set initial state
+        if (input.checked) {
+          slider.style.backgroundColor = '#3b82f6';
+          thumb.style.transform = 'translateX(20px)';
+        } else {
+          slider.style.backgroundColor = '#ccc';
+          thumb.style.transform = 'translateX(0)';
+        }
+        
+        // Add change event listener
+        input.addEventListener('change', function() {
+          console.log('Toggle changed:', toggle.input, this.checked);
+          if (this.checked) {
+            slider.style.backgroundColor = '#3b82f6';
+            thumb.style.transform = 'translateX(20px)';
+          } else {
+            slider.style.backgroundColor = '#ccc';
+            thumb.style.transform = 'translateX(0)';
+          }
+        });
+        
+        // Add click event listener to slider for better UX
+        slider.addEventListener('click', function() {
+          console.log('Slider clicked:', toggle.input);
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event('change'));
+        });
+      }
+    });
+  }
+  
+  function loadConsentIntoModal(consent) {
+    console.log('Loading consent into modal:', consent);
+    var func = document.getElementById('cookie-func-toggle-modal');
+    var performance = document.getElementById('cookie-performance-toggle-modal');
+    var targeting = document.getElementById('cookie-targeting-toggle-modal');
+    var social = document.getElementById('cookie-social-toggle-modal');
+    
+    if (func) func.checked = consent.functionality || false;
+    if (performance) performance.checked = consent.analytics || false;
+    if (targeting) targeting.checked = consent.marketing || false;
+    if (social) social.checked = consent.marketing || false;
+    
+    // Update visual state
+    setupToggleSwitches();
+  }
+  
+  function init() {
+    console.log('Initializing cookie banner...');
+    
+    try {
+      var banner = document.getElementById('cookie-consent-banner');
+      var acceptBtn = document.getElementById('cookie-accept-btn');
+      var rejectBtn = document.getElementById('cookie-reject-btn');
+      var prefsBtn = document.getElementById('cookie-preferences-btn');
+      var modal = document.getElementById('cookie-preferences-modal');
+      var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
+      var confirmChoicesBtn = document.getElementById('cookie-confirm-choices-btn');
+      
+      console.log('Elements found:', {
+        banner: !!banner,
+        acceptBtn: !!acceptBtn,
+        rejectBtn: !!rejectBtn,
+        prefsBtn: !!prefsBtn,
+        modal: !!modal,
+        acceptAllBtn: !!acceptAllBtn,
+        confirmChoicesBtn: !!confirmChoicesBtn
+      });
+      
+      if (!banner) {
+        console.error('Banner element not found!');
+        return;
+      }
+      
+      var existingConsent = getConsent();
+      
+      if (existingConsent) {
+        console.log('Existing consent found:', existingConsent);
+        
+        // Show cookie settings floating button after consent is given
+        var floatBtn = document.getElementById('cookie-settings-float');
+        if (floatBtn) {
+          floatBtn.style.display = 'block';
+          updateFloatingButtonIcon(existingConsent);
+          floatBtn.onclick = function() {
+            console.log('Floating button clicked');
+            var modal = document.getElementById('cookie-preferences-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              loadConsentIntoModal(existingConsent);
+            }
+          };
+        }
+        
+        return;
+      }
+      
+      banner.style.display = 'block';
+      
+      // Accept button
+      if (acceptBtn) {
+        acceptBtn.onclick = function() {
+          console.log('Accept button clicked');
+          saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+          banner.style.display = 'none';
+          
+          // Show floating cookie settings button after accepting
+          var floatBtn = document.getElementById('cookie-settings-float');
+          if (floatBtn) {
+            floatBtn.style.display = 'block';
+            updateFloatingButtonIcon({ essential: true, functionality: true, analytics: true, marketing: true });
+            floatBtn.onclick = function() {
+              var modal = document.getElementById('cookie-preferences-modal');
+              if (modal) {
+                modal.style.display = 'flex';
+                loadConsentIntoModal({ essential: true, functionality: true, analytics: true, marketing: true });
+              }
+            };
+          }
+        };
+        console.log('Accept button handler attached');
+      }
+      
+      // Reject button
+      if (rejectBtn) {
+        rejectBtn.onclick = function() {
+          console.log('Reject button clicked');
+          saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
+          banner.style.display = 'none';
+          
+          // Show floating cookie settings button after rejecting
+          var floatBtn = document.getElementById('cookie-settings-float');
+          if (floatBtn) {
+            floatBtn.style.display = 'block';
+            updateFloatingButtonIcon({ essential: true, functionality: false, analytics: false, marketing: false });
+            floatBtn.onclick = function() {
+              var modal = document.getElementById('cookie-preferences-modal');
+              if (modal) {
+                modal.style.display = 'flex';
+                loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
+              }
+            };
+          }
+        };
+        console.log('Reject button handler attached');
+      }
+      
+      // Preferences button
+      if (prefsBtn) {
+        prefsBtn.onclick = function() {
+          console.log('Preferences button clicked');
+          var modal = document.getElementById('cookie-preferences-modal');
+          if (modal) {
+            modal.style.display = 'flex';
+            // Load current consent state into modal
+            var currentConsent = getConsent();
+            if (currentConsent) {
+              loadConsentIntoModal(currentConsent);
+            } else {
+              loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
+            }
+          }
+        };
+        console.log('Preferences button handler attached');
+      }
+      
+      // Accept All button
+      if (acceptAllBtn) {
+        acceptAllBtn.onclick = function() {
+          console.log('Accept All button clicked');
+          saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+          banner.style.display = 'none';
+          modal.style.display = 'none';
+        };
+        console.log('Accept All button handler attached');
+      }
+      
+      // Confirm Choices button
+      if (confirmChoicesBtn) {
+        confirmChoicesBtn.onclick = function() {
+          console.log('Confirm Choices button clicked');
+          var func = document.getElementById('cookie-func-toggle-modal');
+          var performance = document.getElementById('cookie-performance-toggle-modal');
+          var targeting = document.getElementById('cookie-targeting-toggle-modal');
+          var social = document.getElementById('cookie-social-toggle-modal');
+          
+          var consent = {
+            essential: true,
+            functionality: func ? func.checked : false,
+            analytics: performance ? performance.checked : false,
+            marketing: (targeting ? targeting.checked : false) || (social ? social.checked : false)
+          };
+          
+          console.log('User confirmed cookie preferences:', consent);
+          saveConsent(consent);
+          
+          banner.style.display = 'none';
+          modal.style.display = 'none';
+          
+          // Show floating cookie settings button after confirming preferences
+          var floatBtn = document.getElementById('cookie-settings-float');
+          if (floatBtn) {
+            floatBtn.style.display = 'block';
+            updateFloatingButtonIcon(consent);
+            floatBtn.onclick = function() {
+              var modal = document.getElementById('cookie-preferences-modal');
+              if (modal) {
+                modal.style.display = 'flex';
+                loadConsentIntoModal(consent);
+              }
+            };
+          }
+        };
+        console.log('Confirm Choices button handler attached');
+      }
+      
+      // Modal close button
+      var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
+      if (modalCloseBtn) {
+        modalCloseBtn.onclick = function() {
+          console.log('Modal close button clicked');
+          modal.style.display = 'none';
+        };
+        console.log('Modal close button handler attached');
+      }
+      
+      // Close modal when clicking outside
+      if (modal) {
+        modal.onclick = function(e) {
+          if (e.target === modal) {
+            console.log('Modal background clicked');
+            modal.style.display = 'none';
+          }
+        };
+      }
+      
+      // Initialize toggles
+      setupToggleSwitches();
+      
+      console.log('Cookie banner initialization complete');
+      
+    } catch (error) {
+      console.error('Error initializing cookie banner:', error);
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    console.log('DOM still loading, waiting for DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    console.log('DOM already loaded, initializing immediately');
+    init();
+  }
+  
+})();
+</script>
+</head>
+<body>
+    <h1>Fixed Cookie Banner Test</h1>
+    <p>This page tests the fixed cookie banner with better error handling and console logging.</p>
+    <p>Open the browser console to see debug messages.</p>
+    
+    <!-- Your BODY code here -->
+    <div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #ffffff; color: #1f2937; border-radius: 8px;padding: 20px;box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; animation: cookieFadeIn 0.5s ease-out; display: none;">
+      <div style="position: relative;">
+        <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">We use cookies</h3>
+            <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">This website uses cookies to enhance your browsing experience and provide personalized content.</p>
+            
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button id="cookie-accept-btn" style="background-color: #3b82f6; color: #ffffff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">Accept All</button>
+              <button id="cookie-reject-btn" style="background-color: transparent; color: #3b82f6; border: 1px solid #3b82f6; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">Reject</button>
+              <button id="cookie-preferences-btn" style="background-color: transparent; color: #1d4ed8; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">Preferences</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences Modal -->
+    <div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: white; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid #e5e7eb;">
+          <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0;">Privacy Center</h2>
+          <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: #6b7280; font-size: 20px; line-height: 1; flex-shrink: 0;" aria-label="Close">×</button>
+        </div>
+
+        <!-- Content -->
+        <div style="display: flex; flex-direction: column; height: 100%; max-height: calc(90vh - 80px);">
+          <div style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
+            <!-- Description -->
+            <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px 0; line-height: 1.5;">By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.</p>
+
+            <!-- Accept All Button -->
+            <button id="cookie-accept-all-btn" style="width: 100%; height: 48px; margin-bottom: 24px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: #3b82f6; color: #ffffff;">ACCEPT ALL</button>
+
+            <!-- Cookie Preferences Section -->
+            <div style="margin-bottom: 24px;">
+              <h3 style="font-weight: bold; color: #111827; margin: 0 0 16px 0;">Manage cookie preferences</h3>
+              
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Strictly Necessary -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f9fafb;">
+                  <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                    <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                    <div style="min-width: 0; flex: 1;">
+                      <div style="font-weight: 500; color: #111827;">Strictly Necessary Cookies</div>
+                      <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Always active</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Functionality -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                    <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                    <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Functional Cookies</div>
+                  </div>
+                  <div style="flex-shrink: 0; margin-left: 12px;">
+                    <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+                      <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+                      <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                      <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Performance -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                    <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                    <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Performance Cookies</div>
+                  </div>
+                  <div style="flex-shrink: 0; margin-left: 12px;">
+                    <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+                      <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+                      <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                      <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Targeting -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                    <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                    <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Targeting Cookies</div>
+                  </div>
+                  <div style="flex-shrink: 0; margin-left: 12px;">
+                    <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+                      <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+                      <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                      <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Social Media -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
+                    <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                    <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Social Media Cookies</div>
+                  </div>
+                  <div style="flex-shrink: 0; margin-left: 12px;">
+                    <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+                      <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
+                      <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                      <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer with buttons -->
+          <div style="padding: 24px 24px 0 24px; border-top: 1px solid #f3f4f6; background-color: #f9fafb;">
+            <!-- Confirm Button -->
+            <button id="cookie-confirm-choices-btn" style="width: 100%; height: 48px; margin-bottom: 16px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: #3b82f6; color: #ffffff;">CONFIRM MY CHOICES</button>
+
+            <!-- Powered by -->
+            <div style="text-align: center;">
+              <p style="font-size: 12px; color: #6b7280; margin: 0;">Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: #6b7280; text-decoration: none;">cookie-banner.ca</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Floating Cookie Settings Button -->
+    <div id="cookie-settings-float" style="position: fixed; bottom: 16px; left: 16px; z-index: 999998; background: #3b82f6; color: #ffffff; border: none; padding: 0; border-radius: 50%; width: 40px; height: 40px; font-size: 12px; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; font-family: inherit; display: none; transition: all 0.2s ease; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+      <!-- Cookie icon will be inserted here by JavaScript -->
+    </div>
+</body>
+</html>
