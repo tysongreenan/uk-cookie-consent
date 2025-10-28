@@ -221,12 +221,8 @@ function generateFloatingButtonContent(config: any): string {
   let content = ''
   
   if (shape === 'circle') {
-    // Circle shows only icon/logo
-    if (hasLogo) {
-      content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 20px; height: 20px; object-fit: contain;" />`
-    } else {
-      content = `${cookieAcceptedIcon}`
-    }
+    // Circle shows only cookie icon (not logo) for dynamic state changes
+    content = `${cookieAcceptedIcon}`
   } else {
     // Pill and square can show text
     if (hasLogo) {
