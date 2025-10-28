@@ -908,7 +908,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       // Show cookie settings floating button after consent is given
       var floatBtn = document.getElementById('cookie-settings-float');
       if (floatBtn) {
-        floatBtn.style.display = 'block';
+        floatBtn.classList.add('show');
         updateFloatingButtonIcon(existingConsent);
         floatBtn.onclick = function() {
           var modal = document.getElementById('cookie-preferences-modal');
@@ -930,7 +930,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     // Hide floating button while main banner is showing
     var floatBtn = document.getElementById('cookie-settings-float');
     if (floatBtn) {
-      floatBtn.style.display = 'none';
+      floatBtn.classList.remove('show');
     }
     ` : ''}
     
@@ -944,7 +944,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         // Show floating cookie settings button after accepting
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
-          floatBtn.style.display = 'block';
+          floatBtn.classList.add('show');
           updateFloatingButtonIcon({ essential: true, functionality: true, analytics: true, marketing: true });
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
@@ -967,7 +967,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         // Show floating cookie settings button after rejecting (so user can change mind)
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
-          floatBtn.style.display = 'block';
+          floatBtn.classList.add('show');
           updateFloatingButtonIcon({ essential: true, functionality: false, analytics: false, marketing: false });
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
@@ -1027,6 +1027,22 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         
         banner.style.display = 'none';
         modal.style.display = 'none';
+        
+        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
+        // Show floating cookie settings button after accepting all in modal
+        var floatBtn = document.getElementById('cookie-settings-float');
+        if (floatBtn) {
+          floatBtn.classList.add('show');
+          updateFloatingButtonIcon(consent);
+          floatBtn.onclick = function() {
+            var modal = document.getElementById('cookie-preferences-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              loadConsentIntoModal(consent);
+            }
+          };
+        }
+        ` : ''}
       };
     }
     
@@ -1054,7 +1070,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         // Show floating cookie settings button after confirming preferences
         var floatBtn = document.getElementById('cookie-settings-float');
         if (floatBtn) {
-          floatBtn.style.display = 'block';
+          floatBtn.classList.add('show');
           updateFloatingButtonIcon(consent);
           floatBtn.onclick = function() {
             var modal = document.getElementById('cookie-preferences-modal');
@@ -1214,8 +1230,8 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   box-sizing: border-box !important;
 }
 
-/* Ensure the button itself has strong centering */
-#cookie-settings-float {
+/* Ensure the button itself has strong centering - only when visible */
+#cookie-settings-float.show {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
