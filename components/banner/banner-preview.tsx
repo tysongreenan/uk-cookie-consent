@@ -148,13 +148,13 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   
   // Cookie icons (matching the code generator)
   const cookieAcceptedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block', lineHeight: 1, textAlign: 'center', margin: 0, padding: 0}}>
+    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>
       cookie
     </span>
   )
   
   const cookieRejectedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block', lineHeight: 1, textAlign: 'center', margin: 0, padding: 0}}>
+    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>
       cookie_off
     </span>
   )

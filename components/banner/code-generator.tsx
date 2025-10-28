@@ -213,10 +213,10 @@ function generateFloatingButtonContent(config: any): string {
   const text = config.branding?.footerLink?.text || 'Cookie Settings'
   const hasLogo = config.branding?.logo?.enabled && config.branding?.logo?.url
   
-  // Cookie icons using Material Symbols - clean and scalable with better centering
-  const cookieAcceptedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie</span>`
+  // Cookie icons using Material Symbols - clean and scalable with perfect centering
+  const cookieAcceptedIcon = `<span class="material-symbols-outlined" style="font-size: 20px;">cookie</span>`
   
-  const cookieRejectedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie_off</span>`
+  const cookieRejectedIcon = `<span class="material-symbols-outlined" style="font-size: 20px;">cookie_off</span>`
   
   let content = ''
   
@@ -826,10 +826,10 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
     var floatBtn = document.getElementById('cookie-settings-float');
     if (!floatBtn) return;
     
-    // Cookie icons using Material Symbols - clean and scalable with better centering
-    var cookieAcceptedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie</span>';
+    // Cookie icons using Material Symbols - clean and scalable with perfect centering
+    var cookieAcceptedIcon = '<span class="material-symbols-outlined" style="font-size: 20px;">cookie</span>';
     
-    var cookieRejectedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie_off</span>';
+    var cookieRejectedIcon = '<span class="material-symbols-outlined" style="font-size: 20px;">cookie_off</span>';
     
     // Determine if user has accepted any non-essential cookies
     var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
@@ -1179,8 +1179,11 @@ ${marketingLoaders || '      // No marketing scripts configured'}
 
 /* Specific styles for cookie floating button icons */
 #cookie-settings-float .material-symbols-outlined {
-  display: block !important;
-  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
   line-height: 1 !important;
