@@ -213,10 +213,10 @@ function generateFloatingButtonContent(config: any): string {
   const text = config.branding?.footerLink?.text || 'Cookie Settings'
   const hasLogo = config.branding?.logo?.enabled && config.branding?.logo?.url
   
-  // Cookie icons using Material Symbols - clean and scalable
-  const cookieAcceptedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block;">cookie</span>`
+  // Cookie icons using Material Symbols - clean and scalable with better centering
+  const cookieAcceptedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie</span>`
   
-  const cookieRejectedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block;">cookie_off</span>`
+  const cookieRejectedIcon = `<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie_off</span>`
   
   let content = ''
   
@@ -826,10 +826,10 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
     var floatBtn = document.getElementById('cookie-settings-float');
     if (!floatBtn) return;
     
-    // Cookie icons using Material Symbols - clean and scalable
-    var cookieAcceptedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block;">cookie</span>';
+    // Cookie icons using Material Symbols - clean and scalable with better centering
+    var cookieAcceptedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie</span>';
     
-    var cookieRejectedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block;">cookie_off</span>';
+    var cookieRejectedIcon = '<span class="material-symbols-outlined" style="font-size: 20px; display: block; line-height: 1; text-align: center; margin: 0; padding: 0;">cookie_off</span>';
     
     // Determine if user has accepted any non-essential cookies
     var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
@@ -1159,21 +1159,32 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   'FILL' 0,
   'wght' 400,
   'GRAD' 0,
-  'opsz' 24;
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
+  'opsz' 24 !important;
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-wrap: normal !important;
+  white-space: nowrap !important;
+  direction: ltr !important;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'liga';
+  vertical-align: middle !important;
+}
+
+/* Specific styles for cookie floating button icons */
+#cookie-settings-float .material-symbols-outlined {
+  display: block !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  vertical-align: baseline !important;
 }
 
 #cookie-consent-banner * {

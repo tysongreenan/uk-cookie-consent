@@ -148,13 +148,13 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   
   // Cookie icons (matching the code generator)
   const cookieAcceptedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block'}}>
+    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block', lineHeight: 1, textAlign: 'center', margin: 0, padding: 0}}>
       cookie
     </span>
   )
   
   const cookieRejectedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block'}}>
+    <span className="material-symbols-outlined" style={{fontSize: '20px', display: 'block', lineHeight: 1, textAlign: 'center', margin: 0, padding: 0}}>
       cookie_off
     </span>
   )
@@ -222,21 +222,22 @@ export function BannerPreview({ config }: BannerPreviewProps) {
         'FILL' 0,
         'wght' 400,
         'GRAD' 0,
-        'opsz' 24;
-        font-family: 'Material Symbols Outlined';
-        font-weight: normal;
-        font-style: normal;
-        display: inline-block;
-        line-height: 1;
-        text-transform: none;
-        letter-spacing: normal;
-        word-wrap: normal;
-        white-space: nowrap;
-        direction: ltr;
+        'opsz' 24 !important;
+        font-family: 'Material Symbols Outlined' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        display: inline-block !important;
+        line-height: 1 !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        word-wrap: normal !important;
+        white-space: nowrap !important;
+        direction: ltr !important;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
         -moz-osx-font-smoothing: grayscale;
         font-feature-settings: 'liga';
+        vertical-align: middle !important;
       }
     `
     document.head.appendChild(style)
