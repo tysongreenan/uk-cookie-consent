@@ -156,20 +156,23 @@ function generateFloatingButtonStyles(config: any): string {
   }
   
   return `
-    background: ${backgroundColor};
-    color: ${color};
-    border: ${border};
-    padding: ${padding};
-    border-radius: ${borderRadius};
-    width: ${width};
-    height: ${height};
-    font-size: ${sizeProps.fontSize};
-    font-weight: 500;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    background: ${backgroundColor} !important;
+    color: ${color} !important;
+    border: ${border} !important;
+    padding: ${padding} !important;
+    border-radius: ${borderRadius} !important;
+    width: ${width} !important;
+    height: ${height} !important;
+    font-size: ${sizeProps.fontSize} !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    overflow: hidden !important;
   `
 }
 
@@ -1177,7 +1180,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   vertical-align: middle !important;
 }
 
-/* Specific styles for cookie floating button icons */
+/* Specific styles for cookie floating button icons - Extra strong to override site CSS */
 #cookie-settings-float .material-symbols-outlined {
   display: flex !important;
   align-items: center !important;
@@ -1188,6 +1191,29 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   padding: 0 !important;
   line-height: 1 !important;
   vertical-align: baseline !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  transform: none !important;
+}
+
+/* Extra protection against common CSS resets and frameworks */
+#cookie-settings-float .material-symbols-outlined * {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the button itself has strong centering */
+#cookie-settings-float {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
 }
 
 #cookie-consent-banner * {
