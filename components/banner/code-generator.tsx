@@ -403,7 +403,8 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       }
     }
 
-    return `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${config.colors.background}; color: ${config.colors.text}; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
+    // Main banner HTML
+    const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${config.colors.background}; color: ${config.colors.text}; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
     <button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
     
@@ -430,9 +431,10 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
   </div>
-</div>
+</div>`
 
-${config.behavior.showPreferences ? `
+    // Preferences modal HTML
+    const preferencesModal = config.behavior.showPreferences ? `
 <!-- Preferences Modal -->
 <div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
   <div style="background: white; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
@@ -573,33 +575,43 @@ ${config.behavior.showPreferences ? `
       </div>
     </div>
   </div>
-</div>
-` : ''}
+</div>` : ''
 
-${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-<!-- Enhanced Floating Cookie Settings Button -->
+    // Floating button HTML (separate from main banner)
+    const floatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
+
+<!-- Floating Cookie Settings Button (separate from banner) -->
 <div id="cookie-settings-float" style="
   position: fixed;
   ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 16px; right: 16px;' : 'bottom: 16px; left: 16px;'}
   z-index: 999998;
-  ${generateFloatingButtonStyles(config)}
+  background: ${config.colors.button};
+  color: ${config.colors.buttonText};
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   cursor: pointer;
   font-family: inherit;
-  display: none;
   transition: all 0.2s ease;
-  opacity: 0.7;
-" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-  ${generateFloatingButtonContent(config)}
-</div>
-` : ''}
+  opacity: 0.9;
+" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+  🍪 Cookie Settings
+</div>` : ''
 
-${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
+    // Inline footer link HTML (commented out for reference)
+    const inlineFooterLink = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
+
 <!-- Inline Footer Link HTML Snippet -->
 <!-- Copy this HTML and paste it in your website footer where you want the cookie settings link to appear -->
 <!-- 
 ${generateInlineFooterLinkHTML(config.branding.footerLink)}
--->
-` : ''}`
+-->` : ''
+
+    // Return all components separately
+    return mainBanner + preferencesModal + floatingButton + inlineFooterLink
   }
 
   const generateJavaScript = () => {
@@ -823,7 +835,28 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
   function saveConsent(consent) {
     setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
     loadScripts(consent);
+    showFloatingButton();
     updateFloatingButtonIcon(consent);
+  }
+  
+  function showFloatingButton() {
+    var floatBtn = document.getElementById('cookie-settings-float');
+    if (floatBtn) {
+      floatBtn.classList.add('show'); // Use class, not style.display
+      floatBtn.onclick = function() {
+        var banner = document.getElementById('cookie-consent-banner');
+        if (banner) {
+          banner.style.display = 'block';
+        }
+      };
+    }
+  }
+  
+  function hideFloatingButton() {
+    var floatBtn = document.getElementById('cookie-settings-float');
+    if (floatBtn) {
+      floatBtn.classList.remove('show'); // Use class, not style.display
+    }
   }
   
   function updateFloatingButtonIcon(consent) {
@@ -905,21 +938,9 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         initGA4();
       }
       
-      ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-      // Show cookie settings floating button after consent is given
-      var floatBtn = document.getElementById('cookie-settings-float');
-      if (floatBtn) {
-        floatBtn.classList.add('show');
-        updateFloatingButtonIcon(existingConsent);
-        floatBtn.onclick = function() {
-          var modal = document.getElementById('cookie-preferences-modal');
-          if (modal) {
-            modal.style.display = 'flex';
-            loadConsentIntoModal(existingConsent);
-          }
-        };
-      }
-      ` : ''}
+      // Show floating button if consent already exists
+      showFloatingButton();
+      updateFloatingButtonIcon(existingConsent);
       
       return;
     }
@@ -929,10 +950,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     trackConsentEvent('impression'); // Track banner impression
     
     // Hide floating button while main banner is showing
-    var floatBtn = document.getElementById('cookie-settings-float');
-    if (floatBtn) {
-      floatBtn.classList.remove('show');
-    }
+    hideFloatingButton();
     ` : ''}
     
     if (acceptBtn) {
@@ -941,21 +959,6 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         initGA4(); // Initialize GA4
         trackConsentEvent('accept'); // Track consent event
         banner.style.display = 'none';
-        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-        // Show floating cookie settings button after accepting
-        var floatBtn = document.getElementById('cookie-settings-float');
-        if (floatBtn) {
-          floatBtn.classList.add('show');
-          updateFloatingButtonIcon({ essential: true, functionality: true, analytics: true, marketing: true });
-          floatBtn.onclick = function() {
-            var modal = document.getElementById('cookie-preferences-modal');
-            if (modal) {
-              modal.style.display = 'flex';
-              loadConsentIntoModal({ essential: true, functionality: true, analytics: true, marketing: true });
-            }
-          };
-        }
-        ` : ''}
       };
     }
     
@@ -964,21 +967,6 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
         trackConsentEvent('reject'); // Track consent event (but don't init GA4)
         banner.style.display = 'none';
-        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-        // Show floating cookie settings button after rejecting (so user can change mind)
-        var floatBtn = document.getElementById('cookie-settings-float');
-        if (floatBtn) {
-          floatBtn.classList.add('show');
-          updateFloatingButtonIcon({ essential: true, functionality: false, analytics: false, marketing: false });
-          floatBtn.onclick = function() {
-            var modal = document.getElementById('cookie-preferences-modal');
-            if (modal) {
-              modal.style.display = 'flex';
-              loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
-            }
-          };
-        }
-        ` : ''}
       };
     }
     
@@ -1028,22 +1016,6 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         
         banner.style.display = 'none';
         modal.style.display = 'none';
-        
-        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-        // Show floating cookie settings button after accepting all in modal
-        var floatBtn = document.getElementById('cookie-settings-float');
-        if (floatBtn) {
-          floatBtn.classList.add('show');
-          updateFloatingButtonIcon(consent);
-          floatBtn.onclick = function() {
-            var modal = document.getElementById('cookie-preferences-modal');
-            if (modal) {
-              modal.style.display = 'flex';
-              loadConsentIntoModal(consent);
-            }
-          };
-        }
-        ` : ''}
       };
     }
     
@@ -1066,22 +1038,6 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         
         banner.style.display = 'none';
         modal.style.display = 'none';
-        
-        ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
-        // Show floating cookie settings button after confirming preferences
-        var floatBtn = document.getElementById('cookie-settings-float');
-        if (floatBtn) {
-          floatBtn.classList.add('show');
-          updateFloatingButtonIcon(consent);
-          floatBtn.onclick = function() {
-            var modal = document.getElementById('cookie-preferences-modal');
-            if (modal) {
-              modal.style.display = 'flex';
-              loadConsentIntoModal(consent);
-            }
-          };
-        }
-        ` : ''}
       };
     }
     
@@ -1231,12 +1187,23 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   box-sizing: border-box !important;
 }
 
-/* Ensure the button itself has strong centering - only when visible */
-#cookie-settings-float.show {
-  display: flex !important;
+/* Floating button - hidden by default with strong CSS */
+#cookie-settings-float {
+  display: none !important; /* This is critical! */
   align-items: center !important;
   justify-content: center !important;
   box-sizing: border-box !important;
+}
+
+#cookie-settings-float.show {
+  display: flex !important; /* Better for centering content */
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#cookie-settings-float:hover {
+  opacity: 1 !important;
+  transform: translateY(-2px);
 }
 
 #cookie-consent-banner * {
