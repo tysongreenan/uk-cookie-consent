@@ -59,6 +59,10 @@ interface BannerConfig {
       text: string
       position: 'floating' | 'inline'
       floatingPosition?: 'bottom-left' | 'bottom-right'
+      icons?: {
+        accepted?: string
+        rejected?: string
+      }
     }
   }
   layout: {
@@ -102,6 +106,17 @@ interface BannerConfig {
 interface CodeGeneratorProps {
   config: BannerConfig
 }
+
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+const DEFAULT_ACCEPTED_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSIjMWYxZjFmIj48cGF0aCBkPSJNNDgwLTgwcS04MyAwLTE1Ni0zMS41VDE5Ny0xOTdxLTU0LTU0LTg1LjUtMTI3VDgwLTQ4MHEwLTc1IDI5LTE0N3Q4MS0xMjguNXE1Mi01Ni41IDEyNS05MVQ0NzUtODgxcTIxIDAgNDMgMnQ0NSA3cS05IDQ1IDYgODV0NDUgNjYuNXEzMCAyNi41IDcxLjUgMzYuNXQ4NS41LTVxLTI2IDU5IDcuNSAxMTN0OTkuNSA1NnExIDExIDEuNSAyMC41dC41IDIwLjVxMCA4Mi0zMS41IDE1NC41dC04NS41IDEyN3EtNTQgNTQuNS0xMjcgODZUNDgwLTgwWm0tNjAtNDgwcTI1IDAgNDIuNS0xNy41VDQ4MC02MjBxMC0yNS0xNy41LTQyLjVUNDIwLTY4MHEtMjUgMC00Mi41IDE3LjVUMzYwLTYyMHEwIDI1IDE3LjUgNDIuNVQ0MjAtNTYwWm0tODAgMjAwcTI1IDAgNDIuNS0xNy41VDQwMC00MjBxMC0yNS0xNy41LTQyLjVUMzQwLTQ4MHEtMjUgMC00Mi41IDE3LjVUMjgwLTQyMHEwIDI1IDE3LjUgNDIuNVQzNDAtMzYwWm0yNjAgNDBxMTcgMCAyOC41LTExLjVUNjQwLTM2MHEwLTE3LTExLjUtMjguNVQ2MDAtNDAwcS0xNyAwLTI4LjUgMTEuNVQ1NjAtMzYwcTAgMTcgMTEuNSAyOC41VDYwMC0zMjBaTTQ4MC0xNjBxMTIyIDAgMjE2LjUtODRUODAwLTQ1OHEtNTAtMjItNzguNS02MFQ2ODMtNjAzcS03Ny0xMS0xMzItNjZ0LTY4LTEzMnEtODAtMi0xNDAuNSAyOXQtMTAxIDc5LjVRMjAxLTY0NCAxODAuNS01ODdUMTYwLTQ4MHEwIDEzMyA5My41IDIyNi41VDQ4MC0xNjBabTAtMzI0WiIvPjwvc3ZnPg=='
+const DEFAULT_REJECTED_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSIjMWYxZjFmIj48cGF0aCBkPSJtODE1LTI2MC01OC01OHExOC0zMSAyOS02Ni41dDE0LTczLjVxLTUwLTIyLTc4LjUtNjBUNjgzLTYwM3EtNzctMTEtMTMyLTY2dC02OC0xMzJxLTQ5LTItOTAgMTB0LTc2IDMzbC01Ny01N3E2MS00MiAxMzcuNS01OC41VDU2My04NzJxLTkgNDUgNiA4NC41dDQ1IDY2LjVxMzAgMjcgNzEgMzd0ODYtNXEtMzEgNjkgMTEgMTE4dDk2IDUxcTggNzItOS41IDEzOFQ4MTUtMjYwWk0zNDAtMzYwcS0yNSAwLTQyLjUtMTcuNVQyODAtNDIwcTAtMjUgMTcuNS00Mi41VDM0MC00ODBxMjUgMCA0Mi41IDE3LjVUNDAwLTQyMHEwIDI1LTE3LjUgNDIuNVQzNDAtMzYwWk04MTktMjggNzAxLTE0NnEtNDggMzItMTAzLjUgNDlUNDgwLTgwcS04MyAwLTE1Ni0zMS41VDE5Ny0xOTdxLTU0LTU0LTg1LjUtMTI3VDgwLTQ4MHEwLTYyIDE3LTExNy41VDE0Ni03MDFMMjctODIwbDU3LTU3TDg3Ni04NWwtNTcgNTdaTTQ4MC0xNjBxNDUgMCA4NS41LTEydDc2LjUtMzNMMjA1LTY0MnEtMjEgMzYtMzMgNzYuNVQxNjAtNDgwcTAgMTMzIDkzLjUgMjI2LjVUNDgwLTE2MFptLTU2LTI2NFptMTM1LTEzN1oiLz48L3N2Zz4='
 
 // Helper function to generate floating button styles
 function generateFloatingButtonStyles(config: any): string {
@@ -154,11 +169,12 @@ function generateFloatingButtonStyles(config: any): string {
     backgroundColor = config.colors?.button || '#3b82f6'
     color = config.colors?.buttonText || '#ffffff'
   }
+  const safeBorder = border === 'none' ? 'none' : escapeHtml(border)
   
   return `
-    background: ${backgroundColor} !important;
-    color: ${color} !important;
-    border: ${border} !important;
+    background: ${escapeHtml(backgroundColor)} !important;
+    color: ${escapeHtml(color)} !important;
+    border: ${safeBorder} !important;
     padding: ${padding} !important;
     border-radius: ${borderRadius} !important;
     width: ${width} !important;
@@ -178,32 +194,32 @@ function generateFloatingButtonStyles(config: any): string {
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any, config: any): string {
-  const text = footerLink.text || 'Cookie Settings'
+  const text = escapeHtml(footerLink.text || 'Cookie Settings')
   const linkType = footerLink.inlineStyle?.linkType || 'plain'
   const includeIcon = footerLink.inlineStyle?.includeIcon || false
   const includeLogo = footerLink.inlineStyle?.includeLogo || false
-  const customClass = footerLink.inlineStyle?.customClass || ''
+  const customClass = escapeHtml(footerLink.inlineStyle?.customClass || '')
 
   let html = ''
 
   switch (linkType) {
     case 'plain':
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${escapeHtml(config.colors.link)};">${text}</a>`
       break
     case 'button':
-      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
+      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: ${escapeHtml(config.colors.button)}; color: ${escapeHtml(config.colors.buttonText)}; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
       break
     case 'icon-text':
       const icon = includeIcon ? '🍪 ' : ''
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${icon}${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${escapeHtml(config.colors.link)};">${icon}${text}</a>`
       break
     case 'custom':
       const customIcon = includeIcon ? '🍪 ' : ''
       const customLogo = includeLogo ? '<img src="YOUR_LOGO_URL" alt="Logo" style="height: 16px; margin-right: 4px;" />' : ''
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${customLogo}${customIcon}${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${escapeHtml(config.colors.link)};">${customLogo}${customIcon}${text}</a>`
       break
     default:
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link" style="color: ${config.colors.link};">${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link" style="color: ${escapeHtml(config.colors.link)};">${text}</a>`
   }
   return html
 }
@@ -213,14 +229,19 @@ function generateFloatingButtonContent(config: any): string {
   const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
   const shape = floatingStyle.shape || 'pill'
   const showText = floatingStyle.showText !== false
-  const text = config.branding?.footerLink?.text || 'Cookie Settings'
+  const text = escapeHtml(config.branding?.footerLink?.text || 'Cookie Settings')
   const hasLogo = config.branding?.logo?.enabled && config.branding?.logo?.url
-  
-  // Cookie icons using Material Symbols - clean and scalable with perfect centering
-  const cookieAcceptedIcon = `<span class="material-symbols-outlined" style="font-size: 20px;">cookie</span>`
-  
-  const cookieRejectedIcon = `<span class="material-symbols-outlined" style="font-size: 20px;">cookie_off</span>`
-  
+
+  const acceptedIconUrl = config.branding?.footerLink?.icons?.accepted || DEFAULT_ACCEPTED_ICON
+  const rejectedIconUrl = config.branding?.footerLink?.icons?.rejected || DEFAULT_REJECTED_ICON
+  const iconStyle = 'style="width: 20px; height: 20px; display: inline-flex;"'
+  const cookieAcceptedIcon = acceptedIconUrl
+    ? `<img src="${escapeHtml(acceptedIconUrl)}" alt="" style="width: 20px; height: 20px; display: inline-flex;" />`
+    : `<span class="material-symbols-outlined" style="font-size: 20px; line-height: 1; display: inline-flex;">cookie</span>`
+  const cookieRejectedIcon = rejectedIconUrl
+    ? `<img src="${escapeHtml(rejectedIconUrl)}" alt="" style="width: 20px; height: 20px; display: inline-flex;" />`
+    : `<span class="material-symbols-outlined" style="font-size: 20px; line-height: 1; display: inline-flex;">cookie_off</span>`
+
   let content = ''
   
   if (shape === 'circle') {
@@ -230,7 +251,7 @@ function generateFloatingButtonContent(config: any): string {
     // Pill and square respect the showText setting
     if (showText && hasLogo) {
       // Show logo + text when both are enabled
-      content = `<img src="${config.branding.logo.url}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" />`
+      content = `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" />`
       content += `<span>${text}</span>`
     } else if (showText && !hasLogo) {
       // Show icon + text when text is enabled but no logo
@@ -415,11 +436,11 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
 
   const generateHTML = () => {
     const logoElement = config.branding.logo.enabled && config.branding.logo.url
-      ? `<img src="${config.branding.logo.url}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
+      ? `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
       : ''
 
     const privacyPolicyLink = config.branding.privacyPolicy.url
-      ? `<a href="${config.branding.privacyPolicy.url}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${config.colors.link}; text-decoration: underline;">${config.branding.privacyPolicy.text}</a>`
+      ? `<a href="${escapeHtml(config.branding.privacyPolicy.url)}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${escapeHtml(config.colors.link)} !important; text-decoration: underline;">${escapeHtml(config.branding.privacyPolicy.text)}</a>`
       : ''
 
     const borderColor = getBorderColor()
@@ -505,7 +526,7 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     }
 
     // Main banner HTML
-    const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${config.colors.background}; color: ${config.colors.text}; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
+    const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
     <button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
     
@@ -515,16 +536,16 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       <div style="flex: 1; min-width: 250px;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${config.text.title}</h3>
+        <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${escapeHtml(config.text.title)}</h3>
         
-        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">${config.text.message}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
         
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="cookie-accept-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.acceptButton}</button>
+          <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.acceptButton)}</button>
           
-          <button id="cookie-reject-btn" style="background-color: transparent; color: ${config.colors.button}; border: 1px solid ${config.colors.button}; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.rejectButton}</button>
+          <button id="cookie-reject-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.button)} !important; border: 1px solid ${escapeHtml(config.colors.button)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.rejectButton)}</button>
           
-          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${config.colors.link}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${config.text.preferencesButton}</button>` : ''}
+          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
         </div>
         
       </div>
@@ -825,6 +846,20 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
     console.log('GA4 consent event not tracked (not configured):', action);
   }`
 
+    const acceptedIconUrl = config.branding?.footerLink?.icons?.accepted || DEFAULT_ACCEPTED_ICON
+    const rejectedIconUrl = config.branding?.footerLink?.icons?.rejected || DEFAULT_REJECTED_ICON
+    const iconStyle = 'width: 20px; height: 20px; display: inline-flex;'
+    const acceptedIconMarkup = acceptedIconUrl
+      ? `<img src="${escapeHtml(acceptedIconUrl)}" alt="" style="${iconStyle}" />`
+      : `<span class="material-symbols-outlined" style="font-size: 20px; line-height: 1; display: inline-flex;">cookie</span>`
+    const effectiveRejectedIconUrl = rejectedIconUrl || acceptedIconUrl
+    const rejectedIconMarkup = effectiveRejectedIconUrl
+      ? `<img src="${escapeHtml(effectiveRejectedIconUrl)}" alt="" style="${iconStyle}" />`
+      : `<span class="material-symbols-outlined" style="font-size: 20px; line-height: 1; display: inline-flex;">cookie_off</span>`
+
+    const cookieAcceptedIconSerialized = JSON.stringify(acceptedIconMarkup)
+    const cookieRejectedIconSerialized = JSON.stringify(rejectedIconMarkup)
+
     return `(function() {
   'use strict';
   
@@ -1044,7 +1079,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   function showFloatingButton() {
     var floatBtn = document.getElementById('cookie-settings-float');
     if (floatBtn) {
-      floatBtn.classList.add('show'); // Use class, not style.display
+      floatBtn.classList.add('show');
+      floatBtn.style.setProperty('display', 'flex', 'important');
       floatBtn.onclick = function() {
         var banner = document.getElementById('cookie-consent-banner');
         if (banner) {
@@ -1057,7 +1093,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   function hideFloatingButton() {
     var floatBtn = document.getElementById('cookie-settings-float');
     if (floatBtn) {
-      floatBtn.classList.remove('show'); // Use class, not style.display
+      floatBtn.classList.remove('show');
+      floatBtn.style.setProperty('display', 'none', 'important');
     }
   }
   
@@ -1065,10 +1102,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
     var floatBtn = document.getElementById('cookie-settings-float');
     if (!floatBtn) return;
     
-    // Cookie icons using Material Symbols - clean and scalable with perfect centering
-    var cookieAcceptedIcon = '<span class="material-symbols-outlined" style="font-size: 20px;">cookie</span>';
-    
-    var cookieRejectedIcon = '<span class="material-symbols-outlined" style="font-size: 20px;">cookie_off</span>';
+    var cookieAcceptedIcon = ${cookieAcceptedIconSerialized};
+    var cookieRejectedIcon = ${cookieRejectedIconSerialized};
     
     // Determine if user has accepted any non-essential cookies
     var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
@@ -1324,6 +1359,9 @@ ${marketingLoaders || '      // No marketing scripts configured'}
       if (!scrolled && window.pageYOffset > 100) {
         scrolled = true;
         banner.style.display = 'none';
+        showFloatingButton();
+        updateFloatingButtonIcon({ functionality: false, analytics: false, marketing: false });
+        trackConsentEvent('dismiss');
       }
     });
     ` : ''}

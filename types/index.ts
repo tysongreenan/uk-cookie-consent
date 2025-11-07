@@ -91,6 +91,10 @@ export interface BannerConfig {
         includeLogo: boolean
         customClass?: string
       }
+      icons?: {
+        accepted?: string
+        rejected?: string
+      }
     }
   }
   
