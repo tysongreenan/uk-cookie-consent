@@ -8,6 +8,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/debug/schema - Debug database schema (only for authenticated users)
 export async function GET(request: NextRequest) {
   try {

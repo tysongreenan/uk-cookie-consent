@@ -202,6 +202,49 @@ export interface UserLogo {
   createdAt: Date
 }
 
+export interface BrandColorCandidate {
+  hex: string
+  score: number
+  sources: string[]
+  luminance: number
+  contrastOnWhite: number
+  contrastOnBlack: number
+  recommendedUsage: Array<'background' | 'text' | 'button' | 'buttonText' | 'link'>
+  suggestedTextColor: string
+}
+
+export interface BrandColorSuggestions {
+  colors: BrandColorCandidate[]
+  suggestions: {
+    background: string
+    text: string
+    button: string
+    buttonText: string
+    link: string
+  }
+  warnings: string[]
+}
+
+export interface BrandLogoSuggestion {
+  url: string
+  source: string
+}
+
+export interface BrandDiscoveryResult {
+  url: string
+  colors: BrandColorCandidate[]
+  suggestions: {
+    background: string
+    text: string
+    button: string
+    buttonText: string
+    link: string
+  }
+  warnings: string[]
+  logo?: BrandLogoSuggestion
+  fetchedAt: string
+}
+
 // Form types
 export interface CreateProjectForm {
   name: string

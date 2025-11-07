@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { securityMonitor } from '@/lib/security-monitor'
 import { authOptimizer } from '@/lib/auth-optimization'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/auth/metrics - Get authentication metrics and security data
 export async function GET(request: NextRequest) {
   try {

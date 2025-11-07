@@ -33,8 +33,11 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.2",
+    "cheerio": "^1.1.2",
+    "chroma-js": "^3.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "colorthief": "^2.6.0",
     "dotenv": "^17.2.3",
     "framer-motion": "^10.18.0",
     "gray-matter": "^4.0.3",
@@ -57,7 +60,11 @@
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
+    "@types/chroma-js": "^3.1.2",
     "@types/node": "^20.10.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",

@@ -17,7 +17,7 @@ import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'react-hot-toast'
-import { BannerConfig, TrackingScript, ComplianceFramework } from '@/types'
+import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
@@ -458,6 +458,10 @@ export default function BannerBuilderPage() {
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
+  const [brandImportUrl, setBrandImportUrl] = useState('')
+  const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
+  const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
+  const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -479,9 +483,13 @@ export default function BannerBuilderPage() {
     setIsLoadingBanner(true)
     try {
       const response = await fetch(`/api/banners/simple/${id}`)
-      const data = await response.json()
+      const data = (await response.json()) as {
+        success?: boolean
+        banner?: ConsentBanner
+        error?: string
+      }
       
-      if (response.ok) {
+      if (response.ok && data.banner) {
         // Check if banner needs migration
         const originalConfig = data.banner.config
         const needsUpdate = needsMigration(originalConfig)
@@ -552,6 +560,74 @@ export default function BannerBuilderPage() {
         [section]: { ...(currentValue as any), ...updates }
       }
     })
+  }
+
+  const applyColorUpdates = (updates: Partial<BannerConfig['colors']>) => {
+    setConfig(prev => ({
+      ...prev,
+      colors: {
+        ...prev.colors,
+        ...updates
+      }
+    }))
+  }
+
+  const applyColorRole = (role: keyof BannerConfig['colors'], value: string) => {
+    applyColorUpdates({ [role]: value })
+    toast.success(`Applied ${role} color`)
+  }
+
+  const applyBrandPalette = () => {
+    if (!brandDiscovery?.suggestions) return
+    applyColorUpdates(brandDiscovery.suggestions)
+    toast.success('Brand palette applied')
+  }
+
+  const applyBrandLogo = (logo: BrandLogoSuggestion) => {
+    setConfig(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        logo: {
+          ...prev.branding.logo,
+          enabled: true,
+          url: logo.url
+        }
+      }
+    }))
+    toast.success('Brand logo applied')
+  }
+
+  const handleBrandImport = async () => {
+    if (!brandImportUrl.trim()) {
+      setBrandDiscoveryError('Enter a website URL to import brand colors.')
+      return
+    }
+
+    setIsDiscoveringBrand(true)
+    setBrandDiscoveryError(null)
+
+    try {
+      const response = await fetch('/api/brand/discover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: brandImportUrl.trim() })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setBrandDiscoveryError(data.error || 'Unable to discover brand details.')
+        return
+      }
+
+      setBrandDiscovery(data)
+      toast.success('Brand colors discovered')
+    } catch (error) {
+      setBrandDiscoveryError((error as Error).message)
+    } finally {
+      setIsDiscoveringBrand(false)
+    }
   }
 
   const handleComplianceFrameworkChange = (framework: ComplianceFramework) => {
@@ -900,6 +976,92 @@ export default function BannerBuilderPage() {
                       <CardTitle>Brand Style</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                      <div className="space-y-3">
+                        <Label htmlFor="brand-import" className="text-sm font-medium">Import from Website</Label>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                          <Input
+                            id="brand-import"
+                            placeholder="https://example.com"
+                            value={brandImportUrl}
+                            onChange={(e) => setBrandImportUrl(e.target.value)}
+                            className="flex-1"
+                            inputMode="url"
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                          />
+                          <Button onClick={handleBrandImport} disabled={isDiscoveringBrand}>
+                            {isDiscoveringBrand ? 'Importing…' : 'Import Brand'}
+                          </Button>
+                        </div>
+                        {brandDiscoveryError && (
+                          <p className="text-sm text-red-500">{brandDiscoveryError}</p>
+                        )}
+                      </div>
+
+                      {brandDiscovery && (
+                        <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-sm font-semibold">Detected palette</p>
+                              <p className="text-xs text-muted-foreground">Imported from {brandDiscovery.url}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" onClick={applyBrandPalette}>Apply Palette</Button>
+                            </div>
+                          </div>
+
+                          {brandDiscovery.warnings.length > 0 && (
+                            <ul className="space-y-1 text-xs text-amber-600">
+                              {brandDiscovery.warnings.map((warning, index) => (
+                                <li key={index}>⚠️ {warning}</li>
+                              ))}
+                            </ul>
+                          )}
+
+                          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            {brandDiscovery.colors.slice(0, 8).map((color) => (
+                              <div key={color.hex} className="overflow-hidden rounded-md border">
+                                <div className="h-16" style={{ backgroundColor: color.hex }} title={color.hex} />
+                                <div className="space-y-2 p-3">
+                                  <div className="flex items-center justify-between text-sm font-medium">
+                                    <span>{color.hex}</span>
+                                    <span className="text-xs text-muted-foreground">score {color.score}</span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('background', color.hex)}>Background</Button>
+                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('text', color.hex)}>Text</Button>
+                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('button', color.hex)}>Button</Button>
+                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('buttonText', color.hex)}>Button Text</Button>
+                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('link', color.hex)}>Link</Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {brandDiscovery.logo && (
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={brandDiscovery.logo.url}
+                                alt="Detected brand logo"
+                                className="h-16 w-16 rounded border bg-white object-contain p-2"
+                              />
+                              <div className="flex-1 space-y-1">
+                                <p className="text-sm font-medium">Detected logo</p>
+                                <p className="text-xs text-muted-foreground">Source: {brandDiscovery.logo.source}</p>
+                                <div className="flex gap-2">
+                                  <Button size="sm" onClick={() => applyBrandLogo(brandDiscovery.logo!)}>Use Logo</Button>
+                                  <Button size="sm" variant="outline" asChild>
+                                    <a href={brandDiscovery.logo.url} target="_blank" rel="noopener noreferrer">Open logo</a>
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       <div>
                         <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
                         <Select value={config.theme} onValueChange={handleThemeChange}>

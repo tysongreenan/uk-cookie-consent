@@ -274,9 +274,15 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   }
 
   // Helper function to generate script loading code
-  const generateScriptLoaders = (scripts: TrackingScript[], category: string): string => {
+  const generateScriptLoaders = (
+    scripts: TrackingScript[],
+    category: string,
+    options?: { lazy?: boolean }
+  ): string => {
     const enabledScripts = scripts.filter(s => s.enabled && s.scriptCode.trim())
     if (enabledScripts.length === 0) return ''
+
+    const useLazy = options?.lazy === true
     
     return enabledScripts.map(script => {
       const escaped = encodeScriptCode(script.scriptCode)
@@ -289,13 +295,23 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
         // Handle external scripts
         const srcMatch = script.scriptCode.match(/src=["']([^"']+)["']/)
         if (srcMatch) {
+          const srcLiteral = JSON.stringify(srcMatch[1])
+          const nameLiteral = JSON.stringify(script.name)
+
+          if (useLazy) {
+            return `      // ${script.name} (External, scheduled)
+      scheduleTask(function() {
+        try {
+          loadExternalScript(${srcLiteral}, ${nameLiteral});
+        } catch(e) {
+          console.error('Error scheduling external script ${script.name}:', e);
+        }
+      });`
+          }
+
           return `      // ${script.name} (External)
       try {
-        var scriptEl_${varName} = document.createElement('script');
-        scriptEl_${varName}.src = '${srcMatch[1]}';
-        scriptEl_${varName}.async = true;
-        document.head.appendChild(scriptEl_${varName});
-        console.log('Loading external script: ${script.name}');
+        loadExternalScript(${srcLiteral}, ${nameLiteral});
       } catch(e) {
         console.error('Error loading external script ${script.name}:', e);
       }`
@@ -303,13 +319,26 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       }
       
       // Handle inline scripts - decode Base64 and execute
+      if (useLazy) {
+        const encodedLiteral = JSON.stringify(escaped)
+        const nameLiteral = JSON.stringify(script.name)
+        const cacheLiteral = JSON.stringify(varName)
+        return `      // ${script.name} (scheduled)
+      scheduleTask(function() {
+        try {
+          injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral});
+        } catch(e) {
+          console.error('Error scheduling ${script.name}:', e);
+        }
+      });`
+      }
+
+      const encodedLiteral = JSON.stringify(escaped)
+      const nameLiteral = JSON.stringify(script.name)
+      const cacheLiteral = JSON.stringify(varName)
       return `      // ${script.name}
       try {
-        var scriptCode_${varName} = atob('${escaped}');
-        var scriptEl_${varName} = document.createElement('script');
-        scriptEl_${varName}.textContent = scriptCode_${varName};
-        document.head.appendChild(scriptEl_${varName});
-        console.log('Loaded script: ${script.name}');
+        injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral});
       } catch(e) {
         console.error('Error loading ${script.name}:', e);
       }`
@@ -681,10 +710,26 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   }
 
   const generateJavaScript = () => {
+    const performanceOptions = config.advanced?.performance ?? {}
+    const useLazyLoader = Boolean(
+      performanceOptions.deferNonCriticalScripts ||
+      performanceOptions.lazyLoadAnalytics ||
+      performanceOptions.useRequestIdleCallback
+    )
+    const useIdleCallback = Boolean(performanceOptions.useRequestIdleCallback)
+
     const strictlyNecessaryLoaders = generateScriptLoaders(config.scripts.strictlyNecessary, 'strict')
-    const functionalityLoaders = generateScriptLoaders(config.scripts.functionality, 'func')
-    const analyticsLoaders = generateScriptLoaders(config.scripts.trackingPerformance, 'analytics')
-    const marketingLoaders = generateScriptLoaders(config.scripts.targetingAdvertising, 'marketing')
+    const functionalityLoaders = generateScriptLoaders(config.scripts.functionality, 'func', {
+      lazy: Boolean(performanceOptions.deferNonCriticalScripts)
+    })
+    const analyticsLoaders = generateScriptLoaders(config.scripts.trackingPerformance, 'analytics', {
+      lazy: Boolean(
+        performanceOptions.lazyLoadAnalytics ?? performanceOptions.deferNonCriticalScripts
+      )
+    })
+    const marketingLoaders = generateScriptLoaders(config.scripts.targetingAdvertising, 'marketing', {
+      lazy: Boolean(performanceOptions.deferNonCriticalScripts)
+    })
 
     // GA4 Integration
     const ga4Integration = config.integrations?.googleAnalytics?.enabled && config.integrations?.googleAnalytics?.measurementId
@@ -694,21 +739,40 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   var GA_TRACK_CONSENT_EVENTS = ${config.integrations.googleAnalytics.trackConsentEvents};
   var GA_TRACK_IMPRESSIONS = ${config.integrations.googleAnalytics.trackImpressions ?? true};
   var GA_ANONYMIZE_IP = ${config.integrations.googleAnalytics.anonymizeIp};
+
+  function initGA4Default() {
+    if (!GA_MEASUREMENT_ID) return;
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = window.gtag || gtag;
+
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+
+    gtag('js', new Date());
+  }
   
   function initGA4() {
     if (!GA_MEASUREMENT_ID) return;
     
-    // Load GA4 script
-    var gaScript = document.createElement('script');
-    gaScript.async = true;
-    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
-    document.head.appendChild(gaScript);
-    
-    // Initialize gtag
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    window.gtag = gtag;
-    gtag('js', new Date());
+    if (!window.gtag) {
+      initGA4Default();
+    }
+
+    if (!document.querySelector('script[data-cookie-banner-ga="true"]')) {
+      var gaScript = document.createElement('script');
+      gaScript.async = true;
+      gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+      gaScript.setAttribute('data-cookie-banner-ga', 'true');
+      document.head.appendChild(gaScript);
+    }
+
     gtag('config', GA_MEASUREMENT_ID, {
       ${config.integrations.googleAnalytics.anonymizeIp ? "'anonymize_ip': true," : ''}
       'cookie_flags': 'SameSite=None;Secure'
@@ -751,6 +815,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   }`
       : `
   // GA4 Integration not configured
+  function initGA4Default() {}
+
   function initGA4() {
     console.log('GA4 integration not configured');
   }
@@ -764,8 +830,66 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   
   var COOKIE_NAME = 'cookie_consent';
   var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
+  var USE_LAZY_LOADER = ${useLazyLoader};
+  var USE_IDLE_CALLBACK = ${useIdleCallback};
   
   ${ga4Integration}
+
+  initGA4Default();
+
+  var injectedScripts = window.__cookieBannerInjected || (window.__cookieBannerInjected = {});
+  var injectedExternalScripts = window.__cookieBannerExternal || (window.__cookieBannerExternal = {});
+  
+  function scheduleTask(fn) {
+    if (!USE_LAZY_LOADER) {
+      fn();
+      return;
+    }
+
+    if (USE_IDLE_CALLBACK && typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(fn);
+    } else {
+      setTimeout(fn, 1);
+    }
+  }
+
+  function loadExternalScript(src, name) {
+    if (injectedExternalScripts[src]) {
+      return;
+    }
+
+    var scriptEl = document.createElement('script');
+    scriptEl.async = true;
+    scriptEl.src = src;
+    scriptEl.setAttribute('data-cookie-banner-src', src);
+    scriptEl.onload = function() {
+      injectedExternalScripts[src] = true;
+    };
+    scriptEl.onerror = function(error) {
+      delete injectedExternalScripts[src];
+      console.error('Error loading external script:', name, error);
+    };
+    injectedExternalScripts[src] = true;
+    document.head.appendChild(scriptEl);
+    console.log('Loading external script:', name);
+  }
+
+  function injectInlineScript(encoded, name, cacheKey) {
+    if (injectedScripts[cacheKey]) {
+      return;
+    }
+
+    try {
+      var scriptEl = document.createElement('script');
+      scriptEl.setAttribute('data-cookie-banner-inline', cacheKey);
+      scriptEl.textContent = atob(encoded);
+      document.head.appendChild(scriptEl);
+      injectedScripts[cacheKey] = true;
+      console.log('Loaded script:', name);
+    } catch (error) {
+      console.error('Error injecting inline script', name, error);
+    }
+  }
   
   // Language translations
   var TRANSLATIONS = {
@@ -912,6 +1036,9 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
     loadScripts(consent);
     showFloatingButton();
     updateFloatingButtonIcon(consent);
+    if (consent.analytics) {
+      initGA4();
+    }
   }
   
   function showFloatingButton() {
@@ -1211,9 +1338,7 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   }
 
   const generateCSS = () => {
-    return `/* Material Symbols CSS */
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off');
-
+    return `/* Material Symbols CSS - font file loaded asynchronously via <link> */
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
@@ -1361,10 +1486,17 @@ ${config.advanced.customCSS}`
   }
 
   const generateHeadCode = () => {
+    const materialFontUrl = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off&display=swap'
+
     return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 Cookie Consent Banner - HEAD CODE (cookie-banner.ca)      🍁 -->
 <!-- 🍁 Place this code in your <head> section                    🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="${materialFontUrl}" />
+<link rel="stylesheet" href="${materialFontUrl}" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="${materialFontUrl}" /></noscript>
 <style>
 ${generateCSS()}
 </style>

@@ -8,6 +8,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/roadmap - Get roadmap items with user's vote status
 export async function GET(request: NextRequest) {
   try {
