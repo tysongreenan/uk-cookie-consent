@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.0.1'
+export const CURRENT_BANNER_VERSION = '2.0.2'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -118,6 +118,11 @@ export function migrateBannerConfig(config: any): BannerConfig {
   // Migration from v2.0.0 to v2.1.0
   if (migratedConfig.version === '2.0.0') {
     migratedConfig = migrateToV2_1(migratedConfig)
+  }
+
+  // Migration from v2.0.1 to v2.0.2
+  if (migratedConfig.version === '2.0.1') {
+    migratedConfig = migrateToV2_0_2(migratedConfig)
   }
 
   // Add current version and timestamp
@@ -290,6 +295,19 @@ function migrateToV2_1(config: any): any {
 }
 
 /**
+ * Migration from v2.0.1 to v2.0.2 - Enhanced floating button shape flexibility
+ */
+function migrateToV2_0_2(config: any): any {
+  const migrated = { ...config }
+
+  // No structural changes needed - this is a code generation improvement
+  // The floating button logic now properly respects "Show text with icon: OFF" for all shapes
+  
+  migrated.version = '2.0.2'
+  return migrated
+}
+
+/**
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
@@ -319,6 +337,13 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🛡️ Bulletproof CSS that resists external website interference')
     notes.push('⏱️ Enhanced banner timing - floating button appears after consent')
     notes.push('🔧 Improved toggle functionality and modal state management')
+  }
+
+  if (oldVersion === '2.0.1' && newVersion === '2.0.2') {
+    notes.push('🔲 Fixed Square/Pill shapes to respect "Show text with icon: OFF" setting')
+    notes.push('🎨 All shapes (Circle, Square, Pill) now support icon-only mode')
+    notes.push('⚙️ Consistent behavior across all floating button shapes')
+    notes.push('🎯 Enhanced user choice and customization options')
   }
 
   return notes

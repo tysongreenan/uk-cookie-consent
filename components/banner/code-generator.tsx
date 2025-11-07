@@ -177,7 +177,7 @@ function generateFloatingButtonStyles(config: any): string {
 }
 
 // Helper function to generate inline footer link HTML
-function generateInlineFooterLinkHTML(footerLink: any): string {
+function generateInlineFooterLinkHTML(footerLink: any, config: any): string {
   const text = footerLink.text || 'Cookie Settings'
   const linkType = footerLink.inlineStyle?.linkType || 'plain'
   const includeIcon = footerLink.inlineStyle?.includeIcon || false
@@ -188,22 +188,22 @@ function generateInlineFooterLinkHTML(footerLink: any): string {
 
   switch (linkType) {
     case 'plain':
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${text}</a>`
       break
     case 'button':
-      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
+      html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
       break
     case 'icon-text':
       const icon = includeIcon ? '🍪 ' : ''
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${icon}${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${icon}${text}</a>`
       break
     case 'custom':
       const customIcon = includeIcon ? '🍪 ' : ''
       const customLogo = includeLogo ? '<img src="YOUR_LOGO_URL" alt="Logo" style="height: 16px; margin-right: 4px;" />' : ''
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}">${customLogo}${customIcon}${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${config.colors.link};">${customLogo}${customIcon}${text}</a>`
       break
     default:
-      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link">${text}</a>`
+      html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link" style="color: ${config.colors.link};">${text}</a>`
   }
   return html
 }
@@ -316,6 +316,74 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     }).join('\n\n')
   }
 
+  // Helper function to calculate border color based on theme
+  const getBorderColor = () => {
+    // For dark theme, use lighter border; for light theme, use darker border
+    if (config.theme === 'dark') {
+      // Use semi-transparent white/light color for borders
+      return 'rgba(255, 255, 255, 0.2)'
+    } else {
+      // Use semi-transparent dark color for borders
+      return 'rgba(0, 0, 0, 0.1)'
+    }
+  }
+
+  // Helper function to calculate secondary text color based on theme
+  const getSecondaryTextColor = () => {
+    // For dark theme, use lighter secondary text; for light theme, use darker secondary text
+    if (config.theme === 'dark') {
+      // Use 70% opacity of main text color for secondary text
+      const textColor = config.colors.text
+      if (textColor.startsWith('#')) {
+        // Convert hex to rgba with opacity
+        const hex = textColor.replace('#', '')
+        const r = parseInt(hex.substr(0, 2), 16)
+        const g = parseInt(hex.substr(2, 2), 16)
+        const b = parseInt(hex.substr(4, 2), 16)
+        return `rgba(${r}, ${g}, ${b}, 0.7)`
+      } else if (textColor.startsWith('rgb')) {
+        return textColor.replace(')', ', 0.7)').replace('rgb', 'rgba')
+      }
+      return textColor
+    } else {
+      // Use 60% opacity of main text color for secondary text
+      const textColor = config.colors.text
+      if (textColor.startsWith('#')) {
+        // Convert hex to rgba with opacity
+        const hex = textColor.replace('#', '')
+        const r = parseInt(hex.substr(0, 2), 16)
+        const g = parseInt(hex.substr(2, 2), 16)
+        const b = parseInt(hex.substr(4, 2), 16)
+        return `rgba(${r}, ${g}, ${b}, 0.6)`
+      } else if (textColor.startsWith('rgb')) {
+        return textColor.replace(')', ', 0.6)').replace('rgb', 'rgba')
+      }
+      return textColor
+    }
+  }
+
+  // Helper function to calculate background color for card sections
+  const getCardBackgroundColor = () => {
+    if (config.theme === 'dark') {
+      // Slightly lighter than main background for dark theme
+      const bgColor = config.colors.background
+      if (bgColor.startsWith('#')) {
+        // Convert hex to rgba with opacity
+        const hex = bgColor.replace('#', '')
+        const r = parseInt(hex.substr(0, 2), 16)
+        const g = parseInt(hex.substr(2, 2), 16)
+        const b = parseInt(hex.substr(4, 2), 16)
+        return `rgba(${r}, ${g}, ${b}, 0.3)`
+      } else if (bgColor.startsWith('rgb')) {
+        return bgColor.replace(')', ', 0.3)').replace('rgb', 'rgba')
+      }
+      return bgColor
+    } else {
+      // Slightly darker than main background for light theme
+      return 'rgba(0, 0, 0, 0.02)'
+    }
+  }
+
   const generateHTML = () => {
     const logoElement = config.branding.logo.enabled && config.branding.logo.url
       ? `<img src="${config.branding.logo.url}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
@@ -324,6 +392,10 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     const privacyPolicyLink = config.branding.privacyPolicy.url
       ? `<a href="${config.branding.privacyPolicy.url}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${config.colors.link}; text-decoration: underline;">${config.branding.privacyPolicy.text}</a>`
       : ''
+
+    const borderColor = getBorderColor()
+    const secondaryTextColor = getSecondaryTextColor()
+    const cardBackgroundColor = getCardBackgroundColor()
 
     const getPositionStyles = () => {
       switch (config.position) {
@@ -437,16 +509,16 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     const preferencesModal = config.behavior.showPreferences ? `
 <!-- Preferences Modal -->
 <div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
-  <div style="background: white; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+  <div style="background: ${config.colors.background}; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
     <!-- Header -->
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid #e5e7eb;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid ${borderColor};">
       ${config.branding.logo.enabled && config.branding.logo.url ? `
       <img src="${config.branding.logo.url}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
       ` : `
-      <span style="font-weight: 600; color: #111827;">Cookie Settings</span>
+      <span style="font-weight: 600; color: ${config.colors.text};">Cookie Settings</span>
       `}
       
-      <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: #6b7280; font-size: 20px; line-height: 1; flex-shrink: 0;" aria-label="Close">
+      <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: ${config.colors.text}; font-size: 20px; line-height: 1; flex-shrink: 0; opacity: 0.7;" aria-label="Close">
         ×
       </button>
     </div>
@@ -455,12 +527,12 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
     <div style="display: flex; flex-direction: column; height: 100%; max-height: calc(90vh - 80px);">
       <div style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
         <!-- Title -->
-        <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 12px 0;">
+        <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0;">
           Privacy Center
         </h2>
         
         <!-- Description -->
-        <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px 0; line-height: 1.5;">
+        <p style="font-size: 14px; color: ${secondaryTextColor}; margin: 0 0 24px 0; line-height: 1.5;">
           By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
         </p>
 
@@ -471,87 +543,87 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
 
         <!-- Cookie Preferences Section -->
         <div style="margin-bottom: 24px;">
-          <h3 style="font-weight: bold; color: #111827; margin: 0 0 16px 0;">
+          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 16px 0;">
             Manage cookie preferences
           </h3>
           
           <div style="display: flex; flex-direction: column; gap: 12px;">
             <!-- Strictly Necessary -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f9fafb;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px; background-color: ${cardBackgroundColor};">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-necessary" style="font-weight: 500; color: #111827;">Strictly Necessary Cookies</div>
-                  <div id="cat-necessary-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Always active</div>
+                  <div id="cat-necessary" style="font-weight: 500; color: ${config.colors.text};">Strictly Necessary Cookies</div>
+                  <div id="cat-necessary-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Always active</div>
                 </div>
               </div>
             </div>
 
             <!-- Functionality -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-functionality" style="font-weight: 500; color: #111827;">Functional Cookies</div>
-                  <div id="cat-functionality-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Remember preferences and choices</div>
+                  <div id="cat-functionality" style="font-weight: 500; color: ${config.colors.text};">Functional Cookies</div>
+                  <div id="cat-functionality-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Remember preferences and choices</div>
                 </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
 
             <!-- Performance -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-analytics" style="font-weight: 500; color: #111827;">Performance Cookies</div>
-                  <div id="cat-analytics-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Help us improve our website</div>
+                  <div id="cat-analytics" style="font-weight: 500; color: ${config.colors.text};">Performance Cookies</div>
+                  <div id="cat-analytics-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Help us improve our website</div>
                 </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
 
             <!-- Targeting -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-marketing" style="font-weight: 500; color: #111827;">Targeting Cookies</div>
-                  <div id="cat-marketing-desc" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Personalized ads and content</div>
+                  <div id="cat-marketing" style="font-weight: 500; color: ${config.colors.text};">Targeting Cookies</div>
+                  <div id="cat-marketing-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Personalized ads and content</div>
                 </div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
 
             <!-- Social Media -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: #9ca3af; font-size: 20px; flex-shrink: 0;">›</span>
-                <div style="min-width: 0; flex: 1; font-weight: 500; color: #111827;">Social Media Cookies</div>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <div style="min-width: 0; flex: 1; font-weight: 500; color: ${config.colors.text};">Social Media Cookies</div>
               </div>
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
                 </label>
               </div>
             </div>
@@ -560,7 +632,7 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       </div>
 
       <!-- Footer with buttons -->
-      <div style="padding: 24px 24px 0 24px; border-top: 1px solid #f3f4f6; background-color: #f9fafb;">
+      <div style="padding: 24px 24px 0 24px; border-top: 1px solid ${borderColor}; background-color: ${cardBackgroundColor};">
         <!-- Confirm Button -->
         <button id="cookie-confirm-choices-btn" style="width: 100%; height: 48px; margin-bottom: 16px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
           CONFIRM MY CHOICES
@@ -568,8 +640,8 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
 
         <!-- Powered by -->
         <div style="text-align: center;">
-          <p style="font-size: 12px; color: #6b7280; margin: 0;">
-            Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: #6b7280; text-decoration: none;" onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#6b7280'">cookie-banner.ca</a>
+          <p style="font-size: 12px; color: ${secondaryTextColor}; margin: 0;">
+            Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: ${config.colors.link}; text-decoration: none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">cookie-banner.ca</a>
           </p>
         </div>
       </div>
@@ -585,20 +657,14 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
   position: fixed;
   ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 16px; right: 16px;' : 'bottom: 16px; left: 16px;'}
   z-index: 999998;
-  background: ${config.colors.button};
-  color: ${config.colors.buttonText};
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  ${generateFloatingButtonStyles(config)}
   cursor: pointer;
   font-family: inherit;
   transition: all 0.2s ease;
   opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
-  🍪 Cookie Settings
+  ${generateFloatingButtonContent(config)}
 </div>` : ''
 
     // Inline footer link HTML (commented out for reference)
@@ -607,7 +673,7 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
 <!-- Inline Footer Link HTML Snippet -->
 <!-- Copy this HTML and paste it in your website footer where you want the cookie settings link to appear -->
 <!-- 
-${generateInlineFooterLinkHTML(config.branding.footerLink)}
+${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
 -->` : ''
 
     // Return all components separately
@@ -652,6 +718,15 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink)}
   }
   
   function trackConsentEvent(action) {
+    // For reject events, we need to track them even if GA4 isn't loaded yet
+    // This respects user privacy while still providing analytics insights
+    if (action === 'reject' && GA_TRACK_CONSENT_EVENTS) {
+      // Initialize GA4 temporarily just for tracking the reject event
+      if (!window.gtag) {
+        initGA4();
+      }
+    }
+    
     if (!window.gtag) return;
     
     // Track consent events (accept/reject/dismiss)
@@ -1052,6 +1127,9 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     
     // Make toggle switches functional
     function setupToggleSwitches() {
+      var buttonColor = '${config.colors.button}';
+      var inactiveColor = '${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}';
+      
       var toggles = [
         { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
         { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
@@ -1067,20 +1145,20 @@ ${marketingLoaders || '      // No marketing scripts configured'}
         if (input && slider && thumb) {
           // Set initial state
           if (input.checked) {
-            slider.style.backgroundColor = '#3b82f6';
+            slider.style.backgroundColor = buttonColor;
             thumb.style.transform = 'translateX(20px)';
           } else {
-            slider.style.backgroundColor = '#ccc';
+            slider.style.backgroundColor = inactiveColor;
             thumb.style.transform = 'translateX(0)';
           }
           
           // Add change event listener
           input.addEventListener('change', function() {
             if (this.checked) {
-              slider.style.backgroundColor = '#3b82f6';
+              slider.style.backgroundColor = buttonColor;
               thumb.style.transform = 'translateX(20px)';
             } else {
-              slider.style.backgroundColor = '#ccc';
+              slider.style.backgroundColor = inactiveColor;
               thumb.style.transform = 'translateX(0)';
             }
           });
@@ -1241,17 +1319,9 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   50% { transform: scale(1.05); }
 }
 
-/* Toggle Switch Styles */
-input:checked + span {
-  background-color: #3b82f6 !important;
-}
-
+/* Toggle Switch Styles - Colors handled by JavaScript for theme consistency */
 input:checked + span:before {
   transform: translateX(20px);
-}
-
-input:focus + span {
-  box-shadow: 0 0 1px #3b82f6;
 }
 
 /* Modal Styles */
