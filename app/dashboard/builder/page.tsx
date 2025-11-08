@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -447,7 +449,7 @@ const SmartScriptInput = ({
   )
 }
 
-export default function BannerBuilderPage() {
+function BannerBuilderContent() {
   const { data: session } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -3381,5 +3383,13 @@ export default function BannerBuilderPage() {
 
         </main>
     </div>
+  )
+}
+
+export default function BannerBuilderPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center text-muted-foreground">Loading builder...</div>}>
+      <BannerBuilderContent />
+    </Suspense>
   )
 }

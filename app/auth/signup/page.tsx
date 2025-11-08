@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
@@ -14,7 +16,7 @@ import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
-export default function SignUpPage() {
+function SignUpContent() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -379,5 +381,13 @@ export default function SignUpPage() {
         </motion.div>
       </motion.div>
     </div>
+  )
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center text-muted-foreground">Loading sign-up...</div>}>
+      <SignUpContent />
+    </Suspense>
   )
 }
