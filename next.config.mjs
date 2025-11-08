@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+process.env.NEXT_DISABLE_TRACE_BATCHING = '1'
+process.env.NEXT_PRIVATE_BUILD_SKIP_TRACE_CLEANUP = '1'
+
 const nextConfig = {
   images: {
     domains: ['localhost', 'cdn.cookieconsentbuilder.com', 'vercel.app'],
@@ -11,8 +14,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
-  // Ensure proper build output
-  output: 'standalone',
   
   // Security headers
   async headers() {

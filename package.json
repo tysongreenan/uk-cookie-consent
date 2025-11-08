@@ -61,7 +61,7 @@
     "zod": "^3.22.4"
   },
   "engines": {
-    "node": "20.10.0"
+    "node": "20"
   },
   "devDependencies": {
     "@types/chroma-js": "^3.1.2",
