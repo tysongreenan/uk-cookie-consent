@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-process.env.NEXT_DISABLE_TRACE_BATCHING = '1'
-process.env.NEXT_PRIVATE_BUILD_SKIP_TRACE_CLEANUP = '1'
 
 const nextConfig = {
   images: {
