@@ -7,12 +7,14 @@ import { logLoginAttempt, logAccountLockout, securityMonitor } from '@/lib/secur
 import jwt from 'jsonwebtoken'
 
 // Lazy initialization to avoid build-time errors
+// Use service role key for server-side operations (bypasses RLS)
+// This is safe because we authenticate via password verification before using it
 function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
   
   if (!url || !key) {
-    throw new Error('Supabase configuration is missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY environment variables.')
+    throw new Error('Supabase configuration is missing. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
   }
   
   return createClient(url, key)

@@ -4,9 +4,11 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
 
+// Use service role key for server-side operations (bypasses RLS)
+// This is safe because we authenticate via NextAuth session before using it
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 // Helper function to verify JWT token
