@@ -808,15 +808,26 @@ function initGA4() {
     gaScript.async = true;
     gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
     gaScript.setAttribute('data-cookie-banner-ga', 'true');
+    
+    // Suppress "Invalid domain for site key" and other GA errors
+    gaScript.onerror = function() {
+      console.warn('Google Analytics script failed to load. This may be due to domain restrictions.');
+      // Silently fail - don't show error to user
+    };
+    
     document.head.appendChild(gaScript);
   }
 
-  gtag('config', GA_MEASUREMENT_ID, {
-    ${config.integrations.googleAnalytics.anonymizeIp ? "'anonymize_ip': true," : ''}
-    'cookie_flags': 'SameSite=None;Secure'
-  });
-  
-  console.log('Google Analytics 4 initialized with ID:', GA_MEASUREMENT_ID);
+  try {
+    gtag('config', GA_MEASUREMENT_ID, {
+      ${config.integrations.googleAnalytics.anonymizeIp ? "'anonymize_ip': true," : ''}
+      'cookie_flags': 'SameSite=None;Secure'
+    });
+    console.log('Google Analytics 4 initialized with ID:', GA_MEASUREMENT_ID);
+  } catch (error) {
+    // Suppress GA configuration errors (e.g., invalid domain)
+    console.warn('Google Analytics configuration error (suppressed):', error.message);
+  }
 }
 
 function trackConsentEvent(action) {

@@ -83,55 +83,36 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Suppress GTM/reCAPTCHA errors to prevent "Invalid domain for site key" messages
+              window.addEventListener('error', function(e) {
+                if (e.message && (e.message.includes('site key') || e.message.includes('recaptcha') || e.message.includes('Invalid domain'))) {
+                  e.preventDefault();
+                  return true;
+                }
+              }, true);
+              
               // Defer GTM until page is fully loaded
               window.addEventListener('load', function() {
                 setTimeout(function() {
-                  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                  })(window,document,'script','dataLayer','GTM-5LGTBVXZ');
+                  try {
+                    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                    j.onerror = function() { console.warn('GTM failed to load (suppressed)'); };
+                    f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer','GTM-5LGTBVXZ');
+                  } catch(e) {
+                    console.warn('GTM initialization error (suppressed):', e.message);
+                  }
                 }, 1000); // 1 second delay after load
               });
             `,
           }}
         />
         
-        {/* Deferred Google Analytics - loads after page is interactive */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Initialize dataLayer and consent before GA loads
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              
-              // Set default consent to denied
-              gtag('consent', 'default', {
-                'analytics_storage': 'denied',
-                'ad_storage': 'denied',
-                'ad_user_data': 'denied',
-                'ad_personalization': 'denied'
-              });
-              
-              // Defer loading GA script until after page load
-              window.addEventListener('load', function() {
-                setTimeout(function() {
-                  var script = document.createElement('script');
-                  script.async = true;
-                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5';
-                  document.head.appendChild(script);
-                  
-                  script.onload = function() {
-                    gtag('js', new Date());
-                    gtag('config', 'G-QM1L8P6TT5', {
-                      'anonymize_ip': true
-                    });
-                  };
-                }, 1000); // 1 second delay after load
-              });
-            `,
-          }}
-        />
+        {/* Google Analytics removed - should be configured per-banner via banner builder */}
+        {/* This prevents "Invalid domain for site key" errors when testing banners */}
       </head>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
