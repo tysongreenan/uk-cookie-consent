@@ -1066,10 +1066,20 @@ ${config.branding.footerLink.enabled ? `
 // Global function for inline cookie settings links
 window.showCookiePreferences = function() {
   var banner = document.getElementById('cookie-consent-banner');
+  var modal = document.getElementById('cookie-preferences-modal');
+  
+  // Close modal if it's open (prevents blocking clicks)
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  
   if (banner) {
     banner.style.display = 'block';
     // Re-initialize button handlers when banner is shown again
-    reinitializeBannerHandlers();
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(function() {
+      reinitializeBannerHandlers();
+    }, 10);
   }
 };
 ` : ''}
@@ -1125,8 +1135,21 @@ function showFloatingButton() {
     floatBtn.style.setProperty('display', 'flex', 'important');
     floatBtn.onclick = function() {
       var banner = document.getElementById('cookie-consent-banner');
+      var modal = document.getElementById('cookie-preferences-modal');
+      
+      // Close modal if it's open (prevents blocking clicks)
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      
       if (banner) {
         banner.style.display = 'block';
+        // CRITICAL: Reinitialize event handlers when banner is reopened
+        // This ensures buttons are clickable after reopening
+        // Use setTimeout to ensure DOM is ready
+        setTimeout(function() {
+          reinitializeBannerHandlers();
+        }, 10);
       }
     };
   }
