@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -464,6 +464,9 @@ function BannerBuilderContent() {
   const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
   const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
   const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
+  const [scriptScanUrl, setScriptScanUrl] = useState('')
+  const [isScanningScripts, setIsScanningScripts] = useState(false)
+  const [scriptScanError, setScriptScanError] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -598,6 +601,85 @@ function BannerBuilderContent() {
       }
     }))
     toast.success('Brand logo applied')
+  }
+
+  const handleScriptDiscovery = async () => {
+    if (!scriptScanUrl.trim()) {
+      setScriptScanError('Enter a website URL to scan for scripts.')
+      return
+    }
+
+    setIsScanningScripts(true)
+    setScriptScanError(null)
+
+    try {
+      const response = await fetch('/api/scripts/discover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: scriptScanUrl.trim() })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After')
+          const message = retryAfter 
+            ? `Too many requests. Please wait ${Math.ceil(parseInt(retryAfter) / 60)} minutes.`
+            : 'Too many requests. Please wait before trying again.'
+          setScriptScanError(message)
+          toast.error(message)
+        } else {
+          setScriptScanError(data.error || 'Unable to discover scripts.')
+          toast.error(data.error || 'Unable to discover scripts.')
+        }
+        return
+      }
+
+      if (data.scripts && data.scripts.length > 0) {
+        // Add discovered scripts to their respective categories
+        const newScripts = { ...config.scripts }
+        
+        data.scripts.forEach((script: TrackingScript) => {
+          const category = script.category
+          if (category === 'strictly-necessary') {
+            newScripts.strictlyNecessary = [...newScripts.strictlyNecessary, script]
+          } else if (category === 'functionality') {
+            newScripts.functionality = [...newScripts.functionality, script]
+          } else if (category === 'tracking-performance') {
+            newScripts.trackingPerformance = [...newScripts.trackingPerformance, script]
+          } else if (category === 'targeting-advertising') {
+            newScripts.targetingAdvertising = [...newScripts.targetingAdvertising, script]
+          }
+        })
+
+        setConfig(prev => ({
+          ...prev,
+          scripts: newScripts
+        }))
+
+        toast.success(`Found ${data.scripts.length} script${data.scripts.length > 1 ? 's' : ''}! Added to your banner.`)
+        
+        if (data.warnings && data.warnings.length > 0) {
+          data.warnings.forEach((warning: string) => {
+            toast(warning, { icon: 'ℹ️', duration: 5000 })
+          })
+        }
+      } else {
+        toast('No tracking scripts detected. You may need to add them manually.', { icon: 'ℹ️', duration: 5000 })
+        if (data.warnings && data.warnings.length > 0) {
+          data.warnings.forEach((warning: string) => {
+            toast(warning, { icon: 'ℹ️', duration: 5000 })
+          })
+        }
+      }
+    } catch (error) {
+      const errorMessage = (error as Error).message
+      setScriptScanError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setIsScanningScripts(false)
+    }
   }
 
   const handleBrandImport = async () => {
@@ -1041,6 +1123,45 @@ function BannerBuilderContent() {
                             ))}
                           </div>
 
+                          {brandDiscovery.fonts && brandDiscovery.fonts.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-sm font-semibold">Detected fonts</p>
+                              <div className="flex flex-wrap gap-2">
+                                {brandDiscovery.fonts.map((font, index) => (
+                                  <Button
+                                    key={index}
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      // Apply font via customCSS
+                                      const fontFamily = font.family.includes(' ') ? `"${font.family}"` : font.family
+                                      const fontCSS = font.url
+                                        ? `@import url('${font.url}');\n#cookie-consent-banner { font-family: ${fontFamily}, sans-serif !important; }`
+                                        : `#cookie-consent-banner { font-family: ${fontFamily}, sans-serif !important; }`
+                                      
+                                      const currentCSS = config.advanced.customCSS || ''
+                                      // Remove existing font imports and font-family declarations
+                                      const cleanedCSS = currentCSS
+                                        .replace(/@import\s+url\([^)]+fonts[^)]+\)[^;]*;?\s*/gi, '')
+                                        .replace(/#cookie-consent-banner\s*\{[^}]*font-family[^;]*;?[^}]*\}/gi, '')
+                                      
+                                      updateConfig('advanced', { 
+                                        customCSS: cleanedCSS.trim() + (cleanedCSS.trim() ? '\n\n' : '') + fontCSS
+                                      })
+                                      toast.success(`Applied font: ${font.family}`)
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    <span style={{ fontFamily: font.family }}>{font.family}</span>
+                                  </Button>
+                                ))}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                Click a font to apply it to your banner. Fonts will be added to your custom CSS.
+                              </p>
+                            </div>
+                          )}
+
                           {brandDiscovery.logo && (
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1154,6 +1275,25 @@ function BannerBuilderContent() {
                                 className="flex-1"
                               />
                             </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="link-color" className="text-sm font-medium">Link</Label>
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              id="link-color"
+                              type="color"
+                              value={config.colors.link}
+                              onChange={(e) => updateConfig('colors', { link: e.target.value })}
+                              className="w-12 h-8 p-1 border rounded"
+                            />
+                            <Input
+                              value={config.colors.link}
+                              onChange={(e) => updateConfig('colors', { link: e.target.value })}
+                              placeholder="#3b82f6"
+                              className="flex-1"
+                            />
                           </div>
                         </div>
                       </div>
@@ -2013,6 +2153,58 @@ function BannerBuilderContent() {
 
           {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
+                {/* Script Discovery */}
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Search className="h-5 w-5 text-primary" />
+                      Auto-Discover Scripts
+                    </CardTitle>
+                    <CardDescription>
+                      Scan your website to automatically find and add tracking scripts. This saves hours of manual work!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="https://example.com"
+                        value={scriptScanUrl}
+                        onChange={(e) => setScriptScanUrl(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !isScanningScripts) {
+                            handleScriptDiscovery()
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={handleScriptDiscovery} 
+                        disabled={isScanningScripts}
+                      >
+                        {isScanningScripts ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Scanning...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="mr-2 h-4 w-4" />
+                            Scan Website
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {scriptScanError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{scriptScanError}</AlertDescription>
+                      </Alert>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Detects: Google Analytics, Facebook Pixel, Google Tag Manager, Hotjar, Microsoft Clarity, LinkedIn Insight Tag, TikTok Pixel, Google Ads, Intercom, Zendesk, and more.
+                    </p>
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Tracking Scripts</CardTitle>
@@ -3328,7 +3520,7 @@ function BannerBuilderContent() {
                         </div>
                       </div>
                       <div className="p-0">
-                        <CodeGenerator config={config} />
+                        <CodeGenerator config={config} bannerId={bannerId || undefined} />
                       </div>
                     </div>
 

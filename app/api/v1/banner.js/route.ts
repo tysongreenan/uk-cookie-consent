@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY || 'placeholder-key'
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
 )
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +15,10 @@ export async function GET(request: NextRequest) {
     const bannerId = searchParams.get('id')
     
     if (!bannerId) {
-      return new NextResponse('Missing banner ID', { status: 400 })
+      return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
+        status: 400,
+        headers: { 'Content-Type': 'application/javascript' }
+      })
     }
     
     // Fetch config by banner ID
@@ -31,134 +35,85 @@ export async function GET(request: NextRequest) {
     
     if (error || !banner) {
       console.error('Banner fetch error:', error)
-      console.error('Banner ID searched:', bannerId)
-      return new NextResponse('Config not found', { status: 404 })
+      return new NextResponse('console.error("Cookie Banner: Config not found");', { 
+        status: 404,
+        headers: { 'Content-Type': 'application/javascript' }
+      })
     }
     
-    console.log('Banner found:', banner.id, 'Active:', banner.isActive)
+    if (!banner.isActive) {
+      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
+        headers: { 'Content-Type': 'application/javascript' }
+      })
+    }
     
     const config = typeof banner.config === 'string' 
       ? JSON.parse(banner.config) 
       : banner.config
     
-    // Generate JavaScript code dynamically
-    const bannerCode = generateBannerJS(bannerId, config)
+    // Generate all components
+    const html = generateBannerHTML(config)
+    const css = generateBannerCSS(config)
+    const js = generateBannerJS(config)
+    const consentInit = generateConsentInitScript()
     
-    return new NextResponse(bannerCode, {
+    // Extract the inner JS from the consent init script tag
+    const consentInitJs = consentInit
+      .replace('<script>', '')
+      .replace('</script>', '')
+      .trim()
+
+    // Combine into a single executable script
+    const combinedScript = `
+(function() {
+  // 1. Initialize Consent Mode (Critical)
+  ${consentInitJs}
+
+  // 2. Inject CSS
+  var style = document.createElement('style');
+  style.textContent = ${JSON.stringify(css)};
+  document.head.appendChild(style);
+
+  // 3. Inject HTML
+  // We need to wait for body to be available
+  function injectHTML() {
+    if (!document.body) {
+      setTimeout(injectHTML, 10);
+      return;
+    }
+    
+    var div = document.createElement('div');
+    div.innerHTML = ${JSON.stringify(html)};
+    
+    // Append all children to body
+    while (div.firstChild) {
+      document.body.appendChild(div.firstChild);
+    }
+    
+    // 4. Execute Banner Logic
+    ${js}
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectHTML);
+  } else {
+    injectHTML();
+  }
+})();
+`
+    
+    return new NextResponse(combinedScript, {
       headers: {
         'Content-Type': 'application/javascript',
-        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=60', // Cache for 5 minutes
         'Access-Control-Allow-Origin': '*',
       },
     })
   } catch (error) {
     console.error('Banner.js generation error:', error)
-    return new NextResponse('Internal server error', { status: 500 })
+    return new NextResponse('console.error("Cookie Banner: Internal server error");', { 
+      status: 500,
+      headers: { 'Content-Type': 'application/javascript' }
+    })
   }
-}
-
-function generateBannerJS(bannerId: string, config: any) {
-  // For now, return a simple banner until we can properly import the code generator
-  return `
-(function() {
-  'use strict';
-  
-  var COOKIE_NAME = 'cookie_consent';
-  var COOKIE_EXPIRY = 90;
-  
-  // Create banner HTML
-  function createBanner() {
-    const banner = document.createElement('div');
-    banner.id = 'cookie-consent-banner';
-    banner.innerHTML = \`
-      <div style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #ffffff;
-        color: #1f2937;
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-      ">
-        <div style="flex: 1; min-width: 300px;">
-          <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">We use cookies</h3>
-          <p style="margin: 0; line-height: 1.5;">This website uses cookies to enhance your browsing experience and provide personalized content.</p>
-        </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button id="cookie-accept" style="
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: opacity 0.2s;
-          " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-            Accept All
-          </button>
-          <button id="cookie-reject" style="
-            background: transparent;
-            color: #3b82f6;
-            border: 1px solid #3b82f6;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: opacity 0.2s;
-          " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-            Reject
-          </button>
-        </div>
-      </div>
-    \`;
-    
-    document.body.appendChild(banner);
-    
-    // Event listeners
-    document.getElementById('cookie-accept').addEventListener('click', handleAccept);
-    document.getElementById('cookie-reject').addEventListener('click', handleReject);
-  }
-  
-  function handleAccept() {
-    localStorage.setItem('cookie_consent', 'accepted');
-    hideBanner();
-  }
-  
-  function handleReject() {
-    localStorage.setItem('cookie_consent', 'rejected');
-    hideBanner();
-  }
-  
-  function hideBanner() {
-    const banner = document.getElementById('cookie-consent-banner');
-    if (banner) {
-      banner.style.opacity = '0';
-      banner.style.transform = 'translateY(100%)';
-      banner.style.transition = 'all 0.3s ease';
-      setTimeout(() => banner.remove(), 300);
-    }
-  }
-  
-  // Check if user already made a choice
-  const consent = localStorage.getItem('cookie_consent');
-  if (!consent) {
-    // Show banner after page load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', createBanner);
-    } else {
-      createBanner();
-    }
-  }
-})();
-  `;
 }
