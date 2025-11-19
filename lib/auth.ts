@@ -17,10 +17,17 @@ import GoogleProvider from 'next-auth/providers/google'
 import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
-)
+// Lazy initialization to avoid build-time errors
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  
+  if (!url || !key) {
+    throw new Error('Supabase configuration is missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY environment variables.')
+  }
+  
+  return createClient(url, key)
+}
 
 // Enterprise-level session configuration
 const SESSION_DURATION = {
@@ -53,6 +60,9 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          // Get Supabase client
+          const supabase = getSupabaseClient()
+          
           // Basic user query (only existing fields)
           const { data: user, error } = await supabase
             .from('User')

@@ -6,10 +6,21 @@ import { sanitizeEmail } from '@/lib/sanitize'
 import { logLoginAttempt, logAccountLockout, securityMonitor } from '@/lib/security-monitor'
 import jwt from 'jsonwebtoken'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+// Lazy initialization to avoid build-time errors
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  
+  if (!url || !key) {
+    throw new Error('Supabase configuration is missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY environment variables.')
+  }
+  
+  return createClient(url, key)
+}
+
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +77,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Get Supabase client
+    const supabase = getSupabaseClient()
 
     // Get user from database
     const { data: user, error } = await supabase
