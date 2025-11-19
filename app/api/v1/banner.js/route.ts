@@ -1,23 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
+import { RateLimit } from '@/lib/rate-limit'
+import { SECURITY_HEADERS } from '@/lib/security-validation'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
 )
 
+// Rate limiter: 100 requests per minute per IP (generous for legitimate use)
+const bannerScriptRateLimit = new RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 100, // 100 requests per minute
+})
+
+// Validate banner ID format (UUID v4)
+function isValidBannerId(id: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  return uuidRegex.test(id)
+}
+
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    // Check rate limit
+    const rateLimitResult = await bannerScriptRateLimit.check(request)
+    if (!rateLimitResult.allowed) {
+      return new NextResponse('console.error("Cookie Banner: Rate limit exceeded. Please try again later.");', {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/javascript',
+          'X-RateLimit-Limit': '100',
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+          'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
+          ...SECURITY_HEADERS,
+        },
+      })
+    }
+
     const { searchParams } = new URL(request.url)
     const bannerId = searchParams.get('id')
     
     if (!bannerId) {
       return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
         status: 400,
-        headers: { 'Content-Type': 'application/javascript' }
+        headers: { 
+          'Content-Type': 'application/javascript',
+          ...SECURITY_HEADERS,
+        }
+      })
+    }
+
+    // Validate banner ID format to prevent injection attacks
+    if (!isValidBannerId(bannerId)) {
+      return new NextResponse('console.error("Cookie Banner: Invalid banner ID format");', { 
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/javascript',
+          ...SECURITY_HEADERS,
+        }
       })
     }
     
@@ -37,13 +81,19 @@ export async function GET(request: NextRequest) {
       console.error('Banner fetch error:', error)
       return new NextResponse('console.error("Cookie Banner: Config not found");', { 
         status: 404,
-        headers: { 'Content-Type': 'application/javascript' }
+        headers: { 
+          'Content-Type': 'application/javascript',
+          ...SECURITY_HEADERS,
+        }
       })
     }
     
     if (!banner.isActive) {
       return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
-        headers: { 'Content-Type': 'application/javascript' }
+        headers: { 
+          'Content-Type': 'application/javascript',
+          ...SECURITY_HEADERS,
+        }
       })
     }
     
@@ -107,13 +157,20 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/javascript',
         'Cache-Control': 'public, max-age=300, stale-while-revalidate=60', // Cache for 5 minutes
         'Access-Control-Allow-Origin': '*',
+        'X-RateLimit-Limit': '100',
+        'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+        'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+        ...SECURITY_HEADERS,
       },
     })
   } catch (error) {
     console.error('Banner.js generation error:', error)
     return new NextResponse('console.error("Cookie Banner: Internal server error");', { 
       status: 500,
-      headers: { 'Content-Type': 'application/javascript' }
+      headers: { 
+        'Content-Type': 'application/javascript',
+        ...SECURITY_HEADERS,
+      }
     })
   }
 }
