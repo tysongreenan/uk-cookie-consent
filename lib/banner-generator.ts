@@ -773,10 +773,10 @@ export const generateBannerJS = (config: BannerConfig) => {
   const ga4Integration = config.integrations?.googleAnalytics?.enabled && config.integrations?.googleAnalytics?.measurementId
     ? `
 // Google Analytics 4 Integration
-var GA_MEASUREMENT_ID = '${config.integrations.googleAnalytics.measurementId}';
-var GA_TRACK_CONSENT_EVENTS = ${config.integrations.googleAnalytics.trackConsentEvents};
-var GA_TRACK_IMPRESSIONS = ${config.integrations.googleAnalytics.trackImpressions ?? true};
-var GA_ANONYMIZE_IP = ${config.integrations.googleAnalytics.anonymizeIp};
+var GA_MEASUREMENT_ID = ${JSON.stringify(config.integrations.googleAnalytics.measurementId)};
+var GA_TRACK_CONSENT_EVENTS = ${Boolean(config.integrations.googleAnalytics.trackConsentEvents)};
+var GA_TRACK_IMPRESSIONS = ${Boolean(config.integrations.googleAnalytics.trackImpressions ?? true)};
+var GA_ANONYMIZE_IP = ${Boolean(config.integrations.googleAnalytics.anonymizeIp)};
 
 function initGA4Default() {
   if (!GA_MEASUREMENT_ID) return;
@@ -881,9 +881,21 @@ function trackConsentEvent(action) {
 'use strict';
 
 var COOKIE_NAME = 'cookie_consent';
-var COOKIE_EXPIRY = ${config.behavior.cookieExpiry};
+var COOKIE_EXPIRY = ${Number(config.behavior.cookieExpiry) || 182};
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
+
+// Load Material Symbols font for cookie icons (if not already loaded)
+(function loadMaterialSymbolsFont() {
+  if (document.querySelector('link[href*="Material+Symbols+Outlined"]')) {
+    return; // Font already loaded
+  }
+  
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off&display=swap';
+  document.head.appendChild(link);
+})();
 
 ${ga4Integration}
 
@@ -946,12 +958,12 @@ function injectInlineScript(encoded, name, cacheKey) {
 // Language translations
 var TRANSLATIONS = {
   en: {
-    title: "${config.text.title.replace(/"/g, '\\"')}",
-    message: "${config.text.message.replace(/"/g, '\\"')}",
-    acceptButton: "${config.text.acceptButton.replace(/"/g, '\\"')}",
-    rejectButton: "${config.text.rejectButton.replace(/"/g, '\\"')}",
-    preferencesButton: "${config.text.preferencesButton.replace(/"/g, '\\"')}",
-    footerLink: "${config.branding.footerLink.text.replace(/"/g, '\\"')}",
+    title: ${JSON.stringify(config.text.title)},
+    message: ${JSON.stringify(config.text.message)},
+    acceptButton: ${JSON.stringify(config.text.acceptButton)},
+    rejectButton: ${JSON.stringify(config.text.rejectButton)},
+    preferencesButton: ${JSON.stringify(config.text.preferencesButton)},
+    footerLink: ${JSON.stringify(config.branding.footerLink.text)},
     preferencesTitle: "Cookie Preferences",
     strictlyNecessary: "Strictly Necessary",
     strictlyNecessaryDesc: "Essential for website functionality",
@@ -990,7 +1002,7 @@ function detectLanguage() {
   var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
   return browserLang.startsWith('fr') ? 'fr' : 'en';
   ` : `
-  return '${config.language}';
+  return ${JSON.stringify(config.language)};
   `}
 }
 
@@ -1045,6 +1057,8 @@ window.showCookiePreferences = function() {
   var banner = document.getElementById('cookie-consent-banner');
   if (banner) {
     banner.style.display = 'block';
+    // Re-initialize button handlers when banner is shown again
+    reinitializeBannerHandlers();
   }
 };
 ` : ''}
@@ -1125,11 +1139,33 @@ function updateFloatingButtonIcon(consent) {
   // Determine if user has accepted any non-essential cookies
   var hasAcceptedNonEssential = consent.functionality || consent.analytics || consent.marketing;
   
-  // Update icon based on consent state
-  if (hasAcceptedNonEssential) {
-    floatBtn.innerHTML = cookieAcceptedIcon;
+  // Check if button should show text (preserve text if showText is enabled)
+  var shouldShowText = ${config.branding?.footerLink?.floatingStyle?.showText !== false};
+  // Security: Escape text and URL to prevent XSS when injecting via innerHTML
+  var text = ${JSON.stringify(escapeHtml(config.branding?.footerLink?.text || 'Cookie Settings'))};
+  var hasLogo = ${config.branding?.logo?.enabled && config.branding?.logo?.url ? 'true' : 'false'};
+  var logoUrl = ${config.branding?.logo?.enabled && config.branding?.logo?.url ? JSON.stringify(escapeHtml(config.branding.logo.url)) : 'null'};
+  var shape = ${JSON.stringify(config.branding?.footerLink?.floatingStyle?.shape || 'pill')};
+  
+  // Get the appropriate icon
+  var icon = hasAcceptedNonEssential ? cookieAcceptedIcon : cookieRejectedIcon;
+  
+  // Update content based on shape and showText setting
+  if (shape === 'circle') {
+    // Circle always shows only icon
+    floatBtn.innerHTML = icon;
   } else {
-    floatBtn.innerHTML = cookieRejectedIcon;
+    // Pill and square respect showText setting
+    if (shouldShowText && hasLogo && logoUrl) {
+      // Show logo + text
+      floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" /><span>' + text + '</span>';
+    } else if (shouldShowText && !hasLogo) {
+      // Show icon + text
+      floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
+    } else {
+      // Show only icon
+      floatBtn.innerHTML = icon;
+    }
   }
 }
 
@@ -1177,45 +1213,18 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   }
 }
 
-function init() {
+// Re-initialize banner handlers (called when banner is shown again after consent)
+function reinitializeBannerHandlers() {
   var banner = document.getElementById('cookie-consent-banner');
   var acceptBtn = document.getElementById('cookie-accept-btn');
   var rejectBtn = document.getElementById('cookie-reject-btn');
-  var prefsBtn = document.getElementById('cookie-preferences-btn');
   var closeBtn = document.getElementById('cookie-close-btn');
-  var prefsPanel = document.getElementById('cookie-preferences-panel');
-  var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
-  var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
+  var prefsBtn = document.getElementById('cookie-preferences-btn');
   
   if (!banner) return;
   
-  // Apply language translations
-  applyTranslations();
-  
-  var existingConsent = getConsent();
-  
-  if (existingConsent) {
-    loadScripts(existingConsent);
-    
-    // Initialize GA4 if analytics was accepted
-    if (existingConsent.analytics) {
-      initGA4();
-    }
-    
-    // Show floating button if consent already exists
-    showFloatingButton();
-    updateFloatingButtonIcon(existingConsent);
-    
-    return;
-  }
-  
-  ${config.behavior.autoShow ? `
-  banner.style.display = 'block';
-  trackConsentEvent('impression'); // Track banner impression
-  
   // Hide floating button while main banner is showing
   hideFloatingButton();
-  ` : ''}
   
   if (acceptBtn) {
     acceptBtn.onclick = function() {
@@ -1257,8 +1266,53 @@ function init() {
       }
     };
   }
+  ` : ''}
+}
+
+function init() {
+  var banner = document.getElementById('cookie-consent-banner');
+  var acceptBtn = document.getElementById('cookie-accept-btn');
+  var rejectBtn = document.getElementById('cookie-reject-btn');
+  var prefsBtn = document.getElementById('cookie-preferences-btn');
+  var closeBtn = document.getElementById('cookie-close-btn');
+  var prefsPanel = document.getElementById('cookie-preferences-panel');
+  var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
+  var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
   
-  // Modal event handlers
+  if (!banner) return;
+  
+  // Apply language translations
+  applyTranslations();
+  
+  var existingConsent = getConsent();
+  
+  if (existingConsent) {
+    loadScripts(existingConsent);
+    
+    // Initialize GA4 if analytics was accepted
+    if (existingConsent.analytics) {
+      initGA4();
+    }
+    
+    // Show floating button if consent already exists
+    showFloatingButton();
+    updateFloatingButtonIcon(existingConsent);
+    
+    return;
+  }
+  
+  ${config.behavior.autoShow ? `
+  banner.style.display = 'block';
+  trackConsentEvent('impression'); // Track banner impression
+  
+  // Hide floating button while main banner is showing
+  hideFloatingButton();
+  ` : ''}
+  
+  // Initialize handlers
+  reinitializeBannerHandlers();
+  
+  // Modal event handlers (only set up once, not re-initialized)
   var modal = document.getElementById('cookie-preferences-modal');
   var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
   var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
@@ -1316,8 +1370,8 @@ function init() {
   
   // Make toggle switches functional
   function setupToggleSwitches() {
-    var buttonColor = '${config.colors.button}';
-    var inactiveColor = '${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}';
+    var buttonColor = ${JSON.stringify(config.colors.button)};
+    var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
     
     var toggles = [
       { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
@@ -1378,7 +1432,6 @@ function init() {
   
   // Initialize toggles
   setupToggleSwitches();
-  ` : ''}
   
   ${config.behavior.dismissOnScroll ? `
   var scrolled = false;
