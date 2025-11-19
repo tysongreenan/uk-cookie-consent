@@ -19,7 +19,7 @@ import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'react-hot-toast'
-import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, BrandFontCandidate } from '@/types'
+import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
@@ -1125,7 +1125,7 @@ function BannerBuilderContent() {
 
                           {(() => {
                             // TypeScript workaround: fonts property exists but type definition may be cached
-                            const fonts = (brandDiscovery as BrandDiscoveryResult & { fonts?: BrandFontCandidate[] }).fonts
+                            const fonts = (brandDiscovery as BrandDiscoveryResult & { fonts?: Array<{ family: string; source: string; weight: number; url?: string }> }).fonts
                             return fonts && fonts.length > 0 && (
                               <div className="space-y-2">
                                 <p className="text-sm font-semibold">Detected fonts</p>
