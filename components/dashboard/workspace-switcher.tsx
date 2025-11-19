@@ -48,13 +48,26 @@ export function WorkspaceSwitcher() {
   const fetchWorkspaces = async () => {
     try {
       const response = await fetch('/api/teams')
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Failed to fetch workspaces:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData.error || 'Unknown error',
+          details: errorData.details
+        })
+        toast.error(errorData.error || 'Failed to load workspaces')
+        return
+      }
+      
       const data = await response.json()
       
       if (data.success) {
         setWorkspaces(data.data || [])
       } else {
         console.error('Failed to fetch workspaces:', data.error)
-        toast.error('Failed to load workspaces')
+        toast.error(data.error || 'Failed to load workspaces')
       }
     } catch (error) {
       console.error('Error fetching workspaces:', error)

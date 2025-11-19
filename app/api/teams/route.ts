@@ -5,9 +5,11 @@ import { createClient } from '@supabase/supabase-js'
 import { CreateTeamForm } from '@/types'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 
+// Use service role key for server-side operations (bypasses RLS)
+// This is safe because we authenticate via NextAuth session before using it
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 // POST /api/teams - Create a new team
@@ -146,8 +148,18 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching teams:', error)
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        userId: session.user.id
+      })
       return NextResponse.json(
-        { error: 'Failed to fetch teams' },
+        { 
+          error: 'Failed to fetch teams',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        },
         { status: 500 }
       )
     }
