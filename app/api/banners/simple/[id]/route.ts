@@ -254,6 +254,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get Supabase client
+    const supabase = getSupabaseClient()
+
     // Delete banner using direct SQL to bypass RLS issues
     const { data, error } = await supabase.rpc('delete_banner_simple', {
       banner_id: params.id,
