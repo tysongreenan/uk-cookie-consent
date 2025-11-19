@@ -1,4 +1,4 @@
-import { BannerConfig, TrackingScript } from '@/types/banner'
+import { BannerConfig, TrackingScript } from '@/types'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {

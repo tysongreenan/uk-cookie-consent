@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Copy, Download, RefreshCw, Globe } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { BannerConfig } from '@/types/banner'
+import { BannerConfig } from '@/types'
 import { 
   generateBannerHTML, 
   generateBannerCSS, 
