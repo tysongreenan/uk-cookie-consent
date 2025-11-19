@@ -164,6 +164,8 @@ export function DashboardClient() {
 
   const toggleBanner = async (bannerId: string, isActive: boolean) => {
     try {
+      console.log('🔄 Toggling banner:', { bannerId, currentState: isActive, newState: !isActive })
+      
       const response = await fetch(`/api/banners/simple/${bannerId}`, {
         method: 'PUT',
         headers: {
@@ -171,6 +173,9 @@ export function DashboardClient() {
         },
         body: JSON.stringify({ isActive: !isActive }),
       })
+
+      const responseData = await response.json()
+      console.log('📡 Toggle response:', { status: response.status, data: responseData })
 
       if (response.ok) {
         setBanners(prevBanners =>
@@ -180,12 +185,14 @@ export function DashboardClient() {
         )
         toast.success(`Banner ${!isActive ? 'activated' : 'deactivated'} successfully!`)
       } else {
-        const errorData = await response.json()
-        toast.error(`Failed to toggle banner status: ${errorData.error}`)
+        const errorMsg = responseData.error || responseData.details || 'Unknown error'
+        const errorCode = responseData.code ? ` (${responseData.code})` : ''
+        console.error('❌ Toggle failed:', { error: errorMsg, code: responseData.code, fullResponse: responseData })
+        toast.error(`Failed to toggle banner status: ${errorMsg}${errorCode}`)
       }
     } catch (error) {
-      console.error('Error toggling banner status:', error)
-      toast.error('Failed to toggle banner status')
+      console.error('❌ Error toggling banner status:', error)
+      toast.error(`Failed to toggle banner status: ${error instanceof Error ? error.message : 'Network error'}`)
     }
   }
 

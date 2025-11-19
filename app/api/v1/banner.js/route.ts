@@ -4,10 +4,18 @@ import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsen
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
-)
+// Lazy initialization to avoid build-time errors and ensure service role key is used
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  // Use service role key for public banner access (bypasses RLS)
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  
+  if (!url || !key) {
+    throw new Error('Supabase configuration is missing')
+  }
+  
+  return createClient(url, key)
+}
 
 // Rate limiter: 100 requests per minute per IP (generous for legitimate use)
 const bannerScriptRateLimit = new RateLimit({
@@ -65,17 +73,37 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    // Fetch config by banner ID
-    const { data: banner, error } = await supabase
-      .from('ConsentBanner')
-      .select(`
-        id,
-        name,
-        config,
-        "isActive"
-      `)
+    // Get Supabase client
+    const supabase = getSupabaseClient()
+    
+    // Fetch config by banner ID from SimpleBanners table (using service role to bypass RLS)
+    // Try SimpleBanners first (new system)
+    let banner: any = null
+    let error: any = null
+    
+    // First try SimpleBanners table
+    const { data: simpleBanner, error: simpleError } = await supabase
+      .from('SimpleBanners')
+      .select('id, name, config, "isActive"')
       .eq('id', bannerId)
       .single()
+    
+    if (!simpleError && simpleBanner) {
+      banner = simpleBanner
+    } else {
+      // Fallback to ConsentBanner table (legacy system)
+      const { data: consentBanner, error: consentError } = await supabase
+        .from('ConsentBanner')
+        .select('id, name, config, "isActive"')
+        .eq('id', bannerId)
+        .single()
+      
+      if (!consentError && consentBanner) {
+        banner = consentBanner
+      } else {
+        error = consentError || simpleError
+      }
+    }
     
     if (error || !banner) {
       console.error('Banner fetch error:', error)
