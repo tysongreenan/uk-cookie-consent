@@ -6,8 +6,8 @@ import { UpdateTeamForm } from '@/types'
 import { requireTeamPermission } from '@/lib/team-permissions'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 // GET /api/teams/[teamId] - Get team details

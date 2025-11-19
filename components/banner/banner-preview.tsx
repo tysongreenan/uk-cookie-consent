@@ -544,7 +544,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                   </div>
                 )}
                 
-                <h3 className="font-semibold text-lg mb-2">
+                <h3 className="font-semibold text-lg mb-2" style={{ color: safeConfig.colors.text }}>
                   {safeConfig.text.title}
                 </h3>
                 
@@ -584,8 +584,9 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                     variant="outline"
                     size="sm"
                     style={{
-                      borderColor: safeConfig.colors.button,
-                      color: safeConfig.colors.button,
+                      backgroundColor: 'transparent',
+                      borderColor: safeConfig.colors.text,
+                      color: safeConfig.colors.text,
                     }}
                     className="hover:bg-opacity-10"
                   >

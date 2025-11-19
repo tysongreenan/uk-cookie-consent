@@ -40,7 +40,7 @@ export function LiveCookieBanner() {
                 <button id="cookie-accept-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">
                   ${config.text.acceptButton}
                 </button>
-                <button id="cookie-reject-btn" style="background-color: transparent; color: ${config.colors.button}; border: 1px solid ${config.colors.button}; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">
+                <button id="cookie-reject-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">
                   ${config.text.rejectButton}
                 </button>
                 <button id="cookie-preferences-btn" style="background-color: transparent; color: ${config.colors.link}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">

@@ -30,7 +30,7 @@ export default function PricingPage() {
       tier: 'free',
       icon: <Zap className="w-6 h-6" />,
       popular: true,
-      ctaLink: '/auth/signup'
+      ctaLink: '/builder'
     },
     {
       name: 'Pro',

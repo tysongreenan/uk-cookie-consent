@@ -7,9 +7,10 @@ The team management feature is not working because the required database tables 
 You need to run the database migration to create the team management tables.
 
 ### Step 1: Access Supabase Dashboard
-1. Go to https://supabase.com/dashboard/project/bamunfrbhopzrjobowfx
-2. Log in with your Supabase account
-3. Navigate to the SQL Editor (left sidebar)
+1. Go to https://supabase.com/dashboard
+2. Select your project (or create a new one)
+3. Log in with your Supabase account
+4. Navigate to the SQL Editor (left sidebar)
 
 ### Step 2: Run the Migration
 1. Copy the contents of `manual-migration.sql` (in the project root)

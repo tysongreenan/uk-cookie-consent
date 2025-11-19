@@ -234,6 +234,13 @@ export interface BrandLogoSuggestion {
   source: string
 }
 
+export interface BrandFontCandidate {
+  family: string
+  source: string
+  weight: number
+  url?: string
+}
+
 export interface BrandDiscoveryResult {
   url: string
   colors: BrandColorCandidate[]
@@ -246,6 +253,7 @@ export interface BrandDiscoveryResult {
   }
   warnings: string[]
   logo?: BrandLogoSuggestion
+  fonts?: BrandFontCandidate[]
   fetchedAt: string
 }
 

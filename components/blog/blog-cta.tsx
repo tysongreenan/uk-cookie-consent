@@ -5,11 +5,11 @@ import Link from 'next/link'
 
 export function BlogCTA() {
   return (
-    <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+    <Card className="border-2 border-border bg-muted/30">
       <CardContent className="p-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <span className="text-sm font-semibold text-primary uppercase tracking-wide">
+          <Sparkles className="h-5 w-5 text-foreground" />
+          <span className="text-sm font-semibold text-foreground uppercase tracking-wide">
             Start Building Today
           </span>
         </div>
@@ -24,9 +24,9 @@ export function BlogCTA() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-            <Link href="/auth/signup">
-              Get Your Free Banner
+          <Button asChild size="lg">
+            <Link href="/builder">
+              Start Building Your Banner
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

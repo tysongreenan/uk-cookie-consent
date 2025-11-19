@@ -22,9 +22,9 @@ openssl rand -base64 32
 
 ### 3. Add to Vercel (one by one):
 - **NEXTAUTH_URL** = `https://your-app-name.vercel.app`
-- **NEXTAUTH_SECRET** = `eyfPsm9Es79RLP+uvYj6WpgNQ6W38Bi+Kw5xbcc2x+M=`
+- **NEXTAUTH_SECRET** = `[generate-with-openssl-rand-base64-32]` (use command from step 1)
 - **SUPABASE_URL** = `[from-supabase]`
-- **SUPABASE_ANON_KEY** = `[from-supabase]`
+- **NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY** = `[from-supabase]`
 - **DATABASE_URL** = `[from-supabase]`
 
 **Note**: Add these as Environment Variables, not as Secrets.

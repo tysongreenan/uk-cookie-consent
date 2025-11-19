@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSession, signIn } from 'next-auth/react'
@@ -19,11 +20,12 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:h-14">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <img 
+          <Image 
             src="/logos/logo.svg" 
             alt="Cookie Banner Generator" 
-            width="120"
-            height="32"
+            width={120}
+            height={32}
+            priority
             className="h-7 w-auto sm:h-8"
           />
         </Link>
@@ -67,8 +69,8 @@ export function Header() {
                 <Button variant="ghost" asChild size="sm">
                   <Link href="/auth/signin">Sign In</Link>
                 </Button>
-                <Button asChild size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
-                  <Link href="/auth/signup">Start Free</Link>
+                <Button asChild size="sm">
+                  <Link href="/builder">Start Building</Link>
                 </Button>
               </>
             )}
@@ -128,8 +130,8 @@ export function Header() {
                   <Button asChild size="lg" variant="outline" className="w-full">
                     <Link href="/auth/signin">Sign In</Link>
                   </Button>
-                  <Button asChild size="lg" className="w-full bg-brand-red hover:bg-brand-red/90 text-white">
-                    <Link href="/auth/signup">Start Free</Link>
+                  <Button asChild size="lg" className="w-full">
+                    <Link href="/builder">Start Building</Link>
                   </Button>
                 </>
               )}

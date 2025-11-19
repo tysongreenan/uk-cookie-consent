@@ -1,93 +1,188 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { List } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import React, { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
-interface TOCItem {
-  id: string
-  text: string
-  level: number
+interface Heading {
+  id: string;
+  text: string;
+  level: number;
 }
 
 interface TableOfContentsProps {
-  content: string
+  className?: string;
 }
 
-export function TableOfContents({ content }: TableOfContentsProps) {
-  const [tocItems, setTocItems] = useState<TOCItem[]>([])
-  const [activeId, setActiveId] = useState<string>('')
+export function TableOfContents({ className }: TableOfContentsProps) {
+  const [headings, setHeadings] = useState<Heading[]>([]);
+  const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
-    // Extract only H2 headings from the HTML content
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(content, 'text/html')
-    const headings = doc.querySelectorAll('h2')
-    
-    const items: TOCItem[] = []
-    headings.forEach((heading, index) => {
-      const id = heading.id || `heading-${index}`
-      const text = heading.textContent || ''
-      const level = 2 // All items are H2
-      
-      // Skip the first H2 (TL;DR) as it's already highlighted
-      if (index === 0 && text.toLowerCase().includes('tl;dr')) {
-        return
+    const headingElements = document.querySelectorAll("h1, h2, h3");
+    const headingsArray: Heading[] = [];
+
+    headingElements.forEach((element) => {
+      if (element.id) {
+        headingsArray.push({
+          id: element.id,
+          text: element.textContent || "",
+          level: parseInt(element.tagName.charAt(1)),
+        });
       }
-      
-      items.push({ id, text, level })
-    })
-    
-    setTocItems(items)
-  }, [content])
+    });
+
+    setHeadings(headingsArray);
+  }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const headingElements = tocItems.map(item => document.getElementById(item.id)).filter(Boolean)
-      
-      for (let i = headingElements.length - 1; i >= 0; i--) {
-        const element = headingElements[i]
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          if (rect.top <= 100) {
-            setActiveId(element.id)
-            break
-          }
+    const observer = new IntersectionObserver(
+      () => {
+        const headingPositions = headings.map((heading) => {
+          const element = document.getElementById(heading.id);
+          return {
+            id: heading.id,
+            top: element ? element.getBoundingClientRect().top : Infinity,
+          };
+        });
+
+        let activeHeading = headingPositions.find(
+          (heading) => heading.top >= 0 && heading.top <= 100
+        );
+
+        if (!activeHeading) {
+          const headingsAbove = headingPositions
+            .filter((heading) => heading.top < 0)
+            .sort((a, b) => b.top - a.top);
+
+          activeHeading = headingsAbove[0];
         }
+
+        if (!activeHeading) {
+          const headingsBelow = headingPositions
+            .filter((heading) => heading.top > 100)
+            .sort((a, b) => a.top - b.top);
+
+          activeHeading = headingsBelow[0];
+        }
+
+        if (activeHeading && activeHeading.id !== activeId) {
+          setActiveId(activeHeading.id);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "-100px",
+        threshold: 0,
       }
+    );
+
+    headings.forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    const handleScroll = () => {
+      const headingPositions = headings.map((heading) => {
+        const element = document.getElementById(heading.id);
+        return {
+          id: heading.id,
+          top: element ? element.getBoundingClientRect().top : Infinity,
+        };
+      });
+
+      let activeHeading = headingPositions.find(
+        (heading) => heading.top >= -50 && heading.top <= 100
+      );
+
+      if (!activeHeading) {
+        const headingsAbove = headingPositions
+          .filter((heading) => heading.top < -50)
+          .sort((a, b) => b.top - a.top);
+
+        activeHeading = headingsAbove[0];
+      }
+
+      if (activeHeading && activeHeading.id !== activeId) {
+        setActiveId(activeHeading.id);
+      }
+    };
+
+    let scrollTimeout: NodeJS.Timeout;
+    const throttledScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScroll, 10);
+    };
+
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+
+    handleScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", throttledScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [headings, activeId]);
+
+  const handleClick = async (id: string) => {
+    const url = `${window.location.origin}${window.location.pathname}#${id}`;
+
+    window.history.pushState({}, '', `#${id}`);
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (err) {
+      console.error(err);
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
     }
 
-    window.addEventListener('scroll', handleScroll)
-    handleScroll() // Check initial position
-    
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [tocItems])
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
 
-  if (tocItems.length === 0) return null
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  if (headings.length === 0) return null;
 
   return (
-    <Card className="sticky top-24 mb-8 bg-background border border-border">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <List className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold text-foreground">Table of Contents</h3>
-        </div>
-        <nav className="space-y-2">
-          {tocItems.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={`block text-sm transition-colors hover:text-primary ${
-                activeId === item.id 
-                  ? 'text-primary font-semibold' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {item.text}
-            </a>
+    <div className={cn("space-y-2", className)}>
+      <h4 className="text-sm font-semibold text-foreground mb-4">
+        On this page
+      </h4>
+      <nav>
+        <ul className="space-y-2">
+          {headings.map((heading) => (
+            <li key={heading.id}>
+              <button
+                onClick={() => handleClick(heading.id)}
+                className={cn(
+                  "block w-full text-left text-sm transition-colors hover:text-foreground text-muted-foreground",
+                  {
+                    "text-foreground font-medium underline underline-offset-4":
+                      activeId === heading.id,
+                  }
+                )}
+              >
+                {heading.text}
+              </button>
+            </li>
           ))}
-        </nav>
-      </CardContent>
-    </Card>
-  )
+        </ul>
+      </nav>
+    </div>
+  );
 }

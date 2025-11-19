@@ -1,3 +1,5 @@
+@import 'lenis/dist/lenis.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,22 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  h1 {
+    font-weight: 600;
+  }
+  h2 {
+    font-weight: 600;
+  }
+  h3 {
+    font-weight: 500;
   }
 }
 
@@ -123,10 +141,10 @@
 
 @keyframes banner-glow {
   0%, 100% {
-    box-shadow: 0 4px 20px rgba(42, 98, 112, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
   50% {
-    box-shadow: 0 8px 30px rgba(42, 98, 112, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -158,67 +176,72 @@
 
 @layer base {
   :root {
-    /* Brand Colors */
-    --primary: 195 45% 35%; /* Deep Tech Teal #2A6270 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
+    /* Minimal Techy Color Palette - Beige/White/Black */
+    --background: 0 0% 100%; /* Pure white #FFFFFF */
+    --foreground: 0 0% 10%; /* Minimal black #1A1A1A */
     
-    /* Accent Colors */
-    --accent-red: 347 67% 53%; /* Muted Rose Red #C83C55 */
-    --accent-green: 105 42% 40%; /* Clean Digital Green #5E9B40 */
-    --accent-purple: 279 25% 47%; /* Muted Lavender #805A99 */
-    --accent-pink: 344 75% 71%; /* Dusty Rose Pink #E87994 */
-    --accent-blue: 195 35% 49%; /* Medium Sky Blue #4C849B */
+    /* Primary - Brand teal (#0E768C) - WCAG AA compliant with white text (5.26:1 contrast) */
+    --primary: 191 82% 30%; /* #0E768C - vibrant teal */
+    --primary-foreground: 0 0% 100%; /* White text for maximum contrast */
     
-    /* Neutral Colors */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 34%; /* Modern Neutral Gray #565656 */
+    /* Primary hover - Darker brand teal (#2D5660) - WCAG AA compliant (8.04:1 contrast) */
+    --primary-hover: 191 36% 28%; /* #2D5660 - darker teal for hover states */
+    
+    /* Secondary - Subtle beige */
+    --secondary: 45 20% 96%; /* Warm beige #F5F5F0 */
+    --secondary-foreground: 0 0% 10%;
+    
+    /* Card */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 34%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 34%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 0 0% 50%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 0 0% 34%;
-    --destructive: 347 67% 53%; /* Using accent-red for destructive actions */
-    --destructive-foreground: 0 0% 100%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 195 45% 35%; /* Using primary for ring */
-    --radius: 0.5rem;
+    --card-foreground: 0 0% 10%;
     
-    /* Custom brand color utilities */
-    --brand-teal: 195 45% 35%;
-    --brand-red: 347 67% 53%;
-    --brand-green: 105 42% 40%;
-    --brand-purple: 279 25% 47%;
-    --brand-pink: 344 75% 71%;
-    --brand-blue: 195 35% 49%;
-    --brand-neutral: 0 0% 34%;
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    
+    /* Muted - Light beige/gray */
+    --muted: 45 15% 95%; /* Very light beige #FAFAF5 */
+    --muted-foreground: 0 0% 42%; /* Medium gray #6B6B6B */
+    
+    /* Accent - Subtle beige */
+    --accent: 45 20% 96%;
+    --accent-foreground: 0 0% 10%;
+    
+    /* Destructive - Minimal red (kept for errors) */
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders - Very light beige/gray */
+    --border: 45 10% 90%; /* Light beige #E5E5E0 */
+    --input: 45 10% 90%;
+    --ring: 0 0% 10%; /* Black for focus rings */
+    
+    --radius: 0.375rem; /* Slightly smaller, more techy */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    /* Dark mode - Inverted minimal palette */
+    --background: 0 0% 10%; /* Dark background */
+    --foreground: 0 0% 98%; /* Light text */
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
+    /* Dark mode primary - Use lighter brand color for dark backgrounds */
+    --primary: 191 82% 45%; /* Lighter teal variant for dark mode visibility */
+    --primary-foreground: 0 0% 100%; /* White text */
+    --primary-hover: 191 82% 40%; /* Slightly darker for hover in dark mode */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 98%;
   }
 }
 
@@ -263,88 +286,29 @@
   @apply bg-muted-foreground/30;
 }
 
-/* Brand Color Utilities */
+/* Minimal Techy Utilities */
 @layer utilities {
-  .text-brand-teal {
-    color: hsl(var(--brand-teal));
-  }
-  .text-brand-red {
-    color: hsl(var(--brand-red));
-  }
-  .text-brand-green {
-    color: hsl(var(--brand-green));
-  }
-  .text-brand-purple {
-    color: hsl(var(--brand-purple));
-  }
-  .text-brand-pink {
-    color: hsl(var(--brand-pink));
-  }
-  .text-brand-blue {
-    color: hsl(var(--brand-blue));
-  }
-  .text-brand-neutral {
-    color: hsl(var(--brand-neutral));
-  }
-  
-  .bg-brand-teal {
-    background-color: hsl(var(--brand-teal));
-  }
-  .bg-brand-red {
-    background-color: hsl(var(--brand-red));
-  }
-  .bg-brand-green {
-    background-color: hsl(var(--brand-green));
-  }
-  .bg-brand-purple {
-    background-color: hsl(var(--brand-purple));
-  }
-  .bg-brand-pink {
-    background-color: hsl(var(--brand-pink));
-  }
-  .bg-brand-blue {
-    background-color: hsl(var(--brand-blue));
-  }
-  
-  .border-brand-teal {
-    border-color: hsl(var(--brand-teal));
-  }
-  .border-brand-red {
-    border-color: hsl(var(--brand-red));
-  }
-  .border-brand-green {
-    border-color: hsl(var(--brand-green));
-  }
-  .border-brand-purple {
-    border-color: hsl(var(--brand-purple));
-  }
-  .border-brand-pink {
-    border-color: hsl(var(--brand-pink));
-  }
-  .border-brand-blue {
-    border-color: hsl(var(--brand-blue));
-  }
-  
-  /* CTA Button with Accent Red */
+  /* Minimal CTA Button - Black with subtle hover */
   .btn-cta {
-    background-color: hsl(var(--brand-red));
-    color: white;
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
   }
   .btn-cta:hover {
-    background-color: hsl(var(--brand-red) / 0.9);
+    background-color: hsl(var(--foreground) / 0.9);
   }
   
-  /* Success Button with Accent Green */
+  /* Minimal Success Button - Subtle beige */
   .btn-success {
-    background-color: hsl(var(--brand-green));
-    color: white;
+    background-color: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
   }
   .btn-success:hover {
-    background-color: hsl(var(--brand-green) / 0.9);
+    background-color: hsl(var(--muted) / 0.8);
   }
 }
 
-/* Blog Post Styling - Match Main Site */
+/* Blog Post Styling - Minimal Techy Aesthetic */
 .prose {
   /* H1 - Main Title */
   h1 {
@@ -352,8 +316,9 @@
     line-height: 1.2 !important;
     margin-top: 2rem !important;
     margin-bottom: 2rem !important;
-    color: hsl(var(--primary)) !important;
-    font-weight: 700;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 600;
+    scroll-margin-top: 80px;
   }
   
   /* H2 - Section Headers */
@@ -364,6 +329,8 @@
     margin-bottom: 1.5rem !important;
     color: hsl(var(--foreground)) !important;
     font-weight: 600;
+    letter-spacing: -0.02em;
+    scroll-margin-top: 80px;
   }
   
   /* H3 - Subsection Headers */
@@ -373,7 +340,9 @@
     margin-top: 2.5rem !important;
     margin-bottom: 1rem !important;
     color: hsl(var(--foreground)) !important;
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    scroll-margin-top: 80px;
   }
   
   /* H4 - Minor Headers */
@@ -383,7 +352,9 @@
     margin-top: 2rem !important;
     margin-bottom: 0.75rem !important;
     color: hsl(var(--foreground)) !important;
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    scroll-margin-top: 80px;
   }
   
   /* TL;DR Box - Clean Style */
@@ -425,27 +396,61 @@
   
   /* Lists */
   ul, ol {
-    margin: 1.5rem 0;
+    margin: 1.5rem 0 !important;
+    padding-left: 1.5rem !important;
+    list-style-position: outside !important;
+  }
+  
+  ul {
+    list-style-type: disc !important;
+  }
+  
+  ol {
+    list-style-type: decimal !important;
   }
   
   ul > li, ol > li {
-    margin: 0.75rem 0;
-    line-height: 1.6;
-    font-size: 1.125rem;
+    margin: 0.75rem 0 !important;
+    line-height: 1.6 !important;
+    font-size: 1.125rem !important;
+    padding-left: 0.5rem !important;
+    list-style: inherit !important;
+  }
+  
+  /* Nested lists */
+  ul ul, ol ol, ul ol, ol ul {
+    margin: 0.5rem 0 !important;
+    padding-left: 1.5rem !important;
+  }
+  
+  ul ul {
+    list-style-type: circle !important;
+  }
+  
+  ul ul ul {
+    list-style-type: square !important;
+  }
+  
+  ol ol {
+    list-style-type: lower-alpha !important;
+  }
+  
+  ol ol ol {
+    list-style-type: lower-roman !important;
   }
   
   /* Links */
   a {
-    color: hsl(var(--primary));
+    color: hsl(var(--foreground));
     text-decoration: underline;
-    text-decoration-color: hsl(var(--primary) / 0.3);
+    text-decoration-color: hsl(var(--foreground) / 0.3);
     text-underline-offset: 0.2em;
     transition: all 0.2s;
   }
   
   a:hover {
-    color: hsl(var(--brand-red));
-    text-decoration-color: hsl(var(--brand-red));
+    color: hsl(var(--foreground) / 0.7);
+    text-decoration-color: hsl(var(--foreground) / 0.5);
   }
   
   /* Strong text */
@@ -479,7 +484,7 @@
     font-style: normal;
     margin: 2rem 0;
     background: hsl(var(--muted) / 0.5);
-    border-left: 4px solid hsl(var(--primary));
+    border-left: 4px solid hsl(var(--border));
     border-radius: 0.5rem;
     padding: 1.5rem;
   }
@@ -505,11 +510,39 @@
     font-weight: 600;
   }
   
+  /* Images */
+  img {
+    border-radius: 0.5rem;
+    margin: 2rem 0;
+    max-width: 100%;
+    height: auto;
+  }
+  
   /* Horizontal rules */
   hr {
     border: none;
     height: 1px;
     background: hsl(var(--border));
     margin: 3rem 0;
+  }
+  
+  /* Direct Answer Box Styling (for AEO) */
+  .direct-answer {
+    background: hsl(var(--muted) / 0.3);
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+  
+  .direct-answer strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(var(--muted-foreground));
   }
 }

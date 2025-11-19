@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: 'CookieBanner Pro - Lifetime Access',
               description: 'Unlock analytics, team collaboration, custom layouts, and more',
-              images: [`${process.env.NEXT_PUBLIC_BASE_URL}/logos/cookie-banner-logo.png`],
+              images: [`${process.env.NEXT_PUBLIC_BASE_URL}/logos/logo.svg`],
             },
             unit_amount: 4899, // $48.99 in cents
           },

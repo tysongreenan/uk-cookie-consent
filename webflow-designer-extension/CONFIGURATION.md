@@ -86,7 +86,7 @@ Ensure these environment variables are set in your main app:
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
 
 ### 6. Testing the Integration
 

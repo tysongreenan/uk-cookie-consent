@@ -277,7 +277,7 @@ export default function AboutPage() {
                 🧠 First 1,000 accounts are free — for life.
               </p>
               <Button asChild size="lg" className="text-base bg-brand-red hover:bg-brand-red/90 text-white">
-                <Link href="/auth/signup">
+                <Link href="/builder">
                   Claim Yours Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>

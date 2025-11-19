@@ -111,7 +111,7 @@ export default function FreeCookieBannerPage() {
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <Button asChild size="lg" className="h-12 px-8 text-base font-semibold bg-green-600 hover:bg-green-700 text-white">
-                  <Link href="/auth/signup">
+                  <Link href="/builder">
                     <Sparkles className="mr-2 h-5 w-5" />
                     Get My Free Banner Now
                   </Link>
@@ -234,7 +234,7 @@ export default function FreeCookieBannerPage() {
 
               <div className="text-center mt-8">
                 <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white">
-                  <Link href="/auth/signup">
+                  <Link href="/builder">
                     <ArrowRight className="mr-2 h-5 w-5" />
                     Start Using Our Free Solution
                   </Link>
@@ -472,7 +472,7 @@ export default function FreeCookieBannerPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <Button asChild size="lg" className="bg-white text-green-600 hover:bg-gray-100">
-                  <Link href="/auth/signup">
+                  <Link href="/builder">
                     <Sparkles className="mr-2 h-5 w-5" />
                     Get My Free Banner Now
                   </Link>

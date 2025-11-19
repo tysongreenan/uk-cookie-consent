@@ -4,8 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 export const dynamic = 'force-dynamic'
@@ -19,63 +19,13 @@ export async function GET(request: NextRequest) {
     const defaultItems = [
       {
         id: 1,
-        title: 'Advanced Analytics Dashboard',
-        description: 'Comprehensive analytics showing consent rates, user interactions, and conversion metrics.',
-        category: 'analytics',
-        status: 'planned',
-        vote_count: 47,
+        title: 'Latest Release: Build Stability & Consent Banner Reliability',
+        description: 'Upgraded to Next.js 14.2.5, wrapped auth + builder flows in Suspense, and hardened the optimized banner generator so deployments stay green and performance improvements reach production.',
+        category: 'release',
+        status: 'shipped',
+        vote_count: 0,
         userVoted: false,
         priority: 1
-      },
-      {
-        id: 2,
-        title: 'Team Collaboration Features',
-        description: 'Invite team members, assign roles, and collaborate on banner projects together.',
-        category: 'collaboration',
-        status: 'planned',
-        vote_count: 32,
-        userVoted: false,
-        priority: 2
-      },
-      {
-        id: 3,
-        title: 'Multi-Language Support',
-        description: 'Built-in translations for 20+ languages with automatic locale detection.',
-        category: 'localization',
-        status: 'in-progress',
-        vote_count: 28,
-        userVoted: false,
-        priority: 3
-      },
-      {
-        id: 4,
-        title: 'Advanced Compliance Tools',
-        description: 'Automated compliance checking, privacy policy generators, and legal document templates.',
-        category: 'compliance',
-        status: 'planned',
-        vote_count: 41,
-        userVoted: false,
-        priority: 4
-      },
-      {
-        id: 5,
-        title: 'Custom CSS Editor',
-        description: 'Advanced styling options with live preview and CSS customization.',
-        category: 'design',
-        status: 'planned',
-        vote_count: 19,
-        userVoted: false,
-        priority: 5
-      },
-      {
-        id: 6,
-        title: 'A/B Testing Framework',
-        description: 'Test different banner designs and messages to optimize conversion rates.',
-        category: 'optimization',
-        status: 'planned',
-        vote_count: 35,
-        userVoted: false,
-        priority: 6
       }
     ]
 

@@ -48,6 +48,7 @@ export interface BlogPost {
   title: string
   description: string
   date: string
+  updatedDate?: string
   author: string
   image?: string
   tags: string[]
@@ -62,6 +63,7 @@ export interface BlogPostMetadata {
   title: string
   description: string
   date: string
+  updatedDate?: string
   author: string
   image?: string
   tags: string[]
@@ -96,6 +98,7 @@ export function getAllPosts(): BlogPostMetadata[] {
         title: data.title || '',
         description: data.description || '',
         date: data.date || '',
+        updatedDate: data.updatedDate || undefined,
         author: data.author || 'Cookie Banner Team',
         image: data.image || '',
         tags: data.tags || [],
@@ -130,6 +133,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       title: data.title || '',
       description: data.description || '',
       date: data.date || '',
+      updatedDate: data.updatedDate || undefined,
       author: data.author || 'Cookie Banner Team',
       image: data.image || '',
       tags: data.tags || [],

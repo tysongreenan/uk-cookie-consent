@@ -4,6 +4,7 @@ import type { CheerioAPI } from 'cheerio/slim'
 import { fetchSafeText } from '@/lib/fetchSafe'
 import { extractBrandColors } from '@/lib/brand/colors'
 import { discoverLogo } from '@/lib/brand/logo'
+import { extractBrandFonts } from '@/lib/brand/fonts'
 import { BrandDiscoveryResult } from '@/types'
 
 export async function discoverBrand(targetUrl: string): Promise<BrandDiscoveryResult> {
@@ -15,6 +16,7 @@ export async function discoverBrand(targetUrl: string): Promise<BrandDiscoveryRe
 
   const { colors, suggestions, warnings } = await extractBrandColors(html, url, $)
   const logo = discoverLogo($, url)
+  const fonts = await extractBrandFonts(html, url, $)
 
   const response: BrandDiscoveryResult = {
     url: url.toString(),
@@ -26,6 +28,10 @@ export async function discoverBrand(targetUrl: string): Promise<BrandDiscoveryRe
 
   if (logo) {
     response.logo = logo
+  }
+
+  if (fonts.length > 0) {
+    response.fonts = fonts
   }
 
   return response

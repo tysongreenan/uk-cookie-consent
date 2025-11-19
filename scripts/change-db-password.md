@@ -6,7 +6,7 @@ Your database password is currently exposed in the codebase. Follow these steps 
 
 ### Step 1: Change Supabase Database Password
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Select your project: `bamunfrbhopzrjobowfx`
+2. Select your project (from your Supabase dashboard)
 3. Go to **Settings** → **Database**
 4. Click **Reset Database Password**
 5. Generate a new secure password (save it securely!)
@@ -16,14 +16,14 @@ After changing the password, update these files:
 
 #### Production Environment (Vercel/Netlify/etc.):
 ```
-DATABASE_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
-DIRECT_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
+DATABASE_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.[your-project-ref].supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.[your-project-ref].supabase.co:5432/postgres"
 ```
 
 #### Local Development (.env.local):
 ```
-DATABASE_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
-DIRECT_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
+DATABASE_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.[your-project-ref].supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres:YOUR_NEW_PASSWORD@db.[your-project-ref].supabase.co:5432/postgres"
 ```
 
 ### Step 3: Test Connection

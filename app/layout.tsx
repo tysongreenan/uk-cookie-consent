@@ -1,17 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
 import { UpdateAnnouncement } from '@/components/landing/update-announcement'
 import { AnnouncementProvider } from '@/lib/announcement-context'
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap', // Critical for LCP
-  preload: true,
-  variable: '--font-inter',
-})
 
 export const metadata: Metadata = {
   title: {
@@ -21,9 +15,9 @@ export const metadata: Metadata = {
   description: 'Create unlimited cookie banners custom-branded to your site. Fully compliant with GDPR & PIPEDA. First 1,000 accounts free — no card needed.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
-    icon: '/logos/logo.svg',
-    shortcut: '/logos/logo.svg',
-    apple: '/logos/logo.svg',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   keywords: [
     'cookie banner',
@@ -74,9 +68,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        
         {/* Preconnect to Google Fonts for faster loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
         
         {/* Deferred Google Tag Manager - loads after page is interactive */}
         <script
@@ -132,7 +133,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe 

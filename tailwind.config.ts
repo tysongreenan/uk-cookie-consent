@@ -18,8 +18,9 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        heading: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,21 +56,12 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Brand Colors
-        brand: {
-          teal: "hsl(var(--brand-teal))",
-          red: "hsl(var(--brand-red))",
-          green: "hsl(var(--brand-green))",
-          purple: "hsl(var(--brand-purple))",
-          pink: "hsl(var(--brand-pink))",
-          blue: "hsl(var(--brand-blue))",
-          neutral: "hsl(var(--brand-neutral))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        none: "0",
       },
       keyframes: {
         "accordion-down": {
