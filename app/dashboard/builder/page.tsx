@@ -1123,11 +1123,13 @@ function BannerBuilderContent() {
                             ))}
                           </div>
 
-                          {brandDiscovery.fonts && brandDiscovery.fonts.length > 0 && (
-                            <div className="space-y-2">
-                              <p className="text-sm font-semibold">Detected fonts</p>
-                              <div className="flex flex-wrap gap-2">
-                                {brandDiscovery.fonts.map((font, index) => (
+                          {(() => {
+                            const fonts = brandDiscovery.fonts
+                            return fonts && fonts.length > 0 && (
+                              <div className="space-y-2">
+                                <p className="text-sm font-semibold">Detected fonts</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {fonts.map((font, index) => (
                                   <Button
                                     key={index}
                                     size="sm"
@@ -1160,7 +1162,8 @@ function BannerBuilderContent() {
                                 Click a font to apply it to your banner. Fonts will be added to your custom CSS.
                               </p>
                             </div>
-                          )}
+                            )
+                          })()}
 
                           {brandDiscovery.logo && (
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
