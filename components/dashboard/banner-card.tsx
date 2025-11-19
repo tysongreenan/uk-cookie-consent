@@ -174,7 +174,7 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
             <div className="flex items-center space-x-2">
               <Switch
                 checked={banner.isActive}
-                onCheckedChange={(checked) => onToggle(banner.id, checked)}
+                onCheckedChange={() => onToggle(banner.id, banner.isActive)}
                 className="data-[state=checked]:bg-primary"
               />
               <span className="text-sm text-muted-foreground">
