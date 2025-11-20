@@ -1241,29 +1241,7 @@ function init() {
   
   var existingConsent = getConsent();
   
-  if (existingConsent) {
-    loadScripts(existingConsent);
-    
-    // Initialize GA4 if analytics was accepted
-    if (existingConsent.analytics) {
-      initGA4();
-    }
-    
-    // Show floating button if consent already exists
-    showFloatingButton();
-    updateFloatingButtonIcon(existingConsent);
-    
-    return;
-  }
-  
-  ${config.behavior.autoShow ? `
-  banner.style.display = 'block';
-  trackConsentEvent('impression'); // Track banner impression
-  
-  // Hide floating button while main banner is showing
-  hideFloatingButton();
-  ` : ''}
-  
+  // Set up banner button handlers ALWAYS (needed even when consent exists, for when user reopens banner)
   // Set up banner button handlers directly
   if (acceptBtn) {
     acceptBtn.onclick = function() {
@@ -1307,7 +1285,7 @@ function init() {
   }
   ` : ''}
   
-  // Modal event handlers
+  // Modal event handlers (set up ALWAYS, needed when user reopens banner)
   var modal = document.getElementById('cookie-preferences-modal');
   var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
   var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
@@ -1391,21 +1369,25 @@ function init() {
         }
         
         // Add change event listener
-        input.addEventListener('change', function() {
-          if (this.checked) {
-            slider.style.backgroundColor = buttonColor;
-            thumb.style.transform = 'translateX(20px)';
-          } else {
-            slider.style.backgroundColor = inactiveColor;
-            thumb.style.transform = 'translateX(0)';
-          }
-        });
-        
-        // Add click event listener to slider for better UX
-        slider.addEventListener('click', function() {
-          input.checked = !input.checked;
-          input.dispatchEvent(new Event('change'));
-        });
+        if (!input.dataset.listenerAttached) {
+          input.addEventListener('change', function() {
+            if (this.checked) {
+              slider.style.backgroundColor = buttonColor;
+              thumb.style.transform = 'translateX(20px)';
+            } else {
+              slider.style.backgroundColor = inactiveColor;
+              thumb.style.transform = 'translateX(0)';
+            }
+          });
+          
+          // Add click event listener to slider for better UX
+          slider.addEventListener('click', function() {
+            input.checked = !input.checked;
+            input.dispatchEvent(new Event('change'));
+          });
+          
+          input.dataset.listenerAttached = 'true';
+        }
       }
     });
   }
@@ -1427,6 +1409,33 @@ function init() {
   
   // Initialize toggles
   setupToggleSwitches();
+  
+  // If consent already exists, restore it and show floating button (but don't show banner)
+  // All handlers are now set up above, so banner will work when reopened
+  if (existingConsent) {
+    loadScripts(existingConsent);
+    
+    // Initialize GA4 if analytics was accepted
+    if (existingConsent.analytics) {
+      initGA4();
+    }
+    
+    // Show floating button if consent already exists
+    showFloatingButton();
+    updateFloatingButtonIcon(existingConsent);
+    
+    // Don't show banner, but all handlers are already set up above
+    return;
+  }
+  
+  // No existing consent - show banner
+  ${config.behavior.autoShow ? `
+  banner.style.display = 'block';
+  trackConsentEvent('impression'); // Track banner impression
+  
+  // Hide floating button while main banner is showing
+  hideFloatingButton();
+  ` : ''}
   
   ${config.behavior.dismissOnScroll ? `
   var scrolled = false;
