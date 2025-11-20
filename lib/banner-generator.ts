@@ -1190,11 +1190,13 @@ function updateFloatingButtonIcon(consent) {
     floatBtn.innerHTML = icon;
   } else {
     // Pill and square respect showText setting
-    if (shouldShowText && hasLogo && logoUrl) {
+    // Only show logo if user has NOT rejected (hasAcceptedNonEssential is true)
+    // This ensures the rejected state is clearly visible with the rejected icon
+    if (shouldShowText && hasLogo && logoUrl && hasAcceptedNonEssential) {
       // Show logo + text
       floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" /><span>' + text + '</span>';
-    } else if (shouldShowText && !hasLogo) {
-      // Show icon + text
+    } else if (shouldShowText) {
+      // Show icon + text (Icon handles both rejected state and no-logo state)
       floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
     } else {
       // Show only icon
@@ -1249,58 +1251,90 @@ ${marketingLoaders || '      // No marketing scripts configured'}
 
 // Re-initialize banner handlers (called when banner is shown again after consent)
 function reinitializeBannerHandlers() {
+  // Use event delegation to handle clicks on buttons that might be dynamically replaced by frameworks
+  // This is the "Silver Bullet" for SPA/React issues
+  if (!window.cookieBannerHandlersInitialized) {
+    document.addEventListener('click', function(e) {
+      var target = e.target;
+      if (!target) return;
+      
+      // Helper to find button element (handles clicks on child elements like spans/text)
+      function findButton(id) {
+        if (target.id === id) return target;
+        var parent = target.parentElement;
+        while (parent && parent !== document.body) {
+          if (parent.id === id) return parent;
+          parent = parent.parentElement;
+        }
+        return null;
+      }
+      
+      // Handle Accept Button
+      var acceptBtn = findButton('cookie-accept-btn');
+      if (acceptBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+        initGA4(); // Initialize GA4
+        trackConsentEvent('accept'); // Track consent event
+        var banner = document.getElementById('cookie-consent-banner');
+        if (banner) banner.style.display = 'none';
+        return;
+      }
+      
+      // Handle Reject Button
+      var rejectBtn = findButton('cookie-reject-btn');
+      if (rejectBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
+        trackConsentEvent('reject'); // Track consent event (but don't init GA4)
+        var banner = document.getElementById('cookie-consent-banner');
+        if (banner) banner.style.display = 'none';
+        return;
+      }
+      
+      // Handle Close Button
+      var closeBtn = findButton('cookie-close-btn');
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var banner = document.getElementById('cookie-consent-banner');
+        if (banner) banner.style.display = 'none';
+        trackConsentEvent('dismiss');
+        return;
+      }
+      
+      // Handle Preferences Button
+      ${config.behavior.showPreferences ? `
+      var prefsBtn = findButton('cookie-preferences-btn');
+      if (prefsBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var modal = document.getElementById('cookie-preferences-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          // Load current consent state into modal
+          var currentConsent = getConsent();
+          if (currentConsent) {
+            loadConsentIntoModal(currentConsent);
+          } else {
+            loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
+          }
+        }
+        return;
+      }
+      ` : ''}
+    });
+    window.cookieBannerHandlersInitialized = true;
+  }
+  
   var banner = document.getElementById('cookie-consent-banner');
-  var acceptBtn = document.getElementById('cookie-accept-btn');
-  var rejectBtn = document.getElementById('cookie-reject-btn');
-  var closeBtn = document.getElementById('cookie-close-btn');
-  var prefsBtn = document.getElementById('cookie-preferences-btn');
   
   if (!banner) return;
   
   // Hide floating button while main banner is showing
   hideFloatingButton();
-  
-  if (acceptBtn) {
-    acceptBtn.onclick = function() {
-      saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
-      initGA4(); // Initialize GA4
-      trackConsentEvent('accept'); // Track consent event
-      banner.style.display = 'none';
-    };
-  }
-  
-  if (rejectBtn) {
-    rejectBtn.onclick = function() {
-      saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
-      trackConsentEvent('reject'); // Track consent event (but don't init GA4)
-      banner.style.display = 'none';
-    };
-  }
-  
-  if (closeBtn) {
-    closeBtn.onclick = function() {
-      banner.style.display = 'none';
-      trackConsentEvent('dismiss');
-    };
-  }
-  
-  ${config.behavior.showPreferences ? `
-  if (prefsBtn) {
-    prefsBtn.onclick = function() {
-      var modal = document.getElementById('cookie-preferences-modal');
-      if (modal) {
-        modal.style.display = 'flex';
-        // Load current consent state into modal
-        var currentConsent = getConsent();
-        if (currentConsent) {
-          loadConsentIntoModal(currentConsent);
-        } else {
-          loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
-        }
-      }
-    };
-  }
-  ` : ''}
 }
 
 function init() {

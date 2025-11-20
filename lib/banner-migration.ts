@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.0.2'
+export const CURRENT_BANNER_VERSION = '2.0.3'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -123,6 +123,11 @@ export function migrateBannerConfig(config: any): BannerConfig {
   // Migration from v2.0.1 to v2.0.2
   if (migratedConfig.version === '2.0.1') {
     migratedConfig = migrateToV2_0_2(migratedConfig)
+  }
+
+  // Migration from v2.0.2 to v2.0.3
+  if (migratedConfig.version === '2.0.2') {
+    migratedConfig = migrateToV2_0_3(migratedConfig)
   }
 
   // Add current version and timestamp
@@ -308,6 +313,19 @@ function migrateToV2_0_2(config: any): any {
 }
 
 /**
+ * Migration from v2.0.2 to v2.0.3 - Bug fixes for duplicate injection and logo logic
+ */
+function migrateToV2_0_3(config: any): any {
+  const migrated = { ...config }
+
+  // No structural changes needed - this is a critical bug fix release
+  // The generated script now prevents duplicate injection and handles logo/icon logic correctly
+  
+  migrated.version = '2.0.3'
+  return migrated
+}
+
+/**
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
@@ -337,6 +355,8 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🛡️ Bulletproof CSS that resists external website interference')
     notes.push('⏱️ Enhanced banner timing - floating button appears after consent')
     notes.push('🔧 Improved toggle functionality and modal state management')
+    notes.push('🐞 Fixed event handlers for more reliable button clicks')
+    notes.push('🍪 Improved icon logic for rejected cookie states')
   }
 
   if (oldVersion === '2.0.1' && newVersion === '2.0.2') {
@@ -344,6 +364,12 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🎨 All shapes (Circle, Square, Pill) now support icon-only mode')
     notes.push('⚙️ Consistent behavior across all floating button shapes')
     notes.push('🎯 Enhanced user choice and customization options')
+  }
+
+  if (oldVersion === '2.0.2' && newVersion === '2.0.3') {
+    notes.push('🐞 Fixed "unresponsive button" issue caused by duplicate banner injection')
+    notes.push('🍪 Fixed logo logic: Now correctly shows "Cookie Off" icon when rejected')
+    notes.push('⚡ Improved stability for Single Page Applications (SPA)')
   }
 
   return notes
