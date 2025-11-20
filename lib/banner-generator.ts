@@ -1076,10 +1076,10 @@ window.showCookiePreferences = function() {
   if (banner) {
     banner.style.display = 'block';
     // Re-initialize button handlers when banner is shown again
-    // Use setTimeout to ensure DOM is ready
+    // Use setTimeout to ensure DOM is ready. Increased to 50ms to be safer.
     setTimeout(function() {
       reinitializeBannerHandlers();
-    }, 10);
+    }, 50);
   }
 };
 ` : ''}
@@ -1146,10 +1146,10 @@ function showFloatingButton() {
         banner.style.display = 'block';
         // CRITICAL: Reinitialize event handlers when banner is reopened
         // This ensures buttons are clickable after reopening
-        // Use setTimeout to ensure DOM is ready
+        // Use setTimeout to ensure DOM is ready. Increased to 50ms to be safer.
         setTimeout(function() {
           reinitializeBannerHandlers();
-        }, 10);
+        }, 50);
       }
     };
   }
@@ -1190,11 +1190,15 @@ function updateFloatingButtonIcon(consent) {
     floatBtn.innerHTML = icon;
   } else {
     // Pill and square respect showText setting
-    if (shouldShowText && hasLogo && logoUrl) {
-      // Show logo + text
+    if (shouldShowText && !hasAcceptedNonEssential) {
+      // If rejected (or no non-essential consent), prioritize showing the status icon (Rejected) over the logo
+      // This ensures the user sees they have rejected cookies
+      floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
+    } else if (shouldShowText && hasLogo && logoUrl) {
+      // Show logo + text (Only if accepted or default state)
       floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" /><span>' + text + '</span>';
-    } else if (shouldShowText && !hasLogo) {
-      // Show icon + text
+    } else if (shouldShowText) {
+      // Show icon + text (No logo configured)
       floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
     } else {
       // Show only icon

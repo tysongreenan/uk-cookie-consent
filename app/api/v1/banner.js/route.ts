@@ -230,6 +230,11 @@ export async function GET(request: NextRequest) {
       setTimeout(injectHTML, 10);
       return;
     }
+
+    // Prevent duplicate injection
+    if (document.getElementById('cookie-consent-banner')) {
+      return;
+    }
     
     var div = document.createElement('div');
     div.innerHTML = ${JSON.stringify(html)};

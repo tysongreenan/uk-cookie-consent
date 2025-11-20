@@ -7,22 +7,48 @@ import { CookieBannerFAQ } from '@/components/faq/cookie-banner-faq'
 import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
-import { HeroSection } from '@/components/blocks/hero-section' 
+import { HeroSection } from '@/components/blocks/hero-section'
+import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
+import { ProductDescription } from '@/components/landing/product-description' 
 
 export const metadata: Metadata = {
   title: 'Cookie Consent Banners That Keep You Compliant | Free Forever',
-  description: 'Avoid privacy law fines. Match your brand perfectly. Free forever.',
-  keywords: ['cookie banner', 'GDPR compliant', 'PIPEDA compliant', 'cookie consent', 'Canada', 'privacy law'],
+  description: 'Cookie consent banner generator built in Canada for PIPEDA, CASL, Quebec Law 25, and GDPR compliance. Brand-matching customization, unlimited banners, works on WordPress, Shopify, Webflow. Free forever for first 1,000 accounts. 5-minute setup.',
+  keywords: [
+    'cookie banner',
+    'cookie consent',
+    'GDPR compliant',
+    'PIPEDA compliant',
+    'CASL compliant',
+    'Quebec Law 25',
+    'cookie banner generator',
+    'cookie banner Canada',
+    'privacy compliance',
+    'branded cookie banner',
+    'custom cookie consent',
+    'bilingual cookie banner',
+    'cookie banner WordPress',
+    'cookie banner Shopify',
+    'cookie banner Webflow',
+  ],
   openGraph: {
     title: 'Cookie Consent Banners That Keep You Compliant | Free Forever',
-    description: 'Avoid privacy law fines. Match your brand perfectly. Free forever.',
+    description: 'Cookie consent banner generator built in Canada for PIPEDA, CASL, Quebec Law 25, and GDPR compliance. Brand-matching customization, unlimited banners, works on WordPress, Shopify, Webflow. Free forever for first 1,000 accounts.',
     type: 'website',
+  },
+  alternates: {
+    canonical: '/',
   },
 }
 
 export default function HomePage() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
+  
   return (
     <div className="min-h-screen bg-background">
+      {/* AEO Structured Data - Optimized for AI Assistants */}
+      <AEOStructuredData baseUrl={baseUrl} />
+      
       <LiveCookieBanner />
       <Header />
       <main>
@@ -50,6 +76,7 @@ export default function HomePage() {
       
         <InteractiveBannerDemo />
         <FeaturesBento />
+        <ProductDescription />
         <RoadmapPreview />
         <FinalCTA />
         <CookieBannerFAQ />
