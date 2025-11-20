@@ -1066,20 +1066,8 @@ ${config.branding.footerLink.enabled ? `
 // Global function for inline cookie settings links
 window.showCookiePreferences = function() {
   var banner = document.getElementById('cookie-consent-banner');
-  var modal = document.getElementById('cookie-preferences-modal');
-  
-  // Close modal if it's open (prevents blocking clicks)
-  if (modal) {
-    modal.style.display = 'none';
-  }
-  
   if (banner) {
     banner.style.display = 'block';
-    // Re-initialize button handlers when banner is shown again
-    // Use setTimeout to ensure DOM is ready. Increased to 50ms to be safer.
-    setTimeout(function() {
-      reinitializeBannerHandlers();
-    }, 50);
   }
 };
 ` : ''}
@@ -1135,21 +1123,8 @@ function showFloatingButton() {
     floatBtn.style.setProperty('display', 'flex', 'important');
     floatBtn.onclick = function() {
       var banner = document.getElementById('cookie-consent-banner');
-      var modal = document.getElementById('cookie-preferences-modal');
-      
-      // Close modal if it's open (prevents blocking clicks)
-      if (modal) {
-        modal.style.display = 'none';
-      }
-      
       if (banner) {
         banner.style.display = 'block';
-        // CRITICAL: Reinitialize event handlers when banner is reopened
-        // This ensures buttons are clickable after reopening
-        // Use setTimeout to ensure DOM is ready. Increased to 50ms to be safer.
-        setTimeout(function() {
-          reinitializeBannerHandlers();
-        }, 50);
       }
     };
   }
@@ -1190,15 +1165,13 @@ function updateFloatingButtonIcon(consent) {
     floatBtn.innerHTML = icon;
   } else {
     // Pill and square respect showText setting
-    if (shouldShowText && !hasAcceptedNonEssential) {
-      // If rejected (or no non-essential consent), prioritize showing the status icon (Rejected) over the logo
-      // This ensures the user sees they have rejected cookies
-      floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
-    } else if (shouldShowText && hasLogo && logoUrl) {
-      // Show logo + text (Only if accepted or default state)
+    // Only show logo if user has NOT rejected (hasAcceptedNonEssential is true)
+    // This ensures the rejected state is clearly visible with the rejected icon
+    if (shouldShowText && hasLogo && logoUrl && hasAcceptedNonEssential) {
+      // Show logo + text
       floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" /><span>' + text + '</span>';
     } else if (shouldShowText) {
-      // Show icon + text (No logo configured)
+      // Show icon + text (Icon handles both rejected state and no-logo state)
       floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
     } else {
       // Show only icon
@@ -1251,19 +1224,47 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   }
 }
 
-// Re-initialize banner handlers (called when banner is shown again after consent)
-function reinitializeBannerHandlers() {
+function init() {
   var banner = document.getElementById('cookie-consent-banner');
   var acceptBtn = document.getElementById('cookie-accept-btn');
   var rejectBtn = document.getElementById('cookie-reject-btn');
-  var closeBtn = document.getElementById('cookie-close-btn');
   var prefsBtn = document.getElementById('cookie-preferences-btn');
+  var closeBtn = document.getElementById('cookie-close-btn');
+  var prefsPanel = document.getElementById('cookie-preferences-panel');
+  var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
+  var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
   
   if (!banner) return;
   
+  // Apply language translations
+  applyTranslations();
+  
+  var existingConsent = getConsent();
+  
+  if (existingConsent) {
+    loadScripts(existingConsent);
+    
+    // Initialize GA4 if analytics was accepted
+    if (existingConsent.analytics) {
+      initGA4();
+    }
+    
+    // Show floating button if consent already exists
+    showFloatingButton();
+    updateFloatingButtonIcon(existingConsent);
+    
+    return;
+  }
+  
+  ${config.behavior.autoShow ? `
+  banner.style.display = 'block';
+  trackConsentEvent('impression'); // Track banner impression
+  
   // Hide floating button while main banner is showing
   hideFloatingButton();
+  ` : ''}
   
+  // Set up banner button handlers directly
   if (acceptBtn) {
     acceptBtn.onclick = function() {
       saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
@@ -1305,52 +1306,8 @@ function reinitializeBannerHandlers() {
     };
   }
   ` : ''}
-}
-
-function init() {
-  var banner = document.getElementById('cookie-consent-banner');
-  var acceptBtn = document.getElementById('cookie-accept-btn');
-  var rejectBtn = document.getElementById('cookie-reject-btn');
-  var prefsBtn = document.getElementById('cookie-preferences-btn');
-  var closeBtn = document.getElementById('cookie-close-btn');
-  var prefsPanel = document.getElementById('cookie-preferences-panel');
-  var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
-  var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
   
-  if (!banner) return;
-  
-  // Apply language translations
-  applyTranslations();
-  
-  var existingConsent = getConsent();
-  
-  if (existingConsent) {
-    loadScripts(existingConsent);
-    
-    // Initialize GA4 if analytics was accepted
-    if (existingConsent.analytics) {
-      initGA4();
-    }
-    
-    // Show floating button if consent already exists
-    showFloatingButton();
-    updateFloatingButtonIcon(existingConsent);
-    
-    return;
-  }
-  
-  ${config.behavior.autoShow ? `
-  banner.style.display = 'block';
-  trackConsentEvent('impression'); // Track banner impression
-  
-  // Hide floating button while main banner is showing
-  hideFloatingButton();
-  ` : ''}
-  
-  // Initialize handlers
-  reinitializeBannerHandlers();
-  
-  // Modal event handlers (only set up once, not re-initialized)
+  // Modal event handlers
   var modal = document.getElementById('cookie-preferences-modal');
   var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
   var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
@@ -1483,20 +1440,6 @@ function init() {
     }
   });
   ` : ''}
-}
-
-// Try to restore consent immediately (for returning users)
-// This ensures tracking works without waiting for DOMContentLoaded
-try {
-  var earlyConsent = getConsent();
-  if (earlyConsent) {
-    loadScripts(earlyConsent);
-    if (earlyConsent.analytics) {
-      initGA4();
-    }
-  }
-} catch (e) {
-  console.error('Error restoring consent early:', e);
 }
 
 if (document.readyState === 'loading') {

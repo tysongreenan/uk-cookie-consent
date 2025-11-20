@@ -125,3 +125,10 @@ prisma/migrations/
 test-supabase.js
 setup-database.js
 check-tables.js
+
+# Internal reference documentation (keep local only)
+WORKING_STATE_REFERENCE.md
+EAGLEVIEW_COMPARISON.md
+COMPARISON.md
+SIMPLIFICATION_SUMMARY.md
+working-header.html
