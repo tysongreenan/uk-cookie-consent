@@ -793,11 +793,20 @@ function BannerBuilderContent() {
     }))
   }
 
+  const [isPushing, setIsPushing] = useState(false)
+
   const handleSave = async () => {
     setIsLoading(true)
     try {
       const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
       const method = isEditing ? 'PUT' : 'POST'
+      
+      // Add version timestamp to ensure cache invalidation
+      const configWithVersion = {
+        ...config,
+        version: '2.1.0',
+        lastUpdated: new Date().toISOString()
+      }
       
       const response = await fetch(url, {
         method: method,
@@ -806,7 +815,7 @@ function BannerBuilderContent() {
         },
         body: JSON.stringify({
           name: config.name,
-          config: config,
+          config: configWithVersion,
           isActive: true
         }),
       })
@@ -814,6 +823,8 @@ function BannerBuilderContent() {
       const data = await response.json()
 
       if (response.ok) {
+        // Update local config with the version
+        setConfig(configWithVersion)
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
           // For new banners, redirect to dashboard after saving
@@ -833,6 +844,60 @@ function BannerBuilderContent() {
       toast.error('Failed to save banner')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handlePushLive = async () => {
+    if (!isEditing || !bannerId) {
+      toast.error('Please save the banner first')
+      return
+    }
+    
+    setIsPushing(true)
+    try {
+      // First save any pending changes
+      const configWithVersion = {
+        ...config,
+        version: '2.1.0',
+        lastUpdated: new Date().toISOString()
+      }
+      
+      const response = await fetch(`/api/banners/simple/${bannerId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: config.name,
+          config: configWithVersion,
+          isActive: true
+        }),
+      })
+
+      if (response.ok) {
+        setConfig(configWithVersion)
+        
+        // Force refresh the banner script by hitting it with nocache
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
+        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`)
+        
+        toast.success(
+          <div>
+            <strong>Changes pushed live!</strong>
+            <p className="text-sm mt-1">Your website will show the new banner within 30 seconds.</p>
+            <p className="text-xs mt-1 text-gray-500">Hard refresh (Ctrl+Shift+R) for immediate update.</p>
+          </div>,
+          { duration: 6000 }
+        )
+      } else {
+        const data = await response.json()
+        toast.error(data.error || 'Failed to push changes')
+      }
+    } catch (error) {
+      console.error('Push live error:', error)
+      toast.error('Failed to push changes live')
+    } finally {
+      setIsPushing(false)
     }
   }
 
@@ -879,10 +944,30 @@ function BannerBuilderContent() {
                 />
             </div>
             <div className="flex items-center space-x-2">
-              <Button onClick={handleSave} disabled={isLoading} size="sm">
+              <Button onClick={handleSave} disabled={isLoading} size="sm" variant="outline">
                 <Save className="h-4 w-4" />
-                {isLoading ? 'Saving...' : 'Save'}
+                {isLoading ? 'Saving...' : 'Save Draft'}
               </Button>
+              {isEditing && (
+                <Button 
+                  onClick={handlePushLive} 
+                  disabled={isPushing || isLoading} 
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isPushing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Pushing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowLeft className="h-4 w-4 rotate-180" />
+                      Push Live
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>
