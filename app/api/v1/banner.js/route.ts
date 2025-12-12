@@ -3,6 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
+import { 
+  bannerCache, 
+  CACHE_TTL_MS, 
+  getCachedBanner, 
+  setCachedBanner, 
+  cleanupExpiredCache 
+} from '@/lib/banner-cache'
 
 // Lazy initialization to avoid build-time errors and ensure service role key is used
 function getSupabaseClient() {
@@ -22,30 +29,6 @@ const bannerScriptRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100, // 100 requests per minute
 })
-
-// Server-side cache for banner scripts (reduces database queries by 95%+)
-interface BannerCacheEntry {
-  script: string
-  expiresAt: number
-  isActive: boolean
-}
-
-const bannerCache = new Map<string, BannerCacheEntry>()
-const CACHE_TTL_MS = 2 * 60 * 1000 // 2 minutes (reduced from 10 for faster updates)
-
-// Clean up expired cache entries periodically
-function cleanupCache() {
-  const now = Date.now()
-  const keysToDelete: string[] = []
-  
-  bannerCache.forEach((entry, key) => {
-    if (now > entry.expiresAt) {
-      keysToDelete.push(key)
-    }
-  })
-  
-  keysToDelete.forEach(key => bannerCache.delete(key))
-}
 
 // Validate banner ID format (UUID v4)
 function isValidBannerId(id: string): boolean {
@@ -100,21 +83,21 @@ export async function GET(request: NextRequest) {
     
     // Clean up expired cache entries occasionally (1% chance per request)
     if (Math.random() < 0.01) {
-      cleanupCache()
+      cleanupExpiredCache()
     }
     
     // Check server-side cache first (reduces database queries by 95%+)
     // Skip cache if nocache parameter is set (for testing/updates)
-    const cached = nocache ? null : bannerCache.get(bannerId)
-    const now = Date.now()
+    const cached = nocache ? null : getCachedBanner(bannerId)
     
-    if (cached && now < cached.expiresAt) {
+    if (cached) {
       // Cache hit - return cached script
+      console.log(`📦 Banner cache HIT for: ${bannerId}`)
       if (!cached.isActive) {
         return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
           headers: { 
             'Content-Type': 'application/javascript',
-            'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
+            'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
             'X-Cache': 'HIT',
             ...SECURITY_HEADERS,
           }
@@ -124,7 +107,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse(cached.script, {
         headers: {
           'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
           'Access-Control-Allow-Origin': '*',
           'X-Cache': 'HIT',
           'X-RateLimit-Limit': '100',
@@ -134,6 +117,8 @@ export async function GET(request: NextRequest) {
         },
       })
     }
+    
+    console.log(`📦 Banner cache MISS for: ${bannerId}`)
     
     // Cache miss - fetch from database
     const supabase = getSupabaseClient()
@@ -180,16 +165,15 @@ export async function GET(request: NextRequest) {
     
     // Cache inactive banners too (to avoid repeated DB queries)
     if (!banner.isActive) {
-      bannerCache.set(bannerId, {
+      setCachedBanner(bannerId, {
         script: 'console.log("Cookie Banner: Banner is inactive");',
-        expiresAt: now + CACHE_TTL_MS,
         isActive: false
       })
       
       return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
         headers: { 
           'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
           'X-Cache': 'MISS',
           ...SECURITY_HEADERS,
         }
@@ -236,6 +220,16 @@ export async function GET(request: NextRequest) {
       return;
     }
     
+    // Prevent duplicate injection
+    if (document.getElementById('cookie-consent-banner')) {
+      return;
+    }
+    
+    // Prevent duplicate injection
+    if (document.getElementById('cookie-consent-banner')) {
+      return;
+    }
+    
     var div = document.createElement('div');
     div.innerHTML = ${JSON.stringify(html)};
     
@@ -256,17 +250,16 @@ export async function GET(request: NextRequest) {
 })();
 `
     
-    // Cache the generated script
-    bannerCache.set(bannerId, {
+    // Cache the generated script (shared cache can be invalidated from update endpoints)
+    setCachedBanner(bannerId, {
       script: combinedScript,
-      expiresAt: now + CACHE_TTL_MS,
       isActive: true
     })
     
     return new NextResponse(combinedScript, {
       headers: {
         'Content-Type': 'application/javascript',
-        'Cache-Control': 'public, max-age=300, stale-while-revalidate=60', // Cache for 5 minutes
+        'Cache-Control': 'public, max-age=30, stale-while-revalidate=10', // Reduced for faster updates
         'Access-Control-Allow-Origin': '*',
         'X-Cache': 'MISS', // Indicates this was fetched from database
         'X-RateLimit-Limit': '100',

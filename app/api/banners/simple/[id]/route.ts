@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { invalidateBannerCache } from '@/lib/banner-cache'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -188,7 +189,10 @@ export async function PUT(
         }
       }
 
-      console.log('✅ Simple Toggle: Banner toggled successfully in', bannerTable)
+      // Invalidate cache so the status change appears immediately
+      invalidateBannerCache(params.id)
+      console.log('✅ Simple Toggle: Banner toggled and cache invalidated in', bannerTable)
+      
       return NextResponse.json({ 
         success: true, 
         bannerId: params.id,
@@ -238,7 +242,10 @@ function rejectCookies() {
       return NextResponse.json({ error: 'Failed to update banner' }, { status: 500 })
     }
 
-    console.log('✅ Simple Update: Banner updated successfully:', params.id)
+    // Invalidate cache so changes appear immediately on live websites
+    invalidateBannerCache(params.id)
+    console.log('✅ Simple Update: Banner updated and cache invalidated:', params.id)
+    
     return NextResponse.json({ 
       success: true, 
       bannerId: params.id,

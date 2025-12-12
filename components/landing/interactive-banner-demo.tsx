@@ -198,7 +198,9 @@ const defaultConfig: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: true,
-    cookieExpiry: 182
+    cookieExpiry: 182,
+    buttonLayout: 'standard',
+    showRejectButton: true
   },
   branding: {
     logo: {

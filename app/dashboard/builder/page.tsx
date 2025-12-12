@@ -202,7 +202,9 @@ const defaultConfig: BannerConfig = {
     autoShow: true,
     dismissOnScroll: false,
     showPreferences: true,
-    cookieExpiry: 182
+    cookieExpiry: 182,
+    buttonLayout: 'standard',
+    showRejectButton: true
   },
   branding: {
     logo: {
@@ -525,6 +527,27 @@ function BannerBuilderContent() {
             })
           } catch (error) {
             console.error('Failed to save migrated banner:', error)
+          }
+        } else {
+          // Even if migration didn't run, ensure new fields exist
+          // This handles cases where banners might be at 2.1.0 but missing buttonLayout
+          if (!bannerConfig.behavior) {
+            bannerConfig.behavior = {
+              autoShow: true,
+              dismissOnScroll: false,
+              showPreferences: true,
+              cookieExpiry: 182,
+              buttonLayout: 'standard',
+              showRejectButton: true
+            }
+          } else {
+            // Ensure new fields exist on existing behavior object
+            if (bannerConfig.behavior.buttonLayout === undefined) {
+              bannerConfig.behavior.buttonLayout = 'standard'
+            }
+            if (bannerConfig.behavior.showRejectButton === undefined) {
+              bannerConfig.behavior.showRejectButton = true
+            }
           }
         }
         
@@ -1050,6 +1073,223 @@ function BannerBuilderContent() {
                   selectedFramework={config.compliance.framework}
                   onFrameworkChange={handleComplianceFrameworkChange}
                 />
+                
+                {/* Button Layout Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Button Layout
+                    </CardTitle>
+                    <CardDescription>
+                      Choose which buttons appear on your banner. Some layouts may not meet all compliance requirements.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Standard Layout */}
+                      <div
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          (config.behavior.buttonLayout || 'standard') === 'standard'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-gray-300'
+                        }`}
+                        onClick={() => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            buttonLayout: 'standard',
+                            showRejectButton: true
+                          }
+                        }))}
+                      >
+                        <div className="font-medium mb-1">Standard</div>
+                        <div className="text-sm text-muted-foreground mb-3">Accept + Reject + Customize</div>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="default" className="text-xs">Accept</Badge>
+                          <Badge variant="outline" className="text-xs">Reject</Badge>
+                          <Badge variant="secondary" className="text-xs">Customize</Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-green-600">✓ GDPR Compliant</div>
+                      </div>
+                      
+                      {/* Soft Consent Layout */}
+                      <div
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          config.behavior.buttonLayout === 'soft-consent'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-gray-300'
+                        }`}
+                        onClick={() => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            buttonLayout: 'soft-consent',
+                            showRejectButton: false,
+                            showPreferences: true
+                          }
+                        }))}
+                      >
+                        <div className="font-medium mb-1">Soft Consent</div>
+                        <div className="text-sm text-muted-foreground mb-3">Accept + Customize only</div>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="default" className="text-xs">Accept</Badge>
+                          <Badge variant="secondary" className="text-xs">Customize</Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-amber-600">⚠ Higher acceptance rates</div>
+                      </div>
+                      
+                      {/* Accept Only Layout */}
+                      <div
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          config.behavior.buttonLayout === 'accept-only'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-gray-300'
+                        }`}
+                        onClick={() => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            buttonLayout: 'accept-only',
+                            showRejectButton: false,
+                            showPreferences: false
+                          }
+                        }))}
+                      >
+                        <div className="font-medium mb-1">Accept Only</div>
+                        <div className="text-sm text-muted-foreground mb-3">Just the Accept button</div>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="default" className="text-xs">Accept</Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-red-600">⚠ May not be compliant</div>
+                      </div>
+                    </div>
+                    
+                    {/* Compliance Warning */}
+                    {config.compliance.framework === 'gdpr' && config.behavior.buttonLayout !== 'standard' && (
+                      <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertDescription>
+                          GDPR requires an easy way to reject cookies. Consider using "Standard" layout for full compliance.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
+                    {/* Manual Toggle Override */}
+                    <div className="pt-4 border-t space-y-3">
+                      <div className="text-sm font-medium text-muted-foreground">Manual Controls</div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="show-reject">Show Reject Button</Label>
+                          <p className="text-xs text-muted-foreground">Display a dedicated reject button</p>
+                        </div>
+                        <Switch
+                          id="show-reject"
+                          checked={config.behavior.showRejectButton !== false}
+                          onCheckedChange={(checked) => setConfig(prev => ({
+                            ...prev,
+                            behavior: {
+                              ...prev.behavior,
+                              showRejectButton: checked,
+                              buttonLayout: checked ? 'standard' : (prev.behavior.showPreferences ? 'soft-consent' : 'accept-only')
+                            }
+                          }))}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="show-preferences">Show Customize Button</Label>
+                          <p className="text-xs text-muted-foreground">Allow users to customize cookie preferences</p>
+                        </div>
+                        <Switch
+                          id="show-preferences"
+                          checked={config.behavior.showPreferences}
+                          onCheckedChange={(checked) => setConfig(prev => ({
+                            ...prev,
+                            behavior: {
+                              ...prev.behavior,
+                              showPreferences: checked,
+                              buttonLayout: prev.behavior.showRejectButton !== false 
+                                ? 'standard' 
+                                : (checked ? 'soft-consent' : 'accept-only')
+                            }
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Framework Comparison */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Framework Comparison</CardTitle>
+                    <CardDescription>
+                      Quick comparison of key differences between compliance frameworks
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2">Requirement</th>
+                            <th className="text-center py-2">PIPEDA</th>
+                            <th className="text-center py-2">GDPR</th>
+                            <th className="text-center py-2">CCPA</th>
+                            <th className="text-center py-2">Custom</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b">
+                            <td className="py-2">Consent Type</td>
+                            <td className="text-center py-2">
+                              <Badge variant="outline" className="text-xs">Opt-out</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="outline" className="text-xs">Opt-in</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="outline" className="text-xs">Opt-out</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="outline" className="text-xs">Opt-in</Badge>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="py-2">Granular Controls</td>
+                            <td className="text-center py-2">
+                              <Badge variant="secondary" className="text-xs">Optional</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="default" className="text-xs">Required</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="default" className="text-xs">Required</Badge>
+                            </td>
+                            <td className="text-center py-2">
+                              <Badge variant="default" className="text-xs">Required</Badge>
+                            </td>
+                          </tr>
+                          <tr className="border-b">
+                            <td className="py-2">Max Penalty</td>
+                            <td className="text-center py-2 text-xs">Reputation</td>
+                            <td className="text-center py-2 text-xs">€20M</td>
+                            <td className="text-center py-2 text-xs">$7,500</td>
+                            <td className="text-center py-2 text-xs">Varies</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2">Consent Expiry</td>
+                            <td className="text-center py-2 text-xs">24 months</td>
+                            <td className="text-center py-2 text-xs">12 months</td>
+                            <td className="text-center py-2 text-xs">12 months</td>
+                            <td className="text-center py-2 text-xs">12 months</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* Design Tab */}

@@ -8,6 +8,7 @@ import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 import { HeroSection } from '@/components/blocks/hero-section'
+import { LogoMarquee } from '@/components/landing/logo-marquee'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 import { ProductDescription } from '@/components/landing/product-description' 
 
@@ -73,6 +74,7 @@ export default function HomePage() {
           // }}
         />
 
+        <LogoMarquee />
       
         <InteractiveBannerDemo />
         <FeaturesBento />

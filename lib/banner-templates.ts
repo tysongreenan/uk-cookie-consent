@@ -268,6 +268,105 @@ export const CCPA_TEMPLATE: BannerConfig = {
   },
 }
 
+export const CUSTOM_TEMPLATE: BannerConfig = {
+  version: '2.1.0',
+  lastUpdated: new Date().toISOString(),
+  compliance: {
+    framework: 'custom',
+    requiresExplicitConsent: true,
+    requiresOptIn: true,
+    requiresGranularConsent: true,
+    requiresPrivacyPolicy: true,
+    requiresDataRetentionPolicy: false,
+    maxPenalty: 'Varies by jurisdiction',
+    consentExpiry: 12,
+  },
+  name: 'Custom Compliance Banner',
+  position: 'bottom',
+  theme: 'light',
+  colors: {
+    background: '#ffffff',
+    text: '#1f2937',
+    button: '#9333ea', // Purple for custom
+    buttonText: '#ffffff',
+    link: '#9333ea',
+  },
+  language: 'en',
+  text: {
+    title: 'Cookie Consent',
+    message: 'We use cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content. You can manage your preferences or learn more in our Privacy Policy.',
+    acceptButton: 'Accept All',
+    rejectButton: 'Reject All',
+    preferencesButton: 'Customize',
+  },
+  behavior: {
+    autoShow: true,
+    dismissOnScroll: false,
+    showPreferences: true,
+    cookieExpiry: 182,
+    buttonLayout: 'standard',
+    showRejectButton: true,
+  },
+  branding: {
+    logo: {
+      enabled: false,
+      url: '',
+      position: 'left',
+      maxWidth: 120,
+      maxHeight: 40,
+    },
+    privacyPolicy: {
+      url: '',
+      text: 'Privacy Policy',
+      openInNewTab: true,
+      required: true,
+    },
+    footerLink: {
+      enabled: true,
+      text: 'Cookie Settings',
+      position: 'floating',
+      floatingPosition: 'bottom-left',
+      style: 'floating',
+      floatingStyle: {
+        shape: 'pill',
+        size: 'small',
+        showText: true,
+        useCustomColors: false
+      },
+      inlineStyle: {
+        linkType: 'plain',
+        includeIcon: false,
+        includeLogo: false
+      }
+    },
+  },
+  layout: {
+    width: 'container',
+    borderRadius: 8,
+    padding: 20,
+    margin: 20,
+    shadow: 'medium',
+    animation: 'slide',
+  },
+  scripts: {
+    strictlyNecessary: [],
+    functionality: [],
+    trackingPerformance: [],
+    targetingAdvertising: [],
+  },
+  advanced: {
+    googleConsentMode: true,
+    customCSS: '',
+    customJS: '',
+    performance: {
+      deferNonCriticalScripts: true,
+      useRequestIdleCallback: true,
+      lazyLoadAnalytics: true,
+      inlineCriticalCSS: true,
+    },
+  },
+}
+
 export function getBannerTemplate(framework: ComplianceFramework): BannerConfig {
   switch (framework) {
     case 'pipeda':
@@ -276,8 +375,10 @@ export function getBannerTemplate(framework: ComplianceFramework): BannerConfig 
       return GDPR_TEMPLATE
     case 'ccpa':
       return CCPA_TEMPLATE
+    case 'custom':
+      return CUSTOM_TEMPLATE
     default:
-      return GDPR_TEMPLATE // Default to GDPR for custom
+      return CUSTOM_TEMPLATE // Default to custom template
   }
 }
 

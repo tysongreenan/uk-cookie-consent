@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
+import { invalidateBannerCache } from '@/lib/banner-cache'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -163,6 +164,10 @@ async function handleBannerUpdate(
         { status: 500 }
       )
     }
+
+    // Invalidate cache so changes appear immediately on live websites
+    invalidateBannerCache(bannerId)
+    console.log(`✅ Banner ${bannerId} updated and cache invalidated`)
 
     return NextResponse.json({
       success: true,

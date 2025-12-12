@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.0.2'
+export const CURRENT_BANNER_VERSION = '2.1.0'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -55,7 +55,9 @@ export function migrateBannerConfig(config: any): BannerConfig {
         autoShow: true,
         dismissOnScroll: false,
         showPreferences: true,
-        cookieExpiry: 182
+        cookieExpiry: 182,
+        buttonLayout: 'standard',
+        showRejectButton: true
       },
       branding: {
         logo: { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 },
@@ -110,19 +112,43 @@ export function migrateBannerConfig(config: any): BannerConfig {
     migratedConfig.version = '1.0.0'
   }
 
-  // Migration from v1.0.0 to v2.0.0
-  if (migratedConfig.version === '1.0.0') {
-    migratedConfig = migrateToV2(migratedConfig)
+  // Sequential migration chain - apply all migrations until we reach current version
+  // Use a loop to ensure all migrations are applied sequentially
+  let currentVersion = migratedConfig.version || '1.0.0'
+  
+  while (currentVersion !== CURRENT_BANNER_VERSION) {
+    if (currentVersion === '1.0.0') {
+      migratedConfig = migrateToV2(migratedConfig)
+      currentVersion = '2.0.0'
+      migratedConfig.version = currentVersion
+    } else if (currentVersion === '2.0.0') {
+      migratedConfig = migrateToV2_1(migratedConfig)
+      currentVersion = '2.0.1'
+      migratedConfig.version = currentVersion
+    } else if (currentVersion === '2.0.1') {
+      migratedConfig = migrateToV2_0_2(migratedConfig)
+      currentVersion = '2.0.2'
+      migratedConfig.version = currentVersion
+    } else if (currentVersion === '2.0.2') {
+      migratedConfig = migrateToV2_1_0(migratedConfig)
+      currentVersion = '2.1.0'
+      migratedConfig.version = currentVersion
+    } else {
+      // Unknown version or already at latest - break to avoid infinite loop
+      break
+    }
   }
 
-  // Migration from v2.0.0 to v2.1.0
-  if (migratedConfig.version === '2.0.0') {
-    migratedConfig = migrateToV2_1(migratedConfig)
+  // Ensure buttonLayout and showRejectButton exist even if migration didn't run
+  // This handles edge cases where banners might have been partially migrated
+  if (!migratedConfig.behavior) {
+    migratedConfig.behavior = {}
   }
-
-  // Migration from v2.0.1 to v2.0.2
-  if (migratedConfig.version === '2.0.1') {
-    migratedConfig = migrateToV2_0_2(migratedConfig)
+  if (migratedConfig.behavior.buttonLayout === undefined) {
+    migratedConfig.behavior.buttonLayout = 'standard'
+  }
+  if (migratedConfig.behavior.showRejectButton === undefined) {
+    migratedConfig.behavior.showRejectButton = true
   }
 
   // Add current version and timestamp
@@ -308,6 +334,33 @@ function migrateToV2_0_2(config: any): any {
 }
 
 /**
+ * Migration from v2.0.2 to v2.1.0 - Button Layout customization
+ * Adds buttonLayout and showRejectButton fields for customizable consent buttons
+ */
+function migrateToV2_1_0(config: any): any {
+  const migrated = { ...config }
+
+  // Ensure behavior object exists
+  if (!migrated.behavior) {
+    migrated.behavior = {}
+  }
+
+  // Add buttonLayout if missing - default to 'standard' for backward compatibility
+  if (migrated.behavior.buttonLayout === undefined) {
+    migrated.behavior.buttonLayout = 'standard'
+  }
+
+  // Add showRejectButton if missing - default to true for backward compatibility
+  // This ensures existing banners continue showing the Reject button
+  if (migrated.behavior.showRejectButton === undefined) {
+    migrated.behavior.showRejectButton = true
+  }
+
+  migrated.version = '2.1.0'
+  return migrated
+}
+
+/**
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
@@ -344,6 +397,13 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🎨 All shapes (Circle, Square, Pill) now support icon-only mode')
     notes.push('⚙️ Consistent behavior across all floating button shapes')
     notes.push('🎯 Enhanced user choice and customization options')
+  }
+
+  if (oldVersion === '2.0.2' && newVersion === '2.1.0') {
+    notes.push('🎛️ New Button Layout feature - choose Standard, Soft Consent, or Accept Only')
+    notes.push('📈 Soft Consent mode for higher acceptance rates (Accept + Customize)')
+    notes.push('⚙️ Granular control over Reject and Customize button visibility')
+    notes.push('⚠️ Compliance warnings when button layout may not meet framework requirements')
   }
 
   return notes

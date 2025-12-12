@@ -1,5 +1,8 @@
 export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'custom'
 
+// Button layout presets for cookie banners
+export type ButtonLayout = 'standard' | 'soft-consent' | 'accept-only'
+
 export interface ComplianceRequirements {
   framework: ComplianceFramework
   requiresExplicitConsent: boolean // GDPR: true, PIPEDA: false (can use implied consent)
@@ -51,6 +54,9 @@ export interface BannerConfig {
     dismissOnScroll: boolean
     showPreferences: boolean
     cookieExpiry: number // days
+    // Button layout controls
+    buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'
+    showRejectButton?: boolean // Granular control - defaults to true for backward compatibility
   }
   
   // Branding

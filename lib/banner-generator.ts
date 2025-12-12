@@ -412,7 +412,7 @@ export const generateBannerHTML = (config: BannerConfig) => {
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.acceptButton)}</button>
           
-          <button id="cookie-reject-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.text)} !important; border: 1px solid ${escapeHtml(config.colors.text)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.rejectButton)}</button>
+          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.text)} !important; border: 1px solid ${escapeHtml(config.colors.text)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
           
           ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
         </div>

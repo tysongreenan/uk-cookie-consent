@@ -158,12 +158,20 @@ export function validateInvitationToken(token: string): { valid: boolean; error?
  * Validate payment amount
  */
 export function validatePaymentAmount(amount: number): { valid: boolean; error?: string } {
-  const expectedAmount = 4899 // $48.99 in cents
-  
-  if (amount !== expectedAmount) {
+  // Allow any positive amount to support discount codes (e.g. 50% off = 2449 or 2450)
+  // But ensure it's not zero unless we explicitly want to support 100% off
+  if (amount <= 0) {
     return {
       valid: false,
-      error: `Invalid payment amount. Expected ${expectedAmount}, got ${amount}`
+      error: `Invalid payment amount. Must be greater than 0, got ${amount}`
+    }
+  }
+
+  // Optional: Add a maximum amount sanity check to prevent absurd overcharges
+  if (amount > 100000) { // $1000.00
+    return {
+      valid: false,
+      error: `Payment amount too high`
     }
   }
 

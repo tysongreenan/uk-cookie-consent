@@ -11,7 +11,7 @@ published: true
 # What Is Cookie Consent in Canada?
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> Cookie consent in Canada is the legal requirement for websites to obtain user permission before collecting personal data through cookies. Under Canadian privacy laws (PIPEDA, CASL, and Quebec's Law 25), websites must get explicit, opt-in consent for tracking cookies used for analytics, advertising, or marketing purposes. Penalties for non-compliance can reach up to $25 million or 4% of global revenue under Quebec's Law 25.
+Cookie consent in Canada is the legal requirement for websites to obtain user permission before collecting personal data through cookies. Under Canadian privacy laws (PIPEDA, CASL, and Quebec's Law 25), websites must get explicit, opt-in consent for tracking cookies used for analytics, advertising, or marketing purposes. Penalties for non-compliance can reach up to $25 million or 4% of global revenue under Quebec's Law 25.
 
 [Learn more about PIPEDA compliance →](/compliance/pipeda)
 </div>

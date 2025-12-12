@@ -29,6 +29,8 @@ interface BannerConfig {
     dismissOnScroll: boolean
     showPreferences: boolean
     cookieExpiry: number
+    buttonLayout?: 'standard' | 'soft-consent' | 'accept-only'
+    showRejectButton?: boolean
   }
   branding: {
     logo: {
@@ -267,7 +269,9 @@ export function BannerPreview({ config }: BannerPreviewProps) {
       autoShow: config.behavior?.autoShow ?? true,
       dismissOnScroll: config.behavior?.dismissOnScroll ?? false,
       showPreferences: config.behavior?.showPreferences ?? true,
-      cookieExpiry: config.behavior?.cookieExpiry || 365
+      cookieExpiry: config.behavior?.cookieExpiry || 365,
+      buttonLayout: config.behavior?.buttonLayout || 'standard',
+      showRejectButton: config.behavior?.showRejectButton ?? true // Default true for backward compatibility
     },
     branding: {
       logo: {
@@ -579,19 +583,21 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                     {safeConfig.text.acceptButton}
                   </Button>
                   
-                  <Button
-                    onClick={handleReject}
-                    variant="outline"
-                    size="sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      borderColor: safeConfig.colors.text,
-                      color: safeConfig.colors.text,
-                    }}
-                    className="hover:bg-opacity-10"
-                  >
-                    {safeConfig.text.rejectButton}
-                  </Button>
+                  {safeConfig.behavior.showRejectButton !== false && (
+                    <Button
+                      onClick={handleReject}
+                      variant="outline"
+                      size="sm"
+                      style={{
+                        backgroundColor: 'transparent',
+                        borderColor: safeConfig.colors.text,
+                        color: safeConfig.colors.text,
+                      }}
+                      className="hover:bg-opacity-10"
+                    >
+                      {safeConfig.text.rejectButton}
+                    </Button>
+                  )}
 
                   {safeConfig.behavior.showPreferences && (
                     <Button
