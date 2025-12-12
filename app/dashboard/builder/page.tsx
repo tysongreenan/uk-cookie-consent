@@ -460,6 +460,7 @@ function BannerBuilderContent() {
   const [activeTab, setActiveTab] = useState('compliance')
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
+  const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   const [brandImportUrl, setBrandImportUrl] = useState('')
@@ -554,6 +555,8 @@ function BannerBuilderContent() {
         setConfig(bannerConfig)
         setIsEditing(true)
         setBannerId(id)
+        // Store updatedAt for cache-busting in script URLs
+        setBannerUpdatedAt(data.banner.updatedAt ? new Date(data.banner.updatedAt) : new Date())
         toast.success(`Loaded "${data.banner.name}" for editing`)
       } else {
         console.error('Failed to load banner:', data.error)
@@ -825,6 +828,12 @@ function BannerBuilderContent() {
       if (response.ok) {
         // Update local config with the version
         setConfig(configWithVersion)
+        // Update timestamp for cache-busting
+        if (data.banner?.updatedAt) {
+          setBannerUpdatedAt(new Date(data.banner.updatedAt))
+        } else {
+          setBannerUpdatedAt(new Date())
+        }
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
           // For new banners, redirect to dashboard after saving
@@ -874,8 +883,16 @@ function BannerBuilderContent() {
         }),
       })
 
+      const data = await response.json()
+      
       if (response.ok) {
         setConfig(configWithVersion)
+        // Update timestamp for cache-busting - this will update the script URL automatically
+        if (data.banner?.updatedAt) {
+          setBannerUpdatedAt(new Date(data.banner.updatedAt))
+        } else {
+          setBannerUpdatedAt(new Date())
+        }
         
         // Force refresh the banner script by hitting it with nocache
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
@@ -884,13 +901,13 @@ function BannerBuilderContent() {
         toast.success(
           <div>
             <strong>Changes pushed live!</strong>
-            <p className="text-sm mt-1">Your website will show the new banner within 30 seconds.</p>
-            <p className="text-xs mt-1 text-gray-500">Hard refresh (Ctrl+Shift+R) for immediate update.</p>
+            <p className="text-sm mt-1">The script URL has been updated with a new cache-busting parameter.</p>
+            <p className="text-sm mt-1">Browsers will automatically fetch the latest version.</p>
+            <p className="text-xs mt-1 text-gray-500">If you see old content, hard refresh (Ctrl+Shift+R).</p>
           </div>,
           { duration: 6000 }
         )
       } else {
-        const data = await response.json()
         toast.error(data.error || 'Failed to push changes')
       }
     } catch (error) {
@@ -3849,7 +3866,11 @@ function BannerBuilderContent() {
                         </div>
                       </div>
                       <div className="p-0">
-                        <CodeGenerator config={config} bannerId={bannerId || undefined} />
+                        <CodeGenerator 
+                          config={config} 
+                          bannerId={bannerId || undefined} 
+                          updatedAt={bannerUpdatedAt || undefined}
+                        />
                       </div>
                     </div>
 

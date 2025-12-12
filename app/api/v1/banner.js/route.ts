@@ -90,24 +90,58 @@ export async function GET(request: NextRequest) {
     // Skip cache if nocache parameter is set (for testing/updates)
     const cached = nocache ? null : getCachedBanner(bannerId)
     
-    if (cached) {
-      // Cache hit - return cached script
-      console.log(`📦 Banner cache HIT for: ${bannerId}`)
-      if (!cached.isActive) {
-        return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
-          headers: { 
-            'Content-Type': 'application/javascript',
-            'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
-            'X-Cache': 'HIT',
-            ...SECURITY_HEADERS,
-          }
-        })
-      }
+    // Always fetch updatedAt from DB for ETag generation (lightweight query)
+    // This ensures proper HTTP caching even with server-side cache
+    const supabase = getSupabaseClient()
+    
+    // Quick query to get just updatedAt for ETag
+    let updatedAt: number | null = null
+    const { data: bannerMeta } = await supabase
+      .from('SimpleBanners')
+      .select('"updatedAt"')
+      .eq('id', bannerId)
+      .single()
+    
+    if (bannerMeta?.updatedAt) {
+      updatedAt = new Date(bannerMeta.updatedAt).getTime()
+    } else {
+      // Fallback to ConsentBanner
+      const { data: consentMeta } = await supabase
+        .from('ConsentBanner')
+        .select('"updatedAt"')
+        .eq('id', bannerId)
+        .single()
       
+      if (consentMeta?.updatedAt) {
+        updatedAt = new Date(consentMeta.updatedAt).getTime()
+      }
+    }
+    
+    // Generate ETag for conditional requests
+    const etag = updatedAt ? `"${bannerId}-${updatedAt}"` : `"${bannerId}-${Date.now()}"`
+    const ifNoneMatch = request.headers.get('if-none-match')
+    
+    // If client has matching ETag, return 304 Not Modified
+    if (ifNoneMatch === etag && cached) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'ETag': etag,
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'X-Cache': 'HIT',
+          ...SECURITY_HEADERS,
+        },
+      })
+    }
+    
+    // If we have cached script and banner is active, return it with ETag
+    if (cached && cached.isActive) {
+      console.log(`📦 Banner cache HIT for: ${bannerId}`)
       return new NextResponse(cached.script, {
         headers: {
           'Content-Type': 'application/javascript',
           'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'ETag': etag,
           'Access-Control-Allow-Origin': '*',
           'X-Cache': 'HIT',
           'X-RateLimit-Limit': '100',
@@ -118,10 +152,22 @@ export async function GET(request: NextRequest) {
       })
     }
     
+    if (cached && !cached.isActive) {
+      console.log(`📦 Banner cache HIT (inactive) for: ${bannerId}`)
+      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
+        headers: { 
+          'Content-Type': 'application/javascript',
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'ETag': etag,
+          'X-Cache': 'HIT',
+          ...SECURITY_HEADERS,
+        }
+      })
+    }
+    
     console.log(`📦 Banner cache MISS for: ${bannerId}`)
     
-    // Cache miss - fetch from database
-    const supabase = getSupabaseClient()
+    // Cache miss - fetch full banner from database
     
     // Fetch config by banner ID from SimpleBanners table (using service role to bypass RLS)
     // Try SimpleBanners first (new system)
@@ -131,7 +177,7 @@ export async function GET(request: NextRequest) {
     // First try SimpleBanners table
     const { data: simpleBanner, error: simpleError } = await supabase
       .from('SimpleBanners')
-      .select('id, name, config, "isActive"')
+      .select('id, name, config, "isActive", "updatedAt"')
       .eq('id', bannerId)
       .single()
     
@@ -141,7 +187,7 @@ export async function GET(request: NextRequest) {
       // Fallback to ConsentBanner table (legacy system)
       const { data: consentBanner, error: consentError } = await supabase
         .from('ConsentBanner')
-        .select('id, name, config, "isActive"')
+        .select('id, name, config, "isActive", "updatedAt"')
         .eq('id', bannerId)
         .single()
       
@@ -163,6 +209,10 @@ export async function GET(request: NextRequest) {
       })
     }
     
+    // Use updatedAt from banner (already fetched above)
+    const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
+    const finalEtag = `"${bannerId}-${bannerUpdatedAt}"`
+    
     // Cache inactive banners too (to avoid repeated DB queries)
     if (!banner.isActive) {
       setCachedBanner(bannerId, {
@@ -170,10 +220,23 @@ export async function GET(request: NextRequest) {
         isActive: false
       })
       
+      // Check if client has cached version (304 Not Modified)
+      if (ifNoneMatch === finalEtag) {
+        return new NextResponse(null, {
+          status: 304,
+          headers: {
+            'ETag': finalEtag,
+            'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+            ...SECURITY_HEADERS,
+          },
+        })
+      }
+      
       return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
         headers: { 
           'Content-Type': 'application/javascript',
           'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'ETag': finalEtag,
           'X-Cache': 'MISS',
           ...SECURITY_HEADERS,
         }
@@ -250,6 +313,20 @@ export async function GET(request: NextRequest) {
 })();
 `
     
+    // Check if client has cached version (304 Not Modified)
+    // This is the key: when banner updates, updatedAt changes, ETag changes, browser re-fetches automatically
+    if (ifNoneMatch === finalEtag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'ETag': finalEtag,
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'X-Cache': 'HIT',
+          ...SECURITY_HEADERS,
+        },
+      })
+    }
+    
     // Cache the generated script (shared cache can be invalidated from update endpoints)
     setCachedBanner(bannerId, {
       script: combinedScript,
@@ -260,6 +337,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/javascript',
         'Cache-Control': 'public, max-age=30, stale-while-revalidate=10', // Reduced for faster updates
+        'ETag': finalEtag, // ETag based on updatedAt - changes when banner updates
         'Access-Control-Allow-Origin': '*',
         'X-Cache': 'MISS', // Indicates this was fetched from database
         'X-RateLimit-Limit': '100',

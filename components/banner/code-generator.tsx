@@ -17,9 +17,10 @@ import {
 interface CodeGeneratorProps {
   config: BannerConfig
   bannerId?: string
+  updatedAt?: string | Date // Not used for URL, but kept for potential future use
 }
 
-export function CodeGenerator({ config, bannerId }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, updatedAt }: CodeGeneratorProps) {
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>('head')
   const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -94,12 +95,16 @@ ${generateBannerHTML(config)}
   const generateHostedScript = () => {
     if (!bannerId) return ''
     
+    // Static URL - no version parameter needed!
+    // The server uses ETag headers based on updatedAt timestamp
+    // Browsers automatically re-fetch when the banner is updated
     const scriptUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}`
     
     return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 Cookie Consent Banner - HOSTED SCRIPT (cookie-banner.ca)  🍁 -->
 <!-- 🍁 Place this code in your <head> section                    🍁 -->
 <!-- 🍁 IMPORTANT: Place as high as possible to block trackers    🍁 -->
+<!-- 🍁 Updates automatically - no need to change this code!       🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 
 <script src="${scriptUrl}" async></script>
