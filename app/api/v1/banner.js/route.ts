@@ -86,14 +86,10 @@ export async function GET(request: NextRequest) {
       cleanupExpiredCache()
     }
     
-    // Check server-side cache first (reduces database queries by 95%+)
-    // Skip cache if nocache parameter is set (for testing/updates)
-    const cached = nocache ? null : getCachedBanner(bannerId)
-    
-    // Always fetch updatedAt from DB for ETag generation (lightweight query)
-    // This ensures proper HTTP caching even with server-side cache
+    // Always fetch updatedAt from DB for ETag generation
+    // This is the source of truth for cache invalidation across serverless instances
     const supabase = getSupabaseClient()
-    
+
     // Quick query to get just updatedAt for ETag
     let updatedAt: number | null = null
     const { data: bannerMeta } = await supabase
@@ -101,7 +97,7 @@ export async function GET(request: NextRequest) {
       .select('"updatedAt"')
       .eq('id', bannerId)
       .single()
-    
+
     if (bannerMeta?.updatedAt) {
       updatedAt = new Date(bannerMeta.updatedAt).getTime()
     } else {
@@ -111,29 +107,37 @@ export async function GET(request: NextRequest) {
         .select('"updatedAt"')
         .eq('id', bannerId)
         .single()
-      
+
       if (consentMeta?.updatedAt) {
         updatedAt = new Date(consentMeta.updatedAt).getTime()
       }
     }
-    
-    // Generate ETag for conditional requests
+
+    // Generate ETag based on database updatedAt (source of truth)
     const etag = updatedAt ? `"${bannerId}-${updatedAt}"` : `"${bannerId}-${Date.now()}"`
     const ifNoneMatch = request.headers.get('if-none-match')
-    
-    // If client has matching ETag, return 304 Not Modified
-    if (ifNoneMatch === etag && cached) {
+
+    // If client has matching ETag (same updatedAt), return 304 Not Modified
+    // The ETag is based on database timestamp, so this works correctly across serverless instances
+    if (ifNoneMatch === etag && updatedAt) {
       return new NextResponse(null, {
         status: 304,
         headers: {
           'ETag': etag,
           'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
-          'X-Cache': 'HIT',
+          'X-Cache': 'NOT-MODIFIED',
           ...SECURITY_HEADERS,
         },
       })
     }
-    
+
+    // Check server-side cache, but ONLY use it if:
+    // 1. nocache is not set
+    // 2. Client has no ETag (first request) OR client's ETag matches current (already handled above with 304)
+    // If client has a DIFFERENT ETag, it means the banner was updated and we need fresh data
+    const clientHasStaleEtag = ifNoneMatch && ifNoneMatch !== etag
+    const cached = (nocache || clientHasStaleEtag) ? null : getCachedBanner(bannerId)
+
     // If we have cached script and banner is active, return it with ETag
     if (cached && cached.isActive) {
       console.log(`📦 Banner cache HIT for: ${bannerId}`)
@@ -151,11 +155,11 @@ export async function GET(request: NextRequest) {
         },
       })
     }
-    
+
     if (cached && !cached.isActive) {
       console.log(`📦 Banner cache HIT (inactive) for: ${bannerId}`)
-      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
-        headers: { 
+      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', {
+        headers: {
           'Content-Type': 'application/javascript',
           'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
           'ETag': etag,
@@ -164,8 +168,8 @@ export async function GET(request: NextRequest) {
         }
       })
     }
-    
-    console.log(`📦 Banner cache MISS for: ${bannerId}`)
+
+    console.log(`📦 Banner cache MISS for: ${bannerId}${clientHasStaleEtag ? ' (client had stale ETag)' : ''}`)
     
     // Cache miss - fetch full banner from database
     
