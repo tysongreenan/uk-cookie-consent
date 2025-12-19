@@ -242,15 +242,28 @@ function rejectCookies() {
       return NextResponse.json({ error: 'Failed to update banner' }, { status: 500 })
     }
 
+    // Fetch the updated banner to get the actual updatedAt timestamp from DB
+    // This is critical for ETag-based cache invalidation to work correctly
+    const { data: updatedBanner } = await supabase
+      .from('SimpleBanners')
+      .select('id, name, "updatedAt"')
+      .eq('id', params.id)
+      .single()
+
     // Invalidate cache so changes appear immediately on live websites
     invalidateBannerCache(params.id)
     console.log('✅ Simple Update: Banner updated and cache invalidated:', params.id)
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       bannerId: params.id,
+      banner: updatedBanner ? {
+        id: updatedBanner.id,
+        name: updatedBanner.name,
+        updatedAt: updatedBanner.updatedAt
+      } : undefined,
       code,
-      message: 'Banner updated successfully!' 
+      message: 'Banner updated successfully!'
     })
 
   } catch (error) {

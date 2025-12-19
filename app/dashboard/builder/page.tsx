@@ -895,8 +895,11 @@ function BannerBuilderContent() {
         }
         
         // Force refresh the banner script by hitting it with nocache
+        // Use cache: 'no-store' to bypass browser's HTTP cache entirely
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
-        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`)
+        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`, {
+          cache: 'no-store'
+        })
         
         toast.success(
           <div>
