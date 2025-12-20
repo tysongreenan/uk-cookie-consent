@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Code, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, Download, ExternalLink, Shield } from '@phosphor-icons/react'
+import { Code, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, Download, ExternalLink, Shield } from 'lucide-react'
 import { CodeCopyBlock } from '@/components/landing/visuals/integration/CodeCopyBlock'
 import { ThreeStepInstallation } from '@/components/landing/visuals/integration/ThreeStepInstallation'
 import { PluginComparisonTable } from '@/components/landing/visuals/integration/PluginComparisonTable'

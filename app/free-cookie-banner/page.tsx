@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +18,7 @@ import {
   Sparkles,
   Heart,
   AlertTriangle
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'

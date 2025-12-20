@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Code, Zap, Package, Users, CheckCircle, ExternalLink, Download, Settings } from '@phosphor-icons/react'
+import { Code, Zap, Package, Users, CheckCircle, ExternalLink, Download, Settings } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'React Cookie Consent Integration | Next.js Component Library 2025',

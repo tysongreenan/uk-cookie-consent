@@ -23,7 +23,7 @@ import {
   Eye,
   Loader2,
   LogOut
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 interface Workspace {

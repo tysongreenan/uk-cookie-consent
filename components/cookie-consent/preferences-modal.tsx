@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { X, ChevronRight } from '@phosphor-icons/react'
+import { X, ChevronRight } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 
 interface BannerConfig {

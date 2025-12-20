@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Shield, AlertTriangle, CheckCircle, Cookie, Eye, Zap } from '@phosphor-icons/react'
+import { Search, Shield, AlertTriangle, CheckCircle, Cookie, Eye, Zap } from 'lucide-react'
 
 interface CookieResult {
   id: string

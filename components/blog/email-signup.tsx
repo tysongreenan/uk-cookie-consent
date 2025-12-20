@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Mail, Check } from '@phosphor-icons/react'
+import { Mail, Check } from 'lucide-react'
 
 export function EmailSignup() {
   const [email, setEmail] = useState('')

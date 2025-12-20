@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, ExternalLink } from '@phosphor-icons/react'
+import { Copy, Check, ExternalLink } from 'lucide-react'
 
 interface CodeExample {
   id: string

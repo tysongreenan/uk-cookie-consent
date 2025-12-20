@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { X, Sparkles, Zap, Gift, ArrowRight } from '@phosphor-icons/react'
+import { X, Sparkles, Zap, Gift, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useAnnouncement } from '@/lib/announcement-context'
 

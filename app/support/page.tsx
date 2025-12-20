@@ -1,10 +1,11 @@
+
 import { Metadata } from 'next'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Mail, Code, HelpCircle, ArrowRight } from '@phosphor-icons/react'
+import { Mail, Code, HelpCircle, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Support - Cookie Banner Generator',

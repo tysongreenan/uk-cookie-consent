@@ -34,7 +34,7 @@ import {
   XCircle,
   Copy,
   Link as LinkIcon
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { InviteMemberModal } from './invite-member-modal'
 

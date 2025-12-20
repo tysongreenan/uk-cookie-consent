@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calculator, DollarSign, TrendingUp, AlertTriangle, CheckCircle } from '@phosphor-icons/react'
+import { Calculator, DollarSign, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
 
 interface ROICalculatorProps {
   industry?: 'ecommerce' | 'healthcare' | 'saas' | 'finance' | 'education'

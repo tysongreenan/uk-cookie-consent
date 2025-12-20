@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronRight, Home } from '@phosphor-icons/react'
+import { ChevronRight, Home } from 'lucide-react'
 
 interface BreadcrumbItem {
   label: string

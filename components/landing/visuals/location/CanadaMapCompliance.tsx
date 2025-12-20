@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MapPin, Shield, AlertTriangle, CheckCircle, Globe } from '@phosphor-icons/react'
+import { MapPin, Shield, AlertTriangle, CheckCircle, Globe } from 'lucide-react'
 
 interface Province {
   id: string

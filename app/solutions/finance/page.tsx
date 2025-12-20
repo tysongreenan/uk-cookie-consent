@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { DollarSign, Shield, Lock, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, CreditCard, TrendingUp } from '@phosphor-icons/react'
+import { DollarSign, Shield, Lock, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, CreditCard, TrendingUp } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Financial Cookie Consent | Banking GDPR Compliance Solution 2025',

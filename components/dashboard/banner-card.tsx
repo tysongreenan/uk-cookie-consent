@@ -12,7 +12,7 @@ import {
   ExternalLink,
   Eye,
   Settings
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Sparkles, Zap, Star } from '@phosphor-icons/react'
+import { Sparkles, Zap, Star } from 'lucide-react'
 
 interface NewBadgeProps {
   children?: React.ReactNode

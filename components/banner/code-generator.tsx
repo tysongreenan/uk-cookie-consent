@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Copy, Download, RefreshCw, Globe } from '@phosphor-icons/react'
+import { Copy, Download, RefreshCw, Globe } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { BannerConfig } from '@/types'
 import { 

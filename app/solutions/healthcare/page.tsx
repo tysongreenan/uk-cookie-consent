@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Heart, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, Stethoscope, FileText } from '@phosphor-icons/react'
+import { Heart, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, Stethoscope, FileText } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Healthcare Cookie Consent | HIPAA GDPR Compliance Solution 2025',

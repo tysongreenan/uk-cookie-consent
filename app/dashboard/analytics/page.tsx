@@ -31,7 +31,7 @@ import {
   ArrowUpRight,
   Settings,
   Copy
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'

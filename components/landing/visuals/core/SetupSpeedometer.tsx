@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Clock, Zap, CheckCircle, XCircle } from '@phosphor-icons/react'
+import { Clock, Zap, CheckCircle, XCircle } from 'lucide-react'
 
 export function SetupSpeedometer() {
   const [isAnimating, setIsAnimating] = useState(false)

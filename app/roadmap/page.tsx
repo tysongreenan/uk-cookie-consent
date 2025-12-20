@@ -28,7 +28,7 @@ import {
   Search,
   X,
   ExternalLink
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 
 // This will be populated from the API
 const iconMap = {

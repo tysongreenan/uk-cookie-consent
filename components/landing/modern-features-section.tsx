@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { Shield, CheckCircle, FileText, Globe, Zap, Repeat, Palette } from '@phosphor-icons/react'
+import { Shield, CheckCircle, FileText, Globe, Zap, Repeat, Palette } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 
 interface Feature {

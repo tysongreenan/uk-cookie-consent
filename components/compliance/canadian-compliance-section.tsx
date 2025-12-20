@@ -1,6 +1,8 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, Shield, Globe, Gear } from '@phosphor-icons/react'
+import { CheckCircle, Shield, Globe, Settings } from 'lucide-react'
 import { GranularControlsDemo } from './granular-controls-demo'
 import { ConsentWithdrawalDemo } from './consent-withdrawal-demo'
 import { BilingualDemo } from './bilingual-demo'

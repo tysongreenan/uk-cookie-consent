@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Code, Zap, Users, CheckCircle, ExternalLink, Download, Settings, Smartphone } from '@phosphor-icons/react'
+import { Code, Zap, Users, CheckCircle, ExternalLink, Download, Settings, Smartphone } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Wix Cookie Consent Integration | Velo Custom Code Guide 2025',

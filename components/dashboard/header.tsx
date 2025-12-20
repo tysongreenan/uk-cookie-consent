@@ -13,7 +13,7 @@ import {
   LogOut,
   ChevronDown as ChevronDown,
   UserPlus
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   DropdownMenu,

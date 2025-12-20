@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Envelope as Mail, Lock, User, ArrowRight, Shield, CheckCircle, CircleNotch as CircleNotch as Loader2, Check } from '@phosphor-icons/react'
+import { Mail, Lock, User, ArrowRight, Shield, CheckCircle, Loader2, Check } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
@@ -230,7 +230,7 @@ function SignUpContent() {
               disabled={isLoading || isGoogleLoading}
             >
               {isGoogleLoading ? (
-                <CircleNotch as Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <div className="flex items-center justify-center gap-3">
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -379,7 +379,7 @@ function SignUpContent() {
                 disabled={isLoading || isGoogleLoading || !agreeToTerms}
               >
                 {isLoading ? (
-                  <CircleNotch as Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <div className="flex items-center gap-2">
                     <span>Create account</span>
@@ -404,7 +404,7 @@ function SignUpContent() {
 
 export default function SignUpPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center"><CircleNotch as Loader2 className="w-8 h-8 animate-spin text-gray-400" /></div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-gray-400" /></div>}>
       <SignUpContent />
     </Suspense>
   )

@@ -1,5 +1,7 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, WarningCircle, Info } from '@phosphor-icons/react'
+import { CheckCircle, AlertCircle, Info } from 'lucide-react'
 
 export function BlogRecap() {
   return (
@@ -33,7 +35,7 @@ export function BlogRecap() {
           </div>
 
           <div className="flex items-start gap-3">
-            <WarningCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-semibold text-sm">Quebec Law 25</h4>
               <p className="text-xs text-muted-foreground">

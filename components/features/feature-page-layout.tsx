@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactNode } from 'react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
@@ -10,7 +12,7 @@ import { ModernHero, ModernHeroProps } from '@/components/landing/modern-hero'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowRight } from '@phosphor-icons/react'
+import { ArrowRight } from 'lucide-react'
 import { getAuthor } from '@/lib/authors'
 
 interface FeaturePageLayoutProps {

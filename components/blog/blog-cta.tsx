@@ -1,6 +1,8 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight, Sparkle } from '@phosphor-icons/react'
+import { ArrowRight, Sparkle } from 'lucide-react'
 import Link from 'next/link'
 
 export function BlogCTA() {

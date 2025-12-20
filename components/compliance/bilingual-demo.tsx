@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Globe } from '@phosphor-icons/react'
+import { Globe } from 'lucide-react'
 
 export function BilingualDemo() {
   const [language, setLanguage] = useState<'en' | 'fr'>('en')

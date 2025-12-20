@@ -1,6 +1,8 @@
+'use client'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check } from '@phosphor-icons/react'
+import { Check } from 'lucide-react'
 
 const plans = [
   {

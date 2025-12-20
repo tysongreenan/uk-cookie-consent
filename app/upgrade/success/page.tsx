@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, BarChart3, Users, Palette, Upload, ArrowRight } from '@phosphor-icons/react'
+import { CheckCircle, BarChart3, Users, Palette, Upload, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'

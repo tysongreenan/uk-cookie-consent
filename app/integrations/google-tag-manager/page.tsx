@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Code, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, Download, ExternalLink, BarChart3, Shield } from '@phosphor-icons/react'
+import { Code, CheckCircle, AlertTriangle, FileText, Globe, Users, Zap, Clock, Download, ExternalLink, BarChart3, Shield } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Google Tag Manager Cookie Consent | Consent Mode v2 Integration 2025',

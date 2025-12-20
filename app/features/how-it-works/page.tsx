@@ -1,9 +1,10 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { StructuredData } from '@/components/seo/structured-data'
 import { FeaturePageLayout } from '@/components/features/feature-page-layout'
 import { ModernFeaturesSection, VerificationSkeleton } from '@/components/landing/modern-features-section'
-import { CheckCircle } from '@phosphor-icons/react'
+import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'How Do I Know My Cookie Banner Is Working? | Verification Guide',

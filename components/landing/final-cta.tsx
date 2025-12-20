@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowRight, Clock } from '@phosphor-icons/react'
+import { ArrowRight, Clock } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 

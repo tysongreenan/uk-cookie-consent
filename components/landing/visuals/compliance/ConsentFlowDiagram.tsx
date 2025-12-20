@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, XCircle, ArrowRight, AlertTriangle } from '@phosphor-icons/react'
+import { CheckCircle, XCircle, ArrowRight, AlertTriangle } from 'lucide-react'
 
 interface FlowStep {
   id: string

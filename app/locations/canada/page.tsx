@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { CanadianComplianceSection } from '@/components/compliance/canadian-compliance-section'
-import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale } from '@phosphor-icons/react'
+import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale } from 'lucide-react'
 import { CanadaMapCompliance } from '@/components/landing/visuals/location/CanadaMapCompliance'
 import { BilingualBannerToggle } from '@/components/landing/visuals/compliance/BilingualBannerToggle'
 import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'

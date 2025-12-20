@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Eye, EyeOff } from '@phosphor-icons/react'
+import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
 
 export function BeforeAfterSlider() {
   const [sliderPosition, setSliderPosition] = useState(50)

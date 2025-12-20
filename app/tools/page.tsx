@@ -1,8 +1,9 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Search, Shield, FileText, Globe, Zap, CheckCircle } from '@phosphor-icons/react'
+import { Search, Shield, FileText, Globe, Zap, CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Cookie Consent Tools | Free Compliance Checker & Scanner',

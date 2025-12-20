@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +18,7 @@ import {
   ExternalLink,
   Copy,
   Play
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2025',
