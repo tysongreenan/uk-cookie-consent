@@ -35,25 +35,25 @@ export function Header() {
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
               href="/pricing"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-foreground text-foreground/60"
             >
               Pricing
             </Link>
             <Link
               href="/integrations"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-foreground text-foreground/60"
             >
               Integrations
             </Link>
             <Link
               href="/compliance"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-foreground text-foreground/60"
             >
               Compliance
             </Link>
             <Link
               href="/support"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-foreground text-foreground/60"
             >
               Support
             </Link>

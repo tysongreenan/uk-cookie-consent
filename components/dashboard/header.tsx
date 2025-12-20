@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { 
-  Bell, 
-  Moon, 
-  Sun, 
-  User, 
-  Settings, 
-  LogOut, 
-  ChevronDown,
+import {
+  Bell,
+  Moon,
+  Sun,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown as ChevronDown,
   UserPlus
 } from 'lucide-react'
 import { useTheme } from 'next-themes'

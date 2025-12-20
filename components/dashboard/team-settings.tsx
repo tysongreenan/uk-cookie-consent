@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 // Removed Avatar import - using simple div instead
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { 
   Dialog,
@@ -20,14 +20,14 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { 
-  Users, 
-  UserPlus, 
-  MoreVertical, 
-  Crown, 
-  Shield, 
-  Edit, 
-  Eye, 
+import {
+  Users,
+  UserPlus,
+  MoreVertical,
+  Crown,
+  Shield,
+  Edit,
+  Eye,
   Trash2,
   Clock,
   CheckCircle,

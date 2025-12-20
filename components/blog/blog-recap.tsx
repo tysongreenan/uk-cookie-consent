@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, AlertTriangle, Info } from 'lucide-react'
+import { CheckCircle, WarningCircle, Info } from 'lucide-react'
 
 export function BlogRecap() {
   return (
@@ -21,7 +21,7 @@ export function BlogRecap() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3">
             <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
             <div>
@@ -31,9 +31,9 @@ export function BlogRecap() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <WarningCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-semibold text-sm">Quebec Law 25</h4>
               <p className="text-xs text-muted-foreground">

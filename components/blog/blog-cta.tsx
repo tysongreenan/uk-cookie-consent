@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkle } from 'lucide-react'
 import Link from 'next/link'
 
 export function BlogCTA() {
@@ -8,7 +8,7 @@ export function BlogCTA() {
     <Card className="border-2 border-border bg-muted/30">
       <CardContent className="p-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-foreground" />
+          <Sparkle className="h-5 w-5 text-foreground" />
           <span className="text-sm font-semibold text-foreground uppercase tracking-wide">
             Start Building Today
           </span>

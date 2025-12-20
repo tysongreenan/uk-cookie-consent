@@ -77,7 +77,7 @@ export function NewBadge({
     return (
       <motion.div className="relative">
         <div className={`${baseClasses} !bg-gradient-to-r !from-yellow-500 !to-orange-600 !text-white shadow-lg`} style={{background: 'linear-gradient(to right, rgb(234 179 8), rgb(234 88 12))'}}>
-          <Star className="w-3 h-3 mr-1" />
+          <Star className="w-3 h-3 mr-1" fill="currentColor" />
           {children}
         </div>
         <motion.div
@@ -92,7 +92,7 @@ export function NewBadge({
             ease: "easeInOut"
           }}
         >
-          <Star className="w-2 h-2 text-yellow-300" />
+          <Star className="w-2 h-2 text-yellow-300" fill="currentColor" />
         </motion.div>
       </motion.div>
     )

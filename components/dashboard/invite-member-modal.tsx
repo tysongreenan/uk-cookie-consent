@@ -16,12 +16,12 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Copy, 
-  CheckCircle, 
-  XCircle, 
-  Shield, 
-  Edit, 
+import {
+  Copy,
+  CheckCircle,
+  XCircle,
+  Shield,
+  Edit,
   Eye,
   Send,
   Link as LinkIcon

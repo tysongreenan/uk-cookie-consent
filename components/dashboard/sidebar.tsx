@@ -3,16 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { 
-  LayoutDashboard, 
-  Palette, 
-  FileText, 
-  Settings, 
-  BarChart3, 
-  Users, 
+import {
+  LayoutDashboard,
+  Palette,
+  FileText,
+  Settings,
+  BarChart3,
+  Users,
   HelpCircle,
-  ChevronDown,
-  ChevronRight,
+  ChevronDown as ChevronDown,
+  ChevronRight as ChevronRight,
   Shield,
   Code,
   Globe,

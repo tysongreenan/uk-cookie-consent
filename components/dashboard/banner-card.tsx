@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Copy, 
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Copy,
   ExternalLink,
   Eye,
   Settings

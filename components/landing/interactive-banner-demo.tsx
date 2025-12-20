@@ -352,7 +352,7 @@ const COMMON_SCRIPTS = {
     'Adobe Experience Platform',
     'Salesforce Marketing Cloud',
     'HubSpot Tracking',
-    'Mailchimp Tracking',
+    'EnvelopeSimple as Mailchimp Tracking',
     'Klaviyo Tracking',
     'Intercom',
     'Zendesk Chat',

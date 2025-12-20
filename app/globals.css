@@ -176,72 +176,92 @@
 
 @layer base {
   :root {
-    /* Minimal Techy Color Palette - Beige/White/Black */
+    /* Lyra Design System - Cyan/Zinc Palette */
     --background: 0 0% 100%; /* Pure white #FFFFFF */
-    --foreground: 0 0% 10%; /* Minimal black #1A1A1A */
-    
-    /* Primary - Brand teal (#0E768C) - WCAG AA compliant with white text (5.26:1 contrast) */
-    --primary: 191 82% 30%; /* #0E768C - vibrant teal */
+    --foreground: 240 10% 3.9%; /* Near black with slight cool tone */
+
+    /* Primary - Cyan theme (Lyra) */
+    --primary: 189 94% 43%; /* Vibrant cyan #06B6D4 */
     --primary-foreground: 0 0% 100%; /* White text for maximum contrast */
-    
-    /* Primary hover - Darker brand teal (#2D5660) - WCAG AA compliant (8.04:1 contrast) */
-    --primary-hover: 191 36% 28%; /* #2D5660 - darker teal for hover states */
-    
-    /* Secondary - Subtle beige */
-    --secondary: 45 20% 96%; /* Warm beige #F5F5F0 */
-    --secondary-foreground: 0 0% 10%;
-    
+    --primary-hover: 189 94% 38%; /* Darker cyan for hover #0891B2 */
+
+    /* Secondary - Zinc-based */
+    --secondary: 240 4.8% 95.9%; /* Light zinc */
+    --secondary-foreground: 240 5.9% 10%;
+
     /* Card */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    
+    --card-foreground: 240 10% 3.9%;
+
     /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    
-    /* Muted - Light beige/gray */
-    --muted: 45 15% 95%; /* Very light beige #FAFAF5 */
-    --muted-foreground: 0 0% 42%; /* Medium gray #6B6B6B */
-    
-    /* Accent - Subtle beige */
-    --accent: 45 20% 96%;
-    --accent-foreground: 0 0% 10%;
-    
-    /* Destructive - Minimal red (kept for errors) */
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 0 0% 100%;
-    
-    /* Borders - Very light beige/gray */
-    --border: 45 10% 90%; /* Light beige #E5E5E0 */
-    --input: 45 10% 90%;
-    --ring: 0 0% 10%; /* Black for focus rings */
-    
-    --radius: 0.375rem; /* Slightly smaller, more techy */
+    --popover-foreground: 240 10% 3.9%;
+
+    /* Muted - Zinc-based */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    /* Accent - Zinc with subtle variation */
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Borders - Zinc-based */
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 189 94% 43%; /* Cyan ring for focus states */
+
+    /* Lyra-specific - Chart colors */
+    --chart-1: 189 94% 43%; /* Cyan */
+    --chart-2: 173 58% 39%; /* Teal */
+    --chart-3: 197 37% 24%; /* Dark cyan */
+    --chart-4: 43 74% 66%; /* Gold */
+    --chart-5: 27 87% 67%; /* Orange */
+
+    --radius: 0.375rem; /* Small radius (Lyra preset) */
   }
 
   .dark {
-    /* Dark mode - Inverted minimal palette */
-    --background: 0 0% 10%; /* Dark background */
+    /* Lyra Dark Mode - Zinc/Cyan */
+    --background: 240 10% 3.9%; /* Dark zinc background */
     --foreground: 0 0% 98%; /* Light text */
-    --card: 0 0% 12%;
+
+    --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 12%;
+
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    /* Dark mode primary - Use lighter brand color for dark backgrounds */
-    --primary: 191 82% 45%; /* Lighter teal variant for dark mode visibility */
-    --primary-foreground: 0 0% 100%; /* White text */
-    --primary-hover: 191 82% 40%; /* Slightly darker for hover in dark mode */
-    --secondary: 0 0% 15%;
+
+    /* Primary - Brighter cyan for dark mode */
+    --primary: 189 94% 43%;
+    --primary-foreground: 240 5.9% 10%;
+    --primary-hover: 189 94% 48%; /* Lighter cyan for hover in dark mode */
+
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 15%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 65% 50%;
+
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 189 94% 43%;
+
+    /* Dark mode chart colors */
+    --chart-1: 189 94% 43%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
   }
 }
 
@@ -296,7 +316,7 @@
   .btn-cta:hover {
     background-color: hsl(var(--foreground) / 0.9);
   }
-  
+
   /* Minimal Success Button - Subtle beige */
   .btn-success {
     background-color: hsl(var(--muted));
@@ -305,6 +325,15 @@
   }
   .btn-success:hover {
     background-color: hsl(var(--muted) / 0.8);
+  }
+
+  /* Hover state text utilities */
+  .hover-text-foreground:hover {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .hover-text-primary:hover {
+    color: hsl(var(--primary)) !important;
   }
 }
 
