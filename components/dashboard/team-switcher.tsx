@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { ChevronDown, Users, Plus, Settings } from 'lucide-react'
+import { ChevronDown, Users, Plus, Settings } from '@phosphor-icons/react'
 import { toast } from 'react-hot-toast'
 import { Team } from '@/types'
 

@@ -25,7 +25,7 @@ import {
   Eye,
   Send,
   Link as LinkIcon
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { toast } from 'react-hot-toast'
 import { TeamRole } from '@/types'
 

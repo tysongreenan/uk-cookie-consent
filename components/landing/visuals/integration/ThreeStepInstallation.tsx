@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, ArrowRight, Code, Copy, Eye, Settings } from 'lucide-react'
+import { CheckCircle, ArrowRight, Code, Copy, Eye, Settings } from '@phosphor-icons/react'
 
 interface InstallationStep {
   id: number

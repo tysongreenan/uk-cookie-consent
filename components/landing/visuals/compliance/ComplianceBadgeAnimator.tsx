@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { Shield, CheckCircle, AlertTriangle, XCircle } from '@phosphor-icons/react'
 
 interface ComplianceItem {
   id: string

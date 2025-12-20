@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, WarningCircle, Info } from 'lucide-react'
+import { CheckCircle, WarningCircle, Info } from '@phosphor-icons/react'
 
 export function BlogRecap() {
   return (

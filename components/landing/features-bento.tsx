@@ -1,6 +1,6 @@
 'use client'
 
-import { Palette, Shield, Globe, Zap, Clock, DollarSign, Code, Layers, Smartphone } from 'lucide-react'
+import { Palette, Shield, Globe, Zap, Clock, DollarSign, Code, Layers, Smartphone } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 

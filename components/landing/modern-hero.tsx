@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { ArrowRight, Calendar } from 'lucide-react'
+import { ArrowRight, Calendar } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export interface ModernHeroProps {

@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {

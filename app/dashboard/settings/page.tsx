@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowLeft, User, Mail, Trash2, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, AlertTriangle } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 

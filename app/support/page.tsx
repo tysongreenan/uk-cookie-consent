@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Mail, Code, HelpCircle, ArrowRight } from 'lucide-react'
+import { Mail, Code, HelpCircle, ArrowRight } from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'Support - Cookie Banner Generator',

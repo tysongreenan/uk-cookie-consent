@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
-import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
+import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2025',

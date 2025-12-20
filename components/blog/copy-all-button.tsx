@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check } from '@phosphor-icons/react'
 import { toast } from 'react-hot-toast'
 
 interface CopyAllButtonProps {

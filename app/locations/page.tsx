@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { MapPin, Globe, Shield, FileText } from 'lucide-react'
+import { MapPin, Globe, Shield, FileText } from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'Cookie Consent by Location | GDPR, PIPEDA, CCPA Compliance',

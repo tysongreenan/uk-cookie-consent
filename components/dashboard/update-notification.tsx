@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { X, Sparkles, CheckCircle, Zap, Shield, Settings, Star, ArrowRight, Gift } from 'lucide-react'
+import { X, Sparkles, CheckCircle, Zap, Shield, Settings, Star, ArrowRight, Gift } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
 

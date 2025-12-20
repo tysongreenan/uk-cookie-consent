@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Search, AlertTriangle, CheckCircle, Download, ExternalLink } from 'lucide-react'
+import { CircleNotch as Loader2, Search, AlertTriangle, CheckCircle, Download, ExternalLink } from '@phosphor-icons/react'
 
 interface CookieData {
   name: string
@@ -226,7 +226,7 @@ export function CookieScanner() {
             >
               {isScanning ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <CircleNotch as Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Scanning...
                 </>
               ) : (

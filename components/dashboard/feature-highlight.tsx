@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { NewBadge } from '@/components/ui/new-badge'
-import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react'
+import { ArrowRight, ExternalLink, Sparkles } from '@phosphor-icons/react'
 
 interface FeatureHighlightProps {
   title: string

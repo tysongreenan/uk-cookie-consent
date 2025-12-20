@@ -15,7 +15,7 @@ import {
   ExternalLink,
   Copy,
   Check
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { toast } from 'react-hot-toast'
 
 

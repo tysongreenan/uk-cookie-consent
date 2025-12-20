@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, XCircle, Eye, EyeOff } from 'lucide-react'
+import { CheckCircle, XCircle, Eye, EyeOff } from '@phosphor-icons/react'
 
 interface TextExample {
   id: string

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Globe, Languages } from 'lucide-react'
+import { Globe, Languages } from '@phosphor-icons/react'
 
 interface BilingualBannerToggleProps {
   className?: string

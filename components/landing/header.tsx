@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSession, signIn } from 'next-auth/react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X } from '@phosphor-icons/react'
 import { useAnnouncement } from '@/lib/announcement-context'
 
 export function Header() {

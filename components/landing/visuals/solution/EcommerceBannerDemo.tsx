@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingCart, Package, TrendingUp, Shield, Eye, EyeOff } from 'lucide-react'
+import { ShoppingCart, Package, TrendingUp, Shield, Eye, EyeOff } from '@phosphor-icons/react'
 
 export function EcommerceBannerDemo() {
   const [showBanner, setShowBanner] = useState(false)

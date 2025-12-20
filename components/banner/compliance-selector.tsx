@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Shield, Globe, Building, Info } from 'lucide-react'
+import { Check, Shield, Globe, Building, Info } from '@phosphor-icons/react'
 import { ComplianceFramework } from '@/types'
 
 interface ComplianceSelectorProps {

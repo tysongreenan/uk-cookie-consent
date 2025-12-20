@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, XCircle, Star, Zap, Shield, DollarSign } from 'lucide-react'
+import { CheckCircle, XCircle, Star, Zap, Shield, DollarSign } from '@phosphor-icons/react'
 
 interface ComparisonFeature {
   id: string

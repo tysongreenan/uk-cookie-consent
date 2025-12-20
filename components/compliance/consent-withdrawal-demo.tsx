@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Settings, ArrowRight } from 'lucide-react'
+import { Settings, ArrowRight } from '@phosphor-icons/react'
 
 export function ConsentWithdrawalDemo() {
   const [showPreferences, setShowPreferences] = useState(false)

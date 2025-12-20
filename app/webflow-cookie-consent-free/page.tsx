@@ -17,7 +17,7 @@ import {
   ExternalLink,
   Copy,
   Play
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2025',

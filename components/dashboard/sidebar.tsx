@@ -17,7 +17,7 @@ import {
   Code,
   Globe,
   Target
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NewBadge } from '@/components/ui/new-badge'
 import { WorkspaceSwitcher } from '@/components/dashboard/workspace-switcher'

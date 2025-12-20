@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from '@phosphor-icons/react'
 
 export function Footer() {
   return (

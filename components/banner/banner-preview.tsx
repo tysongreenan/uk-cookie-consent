@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { X } from 'lucide-react'
+import { X } from '@phosphor-icons/react'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
 
 interface BannerConfig {

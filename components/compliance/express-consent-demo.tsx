@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Shield, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle } from '@phosphor-icons/react'
 
 export function ExpressConsentDemo() {
   const [consentGiven, setConsentGiven] = useState(false)

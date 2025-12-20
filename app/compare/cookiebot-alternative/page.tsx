@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, XCircle, AlertTriangle, DollarSign, Zap, Shield, Users, Globe } from 'lucide-react'
+import { CheckCircle, XCircle, AlertTriangle, DollarSign, Zap, Shield, Users, Globe } from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'Cookiebot Alternative | Free vs Paid Cookie Consent Solutions 2025',

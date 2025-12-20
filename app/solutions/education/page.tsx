@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { GraduationCap, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, BookOpen, Laptop, UserCheck } from 'lucide-react'
+import { GraduationCap, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, BookOpen, Laptop, UserCheck } from '@phosphor-icons/react'
 
 export const metadata: Metadata = {
   title: 'Education Cookie Consent | FERPA COPPA Compliance Solution 2025',

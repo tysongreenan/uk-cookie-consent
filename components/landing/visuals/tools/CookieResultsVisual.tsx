@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, AlertTriangle, CheckCircle, Cookie, Eye, Zap, TrendingUp, Users, Clock } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle, Cookie, Eye, Zap, TrendingUp, Users, Clock } from '@phosphor-icons/react'
 
 interface CookieCategory {
   name: string

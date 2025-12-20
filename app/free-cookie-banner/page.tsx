@@ -17,7 +17,7 @@ import {
   Sparkles,
   Heart,
   AlertTriangle
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
