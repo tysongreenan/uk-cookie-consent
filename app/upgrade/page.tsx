@@ -11,26 +11,44 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 
 export default function UpgradePage() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleUpgrade = async () => {
+    // Check if user is logged in
+    if (!session?.user?.id) {
+      setError('Please sign in to upgrade')
+      window.location.href = '/auth/signin?callbackUrl=/upgrade'
+      return
+    }
+
     setIsLoading(true)
+    setError('')
+
     try {
       const response = await fetch('/api/upgrade/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: session?.user?.id })
+        body: JSON.stringify({ userId: session.user.id })
       })
-      
+
       const data = await response.json()
-      
+
+      if (data.error) {
+        setError(data.error)
+        console.error('Checkout error:', data.error)
+        return
+      }
+
       if (data.url) {
         window.location.href = data.url
       } else {
+        setError('Failed to create checkout session. Please try again.')
         console.error('No checkout URL received')
       }
     } catch (error) {
+      setError('An error occurred. Please try again.')
       console.error('Error creating checkout session:', error)
     } finally {
       setIsLoading(false)
@@ -157,6 +175,11 @@ export default function UpgradePage() {
                     </>
                   )}
                 </Button>
+                {error && (
+                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-600 text-center">{error}</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
