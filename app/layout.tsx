@@ -73,12 +73,24 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-        
+
         {/* Preconnect to Google Fonts for faster loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        
+
+        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
+        {/* 🍁 Cookie Consent Banner - HOSTED SCRIPT (cookie-banner.ca)  🍁 */}
+        {/* 🍁 Place this code in your <head> section                    🍁 */}
+        {/* 🍁 IMPORTANT: Place as high as possible to block trackers    🍁 */}
+        {/* 🍁 Updates automatically - no need to change this code!      🍁 */}
+        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
+
+        <script src="https://www.cookie-banner.ca/api/v1/banner.js?id=eb2e7ccc-3c74-4ca4-86ca-2bf2cd1fc6b8"></script>
+
+        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
+        {/* 🍁 End HOSTED SCRIPT - Powered by cookie-banner.ca           🍁 */}
+        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
+
         {/* Deferred Google Tag Manager - loads after page is interactive */}
         <script
           dangerouslySetInnerHTML={{

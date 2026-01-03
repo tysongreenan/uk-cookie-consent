@@ -73,10 +73,48 @@ export default function UpgradePage() {
     'Community support'
   ]
 
+  // Show sign-up prompt for non-logged-in users
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="pt-20 pb-12 px-4 max-w-2xl mx-auto text-center">
+          <Crown className="h-16 w-16 mx-auto mb-6 text-primary" />
+          <h1 className="text-4xl font-bold mb-4">Upgrade to Pro</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            Sign up for a free account to unlock Pro features
+          </p>
+          <div className="space-y-4">
+            <Button size="lg" className="w-full max-w-md" asChild>
+              <Link href="/auth/signup?callbackUrl=/upgrade">
+                Create Free Account & Upgrade
+              </Link>
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link href="/auth/signin?callbackUrl=/upgrade" className="text-primary hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-20 pb-12 px-4 max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
