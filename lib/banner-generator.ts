@@ -1242,34 +1242,37 @@ function init() {
   var existingConsent = getConsent();
   
   // Set up banner button handlers ALWAYS (needed even when consent exists, for when user reopens banner)
-  // Set up banner button handlers directly
-  if (acceptBtn) {
-    acceptBtn.onclick = function() {
+  // Use addEventListener to prevent handlers from being overwritten
+  if (acceptBtn && !acceptBtn.dataset.handlerAttached) {
+    acceptBtn.addEventListener('click', function() {
       saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
       initGA4(); // Initialize GA4
       trackConsentEvent('accept'); // Track consent event
       banner.style.display = 'none';
-    };
+    });
+    acceptBtn.dataset.handlerAttached = 'true';
   }
-  
-  if (rejectBtn) {
-    rejectBtn.onclick = function() {
+
+  if (rejectBtn && !rejectBtn.dataset.handlerAttached) {
+    rejectBtn.addEventListener('click', function() {
       saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
       trackConsentEvent('reject'); // Track consent event (but don't init GA4)
       banner.style.display = 'none';
-    };
+    });
+    rejectBtn.dataset.handlerAttached = 'true';
   }
-  
-  if (closeBtn) {
-    closeBtn.onclick = function() {
+
+  if (closeBtn && !closeBtn.dataset.handlerAttached) {
+    closeBtn.addEventListener('click', function() {
       banner.style.display = 'none';
       trackConsentEvent('dismiss');
-    };
+    });
+    closeBtn.dataset.handlerAttached = 'true';
   }
-  
+
   ${config.behavior.showPreferences ? `
-  if (prefsBtn) {
-    prefsBtn.onclick = function() {
+  if (prefsBtn && !prefsBtn.dataset.handlerAttached) {
+    prefsBtn.addEventListener('click', function() {
       var modal = document.getElementById('cookie-preferences-modal');
       if (modal) {
         modal.style.display = 'flex';
@@ -1281,7 +1284,8 @@ function init() {
           loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
         }
       }
-    };
+    });
+    prefsBtn.dataset.handlerAttached = 'true';
   }
   ` : ''}
   
@@ -1290,55 +1294,59 @@ function init() {
   var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
   var acceptAllBtn = document.getElementById('cookie-accept-all-btn');
   var confirmChoicesBtn = document.getElementById('cookie-confirm-choices-btn');
-  
-  if (modalCloseBtn) {
-    modalCloseBtn.onclick = function() {
+
+  if (modalCloseBtn && !modalCloseBtn.dataset.handlerAttached) {
+    modalCloseBtn.addEventListener('click', function() {
       modal.style.display = 'none';
-    };
+    });
+    modalCloseBtn.dataset.handlerAttached = 'true';
   }
-  
-  if (acceptAllBtn) {
-    acceptAllBtn.onclick = function() {
+
+  if (acceptAllBtn && !acceptAllBtn.dataset.handlerAttached) {
+    acceptAllBtn.addEventListener('click', function() {
       var consent = { essential: true, functionality: true, analytics: true, marketing: true };
       saveConsent(consent);
-      
+
       // Update modal toggles to show all ON before closing
       loadConsentIntoModal(consent);
-      
+
       banner.style.display = 'none';
       modal.style.display = 'none';
-    };
+    });
+    acceptAllBtn.dataset.handlerAttached = 'true';
   }
-  
-  if (confirmChoicesBtn) {
-    confirmChoicesBtn.onclick = function() {
+
+  if (confirmChoicesBtn && !confirmChoicesBtn.dataset.handlerAttached) {
+    confirmChoicesBtn.addEventListener('click', function() {
       var func = document.getElementById('cookie-func-toggle-modal');
       var performance = document.getElementById('cookie-performance-toggle-modal');
       var targeting = document.getElementById('cookie-targeting-toggle-modal');
       var social = document.getElementById('cookie-social-toggle-modal');
-      
+
       var consent = {
         essential: true,
         functionality: func ? func.checked : false,
         analytics: performance ? performance.checked : false,
         marketing: (targeting ? targeting.checked : false) || (social ? social.checked : false)
       };
-      
+
       console.log('User confirmed cookie preferences:', consent);
       saveConsent(consent);
-      
+
       banner.style.display = 'none';
       modal.style.display = 'none';
-    };
+    });
+    confirmChoicesBtn.dataset.handlerAttached = 'true';
   }
-  
+
   // Close modal when clicking outside
-  if (modal) {
-    modal.onclick = function(e) {
+  if (modal && !modal.dataset.handlerAttached) {
+    modal.addEventListener('click', function(e) {
       if (e.target === modal) {
         modal.style.display = 'none';
       }
-    };
+    });
+    modal.dataset.handlerAttached = 'true';
   }
   
   // Make toggle switches functional
