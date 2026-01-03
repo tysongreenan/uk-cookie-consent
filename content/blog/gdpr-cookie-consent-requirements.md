@@ -1,11 +1,19 @@
 ---
-title: "What Are GDPR Cookie Consent Requirements?"
-description: "GDPR requires explicit opt-in consent for cookies in Europe. Websites must block tracking cookies until users actively accept them. Penalties can reach €20 million or 4% of revenue for non-compliance."
+title: "GDPR Cookie Consent Requirements 2025: Complete Compliance Guide"
+description: "GDPR requires explicit opt-in consent for cookies in Europe. Learn the 6 core requirements, avoid €20M fines, and implement compliant cookie banners. Free checklist included."
 date: "2025-01-17"
-updatedDate: "2025-05-01"
+updatedDate: "2025-12-29"
 author: "cookie-banner-team"
-tags: ["GDPR", "Cookie Consent", "Privacy Law", "Europe", "Compliance"]
+tags: ["GDPR", "Cookie Consent", "Privacy Law", "Europe", "Compliance", "GDPR 2025"]
 published: true
+canonical: "/blog/gdpr-cookie-consent-requirements"
+keywords:
+  - "gdpr cookie requirements"
+  - "gdpr cookie consent law"
+  - "what cookies need gdpr consent"
+  - "gdpr cookie banner requirements"
+  - "gdpr compliance checklist"
+  - "gdpr cookie consent 2025"
 ---
 
 # What Are GDPR Cookie Consent Requirements?

@@ -1,11 +1,19 @@
 ---
-title: "What Is Cookie Consent in Canada?"
-description: "Cookie consent in Canada is required under PIPEDA, CASL, and Quebec's Law 25. Websites must obtain explicit opt-in consent before using tracking cookies for analytics or advertising. Penalties can reach $25 million for non-compliance."
+title: "Cookie Consent in Canada 2025: PIPEDA, CASL & Law 25 Complete Guide"
+description: "Complete guide to Canadian cookie consent laws (PIPEDA, CASL, Quebec Law 25). Avoid $25M fines with our step-by-step compliance checklist. Free implementation guide included."
 date: "2025-01-15"
-updatedDate: "2025-05-01"
+updatedDate: "2025-12-29"
 author: "cookie-banner-team"
-tags: ["PIPEDA", "CASL", "Canada", "Privacy Law", "Cookie Consent"]
+tags: ["PIPEDA", "CASL", "Canada", "Privacy Law", "Cookie Consent", "Law 25", "Quebec"]
 published: true
+canonical: "/blog/cookie-consent-canada-guide-2025"
+keywords:
+  - "cookie consent canada"
+  - "pipeda cookie requirements"
+  - "casl cookie consent"
+  - "quebec law 25 cookies"
+  - "canadian privacy law cookies"
+  - "canada cookie banner requirements 2025"
 ---
 
 # What Is Cookie Consent in Canada?

@@ -34,7 +34,7 @@ export default function PricingPage() {
     },
     {
       name: 'Pro',
-      price: '$48.99',
+      price: '$99',
       period: ' one-time',
       description: 'Everything you need, forever',
       features: [
@@ -115,8 +115,8 @@ export default function PricingPage() {
               </div>
               <h3 className="font-semibold mb-2">Save $200+ Per Year</h3>
               <p className="text-sm text-muted-foreground">
-                $48.99 once vs competitors charging $9-19/month. 
-                You save money after just 3-6 months.
+                $99 once vs competitors charging $9-19/month.
+                You save money after just 6-11 months.
               </p>
             </div>
             <div className="text-center">

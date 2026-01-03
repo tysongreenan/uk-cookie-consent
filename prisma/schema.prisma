@@ -61,6 +61,7 @@ model User {
   sentInvitations TeamInvitation[] @relation("InvitedBy")
   ownedTeams Team[] @relation("TeamOwner")
   invitedMembers TeamMember[] @relation("TeamMemberInviter")
+  payments Payment[]
 }
 
 model VerificationToken {
@@ -186,4 +187,23 @@ model TeamInvitation {
 
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   inviter User @relation("InvitedBy", fields: [invitedBy], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                   String   @id @default(cuid())
+  userId               String
+  amount               Int      // Amount in cents
+  currency             String   @default("usd")
+  status               String   // 'succeeded', 'failed', 'refunded'
+  planTier             String   // 'pro', 'enterprise'
+  stripeSessionId      String?  @unique
+  stripePaymentIntentId String? @unique
+  stripeCustomerId     String?
+  createdAt            DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }

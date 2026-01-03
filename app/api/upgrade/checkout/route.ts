@@ -41,18 +41,18 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'CookieBanner Pro - Lifetime Access',
-              description: 'Unlock analytics, team collaboration, custom layouts, and more',
-              images: [`${process.env.NEXT_PUBLIC_BASE_URL}/logos/logo.svg`],
+              name: 'UK Cookie Consent Pro - Lifetime Access',
+              description: 'Analytics dashboard, team collaboration, custom layouts, logo uploads, and priority support - lifetime access with all future updates included',
+              images: [`${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/logo.png`],
             },
-            unit_amount: 4899, // $48.99 in cents
+            unit_amount: 9900, // $99.00 in cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/upgrade`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade`,
       customer_email: session.user.email,
       metadata: {
         userId: session.user.id,
@@ -60,6 +60,10 @@ export async function POST(request: NextRequest) {
         planTier: 'pro'
       },
       allow_promotion_codes: true,
+      billing_address_collection: 'auto',
+      invoice_creation: {
+        enabled: true,
+      },
     })
 
     return NextResponse.json({ url: checkoutSession.url })

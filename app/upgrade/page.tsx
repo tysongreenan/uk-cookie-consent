@@ -70,7 +70,7 @@ export default function UpgradePage() {
           </div>
           <h1 className="text-4xl font-bold mb-4">Upgrade to Pro</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Unlock advanced features and team collaboration for just $48.99
+            Unlock advanced features and team collaboration for just $99
           </p>
           <div className="flex items-center justify-center space-x-4">
             <Badge variant="secondary" className="bg-green-100 text-green-800">
@@ -136,7 +136,7 @@ export default function UpgradePage() {
               </ul>
               <div className="border-t pt-4">
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold">$48.99</div>
+                  <div className="text-3xl font-bold">$99</div>
                   <div className="text-sm text-muted-foreground">One-time payment</div>
                 </div>
                 <Button 
@@ -172,8 +172,8 @@ export default function UpgradePage() {
               </div>
               <h3 className="font-semibold mb-2">Save Money</h3>
               <p className="text-sm text-muted-foreground">
-                $48.99 once vs competitors charging $9-19/month. 
-                You save money after just 3-6 months.
+                $99 once vs competitors charging $9-19/month.
+                You save money after just 6-11 months.
               </p>
             </div>
             <div className="text-center">

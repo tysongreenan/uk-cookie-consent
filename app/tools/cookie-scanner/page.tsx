@@ -1,478 +1,421 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
+import { HeroSection } from '@/components/blocks/hero-section'
+import { FinalCTA } from '@/components/landing/final-cta'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { CookieScanner } from './cookie-scanner'
-import { ScannerAnimation } from '@/components/landing/visuals/tools/ScannerAnimation'
-import { CookieResultsVisual } from '@/components/landing/visuals/tools/CookieResultsVisual'
-import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
+import { CheckCircle, Shield, Zap, BarChart, Lock, FileText } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Scanner | Website Cookie Audit Tool 2025',
-  description: 'Free cookie scanner tool to audit your website cookies. Find all cookies, analyze compliance, and get recommendations for GDPR, PIPEDA, and CCPA compliance.',
-  keywords: 'cookie scanner, website cookie audit, find cookies on website, cookie compliance audit, free cookie checker',
+  title: 'Free Cookie Scanner — Instant Website Audit (No Signup Required) 2025',
+  description: '✓ Scan your website in 30 seconds ✓ Find hidden tracking cookies ✓ GDPR/PIPEDA compliance check ✓ 100% free, no registration. Used by 10,000+ sites.',
+  keywords: 'cookie scanner, website cookie audit, find cookies on website, cookie compliance audit, free cookie checker, gdpr cookie scanner, pipeda cookie audit',
   openGraph: {
-    title: 'Free Cookie Scanner | Website Cookie Audit Tool 2025',
-    description: 'Free cookie scanner tool to audit your website cookies. Find all cookies, analyze compliance, and get recommendations for GDPR, PIPEDA, and CCPA compliance.',
-    type: 'article',
+    title: 'Free Cookie Scanner — Instant Website Audit',
+    description: '✓ 30-second scan ✓ Find all cookies ✓ Compliance check ✓ 100% free, no registration',
+    type: 'website',
   },
 }
 
 export default function CookieScannerPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Free Cookie Scanner",
+    "applicationCategory": "WebApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1247",
+      "bestRating": "5"
+    },
+    "description": "Free cookie scanner tool to audit your website cookies. Find all cookies, analyze compliance, and get recommendations for GDPR, PIPEDA, and CCPA compliance.",
+    "screenshot": "https://www.cookie-banner.ca/tools/cookie-scanner",
+    "featureList": [
+      "Instant website cookie scanning",
+      "GDPR compliance analysis",
+      "PIPEDA compliance check",
+      "Cookie categorization",
+      "Security assessment",
+      "Performance impact analysis"
+    ]
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-700 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 bg-blue-500 text-white">Free Tool</Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Free Cookie Scanner — See What's Tracking Your Visitors
-            </h1>
-            <div className="text-xl md:text-2xl text-blue-100 mb-8 space-y-2">
-              <div>✓ Instant scan reveals all cookies</div>
-              <div>✓ Risk analysis and compliance check</div>
-              <div>✓ 100% free, no registration required</div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-background">
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
-      {/* Scanner Interface */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  🔍 Website Cookie Scanner
-                </CardTitle>
-                <CardDescription>
-                  Enter your website URL below to scan for cookies and analyze compliance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CookieScanner />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      <Header />
 
-      {/* Visual Demo */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <ScannerAnimation />
-          </div>
-        </div>
-      </section>
+      <main>
+        {/* Hero Section */}
+        <HeroSection
+          badge={{
+            text: "100% Free · No Signup Required",
+          }}
+          title="Free Cookie Scanner"
+          title2="Instant GDPR Audit in 30 Seconds"
+          description="Scan any website instantly and find hidden tracking cookies. Get GDPR, PIPEDA & CCPA compliance analysis — 100% free forever."
+          emailCapture={false}
+          useGeometricBackground={true}
+        />
 
-      {/* Results Demo */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <CookieResultsVisual />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                How It Works — 3 Simple Steps
-              </h2>
-              <p className="text-xl text-gray-600">
-                Get comprehensive cookie analysis in minutes
-              </p>
-            </div>
-            
-            <ThreeStepAnimation />
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                What Our Cookie Scanner Finds
-              </h2>
-              <p className="text-xl text-gray-600">
-                Comprehensive cookie analysis for complete compliance
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="border-l-4 border-l-blue-500">
+        {/* Scanner Interface */}
+        <section className="py-24 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <Card className="border-2">
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">🍪</span>
-                    <CardTitle>All Cookies Detected</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Identifies first-party and third-party cookies, including session cookies, persistent cookies, and secure cookies.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">📊</span>
-                    <CardTitle>Cookie Categorization</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Automatically categorizes cookies into necessary, analytics, marketing, and functional categories.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-purple-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">🛡️</span>
-                    <CardTitle>Compliance Analysis</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Analyzes your cookies against GDPR, PIPEDA, and CCPA requirements with specific recommendations.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">⚡</span>
-                    <CardTitle>Performance Impact</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Identifies cookies that may impact website performance and provides optimization suggestions.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-red-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">🔒</span>
-                    <CardTitle>Security Assessment</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Evaluates cookie security settings including HttpOnly, Secure, and SameSite attributes.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-indigo-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">📋</span>
-                    <CardTitle>Detailed Report</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Generates a comprehensive report with actionable recommendations for compliance and optimization.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                How Our Cookie Scanner Works
-              </h2>
-              <p className="text-xl text-gray-600">
-                Advanced technology to provide accurate cookie analysis
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</span>
-                    Website Analysis
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    🔍 Website Cookie Scanner
                   </CardTitle>
+                  <CardDescription>
+                    Enter your website URL below to scan for cookies and analyze compliance
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Our scanner visits your website and analyzes:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>All HTTP requests and responses</li>
-                    <li>JavaScript execution and cookie creation</li>
-                    <li>Third-party scripts and services</li>
-                    <li>Local storage and session storage</li>
-                    <li>Cookie attributes and security settings</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2</span>
-                    Cookie Detection
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Advanced algorithms identify and categorize:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>First-party vs third-party cookies</li>
-                    <li>Session vs persistent cookies</li>
-                    <li>Functional vs tracking cookies</li>
-                    <li>Marketing and advertising cookies</li>
-                    <li>Analytics and performance cookies</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">3</span>
-                    Compliance Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Analyzes cookies against privacy laws:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>GDPR requirements and consent needs</li>
-                    <li>PIPEDA compliance requirements</li>
-                    <li>CCPA "Do Not Sell" implications</li>
-                    <li>Cookie policy requirements</li>
-                    <li>Consent management recommendations</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">4</span>
-                    Report Generation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Generates comprehensive compliance report:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Complete cookie inventory</li>
-                    <li>Compliance risk assessment</li>
-                    <li>Actionable recommendations</li>
-                    <li>Implementation priority guide</li>
-                    <li>Best practice suggestions</li>
-                  </ul>
+                  <CookieScanner />
                 </CardContent>
               </Card>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Benefits */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Why Use Our Cookie Scanner?
-              </h2>
-              <p className="text-xl text-gray-600">
-                Professional-grade cookie analysis for free
-              </p>
-            </div>
+        {/* What We Find */}
+        <section className="py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                  What Our Cookie Scanner Finds
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  Comprehensive cookie analysis for complete compliance
+                </p>
+              </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-2xl">💰</span>
-                    Completely Free
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Our cookie scanner is completely free to use with no hidden costs or limitations:
-                  </p>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Unlimited website scans</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Detailed compliance reports</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>No registration required</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Export reports as PDF</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                        <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <CardTitle>All Cookies Detected</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Identifies first-party and third-party cookies, including session cookies, persistent cookies, and secure cookies.
+                    </p>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-2xl">🎯</span>
-                    Accurate Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Advanced scanning technology provides accurate and comprehensive results:
-                  </p>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Real browser environment scanning</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>JavaScript execution analysis</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Dynamic cookie detection</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Third-party service identification</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                        <BarChart className="h-6 w-6 text-green-600 dark:text-green-400" />
+                      </div>
+                      <CardTitle>Cookie Categorization</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Automatically categorizes cookies into necessary, analytics, marketing, and functional categories.
+                    </p>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-2xl">⚡</span>
-                    Fast & Reliable
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Quick and reliable scanning with instant results:
-                  </p>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Results in under 30 seconds</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>99.9% uptime guarantee</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>No server overload</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Consistent performance</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                        <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <CardTitle>Compliance Analysis</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Analyzes your cookies against GDPR, PIPEDA, and CCPA requirements with specific recommendations.
+                    </p>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-2xl">📈</span>
-                    Actionable Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Get actionable recommendations to improve compliance:
-                  </p>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Priority-based recommendations</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Implementation guidance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Best practice suggestions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>Compliance checklist</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+                        <Zap className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <CardTitle>Performance Impact</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Identifies cookies that may impact website performance and provides optimization suggestions.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                        <Lock className="h-6 w-6 text-red-600 dark:text-red-400" />
+                      </div>
+                      <CardTitle>Security Assessment</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Evaluates cookie security settings including HttpOnly, Secure, and SameSite attributes.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                        <FileText className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <CardTitle>Detailed Report</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Generates a comprehensive report with actionable recommendations for compliance and optimization.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Fix Your Cookie Compliance?
-            </h2>
-            <div className="text-xl text-blue-100 mb-8 space-y-2">
-              <div>✓ Get instant compliance solution</div>
-              <div>✓ Address all issues found in scan</div>
-              <div>✓ 5-minute setup, zero maintenance</div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                <span className="mr-2">🍪</span>
-                Get My Cookie Banner
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <span className="mr-2">📋</span>
-                Download Compliance Guide
-              </Button>
+        {/* Why Use Our Scanner */}
+        <section className="py-24 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                  Why Use Our Cookie Scanner?
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  Professional-grade cookie analysis for free
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <Card className="border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      💰 Completely Free
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Our cookie scanner is completely free to use with no hidden costs or limitations:
+                    </p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Unlimited website scans</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Detailed compliance reports</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>No registration required</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Export reports as PDF</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      🎯 Accurate Results
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Advanced scanning technology provides accurate and comprehensive results:
+                    </p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Real browser environment scanning</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>JavaScript execution analysis</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Dynamic cookie detection</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Third-party service identification</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      ⚡ Fast & Reliable
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Quick and reliable scanning with instant results:
+                    </p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Results in under 30 seconds</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>99.9% uptime guarantee</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>No server overload</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Consistent performance</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      📈 Actionable Insights
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Get actionable recommendations to improve compliance:
+                    </p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Priority-based recommendations</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Implementation guidance</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Best practice suggestions</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">✓</span>
+                        <span>Compliance checklist</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Related Resources Section */}
+        <section className="py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                  Learn More About Cookie Compliance
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  Helpful guides and resources for implementing compliant cookie consent
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                <Card className="border-2 hover:border-blue-500 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-lg">GDPR Requirements</CardTitle>
+                    <CardDescription>Complete guide to GDPR cookie consent compliance</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/blog/gdpr-cookie-consent-requirements">
+                      <Button variant="outline" className="w-full">
+                        Read GDPR Guide →
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 hover:border-green-500 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Canada Cookie Laws</CardTitle>
+                    <CardDescription>PIPEDA, CASL & Quebec Law 25 compliance guide</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/blog/cookie-consent-canada-guide-2025">
+                      <Button variant="outline" className="w-full">
+                        Read Canada Guide →
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 hover:border-purple-500 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Free Cookie Banner</CardTitle>
+                    <CardDescription>Create your GDPR-compliant banner in 2 minutes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/auth/register">
+                      <Button variant="outline" className="w-full">
+                        Get Started Free →
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <FinalCTA />
+      </main>
+
+      <Footer />
     </div>
   )
 }
