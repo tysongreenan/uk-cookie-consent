@@ -19,7 +19,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        heading: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-bricolage)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-geist-mono)', 'monospace'],
       },
       colors: {
@@ -47,6 +47,14 @@ const config: Config = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          warm: {
+            DEFAULT: "hsl(var(--accent-warm))",
+            foreground: "hsl(var(--accent-warm-foreground))",
+          },
+          cool: {
+            DEFAULT: "hsl(var(--accent-cool))",
+            foreground: "hsl(var(--accent-cool-foreground))",
+          },
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

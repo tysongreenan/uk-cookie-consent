@@ -11,13 +11,16 @@ import { CookieScanner } from './cookie-scanner'
 import { CheckCircle, Shield, Zap, BarChart, Lock, FileText } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Scanner — Instant Website Audit (No Signup Required) 2025',
-  description: '✓ Scan your website in 30 seconds ✓ Find hidden tracking cookies ✓ GDPR/PIPEDA compliance check ✓ 100% free, no registration. Used by 10,000+ sites.',
-  keywords: 'cookie scanner, website cookie audit, find cookies on website, cookie compliance audit, free cookie checker, gdpr cookie scanner, pipeda cookie audit',
+  title: 'Free Cookie Scanner | Check Your Website\'s Cookie Compliance',
+  description: 'Scan any website for cookies in 30 seconds. Free audit tool checks GDPR, PIPEDA, CCPA compliance. No signup needed. Instant actionable results.',
+  keywords: 'cookie scanner, website cookie audit, find cookies on website, cookie compliance audit, free cookie checker, gdpr cookie scanner, pipeda cookie audit, cookie compliance checker',
   openGraph: {
-    title: 'Free Cookie Scanner — Instant Website Audit',
-    description: '✓ 30-second scan ✓ Find all cookies ✓ Compliance check ✓ 100% free, no registration',
+    title: 'Free Cookie Scanner | Check Your Website\'s Cookie Compliance',
+    description: 'Scan any website for cookies in 30 seconds. Free audit tool checks GDPR, PIPEDA, CCPA compliance. No signup needed.',
     type: 'website',
+  },
+  alternates: {
+    canonical: '/tools/cookie-scanner',
   },
 }
 
@@ -51,12 +54,129 @@ export default function CookieScannerPage() {
     ]
   }
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does a cookie scanner do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A cookie scanner analyzes your website to detect all cookies being set, categorizes them (necessary, analytics, marketing, functional), checks their security settings, and evaluates compliance with privacy laws like GDPR, PIPEDA, and CCPA."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this cookie scanner really free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our cookie scanner is 100% free with no hidden costs. You can run unlimited scans without creating an account or providing any personal information."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does a cookie scan take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most scans complete in under 30 seconds. The scanner loads your website in a real browser environment, detects all cookies and tracking scripts, and generates a comprehensive compliance report."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What privacy laws does the scanner check against?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The scanner checks compliance against GDPR (European Union), PIPEDA (Canada), CCPA/CPRA (California), and Quebec's Law 25. It identifies cookies that require user consent under each regulation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need a cookie banner if the scanner finds tracking cookies?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. If your website sets non-essential cookies (analytics, marketing, or advertising cookies), you need a cookie consent banner that blocks these cookies until users explicitly opt in. This is required under GDPR, PIPEDA, and most modern privacy laws."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often should I scan my website for cookies?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You should scan your website whenever you add new third-party tools (analytics, ads, chat widgets), after major website updates, and at least quarterly to catch any unexpected cookies from plugin updates or third-party script changes."
+        }
+      }
+    ]
+  }
+
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Scan Your Website for Cookies",
+    "description": "Use our free cookie scanner to audit your website's cookies and check compliance with GDPR, PIPEDA, and CCPA.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Enter your website URL",
+        "text": "Type or paste your website URL into the scanner input field. The scanner accepts any public website URL."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Run the scan",
+        "text": "Click the Scan button. The scanner will load your website in a real browser environment and detect all cookies and tracking scripts."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Review your results",
+        "text": "Review the compliance report showing all detected cookies, their categories, security settings, and specific recommendations for GDPR, PIPEDA, and CCPA compliance."
+      }
+    ],
+    "totalTime": "PT30S"
+  }
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.cookie-banner.ca"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tools",
+        "item": "https://www.cookie-banner.ca/tools"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Cookie Scanner",
+        "item": "https://www.cookie-banner.ca/tools/cookie-scanner"
+      }
+    ]
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <Header />

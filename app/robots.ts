@@ -33,12 +33,8 @@ export default function robots(): MetadataRoute.Robots {
           '/invite/',
           // Block upgrade flow (no SEO value)
           '/upgrade/',
-          // Block location pages (low value, potential duplicate content)
-          '/locations/',
-          // Block webflow-specific landing page (duplicate of main page)
-          '/webflow-cookie-consent-free/',
-          // Block free-cookie-banner (duplicate of main page)
-          '/free-cookie-banner/',
+          // Location pages, webflow landing page, and free-cookie-banner are now
+          // allowed for all crawlers (valuable SEO content)
         ],
       },
       // Googlebot-specific rules (more permissive for better indexing)
