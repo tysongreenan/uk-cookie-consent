@@ -3774,7 +3774,7 @@ function BannerBuilderContent() {
                       <Label className="text-sm font-medium mb-2 block">Generated Code Preview</Label>
                       <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
                         <div className="text-green-400 mb-2">// Main Banner Script</div>
-                        <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${session?.user?.id}"></script>`}</div>
+                        <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${bannerId || session?.user?.id}"></script>`}</div>
                         
                         {config.integrations?.googleAnalytics?.measurementId && (
                           <>
