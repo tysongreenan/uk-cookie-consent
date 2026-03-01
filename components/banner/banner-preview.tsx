@@ -67,13 +67,17 @@ interface BannerPreviewProps {
 export function BannerPreview({ config }: BannerPreviewProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [showPreferences, setShowPreferences] = useState(false)
+  const [hasConsented, setHasConsented] = useState(false)
+  const [showPrefsDialog, setShowPrefsDialog] = useState(false)
 
   const handleAccept = () => {
     setIsVisible(false)
+    setHasConsented(true)
   }
 
   const handleReject = () => {
     setIsVisible(false)
+    setHasConsented(true)
   }
 
   const handlePreferences = () => {
@@ -84,13 +88,25 @@ export function BannerPreview({ config }: BannerPreviewProps) {
     setIsVisible(false)
   }
 
-  if (!isVisible) {
+  const handleCookieButtonClick = () => {
+    setShowPrefsDialog(true)
+  }
+
+  const handleDialogSave = () => {
+    setShowPrefsDialog(false)
+  }
+
+  const handleDialogClose = () => {
+    setShowPrefsDialog(false)
+  }
+
+  if (!isVisible && !hasConsented) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <p>Banner is hidden</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setIsVisible(true)}
           className="mt-2"
         >
@@ -382,6 +398,136 @@ export function BannerPreview({ config }: BannerPreviewProps) {
           </div>
         </div>
       </div>
+
+      {/* Cookie Settings Button (appears after consent) */}
+      {hasConsented && !isVisible && !showPrefsDialog && (
+        <div className="bg-gray-100 rounded-lg p-4 min-h-[200px] relative overflow-hidden">
+          <div className="bg-white rounded shadow-sm p-4 h-full">
+            <div className="h-4 bg-gray-200 rounded mb-4"></div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+
+          {/* Floating cookie button */}
+          <button
+            onClick={handleCookieButtonClick}
+            className="absolute bottom-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-110 transition-transform cursor-pointer"
+            style={{
+              backgroundColor: config.colors.button,
+              color: config.colors.buttonText,
+            }}
+            title="Cookie settings"
+          >
+            🍪
+          </button>
+        </div>
+      )}
+
+      {/* Preferences Dialog */}
+      {showPrefsDialog && (
+        <div className="bg-gray-100 rounded-lg p-4 min-h-[200px] relative overflow-hidden">
+          <div className="bg-white rounded shadow-sm p-4 h-full opacity-50">
+            <div className="h-4 bg-gray-200 rounded mb-4"></div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/30 rounded-lg" />
+
+          {/* Dialog */}
+          <div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-2xl p-6 w-[90%] max-w-[400px] z-10"
+            style={{
+              backgroundColor: config.colors.background,
+              color: config.colors.text,
+            }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">Cookie Preferences</h3>
+              <button
+                onClick={handleDialogClose}
+                className="opacity-70 hover:opacity-100 text-xl leading-none"
+                style={{ color: config.colors.text }}
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-sm opacity-80 mb-4">Manage your cookie preferences below. Strictly necessary cookies cannot be disabled.</p>
+            <div className="space-y-3 text-sm">
+              <label className="flex items-center opacity-70 cursor-not-allowed">
+                <input type="checkbox" defaultChecked disabled className="mr-2" />
+                <span><strong>Strictly Necessary</strong><br /><small className="opacity-75">Essential for website functionality</small></span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input type="checkbox" id="dialog-func" className="mr-2" style={{ accentColor: config.colors.button }} />
+                <span><strong>Functionality</strong><br /><small className="opacity-75">Remember preferences and choices</small></span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input type="checkbox" id="dialog-analytics" className="mr-2" style={{ accentColor: config.colors.button }} />
+                <span><strong>Analytics</strong><br /><small className="opacity-75">Help us improve our website</small></span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input type="checkbox" id="dialog-marketing" className="mr-2" style={{ accentColor: config.colors.button }} />
+                <span><strong>Marketing</strong><br /><small className="opacity-75">Personalized ads and content</small></span>
+              </label>
+            </div>
+            <div className="flex gap-2 justify-end mt-5">
+              <Button
+                onClick={handleDialogSave}
+                size="sm"
+                style={{
+                  backgroundColor: config.colors.button,
+                  color: config.colors.buttonText,
+                }}
+              >
+                Save Preferences
+              </Button>
+              <Button
+                onClick={handleDialogClose}
+                variant="outline"
+                size="sm"
+                style={{
+                  borderColor: config.colors.text,
+                  color: config.colors.text,
+                  opacity: 0.7,
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+
+          {/* Cookie button still visible behind dialog */}
+          <button
+            className="absolute bottom-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg"
+            style={{
+              backgroundColor: config.colors.button,
+              color: config.colors.buttonText,
+              opacity: 0.5,
+            }}
+          >
+            🍪
+          </button>
+        </div>
+      )}
+
+      {/* Reset Preview Button */}
+      {hasConsented && (
+        <div className="text-center mt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setIsVisible(true); setHasConsented(false); setShowPrefsDialog(false); setShowPreferences(false) }}
+          >
+            Reset Preview
+          </Button>
+        </div>
+      )}
 
       {/* Preview Controls */}
       <div className="text-xs text-muted-foreground space-y-1">

@@ -286,7 +286,30 @@ export function CodeGenerator({ config }: CodeGeneratorProps) {
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>
   </div>
-</div>`
+</div>
+
+<!-- Cookie Settings Button (appears after consent is given) -->
+<button id="cookie-settings-btn" aria-label="Cookie settings" style="display: none; position: fixed; bottom: 20px; left: 20px; width: 48px; height: 48px; border-radius: 50%; background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; cursor: pointer; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 22px; line-height: 48px; text-align: center; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'">\u{1F36A}</button>
+
+<!-- Cookie Preferences Dialog (opened from settings button) -->
+<div id="cookie-preferences-dialog" role="dialog" aria-label="Cookie preferences" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: ${config.colors.background}; color: ${config.colors.text}; padding: 24px; border-radius: 12px; z-index: 10001; max-width: 480px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Cookie Preferences</h3>
+    <button id="cookie-dialog-close-btn" style="background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
+  </div>
+  <p style="font-size: 14px; line-height: 1.5; margin: 0 0 16px 0; opacity: 0.8;">Manage your cookie preferences below. Strictly necessary cookies cannot be disabled.</p>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <label style="display: flex; align-items: center; font-size: 13px; cursor: not-allowed; opacity: 0.7;"><input type="checkbox" checked disabled style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Strictly Necessary</strong><br><small style="opacity: 0.8;">Essential for website functionality</small></span></label>
+    <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-dialog-func" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Functionality</strong><br><small style="opacity: 0.8;">Remember preferences and choices</small></span></label>
+    <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-dialog-analytics" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Analytics</strong><br><small style="opacity: 0.8;">Help us improve our website</small></span></label>
+    <label style="display: flex; align-items: center; font-size: 13px; cursor: pointer;"><input type="checkbox" id="cookie-dialog-marketing" style="margin-right: 8px; accent-color: ${config.colors.button};"> <span><strong>Marketing</strong><br><small style="opacity: 0.8;">Personalized ads and content</small></span></label>
+  </div>
+  <div style="margin-top: 20px; display: flex; gap: 8px; justify-content: flex-end;">
+    <button id="cookie-dialog-save-btn" style="background-color: ${config.colors.button}; color: ${config.colors.buttonText}; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">Save Preferences</button>
+    <button id="cookie-dialog-cancel-btn" style="background-color: transparent; color: ${config.colors.text}; border: 1px solid ${config.colors.text}; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; opacity: 0.7;">Cancel</button>
+  </div>
+</div>
+<div id="cookie-dialog-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000;"></div>`
   }
 
   const generateJavaScript = () => {
@@ -364,6 +387,41 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     ` : ''}
   }
   
+  function showSettingsButton() {
+    var settingsBtn = document.getElementById('cookie-settings-btn');
+    if (settingsBtn) settingsBtn.style.display = 'block';
+  }
+
+  function hideSettingsButton() {
+    var settingsBtn = document.getElementById('cookie-settings-btn');
+    if (settingsBtn) settingsBtn.style.display = 'none';
+  }
+
+  function openPreferencesDialog() {
+    var dialog = document.getElementById('cookie-preferences-dialog');
+    var overlay = document.getElementById('cookie-dialog-overlay');
+    if (!dialog || !overlay) return;
+
+    // Pre-fill checkboxes with current consent
+    var currentConsent = getConsent() || { functionality: false, analytics: false, marketing: false };
+    var funcToggle = document.getElementById('cookie-dialog-func');
+    var analyticsToggle = document.getElementById('cookie-dialog-analytics');
+    var marketingToggle = document.getElementById('cookie-dialog-marketing');
+    if (funcToggle) funcToggle.checked = currentConsent.functionality;
+    if (analyticsToggle) analyticsToggle.checked = currentConsent.analytics;
+    if (marketingToggle) marketingToggle.checked = currentConsent.marketing;
+
+    overlay.style.display = 'block';
+    dialog.style.display = 'block';
+  }
+
+  function closePreferencesDialog() {
+    var dialog = document.getElementById('cookie-preferences-dialog');
+    var overlay = document.getElementById('cookie-dialog-overlay');
+    if (dialog) dialog.style.display = 'none';
+    if (overlay) overlay.style.display = 'none';
+  }
+
   function init() {
     var banner = document.getElementById('cookie-consent-banner');
     var acceptBtn = document.getElementById('cookie-accept-btn');
@@ -373,67 +431,113 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     var prefsPanel = document.getElementById('cookie-preferences-panel');
     var savePrefsBtn = document.getElementById('cookie-save-prefs-btn');
     var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
-    
+    var settingsBtn = document.getElementById('cookie-settings-btn');
+    var dialogCloseBtn = document.getElementById('cookie-dialog-close-btn');
+    var dialogSaveBtn = document.getElementById('cookie-dialog-save-btn');
+    var dialogCancelBtn = document.getElementById('cookie-dialog-cancel-btn');
+    var dialogOverlay = document.getElementById('cookie-dialog-overlay');
+
     if (!banner) return;
-    
+
     var existingConsent = getConsent();
-    
+
     if (existingConsent) {
       loadScripts(existingConsent);
+      showSettingsButton();
       return;
     }
-    
+
     ${config.behavior.autoShow ? 'banner.style.display = "block";' : ''}
-    
+
     if (acceptBtn) {
       acceptBtn.onclick = function() {
         saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
         banner.style.display = 'none';
+        showSettingsButton();
       };
     }
-    
+
     if (rejectBtn) {
       rejectBtn.onclick = function() {
         saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
         banner.style.display = 'none';
+        showSettingsButton();
       };
     }
-    
+
     if (closeBtn) {
       closeBtn.onclick = function() {
         banner.style.display = 'none';
       };
     }
-    
+
     if (prefsBtn && prefsPanel) {
       prefsBtn.onclick = function() {
         prefsPanel.style.display = prefsPanel.style.display === 'none' ? 'block' : 'none';
       };
     }
-    
+
     if (savePrefsBtn) {
       savePrefsBtn.onclick = function() {
         var func = document.getElementById('cookie-func-toggle');
         var analytics = document.getElementById('cookie-analytics-toggle');
         var marketing = document.getElementById('cookie-marketing-toggle');
-        
+
         saveConsent({
           essential: true,
           functionality: func ? func.checked : false,
           analytics: analytics ? analytics.checked : false,
           marketing: marketing ? marketing.checked : false
         });
-        
+
         banner.style.display = 'none';
+        showSettingsButton();
       };
     }
-    
+
     if (cancelPrefsBtn && prefsPanel) {
       cancelPrefsBtn.onclick = function() {
         prefsPanel.style.display = 'none';
       };
     }
-    
+
+    // Cookie settings button -> opens preferences dialog directly
+    if (settingsBtn) {
+      settingsBtn.onclick = function() {
+        openPreferencesDialog();
+      };
+    }
+
+    // Preferences dialog controls
+    if (dialogCloseBtn) {
+      dialogCloseBtn.onclick = closePreferencesDialog;
+    }
+
+    if (dialogCancelBtn) {
+      dialogCancelBtn.onclick = closePreferencesDialog;
+    }
+
+    if (dialogOverlay) {
+      dialogOverlay.onclick = closePreferencesDialog;
+    }
+
+    if (dialogSaveBtn) {
+      dialogSaveBtn.onclick = function() {
+        var func = document.getElementById('cookie-dialog-func');
+        var analytics = document.getElementById('cookie-dialog-analytics');
+        var marketing = document.getElementById('cookie-dialog-marketing');
+
+        saveConsent({
+          essential: true,
+          functionality: func ? func.checked : false,
+          analytics: analytics ? analytics.checked : false,
+          marketing: marketing ? marketing.checked : false
+        });
+
+        closePreferencesDialog();
+      };
+    }
+
     ${config.behavior.dismissOnScroll ? `
     var scrolled = false;
     window.addEventListener('scroll', function() {
