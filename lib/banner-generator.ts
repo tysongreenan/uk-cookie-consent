@@ -1065,10 +1065,7 @@ function applyTranslations() {
 ${config.branding.footerLink.enabled ? `
 // Global function for inline cookie settings links
 window.showCookiePreferences = function() {
-  var banner = document.getElementById('cookie-consent-banner');
-  if (banner) {
-    banner.style.display = 'block';
-  }
+  showPreferencesModal();
 };
 ` : ''}
 
@@ -1116,16 +1113,31 @@ function saveConsent(consent) {
   }
 }
 
+function showPreferencesModal() {
+  var modal = document.getElementById('cookie-preferences-modal');
+
+  if (!modal) {
+    console.warn('Cookie preferences modal not found');
+    return;
+  }
+
+  var currentConsent = getConsent();
+  if (currentConsent) {
+    loadConsentIntoModal(currentConsent);
+  } else {
+    loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
+  }
+
+  modal.style.display = 'flex';
+}
+
 function showFloatingButton() {
   var floatBtn = document.getElementById('cookie-settings-float');
   if (floatBtn) {
     floatBtn.classList.add('show');
     floatBtn.style.setProperty('display', 'flex', 'important');
     floatBtn.onclick = function() {
-      var banner = document.getElementById('cookie-consent-banner');
-      if (banner) {
-        banner.style.display = 'block';
-      }
+      showPreferencesModal();
     };
   }
 }

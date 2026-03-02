@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
 import { createClient } from '@supabase/supabase-js'
+import { authOptions } from '@/lib/auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -11,7 +13,24 @@ export async function GET(
   { params }: { params: { userId: string } }
 ) {
   try {
+    // Verify authentication
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { userId } = params
+
+    // Verify user can only access their own config
+    if (params.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
     
     // Fetch user's banner configuration from ConsentBanner table
     const { data: banners, error } = await supabase

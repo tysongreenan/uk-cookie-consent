@@ -3,9 +3,17 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
+  // Development only - return 404 in production
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    )
+  }
+
   try {
     const session = await getServerSession(authOptions)
-    
+
     return NextResponse.json({
       success: true,
       session: session ? {

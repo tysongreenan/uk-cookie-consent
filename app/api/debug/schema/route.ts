@@ -10,11 +10,19 @@ const supabase = createClient(
 
 export const dynamic = 'force-dynamic'
 
-// GET /api/debug/schema - Debug database schema (only for authenticated users)
+// GET /api/debug/schema - Debug database schema (development only)
 export async function GET(request: NextRequest) {
+  // Development only - return 404 in production
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    )
+  }
+
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
