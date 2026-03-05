@@ -1,8 +1,8 @@
 ---
-title: "Cookie Consent in Canada 2025: PIPEDA, CASL & Law 25 Complete Guide"
-description: "Complete guide to Canadian cookie consent laws (PIPEDA, CASL, Quebec Law 25). Avoid $25M fines with our step-by-step compliance checklist. Free implementation guide included."
+title: "Cookie Consent in Canada 2026: PIPEDA, CASL & Quebec Law 25 Guide"
+description: "What cookie consent do Canadian websites need? Complete guide to PIPEDA, CASL, and Quebec Law 25. Avoid $25M fines with our step-by-step compliance checklist."
 date: "2025-01-15"
-updatedDate: "2025-12-29"
+updatedDate: "2026-02-21"
 author: "cookie-banner-team"
 tags: ["PIPEDA", "CASL", "Canada", "Privacy Law", "Cookie Consent", "Law 25", "Quebec"]
 published: true
@@ -13,7 +13,41 @@ keywords:
   - "casl cookie consent"
   - "quebec law 25 cookies"
   - "canadian privacy law cookies"
-  - "canada cookie banner requirements 2025"
+  - "canada cookie banner requirements 2026"
+schema:
+  "@context": "https://schema.org"
+  "@type": "FAQPage"
+  mainEntity:
+    - "@type": "Question"
+      name: "Do I need a cookie banner if I only use Google Analytics?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Yes. Google Analytics collects personal information (IP addresses, device IDs, browsing behavior) and requires explicit consent under PIPEDA and CASL."
+    - "@type": "Question"
+      name: "What's the difference between PIPEDA and GDPR?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "While both require consent for cookies, GDPR (Europe) is more prescriptive about how consent must be obtained. PIPEDA focuses on meaningful consent and transparency. Canadian websites should design for both if they have EU users."
+    - "@type": "Question"
+      name: "Can I use implied consent for cookies in Canada?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "No. Implied consent (continuing to browse = consent) is not sufficient for tracking cookies under PIPEDA. You need explicit, opt-in consent."
+    - "@type": "Question"
+      name: "Do I need consent for first-party cookies?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "It depends on the cookie's purpose. Session cookies don't require consent. Preference cookies are best practice to get consent. Analytics cookies require consent."
+    - "@type": "Question"
+      name: "How often should I update my cookie policy?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Review your cookie policy whenever you add new tracking tools, when privacy laws change, and at least annually."
+    - "@type": "Question"
+      name: "What if I only have Canadian visitors?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Even if you only serve Canada, you still need to comply with PIPEDA federally and Law 25 if you have Quebec users."
 ---
 
 # What Is Cookie Consent in Canada?

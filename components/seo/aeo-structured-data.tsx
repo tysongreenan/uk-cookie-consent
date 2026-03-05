@@ -24,7 +24,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "price": "0",
         "priceCurrency": "CAD",
         "availability": "https://schema.org/InStock",
-        "priceValidUntil": "2025-12-31",
+        "priceValidUntil": "2026-12-31",
         "description": "Free forever for first 1,000 accounts. Unlimited cookie banners and websites."
       },
       "aggregateRating": {
@@ -138,7 +138,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "url": `${baseUrl}/pricing`,
         "priceCurrency": "CAD",
         "price": "0",
-        "priceValidUntil": "2025-12-31",
+        "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "description": "Free forever for first 1,000 accounts. Unlimited cookie banners and websites. No credit card required.",
         "eligibleRegion": {

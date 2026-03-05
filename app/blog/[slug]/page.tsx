@@ -41,9 +41,12 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${post.title} | Cookie Banner Generator Blog`,
+    title: `${post.title} | Cookie-Banner.ca`,
     description: post.description,
     authors: [{ name: post.author }],
+    alternates: {
+      canonical: post.canonical || `/blog/${params.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
@@ -84,7 +87,7 @@ export default async function BlogPostPage({
     description: post.description,
     image: post.image || '',
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updatedDate || post.date,
     author: {
       '@type': 'Person',
       name: post.author,

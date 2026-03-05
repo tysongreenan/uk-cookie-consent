@@ -55,6 +55,7 @@ export interface BlogPost {
   content: string
   readingTime: string
   published: boolean
+  canonical?: string
   schema?: any
 }
 
@@ -140,6 +141,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       content: contentHtml,
       readingTime: stats.text,
       published: data.published !== false,
+      canonical: data.canonical || undefined,
       schema: data.schema || null,
     }
   } catch (error) {

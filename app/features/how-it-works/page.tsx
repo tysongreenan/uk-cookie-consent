@@ -6,13 +6,16 @@ import { ModernFeaturesSection, VerificationSkeleton } from '@/components/landin
 import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'How Do I Know My Cookie Banner Is Working? | Verification Guide',
+  title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
   description: 'Verify your cookie banner is working with consent logs, cookie blocking verification, monitoring tools, and compliance testing. Step-by-step guide to ensure proper functionality.',
   keywords: 'how to verify cookie banner is working, cookie consent verification, check if cookie banner is blocking cookies, cookie banner testing, cookie consent logs, verify cookie compliance',
   openGraph: {
-    title: 'How Do I Know My Cookie Banner Is Working? | Verification Guide',
+    title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
     description: 'Verify your cookie banner is working with consent logs, cookie blocking verification, monitoring tools, and compliance testing.',
     type: 'article',
+  },
+  alternates: {
+    canonical: '/features/how-it-works',
   },
 }
 

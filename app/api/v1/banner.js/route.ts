@@ -287,16 +287,6 @@ export async function GET(request: NextRequest) {
       return;
     }
     
-    // Prevent duplicate injection
-    if (document.getElementById('cookie-consent-banner')) {
-      return;
-    }
-    
-    // Prevent duplicate injection
-    if (document.getElementById('cookie-consent-banner')) {
-      return;
-    }
-    
     var div = document.createElement('div');
     div.innerHTML = ${JSON.stringify(html)};
     

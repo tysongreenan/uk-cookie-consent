@@ -10,13 +10,16 @@ import { Badge } from '@/components/ui/badge'
 import { Code, Zap, CheckCircle, Shield, Rocket, Globe, Settings, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'React Cookie Consent Integration | Next.js & React Apps 2025',
-  description: 'Add GDPR, PIPEDA, and CCPA compliant cookie consent to your React or Next.js app in under 2 minutes. No npm package needed - just one script tag.',
-  keywords: 'react cookie consent, nextjs cookie banner, react gdpr compliance, next.js cookie consent, react cookie banner',
+  title: 'React Cookie Consent: 2-Minute Setup for Next.js & React (2026)',
+  description: 'Add GDPR and PIPEDA cookie consent to React or Next.js in 2 minutes. One script tag, zero npm packages, no bundle bloat. Works with App Router.',
+  keywords: 'react cookie consent, nextjs cookie banner, react gdpr compliance, next.js cookie consent, react cookie banner, nextjs app router cookie consent',
   openGraph: {
-    title: 'React Cookie Consent Integration | Next.js & React Apps 2025',
-    description: 'Add GDPR, PIPEDA, and CCPA compliant cookie consent to your React or Next.js app in under 2 minutes.',
+    title: 'React Cookie Consent: 2-Minute Setup for Next.js & React (2026)',
+    description: 'Add GDPR and PIPEDA cookie consent to React or Next.js in 2 minutes. One script tag, zero npm packages, no bundle bloat.',
     type: 'article',
+  },
+  alternates: {
+    canonical: '/integrations/react',
   },
 }
 
