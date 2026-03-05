@@ -14,9 +14,11 @@ This guide will help you set up Supabase for the Cookie Consent Builder applicat
 In your `env.local` file, replace `[YOUR-PASSWORD]` with your actual Supabase database password:
 
 ```env
-DATABASE_URL="postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
-DIRECT_URL="postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.bamunfrbhopzrjobowfx.supabase.co:5432/postgres"
+DATABASE_URL="postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.[YOUR_PROJECT_REF].supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.[YOUR_PROJECT_REF].supabase.co:5432/postgres"
 ```
+
+**Note**: Replace `[YOUR_PROJECT_REF]` with your actual Supabase project reference ID (found in your Supabase dashboard URL).
 
 ## 3. Set Up the Database Schema
 

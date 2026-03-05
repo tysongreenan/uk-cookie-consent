@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Cookie Banner Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-button { 
+            background: #3b82f6; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px;
+        }
+        .test-button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>Simple Cookie Banner Test</h1>
+    <p>This tests if the basic JavaScript functionality works.</p>
+    
+    <button class="test-button" onclick="testClick()">Test Click Handler</button>
+    <button class="test-button" onclick="testConsole()">Test Console Log</button>
+    <button class="test-button" onclick="testElements()">Test Element Finding</button>
+    
+    <div id="test-output" style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px;"></div>
+    
+    <script>
+        function testClick() {
+            log('Click handler works!');
+        }
+        
+        function testConsole() {
+            console.log('Console log works!');
+            log('Console log works! (check browser console)');
+        }
+        
+        function testElements() {
+            const banner = document.getElementById('cookie-consent-banner');
+            const modal = document.getElementById('cookie-preferences-modal');
+            const floatBtn = document.getElementById('cookie-settings-float');
+            
+            log(`Banner found: ${!!banner}`);
+            log(`Modal found: ${!!modal}`);
+            log(`Float button found: ${!!floatBtn}`);
+        }
+        
+        function log(message) {
+            const output = document.getElementById('test-output');
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            output.appendChild(div);
+        }
+        
+        // Test if basic JavaScript works
+        log('Page loaded, JavaScript is working');
+    </script>
+    
+    <!-- Your banner code would go here -->
+</body>
+</html>

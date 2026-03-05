@@ -1,4 +1,27 @@
+export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'custom'
+
+// Button layout presets for cookie banners
+export type ButtonLayout = 'standard' | 'soft-consent' | 'accept-only'
+
+export interface ComplianceRequirements {
+  framework: ComplianceFramework
+  requiresExplicitConsent: boolean // GDPR: true, PIPEDA: false (can use implied consent)
+  requiresOptIn: boolean // GDPR: true (opt-in), PIPEDA: false (can use opt-out)
+  requiresGranularConsent: boolean // GDPR: true, PIPEDA: false
+  requiresPrivacyPolicy: boolean // Both: true
+  requiresDataRetentionPolicy: boolean // GDPR: true, PIPEDA: false
+  maxPenalty: string // GDPR: €20M, PIPEDA: Reputation damage
+  consentExpiry: number // GDPR: 12 months, PIPEDA: 24 months
+}
+
 export interface BannerConfig {
+  // Version tracking
+  version?: string
+  lastUpdated?: string
+  
+  // Compliance
+  compliance: ComplianceRequirements
+  
   // Basic settings
   name: string
   position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'
@@ -12,6 +35,9 @@ export interface BannerConfig {
     buttonText: string
     link: string
   }
+  
+  // Language
+  language: 'en' | 'fr' | 'auto'
   
   // Text content
   text: {
@@ -28,6 +54,9 @@ export interface BannerConfig {
     dismissOnScroll: boolean
     showPreferences: boolean
     cookieExpiry: number // days
+    // Button layout controls
+    buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'
+    showRejectButton?: boolean // Granular control - defaults to true for backward compatibility
   }
   
   // Branding
@@ -44,6 +73,34 @@ export interface BannerConfig {
       text: string
       openInNewTab: boolean
       required: boolean
+    }
+    footerLink: {
+      enabled: boolean
+      text: string
+      position: 'floating' | 'inline'
+      floatingPosition?: 'bottom-left' | 'bottom-right'
+      style?: 'floating' | 'inline' | 'both'
+      floatingStyle?: {
+        shape: 'circle' | 'pill' | 'square'
+        size: 'small' | 'medium' | 'large'
+        showText: boolean
+        useCustomColors: boolean
+        customColors?: {
+          background?: string
+          text?: string
+          border?: string
+        }
+      }
+      inlineStyle?: {
+        linkType: 'plain' | 'button' | 'icon-text' | 'custom'
+        includeIcon: boolean
+        includeLogo: boolean
+        customClass?: string
+      }
+      icons?: {
+        accepted?: string
+        rejected?: string
+      }
     }
   }
   
@@ -79,6 +136,17 @@ export interface BannerConfig {
       inlineCriticalCSS?: boolean
     }
   }
+  
+  // Integrations
+  integrations?: {
+    googleAnalytics?: {
+      enabled: boolean
+      measurementId: string // e.g., "G-XXXXXXXXXX"
+      trackConsentEvents: boolean // Track accept/reject/dismiss as GA events
+      trackImpressions: boolean // Track banner impressions as GA events
+      anonymizeIp: boolean
+    }
+  }
 }
 
 export interface TrackingScript {
@@ -86,6 +154,7 @@ export interface TrackingScript {
   name: string
   category: 'strictly-necessary' | 'functionality' | 'tracking-performance' | 'targeting-advertising'
   scriptCode: string
+  bodyCode?: string // Optional body code (e.g., for GTM noscript)
   enabled: boolean
 }
 
@@ -143,6 +212,57 @@ export interface UserLogo {
   createdAt: Date
 }
 
+export interface BrandColorCandidate {
+  hex: string
+  score: number
+  sources: string[]
+  luminance: number
+  contrastOnWhite: number
+  contrastOnBlack: number
+  recommendedUsage: Array<'background' | 'text' | 'button' | 'buttonText' | 'link'>
+  suggestedTextColor: string
+}
+
+export interface BrandColorSuggestions {
+  colors: BrandColorCandidate[]
+  suggestions: {
+    background: string
+    text: string
+    button: string
+    buttonText: string
+    link: string
+  }
+  warnings: string[]
+}
+
+export interface BrandLogoSuggestion {
+  url: string
+  source: string
+}
+
+export interface BrandFontCandidate {
+  family: string
+  source: string
+  weight: number
+  url?: string
+}
+
+export interface BrandDiscoveryResult {
+  url: string
+  colors: BrandColorCandidate[]
+  suggestions: {
+    background: string
+    text: string
+    button: string
+    buttonText: string
+    link: string
+  }
+  warnings: string[]
+  logo?: BrandLogoSuggestion
+  fonts?: BrandFontCandidate[]
+  fetchedAt: string
+}
+
 // Form types
 export interface CreateProjectForm {
   name: string
@@ -177,4 +297,96 @@ export interface PaginatedResponse<T> {
     total: number
     totalPages: number
   }
+}
+
+// Team Management Types
+export type TeamRole = 'owner' | 'admin' | 'editor' | 'viewer'
+export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked'
+export type TeamPermission = 'view' | 'edit' | 'delete' | 'admin' | 'owner'
+
+export interface Team {
+  id: string
+  name: string
+  ownerId: string
+  createdAt: Date
+  updatedAt: Date
+  members?: TeamMember[]
+  invitations?: TeamInvitation[]
+}
+
+export interface TeamMember {
+  id: string
+  teamId: string
+  userId: string
+  role: TeamRole
+  invitedBy?: string
+  joinedAt: Date
+  createdAt: Date
+  updatedAt: Date
+  user?: User
+  inviter?: User
+}
+
+export interface TeamInvitation {
+  id: string
+  teamId: string
+  email: string
+  role: Exclude<TeamRole, 'owner'> // Cannot invite as owner
+  token: string
+  invitedBy: string
+  expiresAt: Date
+  acceptedAt?: Date
+  status: InvitationStatus
+  createdAt: Date
+  team?: Team
+  inviter?: User
+}
+
+// Team Management Form Types
+export interface CreateTeamForm {
+  name: string
+}
+
+export interface UpdateTeamForm {
+  name?: string
+}
+
+export interface InviteMemberForm {
+  email: string
+  role: Exclude<TeamRole, 'owner'>
+  sendEmail?: boolean
+}
+
+export interface UpdateMemberRoleForm {
+  role: TeamRole
+}
+
+// Team Permission Matrix
+export const TEAM_PERMISSIONS: Record<TeamRole, TeamPermission[]> = {
+  owner: ['view', 'edit', 'delete', 'admin', 'owner'],
+  admin: ['view', 'edit', 'delete', 'admin'],
+  editor: ['view', 'edit'],
+  viewer: ['view']
+}
+
+// Helper function to check team permissions
+export function hasTeamPermission(
+  userRole: TeamRole,
+  requiredPermission: TeamPermission
+): boolean {
+  return TEAM_PERMISSIONS[userRole].includes(requiredPermission)
+}
+
+// Plan Management Types
+export type PlanTier = 'free' | 'pro' | 'enterprise'
+
+export interface PlanFeatures {
+  tier: PlanTier
+  maxWebsites: number | 'unlimited'
+  hasInternalAnalytics: boolean
+  hasTeamCollaboration: boolean
+  hasCustomLayouts: boolean
+  hasImageUpload: boolean
+  maxTeamMembers: number | 'unlimited'
+  supportLevel: 'community' | 'priority' | 'dedicated'
 }

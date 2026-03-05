@@ -20,9 +20,9 @@ In Vercel dashboard, go to **Settings > Environment Variables** and add each var
 
 ### Required Variables (add one by one):
 1. **NEXTAUTH_URL** = `https://your-app-name.vercel.app`
-2. **NEXTAUTH_SECRET** = `eyfPsm9Es79RLP+uvYj6WpgNQ6W38Bi+Kw5xbcc2x+M=`
+2. **NEXTAUTH_SECRET** = `[generate-with-openssl-rand-base64-32]` (see instructions below)
 3. **SUPABASE_URL** = `your-supabase-url`
-4. **SUPABASE_ANON_KEY** = `your-supabase-anon-key`
+4. **NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY** = `your-supabase-anon-key`
 5. **DATABASE_URL** = `your-database-connection-string`
 
 **Important**: Add these as individual environment variables, not as secrets.
@@ -34,7 +34,7 @@ In Vercel dashboard, go to **Settings > Environment Variables** and add each var
 openssl rand -base64 32
 ```
 
-**SUPABASE_URL & SUPABASE_ANON_KEY**: From your Supabase project dashboard
+**SUPABASE_URL & NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY**: From your Supabase project dashboard
 
 **DATABASE_URL**: From your Supabase project settings (Database > Connection string)
 

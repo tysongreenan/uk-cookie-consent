@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
+import { invalidateBannerCache } from '@/lib/banner-cache'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 export async function GET(
@@ -19,12 +21,23 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get the specific banner
+    const currentTeamId = session.user.currentTeamId || (session.user as any).current_team_id
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Get the banner and verify it belongs to user's team
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
-      .select('id, name, config, isActive, createdAt, updatedAt')
+      .select(`
+        id, name, config, isActive, createdAt, updatedAt,
+        Project!inner(teamId)
+      `)
       .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('Project.teamId', currentTeamId)
       .single()
 
     if (error) {
@@ -35,11 +48,16 @@ export async function GET(
       )
     }
 
+    // Parse config and check if migration is needed
+    const config = JSON.parse(banner.config)
+    const migratedConfig = needsMigration(config) ? migrateBannerConfig(config) : config
+
     return NextResponse.json({
       success: true,
       banner: {
         ...banner,
-        config: JSON.parse(banner.config)
+        config: migratedConfig,
+        needsMigration: needsMigration(config)
       }
     })
 
@@ -56,11 +74,43 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return handleBannerUpdate(request, params.id)
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return handleBannerUpdate(request, params.id)
+}
+
+async function handleBannerUpdate(
+  request: NextRequest,
+  bannerId: string
+) {
   try {
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const currentTeamId = session.user.currentTeamId
+    const userRole = session.user.userRole
+
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has edit permission
+    if (!['owner', 'admin', 'editor'].includes(userRole || '')) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to edit banners' },
+        { status: 403 }
+      )
     }
 
     const bannerData = await request.json()
@@ -73,17 +123,37 @@ export async function PUT(
       )
     }
 
+    // First get the banner to verify it belongs to user's team
+    const { data: existingBanner, error: fetchError } = await supabase
+      .from('ConsentBanner')
+      .select(`
+        id,
+        Project!inner(teamId)
+      `)
+      .eq('id', bannerId)
+      .eq('Project.teamId', currentTeamId)
+      .single()
+
+    if (fetchError || !existingBanner) {
+      return NextResponse.json(
+        { error: 'Banner not found or unauthorized' },
+        { status: 404 }
+      )
+    }
+
+    // Apply migration to config before saving
+    const migratedConfig = needsMigration(bannerData.config) ? migrateBannerConfig(bannerData.config) : bannerData.config
+
     // Update banner in database
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .update({
         name: bannerData.name,
-        config: JSON.stringify(bannerData.config),
+        config: JSON.stringify(migratedConfig),
         isActive: bannerData.isActive || false,
         updatedAt: new Date().toISOString()
       })
-      .eq('id', params.id)
-      .eq('userId', session.user.id)
+      .eq('id', bannerId)
       .select('id, name, config, isActive, createdAt, updatedAt')
       .single()
 
@@ -95,11 +165,15 @@ export async function PUT(
       )
     }
 
+    // Invalidate cache so changes appear immediately on live websites
+    invalidateBannerCache(bannerId)
+    console.log(`✅ Banner ${bannerId} updated and cache invalidated`)
+
     return NextResponse.json({
       success: true,
       banner: {
         ...banner,
-        config: JSON.parse(banner.config)
+        config: migratedConfig
       }
     })
 
@@ -123,12 +197,47 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const currentTeamId = session.user.currentTeamId
+    const userRole = session.user.userRole
+
+    if (!currentTeamId) {
+      return NextResponse.json(
+        { error: 'No team selected' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has delete permission (admin or owner only)
+    if (!['owner', 'admin'].includes(userRole || '')) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to delete banners' },
+        { status: 403 }
+      )
+    }
+
+    // First verify banner belongs to user's team before deleting
+    const { data: existingBanner, error: fetchError } = await supabase
+      .from('ConsentBanner')
+      .select(`
+        id,
+        Project!inner(teamId)
+      `)
+      .eq('id', params.id)
+      .eq('Project.teamId', currentTeamId)
+      .single()
+
+    if (fetchError || !existingBanner) {
+      return NextResponse.json(
+        { error: 'Banner not found or unauthorized' },
+        { status: 404 }
+      )
+    }
+
     // Delete banner from database
     const { error } = await supabase
       .from('ConsentBanner')
       .delete()
       .eq('id', params.id)
-      .eq('userId', session.user.id)
 
     if (error) {
       console.error('Database error:', error)
