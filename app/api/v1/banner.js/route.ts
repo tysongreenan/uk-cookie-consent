@@ -251,8 +251,57 @@ export async function GET(request: NextRequest) {
       ? JSON.parse(banner.config) 
       : banner.config
     
+    // Look up banner owner's plan tier to determine branding and feature access
+    let ownerPlanTier = 'free'
+    const bannerUserId = banner.userId || null
+    if (bannerUserId) {
+      const { data: bannerOwner } = await supabase
+        .from('User')
+        .select('planTier')
+        .eq('id', bannerUserId)
+        .single()
+      if (bannerOwner?.planTier) {
+        ownerPlanTier = bannerOwner.planTier
+      }
+    } else {
+      // For ConsentBanner (legacy), look up via project -> team -> owner
+      try {
+        const { data: consentBannerFull } = await supabase
+          .from('ConsentBanner')
+          .select('projectId')
+          .eq('id', bannerId)
+          .single()
+        if (consentBannerFull?.projectId) {
+          const { data: project } = await supabase
+            .from('Project')
+            .select('userId')
+            .eq('id', consentBannerFull.projectId)
+            .single()
+          if (project?.userId) {
+            const { data: owner } = await supabase
+              .from('User')
+              .select('planTier')
+              .eq('id', project.userId)
+              .single()
+            if (owner?.planTier) {
+              ownerPlanTier = owner.planTier
+            }
+          }
+        }
+      } catch (e) {
+        // Default to free tier on error
+      }
+    }
+
+    const showBranding = ownerPlanTier === 'free'
+
+    // Strip GA4 integration for free users (server-side enforcement)
+    if (ownerPlanTier === 'free' && config.integrations?.googleAnalytics) {
+      config.integrations.googleAnalytics.enabled = false
+    }
+
     // Generate all components
-    const html = generateBannerHTML(config)
+    const html = generateBannerHTML(config, { showBranding })
     const css = generateBannerCSS(config)
     const js = generateBannerJS(config)
     const consentInit = generateConsentInitScript()

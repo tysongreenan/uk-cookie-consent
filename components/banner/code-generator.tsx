@@ -18,9 +18,11 @@ interface CodeGeneratorProps {
   config: BannerConfig
   bannerId?: string
   updatedAt?: string | Date // Not used for URL, but kept for potential future use
+  planTier?: string
 }
 
-export function CodeGenerator({ config, bannerId, updatedAt }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGeneratorProps) {
+  const showBranding = !planTier || planTier === 'free'
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>('head')
   const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -86,7 +88,7 @@ ${generateBannerJS(config)}
 <!-- 🍁 Place this code just before closing </body> tag          🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->${bodyScriptsHTML}
 
-${generateBannerHTML(config)}
+${generateBannerHTML(config, { showBranding })}
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 End BODY CODE - Powered by cookie-banner.ca               🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->`

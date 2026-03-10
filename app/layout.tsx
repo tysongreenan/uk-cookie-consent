@@ -14,6 +14,7 @@ import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
 import { UpdateAnnouncement } from '@/components/landing/update-announcement'
 import { AnnouncementProvider } from '@/lib/announcement-context'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const metadata: Metadata = {
   title: {
@@ -147,9 +148,10 @@ export default function RootLayout({
         
         <AnnouncementProvider>
           <Providers>
+            <TooltipProvider>
             <UpdateAnnouncement />
             {children}
-            <Toaster 
+            <Toaster
               position="top-right"
               toastOptions={{
                 duration: 4000,
@@ -160,6 +162,7 @@ export default function RootLayout({
                 },
               }}
             />
+            </TooltipProvider>
           </Providers>
         </AnnouncementProvider>
       </body>

@@ -383,10 +383,13 @@ export type PlanTier = 'free' | 'pro' | 'enterprise'
 export interface PlanFeatures {
   tier: PlanTier
   maxWebsites: number | 'unlimited'
+  maxBanners: number | 'unlimited'
   hasInternalAnalytics: boolean
+  hasGA4Integration: boolean
   hasTeamCollaboration: boolean
   hasCustomLayouts: boolean
   hasImageUpload: boolean
+  hasBrandingRemoval: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'dedicated'
 }

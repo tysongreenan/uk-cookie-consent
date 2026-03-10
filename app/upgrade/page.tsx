@@ -56,20 +56,21 @@ export default function UpgradePage() {
   }
 
   const proFeatures = [
-    { icon: <BarChart3 className="h-5 w-5" />, title: 'Analytics Dashboard', description: 'Track impressions, acceptance rates, and traffic estimation' },
+    { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', description: 'Create as many banners as you need (Free plan limited to 1)' },
+    { icon: <BarChart3 className="h-5 w-5" />, title: 'GA4 Analytics Integration', description: 'Track consent events, banner impressions, and user behavior in Google Analytics' },
+    { icon: <Shield className="h-5 w-5" />, title: 'Remove Branding', description: 'Remove "Powered by cookie-banner.ca" from your banners' },
     { icon: <Users className="h-5 w-5" />, title: 'Team Collaboration', description: 'Invite team members with role-based permissions' },
-    { icon: <Palette className="h-5 w-5" />, title: 'Custom Layouts', description: 'Modal, slide-in, minimalist, and more advanced layouts' },
+    { icon: <Palette className="h-5 w-5" />, title: '11 Custom Layouts', description: 'Modal, slide-in, minimalist, full-screen, and more' },
     { icon: <Upload className="h-5 w-5" />, title: 'Image Upload', description: 'Upload custom logos and branding elements' },
-    { icon: <Shield className="h-5 w-5" />, title: 'Priority Support', description: 'Get help when you need it with priority email support' },
     { icon: <Clock className="h-5 w-5" />, title: 'Lifetime Updates', description: 'All future features and improvements included forever' }
   ]
 
   const freeFeatures = [
+    '1 cookie banner',
     'Unlimited websites',
-    'GA4 integration',
+    '4 standard layouts',
     'All compliance frameworks',
-    'Standard layouts (Bottom, Top, Center, Side)',
-    'Basic customization',
+    '"Powered by" branding included',
     'Community support'
   ]
 

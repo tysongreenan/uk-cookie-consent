@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowRight, Clock } from 'lucide-react'
+import { ArrowRight, Clock, Crown } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -50,7 +50,7 @@ export function FinalCTA() {
           </h2>
           
           <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-            Free forever. No credit card required.
+            Start free. Upgrade to Pro for GA4 analytics & unlimited banners.
           </p>
 
           <div className="mx-auto max-w-md">
@@ -62,32 +62,41 @@ export function FinalCTA() {
                 </Link>
               </Button>
             ) : (
-              <form onSubmit={handleUrlSubmit} className="space-y-3 sm:space-y-4">
-                <div className="flex flex-col gap-3">
-                  <Input
-                    type="url"
-                    placeholder="millerwaste.ca"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    required
-                    autoComplete="url"
-                    inputMode="url"
-                    className="h-12 text-base sm:h-14 sm:text-lg"
-                  />
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="h-12 w-full text-base font-semibold sm:h-14 sm:text-lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Scanning...' : 'Scan Website'}
-                    <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground sm:text-sm">
-                  We will search your website for any scripts and import them for you as well as branding.
+              <>
+                <form onSubmit={handleUrlSubmit} className="space-y-3 sm:space-y-4">
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      type="url"
+                      placeholder="millerwaste.ca"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      required
+                      autoComplete="url"
+                      inputMode="url"
+                      className="h-12 text-base sm:h-14 sm:text-lg"
+                    />
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="h-12 w-full text-base font-semibold sm:h-14 sm:text-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Scanning...' : 'Scan Website'}
+                      <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground sm:text-sm">
+                    We will search your website for any scripts and import them for you as well as branding.
+                  </p>
+                </form>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Free plan includes 1 banner.{' '}
+                  <Link href="/pricing" className="text-foreground underline underline-offset-2 hover:text-primary transition-colors">
+                    See Pro features
+                  </Link>
+                  {' '}for $99 one-time.
                 </p>
-              </form>
+              </>
             )}
           </div>
         </div>

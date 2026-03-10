@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { canCreateBanner, getBannerLimit } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -11,9 +13,24 @@ const supabase = createClient(
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check banner limit for user's plan
+    const userTier = ((session.user as any).planTier || 'free') as PlanTier
+    const { data: existingBanners } = await supabase.rpc('get_banners_simple', {
+      user_id: session.user.id
+    })
+    const currentCount = existingBanners?.length || 0
+
+    if (!canCreateBanner(userTier, currentCount)) {
+      const limit = getBannerLimit(userTier)
+      return NextResponse.json({
+        error: `You've reached the ${limit} banner limit on the Free plan. Upgrade to Pro for unlimited banners.`,
+        upgradeRequired: true
+      }, { status: 403 })
     }
 
     const bannerData = await request.json()

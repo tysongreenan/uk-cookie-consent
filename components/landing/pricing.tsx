@@ -6,42 +6,48 @@ const plans = [
   {
     name: 'Free',
     price: '$0',
-    description: 'Perfect for personal projects and small websites',
+    description: 'Perfect for getting started quickly',
     features: [
-      '1 project',
-      'Basic banner templates',
-      'Standard customization',
+      '1 cookie banner',
+      'Unlimited websites',
+      '4 standard layouts',
+      'GDPR & CCPA compliance',
+      '"Powered by" branding',
       'Community support',
     ],
-    buttonText: 'Get Started',
+    buttonText: 'Get Started Free',
     popular: false,
   },
   {
     name: 'Pro',
-    price: '$19',
-    description: 'Ideal for growing businesses and agencies',
+    price: '$99',
+    period: 'one-time',
+    description: 'Everything you need, forever',
     features: [
-      'Unlimited projects',
-      'Advanced customization',
-      'Logo upload',
+      'Unlimited banners',
+      'GA4 analytics integration',
+      'Remove branding',
+      '11 custom layouts',
       'Analytics dashboard',
-      'Script management',
+      'Team collaboration',
+      'Logo & image upload',
       'Priority support',
+      'Lifetime updates',
     ],
-    buttonText: 'Start Pro Trial',
+    buttonText: 'Upgrade to Pro',
     popular: true,
   },
   {
     name: 'Enterprise',
     price: 'Custom',
-    description: 'For large organizations with specific needs',
+    description: 'For large organizations',
     features: [
       'Everything in Pro',
       'White-label options',
       'API access',
       'Custom integrations',
       'Dedicated support',
-      'SLA guarantee',
+      '99.9% SLA guarantee',
     ],
     buttonText: 'Contact Sales',
     popular: false,
@@ -72,7 +78,7 @@ export function Pricing() {
             )}
             <CardHeader>
               <CardTitle className="text-2xl">{plan.name}</CardTitle>
-              <div className="text-3xl font-bold">{plan.price}</div>
+              <div className="text-3xl font-bold">{plan.price}{(plan as any).period && <span className="text-sm font-normal text-muted-foreground"> {(plan as any).period}</span>}</div>
               <CardDescription>{plan.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

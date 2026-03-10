@@ -20,11 +20,12 @@ export function UpgradePrompt({
   className = '' 
 }: UpgradePromptProps) {
   const proFeatures = [
-    { icon: <BarChart3 className="h-4 w-4" />, text: 'Analytics Dashboard' },
+    { icon: <Crown className="h-4 w-4" />, text: 'Unlimited Banners' },
+    { icon: <BarChart3 className="h-4 w-4" />, text: 'GA4 Analytics Integration' },
+    { icon: <Zap className="h-4 w-4" />, text: 'Remove Branding' },
     { icon: <Users className="h-4 w-4" />, text: 'Team Collaboration' },
-    { icon: <Palette className="h-4 w-4" />, text: 'Custom Layouts' },
-    { icon: <Upload className="h-4 w-4" />, text: 'Image Upload' },
-    { icon: <Crown className="h-4 w-4" />, text: 'Priority Support' }
+    { icon: <Palette className="h-4 w-4" />, text: '11 Custom Layouts' },
+    { icon: <Upload className="h-4 w-4" />, text: 'Image Upload' }
   ]
 
   if (variant === 'banner') {
@@ -45,7 +46,7 @@ export function UpgradePrompt({
           <Button asChild className="bg-blue-600 hover:bg-blue-700">
             <Link href="/upgrade">
               <Zap className="h-4 w-4 mr-2" />
-              Upgrade to Pro - $48.99
+              Upgrade to Pro - $99
             </Link>
           </Button>
         </div>
@@ -76,7 +77,7 @@ export function UpgradePrompt({
           </div>
           <div className="pt-4 border-t">
             <div className="text-center mb-4">
-              <div className="text-2xl font-bold">$48.99</div>
+              <div className="text-2xl font-bold">$99</div>
               <div className="text-sm text-gray-600">One-time payment</div>
             </div>
             <Button asChild className="w-full">

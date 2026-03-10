@@ -246,7 +246,8 @@ const generateScriptLoaders = (
   }).join('\n\n')
 }
 
-export const generateBannerHTML = (config: BannerConfig) => {
+export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
+  const showBranding = options?.showBranding !== false // default true
   const logoElement = config.branding.logo.enabled && config.branding.logo.url
     ? `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
     : ''
@@ -416,7 +417,10 @@ export const generateBannerHTML = (config: BannerConfig) => {
           
           ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
         </div>
-        
+        ${showBranding ? `
+        <div style="margin-top: 8px;">
+          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener noreferrer" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Powered by cookie-banner.ca</a>
+        </div>` : ''}
       </div>
       
       ${config.branding.logo.position === 'right' ? logoElement : ''}

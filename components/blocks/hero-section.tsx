@@ -500,9 +500,16 @@ export function HeroSection({
                       </Button>
                     </div>
                   </form>
-                  <div className="text-center">
+                  <div className="text-center space-y-1">
                     <p className="text-sm text-muted-foreground">
                       We will search your website for any scripts and import them for you as well as branding.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Start free.{' '}
+                      <Link href="/pricing" className="text-foreground underline underline-offset-2 hover:text-primary transition-colors">
+                        Pro plan
+                      </Link>
+                      {' '}adds GA4 analytics, unlimited banners & more for $99 one-time.
                     </p>
                   </div>
                 </div>

@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { authRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail } from '@/lib/sanitize'
 import { logLoginAttempt, logAccountLockout, securityMonitor } from '@/lib/security-monitor'
-import jwt from 'jsonwebtoken'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -118,21 +117,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        email: user.email,
-        name: user.name 
-      },
-      process.env.NEXTAUTH_SECRET!,
-      { expiresIn: '24h' }
-    )
-
     // Log successful login
     logLoginAttempt(sanitizedEmail, ip, userAgent, true);
 
-    // Return user data and token (without password)
+    // Return user data (without password)
     return NextResponse.json({
       success: true,
       user: {
@@ -140,8 +128,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
         name: user.name
       },
-      token,
-      message: 'Login successful'
+      message: 'Login successful - use NextAuth for authenticated requests'
     })
 
   } catch (error) {

@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
           // Basic user query (only existing fields)
           const { data: user, error } = await supabase
             .from('User')
-            .select('id, email, name, password, emailVerified')
+            .select('id, email, name, password, emailVerified, planTier')
             .eq('email', credentials.email.toLowerCase().trim())
             .single()
 
@@ -141,7 +141,8 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             rememberMe: credentials.rememberMe === 'true',
             currentTeamId: teamMember?.team_id || null,
-            userRole: teamMember?.role || 'owner'
+            userRole: teamMember?.role || 'owner',
+            planTier: user.planTier || 'free'
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -166,6 +167,7 @@ export const authOptions: NextAuthOptions = {
         token.rememberMe = (user as any).rememberMe || false
         token.currentTeamId = (user as any).currentTeamId || null
         token.userRole = (user as any).userRole || 'owner'
+        token.planTier = (user as any).planTier || 'free'
       }
       return token
     },
@@ -190,6 +192,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           currentTeamId: token.currentTeamId,
           userRole: token.userRole,
+          planTier: token.planTier || 'free',
         },
         expires: new Date(Date.now() + maxAge * 1000).toISOString(),
       };

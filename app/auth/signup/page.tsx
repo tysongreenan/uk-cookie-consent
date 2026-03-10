@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Mail, Lock, User, ArrowRight, Shield, CheckCircle2, Loader2, Check } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Shield, CheckCircle2, Loader2, Check, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
@@ -184,19 +184,49 @@ function SignUpContent() {
           <p className="text-zinc-300 text-lg mb-8">
             Create your first compliant cookie banner in minutes. No credit card required.
           </p>
-          
+
+          {/* Mini plan comparison */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-zinc-200">
-              <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
-              <span>Free forever plan available</span>
+            <div className="rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 p-4">
+              <p className="text-sm font-semibold text-white mb-3">Free Plan</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>1 cookie banner on unlimited sites</span>
+                </div>
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>GDPR, CCPA & PIPEDA compliance</span>
+                </div>
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>4 layouts & full customization</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-zinc-200">
-              <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
-              <span>Full customization control</span>
-            </div>
-            <div className="flex items-center gap-3 text-zinc-200">
-              <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
-              <span>Multi-language support</span>
+
+            <div className="rounded-lg bg-blue-500/15 backdrop-blur-sm border border-blue-400/20 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-white flex items-center gap-1.5">
+                  <Crown className="w-4 h-4 text-blue-400" />
+                  Pro Plan
+                </p>
+                <span className="text-xs text-blue-300 font-medium">$99 one-time</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>Unlimited banners + GA4 analytics</span>
+                </div>
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>Remove branding + 11 layouts</span>
+                </div>
+                <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span>Team collaboration + lifetime updates</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

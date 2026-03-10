@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import jwt from 'jsonwebtoken'
+import { canCreateBanner, getBannerLimit } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 // Use service role key for server-side operations (bypasses RLS)
 // This is safe because we authenticate via NextAuth session before using it
@@ -11,52 +12,20 @@ const supabase = createClient(
   (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
-// Helper function to verify JWT token
-async function verifyToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.substring(7)
-  try {
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET!) as any
-    return decoded
-  } catch (error) {
-    return null
-  }
-}
-
-// Helper function to get user from either session or JWT token
-async function getUser(request: NextRequest) {
-  // Try NextAuth session first (for dashboard)
-  const session = await getServerSession(authOptions)
-  if (session?.user?.id) {
-    return { userId: session.user.id, source: 'session' }
-  }
-
-  // Fallback to JWT token (for Webflow extension)
-  const jwtUser = await verifyToken(request)
-  if (jwtUser?.userId) {
-    return { userId: jwtUser.userId, source: 'jwt' }
-  }
-
-  return null
-}
-
 // GET /api/banners - Get team's banners
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUser(request)
-    if (!user) {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
+    const userId = session.user.id
+
     // Get user's current team from session
-    const session = await getServerSession(authOptions)
     let currentTeamId = session?.user?.currentTeamId || (session?.user as any)?.current_team_id
 
     console.log('🔍 Banners: User session:', session?.user?.id, 'currentTeamId:', currentTeamId)
@@ -204,16 +173,15 @@ export async function GET(request: NextRequest) {
 // POST /api/banners - Create a new banner
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUser(request)
-    if (!user) {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Check if user has permission to create banners (edit permission)
-    const session = await getServerSession(authOptions)
+    const userId = session.user.id
     let currentTeamId = (session?.user as any)?.current_team_id
     let userRole = session?.user?.userRole
 
@@ -255,6 +223,29 @@ export async function POST(request: NextRequest) {
         { error: 'Insufficient permissions to create banners' },
         { status: 403 }
       )
+    }
+
+    // Check banner limit for user's plan
+    const userTier = ((session.user as any).planTier || 'free') as PlanTier
+    const { data: teamProjects } = await supabase
+      .from('Project')
+      .select('id')
+      .eq('team_id', currentTeamId)
+
+    if (teamProjects && teamProjects.length > 0) {
+      const projectIds = teamProjects.map(p => p.id)
+      const { count } = await supabase
+        .from('ConsentBanner')
+        .select('*', { count: 'exact', head: true })
+        .in('projectId', projectIds)
+
+      if (!canCreateBanner(userTier, count || 0)) {
+        const limit = getBannerLimit(userTier)
+        return NextResponse.json({
+          error: `You've reached the ${limit} banner limit on the Free plan. Upgrade to Pro for unlimited banners.`,
+          upgradeRequired: true
+        }, { status: 403 })
+      }
     }
 
     const bannerData = await request.json()
@@ -304,7 +295,7 @@ export async function POST(request: NextRequest) {
         .insert({
           id: projectId,
           name: 'Team Cookie Banners',
-          userId: user.userId,
+          userId: userId,
           team_id: currentTeamId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()

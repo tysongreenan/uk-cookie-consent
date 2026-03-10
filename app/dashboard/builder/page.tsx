@@ -28,6 +28,7 @@ import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -3501,7 +3502,15 @@ function BannerBuilderContent() {
                         <BarChart3 className="w-5 h-5 text-blue-600" />
                         <h3 className="font-semibold text-blue-900">Google Analytics 4</h3>
                       </div>
-                      
+
+                      {!canAccessFeature(userPlan, 'hasGA4Integration') ? (
+                        <UpgradePrompt
+                          feature="GA4 Integration"
+                          description="Connect Google Analytics 4 to track consent events and impressions"
+                          variant="inline"
+                        />
+                      ) : (
+                      <>
                       <div className="flex items-center space-x-2">
                         <Switch
                           id="ga4-enabled"
@@ -3595,6 +3604,8 @@ function BannerBuilderContent() {
                           </div>
                         </div>
                       )}
+                      </>
+                      )}
                     </div>
 
                     <div>
@@ -3624,6 +3635,69 @@ function BannerBuilderContent() {
 
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
+                {/* GA4 Events Reference */}
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center text-base">
+                      <Info className="mr-2 h-4 w-4 text-blue-600" />
+                      Events Sent to Google Analytics 4
+                    </CardTitle>
+                    <CardDescription>
+                      Hover over each event to see what it tracks. These fire automatically when visitors interact with your banner.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-green-100 text-green-800 px-2.5 py-1.5 rounded-md border border-green-200 hover:bg-green-150 transition-colors">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                            cookie_consent
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs">
+                          <p className="font-semibold mb-1">Consent Decision</p>
+                          <p className="text-xs">Fires when a user clicks Accept All, Reject All, or dismisses the banner. Includes <code className="bg-muted px-1 rounded text-[10px]">event_label: accept | reject | dismiss</code> so you can measure opt-in vs opt-out rates.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-purple-100 text-purple-800 px-2.5 py-1.5 rounded-md border border-purple-200 hover:bg-purple-150 transition-colors">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                            banner_impression
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs">
+                          <p className="font-semibold mb-1">Banner View</p>
+                          <p className="text-xs">Fires each time the consent banner is shown to a visitor. Divide accepts by impressions to get your consent rate.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-md border border-amber-200 hover:bg-amber-150 transition-colors">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            cookie_consent_update
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs">
+                          <p className="font-semibold mb-1">Consent Mode v2 Update</p>
+                          <p className="text-xs">Pushed to the dataLayer when preferences change. Includes <code className="bg-muted px-1 rounded text-[10px]">analytics_storage</code>, <code className="bg-muted px-1 rounded text-[10px]">ad_storage</code>, and <code className="bg-muted px-1 rounded text-[10px]">ad_personalization</code> status. Works with Google Consent Mode v2.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      All events work with GA4 Explorations, Audiences, and Looker Studio.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {!canAccessFeature(userPlan, 'hasGA4Integration') ? (
+                  <UpgradePrompt
+                    feature="GA4 Analytics Integration"
+                    description="Connect Google Analytics 4 to track the events above automatically"
+                    variant="card"
+                  />
+                ) : (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
@@ -3820,6 +3894,7 @@ function BannerBuilderContent() {
                     </div>
                   </CardContent>
                 </Card>
+                )}
               </TabsContent>
 
               {/* Code Tab */}
@@ -3869,10 +3944,11 @@ function BannerBuilderContent() {
                         </div>
                       </div>
                       <div className="p-0">
-                        <CodeGenerator 
-                          config={config} 
-                          bannerId={bannerId || undefined} 
+                        <CodeGenerator
+                          config={config}
+                          bannerId={bannerId || undefined}
                           updatedAt={bannerUpdatedAt || undefined}
+                          planTier={(session?.user as any)?.planTier || 'free'}
                         />
                       </div>
                     </div>

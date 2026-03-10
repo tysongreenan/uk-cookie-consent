@@ -1,27 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import jwt from 'jsonwebtoken'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
   (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
-
-// Helper function to verify JWT token
-async function verifyToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.substring(7)
-  try {
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET!) as any
-    return decoded
-  } catch (error) {
-    return null
-  }
-}
 
 // Generate cookie banner code
 function generateBannerCode(config: any) {
@@ -159,24 +144,26 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyToken(request)
-    if (!user) {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
+    const userId = session.user.id
+
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .select(`
-        id, 
-        config, 
+        id,
+        config,
         projectId,
         Project!inner(userId)
       `)
       .eq('id', params.id)
-      .eq('Project.userId', user.userId)
+      .eq('Project.userId', userId)
       .single()
 
     if (error || !banner) {

@@ -19,17 +19,17 @@ export default function PricingPage() {
       period: '',
       description: 'Start free, upgrade when ready',
       features: [
-        'Save 3+ Hours Per Website Setup',
-        'Avoid $20K+ GDPR Fines Automatically',
+        '1 Cookie Banner',
+        'GDPR & CCPA Compliance Built-In',
+        '4 Standard Layouts',
         'Works on Unlimited Websites',
         'Copy & Paste in 5 Minutes',
-        'Match Your Brand Perfectly',
+        'Includes "Powered by" Branding',
         'Community Support'
       ],
       cta: 'Get Started Free',
       tier: 'free',
       icon: <Zap className="w-6 h-6" />,
-      popular: true,
       ctaLink: '/builder'
     },
     {
@@ -38,18 +38,20 @@ export default function PricingPage() {
       period: ' one-time',
       description: 'Everything you need, forever',
       features: [
-        'Everything in Free',
-        'Save 10+ Hours with Analytics Dashboard',
+        'Unlimited Banners',
+        'GA4 Analytics Integration',
+        '11 Layouts Including Modal & Slide-In',
+        'Remove "Powered by" Branding',
+        'Analytics Dashboard & Insights',
         'Invite Unlimited Team Members',
-        'Create Custom Layouts in Minutes',
-        'Upload Your Logo Instantly',
-        'Advanced Brand Customization',
+        'Upload Your Logo & Images',
         'Priority Email Support',
         'Lifetime Updates Included'
       ],
       cta: 'Upgrade to Pro',
       tier: 'pro',
       icon: <Crown className="w-6 h-6" />,
+      popular: true,
       ctaLink: '/upgrade'
     },
     {
@@ -59,10 +61,10 @@ export default function PricingPage() {
       description: 'For large organizations',
       features: [
         'Everything in Pro',
-        'Scale to Unlimited Team Members',
         'White-Label for Your Clients',
         'Dedicated Support Manager',
         'Custom Integrations Built for You',
+        'API Access',
         '99.9% Uptime SLA Guarantee',
         'On-Premise Deployment Available'
       ],
