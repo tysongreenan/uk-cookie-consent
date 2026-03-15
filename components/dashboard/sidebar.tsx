@@ -16,9 +16,11 @@ import {
   Shield,
   Code,
   Globe,
-  Target
+  Target,
+  Crown
 } from 'lucide-react'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { NewBadge } from '@/components/ui/new-badge'
 import { WorkspaceSwitcher } from '@/components/dashboard/workspace-switcher'
 
@@ -53,7 +55,7 @@ const navigationItems: NavItem[] = [
   }
 ]
 
-const supportItems: NavItem[] = [
+const getSupportItems = (isPro: boolean): NavItem[] => [
   {
     title: 'Documentation',
     href: '/docs',
@@ -65,9 +67,9 @@ const supportItems: NavItem[] = [
     icon: BarChart3,
   },
   {
-    title: 'Support',
+    title: isPro ? 'Priority Support' : 'Support',
     href: '/support',
-    icon: HelpCircle,
+    icon: isPro ? Crown : HelpCircle,
   }
 ]
 
@@ -77,7 +79,10 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const userPlan = ((session?.user as any)?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
+  const isPro = userPlan === 'pro' || userPlan === 'enterprise'
 
   const toggleExpanded = (title: string) => {
     setExpandedItems(prev => 
@@ -150,7 +155,7 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
           <div>
             <h1 className="text-lg font-semibold">CookieBanner</h1>
-            <p className="text-xs text-muted-foreground">Pro Dashboard</p>
+            <p className="text-xs text-muted-foreground">{isPro ? <span className="text-amber-600 font-medium">Pro Dashboard</span> : 'Dashboard'}</p>
           </div>
         </Link>
       </div>
@@ -173,7 +178,7 @@ export function Sidebar({ className }: SidebarProps) {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             Support
           </p>
-          {supportItems.map(item => renderNavItem(item))}
+          {getSupportItems(isPro).map(item => renderNavItem(item))}
         </div>
       </nav>
 

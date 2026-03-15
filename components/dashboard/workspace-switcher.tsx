@@ -40,6 +40,8 @@ export function WorkspaceSwitcher() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [loading, setLoading] = useState(true)
   const [switching, setSwitching] = useState(false)
+  const userPlan = ((session?.user as any)?.planTier || 'free') as string
+  const isPro = userPlan === 'pro' || userPlan === 'enterprise'
 
   useEffect(() => {
     fetchWorkspaces()
@@ -200,6 +202,7 @@ export function WorkspaceSwitcher() {
               <span className="hidden sm:inline truncate max-w-32">
                 {currentWorkspace?.name || 'Select Workspace'}
               </span>
+          {isPro && <Badge className="ml-2 bg-amber-500 text-white text-[11px] px-2 py-0.5 border-0 font-semibold tracking-wide" aria-label="Pro plan workspace">PRO</Badge>}
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>

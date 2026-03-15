@@ -88,20 +88,12 @@ export default function AnalyticsPage() {
   }, [session])
   
   async function fetchUserPlan() {
-    if (!session?.user?.id) return
-    
-    try {
-      const { data, error } = await supabase
-        .from('User')
-        .select('planTier')
-        .eq('id', session.user.id)
-        .single()
-      
-      if (data?.planTier) {
-        setUserPlan(data.planTier as 'free' | 'pro' | 'enterprise')
-      }
-    } catch (error) {
-      console.error('Error fetching user plan:', error)
+    if (!session?.user) return
+
+    // Use planTier from session (set in NextAuth JWT callback) instead of querying Supabase directly
+    const planTier = (session.user as any).planTier as 'free' | 'pro' | 'enterprise' | undefined
+    if (planTier) {
+      setUserPlan(planTier)
     }
   }
   
