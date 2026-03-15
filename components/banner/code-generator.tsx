@@ -157,24 +157,24 @@ ${generateBannerHTML(config, { showBranding })}
       <div className="space-y-4">
         {/* Update notice */}
         {showUpdateNotice && (
-          <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg relative">
-            <button onClick={dismissUpdateNotice} className="absolute top-3 right-3 text-amber-600 hover:text-amber-800" aria-label="Dismiss">
+          <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 rounded-lg relative">
+            <button onClick={dismissUpdateNotice} className="absolute top-3 right-3 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300" aria-label="Dismiss">
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-start gap-3 pr-6">
-              <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-amber-900">Banner update available: {latestUpdate.title}</p>
-                <p className="text-xs text-amber-700 mt-1">Hosted script users get updates automatically. No action needed.</p>
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">Banner update available: {latestUpdate.title}</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">Hosted script users get updates automatically. No action needed.</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Instructions */}
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm font-semibold text-green-900 mb-2">One line of code. That's it.</p>
-          <p className="text-sm text-green-800">Copy the script tag below and paste it in your website's <code className="bg-green-100 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</p>
+        <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+          <p className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">One line of code. That's it.</p>
+          <p className="text-sm text-green-800 dark:text-green-300">Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</p>
         </div>
 
         {/* Code block */}
@@ -185,7 +185,7 @@ ${generateBannerHTML(config, { showBranding })}
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-xs text-muted-foreground">Paste this in your &lt;head&gt; section</span>
               </div>
-              <span className="text-[10px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">RECOMMENDED</span>
+              <span className="text-[10px] bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 font-semibold px-1.5 py-0.5 rounded-full">RECOMMENDED</span>
             </div>
             <pre className="p-4 text-sm overflow-x-auto bg-muted/50">
               <code>{getCode()}</code>
@@ -279,26 +279,26 @@ ${generateBannerHTML(config, { showBranding })}
     <div className="space-y-4">
       {/* Update notification for copy-paste users */}
       {showUpdateNotice && (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg relative">
-          <button onClick={dismissUpdateNotice} className="absolute top-3 right-3 text-amber-600 hover:text-amber-800" aria-label="Dismiss">
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 rounded-lg relative">
+          <button onClick={dismissUpdateNotice} className="absolute top-3 right-3 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300" aria-label="Dismiss">
             <X className="h-4 w-4" />
           </button>
           <div className="flex items-start gap-3 pr-6">
-            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-900">Banner update available: {latestUpdate.title}</p>
-              <ul className="text-sm text-amber-800 mt-1.5 space-y-0.5 list-disc ml-4">
+              <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">Banner update available: {latestUpdate.title}</p>
+              <ul className="text-sm text-amber-800 dark:text-amber-300 mt-1.5 space-y-0.5 list-disc ml-4">
                 {latestUpdate.changes.map((change, i) => (
                   <li key={i}>{change}</li>
                 ))}
               </ul>
               <div className="flex items-center gap-3 mt-3">
-                <Button onClick={regenerateCode} size="sm" variant="outline" className="border-amber-400 bg-amber-100 hover:bg-amber-200 text-amber-900" disabled={isGenerating}>
+                <Button onClick={regenerateCode} size="sm" variant="outline" className="border-amber-400 dark:border-amber-700 bg-amber-100 dark:bg-amber-900/50 hover:bg-amber-200 dark:hover:bg-amber-900/70 text-amber-900 dark:text-amber-300" disabled={isGenerating}>
                   <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
                   Re-copy code to update
                 </Button>
                 {bannerId && (
-                  <span className="text-xs text-amber-700">
+                  <span className="text-xs text-amber-700 dark:text-amber-400">
                     Or switch to <button onClick={() => setActiveTab('hosted')} className="underline font-medium">Hosted Script</button> for automatic updates
                   </span>
                 )}
@@ -309,15 +309,15 @@ ${generateBannerHTML(config, { showBranding })}
       )}
 
       {/* Instructions */}
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm font-medium text-blue-900 mb-2">Manual Installation:</p>
-        <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
+      <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Manual Installation:</p>
+        <ol className="text-sm text-blue-800 dark:text-blue-300 space-y-1 ml-4 list-decimal">
           <li><strong>Copy "Head Code"</strong> and paste it in your <code>&lt;head&gt;</code> section</li>
           <li><strong>Copy "Body Code"</strong> and paste it just before the closing <code>&lt;/body&gt;</code> tag</li>
           <li><strong>Save and refresh</strong> your website to see the banner</li>
         </ol>
         {bannerId && (
-          <p className="text-xs text-blue-700 mt-2">
+          <p className="text-xs text-blue-700 dark:text-blue-400 mt-2">
             Want easier installation? <button onClick={() => setActiveTab('hosted')} className="underline font-medium">Switch to Hosted Script</button> — one line of code, automatic updates.
           </p>
         )}
@@ -340,7 +340,7 @@ ${generateBannerHTML(config, { showBranding })}
             }`}
           >
             {tab.label}
-            {tab.id === 'hosted' && <span className="ml-1.5 text-[10px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">RECOMMENDED</span>}
+            {tab.id === 'hosted' && <span className="ml-1.5 text-[10px] bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 font-semibold px-1.5 py-0.5 rounded-full">RECOMMENDED</span>}
           </button>
         ))}
       </div>

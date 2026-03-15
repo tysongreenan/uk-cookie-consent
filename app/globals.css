@@ -266,13 +266,17 @@
   }
 }
 
-/* Force light color scheme — prevents Chrome dark mode from overriding input styles */
+/* Color scheme — allows browser UI (scrollbars, inputs, etc.) to follow the theme */
 :root {
   color-scheme: light;
 }
 
+.dark {
+  color-scheme: dark;
+}
+
 input, textarea, select {
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 /* Override Chrome autofill dark mode styles */

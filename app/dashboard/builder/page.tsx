@@ -467,11 +467,11 @@ const SmartScriptInput = ({
         className="font-medium border-0 p-0 h-auto"
       />
       {showSuggestions && filteredScripts.length > 0 && value.trim() && (
-        <div className="absolute top-full left-0 right-0 z-50 bg-white border rounded-md shadow-lg mt-1 max-h-32 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 z-50 bg-popover border rounded-md shadow-lg mt-1 max-h-32 overflow-y-auto">
           {filteredScripts.map((script, index) => (
             <button
               key={index}
-              className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
               onMouseDown={(e) => {
                 e.preventDefault()
                 onChange(script)
@@ -977,7 +977,7 @@ function BannerBuilderContent() {
             <strong>Changes pushed live!</strong>
             <p className="text-sm mt-1">The script URL has been updated with a new cache-busting parameter.</p>
             <p className="text-sm mt-1">Browsers will automatically fetch the latest version.</p>
-            <p className="text-xs mt-1 text-gray-500">If you see old content, hard refresh (Ctrl+Shift+R).</p>
+            <p className="text-xs mt-1 text-muted-foreground">If you see old content, hard refresh (Ctrl+Shift+R).</p>
           </div>,
           { duration: 6000 }
         )
@@ -1058,7 +1058,7 @@ function BannerBuilderContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white">
+      <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -1073,7 +1073,7 @@ function BannerBuilderContent() {
                     value={config.name}
                     onChange={(e) => { setIsDirty(true); setConfig(prev => ({ ...prev, name: e.target.value })) }}
                     placeholder="Banner name"
-                    className="text-lg font-semibold border-0 p-0 h-auto bg-transparent focus:bg-white focus:border focus:px-2 focus:py-1 focus:rounded"
+                    className="text-lg font-semibold border-0 p-0 h-auto bg-transparent focus:bg-background focus:border focus:px-2 focus:py-1 focus:rounded"
                   />
                   <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
@@ -1335,7 +1335,7 @@ function BannerBuilderContent() {
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                           (config.behavior.buttonLayout || 'standard') === 'standard'
                             ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-gray-300'
+                            : 'border-border hover:border-muted-foreground/50'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1361,7 +1361,7 @@ function BannerBuilderContent() {
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                           config.behavior.buttonLayout === 'soft-consent'
                             ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-gray-300'
+                            : 'border-border hover:border-muted-foreground/50'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1387,7 +1387,7 @@ function BannerBuilderContent() {
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                           config.behavior.buttonLayout === 'accept-only'
                             ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-gray-300'
+                            : 'border-border hover:border-muted-foreground/50'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1641,7 +1641,7 @@ function BannerBuilderContent() {
                               <img
                                 src={brandDiscovery.logo.url}
                                 alt="Detected brand logo"
-                                className="h-16 w-16 rounded border bg-white object-contain p-2"
+                                className="h-16 w-16 rounded border bg-muted object-contain p-2"
                               />
                               <div className="flex-1 space-y-1">
                                 <p className="text-sm font-medium">Detected logo</p>
@@ -2373,12 +2373,12 @@ function BannerBuilderContent() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* Cookie Settings Management is mandatory */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <p className="text-sm text-blue-800 font-medium">Cookie Settings Management</p>
+                        <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">Cookie Settings Management</p>
                       </div>
-                      <p className="text-xs text-blue-600 mt-1">
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                         Required for compliance. Users must be able to manage their cookie preferences after initial consent.
                       </p>
                     </div>
@@ -2735,8 +2735,8 @@ function BannerBuilderContent() {
                       {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
                         <div className="space-y-3">
                           <h4 className="text-sm font-medium">Floating Button Preview</h4>
-                          <div className="relative border-2 border-dashed border-gray-200 rounded-lg p-8 bg-gray-50 min-h-[200px]">
-                            <div className="text-center text-sm text-gray-500 mb-4">
+                          <div className="relative border-2 border-dashed border-border rounded-lg p-8 bg-muted/50 min-h-[200px]">
+                            <div className="text-center text-sm text-muted-foreground mb-4">
                               Your website content would appear here
                             </div>
                             
@@ -2787,8 +2787,8 @@ function BannerBuilderContent() {
                       {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
                         <div className="space-y-3">
                           <h4 className="text-sm font-medium">Inline Footer Link Preview</h4>
-                          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                            <div className="text-xs text-gray-500 mb-2">Footer area:</div>
+                          <div className="border border-border rounded-lg p-4 bg-muted/50">
+                            <div className="text-xs text-muted-foreground mb-2">Footer area:</div>
                             <div 
                               className="inline-block"
                               dangerouslySetInnerHTML={{ 
@@ -2820,7 +2820,7 @@ function BannerBuilderContent() {
                       )}
 
                       {!config.branding?.footerLink?.style && (
-                        <div className="text-center text-gray-500 py-8">
+                        <div className="text-center text-muted-foreground py-8">
                           <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
                           <p>Select a display style to see preview</p>
                         </div>
@@ -3795,9 +3795,9 @@ function BannerBuilderContent() {
                       </div>
                     </div>
 
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-medium text-blue-900 mb-2">Performance Benefits</h4>
-                      <ul className="text-sm text-blue-800 space-y-1">
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Performance Benefits</h4>
+                      <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
                         <li>• <strong>Faster LCP:</strong> Deferred scripts don't block page rendering</li>
                         <li>• <strong>Better INP:</strong> Scripts load during idle time</li>
                         <li>• <strong>Reduced CLS:</strong> Inline CSS prevents layout shifts</li>
@@ -3826,10 +3826,10 @@ function BannerBuilderContent() {
                     </div>
 
                     {/* Google Analytics 4 Configuration */}
-                    <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
+                    <div className="space-y-4 p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800">
                       <div className="flex items-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-blue-600" />
-                        <h3 className="font-semibold text-blue-900">Google Analytics 4</h3>
+                        <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <h3 className="font-semibold text-blue-900 dark:text-blue-300">Google Analytics 4</h3>
                       </div>
 
                       {!canAccessFeature(userPlan, 'hasGA4Integration') ? (
@@ -3979,7 +3979,7 @@ function BannerBuilderContent() {
                     <div className="flex flex-wrap gap-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-green-100 text-green-800 px-2.5 py-1.5 rounded-md border border-green-200 hover:bg-green-150 transition-colors">
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300 px-2.5 py-1.5 rounded-md border border-green-200 dark:border-green-800 hover:bg-green-150 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                             cookie_consent
                           </span>
@@ -3991,7 +3991,7 @@ function BannerBuilderContent() {
                       </Tooltip>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-purple-100 text-purple-800 px-2.5 py-1.5 rounded-md border border-purple-200 hover:bg-purple-150 transition-colors">
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300 px-2.5 py-1.5 rounded-md border border-purple-200 dark:border-purple-800 hover:bg-purple-150 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                             banner_impression
                           </span>
@@ -4003,7 +4003,7 @@ function BannerBuilderContent() {
                       </Tooltip>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-md border border-amber-200 hover:bg-amber-150 transition-colors">
+                          <span className="inline-flex items-center gap-1.5 cursor-help text-xs font-semibold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 px-2.5 py-1.5 rounded-md border border-amber-200 dark:border-amber-800 hover:bg-amber-150 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                             cookie_consent_update
                           </span>
@@ -4039,13 +4039,13 @@ function BannerBuilderContent() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* GA4 Status */}
-                    <div className={`p-4 rounded-lg border ${config.integrations?.googleAnalytics?.measurementId ? 'bg-gradient-to-r from-blue-50 to-green-50 border-green-200' : 'bg-gradient-to-r from-blue-50 to-gray-50 border-gray-200'}`}>
+                    <div className={`p-4 rounded-lg border ${config.integrations?.googleAnalytics?.measurementId ? 'bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-950/30 dark:to-green-950/30 border-green-200 dark:border-green-800' : 'bg-gradient-to-r from-blue-50 to-muted dark:from-blue-950/30 dark:to-muted border-border'}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div className={`w-3 h-3 rounded-full ${config.integrations?.googleAnalytics?.measurementId ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                           <div>
-                            <h3 className="font-semibold text-gray-900">Google Analytics 4</h3>
-                            <p className="text-sm text-gray-600">
+                            <h3 className="font-semibold text-foreground">Google Analytics 4</h3>
+                            <p className="text-sm text-muted-foreground">
                               {config.integrations?.googleAnalytics?.measurementId 
                                 ? '✅ Configured and ready' 
                                 : '⚠️ Add your Measurement ID below'}
@@ -4209,9 +4209,9 @@ function BannerBuilderContent() {
 
                     {/* Actions */}
                     <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="text-sm text-gray-600">
-                        {config.integrations?.googleAnalytics?.measurementId 
-                          ? 'Your GA4 integration is configured and will track consent events.' 
+                      <div className="text-sm text-muted-foreground">
+                        {config.integrations?.googleAnalytics?.measurementId
+                          ? 'Your GA4 integration is configured and will track consent events.'
                           : 'Enter your GA4 Measurement ID above to enable tracking.'}
                       </div>
                       <Button variant="outline" asChild>
@@ -4271,13 +4271,13 @@ function BannerBuilderContent() {
                   <CardContent>
                     {/* Browser Chrome Frame */}
                     <div className="border rounded-lg overflow-hidden">
-                      <div className="bg-gray-100 rounded-t-lg px-3 py-2 flex items-center gap-2 border-b">
+                      <div className="bg-muted rounded-t-lg px-3 py-2 flex items-center gap-2 border-b">
                         <div className="flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-red-400" />
                           <span className="w-2 h-2 rounded-full bg-yellow-400" />
                           <span className="w-2 h-2 rounded-full bg-green-400" />
                         </div>
-                        <div className="flex-1 mx-2 bg-gray-200 rounded-md px-3 py-1 text-xs text-gray-500 text-center truncate">
+                        <div className="flex-1 mx-2 bg-muted-foreground/15 rounded-md px-3 py-1 text-xs text-muted-foreground text-center truncate">
                           yoursite.com
                         </div>
                       </div>
