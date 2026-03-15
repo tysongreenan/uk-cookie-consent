@@ -3,13 +3,10 @@ import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
-import { 
-  bannerCache, 
-  CACHE_TTL_MS, 
-  getCachedBanner, 
-  setCachedBanner, 
-  cleanupExpiredCache 
-} from '@/lib/banner-cache'
+// NOTE: In-memory banner cache removed intentionally.
+// On Vercel serverless, each instance has its own memory — invalidating cache
+// on one instance doesn't clear others, causing stale banners after updates.
+// We rely on ETag/304 (database updatedAt) + short Cache-Control max-age instead.
 
 // Lazy initialization to avoid build-time errors and ensure service role key is used
 function getSupabaseClient() {
@@ -58,7 +55,6 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const bannerId = searchParams.get('id')
-    const nocache = searchParams.get('nocache') === 'true' // Allow cache bypass for testing
     
     if (!bannerId) {
       return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
@@ -81,12 +77,7 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    // Clean up expired cache entries occasionally (1% chance per request)
-    if (Math.random() < 0.01) {
-      cleanupExpiredCache()
-    }
-    
-    // Always fetch updatedAt from DB for ETag generation
+    // Fetch updatedAt from DB for ETag generation
     // This is the source of truth for cache invalidation across serverless instances
     const supabase = getSupabaseClient()
 
@@ -131,49 +122,8 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Check server-side cache, but ONLY use it if:
-    // 1. nocache is not set
-    // 2. Client has no ETag (first request) OR client's ETag matches current (already handled above with 304)
-    // If client has a DIFFERENT ETag, it means the banner was updated and we need fresh data
-    const clientHasStaleEtag = ifNoneMatch && ifNoneMatch !== etag
-    const cached = (nocache || clientHasStaleEtag) ? null : getCachedBanner(bannerId)
-
-    // If we have cached script and banner is active, return it with ETag
-    if (cached && cached.isActive) {
-      console.log(`📦 Banner cache HIT for: ${bannerId}`)
-      return new NextResponse(cached.script, {
-        headers: {
-          'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
-          'ETag': etag,
-          'Access-Control-Allow-Origin': '*',
-          'X-Cache': 'HIT',
-          'X-RateLimit-Limit': '100',
-          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-          'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-          ...SECURITY_HEADERS,
-        },
-      })
-    }
-
-    if (cached && !cached.isActive) {
-      console.log(`📦 Banner cache HIT (inactive) for: ${bannerId}`)
-      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', {
-        headers: {
-          'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
-          'ETag': etag,
-          'X-Cache': 'HIT',
-          ...SECURITY_HEADERS,
-        }
-      })
-    }
-
-    console.log(`📦 Banner cache MISS for: ${bannerId}${clientHasStaleEtag ? ' (client had stale ETag)' : ''}`)
-    
-    // Cache miss - fetch full banner from database
-    
-    // Fetch config by banner ID from SimpleBanners table (using service role to bypass RLS)
+    // Fetch full banner from database
+    // No in-memory cache — every request gets fresh data from DB, with ETag/304 for browser caching
     // Try SimpleBanners first (new system)
     let banner: any = null
     let error: any = null
@@ -217,13 +167,7 @@ export async function GET(request: NextRequest) {
     const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
     const finalEtag = `"${bannerId}-${bannerUpdatedAt}"`
     
-    // Cache inactive banners too (to avoid repeated DB queries)
     if (!banner.isActive) {
-      setCachedBanner(bannerId, {
-        script: 'console.log("Cookie Banner: Banner is inactive");',
-        isActive: false
-      })
-      
       // Check if client has cached version (304 Not Modified)
       if (ifNoneMatch === finalEtag) {
         return new NextResponse(null, {
@@ -312,11 +256,65 @@ export async function GET(request: NextRequest) {
       .replace('</script>', '')
       .trim()
 
+    // Build internal analytics tracking code (only for users with analytics enabled)
+    const analyticsUserId = bannerUserId || ''
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
+    const internalAnalyticsJs = `
+  // Internal Analytics Tracking
+  var _cbAnalyticsUserId = ${JSON.stringify(analyticsUserId)};
+  var _cbTrackUrl = ${JSON.stringify(baseUrl + '/api/v1/track')};
+  var _cbBannerShownAt = 0;
+  var _cbEventQueue = [];
+  var _cbFlushTimer = null;
+
+  function _cbQueueEvent(type, extra) {
+    if (!_cbAnalyticsUserId) return;
+    var evt = { type: type };
+    if (extra) {
+      if (extra.decisionTime) evt.decisionTime = extra.decisionTime;
+      if (extra.isReturning) evt.isReturning = true;
+    }
+    _cbEventQueue.push(evt);
+    // Debounce: flush after 1s of no new events, or immediately if queue has 5+
+    if (_cbFlushTimer) clearTimeout(_cbFlushTimer);
+    if (_cbEventQueue.length >= 5) {
+      _cbFlushEvents();
+    } else {
+      _cbFlushTimer = setTimeout(_cbFlushEvents, 1000);
+    }
+  }
+
+  function _cbFlushEvents() {
+    if (_cbEventQueue.length === 0) return;
+    var batch = _cbEventQueue.splice(0, 10);
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(_cbTrackUrl, JSON.stringify({ userId: _cbAnalyticsUserId, events: batch }));
+      } else {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', _cbTrackUrl, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({ userId: _cbAnalyticsUserId, events: batch }));
+      }
+    } catch(e) {}
+  }
+
+  // Flush remaining events when page unloads
+  if (typeof addEventListener !== 'undefined') {
+    addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') _cbFlushEvents();
+    });
+  }
+`
+
     // Combine into a single executable script
     const combinedScript = `
 (function() {
   // 1. Initialize Consent Mode (Critical)
   ${consentInitJs}
+
+  // 1b. Internal Analytics
+  ${internalAnalyticsJs}
 
   // 2. Inject CSS
   var style = document.createElement('style');
@@ -327,9 +325,27 @@ export async function GET(request: NextRequest) {
   // Uses retry logic and MutationObserver for compatibility with page builders
   // (Brizy, Elementor, Divi, etc.) that may rebuild the DOM after initial load
   // Note: bannerHTMLContent is server-generated from trusted config, not user-supplied HTML
+  // Hook into trackConsentEvent for internal analytics
+  // This runs before the banner JS defines trackConsentEvent, so we
+  // set up a global hook that the banner JS will call
+  var _cbOrigTrackConsentEvent = null;
+  function _cbInternalTrack(action) {
+    var decisionTime = _cbBannerShownAt > 0 ? Date.now() - _cbBannerShownAt : 0;
+    if (action === 'impression') {
+      _cbBannerShownAt = Date.now();
+      var isReturning = false;
+      try { isReturning = !!localStorage.getItem('cookie-consent'); } catch(e) {}
+      _cbQueueEvent('impression', { isReturning: isReturning });
+    } else if (action === 'accept' || action === 'reject' || action === 'dismiss') {
+      _cbQueueEvent(action, { decisionTime: decisionTime });
+    }
+  }
+
   var bannerInjected = false;
   var bannerHTMLContent = ${JSON.stringify(html)};
-  var bannerJSInit = function() { ${js} };
+  var bannerJSInit = function() {
+    ${js}
+  };
 
   function injectBannerHTML() {
     if (!document.body) {
@@ -401,12 +417,6 @@ export async function GET(request: NextRequest) {
         },
       })
     }
-    
-    // Cache the generated script (shared cache can be invalidated from update endpoints)
-    setCachedBanner(bannerId, {
-      script: combinedScript,
-      isActive: true
-    })
     
     return new NextResponse(combinedScript, {
       headers: {

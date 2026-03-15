@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { invalidateBannerCache } from '@/lib/banner-cache'
 import { canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 
@@ -191,9 +190,7 @@ export async function PUT(
         }
       }
 
-      // Invalidate cache so the status change appears immediately
-      invalidateBannerCache(params.id)
-      console.log('✅ Simple Toggle: Banner toggled and cache invalidated in', bannerTable)
+      console.log('✅ Simple Toggle: Banner toggled in', bannerTable)
       
       return NextResponse.json({ 
         success: true, 
@@ -264,9 +261,7 @@ function rejectCookies() {
       .eq('id', params.id)
       .single()
 
-    // Invalidate cache so changes appear immediately on live websites
-    invalidateBannerCache(params.id)
-    console.log('✅ Simple Update: Banner updated and cache invalidated:', params.id)
+    console.log('✅ Simple Update: Banner updated:', params.id)
 
     return NextResponse.json({
       success: true,

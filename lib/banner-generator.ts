@@ -598,7 +598,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   transition: all 0.2s ease;
   opacity: 0.9;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'" onclick="window.showCookiePreferences&amp;&amp;window.showCookiePreferences()">
+" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
   ${generateFloatingButtonContent(config)}
 </div>` : ''
 
@@ -852,6 +852,8 @@ function initGA4() {
 }
 
 function trackConsentEvent(action) {
+  // Send to internal analytics if available
+  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action);
   // For reject events, we need to track them even if GA4 isn't loaded yet
   // This respects user privacy while still providing analytics insights
   if (action === 'reject' && GA_TRACK_CONSENT_EVENTS) {
@@ -892,7 +894,7 @@ function initGA4() {
 }
 
 function trackConsentEvent(action) {
-  console.log('GA4 consent event not tracked (not configured):', action);
+  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action);
 }`
 
   // Determine icon color for the floating button in JS section
@@ -1132,6 +1134,17 @@ ${config.branding.footerLink.enabled ? `
 window.showCookiePreferences = function() {
   showPreferencesModal();
 };
+
+// Attach click handler to floating button via addEventListener
+// (more reliable than onclick attribute — some page builders and CSP policies strip inline handlers)
+var floatingBtn = document.getElementById('cookie-settings-float');
+if (floatingBtn && !floatingBtn.dataset.handlerAttached) {
+  floatingBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    showPreferencesModal();
+  });
+  floatingBtn.dataset.handlerAttached = 'true';
+}
 ` : ''}
 
 ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `

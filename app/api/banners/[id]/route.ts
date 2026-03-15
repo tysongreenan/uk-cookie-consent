@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
-import { invalidateBannerCache } from '@/lib/banner-cache'
 import { canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 
@@ -179,9 +178,7 @@ async function handleBannerUpdate(
       )
     }
 
-    // Invalidate cache so changes appear immediately on live websites
-    invalidateBannerCache(bannerId)
-    console.log(`✅ Banner ${bannerId} updated and cache invalidated`)
+    console.log(`✅ Banner ${bannerId} updated`)
 
     return NextResponse.json({
       success: true,
