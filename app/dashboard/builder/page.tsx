@@ -4238,65 +4238,13 @@ function BannerBuilderContent() {
                       Copy and paste this code into your website to activate your cookie banner
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Instructions */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">!</span>
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-blue-900 mb-1">Quick Setup Instructions</h4>
-                          <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                            <li>Copy the code below</li>
-                            <li>Paste it into the &lt;body&gt; section of your website</li>
-                            <li>Place it before the closing &lt;/body&gt; tag</li>
-                            <li>Your cookie banner will appear automatically</li>
-                          </ol>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Code Generator */}
-                    <div className="bg-white border rounded-lg overflow-hidden">
-                      <div className="bg-gray-50 px-4 py-3 border-b">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-gray-900 flex items-center">
-                            <Code className="mr-2 h-4 w-4" />
-                            Your Cookie Banner Code
-                          </h4>
-                          <div className="text-xs text-gray-500">
-                            Ready to implement
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-0">
-                        <CodeGenerator
-                          config={config}
-                          bannerId={bannerId || undefined}
-                          updatedAt={bannerUpdatedAt || undefined}
-                          planTier={(session?.user as any)?.planTier || 'free'}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Success Message */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-green-900">All Set!</h4>
-                          <p className="text-sm text-green-700">
-                            Your cookie banner is configured and ready to deploy. Once you add the code to your website, 
-                            it will automatically comply with {config.compliance.framework.toUpperCase()} requirements.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                  <CardContent>
+                    <CodeGenerator
+                      config={config}
+                      bannerId={bannerId || undefined}
+                      updatedAt={bannerUpdatedAt || undefined}
+                      planTier={(session?.user as any)?.planTier || 'free'}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
