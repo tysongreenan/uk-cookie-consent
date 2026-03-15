@@ -992,6 +992,47 @@ function BannerBuilderContent() {
     }
   }
 
+  const isStepComplete = (step: string): boolean => {
+    switch (step) {
+      case 'compliance':
+        return false // Always has defaults, no meaningful completion to show
+      case 'brand':
+        return (
+          config.colors.background !== '#1f2937' ||
+          config.colors.text !== '#f9fafb' ||
+          config.colors.button !== '#3b82f6' ||
+          config.colors.buttonText !== '#ffffff' ||
+          config.colors.link !== '#60a5fa'
+        )
+      case 'design':
+        return (
+          config.position !== 'bottom' ||
+          config.layout.borderRadius !== 8 ||
+          config.layout.padding !== 20 ||
+          config.layout.margin !== 20
+        )
+      case 'content':
+        return config.text.title !== 'We use cookies'
+      case 'scripts':
+        return (
+          config.scripts.strictlyNecessary.some(s => s.scriptCode) ||
+          config.scripts.functionality.some(s => s.scriptCode) ||
+          config.scripts.trackingPerformance.some(s => s.scriptCode) ||
+          config.scripts.targetingAdvertising.some(s => s.scriptCode)
+        )
+      case 'cookie-settings':
+        return config.branding?.footerLink?.enabled === true
+      case 'behavior':
+        return false // Always has defaults, no meaningful completion to show
+      case 'analytics':
+        return !!(config.integrations?.googleAnalytics?.measurementId)
+      case 'code':
+        return false // Always available, no meaningful completion to show
+      default:
+        return false
+    }
+  }
+
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -1131,6 +1172,7 @@ function BannerBuilderContent() {
                   >
                     <Shield className="h-4 w-4" />
                     <span className="flex-1 text-left">Compliance</span>
+                    {isStepComplete('compliance') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1143,6 +1185,7 @@ function BannerBuilderContent() {
                   >
                     <Palette className="h-4 w-4" />
                     <span className="flex-1 text-left">Brand</span>
+                    {isStepComplete('brand') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
 
                   <button
@@ -1155,6 +1198,7 @@ function BannerBuilderContent() {
                   >
                     <PanelTop className="h-4 w-4" />
                     <span className="flex-1 text-left">Layout</span>
+                    {isStepComplete('design') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1167,6 +1211,7 @@ function BannerBuilderContent() {
                   >
                     <Type className="h-4 w-4" />
                     <span className="flex-1 text-left">Content</span>
+                    {isStepComplete('content') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1179,6 +1224,7 @@ function BannerBuilderContent() {
                   >
                     <Code className="h-4 w-4" />
                     <span className="flex-1 text-left">Scripts</span>
+                    {isStepComplete('scripts') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1191,6 +1237,7 @@ function BannerBuilderContent() {
                   >
                     <Settings className="h-4 w-4" />
                     <span className="flex-1 text-left">Cookie Settings</span>
+                    {isStepComplete('cookie-settings') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1203,6 +1250,7 @@ function BannerBuilderContent() {
                   >
                     <SlidersHorizontal className="h-4 w-4" />
                     <span className="flex-1 text-left">Behavior</span>
+                    {isStepComplete('behavior') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1215,6 +1263,7 @@ function BannerBuilderContent() {
                   >
                     <BarChart3 className="h-4 w-4" />
                     <span className="flex-1 text-left">Analytics</span>
+                    {isStepComplete('analytics') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
                   <button
@@ -1227,6 +1276,7 @@ function BannerBuilderContent() {
                   >
                     <Code className="h-4 w-4" />
                     <span className="flex-1 text-left">Code</span>
+                    {isStepComplete('code') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                 </nav>
               </div>
@@ -1268,7 +1318,7 @@ function BannerBuilderContent() {
                 />
                 
                 {/* Button Layout Section */}
-                <Card>
+                <Card className="border-l-4 border-l-green-500">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Settings className="h-5 w-5" />
@@ -1489,7 +1539,7 @@ function BannerBuilderContent() {
               <TabsContent value="brand" className="space-y-6" id="brand-panel" role="tabpanel" aria-labelledby="brand-tab">
 
                   {/* Brand Import */}
-                  <Card>
+                  <Card className="border-l-4 border-l-amber-500">
                     <CardHeader>
                       <CardTitle>Brand Import</CardTitle>
                     </CardHeader>
@@ -1993,7 +2043,7 @@ function BannerBuilderContent() {
               <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
 
                 {/* Layout Settings */}
-                  <Card>
+                  <Card className="border-l-4 border-l-blue-500">
                     <CardHeader>
                       <CardTitle>Layout & Spacing</CardTitle>
                     </CardHeader>
@@ -2167,7 +2217,7 @@ function BannerBuilderContent() {
               {/* Content Tab */}
               <TabsContent value="content" className="space-y-6" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
 
-                <Card>
+                <Card className="border-l-4 border-l-purple-500">
                   <CardHeader>
                     <CardTitle>Language</CardTitle>
                     <CardDescription>
@@ -2314,7 +2364,7 @@ function BannerBuilderContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Configuration Panel */}
             <div className="space-y-6">
-              <Card>
+              <Card className="border-l-4 border-l-orange-500">
                 <CardHeader>
                   <CardTitle>Cookie Settings Management</CardTitle>
                   <CardDescription>
@@ -2785,7 +2835,7 @@ function BannerBuilderContent() {
           {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
                 {/* Script Discovery */}
-                <Card className="border-primary/20 bg-primary/5">
+                <Card className="border-primary/20 bg-primary/5 border-l-4 border-l-violet-500">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Search className="h-5 w-5 text-primary" />
@@ -3591,7 +3641,7 @@ function BannerBuilderContent() {
 
               {/* Behavior Tab */}
               <TabsContent value="behavior" className="space-y-6" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
-                <Card className="relative">
+                <Card className="relative border-l-4 border-l-cyan-500">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Banner Behavior</CardTitle>
@@ -3915,7 +3965,7 @@ function BannerBuilderContent() {
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
                 {/* GA4 Events Reference */}
-                <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 border-l-4 border-l-rose-500">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center text-base">
                       <Info className="mr-2 h-4 w-4 text-blue-600" />
@@ -4271,7 +4321,22 @@ function BannerBuilderContent() {
                     )}
                   </CardHeader>
                   <CardContent>
-                    <BannerPreview config={config} />
+                    {/* Browser Chrome Frame */}
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="bg-gray-100 rounded-t-lg px-3 py-2 flex items-center gap-2 border-b">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-red-400" />
+                          <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                          <span className="w-2 h-2 rounded-full bg-green-400" />
+                        </div>
+                        <div className="flex-1 mx-2 bg-gray-200 rounded-md px-3 py-1 text-xs text-gray-500 text-center truncate">
+                          yoursite.com
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-b-lg min-h-[300px] relative overflow-hidden">
+                        <BannerPreview config={config} />
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>

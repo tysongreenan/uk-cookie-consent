@@ -437,7 +437,11 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 </div>`
 
   // Preferences modal HTML
-  const preferencesModal = config.behavior.showPreferences ? `
+  // Generate modal when preferences button is shown OR when the floating cookie settings button is enabled
+  // (the floating button always opens the preferences modal)
+  const hasFloatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both')
+  const needsPreferencesModal = config.behavior.showPreferences || hasFloatingButton
+  const preferencesModal = needsPreferencesModal ? `
 <!-- Preferences Modal -->
 <div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
   <div style="background: ${config.colors.background}; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
