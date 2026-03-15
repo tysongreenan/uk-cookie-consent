@@ -6,17 +6,12 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSession, signIn } from 'next-auth/react'
 import { Menu, X } from 'lucide-react'
-import { useAnnouncement } from '@/lib/announcement-context'
-
 export function Header() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { isVisible: announcementVisible } = useAnnouncement()
 
   return (
-    <header className={`sticky z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ${
-      announcementVisible ? 'top-[72px]' : 'top-0'
-    }`}>
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:h-14">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -46,7 +41,7 @@ export function Header() {
               Integrations
             </Link>
             <Link
-              href="/compliance"
+              href="/compliance/gdpr"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Compliance
@@ -106,7 +101,7 @@ export function Header() {
               Integrations
             </Link>
             <Link
-              href="/compliance"
+              href="/compliance/gdpr"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >

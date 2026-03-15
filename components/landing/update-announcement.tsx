@@ -51,7 +51,7 @@ export function UpdateAnnouncement() {
                     animate={{ 
                       opacity: [0, 1, 0],
                       scale: [0, 1, 0],
-                      x: Math.random() * window.innerWidth,
+                      x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
                       y: Math.random() * 80
                     }}
                     transition={{ 
