@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
-import type { PlanTier } from '@/lib/plan-restrictions'
+import type { PlanTier } from '@/types'
 import path from 'path'
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
