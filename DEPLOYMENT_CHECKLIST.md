@@ -104,7 +104,7 @@ vercel --prod
    - ✅ Return URL works
 
 ### Test 4: Revenue Analytics (Admin)
-1. Update admin email in `/app/api/admin/revenue/route.ts`
+1. Ensure `ADMIN_EMAILS` env var is set (defaults to `greenantyson@gmail.com`)
 2. Access: `https://www.cookie-banner.ca/api/admin/revenue?period=30d`
 3. Verify:
    - ✅ Shows correct revenue

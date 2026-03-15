@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has Pro plan
-    const userPlan = 'pro' // TODO: Get actual user plan from database
+    const userPlan = (session.user as any).planTier || 'free'
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
         { 

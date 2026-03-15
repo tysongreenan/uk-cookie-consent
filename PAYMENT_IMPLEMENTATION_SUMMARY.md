@@ -186,7 +186,7 @@ NEXT_PUBLIC_BASE_URL="https://www.cookie-banner.ca"
 - [ ] Deploy to production
 - [ ] Set up Stripe webhook endpoint
 - [ ] Configure Stripe customer portal
-- [ ] Update admin email in revenue route
+- [x] Admin email configured (defaults to greenantyson@gmail.com, override via ADMIN_EMAILS env var)
 
 ### After Deployment
 - [ ] Test payment with real card

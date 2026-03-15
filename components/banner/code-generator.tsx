@@ -1,18 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Copy, Download, RefreshCw, Globe } from 'lucide-react'
+import { Copy, Download, RefreshCw, Globe, AlertTriangle, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { BannerConfig } from '@/types'
-import { 
-  generateBannerHTML, 
-  generateBannerCSS, 
-  generateBannerJS, 
+import {
+  generateBannerHTML,
+  generateBannerCSS,
+  generateBannerJS,
   generateConsentInitScript,
   generateConsentInitScript as generateConsentInitScriptUtil
 } from '@/lib/banner-generator'
+import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 
 interface CodeGeneratorProps {
   config: BannerConfig
@@ -26,12 +27,27 @@ export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGen
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>('head')
   const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [showUpdateNotice, setShowUpdateNotice] = useState(false)
+
+  // Check if user has dismissed the current version's update notice
+  useEffect(() => {
+    const dismissedVersion = localStorage.getItem('banner_update_dismissed_version')
+    if (!dismissedVersion || parseInt(dismissedVersion) < GENERATOR_VERSION) {
+      setShowUpdateNotice(true)
+    }
+  }, [])
+
+  const dismissUpdateNotice = () => {
+    localStorage.setItem('banner_update_dismissed_version', String(GENERATOR_VERSION))
+    setShowUpdateNotice(false)
+  }
 
   const regenerateCode = async () => {
     setIsGenerating(true)
     await new Promise(resolve => setTimeout(resolve, 500))
     setCodeVersion(prev => prev + 1)
     setIsGenerating(false)
+    dismissUpdateNotice()
     toast.success('Code regenerated successfully!')
   }
 
@@ -156,8 +172,53 @@ ${generateBannerHTML(config, { showBranding })}
     toast.success(`Downloaded ${filename}`)
   }
 
+  const latestUpdate = getLatestUpdate()
+
   return (
     <div className="space-y-4">
+      {/* Update notification for copy-paste users */}
+      {showUpdateNotice && activeTab !== 'hosted' && (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg relative">
+          <button
+            onClick={dismissUpdateNotice}
+            className="absolute top-3 right-3 text-amber-600 hover:text-amber-800"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="flex items-start gap-3 pr-6">
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-900">
+                Banner update available: {latestUpdate.title}
+              </p>
+              <ul className="text-sm text-amber-800 mt-1.5 space-y-0.5 list-disc ml-4">
+                {latestUpdate.changes.map((change, i) => (
+                  <li key={i}>{change}</li>
+                ))}
+              </ul>
+              <div className="flex items-center gap-3 mt-3">
+                <Button
+                  onClick={regenerateCode}
+                  size="sm"
+                  variant="outline"
+                  className="border-amber-400 bg-amber-100 hover:bg-amber-200 text-amber-900"
+                  disabled={isGenerating}
+                >
+                  <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                  Re-copy code to update
+                </Button>
+                {bannerId && (
+                  <span className="text-xs text-amber-700">
+                    Or switch to <button onClick={() => setActiveTab('hosted')} className="underline font-medium">Hosted Script</button> for automatic updates
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Instructions at the top */}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm font-medium text-blue-900 mb-2">📋 Installation Instructions:</p>

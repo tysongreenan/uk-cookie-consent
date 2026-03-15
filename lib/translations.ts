@@ -8,30 +8,35 @@ export const translations = {
     preferencesButton: 'Preferences',
     privacyPolicy: 'Privacy Policy',
     footerLink: 'Cookie Settings',
-    
+
     // Preferences panel
-    preferencesTitle: 'Cookie Preferences',
-    preferencesDescription: 'We use cookies and similar technologies to help personalize content, tailor and measure ads, and provide a better experience. By clicking accept, you agree to this use of cookies and data.',
+    preferencesTitle: 'Privacy Center',
+    preferencesDescription: "By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.",
+    managePreferences: 'Manage cookie preferences',
     savePreferences: 'Save Preferences',
     acceptAll: 'Accept All',
     rejectAll: 'Reject All',
-    
+    confirmChoices: 'Confirm My Choices',
+
     // Cookie categories
-    strictlyNecessary: 'Strictly Necessary',
-    strictlyNecessaryDescription: 'These cookies are essential for the website to function and cannot be disabled.',
-    functionality: 'Functionality',
+    strictlyNecessary: 'Strictly Necessary Cookies',
+    strictlyNecessaryDescription: 'Always active',
+    functionality: 'Functional Cookies',
     functionalityDescription: 'These cookies enable enhanced functionality and personalization, such as language preferences and user settings.',
-    trackingPerformance: 'Analytics & Performance',
+    trackingPerformance: 'Performance Cookies',
     trackingPerformanceDescription: 'These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.',
-    targetingAdvertising: 'Targeting & Advertising',
+    targetingAdvertising: 'Targeting Cookies',
     targetingAdvertisingDescription: 'These cookies are used to make advertising messages more relevant to you and your interests.',
-    
+    socialMedia: 'Social Media Cookies',
+    socialMediaDescription: 'These cookies enable social media integration and sharing features.',
+
     // Always active
     alwaysActive: 'Always Active',
-    
+
     // Additional UI elements
     close: 'Close',
     learnMore: 'Learn more',
+    cookieSettings: 'Cookie Settings',
   },
   fr: {
     title: 'Nous utilisons des cookies',
@@ -41,30 +46,35 @@ export const translations = {
     preferencesButton: 'Préférences',
     privacyPolicy: 'Politique de confidentialité',
     footerLink: 'Paramètres des cookies',
-    
+
     // Preferences panel
-    preferencesTitle: 'Préférences des cookies',
-    preferencesDescription: 'Nous utilisons des cookies et des technologies similaires pour aider à personnaliser le contenu, adapter et mesurer les publicités, et offrir une meilleure expérience. En cliquant sur accepter, vous acceptez cette utilisation des cookies et des données.',
+    preferencesTitle: 'Centre de confidentialité',
+    preferencesDescription: "En cliquant sur « Accepter », vous acceptez le stockage de cookies sur votre appareil pour améliorer la navigation sur le site, analyser l\u2019utilisation du site et contribuer à nos efforts de marketing.",
+    managePreferences: 'Gérer les préférences de cookies',
     savePreferences: 'Enregistrer les préférences',
     acceptAll: 'Accepter tout',
     rejectAll: 'Tout rejeter',
-    
+    confirmChoices: 'Confirmer mes choix',
+
     // Cookie categories
-    strictlyNecessary: 'Strictement nécessaire',
-    strictlyNecessaryDescription: 'Ces cookies sont essentiels au fonctionnement du site web et ne peuvent pas être désactivés.',
-    functionality: 'Fonctionnalité',
+    strictlyNecessary: 'Cookies strictement nécessaires',
+    strictlyNecessaryDescription: 'Toujours actif',
+    functionality: 'Cookies fonctionnels',
     functionalityDescription: 'Ces cookies permettent des fonctionnalités améliorées et une personnalisation, telles que les préférences linguistiques et les paramètres utilisateur.',
-    trackingPerformance: 'Analytique et performance',
+    trackingPerformance: 'Cookies de performance',
     trackingPerformanceDescription: 'Ces cookies nous aident à comprendre comment les visiteurs interagissent avec notre site web en collectant et en rapportant des informations de manière anonyme.',
-    targetingAdvertising: 'Ciblage et publicité',
+    targetingAdvertising: 'Cookies de ciblage',
     targetingAdvertisingDescription: 'Ces cookies sont utilisés pour rendre les messages publicitaires plus pertinents pour vous et vos intérêts.',
-    
+    socialMedia: 'Cookies de réseaux sociaux',
+    socialMediaDescription: 'Ces cookies permettent l\u2019intégration des réseaux sociaux et les fonctionnalités de partage.',
+
     // Always active
     alwaysActive: 'Toujours actif',
-    
+
     // Additional UI elements
     close: 'Fermer',
     learnMore: 'En savoir plus',
+    cookieSettings: 'Paramètres des cookies',
   }
 }
 

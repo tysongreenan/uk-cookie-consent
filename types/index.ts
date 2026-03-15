@@ -102,8 +102,9 @@ export interface BannerConfig {
         rejected?: string
       }
     }
+    showPoweredBy?: boolean
   }
-  
+
   // Layout
   layout: {
     width: 'full' | 'container' | 'custom'

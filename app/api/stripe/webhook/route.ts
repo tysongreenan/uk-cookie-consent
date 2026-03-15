@@ -1,6 +1,7 @@
 // Production Stripe webhook handler - One-time payments at $99
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { validatePaymentAmount } from '@/lib/security-validation'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -67,12 +68,14 @@ export async function POST(request: NextRequest) {
           )
         }
 
-        // Validate payment amount (allow any positive amount for promo codes)
+        // Validate payment amount against allowed range (supports promo codes)
         const amount = session.amount_total || 0
-        if (amount <= 0) {
+        const amountValidation = validatePaymentAmount(amount)
+        if (!amountValidation.valid) {
           console.error('[WEBHOOK] Invalid payment amount:', {
             sessionId: session.id,
             amount,
+            error: amountValidation.error,
           })
           return NextResponse.json(
             { error: 'Invalid payment amount' },
@@ -200,13 +203,117 @@ export async function POST(request: NextRequest) {
 
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge
+        const refundCustomerId = charge.customer as string | null
+
         console.log('[WEBHOOK] Charge refunded:', {
           chargeId: charge.id,
+          customerId: refundCustomerId,
           amount: charge.amount / 100,
           refunded: charge.amount_refunded / 100,
         })
-        // Note: You may want to downgrade users on refund
-        // For now, we'll keep them on Pro (generous policy)
+
+        if (!refundCustomerId) {
+          console.error('[WEBHOOK] No customer ID on refunded charge:', charge.id)
+          break
+        }
+
+        const refundUser = await prisma.user.findFirst({
+          where: { stripeCustomerId: refundCustomerId },
+          select: { id: true, email: true, planTier: true },
+        })
+
+        if (!refundUser) {
+          console.error('[WEBHOOK] No user found for refund customer:', refundCustomerId)
+          break
+        }
+
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: refundUser.id },
+            data: {
+              planTier: 'free',
+            },
+          }),
+          prisma.payment.updateMany({
+            where: {
+              userId: refundUser.id,
+              stripeCustomerId: refundCustomerId,
+              status: 'succeeded',
+            },
+            data: {
+              status: 'refunded',
+            },
+          }),
+        ])
+
+        console.log('[WEBHOOK] User downgraded due to refund:', {
+          chargeId: charge.id,
+          userId: refundUser.id,
+          email: refundUser.email,
+          previousPlan: refundUser.planTier,
+          newPlan: 'free',
+          refundedAmount: charge.amount_refunded / 100,
+        })
+
+        break
+      }
+
+      case 'charge.dispute.created': {
+        const dispute = event.data.object as Stripe.Dispute
+        const disputeCharge = dispute.charge as string
+        const disputeCustomerId = (dispute as unknown as { customer: string | null }).customer
+
+        console.log('[WEBHOOK] Charge dispute created:', {
+          disputeId: dispute.id,
+          chargeId: disputeCharge,
+          amount: dispute.amount / 100,
+          reason: dispute.reason,
+        })
+
+        if (!disputeCustomerId) {
+          console.error('[WEBHOOK] No customer ID on dispute:', dispute.id)
+          break
+        }
+
+        const disputeUser = await prisma.user.findFirst({
+          where: { stripeCustomerId: disputeCustomerId },
+          select: { id: true, email: true, planTier: true },
+        })
+
+        if (!disputeUser) {
+          console.error('[WEBHOOK] No user found for dispute customer:', disputeCustomerId)
+          break
+        }
+
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: disputeUser.id },
+            data: {
+              planTier: 'free',
+            },
+          }),
+          prisma.payment.updateMany({
+            where: {
+              userId: disputeUser.id,
+              stripeCustomerId: disputeCustomerId,
+              status: 'succeeded',
+            },
+            data: {
+              status: 'disputed',
+            },
+          }),
+        ])
+
+        console.log('[WEBHOOK] User downgraded due to chargeback:', {
+          disputeId: dispute.id,
+          userId: disputeUser.id,
+          email: disputeUser.email,
+          previousPlan: disputeUser.planTier,
+          newPlan: 'free',
+          disputeAmount: dispute.amount / 100,
+          reason: dispute.reason,
+        })
+
         break
       }
 

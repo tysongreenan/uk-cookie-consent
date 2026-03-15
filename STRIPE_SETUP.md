@@ -126,11 +126,9 @@ Access revenue dashboard (admin only):
 GET /api/admin/revenue?period=30d
 ```
 
-Update admin email in `/app/api/admin/revenue/route.ts`:
-```typescript
-const ADMIN_EMAILS = [
-  'your-email@example.com', // Replace with your email
-]
+Admin emails are configured via the `ADMIN_EMAILS` environment variable (comma-separated), or default to `greenantyson@gmail.com`:
+```bash
+ADMIN_EMAILS=greenantyson@gmail.com
 ```
 
 ## Common Issues & Solutions

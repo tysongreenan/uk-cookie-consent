@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
 import { invalidateBannerCache } from '@/lib/banner-cache'
+import { canUseLayout } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -114,13 +116,25 @@ async function handleBannerUpdate(
     }
 
     const bannerData = await request.json()
-    
+
     // Validate required fields
     if (!bannerData.name || !bannerData.config) {
       return NextResponse.json(
         { error: 'Banner name and configuration are required' },
         { status: 400 }
       )
+    }
+
+    // Validate layout/position against user's plan
+    const requestedLayout = bannerData.config?.position
+    if (requestedLayout) {
+      const userTier = ((session.user as any).planTier || 'free') as PlanTier
+      if (!canUseLayout(userTier, requestedLayout)) {
+        return NextResponse.json({
+          error: `The "${requestedLayout}" layout is not available on your current plan. Upgrade to Pro to unlock all layouts.`,
+          upgradeRequired: true
+        }, { status: 403 })
+      }
     }
 
     // First get the banner to verify it belongs to user's team

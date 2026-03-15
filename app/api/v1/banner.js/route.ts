@@ -181,10 +181,10 @@ export async function GET(request: NextRequest) {
     // First try SimpleBanners table
     const { data: simpleBanner, error: simpleError } = await supabase
       .from('SimpleBanners')
-      .select('id, name, config, "isActive", "updatedAt"')
+      .select('id, name, config, "isActive", "updatedAt", "userId"')
       .eq('id', bannerId)
       .single()
-    
+
     if (!simpleError && simpleBanner) {
       banner = simpleBanner
     } else {
@@ -293,7 +293,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const showBranding = ownerPlanTier === 'free'
+    const showBranding = ownerPlanTier === 'free' || config.branding?.showPoweredBy !== false
 
     // Strip GA4 integration for free users (server-side enforcement)
     if (ownerPlanTier === 'free' && config.integrations?.googleAnalytics) {

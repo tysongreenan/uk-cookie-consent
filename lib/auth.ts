@@ -160,6 +160,119 @@ export const authOptions: NextAuthOptions = {
     maxAge: SESSION_DURATION.default,
   },
   callbacks: {
+    signIn: async ({ user, account }) => {
+      // Only handle OAuth providers (credentials are handled in authorize())
+      if (account?.provider !== 'google') return true
+
+      try {
+        const supabase = getSupabaseClient()
+        const email = user.email?.toLowerCase().trim()
+        if (!email) return false
+
+        // Check if user already exists
+        const { data: existingUser } = await supabase
+          .from('User')
+          .select('id, planTier')
+          .eq('email', email)
+          .single()
+
+        if (existingUser) {
+          // Existing user — look up their workspace
+          const { data: teamMember } = await supabase
+            .from('TeamMember')
+            .select('role, team_id')
+            .eq('user_id', existingUser.id)
+            .order('joined_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          // Attach workspace info so the jwt callback can read it
+          ;(user as any).id = existingUser.id
+          ;(user as any).currentTeamId = teamMember?.team_id || null
+          ;(user as any).userRole = teamMember?.role || 'owner'
+          ;(user as any).planTier = existingUser.planTier || 'free'
+
+          // Update last login
+          await supabase
+            .from('User')
+            .update({ updatedAt: new Date().toISOString() })
+            .eq('id', existingUser.id)
+
+          return true
+        }
+
+        // New user — create account + personal workspace
+        const userId = crypto.randomUUID()
+        const teamId = crypto.randomUUID()
+        const memberId = crypto.randomUUID()
+        const displayName = user.name || email.split('@')[0]
+        const firstName = displayName.split(' ')[0]
+
+        // Create user
+        const { error: insertError } = await supabase
+          .from('User')
+          .insert({
+            id: userId,
+            email,
+            name: displayName,
+            image: user.image || null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          })
+
+        if (insertError) {
+          console.error('Google OAuth: Failed to create user:', insertError)
+          return false
+        }
+
+        // Create personal workspace
+        const { error: teamError } = await supabase
+          .from('Team')
+          .insert({
+            id: teamId,
+            name: `${firstName}'s Workspace`,
+            owner_id: userId,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+
+        if (!teamError) {
+          // Add user as owner
+          await supabase
+            .from('TeamMember')
+            .insert({
+              id: memberId,
+              team_id: teamId,
+              user_id: userId,
+              role: 'owner',
+              invited_by: userId,
+              joined_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+
+          // Set current team
+          await supabase
+            .from('User')
+            .update({ current_team_id: teamId })
+            .eq('id', userId)
+        } else {
+          console.error('Google OAuth: Failed to create workspace:', teamError)
+        }
+
+        // Attach info for jwt callback
+        ;(user as any).id = userId
+        ;(user as any).currentTeamId = teamId
+        ;(user as any).userRole = 'owner'
+        ;(user as any).planTier = 'free'
+
+        console.log('✅ Google OAuth: Created user + workspace for:', email)
+        return true
+      } catch (error) {
+        console.error('Google OAuth signIn error:', error)
+        return false
+      }
+    },
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id

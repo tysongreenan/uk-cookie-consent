@@ -7,10 +7,10 @@ import { prisma } from '@/lib/prisma'
 // Force this route to be dynamic
 export const dynamic = 'force-dynamic'
 
-// Add your admin email here
-const ADMIN_EMAILS = [
-  'your-email@example.com', // Replace with your actual email
-]
+// Admin emails - can be overridden via ADMIN_EMAILS env var (comma-separated)
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS
+  ? process.env.ADMIN_EMAILS.split(',').map((e) => e.trim())
+  : ['greenantyson@gmail.com']
 
 export async function GET(request: NextRequest) {
   try {

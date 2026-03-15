@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { canCreateBanner, getBannerLimit } from '@/lib/plan-restrictions'
+import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 
 // Use service role key for server-side operations (bypasses RLS)
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
     }
 
     const bannerData = await request.json()
-    
+
     // Validate required fields
     if (!bannerData.name) {
       return NextResponse.json(
@@ -258,8 +258,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate layout/position against user's plan
+    const requestedLayout = bannerData.position || bannerData.config?.position
+    if (requestedLayout && !canUseLayout(userTier, requestedLayout)) {
+      return NextResponse.json({
+        error: `The "${requestedLayout}" layout is not available on your current plan. Upgrade to Pro to unlock all layouts.`,
+        upgradeRequired: true
+      }, { status: 403 })
+    }
+
     const bannerId = crypto.randomUUID()
-    
+
     // Transform Webflow extension format to internal format
     const config = {
       theme: bannerData.theme || 'dark',

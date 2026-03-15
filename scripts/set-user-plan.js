@@ -27,7 +27,7 @@ async function setUserPlan() {
   // 1. Find the user
   const { data: user, error: findError } = await supabase
     .from('User')
-    .select('id, email, planTier')
+    .select('id, email, "planTier"')
     .eq('email', email)
     .single()
 
@@ -41,12 +41,12 @@ async function setUserPlan() {
   // 2. Update the plan
   const { data: updatedUser, error: updateError } = await supabase
     .from('User')
-    .update({ 
+    .update({
       planTier: plan,
       upgradedAt: new Date().toISOString()
     })
     .eq('id', user.id)
-    .select()
+    .select('id, email, "planTier"')
     .single()
 
   if (updateError) {

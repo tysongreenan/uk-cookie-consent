@@ -155,23 +155,32 @@ export function validateInvitationToken(token: string): { valid: boolean; error?
 }
 
 /**
- * Validate payment amount
+ * Validate payment amount (in cents)
+ * Pro plan is $99.00 (9900 cents). With promotion codes we allow discounts
+ * down to $1.00 (100 cents), but never above the listed price.
  */
+export const PAYMENT_AMOUNT_MIN_CENTS = 100   // $1.00 — deepest allowed discount
+export const PAYMENT_AMOUNT_MAX_CENTS = 9900  // $99.00 — full listed price
+
 export function validatePaymentAmount(amount: number): { valid: boolean; error?: string } {
-  // Allow any positive amount to support discount codes (e.g. 50% off = 2449 or 2450)
-  // But ensure it's not zero unless we explicitly want to support 100% off
-  if (amount <= 0) {
+  if (!Number.isFinite(amount) || !Number.isInteger(amount)) {
     return {
       valid: false,
-      error: `Invalid payment amount. Must be greater than 0, got ${amount}`
+      error: `Invalid payment amount. Must be a whole number of cents, got ${amount}`
     }
   }
 
-  // Optional: Add a maximum amount sanity check to prevent absurd overcharges
-  if (amount > 100000) { // $1000.00
+  if (amount < PAYMENT_AMOUNT_MIN_CENTS) {
     return {
       valid: false,
-      error: `Payment amount too high`
+      error: `Payment amount too low. Minimum is ${PAYMENT_AMOUNT_MIN_CENTS} cents ($${(PAYMENT_AMOUNT_MIN_CENTS / 100).toFixed(2)}), got ${amount}`
+    }
+  }
+
+  if (amount > PAYMENT_AMOUNT_MAX_CENTS) {
+    return {
+      valid: false,
+      error: `Payment amount too high. Maximum is ${PAYMENT_AMOUNT_MAX_CENTS} cents ($${(PAYMENT_AMOUNT_MAX_CENTS / 100).toFixed(2)}), got ${amount}`
     }
   }
 

@@ -238,7 +238,8 @@ const defaultConfig: BannerConfig = {
         includeIcon: false,
         includeLogo: false
       }
-    }
+    },
+    showPoweredBy: true
   },
   layout: {
     width: 'full',
@@ -476,6 +477,11 @@ function BannerBuilderContent() {
   useEffect(() => {
     if (!session) {
       router.push('/auth/signin')
+    } else {
+      const planTier = (session.user as any)?.planTier as 'free' | 'pro' | 'enterprise' | undefined
+      if (planTier) {
+        setUserPlan(planTier)
+      }
     }
   }, [session, router])
 
@@ -1942,17 +1948,28 @@ function BannerBuilderContent() {
                               id="logo-upload"
                               type="file"
                               accept="image/*"
-                              onChange={(e) => {
+                              onChange={async (e) => {
                                 const file = e.target.files?.[0]
-                                if (file) {
-                                  const reader = new FileReader()
-                                  reader.onload = (event) => {
-                                    const result = event.target?.result as string
-                                    updateConfig('branding', { 
-                                      logo: { ...config.branding.logo, url: result }
+                                if (!file) return
+
+                                const formData = new FormData()
+                                formData.append('file', file)
+
+                                try {
+                                  const res = await fetch('/api/upload/logo', {
+                                    method: 'POST',
+                                    body: formData,
+                                  })
+                                  const data = await res.json()
+                                  if (data.url) {
+                                    updateConfig('branding', {
+                                      logo: { ...config.branding.logo, url: data.url }
                                     })
+                                  } else {
+                                    console.error('Upload failed:', data.error)
                                   }
-                                  reader.readAsDataURL(file)
+                                } catch (err) {
+                                  console.error('Upload failed:', err)
                                 }
                               }}
                               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
@@ -2005,6 +2022,28 @@ function BannerBuilderContent() {
                         </div>
                       </div>
                     )}
+
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <div>
+                        <Label htmlFor="remove-branding">Remove &quot;Powered by&quot; branding</Label>
+                        <p className="text-xs text-muted-foreground">Hide the cookie-banner.ca attribution</p>
+                      </div>
+                      {canAccessFeature(userPlan, 'hasBrandingRemoval') ? (
+                        <Switch
+                          id="remove-branding"
+                          checked={config.branding.showPoweredBy === false}
+                          onCheckedChange={(checked) => updateConfig('branding', {
+                            showPoweredBy: !checked
+                          })}
+                        />
+                      ) : (
+                        <UpgradePrompt
+                          feature="Remove Branding"
+                          description="Hide the 'Powered by cookie-banner.ca' attribution"
+                          variant="inline"
+                        />
+                      )}
+                    </div>
 
                     <div>
                       <Label htmlFor="privacy-url">Privacy Policy URL</Label>

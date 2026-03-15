@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has team collaboration access (Pro plan required)
-    const userPlan = 'pro' // TODO: Get actual user plan from database - temporarily set to 'pro' for testing
+    const userPlan = (session.user as any).planTier || 'free'
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
         { 

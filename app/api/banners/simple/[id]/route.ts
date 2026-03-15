@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { invalidateBannerCache } from '@/lib/banner-cache'
+import { canUseLayout } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -204,6 +206,18 @@ export async function PUT(
     // Extract banner name and config for full updates
     const bannerName = bannerData.name || bannerData.config?.name || 'Untitled Banner'
     const bannerConfig = bannerData.config || bannerData
+
+    // Validate layout/position against user's plan
+    const requestedLayout = bannerConfig.position
+    if (requestedLayout) {
+      const userTier = ((session.user as any).planTier || 'free') as PlanTier
+      if (!canUseLayout(userTier, requestedLayout)) {
+        return NextResponse.json({
+          error: `The "${requestedLayout}" layout is not available on your current plan. Upgrade to Pro to unlock all layouts.`,
+          upgradeRequired: true
+        }, { status: 403 })
+      }
+    }
 
     // Generate updated code
     const code = `<div id="cookie-banner-${params.id}">
