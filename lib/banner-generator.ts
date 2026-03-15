@@ -1180,6 +1180,69 @@ function saveConsent(consent) {
   }
 }
 
+// Toggle switches and consent loading - must be in outer scope
+// so showPreferencesModal() can call loadConsentIntoModal()
+function setupToggleSwitches() {
+  var buttonColor = ${JSON.stringify(config.colors.button)};
+  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
+
+  var toggles = [
+    { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
+    { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
+    { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
+    { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
+  ];
+
+  toggles.forEach(function(toggle) {
+    var input = document.getElementById(toggle.input);
+    var slider = document.getElementById(toggle.slider);
+    var thumb = document.getElementById(toggle.thumb);
+
+    if (input && slider && thumb) {
+      if (input.checked) {
+        slider.style.backgroundColor = buttonColor;
+        thumb.style.transform = 'translateX(20px)';
+      } else {
+        slider.style.backgroundColor = inactiveColor;
+        thumb.style.transform = 'translateX(0)';
+      }
+
+      if (!input.dataset.listenerAttached) {
+        input.addEventListener('change', function() {
+          if (this.checked) {
+            slider.style.backgroundColor = buttonColor;
+            thumb.style.transform = 'translateX(20px)';
+          } else {
+            slider.style.backgroundColor = inactiveColor;
+            thumb.style.transform = 'translateX(0)';
+          }
+        });
+
+        slider.addEventListener('click', function() {
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event('change'));
+        });
+
+        input.dataset.listenerAttached = 'true';
+      }
+    }
+  });
+}
+
+function loadConsentIntoModal(consent) {
+  var func = document.getElementById('cookie-func-toggle-modal');
+  var performance = document.getElementById('cookie-performance-toggle-modal');
+  var targeting = document.getElementById('cookie-targeting-toggle-modal');
+  var social = document.getElementById('cookie-social-toggle-modal');
+
+  if (func) func.checked = consent.functionality || false;
+  if (performance) performance.checked = consent.analytics || false;
+  if (targeting) targeting.checked = consent.marketing || false;
+  if (social) social.checked = consent.marketing || false;
+
+  setupToggleSwitches();
+}
+
 function showPreferencesModal() {
   var modal = document.getElementById('cookie-preferences-modal');
 
@@ -1435,72 +1498,6 @@ function init() {
       }
     });
     modal.dataset.handlerAttached = 'true';
-  }
-  
-  // Make toggle switches functional
-  function setupToggleSwitches() {
-    var buttonColor = ${JSON.stringify(config.colors.button)};
-    var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
-    
-    var toggles = [
-      { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
-      { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
-      { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
-      { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
-    ];
-    
-    toggles.forEach(function(toggle) {
-      var input = document.getElementById(toggle.input);
-      var slider = document.getElementById(toggle.slider);
-      var thumb = document.getElementById(toggle.thumb);
-      
-      if (input && slider && thumb) {
-        // Set initial state
-        if (input.checked) {
-          slider.style.backgroundColor = buttonColor;
-          thumb.style.transform = 'translateX(20px)';
-        } else {
-          slider.style.backgroundColor = inactiveColor;
-          thumb.style.transform = 'translateX(0)';
-        }
-        
-        // Add change event listener
-        if (!input.dataset.listenerAttached) {
-          input.addEventListener('change', function() {
-            if (this.checked) {
-              slider.style.backgroundColor = buttonColor;
-              thumb.style.transform = 'translateX(20px)';
-            } else {
-              slider.style.backgroundColor = inactiveColor;
-              thumb.style.transform = 'translateX(0)';
-            }
-          });
-          
-          // Add click event listener to slider for better UX
-          slider.addEventListener('click', function() {
-            input.checked = !input.checked;
-            input.dispatchEvent(new Event('change'));
-          });
-          
-          input.dataset.listenerAttached = 'true';
-        }
-      }
-    });
-  }
-  
-  function loadConsentIntoModal(consent) {
-    var func = document.getElementById('cookie-func-toggle-modal');
-    var performance = document.getElementById('cookie-performance-toggle-modal');
-    var targeting = document.getElementById('cookie-targeting-toggle-modal');
-    var social = document.getElementById('cookie-social-toggle-modal');
-    
-    if (func) func.checked = consent.functionality || false;
-    if (performance) performance.checked = consent.analytics || false;
-    if (targeting) targeting.checked = consent.marketing || false;
-    if (social) social.checked = consent.marketing || false;
-    
-    // Update visual state
-    setupToggleSwitches();
   }
   
   // Initialize toggles
