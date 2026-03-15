@@ -30,6 +30,7 @@ export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGen
   const [showUpdateNotice, setShowUpdateNotice] = useState(false)
   const [copied, setCopied] = useState(false)
   const [showManualCode, setShowManualCode] = useState(false)
+  const [manualTab, setManualTab] = useState<'head' | 'body'>('head')
 
   useEffect(() => {
     const dismissedVersion = localStorage.getItem('banner_update_dismissed_version')
@@ -222,22 +223,50 @@ ${generateBannerHTML(config, { showBranding })}
               </p>
               <div className="flex space-x-1 bg-muted p-1 rounded-lg">
                 <button
-                  onClick={() => setActiveTab('head')}
+                  onClick={() => setManualTab('head')}
                   className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === 'head' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    manualTab === 'head' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Head Code
                 </button>
                 <button
-                  onClick={() => setActiveTab('body')}
+                  onClick={() => setManualTab('body')}
                   className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === 'body' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    manualTab === 'body' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Body Code
                 </button>
               </div>
+              <Card className="mt-3">
+                <CardContent className="p-0">
+                  <div className="flex items-center justify-between p-3 border-b bg-muted/30">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                      <span className="text-xs text-muted-foreground">
+                        {manualTab === 'head' ? 'Paste this in your <head> section' : 'Paste this before closing </body> tag'}
+                      </span>
+                    </div>
+                  </div>
+                  <pre className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-72">
+                    <code>{manualTab === 'head' ? generateHeadCode() : generateBodyCode()}</code>
+                  </pre>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={async () => {
+                  const code = manualTab === 'head' ? generateHeadCode() : generateBodyCode()
+                  await navigator.clipboard.writeText(code)
+                  toast.success(`${manualTab === 'head' ? 'Head' : 'Body'} code copied!`)
+                }}
+                size="sm"
+                variant="outline"
+                className="mt-2"
+              >
+                <Copy className="mr-2 h-3.5 w-3.5" />
+                Copy {manualTab === 'head' ? 'Head' : 'Body'} Code
+              </Button>
             </div>
           )}
         </div>
