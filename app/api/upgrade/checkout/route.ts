@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -32,8 +33,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create Stripe checkout session
+    // Fetch user name from database for Stripe customer record
     const stripe = getStripe()
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, email: true, stripeCustomerId: true },
+    })
+
+    // Create or retrieve Stripe customer with name
+    let customerId = user?.stripeCustomerId
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: session.user.email || undefined,
+        name: user?.name || undefined,
+        metadata: { userId: session.user.id },
+      })
+      customerId = customer.id
+
+      // Store Stripe customer ID for future use
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { stripeCustomerId: customerId },
+      })
+    } else {
+      // Update existing customer name in case it was missing or changed
+      await stripe.customers.update(customerId, {
+        name: user?.name || undefined,
+      })
+    }
+
+    // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -53,7 +82,7 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade`,
-      customer_email: session.user.email,
+      customer: customerId,
       metadata: {
         userId: session.user.id,
         userEmail: session.user.email || '',
