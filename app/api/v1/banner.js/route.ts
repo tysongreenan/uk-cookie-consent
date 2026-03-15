@@ -203,18 +203,20 @@ export async function GET(request: NextRequest) {
       ? JSON.parse(banner.config) 
       : banner.config
     
-    // Look up banner owner's plan tier to determine branding and feature access
+    // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'
+    let ownerAnalyticsEnabled = false
     const bannerUserId = banner.userId || null
     if (bannerUserId) {
       const { data: bannerOwner } = await supabase
         .from('User')
-        .select('planTier')
+        .select('planTier, analytics_enabled')
         .eq('id', bannerUserId)
         .single()
       if (bannerOwner?.planTier) {
         ownerPlanTier = bannerOwner.planTier
       }
+      ownerAnalyticsEnabled = Boolean(bannerOwner?.analytics_enabled)
     } else {
       // For ConsentBanner (legacy), look up via project -> team -> owner
       try {
@@ -264,8 +266,8 @@ export async function GET(request: NextRequest) {
       .replace('</script>', '')
       .trim()
 
-    // Build internal analytics tracking code (only for users with analytics enabled)
-    const analyticsUserId = bannerUserId || ''
+    // Build internal analytics tracking code (only when analytics is enabled)
+    const analyticsUserId = ownerAnalyticsEnabled ? (bannerUserId || '') : ''
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     const internalAnalyticsJs = `
   // Internal Analytics Tracking
@@ -295,14 +297,17 @@ export async function GET(request: NextRequest) {
   function _cbFlushEvents() {
     if (_cbEventQueue.length === 0) return;
     var batch = _cbEventQueue.splice(0, 10);
+    var payload = JSON.stringify({ userId: _cbAnalyticsUserId, events: batch });
     try {
+      var sent = false;
       if (navigator.sendBeacon) {
-        navigator.sendBeacon(_cbTrackUrl, JSON.stringify({ userId: _cbAnalyticsUserId, events: batch }));
-      } else {
+        sent = navigator.sendBeacon(_cbTrackUrl, new Blob([payload], { type: 'application/json' }));
+      }
+      if (!sent) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', _cbTrackUrl, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify({ userId: _cbAnalyticsUserId, events: batch }));
+        xhr.send(payload);
       }
     } catch(e) {}
   }
@@ -336,15 +341,13 @@ export async function GET(request: NextRequest) {
   // Hook into trackConsentEvent for internal analytics
   // This runs before the banner JS defines trackConsentEvent, so we
   // set up a global hook that the banner JS will call
-  var _cbOrigTrackConsentEvent = null;
   function _cbInternalTrack(action) {
-    var decisionTime = _cbBannerShownAt > 0 ? Date.now() - _cbBannerShownAt : 0;
     if (action === 'impression') {
       _cbBannerShownAt = Date.now();
-      var isReturning = false;
-      try { isReturning = !!localStorage.getItem('cookie-consent'); } catch(e) {}
+      var isReturning = document.cookie.indexOf('cookie_consent=') !== -1;
       _cbQueueEvent('impression', { isReturning: isReturning });
     } else if (action === 'accept' || action === 'reject' || action === 'dismiss') {
+      var decisionTime = _cbBannerShownAt > 0 ? Date.now() - _cbBannerShownAt : null;
       _cbQueueEvent(action, { decisionTime: decisionTime });
     }
   }

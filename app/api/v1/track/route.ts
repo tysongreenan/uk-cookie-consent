@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { RateLimit } from '@/lib/rate-limit'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,12 @@ const CORS_HEADERS = {
 }
 
 const VALID_EVENT_TYPES = ['impression', 'accept', 'reject', 'dismiss']
+
+// 30 requests per minute per IP (one page load = ~2 requests max)
+const trackRateLimit = new RateLimit({
+  windowMs: 60 * 1000,
+  maxRequests: 30,
+})
 
 function getSupabase() {
   return createClient(
@@ -23,6 +30,15 @@ function isValidUserId(id: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit
+    const rateLimitResult = await trackRateLimit.check(request)
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429, headers: CORS_HEADERS }
+      )
+    }
+
     const body = await request.json()
     const { userId, events } = body
 
@@ -51,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     if (!user?.analytics_enabled) {
       return NextResponse.json(
-        { success: false, message: 'Analytics not enabled' },
+        { success: false },
         { status: 200, headers: CORS_HEADERS }
       )
     }
