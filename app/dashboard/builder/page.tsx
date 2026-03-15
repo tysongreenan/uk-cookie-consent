@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -29,6 +29,11 @@ import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { ColorPicker } from '@/components/ui/color-picker'
+import { Slider } from '@/components/ui/slider'
+import { ContrastBadge } from '@/components/ui/contrast-badge'
+import { COLOR_PRESETS } from '@/lib/color-presets'
+import { FONT_PRESETS, getGoogleFontUrl } from '@/lib/font-presets'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -1011,35 +1016,38 @@ function BannerBuilderContent() {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-muted-foreground">
-                      {activeTab === 'compliance' ? 'Step 1 of 8' :
-                       activeTab === 'design' ? 'Step 2 of 8' : 
-                       activeTab === 'content' ? 'Step 3 of 8' : 
-                       activeTab === 'scripts' ? 'Step 4 of 8' : 
-                       activeTab === 'cookie-settings' ? 'Step 5 of 8' :
-                       activeTab === 'behavior' ? 'Step 6 of 8' : 
-                       activeTab === 'analytics' ? 'Step 7 of 8' : 'Step 8 of 8'}
+                      {activeTab === 'compliance' ? 'Step 1 of 9' :
+                       activeTab === 'brand' ? 'Step 2 of 9' :
+                       activeTab === 'design' ? 'Step 3 of 9' :
+                       activeTab === 'content' ? 'Step 4 of 9' :
+                       activeTab === 'scripts' ? 'Step 5 of 9' :
+                       activeTab === 'cookie-settings' ? 'Step 6 of 9' :
+                       activeTab === 'behavior' ? 'Step 7 of 9' :
+                       activeTab === 'analytics' ? 'Step 8 of 9' : 'Step 9 of 9'}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {Math.round((activeTab === 'compliance' ? 12.5 : 
-                                   activeTab === 'design' ? 25 : 
-                                   activeTab === 'content' ? 37.5 : 
-                                   activeTab === 'scripts' ? 50 : 
-                                   activeTab === 'cookie-settings' ? 62.5 :
-                                   activeTab === 'behavior' ? 75 : 
-                                   activeTab === 'analytics' ? 87.5 : 100))}%
+                      {Math.round((activeTab === 'compliance' ? 11 :
+                                   activeTab === 'brand' ? 22 :
+                                   activeTab === 'design' ? 33 :
+                                   activeTab === 'content' ? 44 :
+                                   activeTab === 'scripts' ? 56 :
+                                   activeTab === 'cookie-settings' ? 67 :
+                                   activeTab === 'behavior' ? 78 :
+                                   activeTab === 'analytics' ? 89 : 100))}%
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${activeTab === 'compliance' ? 12.5 : 
-                                 activeTab === 'design' ? 25 : 
-                                 activeTab === 'content' ? 37.5 : 
-                                 activeTab === 'scripts' ? 50 : 
-                                 activeTab === 'cookie-settings' ? 62.5 :
-                                 activeTab === 'behavior' ? 75 : 
-                                 activeTab === 'analytics' ? 87.5 : 100}%` 
+                      style={{
+                        width: `${activeTab === 'compliance' ? 11 :
+                                 activeTab === 'brand' ? 22 :
+                                 activeTab === 'design' ? 33 :
+                                 activeTab === 'content' ? 44 :
+                                 activeTab === 'scripts' ? 56 :
+                                 activeTab === 'cookie-settings' ? 67 :
+                                 activeTab === 'behavior' ? 78 :
+                                 activeTab === 'analytics' ? 89 : 100}%`
                       }}
                     ></div>
                   </div>
@@ -1065,6 +1073,18 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    onClick={() => setActiveTab('brand')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'brand'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Palette className="h-4 w-4" />
+                    <span className="flex-1 text-left">Brand</span>
+                  </button>
+
+                  <button
                     onClick={() => setActiveTab('design')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'design'
@@ -1072,8 +1092,8 @@ function BannerBuilderContent() {
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
-                    <Palette className="h-4 w-4" />
-                    <span className="flex-1 text-left">Design</span>
+                    <Settings className="h-4 w-4" />
+                    <span className="flex-1 text-left">Layout</span>
                   </button>
                   
                   <button
@@ -1158,16 +1178,18 @@ function BannerBuilderContent() {
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-foreground capitalize">
                   {activeTab === 'compliance' ? 'Choose Compliance Framework' :
-                   activeTab === 'design' ? 'Customize Appearance' : 
-                   activeTab === 'content' ? 'Set Text & Messages' : 
-                   activeTab === 'scripts' ? 'Configure Tracking Scripts' : 
+                   activeTab === 'brand' ? 'Brand & Colors' :
+                   activeTab === 'design' ? 'Layout & Spacing' :
+                   activeTab === 'content' ? 'Set Text & Messages' :
+                   activeTab === 'scripts' ? 'Configure Tracking Scripts' :
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
-                   activeTab === 'behavior' ? 'Set Banner Behavior' : 
+                   activeTab === 'behavior' ? 'Set Banner Behavior' :
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {activeTab === 'compliance' ? 'Select the privacy law that applies to your website. This will configure your banner\'s requirements and legal text.' :
-                   activeTab === 'design' ? 'Customize the visual appearance of your cookie consent banner.' :
+                   activeTab === 'brand' ? 'Import your brand, choose colors, fonts, and logo for your cookie consent banner.' :
+                   activeTab === 'design' ? 'Configure position, layout, spacing, and animation settings.' :
                    activeTab === 'content' ? 'Set the text, messages, and button labels for your banner.' :
                    activeTab === 'scripts' ? 'Configure tracking scripts and cookie categories.' :
                    activeTab === 'cookie-settings' ? 'Configure how users can manage their cookie preferences after initial consent.' :
@@ -1404,12 +1426,13 @@ function BannerBuilderContent() {
                 </Card>
               </TabsContent>
 
-              {/* Design Tab */}
-              <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
+              {/* Brand Tab */}
+              <TabsContent value="brand" className="space-y-6" id="brand-panel" role="tabpanel" aria-labelledby="brand-tab">
 
+                  {/* Brand Import */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Brand Style</CardTitle>
+                      <CardTitle>Brand Import</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
@@ -1426,7 +1449,7 @@ function BannerBuilderContent() {
                             autoCorrect="off"
                           />
                           <Button onClick={handleBrandImport} disabled={isDiscoveringBrand}>
-                            {isDiscoveringBrand ? 'Importing…' : 'Import Brand'}
+                            {isDiscoveringBrand ? 'Importing...' : 'Import Brand'}
                           </Button>
                         </div>
                         {brandDiscoveryError && (
@@ -1449,7 +1472,7 @@ function BannerBuilderContent() {
                           {brandDiscovery.warnings.length > 0 && (
                             <ul className="space-y-1 text-xs text-amber-600">
                               {brandDiscovery.warnings.map((warning, index) => (
-                                <li key={index}>⚠️ {warning}</li>
+                                <li key={index}>Warning: {warning}</li>
                               ))}
                             </ul>
                           )}
@@ -1476,7 +1499,6 @@ function BannerBuilderContent() {
                           </div>
 
                           {(() => {
-                            // TypeScript workaround: fonts property exists but type definition may be cached
                             const fonts = (brandDiscovery as BrandDiscoveryResult & { fonts?: Array<{ family: string; source: string; weight: number; url?: string }> }).fonts
                             return fonts && fonts.length > 0 && (
                               <div className="space-y-2">
@@ -1488,21 +1510,7 @@ function BannerBuilderContent() {
                                     size="sm"
                                     variant="outline"
                                     onClick={() => {
-                                      // Apply font via customCSS
-                                      const fontFamily = font.family.includes(' ') ? `"${font.family}"` : font.family
-                                      const fontCSS = font.url
-                                        ? `@import url('${font.url}');\n#cookie-consent-banner { font-family: ${fontFamily}, sans-serif !important; }`
-                                        : `#cookie-consent-banner { font-family: ${fontFamily}, sans-serif !important; }`
-                                      
-                                      const currentCSS = config.advanced.customCSS || ''
-                                      // Remove existing font imports and font-family declarations
-                                      const cleanedCSS = currentCSS
-                                        .replace(/@import\s+url\([^)]+fonts[^)]+\)[^;]*;?\s*/gi, '')
-                                        .replace(/#cookie-consent-banner\s*\{[^}]*font-family[^;]*;?[^}]*\}/gi, '')
-                                      
-                                      updateConfig('advanced', { 
-                                        customCSS: cleanedCSS.trim() + (cleanedCSS.trim() ? '\n\n' : '') + fontCSS
-                                      })
+                                      updateConfig('fontFamily', font.family)
                                       toast.success(`Applied font: ${font.family}`)
                                     }}
                                     className="text-xs"
@@ -1512,7 +1520,7 @@ function BannerBuilderContent() {
                                 ))}
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                Click a font to apply it to your banner. Fonts will be added to your custom CSS.
+                                Click a font to apply it to your banner.
                               </p>
                             </div>
                             )
@@ -1540,7 +1548,15 @@ function BannerBuilderContent() {
                           )}
                         </div>
                       )}
+                    </CardContent>
+                  </Card>
 
+                  {/* Theme & Colors */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Theme & Colors</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
                       <div>
                         <Label htmlFor="theme" className="text-sm font-medium">Theme</Label>
                         <Select value={config.theme} onValueChange={handleThemeChange}>
@@ -1554,107 +1570,368 @@ function BannerBuilderContent() {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
+                      {/* Palette Presets */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Palette Presets</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {COLOR_PRESETS.map((preset) => (
+                            <button
+                              key={preset.name}
+                              type="button"
+                              title={preset.name}
+                              className="group relative flex flex-col w-10 h-12 rounded-md overflow-hidden border-2 border-transparent hover:border-primary transition-colors cursor-pointer"
+                              onClick={() => {
+                                applyColorUpdates(preset.colors)
+                                updateConfig('theme', 'custom')
+                                toast.success(`Applied "${preset.name}" palette`)
+                              }}
+                            >
+                              <div className="flex-1" style={{ backgroundColor: preset.colors.background }} />
+                              <div className="flex-1" style={{ backgroundColor: preset.colors.button }} />
+                              <div className="flex-1" style={{ backgroundColor: preset.colors.text }} />
+                              <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Color Pickers with Contrast Badges */}
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="bg-color" className="text-sm font-medium">Background</Label>
-                            <div className="flex items-center space-x-2">
-                              <Input
-                                id="bg-color"
-                                type="color"
-                                value={config.colors.background}
-                                onChange={(e) => updateConfig('colors', { background: e.target.value })}
-                                className="w-12 h-8 p-1 border rounded"
-                              />
-                              <Input
-                                value={config.colors.background}
-                                onChange={(e) => updateConfig('colors', { background: e.target.value })}
-                                placeholder="#ffffff"
-                                className="flex-1"
-                              />
+                            <div className="flex items-center gap-2">
+                              <Label className="text-sm font-medium">Background</Label>
                             </div>
+                            <ColorPicker
+                              value={config.colors.background}
+                              onChange={(color) => updateConfig('colors', { background: color })}
+                            />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="text-color" className="text-sm font-medium">Text</Label>
-                            <div className="flex items-center space-x-2">
-                              <Input
-                                id="text-color"
-                                type="color"
-                                value={config.colors.text}
-                                onChange={(e) => updateConfig('colors', { text: e.target.value })}
-                                className="w-12 h-8 p-1 border rounded"
-                              />
-                              <Input
-                                value={config.colors.text}
-                                onChange={(e) => updateConfig('colors', { text: e.target.value })}
-                                placeholder="#000000"
-                                className="flex-1"
-                              />
+                            <div className="flex items-center gap-2">
+                              <Label className="text-sm font-medium">Text</Label>
+                              <ContrastBadge foreground={config.colors.text} background={config.colors.background} />
                             </div>
+                            <ColorPicker
+                              value={config.colors.text}
+                              onChange={(color) => updateConfig('colors', { text: color })}
+                            />
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="button-color" className="text-sm font-medium">Button</Label>
-                            <div className="flex items-center space-x-2">
-                              <Input
-                                id="button-color"
-                                type="color"
-                                value={config.colors.button}
-                                onChange={(e) => updateConfig('colors', { button: e.target.value })}
-                                className="w-12 h-8 p-1 border rounded"
-                              />
-                              <Input
-                                value={config.colors.button}
-                                onChange={(e) => updateConfig('colors', { button: e.target.value })}
-                                placeholder="#3b82f6"
-                                className="flex-1"
-                              />
+                            <div className="flex items-center gap-2">
+                              <Label className="text-sm font-medium">Button</Label>
                             </div>
+                            <ColorPicker
+                              value={config.colors.button}
+                              onChange={(color) => updateConfig('colors', { button: color })}
+                            />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="button-text-color" className="text-sm font-medium">Button Text</Label>
-                            <div className="flex items-center space-x-2">
-                              <Input
-                                id="button-text-color"
-                                type="color"
-                                value={config.colors.buttonText}
-                                onChange={(e) => updateConfig('colors', { buttonText: e.target.value })}
-                                className="w-12 h-8 p-1 border rounded"
+                            <div className="flex items-center gap-2">
+                              <Label className="text-sm font-medium">Button Text</Label>
+                              <ContrastBadge foreground={config.colors.buttonText} background={config.colors.button} />
+                            </div>
+                            <ColorPicker
+                              value={config.colors.buttonText}
+                              onChange={(color) => updateConfig('colors', { buttonText: color })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-sm font-medium">Link</Label>
+                            <ContrastBadge foreground={config.colors.link} background={config.colors.background} />
+                          </div>
+                          <ColorPicker
+                            value={config.colors.link}
+                            onChange={(color) => updateConfig('colors', { link: color })}
+                          />
+                        </div>
+
+                        {/* Reject Button Colors */}
+                        {config.behavior.showRejectButton !== false && (
+                          <div className="space-y-3 pt-3 border-t">
+                            <Label className="text-sm font-medium">Reject Button Colors</Label>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label className="text-xs">Reject Button Background</Label>
+                                <ColorPicker
+                                  value={config.colors.rejectButton || 'transparent'}
+                                  onChange={(color) => updateConfig('colors', { rejectButton: color })}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Label className="text-xs">Reject Button Text</Label>
+                                  <ContrastBadge
+                                    foreground={config.colors.rejectButtonText || config.colors.text}
+                                    background={config.colors.rejectButton && config.colors.rejectButton !== 'transparent' ? config.colors.rejectButton : config.colors.background}
+                                  />
+                                </div>
+                                <ColorPicker
+                                  value={config.colors.rejectButtonText || config.colors.text}
+                                  onChange={(color) => updateConfig('colors', { rejectButtonText: color })}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Floating Button Custom Colors */}
+                      {config.branding?.footerLink?.floatingStyle?.useCustomColors && (
+                        <div className="space-y-3 pt-3 border-t">
+                          <Label className="text-sm font-medium">Floating Button Colors</Label>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <Label className="text-xs">Background</Label>
+                              <ColorPicker
+                                value={config.branding?.footerLink?.floatingStyle?.customColors?.background || '#6b7280'}
+                                onChange={(color) => updateConfig('branding', {
+                                  footerLink: {
+                                    ...(config.branding?.footerLink || {}),
+                                    floatingStyle: {
+                                      ...(config.branding?.footerLink?.floatingStyle || {}),
+                                      customColors: {
+                                        ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                        background: color
+                                      }
+                                    }
+                                  }
+                                })}
                               />
-                              <Input
-                                value={config.colors.buttonText}
-                                onChange={(e) => updateConfig('colors', { buttonText: e.target.value })}
-                                placeholder="#ffffff"
-                                className="flex-1"
+                            </div>
+                            <div>
+                              <Label className="text-xs">Text</Label>
+                              <ColorPicker
+                                value={config.branding?.footerLink?.floatingStyle?.customColors?.text || '#ffffff'}
+                                onChange={(color) => updateConfig('branding', {
+                                  footerLink: {
+                                    ...(config.branding?.footerLink || {}),
+                                    floatingStyle: {
+                                      ...(config.branding?.footerLink?.floatingStyle || {}),
+                                      customColors: {
+                                        ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                        text: color
+                                      }
+                                    }
+                                  }
+                                })}
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Border</Label>
+                              <ColorPicker
+                                value={config.branding?.footerLink?.floatingStyle?.customColors?.border || '#6b7280'}
+                                onChange={(color) => updateConfig('branding', {
+                                  footerLink: {
+                                    ...(config.branding?.footerLink || {}),
+                                    floatingStyle: {
+                                      ...(config.branding?.footerLink?.floatingStyle || {}),
+                                      customColors: {
+                                        ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
+                                        border: color
+                                      }
+                                    }
+                                  }
+                                })}
                               />
                             </div>
                           </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="link-color" className="text-sm font-medium">Link</Label>
-                          <div className="flex items-center space-x-2">
-                            <Input
-                              id="link-color"
-                              type="color"
-                              value={config.colors.link}
-                              onChange={(e) => updateConfig('colors', { link: e.target.value })}
-                              className="w-12 h-8 p-1 border rounded"
-                            />
-                            <Input
-                              value={config.colors.link}
-                              onChange={(e) => updateConfig('colors', { link: e.target.value })}
-                              placeholder="#3b82f6"
-                              className="flex-1"
-                            />
-                          </div>
-                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Typography */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Typography</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Label htmlFor="font-family" className="text-sm font-medium">Font Family</Label>
+                        <Select
+                          value={config.fontFamily || 'system-default'}
+                          onValueChange={(value) => updateConfig('fontFamily', value === 'system-default' ? '' : value)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="System Default" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONT_PRESETS.map((font) => (
+                              <SelectItem key={font.value || 'system-default'} value={font.value || 'system-default'}>
+                                {font.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {config.fontFamily ? `Using "${config.fontFamily}" from Google Fonts` : 'Using the browser default font'}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Logo */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Logo</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="logo-enabled-brand"
+                          checked={config.branding.logo.enabled}
+                          onCheckedChange={(checked) => updateConfig('branding', {
+                            logo: { ...config.branding.logo, enabled: checked }
+                          })}
+                        />
+                        <Label htmlFor="logo-enabled-brand">Enable Logo</Label>
+                      </div>
+
+                      {config.branding.logo.enabled && (
+                        <div className="space-y-4">
+                          {/* Drag and drop zone */}
+                          <div>
+                            <Label className="text-sm font-medium">Upload Logo</Label>
+                            <div
+                              className={`mt-2 relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                                config.branding.logo.url
+                                  ? 'border-primary/30 bg-primary/5'
+                                  : 'border-muted-foreground/25 hover:border-primary/50'
+                              }`}
+                              onDragOver={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                e.currentTarget.classList.add('border-primary', 'bg-primary/10')
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                e.currentTarget.classList.remove('border-primary', 'bg-primary/10')
+                              }}
+                              onDrop={async (e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                e.currentTarget.classList.remove('border-primary', 'bg-primary/10')
+                                const file = e.dataTransfer.files?.[0]
+                                if (!file || !file.type.startsWith('image/')) return
+                                const formData = new FormData()
+                                formData.append('file', file)
+                                try {
+                                  const res = await fetch('/api/upload/logo', { method: 'POST', body: formData })
+                                  const data = await res.json()
+                                  if (data.url) {
+                                    updateConfig('branding', { logo: { ...config.branding.logo, url: data.url } })
+                                    toast.success('Logo uploaded')
+                                  } else {
+                                    toast.error(data.error || 'Upload failed')
+                                  }
+                                } catch (err) {
+                                  toast.error('Upload failed')
+                                }
+                              }}
+                            >
+                              {config.branding.logo.url ? (
+                                <div className="flex flex-col items-center gap-3">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={config.branding.logo.url}
+                                    alt="Logo preview"
+                                    className="max-w-32 max-h-16 object-contain"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      updateConfig('branding', { logo: { ...config.branding.logo, url: '' } })
+                                    }}
+                                  >
+                                    <X className="h-4 w-4 mr-1" />
+                                    Remove
+                                  </Button>
+                                </div>
+                              ) : (
+                                <label className="cursor-pointer flex flex-col items-center gap-2">
+                                  <Upload className="h-8 w-8 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground">Drag & drop your logo, or click to browse</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0]
+                                      if (!file) return
+                                      const formData = new FormData()
+                                      formData.append('file', file)
+                                      try {
+                                        const res = await fetch('/api/upload/logo', { method: 'POST', body: formData })
+                                        const data = await res.json()
+                                        if (data.url) {
+                                          updateConfig('branding', { logo: { ...config.branding.logo, url: data.url } })
+                                          toast.success('Logo uploaded')
+                                        } else {
+                                          toast.error(data.error || 'Upload failed')
+                                        }
+                                      } catch (err) {
+                                        toast.error('Upload failed')
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="logo-url-brand">Or Logo URL</Label>
+                            <Input
+                              id="logo-url-brand"
+                              value={config.branding.logo.url}
+                              onChange={(e) => updateConfig('branding', {
+                                logo: { ...config.branding.logo, url: e.target.value }
+                              })}
+                              placeholder="https://example.com/logo.png"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="logo-position-brand">Logo Position</Label>
+                            <Select
+                              value={config.branding.logo.position}
+                              onValueChange={(value: any) => updateConfig('branding', {
+                                logo: { ...config.branding.logo, position: value }
+                              })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="left">Left</SelectItem>
+                                <SelectItem value="right">Right</SelectItem>
+                                <SelectItem value="center">Center</SelectItem>
+                                <SelectItem value="hidden">Hidden</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+              </TabsContent>
+
+              {/* Design/Layout Tab */}
+              <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
 
                 {/* Layout Settings */}
                   <Card>
@@ -1741,61 +2018,69 @@ function BannerBuilderContent() {
                     </div>
 
                     {/* Spacing Settings */}
-                    <div className="space-y-3">
+                    <div className="space-y-5">
                       <Label className="text-sm font-medium">Spacing & Effects</Label>
-                      <div className="grid grid-cols-2 gap-4">
+
+                      <div className="space-y-4">
                         <div>
-                          <Label htmlFor="border-radius" className="text-xs">Border Radius (px)</Label>
-                          <Input
+                          <div className="flex items-center justify-between mb-2">
+                            <Label htmlFor="border-radius" className="text-xs">Border Radius</Label>
+                            <span className="text-xs text-muted-foreground font-mono">{config.layout.borderRadius}px</span>
+                          </div>
+                          <Slider
                             id="border-radius"
-                            type="number"
-                            value={config.layout.borderRadius}
-                            onChange={(e) => updateConfig('layout', { ...config.layout, borderRadius: parseInt(e.target.value) || 0 })}
-                            placeholder="8"
-                            className="mt-1"
+                            min={0}
+                            max={32}
+                            step={1}
+                            value={[config.layout.borderRadius]}
+                            onValueChange={([value]) => updateConfig('layout', { ...config.layout, borderRadius: value })}
                           />
                         </div>
-                        
+
                         <div>
-                          <Label htmlFor="padding" className="text-xs">Padding (px)</Label>
-                          <Input
+                          <div className="flex items-center justify-between mb-2">
+                            <Label htmlFor="padding" className="text-xs">Padding</Label>
+                            <span className="text-xs text-muted-foreground font-mono">{config.layout.padding}px</span>
+                          </div>
+                          <Slider
                             id="padding"
-                            type="number"
-                            value={config.layout.padding}
-                            onChange={(e) => updateConfig('layout', { ...config.layout, padding: parseInt(e.target.value) || 20 })}
-                            placeholder="20"
-                            className="mt-1"
+                            min={0}
+                            max={48}
+                            step={1}
+                            value={[config.layout.padding]}
+                            onValueChange={([value]) => updateConfig('layout', { ...config.layout, padding: value })}
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Label htmlFor="margin" className="text-xs">Margin</Label>
+                            <span className="text-xs text-muted-foreground font-mono">{config.layout.margin}px</span>
+                          </div>
+                          <Slider
+                            id="margin"
+                            min={0}
+                            max={48}
+                            step={1}
+                            value={[config.layout.margin]}
+                            onValueChange={([value]) => updateConfig('layout', { ...config.layout, margin: value })}
                           />
                         </div>
                       </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="margin" className="text-xs">Margin (px)</Label>
-                          <Input
-                            id="margin"
-                            type="number"
-                            value={config.layout.margin}
-                            onChange={(e) => updateConfig('layout', { ...config.layout, margin: parseInt(e.target.value) || 20 })}
-                            placeholder="20"
-                            className="mt-1"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="shadow" className="text-xs">Shadow</Label>
-                          <Select value={config.layout.shadow} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, shadow: value })}>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">None</SelectItem>
-                              <SelectItem value="small">Small</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="large">Large</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+
+                      <div>
+                        <Label htmlFor="shadow" className="text-xs">Shadow</Label>
+                        <Select value={config.layout.shadow} onValueChange={(value: any) => updateConfig('layout', { ...config.layout, shadow: value })}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="small">Small</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="large">Large</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
 
@@ -1925,103 +2210,20 @@ function BannerBuilderContent() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Branding</CardTitle>
+                    <CardTitle>Privacy Policy & Branding</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="logo-enabled"
-                        checked={config.branding.logo.enabled}
-                        onCheckedChange={(checked) => updateConfig('branding', { 
-                          logo: { ...config.branding.logo, enabled: checked }
+                    <div>
+                      <Label htmlFor="privacy-url">Privacy Policy URL</Label>
+                      <Input
+                        id="privacy-url"
+                        value={config.branding.privacyPolicy.url}
+                        onChange={(e) => updateConfig('branding', {
+                          privacyPolicy: { ...config.branding.privacyPolicy, url: e.target.value }
                         })}
+                        placeholder="https://example.com/privacy-policy"
                       />
-                      <Label htmlFor="logo-enabled">Enable Logo</Label>
                     </div>
-
-                    {config.branding.logo.enabled && (
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="logo-upload">Upload Logo</Label>
-                          <div className="mt-2">
-                            <input
-                              id="logo-upload"
-                              type="file"
-                              accept="image/*"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0]
-                                if (!file) return
-
-                                const formData = new FormData()
-                                formData.append('file', file)
-
-                                try {
-                                  const res = await fetch('/api/upload/logo', {
-                                    method: 'POST',
-                                    body: formData,
-                                  })
-                                  const data = await res.json()
-                                  if (data.url) {
-                                    updateConfig('branding', {
-                                      logo: { ...config.branding.logo, url: data.url }
-                                    })
-                                  } else {
-                                    console.error('Upload failed:', data.error)
-                                  }
-                                } catch (err) {
-                                  console.error('Upload failed:', err)
-                                }
-                              }}
-                              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
-                            />
-                          </div>
-                          {config.branding.logo.url && (
-                            <div className="mt-3">
-                              <img
-                                src={config.branding.logo.url}
-                                alt="Logo preview"
-                                className="max-w-32 max-h-12 object-contain border rounded"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none'
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="logo-url">Or Logo URL</Label>
-                          <Input
-                            id="logo-url"
-                            value={config.branding.logo.url}
-                            onChange={(e) => updateConfig('branding', { 
-                              logo: { ...config.branding.logo, url: e.target.value }
-                            })}
-                            placeholder="https://example.com/logo.png"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="logo-position">Logo Position</Label>
-                          <Select 
-                            value={config.branding.logo.position} 
-                            onValueChange={(value: any) => updateConfig('branding', { 
-                              logo: { ...config.branding.logo, position: value }
-                            })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="left">Left</SelectItem>
-                              <SelectItem value="right">Right</SelectItem>
-                              <SelectItem value="center">Center</SelectItem>
-                              <SelectItem value="hidden">Hidden</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    )}
 
                     <div className="flex items-center justify-between pt-2 border-t">
                       <div>
@@ -2043,18 +2245,6 @@ function BannerBuilderContent() {
                           variant="inline"
                         />
                       )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="privacy-url">Privacy Policy URL</Label>
-                      <Input
-                        id="privacy-url"
-                        value={config.branding.privacyPolicy.url}
-                        onChange={(e) => updateConfig('branding', { 
-                          privacyPolicy: { ...config.branding.privacyPolicy, url: e.target.value }
-                        })}
-                        placeholder="https://example.com/privacy-policy"
-                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -2256,19 +2446,17 @@ function BannerBuilderContent() {
                             {config.branding?.footerLink?.floatingStyle?.useCustomColors && (
                               <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                  <Label htmlFor="floating-bg-color">Background Color</Label>
-                                  <Input
-                                    id="floating-bg-color"
-                                    type="color"
+                                  <Label className="text-xs">Background</Label>
+                                  <ColorPicker
                                     value={config.branding?.footerLink?.floatingStyle?.customColors?.background || '#6b7280'}
-                                    onChange={(e) => updateConfig('branding', { 
-                                      footerLink: { 
-                                        ...(config.branding?.footerLink || {}), 
-                                        floatingStyle: { 
-                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                    onChange={(color) => updateConfig('branding', {
+                                      footerLink: {
+                                        ...(config.branding?.footerLink || {}),
+                                        floatingStyle: {
+                                          ...(config.branding?.footerLink?.floatingStyle || {}),
                                           customColors: {
                                             ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            background: e.target.value
+                                            background: color
                                           }
                                         }
                                       }
@@ -2276,19 +2464,17 @@ function BannerBuilderContent() {
                                   />
                                 </div>
                                 <div>
-                                  <Label htmlFor="floating-text-color">Text Color</Label>
-                                  <Input
-                                    id="floating-text-color"
-                                    type="color"
+                                  <Label className="text-xs">Text</Label>
+                                  <ColorPicker
                                     value={config.branding?.footerLink?.floatingStyle?.customColors?.text || '#ffffff'}
-                                    onChange={(e) => updateConfig('branding', { 
-                                      footerLink: { 
-                                        ...(config.branding?.footerLink || {}), 
-                                        floatingStyle: { 
-                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                    onChange={(color) => updateConfig('branding', {
+                                      footerLink: {
+                                        ...(config.branding?.footerLink || {}),
+                                        floatingStyle: {
+                                          ...(config.branding?.footerLink?.floatingStyle || {}),
                                           customColors: {
                                             ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            text: e.target.value
+                                            text: color
                                           }
                                         }
                                       }
@@ -2296,19 +2482,17 @@ function BannerBuilderContent() {
                                   />
                                 </div>
                                 <div>
-                                  <Label htmlFor="floating-border-color">Border Color</Label>
-                                  <Input
-                                    id="floating-border-color"
-                                    type="color"
+                                  <Label className="text-xs">Border</Label>
+                                  <ColorPicker
                                     value={config.branding?.footerLink?.floatingStyle?.customColors?.border || '#6b7280'}
-                                    onChange={(e) => updateConfig('branding', { 
-                                      footerLink: { 
-                                        ...(config.branding?.footerLink || {}), 
-                                        floatingStyle: { 
-                                          ...(config.branding?.footerLink?.floatingStyle || {}), 
+                                    onChange={(color) => updateConfig('branding', {
+                                      footerLink: {
+                                        ...(config.branding?.footerLink || {}),
+                                        floatingStyle: {
+                                          ...(config.branding?.footerLink?.floatingStyle || {}),
                                           customColors: {
                                             ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            border: e.target.value
+                                            border: color
                                           }
                                         }
                                       }

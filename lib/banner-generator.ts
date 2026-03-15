@@ -404,7 +404,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   }
 
   // Main banner HTML
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
     <button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
     
@@ -421,7 +421,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.acceptButton)}</button>
           
-          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.text)} !important; border: 1px solid ${escapeHtml(config.colors.text)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
+          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" style="background-color: ${escapeHtml(config.colors.rejectButton || 'transparent')}; color: ${escapeHtml(config.colors.rejectButtonText || config.colors.text)} !important; border: 1px solid ${escapeHtml(config.colors.rejectButtonText || config.colors.text)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
           
           ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
         </div>
@@ -934,6 +934,17 @@ var USE_IDLE_CALLBACK = ${useIdleCallback};
   link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off&display=swap';
   document.head.appendChild(link);
 })();
+
+${config.fontFamily ? `// Load Google Font for banner
+(function loadBannerFont() {
+  var fontFamily = '${escapeHtml(config.fontFamily)}';
+  var encoded = fontFamily.replace(/ /g, '+');
+  if (document.querySelector('link[href*="family=' + encoded + '"]')) return;
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + encoded + ':wght@400;500;600;700&display=swap';
+  document.head.appendChild(link);
+})();` : ''}
 
 ${ga4Integration}
 

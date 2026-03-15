@@ -16,7 +16,10 @@ interface BannerConfig {
     button: string
     buttonText: string
     link: string
+    rejectButton?: string
+    rejectButtonText?: string
   }
+  fontFamily?: string
   text: {
     title: string
     message: string
@@ -256,8 +259,11 @@ export function BannerPreview({ config }: BannerPreviewProps) {
       text: config.colors?.text || '#000000',
       button: config.colors?.button || '#007bff',
       buttonText: config.colors?.buttonText || '#ffffff',
-      link: config.colors?.link || '#007bff'
+      link: config.colors?.link || '#007bff',
+      rejectButton: (config.colors as any)?.rejectButton,
+      rejectButtonText: (config.colors as any)?.rejectButtonText
     },
+    fontFamily: (config as any)?.fontFamily,
     text: {
       title: config.text?.title || 'Cookie Consent',
       message: config.text?.message || 'We use cookies to improve your experience.',
@@ -496,6 +502,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
           style={{
             backgroundColor: safeConfig.colors.background,
             color: safeConfig.colors.text,
+            ...(safeConfig.fontFamily ? { fontFamily: `"${safeConfig.fontFamily}", sans-serif` } : {}),
             ...getLayoutStyles(),
           }}
         >
@@ -589,9 +596,9 @@ export function BannerPreview({ config }: BannerPreviewProps) {
                       variant="outline"
                       size="sm"
                       style={{
-                        backgroundColor: 'transparent',
-                        borderColor: safeConfig.colors.text,
-                        color: safeConfig.colors.text,
+                        backgroundColor: safeConfig.colors.rejectButton || 'transparent',
+                        borderColor: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
+                        color: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
                       }}
                       className="hover:bg-opacity-10"
                     >

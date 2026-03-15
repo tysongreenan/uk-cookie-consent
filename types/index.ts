@@ -34,7 +34,12 @@ export interface BannerConfig {
     button: string
     buttonText: string
     link: string
+    rejectButton?: string
+    rejectButtonText?: string
   }
+
+  // Typography
+  fontFamily?: string
   
   // Language
   language: 'en' | 'fr' | 'auto'
