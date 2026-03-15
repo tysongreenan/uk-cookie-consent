@@ -1,7 +1,6 @@
 'use client'
 
 import { useSession, signOut } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,15 +17,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowLeft, User, Mail, Trash2, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
-  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false)
+
+  const planTier = (session?.user as any)?.planTier || 'free'
+
+  const handleManageBilling = async () => {
+    setIsLoadingPortal(true)
+    try {
+      const response = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await response.json()
+      if (response.ok && data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error || 'Failed to open billing portal')
+      }
+    } catch (error) {
+      toast.error('Failed to open billing portal')
+    } finally {
+      setIsLoadingPortal(false)
+    }
+  }
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') {
@@ -117,10 +135,56 @@ export default function SettingsPage() {
                   className="mt-1"
                 />
               </div>
-              <div className="text-sm text-muted-foreground">
-                <p>Account created: {new Date().toLocaleDateString()}</p>
-                <p>Last login: {new Date().toLocaleDateString()}</p>
+            </CardContent>
+          </Card>
+
+          {/* Plan & Billing */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="mr-2 h-5 w-5" />
+                Plan & Billing
+              </CardTitle>
+              <CardDescription>
+                Manage your subscription and view invoices
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-lg capitalize">{planTier} Plan</span>
+                    {planTier === 'pro' && <Crown className="h-4 w-4 text-amber-500" />}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {planTier === 'free'
+                      ? '1 banner, 6 layouts, powered-by branding'
+                      : 'Unlimited banners, 13 layouts, no branding, GA4 analytics'}
+                  </p>
+                </div>
+                {planTier === 'free' && (
+                  <Button asChild>
+                    <Link href="/upgrade">Upgrade to Pro</Link>
+                  </Button>
+                )}
               </div>
+
+              {planTier !== 'free' && (
+                <Button
+                  variant="outline"
+                  onClick={handleManageBilling}
+                  disabled={isLoadingPortal}
+                >
+                  {isLoadingPortal ? (
+                    'Opening...'
+                  ) : (
+                    <>
+                      Manage Billing & Invoices
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
             </CardContent>
           </Card>
 

@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
         status: 304,
         headers: {
           'ETag': etag,
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'Cache-Control': 'private, no-cache, must-revalidate',
           'X-Cache': 'NOT-MODIFIED',
           ...SECURITY_HEADERS,
         },
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
           status: 304,
           headers: {
             'ETag': finalEtag,
-            'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+            'Cache-Control': 'private, no-cache, must-revalidate',
             ...SECURITY_HEADERS,
           },
         })
@@ -183,7 +183,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
         headers: { 
           'Content-Type': 'application/javascript',
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'Cache-Control': 'private, no-cache, must-revalidate',
           'ETag': finalEtag,
           'X-Cache': 'MISS',
           ...SECURITY_HEADERS,
@@ -411,7 +411,7 @@ export async function GET(request: NextRequest) {
         status: 304,
         headers: {
           'ETag': finalEtag,
-          'Cache-Control': 'public, max-age=30, stale-while-revalidate=10',
+          'Cache-Control': 'private, no-cache, must-revalidate',
           'X-Cache': 'HIT',
           ...SECURITY_HEADERS,
         },
@@ -421,10 +421,12 @@ export async function GET(request: NextRequest) {
     return new NextResponse(combinedScript, {
       headers: {
         'Content-Type': 'application/javascript',
-        'Cache-Control': 'public, max-age=30, stale-while-revalidate=10', // Reduced for faster updates
-        'ETag': finalEtag, // ETag based on updatedAt - changes when banner updates
+        'Cache-Control': 'private, no-cache, must-revalidate',
+        'CDN-Cache-Control': 'no-store', // Prevent CDN caching (Vercel, Cloudflare, Brizy, etc.)
+        'Surrogate-Control': 'no-store', // Prevent CDN caching (Fastly, Akamai, etc.)
+        'ETag': finalEtag,
         'Access-Control-Allow-Origin': '*',
-        'X-Cache': 'MISS', // Indicates this was fetched from database
+        'X-Cache': 'MISS',
         'X-RateLimit-Limit': '100',
         'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
         'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
