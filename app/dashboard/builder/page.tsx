@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -23,7 +23,6 @@ import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
-import { NewBadge } from '@/components/ui/new-badge'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
@@ -508,6 +507,7 @@ function BannerBuilderContent() {
   const [isScanningScripts, setIsScanningScripts] = useState(false)
   const [scriptScanError, setScriptScanError] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
 
   useEffect(() => {
     if (!session) {
@@ -528,6 +528,18 @@ function BannerBuilderContent() {
       loadBannerForEdit(editId)
     }
   }, [searchParams, session])
+
+  // Warn user about unsaved changes before leaving the page
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
 
   const loadBannerForEdit = async (id: string) => {
     setIsLoadingBanner(true)
@@ -615,6 +627,7 @@ function BannerBuilderContent() {
   }
 
   const updateConfig = (section: keyof BannerConfig, updates: any) => {
+    setIsDirty(true)
     setConfig(prev => {
       const currentValue = prev[section]
       
@@ -819,6 +832,20 @@ function BannerBuilderContent() {
   }
 
   const handleThemeChange = (theme: 'light' | 'dark' | 'custom') => {
+    // Check if user has custom colors that differ from default light/dark themes
+    if (theme !== 'custom') {
+      const lightDefaults = { background: '#ffffff', text: '#1f2937', button: '#3b82f6', buttonText: '#ffffff', link: '#1d4ed8' }
+      const darkDefaults = { background: '#1f2937', text: '#ffffff', button: '#3b82f6', buttonText: '#ffffff', link: '#60a5fa' }
+      const currentColors = config.colors
+      const isDefaultLight = Object.entries(lightDefaults).every(([k, v]) => currentColors[k as keyof typeof currentColors] === v)
+      const isDefaultDark = Object.entries(darkDefaults).every(([k, v]) => currentColors[k as keyof typeof currentColors] === v)
+      if (!isDefaultLight && !isDefaultDark) {
+        if (!window.confirm('Switching themes will reset your custom colors. Continue?')) {
+          return
+        }
+      }
+    }
+    setIsDirty(true)
     setConfig(prev => ({
       ...prev,
       theme,
@@ -876,6 +903,7 @@ function BannerBuilderContent() {
         } else {
           setBannerUpdatedAt(new Date())
         }
+        setIsDirty(false)
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
           // For new banners, redirect to dashboard after saving
@@ -943,6 +971,7 @@ function BannerBuilderContent() {
           cache: 'no-store'
         })
         
+        setIsDirty(false)
         toast.success(
           <div>
             <strong>Changes pushed live!</strong>
@@ -998,15 +1027,18 @@ function BannerBuilderContent() {
                 </Link>
               </Button>
               <div className="h-6 w-px bg-border"></div>
-                <Input
-                  value={config.name}
-                  onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Banner name"
-                  className="text-lg font-semibold border-0 p-0 h-auto bg-transparent focus:bg-white focus:border focus:px-2 focus:py-1 focus:rounded"
-                />
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    value={config.name}
+                    onChange={(e) => { setIsDirty(true); setConfig(prev => ({ ...prev, name: e.target.value })) }}
+                    placeholder="Banner name"
+                    className="text-lg font-semibold border-0 p-0 h-auto bg-transparent focus:bg-white focus:border focus:px-2 focus:py-1 focus:rounded"
+                  />
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button onClick={handleSave} disabled={isLoading} size="sm" variant="outline">
+              <Button onClick={handleSave} disabled={isLoading} size="sm">
                 <Save className="h-4 w-4" />
                 {isLoading ? 'Saving...' : 'Save Draft'}
               </Button>
@@ -1024,7 +1056,7 @@ function BannerBuilderContent() {
                     </>
                   ) : (
                     <>
-                      <ArrowLeft className="h-4 w-4 rotate-180" />
+                      <Rocket className="h-4 w-4" />
                       Push Live
                     </>
                   )}
@@ -1099,7 +1131,6 @@ function BannerBuilderContent() {
                   >
                     <Shield className="h-4 w-4" />
                     <span className="flex-1 text-left">Compliance</span>
-                    <NewBadge variant="sparkle" size="sm" />
                   </button>
                   
                   <button
@@ -1122,7 +1153,7 @@ function BannerBuilderContent() {
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
-                    <Settings className="h-4 w-4" />
+                    <PanelTop className="h-4 w-4" />
                     <span className="flex-1 text-left">Layout</span>
                   </button>
                   
@@ -1160,7 +1191,6 @@ function BannerBuilderContent() {
                   >
                     <Settings className="h-4 w-4" />
                     <span className="flex-1 text-left">Cookie Settings</span>
-                    <NewBadge variant="sparkle" size="sm" />
                   </button>
                   
                   <button
@@ -1171,9 +1201,8 @@ function BannerBuilderContent() {
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
-                    <Settings className="h-4 w-4" />
+                    <SlidersHorizontal className="h-4 w-4" />
                     <span className="flex-1 text-left">Behavior</span>
-                    <NewBadge variant="sparkle" size="sm" />
                   </button>
                   
                   <button
@@ -2223,7 +2252,6 @@ function BannerBuilderContent() {
                         <div className="relative">
                           <div className="flex items-center space-x-1 mb-1">
                             <Label htmlFor="preferences-text" className="text-xs">Preferences Button</Label>
-                            <NewBadge variant="glow" size="sm" />
                           </div>
                           <Input
                             id="preferences-text"
@@ -2733,7 +2761,7 @@ function BannerBuilderContent() {
                             size="sm"
                             onClick={() => {
                               navigator.clipboard.writeText(generateInlineFooterLinkHTML(config.branding?.footerLink));
-                              // You could add a toast notification here
+                              toast.success('Copied to clipboard!')
                             }}
                           >
                             Copy HTML Snippet
@@ -3567,7 +3595,6 @@ function BannerBuilderContent() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Banner Behavior</CardTitle>
-                      <NewBadge variant="sparkle" size="sm" />
                     </div>
                     <CardDescription>Configure how the banner behaves and interacts with users</CardDescription>
                   </CardHeader>
@@ -3592,7 +3619,6 @@ function BannerBuilderContent() {
 
                     <div className="relative p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100">
                       <div className="absolute top-2 right-2">
-                        <NewBadge variant="pulse" size="sm" />
                       </div>
                       <div className="flex items-center space-x-2 pr-16">
                         <Switch
@@ -4237,9 +4263,6 @@ function BannerBuilderContent() {
                         <Eye className="mr-2 h-5 w-5" />
                         Live Preview
                       </CardTitle>
-                      {config.behavior.showPreferences && (
-                        <NewBadge variant="sparkle" size="sm" />
-                      )}
                     </div>
                     {config.behavior.showPreferences && (
                       <CardDescription className="text-purple-600">
