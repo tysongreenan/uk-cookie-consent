@@ -72,10 +72,15 @@ export const authOptions: NextAuthOptions = {
             .eq('email', credentials.email.toLowerCase().trim())
             .single()
 
-          if (error || !user || !user.password) {
-            // Log failed login attempt for security monitoring
-            console.warn(`Failed login attempt for email: ${credentials.email}`)
+          if (error || !user) {
+            console.warn(`Failed login attempt for email: ${credentials.email} - user not found`)
             return null
+          }
+
+          if (!user.password) {
+            // User exists but signed up via Google OAuth — no password set
+            console.warn(`Login attempt with password for OAuth-only account: ${credentials.email}`)
+            throw new Error('This account uses Google Sign-In. Please click "Sign in with Google" instead.')
           }
 
           // Skip account lock check since field doesn't exist yet
@@ -172,12 +177,22 @@ export const authOptions: NextAuthOptions = {
         // Check if user already exists
         const { data: existingUser } = await supabase
           .from('User')
-          .select('id, planTier')
+          .select('id, name, planTier')
           .eq('email', email)
           .single()
 
         if (existingUser) {
-          // Existing user — look up their workspace
+          // Existing user — link account by updating profile with Google info if missing
+          const updates: Record<string, any> = { updatedAt: new Date().toISOString() }
+          if (!existingUser.name && user.name) updates.name = user.name
+          if (user.image) updates.image = user.image
+
+          await supabase
+            .from('User')
+            .update(updates)
+            .eq('id', existingUser.id)
+
+          // Look up their workspace
           const { data: teamMember } = await supabase
             .from('TeamMember')
             .select('role, team_id')
@@ -186,18 +201,44 @@ export const authOptions: NextAuthOptions = {
             .limit(1)
             .maybeSingle()
 
+          // If user has no workspace (e.g., created via credentials but workspace creation failed), create one
+          if (!teamMember) {
+            console.log('Google OAuth: Existing user has no workspace, creating one:', existingUser.id)
+            const teamId = crypto.randomUUID()
+            const memberId = crypto.randomUUID()
+            const firstName = (user.name || email.split('@')[0]).split(' ')[0]
+
+            await supabase.from('Team').insert({
+              id: teamId,
+              name: `${firstName}'s Workspace`,
+              owner_id: existingUser.id,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+
+            await supabase.from('TeamMember').insert({
+              id: memberId,
+              team_id: teamId,
+              user_id: existingUser.id,
+              role: 'owner',
+              invited_by: existingUser.id,
+              joined_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+
+            ;(user as any).currentTeamId = teamId
+            ;(user as any).userRole = 'owner'
+          } else {
+            ;(user as any).currentTeamId = teamMember.team_id
+            ;(user as any).userRole = teamMember.role || 'owner'
+          }
+
           // Attach workspace info so the jwt callback can read it
           ;(user as any).id = existingUser.id
-          ;(user as any).currentTeamId = teamMember?.team_id || null
-          ;(user as any).userRole = teamMember?.role || 'owner'
           ;(user as any).planTier = existingUser.planTier || 'free'
 
-          // Update last login
-          await supabase
-            .from('User')
-            .update({ updatedAt: new Date().toISOString() })
-            .eq('id', existingUser.id)
-
+          console.log('✅ Google OAuth: Linked to existing account:', email)
           return true
         }
 

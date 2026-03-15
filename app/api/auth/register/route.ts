@@ -73,8 +73,35 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existingUser) {
+      // Check if this is an OAuth-only account (no password set) — link it by adding a password
+      const { data: fullUser } = await supabase
+        .from('User')
+        .select('id, password')
+        .eq('id', existingUser.id)
+        .single()
+
+      if (fullUser && !fullUser.password) {
+        // OAuth user registering with password — link the account
+        const hashedPassword = await bcrypt.hash(password, 12)
+        await supabase
+          .from('User')
+          .update({
+            password: hashedPassword,
+            name: sanitizedName || undefined,
+            updatedAt: new Date().toISOString()
+          })
+          .eq('id', fullUser.id)
+
+        console.log('✅ Account linked: Added password to OAuth account:', sanitizedEmail)
+        return NextResponse.json({
+          success: true,
+          user: { id: fullUser.id, email: sanitizedEmail, name: sanitizedName },
+          message: 'Account linked successfully. You can now sign in with either Google or email/password.'
+        })
+      }
+
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'User with this email already exists. Try signing in instead.' },
         { status: 400 }
       )
     }
