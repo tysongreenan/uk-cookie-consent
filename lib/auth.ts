@@ -273,7 +273,7 @@ export const authOptions: NextAuthOptions = {
         return false
       }
     },
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id
         token.iat = Math.floor(Date.now() / 1000) // Issued at
@@ -281,6 +281,21 @@ export const authOptions: NextAuthOptions = {
         token.currentTeamId = (user as any).currentTeamId || null
         token.userRole = (user as any).userRole || 'owner'
         token.planTier = (user as any).planTier || 'free'
+      } else if (token.id) {
+        // Refresh planTier from database on token rotation so upgrades take effect without re-login
+        try {
+          const supabase = getSupabaseClient()
+          const { data } = await supabase
+            .from('User')
+            .select('planTier')
+            .eq('id', token.id)
+            .single()
+          if (data?.planTier) {
+            token.planTier = data.planTier
+          }
+        } catch {
+          // Keep existing planTier on error
+        }
       }
       return token
     },

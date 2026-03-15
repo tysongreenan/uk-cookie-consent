@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 2
+export const GENERATOR_VERSION = 3
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,16 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 3,
+    date: '2026-03-15',
+    title: 'Page Builder Compatibility & Brand Customization',
+    changes: [
+      'Fixed banner not appearing on Brizy, Elementor, and other page builders',
+      'Added font selector, color palette presets, and reject button styling',
+      'Added WCAG contrast checker and drag-and-drop logo upload',
+    ],
+  },
   {
     version: 2,
     date: '2026-03-15',

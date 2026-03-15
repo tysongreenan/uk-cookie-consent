@@ -324,34 +324,66 @@ export async function GET(request: NextRequest) {
   document.head.appendChild(style);
 
   // 3. Inject HTML
-  // We need to wait for body to be available
-  function injectHTML() {
+  // Uses retry logic and MutationObserver for compatibility with page builders
+  // (Brizy, Elementor, Divi, etc.) that may rebuild the DOM after initial load
+  // Note: bannerHTMLContent is server-generated from trusted config, not user-supplied HTML
+  var bannerInjected = false;
+  var bannerHTMLContent = ${JSON.stringify(html)};
+  var bannerJSInit = function() { ${js} };
+
+  function injectBannerHTML() {
     if (!document.body) {
-      setTimeout(injectHTML, 10);
+      setTimeout(injectBannerHTML, 50);
       return;
     }
 
     // Prevent duplicate injection
     if (document.getElementById('cookie-consent-banner')) {
+      if (!bannerInjected) {
+        bannerInjected = true;
+        bannerJSInit();
+      }
       return;
     }
-    
-    var div = document.createElement('div');
-    div.innerHTML = ${JSON.stringify(html)};
-    
-    // Append all children to body
-    while (div.firstChild) {
-      document.body.appendChild(div.firstChild);
+
+    // Create a container and parse the server-generated banner markup
+    var container = document.createElement('div');
+    container.innerHTML = bannerHTMLContent;
+
+    // Append all child elements to body
+    while (container.firstChild) {
+      document.body.appendChild(container.firstChild);
     }
-    
+
+    bannerInjected = true;
+
     // 4. Execute Banner Logic
-    ${js}
+    bannerJSInit();
   }
-  
+
+  // Watch for page builders that rebuild the DOM and remove our elements
+  function watchForBannerRemoval() {
+    if (typeof MutationObserver === 'undefined') return;
+    var observer = new MutationObserver(function() {
+      if (bannerInjected && !document.getElementById('cookie-consent-banner') && document.body) {
+        // Banner was removed (likely by a page builder re-rendering the DOM)
+        bannerInjected = false;
+        injectBannerHTML();
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    // Stop watching after 30s (page builders should be done by then)
+    setTimeout(function() { observer.disconnect(); }, 30000);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectHTML);
+    document.addEventListener('DOMContentLoaded', function() {
+      injectBannerHTML();
+      watchForBannerRemoval();
+    });
   } else {
-    injectHTML();
+    injectBannerHTML();
+    watchForBannerRemoval();
   }
 })();
 `

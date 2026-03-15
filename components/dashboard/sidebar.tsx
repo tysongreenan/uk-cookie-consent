@@ -161,21 +161,21 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       {/* Workspace Switcher */}
-      <div className="p-4 border-b border-border">
+      <div className="px-4 py-3 border-b border-border">
         <WorkspaceSwitcher />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+      <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-1">
+        <div className="space-y-0.5">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Main Menu
           </p>
           {navigationItems.map(item => renderNavItem(item))}
         </div>
 
-        <div className="space-y-1 pt-6">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+        <div className="space-y-0.5 pt-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Support
           </p>
           {getSupportItems(isPro).map(item => renderNavItem(item))}
@@ -183,7 +183,7 @@ export function Sidebar({ className }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border">
+      <div className="p-3 border-t border-border">
         <Link href="/roadmap" className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
             <Globe className="w-4 h-4 text-primary-foreground" />

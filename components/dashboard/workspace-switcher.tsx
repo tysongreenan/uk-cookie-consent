@@ -197,13 +197,13 @@ export function WorkspaceSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="min-w-0">
-          <Building2 className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline truncate max-w-32">
-                {currentWorkspace?.name || 'Select Workspace'}
-              </span>
-          {isPro && <Badge className="ml-2 bg-amber-500 text-white text-[11px] px-2 py-0.5 border-0 font-semibold tracking-wide" aria-label="Pro plan workspace">PRO</Badge>}
-          <ChevronDown className="h-4 w-4 ml-2" />
+        <Button variant="outline" className="w-full justify-between overflow-hidden">
+          <div className="flex items-center min-w-0">
+            <Building2 className="h-4 w-4 mr-2 shrink-0" />
+            <span className="truncate">{currentWorkspace?.name || 'Select Workspace'}</span>
+            {isPro && <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 border-0 font-semibold tracking-wide shrink-0" aria-label="Pro plan workspace">PRO</Badge>}
+          </div>
+          <ChevronDown className="h-4 w-4 ml-1 shrink-0" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
