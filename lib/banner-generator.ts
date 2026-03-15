@@ -1134,17 +1134,6 @@ ${config.branding.footerLink.enabled ? `
 window.showCookiePreferences = function() {
   showPreferencesModal();
 };
-
-// Attach click handler to floating button via addEventListener
-// (more reliable than onclick attribute — some page builders and CSP policies strip inline handlers)
-var floatingBtn = document.getElementById('cookie-settings-float');
-if (floatingBtn && !floatingBtn.dataset.handlerAttached) {
-  floatingBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    showPreferencesModal();
-  });
-  floatingBtn.dataset.handlerAttached = 'true';
-}
 ` : ''}
 
 ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
@@ -1376,7 +1365,18 @@ function init() {
     prefsBtn.dataset.handlerAttached = 'true';
   }
   ` : ''}
-  
+
+  // Floating cookie settings button click handler
+  // Must be inside init() because the element is injected dynamically
+  var floatingSettingsBtn = document.getElementById('cookie-settings-float');
+  if (floatingSettingsBtn && !floatingSettingsBtn.dataset.handlerAttached) {
+    floatingSettingsBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showPreferencesModal();
+    });
+    floatingSettingsBtn.dataset.handlerAttached = 'true';
+  }
+
   // Modal event handlers (set up ALWAYS, needed when user reopens banner)
   var modal = document.getElementById('cookie-preferences-modal');
   var modalCloseBtn = document.getElementById('cookie-prefs-close-btn');
