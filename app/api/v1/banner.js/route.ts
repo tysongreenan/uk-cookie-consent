@@ -13,12 +13,20 @@ function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   // Use service role key for public banner access (bypasses RLS)
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-  
+
   if (!url || !key) {
     throw new Error('Supabase configuration is missing')
   }
-  
-  return createClient(url, key)
+
+  return createClient(url, key, {
+    global: {
+      headers: {
+        // Bypass Supabase/PostgREST/Kong caching to always get fresh data
+        'Cache-Control': 'no-cache, no-store',
+        'x-request-id': `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      }
+    }
+  })
 }
 
 // Rate limiter: 100 requests per minute per IP (generous for legitimate use)
