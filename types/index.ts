@@ -239,6 +239,7 @@ export interface BrandColorSuggestions {
     link: string
   }
   warnings: string[]
+  colorsDiscovered: boolean
 }
 
 export interface BrandLogoSuggestion {
@@ -264,6 +265,7 @@ export interface BrandDiscoveryResult {
     link: string
   }
   warnings: string[]
+  colorsDiscovered: boolean
   logo?: BrandLogoSuggestion
   fonts?: BrandFontCandidate[]
   fetchedAt: string
