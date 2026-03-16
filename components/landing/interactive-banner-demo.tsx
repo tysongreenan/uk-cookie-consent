@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -465,6 +465,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
   const [isScanningScripts, setIsScanningScripts] = useState(false)
   const [scriptScanError, setScriptScanError] = useState<string | null>(null)
   const [hasAutoDiscovered, setHasAutoDiscovered] = useState(false)
+  const [showScanningCard, setShowScanningCard] = useState(false)
   const [builderMode, setBuilderMode] = useState<'simple' | 'advanced'>('simple')
 
   // Simple mode maps 3 steps to underlying tabs
@@ -843,8 +844,25 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
         handleComplianceFrameworkChange(detectedFramework)
       }
 
+      // Show scanning card with minimum display time
+      setShowScanningCard(true)
+      const scanStartTime = Date.now()
+      const MIN_SCAN_DISPLAY_MS = 4000
+
+      // Stagger API calls so results appear one at a time
       discoverBrand()
-      discoverScripts()
+      setTimeout(() => discoverScripts(), 1200)
+
+      // Keep scanning card visible for minimum time after both finish
+      const checkDone = setInterval(() => {
+        // Read latest state via DOM check (avoids stale closure)
+        const elapsed = Date.now() - scanStartTime
+        if (elapsed >= MIN_SCAN_DISPLAY_MS) {
+          clearInterval(checkDone)
+          setShowScanningCard(false)
+        }
+      }, 500)
+
       toast.success('Discovering your website branding and scripts...')
     }
   }, [initialUrl, hasAutoDiscovered])
@@ -1137,10 +1155,12 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
               <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
 
                 {/* Scanning loading state */}
-                {(isDiscoveringBrand || isScanningScripts) && (
+                <AnimatePresence>
+                {showScanningCard && (
                   <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12, transition: { duration: 0.4 } }}
                     className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/5 p-6 overflow-hidden relative"
                   >
                     {/* Animated scan line */}
@@ -1215,6 +1235,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     </div>
                   </motion.div>
                 )}
+                </AnimatePresence>
 
                   <Card>
                     <CardHeader>
