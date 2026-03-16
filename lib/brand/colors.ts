@@ -85,8 +85,15 @@ function accumulateColorsFromContent(content: string, source: string, colorMap: 
 
   let cssVarMatch: RegExpExecArray | null
   while ((cssVarMatch = CSS_VAR_REGEX.exec(normalizedContent)) !== null) {
-    const value = cssVarMatch[1]
-    const normalized = normalizeColor(value)
+    const value = cssVarMatch[1].trim()
+
+    // Try bare RGB triplet format first (e.g. "51, 51, 51" from page builders)
+    const tripletMatch = value.match(/^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/)
+    const colorValue = tripletMatch
+      ? `rgb(${tripletMatch[1]},${tripletMatch[2]},${tripletMatch[3]})`
+      : value
+
+    const normalized = normalizeColor(colorValue)
     if (normalized) {
       addColor(normalized, `${source}-css-var`, colorMap)
     }
@@ -106,7 +113,13 @@ function extractMatches(content: string, regex: RegExp, source: string, colorMap
 function normalizeColor(input: string | undefined | null) {
   if (!input) return null
   try {
-    return chroma(input.trim()).hex().toLowerCase()
+    const color = chroma(input.trim())
+
+    // Skip fully or nearly transparent colors (alpha < 0.1)
+    if (color.alpha() < 0.1) return null
+
+    // Normalize to opaque 6-digit hex (strip alpha channel)
+    return color.alpha(1).hex().toLowerCase()
   } catch {
     return null
   }
@@ -125,7 +138,8 @@ function addColor(hex: string, source: string, colorMap: Map<string, ColorAccumu
 function buildColorCandidates(colorMap: Map<string, ColorAccumulator>): BrandColorCandidate[] {
   return Array.from(colorMap.entries())
     .map(([hex, meta]) => {
-      const luminance = chroma(hex).luminance()
+      const color = chroma(hex)
+      const luminance = color.luminance()
       const isLight = luminance > 0.7
       const isDark = luminance < 0.3
       const recommendedUsage: BrandColorCandidate['recommendedUsage'] = []
@@ -143,9 +157,14 @@ function buildColorCandidates(colorMap: Map<string, ColorAccumulator>): BrandCol
       const contrastOnWhite = chroma.contrast(hex, '#ffffff')
       const contrastOnBlack = chroma.contrast(hex, '#111111')
 
+      // Boost chromatic (colorful) colors — they're more likely brand colors
+      // than structural grays/blacks/whites
+      const [, sat] = color.hsl()
+      const saturationBoost = (isNaN(sat) ? 0 : sat) * meta.count * 2
+
       return {
         hex,
-        score: meta.count,
+        score: meta.count + saturationBoost,
         sources: Array.from(meta.sources),
         luminance,
         contrastOnWhite,
