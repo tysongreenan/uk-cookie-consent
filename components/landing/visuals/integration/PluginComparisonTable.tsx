@@ -71,8 +71,8 @@ export function PluginComparisonTable() {
       name: 'PIPEDA Compliant',
       description: 'Meets Canadian privacy law',
       ourSolution: true,
-      cookiebot: false,
-      oneTrust: false,
+      cookiebot: true,
+      oneTrust: true,
       category: 'compliance'
     },
     {
@@ -89,8 +89,8 @@ export function PluginComparisonTable() {
     {
       id: 'free-tier',
       name: 'Free Tier',
-      description: 'Free for small websites',
-      ourSolution: 'Unlimited',
+      description: 'Free plan for small websites',
+      ourSolution: '1 banner, free',
       cookiebot: '1 domain',
       oneTrust: 'No free tier',
       category: 'cost'
@@ -99,7 +99,7 @@ export function PluginComparisonTable() {
       id: 'pricing',
       name: 'Pricing',
       description: 'Cost for premium features',
-      ourSolution: '$9/month',
+      ourSolution: '$99 one-time',
       cookiebot: '$99/month',
       oneTrust: '$200/month',
       category: 'cost'
@@ -109,8 +109,8 @@ export function PluginComparisonTable() {
       name: 'Setup Fee',
       description: 'One-time setup cost',
       ourSolution: 'Free',
-      cookiebot: '$500',
-      oneTrust: '$1000',
+      cookiebot: 'Varies',
+      oneTrust: 'Varies',
       category: 'cost'
     },
 
@@ -151,16 +151,16 @@ export function PluginComparisonTable() {
     { id: 'cost', name: 'Cost', icon: DollarSign }
   ]
 
-  const filteredFeatures = activeCategory === 'all' 
-    ? features 
+  const filteredFeatures = activeCategory === 'all'
+    ? features
     : features.filter(f => f.category === activeCategory)
 
   const getFeatureValue = (value: boolean | string) => {
     if (typeof value === 'boolean') {
       return value ? (
-        <CheckCircle className="h-5 w-5 text-green-500" />
+        <CheckCircle className="h-5 w-5 text-primary" />
       ) : (
-        <XCircle className="h-5 w-5 text-red-500" />
+        <XCircle className="h-5 w-5 text-muted-foreground/40" />
       )
     }
     return <span className="text-sm font-medium">{value}</span>
@@ -179,10 +179,10 @@ export function PluginComparisonTable() {
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3 className="text-2xl font-bold text-foreground mb-2">
           Plugin Comparison — See the Difference
         </h3>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           How we stack up against the competition
         </p>
       </div>
@@ -195,8 +195,8 @@ export function PluginComparisonTable() {
             onClick={() => setActiveCategory(category.id)}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
               activeCategory === category.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
             <category.icon className="h-4 w-4" />
@@ -206,33 +206,33 @@ export function PluginComparisonTable() {
       </div>
 
       {/* Comparison Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg">
+      <div className="bg-background rounded-xl border border-border overflow-hidden shadow-lg">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/30">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">
                   Feature
                 </th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-center text-sm font-semibold text-foreground">
                   <div className="flex items-center justify-center space-x-2">
-                    <Star className="h-4 w-4 text-yellow-500" />
+                    <Star className="h-4 w-4 text-foreground" />
                     <span>Our Solution</span>
                   </div>
                 </th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-center text-sm font-semibold text-foreground">
                   Cookiebot
                 </th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-center text-sm font-semibold text-foreground">
                   OneTrust
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filteredFeatures.map((feature, index) => (
-                <tr 
+                <tr
                   key={feature.id}
-                  className={`hover:bg-gray-50 transition-colors ${
+                  className={`hover:bg-muted/30 transition-colors ${
                     isAnimating && index < 3 ? 'animate-pulse' : ''
                   }`}
                 >
@@ -240,8 +240,8 @@ export function PluginComparisonTable() {
                     <div className="flex items-center space-x-2">
                       {getCategoryIcon(feature.category)}
                       <div>
-                        <div className="font-medium text-gray-900">{feature.name}</div>
-                        <div className="text-sm text-gray-500">{feature.description}</div>
+                        <div className="font-medium text-foreground">{feature.name}</div>
+                        <div className="text-sm text-muted-foreground">{feature.description}</div>
                       </div>
                     </div>
                   </td>
@@ -269,32 +269,32 @@ export function PluginComparisonTable() {
 
       {/* Summary Stats */}
       <div className="mt-8 grid md:grid-cols-3 gap-6">
-        <div className="p-6 bg-green-50 rounded-xl border border-green-200">
+        <div className="p-6 bg-muted rounded-xl border border-border">
           <div className="flex items-center space-x-2 mb-2">
-            <Zap className="h-5 w-5 text-green-600" />
-            <h4 className="font-semibold text-green-800">Performance</h4>
+            <Zap className="h-5 w-5 text-primary" />
+            <h4 className="font-semibold text-foreground">Performance</h4>
           </div>
-          <p className="text-sm text-green-600">
+          <p className="text-sm text-muted-foreground">
             4x faster load time than competitors
           </p>
         </div>
 
-        <div className="p-6 bg-blue-50 rounded-xl border border-blue-200">
+        <div className="p-6 bg-muted rounded-xl border border-border">
           <div className="flex items-center space-x-2 mb-2">
-            <DollarSign className="h-5 w-5 text-blue-600" />
-            <h4 className="font-semibold text-blue-800">Cost</h4>
+            <DollarSign className="h-5 w-5 text-primary" />
+            <h4 className="font-semibold text-foreground">Cost</h4>
           </div>
-          <p className="text-sm text-blue-600">
-            90% cheaper than enterprise solutions
+          <p className="text-sm text-muted-foreground">
+            One-time payment vs monthly subscriptions
           </p>
         </div>
 
-        <div className="p-6 bg-purple-50 rounded-xl border border-purple-200">
+        <div className="p-6 bg-muted rounded-xl border border-border">
           <div className="flex items-center space-x-2 mb-2">
-            <Shield className="h-5 w-5 text-purple-600" />
-            <h4 className="font-semibold text-purple-800">Compliance</h4>
+            <Shield className="h-5 w-5 text-primary" />
+            <h4 className="font-semibold text-foreground">Compliance</h4>
           </div>
-          <p className="text-sm text-purple-600">
+          <p className="text-sm text-muted-foreground">
             Covers all major privacy laws globally
           </p>
         </div>
@@ -305,7 +305,7 @@ export function PluginComparisonTable() {
         <button
           onClick={startAnimation}
           disabled={isAnimating}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-medium"
+          className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground transition-colors font-medium"
         >
           {isAnimating ? 'Highlighting Features...' : 'Highlight Key Differences'}
         </button>
