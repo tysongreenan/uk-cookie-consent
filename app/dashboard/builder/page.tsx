@@ -649,11 +649,13 @@ function BannerBuilderContent() {
   const applyColorUpdates = (updates: Partial<BannerConfig['colors']>) => {
     setConfig(prev => ({
       ...prev,
+      theme: 'custom',
       colors: {
         ...prev.colors,
         ...updates
       }
     }))
+    setIsDirty(true)
   }
 
   const applyColorRole = (role: keyof BannerConfig['colors'], value: string) => {
@@ -785,7 +787,10 @@ function BannerBuilderContent() {
       }
 
       setBrandDiscovery(data)
-      toast.success('Brand colors discovered')
+      if (data.suggestions) {
+        applyColorUpdates(data.suggestions)
+      }
+      toast.success('Brand colors applied')
     } catch (error) {
       setBrandDiscoveryError((error as Error).message)
     } finally {
