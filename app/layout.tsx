@@ -18,10 +18,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
+    default: 'Cookie Banner Generator — Free & GDPR Compliant | Cookie-Banner.ca',
     template: '%s | Cookie Banner Generator'
   },
-  description: 'Create unlimited cookie banners custom-branded to your site. Fully compliant with GDPR & PIPEDA. First 1,000 accounts free — no card needed.',
+  description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Quebec Law 25 compliant. Works on WordPress, Shopify & any site. No coding needed. Used by 1,000+ websites.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/favicon.svg',
@@ -29,32 +29,32 @@ export const metadata: Metadata = {
     apple: '/favicon.svg',
   },
   keywords: [
-    'cookie banner',
-    'cookie consent',
-    'GDPR',
-    'PIPEDA',
-    'CASL',
-    'cookie banner Canada',
-    'GDPR compliance',
-    'PIPEDA compliance',
-    'privacy compliance',
     'cookie banner generator',
-    'branded cookie banner',
-    'custom cookie consent',
+    'cookie banner generator free',
+    'free cookie banner generator',
+    'cookie banner',
+    'cookie consent banner',
+    'law 25 cookie banner',
+    'GDPR cookie banner',
+    'PIPEDA cookie banner',
+    'CCPA cookie banner',
+    'cookie banner Canada',
+    'cookie consent generator',
+    'free cookie consent banner',
   ],
   verification: {
     google: 'A3HHfv-cqaYqh6td64AMTu4v8TT8xuLZmpBQh2zWvBY',
   },
   openGraph: {
-    title: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
-    description: 'Create unlimited cookie banners custom-branded to your site. Fully compliant with GDPR & PIPEDA. First 1,000 accounts free — no card needed.',
+    title: 'Cookie Banner Generator — Free & GDPR Compliant',
+    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Works on any site. No coding needed.',
     type: 'website',
     locale: 'en_CA',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cookie Banner Generator Canada | GDPR & PIPEDA Compliant',
-    description: 'Create unlimited cookie banners custom-branded to your site. First 1,000 accounts free.',
+    title: 'Cookie Banner Generator — Free & GDPR Compliant',
+    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Used by 1,000+ websites.',
   },
   robots: {
     index: true,

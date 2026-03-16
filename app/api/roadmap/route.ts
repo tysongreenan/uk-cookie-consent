@@ -3,10 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
-)
+// Use service role key to bypass RLS — auth is handled by NextAuth session check
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +33,7 @@ export async function GET(request: NextRequest) {
     ]
 
     // Try to get roadmap items from database, fallback to default if tables don't exist
+    const supabase = getSupabaseClient()
     try {
       const { data: roadmapItems, error: itemsError } = await supabase
         .from('RoadmapItemWithVotes')

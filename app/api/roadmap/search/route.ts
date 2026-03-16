@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
-)
+// Use service role key to bypass RLS for consistent reads
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +25,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    const supabase = getSupabaseClient()
     // Search roadmap items (case-insensitive, partial match)
     const { data: roadmapItems, error: roadmapError } = await supabase
       .from('RoadmapItem')
