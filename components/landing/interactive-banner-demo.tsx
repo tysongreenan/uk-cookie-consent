@@ -468,10 +468,11 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
   const [showScanningCard, setShowScanningCard] = useState(false)
   const [builderMode, setBuilderMode] = useState<'simple' | 'advanced'>('simple')
 
-  // Simple mode maps 3 steps to underlying tabs
+  // Simple mode maps steps to underlying tabs
   const simpleSteps = [
     { id: 'brand', label: 'Brand & Preview', icon: Palette, tabs: ['design', 'compliance'] },
     { id: 'customize', label: 'Customize', icon: Type, tabs: ['content', 'behavior'] },
+    { id: 'scripts', label: 'Scripts', icon: Target, tabs: ['scripts'] },
     { id: 'getcode', label: 'Get Code', icon: Code, tabs: ['code'] },
   ] as const
 
@@ -891,16 +892,16 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-muted-foreground">
-                          Step {simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1} of 3
+                          Step {simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1} of {simpleSteps.length}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {Math.round(((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / 3) * 100)}%
+                          {Math.round(((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / simpleSteps.length) * 100)}%
                         </span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2">
                         <div
                           className="bg-primary h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / 3) * 100}%` }}
+                          style={{ width: `${((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / simpleSteps.length) * 100}%` }}
                         ></div>
                       </div>
                     </>
