@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 3
+export const GENERATOR_VERSION = 4
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 4,
+    date: '2026-03-16',
+    title: 'Pro Features & Analytics Fix — Please Republish Your Banners',
+    changes: [
+      'Fixed Pro layouts (modal, slide-in) not unlocking for Pro users',
+      'Fixed brand color import not persisting after apply',
+      'Analytics tracking now works without a separate script — just enable the toggle',
+      'Please republish and re-embed your banners to get the latest improvements',
+    ],
+  },
   {
     version: 3,
     date: '2026-03-15',
