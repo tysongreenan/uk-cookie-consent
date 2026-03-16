@@ -1571,14 +1571,9 @@ function BannerBuilderContent() {
 
                       {brandDiscovery && (
                         <div className="space-y-4 rounded-lg border bg-muted/40 p-4">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                              <p className="text-sm font-semibold">Detected palette</p>
-                              <p className="text-xs text-muted-foreground">Imported from {brandDiscovery.url}</p>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline" onClick={applyBrandPalette}>Apply Palette</Button>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-green-500" />
+                            <p className="text-sm font-medium">Colors imported from {brandDiscovery.url}</p>
                           </div>
 
                           {brandDiscovery.warnings.length > 0 && (
@@ -1588,50 +1583,6 @@ function BannerBuilderContent() {
                               ))}
                             </ul>
                           )}
-
-                          {/* Color assignment by role — pick which detected color to use for each part of your banner */}
-                          <div className="space-y-3">
-                            {([
-                              { role: 'background' as const, label: 'Banner Background', desc: 'The main background color of the banner' },
-                              { role: 'text' as const, label: 'Banner Text', desc: 'Message text and headings' },
-                              { role: 'button' as const, label: 'Accept / Reject Button', desc: 'The primary action button fill color' },
-                              { role: 'buttonText' as const, label: 'Button Label', desc: 'Text inside the Accept / Reject buttons' },
-                              { role: 'link' as const, label: 'Preferences Link', desc: 'The "Preferences" and privacy policy link color' },
-                            ]).map(({ role, label, desc }) => (
-                              <div key={role} className="rounded-md border p-3">
-                                <div className="mb-2">
-                                  <p className="text-sm font-medium">{label}</p>
-                                  <p className="text-xs text-muted-foreground">{desc}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {/* Current applied color */}
-                                  <div className="flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-mono bg-background">
-                                    <div className="h-3 w-3 rounded-sm border" style={{ backgroundColor: config.colors[role] }} />
-                                    {config.colors[role]}
-                                  </div>
-                                  <span className="text-xs text-muted-foreground">&larr;</span>
-                                  {/* Detected color options */}
-                                  <div className="flex flex-wrap gap-1">
-                                    {brandDiscovery.colors.slice(0, 8).map((color) => (
-                                      <button
-                                        key={color.hex}
-                                        onClick={() => applyColorRole(role, color.hex)}
-                                        className={`group relative h-7 w-7 rounded border-2 transition-all hover:scale-110 ${config.colors[role] === color.hex ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-muted-foreground/40'}`}
-                                        style={{ backgroundColor: color.hex }}
-                                        title={`Apply ${color.hex} as ${label}`}
-                                      >
-                                        {config.colors[role] === color.hex && (
-                                          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: color.contrastOnWhite > color.contrastOnBlack ? '#fff' : '#111' }}>
-                                            &#10003;
-                                          </span>
-                                        )}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
 
                           {(() => {
                             const fonts = (brandDiscovery as BrandDiscoveryResult & { fonts?: Array<{ family: string; source: string; weight: number; url?: string }> }).fonts
@@ -1654,9 +1605,6 @@ function BannerBuilderContent() {
                                   </Button>
                                 ))}
                               </div>
-                              <p className="text-xs text-muted-foreground">
-                                Click a font to apply it to your banner.
-                              </p>
                             </div>
                             )
                           })()}
@@ -1731,6 +1679,45 @@ function BannerBuilderContent() {
                           ))}
                         </div>
                       </div>
+
+                      {/* Brand Colors (shown after import) */}
+                      {brandDiscovery && brandDiscovery.colors.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">Brand Colors</Label>
+                            <Button size="sm" variant="ghost" className="text-xs h-6" onClick={applyBrandPalette}>Reset to suggested</Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Pick a color from your brand, then click any color field below to fine-tune.</p>
+                          <div className="space-y-2">
+                            {([
+                              { role: 'background' as const, label: 'Background' },
+                              { role: 'text' as const, label: 'Text' },
+                              { role: 'button' as const, label: 'Accept Button' },
+                              { role: 'buttonText' as const, label: 'Button Text' },
+                              { role: 'link' as const, label: 'Preferences Link' },
+                            ]).map(({ role, label }) => (
+                              <div key={role} className="flex items-center gap-3">
+                                <span className="text-xs w-28 text-muted-foreground">{label}</span>
+                                <div className="flex gap-1">
+                                  {brandDiscovery.colors.slice(0, 8).map((color) => (
+                                    <button
+                                      key={color.hex}
+                                      onClick={() => applyColorRole(role, color.hex)}
+                                      className={`h-6 w-6 rounded border-2 transition-all hover:scale-110 ${config.colors[role] === color.hex ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-muted-foreground/40'}`}
+                                      style={{ backgroundColor: color.hex }}
+                                      title={`${color.hex} → ${label}`}
+                                    />
+                                  ))}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs font-mono text-muted-foreground">
+                                  <div className="h-3 w-3 rounded-sm border" style={{ backgroundColor: config.colors[role] }} />
+                                  {config.colors[role]}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Color Pickers with Contrast Badges */}
                       <div className="space-y-4">
