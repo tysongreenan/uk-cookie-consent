@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
     // Rate limit
     const rateLimitResult = await trackRateLimit.check(request)
     if (!rateLimitResult.allowed) {
+      console.log('[TRACK] Rate limited')
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429, headers: CORS_HEADERS }
@@ -42,7 +43,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { userId, events } = body
 
+    console.log('[TRACK] Received:', { userId, eventCount: events?.length, events })
+
     if (!userId || !isValidUserId(userId)) {
+      console.warn('[TRACK] Invalid userId:', userId)
       return NextResponse.json(
         { error: 'Invalid user ID' },
         { status: 400, headers: CORS_HEADERS }
@@ -50,6 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!events || !Array.isArray(events) || events.length === 0 || events.length > 10) {
+      console.warn('[TRACK] Invalid events payload:', { events })
       return NextResponse.json(
         { error: 'Invalid events (1-10 required)' },
         { status: 400, headers: CORS_HEADERS }
@@ -59,15 +64,20 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabase()
 
     // Validate user has analytics enabled
-    const { data: user } = await supabase
+    const { data: user, error: userError } = await supabase
       .from('User')
       .select('analytics_enabled')
       .eq('id', userId)
       .single()
 
+    if (userError) {
+      console.error('[TRACK] User lookup failed:', { userId, error: userError.message })
+    }
+
     if (!user?.analytics_enabled) {
+      console.log('[TRACK] Analytics disabled for user:', userId)
       return NextResponse.json(
-        { success: false },
+        { success: false, reason: 'analytics_disabled' },
         { status: 200, headers: CORS_HEADERS }
       )
     }
@@ -76,19 +86,28 @@ export async function POST(request: NextRequest) {
 
     // Process batched events
     for (const event of events) {
-      if (!event.type || !VALID_EVENT_TYPES.includes(event.type)) continue
+      if (!event.type || !VALID_EVENT_TYPES.includes(event.type)) {
+        console.warn('[TRACK] Skipping invalid event type:', event.type)
+        continue
+      }
 
       const decisionTime = typeof event.decisionTime === 'number' && event.decisionTime > 0 && event.decisionTime < 300000
         ? Math.round(event.decisionTime)
         : null
 
-      await supabase.rpc('increment_banner_stat', {
+      const { error: rpcError } = await supabase.rpc('increment_banner_stat', {
         p_user_id: userId,
         p_date: today,
         p_event_type: event.type,
         p_decision_time_ms: decisionTime,
         p_is_returning: Boolean(event.isReturning)
       })
+
+      if (rpcError) {
+        console.error('[TRACK] RPC failed:', { userId, event: event.type, error: rpcError.message })
+      } else {
+        console.log('[TRACK] Recorded:', { userId, event: event.type, date: today })
+      }
     }
 
     return NextResponse.json(
@@ -96,7 +115,7 @@ export async function POST(request: NextRequest) {
       { headers: CORS_HEADERS }
     )
   } catch (error) {
-    console.error('Track error:', error)
+    console.error('[TRACK] Unexpected error:', error)
     return NextResponse.json(
       { success: false },
       { status: 500, headers: CORS_HEADERS }
