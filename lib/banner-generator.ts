@@ -427,7 +427,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
         </div>
         ${showBranding ? `
         <div style="margin-top: 8px;">
-          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener noreferrer" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Powered by cookie-banner.ca</a>
+          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Powered by cookie-banner.ca</a>
         </div>` : ''}
       </div>
       
@@ -615,8 +615,18 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
 -->` : ''
 
+  // Persistent backlink — always visible in DOM for SEO, not inside display:none elements
+  // Position opposite to the floating button to avoid overlap
+  const floatingButtonRendered = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both')
+  const floatingIsLeft = floatingButtonRendered && config.branding?.footerLink?.floatingPosition === 'bottom-left'
+  const backlinkPosition = floatingIsLeft ? 'right: 0;' : 'left: 0;'
+  const persistentBacklink = showBranding ? `
+<div id="cookie-banner-attribution" style="position: fixed; bottom: env(safe-area-inset-bottom, 0px); ${backlinkPosition} z-index: 9999; pointer-events: auto; padding: 2px 8px;">
+  <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 10px; color: rgba(128,128,128,0.5); text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.color='rgba(128,128,128,0.8)'" onmouseout="this.style.color='rgba(128,128,128,0.5)'">Cookie consent by cookie-banner.ca</a>
+</div>` : ''
+
   // Return all components separately
-  return mainBanner + preferencesModal + floatingButton + inlineFooterLink
+  return mainBanner + preferencesModal + floatingButton + inlineFooterLink + persistentBacklink
 }
 
 export const generateBannerCSS = (config: BannerConfig) => {
