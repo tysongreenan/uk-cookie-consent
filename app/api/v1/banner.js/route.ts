@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
     const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
     const finalEtag = `"${bannerId}-${bannerUpdatedAt}"`
     
-    if (!banner.isActive) {
+    if (banner.isActive === false) {
       // Check if client has cached version (304 Not Modified)
       if (ifNoneMatch === finalEtag) {
         return new NextResponse(null, {
