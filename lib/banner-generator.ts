@@ -1192,6 +1192,12 @@ function saveConsent(consent) {
   if (consent.analytics) {
     initGA4();
   }
+  // Notify GTM template and any registered listeners of consent change
+  if (window.__cbConsentCallbacks && window.__cbConsentCallbacks.length) {
+    window.__cbConsentCallbacks.forEach(function(cb) {
+      try { cb(consent); } catch(e) {}
+    });
+  }
 }
 
 // Toggle switches and consent loading - must be in outer scope
@@ -1576,10 +1582,19 @@ export const generateConsentInitScript = () => {
   
   // Initialize dataLayer immediately (for GTM/GA4)
   window.dataLayer = window.dataLayer || [];
-  
+
   // Initialize gtag function immediately
   function gtag(){dataLayer.push(arguments);}
   window.gtag = window.gtag || gtag;
+
+  // GTM Template callback registration
+  // Allows the Cookie Banner Generator GTM template to listen for consent changes
+  window.__cbConsentCallbacks = window.__cbConsentCallbacks || [];
+  window.__cbRegisterConsentCallback = function(cb) {
+    if (typeof cb === 'function') {
+      window.__cbConsentCallbacks.push(cb);
+    }
+  };
   
   // Set consent defaults to DENIED before any trackers load
   // This blocks ALL trackers (GTM, GA4, Meta Pixel, Google Ads, etc.) until user grants consent

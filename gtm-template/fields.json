@@ -1,0 +1,117 @@
+[
+  {
+    "type": "LABEL",
+    "name": "headerLabel",
+    "displayName": "<strong>Cookie Banner Generator — Consent Mode v2</strong><br>Configure default consent states for your cookie banner. Use the <a href=\"https://cookie-banner.ca\">Cookie Banner Generator</a> dashboard to customize your banner appearance and behavior."
+  },
+  {
+    "type": "PARAM_TABLE",
+    "name": "defaultSettings",
+    "displayName": "Default Consent Settings",
+    "help": "Set default consent states per region. Use ISO 3166-2 country codes (e.g., 'GB', 'DE', 'US-CA'). Comma-separate multiple regions (e.g., 'GB,DE,FR'). Leave region blank for global defaults. For GDPR compliance, EEA/UK regions should default to 'denied'.",
+    "paramTableColumns": [
+      {
+        "param": {
+          "type": "TEXT",
+          "name": "region",
+          "displayName": "Region (ISO codes)",
+          "help": "Leave blank for global default. Use ISO 3166-2 codes like 'GB', 'DE', 'US-CA'. Comma-separate multiple: 'GB,DE,FR,IT,ES'"
+        }
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_storage",
+          "displayName": "Ad Storage",
+          "selectItems": [
+            { "value": "denied", "displayValue": "Denied" },
+            { "value": "granted", "displayValue": "Granted" }
+          ],
+          "defaultValue": "denied",
+          "help": "Controls whether advertising cookies can be set"
+        }
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "analytics_storage",
+          "displayName": "Analytics Storage",
+          "selectItems": [
+            { "value": "denied", "displayValue": "Denied" },
+            { "value": "granted", "displayValue": "Granted" }
+          ],
+          "defaultValue": "denied",
+          "help": "Controls whether analytics cookies can be set"
+        }
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_user_data",
+          "displayName": "Ad User Data",
+          "selectItems": [
+            { "value": "denied", "displayValue": "Denied" },
+            { "value": "granted", "displayValue": "Granted" }
+          ],
+          "defaultValue": "denied",
+          "help": "Controls whether user data can be sent to Google for advertising"
+        }
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_personalization",
+          "displayName": "Ad Personalization",
+          "selectItems": [
+            { "value": "denied", "displayValue": "Denied" },
+            { "value": "granted", "displayValue": "Granted" }
+          ],
+          "defaultValue": "denied",
+          "help": "Controls whether personalized advertising is allowed"
+        }
+      }
+    ],
+    "newRowButtonText": "Add Region Override"
+  },
+  {
+    "type": "GROUP",
+    "name": "advancedSettings",
+    "displayName": "Advanced Settings",
+    "groupStyle": "ZIPPY_CLOSED",
+    "subParams": [
+      {
+        "type": "TEXT",
+        "name": "waitForUpdate",
+        "displayName": "Wait for Update (ms)",
+        "defaultValue": "500",
+        "help": "How long (in milliseconds) to wait for the banner to load and check for saved consent before tags fire with default state. Default: 500ms.",
+        "valueValidators": [
+          {
+            "type": "POSITIVE_NUMBER"
+          }
+        ]
+      },
+      {
+        "type": "TEXT",
+        "name": "consentCookieName",
+        "displayName": "Consent Cookie Name",
+        "defaultValue": "cookie_consent",
+        "help": "The name of the cookie where Cookie Banner Generator stores the user's consent choice. Default: 'cookie_consent'. Only change this if you've customized it in your banner settings."
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "ads_data_redaction",
+        "checkboxText": "Enable Ads Data Redaction",
+        "defaultValue": false,
+        "help": "When enabled, ad-click identifiers in network requests are redacted when ad_storage is 'denied'. Recommended for maximum GDPR compliance."
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "url_passthrough",
+        "checkboxText": "Enable URL Passthrough",
+        "defaultValue": false,
+        "help": "Pass ad-click identifiers (gclid, dclid, etc.) via URL parameters when cookies cannot be used. This helps maintain conversion measurement even when ad_storage is denied."
+      }
+    ]
+  }
+]
