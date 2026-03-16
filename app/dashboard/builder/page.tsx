@@ -1584,21 +1584,44 @@ function BannerBuilderContent() {
                             </ul>
                           )}
 
-                          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            {brandDiscovery.colors.slice(0, 8).map((color) => (
-                              <div key={color.hex} className="overflow-hidden rounded-md border">
-                                <div className="h-16" style={{ backgroundColor: color.hex }} title={color.hex} />
-                                <div className="space-y-2 p-3">
-                                  <div className="flex items-center justify-between text-sm font-medium">
-                                    <span>{color.hex}</span>
-                                    <span className="text-xs text-muted-foreground">score {color.score}</span>
+                          {/* Color assignment by role — pick which detected color to use for each part of your banner */}
+                          <div className="space-y-3">
+                            {([
+                              { role: 'background' as const, label: 'Banner Background', desc: 'The main background color of the banner' },
+                              { role: 'text' as const, label: 'Banner Text', desc: 'Message text and headings' },
+                              { role: 'button' as const, label: 'Accept / Reject Button', desc: 'The primary action button fill color' },
+                              { role: 'buttonText' as const, label: 'Button Label', desc: 'Text inside the Accept / Reject buttons' },
+                              { role: 'link' as const, label: 'Preferences Link', desc: 'The "Preferences" and privacy policy link color' },
+                            ]).map(({ role, label, desc }) => (
+                              <div key={role} className="rounded-md border p-3">
+                                <div className="mb-2">
+                                  <p className="text-sm font-medium">{label}</p>
+                                  <p className="text-xs text-muted-foreground">{desc}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {/* Current applied color */}
+                                  <div className="flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-mono bg-background">
+                                    <div className="h-3 w-3 rounded-sm border" style={{ backgroundColor: config.colors[role] }} />
+                                    {config.colors[role]}
                                   </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('background', color.hex)}>Background</Button>
-                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('text', color.hex)}>Text</Button>
-                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('button', color.hex)}>Button</Button>
-                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('buttonText', color.hex)}>Button Text</Button>
-                                    <Button size="sm" variant="outline" onClick={() => applyColorRole('link', color.hex)}>Link</Button>
+                                  <span className="text-xs text-muted-foreground">&larr;</span>
+                                  {/* Detected color options */}
+                                  <div className="flex flex-wrap gap-1">
+                                    {brandDiscovery.colors.slice(0, 8).map((color) => (
+                                      <button
+                                        key={color.hex}
+                                        onClick={() => applyColorRole(role, color.hex)}
+                                        className={`group relative h-7 w-7 rounded border-2 transition-all hover:scale-110 ${config.colors[role] === color.hex ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-muted-foreground/40'}`}
+                                        style={{ backgroundColor: color.hex }}
+                                        title={`Apply ${color.hex} as ${label}`}
+                                      >
+                                        {config.colors[role] === color.hex && (
+                                          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: color.contrastOnWhite > color.contrastOnBlack ? '#fff' : '#111' }}>
+                                            &#10003;
+                                          </span>
+                                        )}
+                                      </button>
+                                    ))}
                                   </div>
                                 </div>
                               </div>
