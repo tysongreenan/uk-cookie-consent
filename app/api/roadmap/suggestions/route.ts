@@ -3,10 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
-)
+// Use service role key to bypass RLS — auth is handled by NextAuth session check
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+  )
+}
 
 // GET /api/roadmap/suggestions - Get feature suggestions
 export async function GET(request: NextRequest) {
@@ -17,6 +20,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const supabase = getSupabaseClient()
     const { data: suggestions, error } = await supabase
       .from('FeatureSuggestion')
       .select('*')
@@ -51,6 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and description are required' }, { status: 400 })
     }
 
+    const supabase = getSupabaseClient()
     const { data: suggestion, error } = await supabase
       .from('FeatureSuggestion')
       .insert({
