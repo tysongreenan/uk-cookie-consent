@@ -2,30 +2,24 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  Palette,
-  Code,
-  Zap,
-  Users,
-  CheckCircle,
-  Download,
-  Settings,
   ArrowRight,
   Circle,
   Clock,
   Shield,
-  Copy,
-  CheckCircle2,
+  Zap,
+  CheckCircle,
+  Globe,
+  Code,
+  Palette,
+  Eye,
+  Settings,
 } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { motion } from 'framer-motion'
-import { CodeCopyBlock } from '@/components/landing/visuals/integration/CodeCopyBlock'
-import { ThreeStepInstallation } from '@/components/landing/visuals/integration/ThreeStepInstallation'
-import { PluginComparisonTable } from '@/components/landing/visuals/integration/PluginComparisonTable'
-import { BeforeAfterSlider } from '@/components/landing/visuals/integration/BeforeAfterSlider'
+import { StructuredData } from '@/components/seo/structured-data'
 
 const fadeUpVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -53,40 +47,90 @@ const cardVariants = {
   }),
 }
 
-const steps = [
+const faqData = [
   {
-    number: '01',
-    title: 'Build Your Banner',
-    description: 'Use the visual builder to create a custom cookie banner that matches your Webflow design.',
+    question: "How do I add a cookie banner to Webflow?",
+    answer: "Go to Project Settings > Custom Code in your Webflow dashboard. Paste the single script tag into the Head Code section. Publish your site. The cookie banner appears automatically on every page. The entire process takes under 3 minutes and requires zero coding knowledge."
+  },
+  {
+    question: "Does Webflow cookie consent require a paid site plan?",
+    answer: "Adding custom code in Webflow requires a paid site plan (Basic, CMS, Business, or Enterprise). This is a Webflow platform requirement for any custom code injection, not specific to our solution. If you are on the free Starter plan, you will need to upgrade to add any cookie consent solution via custom code."
+  },
+  {
+    question: "Will a cookie banner slow down my Webflow site?",
+    answer: "No. Our script is under 10KB gzipped and loads asynchronously from a global CDN. It will not block your page rendering or affect your Core Web Vitals scores. Webflow sites are already optimized for performance, and our banner is designed to preserve that speed."
+  },
+  {
+    question: "Is this Webflow cookie consent GDPR and CCPA compliant?",
+    answer: "Yes. The banner supports GDPR (EU), PIPEDA (Canada), CCPA/CPRA (California), and other global privacy regulations. It automatically blocks analytics and marketing scripts until the visitor consents. You configure the compliance mode in the visual builder based on your audience location."
+  },
+  {
+    question: "Can I match the cookie banner to my Webflow design?",
+    answer: "Absolutely. Use our visual builder to customize colors, fonts, button styles, position, and layout before generating your script. The banner respects your Webflow site typography and color palette. No CSS overrides needed. You can also update the design anytime from the dashboard without touching your Webflow project."
+  },
+]
+
+const articleData = {
+  title: "Webflow Cookie Banner: Add GDPR Consent to Webflow in 3 Minutes",
+  description: "Step-by-step guide to adding a lightweight, GDPR-compliant cookie consent banner to any Webflow site using Project Settings custom code.",
+  datePublished: "2025-06-01",
+  dateModified: "2026-03-16"
+}
+
+const breadcrumbData = [
+  { name: "Home", url: "https://www.cookie-banner.ca" },
+  { name: "Integrations", url: "https://www.cookie-banner.ca/integrations" },
+  { name: "Webflow Cookie Banner", url: "https://www.cookie-banner.ca/integrations/webflow" }
+]
+
+const features = [
+  {
     icon: Palette,
+    title: 'Matches Your Webflow Design',
+    description: 'Visual builder lets you customize colors, typography, and layout. No CSS overrides or Webflow embeds needed.',
   },
   {
-    number: '02',
-    title: 'Copy & Paste Code',
-    description: 'Copy the generated code and paste it into your Webflow Project Settings > Custom Code.',
-    icon: Copy,
+    icon: Zap,
+    title: 'Under 10KB, Zero Impact',
+    description: 'Async loading from a global CDN. Your Webflow site stays fast. No effect on Core Web Vitals or Lighthouse scores.',
   },
   {
-    number: '03',
-    title: 'Publish & Done',
-    description: 'Publish your site and you are compliant. The banner automatically handles all consent management.',
-    icon: CheckCircle2,
+    icon: Shield,
+    title: 'GDPR, CCPA, PIPEDA',
+    description: 'Automatically blocks tracking scripts until consent is given. Supports opt-in (GDPR) and opt-out (CCPA) modes.',
+  },
+  {
+    icon: Globe,
+    title: 'Works on Every Webflow Plan',
+    description: 'Any paid site plan that supports custom code. Basic, CMS, Business, or Enterprise. Multi-site and client projects included.',
+  },
+  {
+    icon: Eye,
+    title: 'Update Without Republishing',
+    description: 'Change banner text, colors, or compliance settings from the dashboard. Changes go live instantly. No Webflow republish needed.',
+  },
+  {
+    icon: Settings,
+    title: 'Google Consent Mode v2',
+    description: 'Built-in support for Google Consent Mode. Works with GA4, Google Ads, and Tag Manager out of the box.',
   },
 ]
 
 export default function WebflowIntegrationPage() {
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData type="faq" data={faqData} />
+      <StructuredData type="article" data={articleData} />
+      <StructuredData type="breadcrumb" data={breadcrumbData} />
+
       <Header />
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-28">
-          {/* Background grid */}
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:14px_24px]" />
 
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto relative z-10">
             <div className="flex flex-col items-center gap-8 relative z-10">
-              {/* Badge */}
               <motion.div
                 custom={0}
                 variants={fadeUpVariants}
@@ -101,7 +145,6 @@ export default function WebflowIntegrationPage() {
                 </div>
               </motion.div>
 
-              {/* Title */}
               <motion.div
                 custom={1}
                 variants={fadeUpVariants}
@@ -115,17 +158,16 @@ export default function WebflowIntegrationPage() {
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Copy, Paste, Done in 5 Minutes
+                    1 Script Tag. 3 Minutes. Done.
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Save 3+ hours vs custom development. Avoid GDPR fines automatically.
-                  Works with all Webflow plans.
+                  Your Webflow site collects cookies the moment it loads. GDPR says that is illegal without consent.
+                  Add a compliant cookie banner through Project Settings custom code — under 10KB, $99 one-time, no subscriptions.
                 </p>
               </motion.div>
 
-              {/* CTA */}
               <motion.div
                 custom={2}
                 variants={fadeUpVariants}
@@ -135,13 +177,13 @@ export default function WebflowIntegrationPage() {
               >
                 <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
                   <Link href="/builder">
-                    Get Webflow Solution
+                    Build Your Webflow Banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
-                  <Link href="#guide">
-                    View Integration Guide
+                  <Link href="#how-to-add">
+                    See the 3-Step Guide
                   </Link>
                 </Button>
               </motion.div>
@@ -149,8 +191,48 @@ export default function WebflowIntegrationPage() {
           </div>
         </section>
 
-        {/* Visual Demo */}
+        {/* Do You Need a Cookie Banner on Webflow? */}
         <section className="py-16 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <div className="max-w-3xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-10"
+              >
+                <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                  Do You Need a Cookie Banner on Webflow?
+                </h2>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="space-y-5 text-muted-foreground leading-relaxed"
+              >
+                <p>
+                  <strong className="text-foreground">Short answer: yes.</strong> Every Webflow site sets cookies. If you use Webflow Analytics, Google Analytics, Facebook Pixel, or any third-party integration, your site drops tracking cookies on visitors the moment they arrive.
+                </p>
+                <p>
+                  Under GDPR, PIPEDA, and CCPA, you must get explicit consent before setting non-essential cookies. No banner means no consent — and fines start at EUR 20,000 for small businesses.
+                </p>
+                <p>
+                  Webflow does not include a built-in cookie consent tool. The Webflow Marketplace has a few options, but most charge monthly fees and add heavy scripts that slow down your carefully optimized site.
+                </p>
+                <p>
+                  Our solution is different: <strong className="text-foreground">1 script tag, under 10KB, $99 once.</strong> Paste it into Project Settings &gt; Custom Code and you are compliant in minutes.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* How to Add Cookie Consent to Webflow */}
+        <section id="how-to-add" className="py-16 sm:py-20 bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -160,14 +242,15 @@ export default function WebflowIntegrationPage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                See It In Action
+                How to Add Cookie Consent to Webflow
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Watch how easy it is to add cookie consent to your Webflow site
+                Three steps. No npm packages, no Webflow apps, no developer needed.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="max-w-3xl mx-auto space-y-8">
+              {/* Step 1 */}
               <motion.div
                 custom={0}
                 variants={cardVariants}
@@ -175,10 +258,28 @@ export default function WebflowIntegrationPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Webflow Embed Code</h3>
-                <CodeCopyBlock />
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted border border-border text-sm font-mono font-semibold text-foreground">
+                      1
+                    </div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                      Build your banner in the visual editor
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    Open the builder, pick your compliance framework (GDPR, PIPEDA, CCPA), customize the design to match your Webflow site, and click Generate. You get a single script tag.
+                  </p>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/builder">
+                      Open the Builder
+                      <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
               </motion.div>
 
+              {/* Step 2 */}
               <motion.div
                 custom={1}
                 variants={cardVariants}
@@ -186,131 +287,53 @@ export default function WebflowIntegrationPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <h3 className="font-heading text-lg font-semibold text-foreground mb-4">3-Step Installation</h3>
-                <ThreeStepInstallation />
-              </motion.div>
-            </div>
-
-            <motion.div
-              custom={2}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <h3 className="font-heading text-lg font-semibold text-foreground mb-4 text-center">Before vs After</h3>
-              <BeforeAfterSlider />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
-                <Link href="/builder">
-                  Build My Webflow Banner
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Comparison Table */}
-        <section className="py-16 sm:py-20 bg-background">
-          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Why Choose Our Webflow Solution?
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                See how we compare to other Webflow cookie consent options
-              </p>
-            </motion.div>
-
-            <motion.div
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <PluginComparisonTable />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mt-8"
-            >
-              <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
-                <Link href="/builder">
-                  Get My Webflow Banner
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* How it Works */}
-        <section id="guide" className="py-16 border-t border-border bg-muted/30">
-          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                How It Works — 3 Simple Steps
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Get your Webflow site compliant in minutes, not hours
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {steps.map((step, i) => {
-                const StepIcon = step.icon
-                return (
-                  <motion.div
-                    key={step.number}
-                    custom={i}
-                    variants={cardVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="relative text-center"
-                  >
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-background border border-border">
-                      <StepIcon className="h-5 w-5 text-foreground" />
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted border border-border text-sm font-mono font-semibold text-foreground">
+                      2
                     </div>
-                    <div className="text-xs font-mono text-muted-foreground mb-2 tracking-widest">
-                      {step.number}
-                    </div>
-                    <h3 className="font-heading text-lg font-semibold text-foreground mb-2">
-                      {step.title}
+                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                      Paste into Webflow Project Settings &gt; Custom Code
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
-                  </motion.div>
-                )
-              })}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    In your Webflow dashboard, go to <strong className="text-foreground">Project Settings &rarr; Custom Code &rarr; Head Code</strong>. Paste the script tag. That is it.
+                  </p>
+                  <div className="bg-foreground/95 text-background font-mono p-4 rounded-lg text-sm overflow-x-auto">
+                    <pre>{`<!-- Cookie Banner — paste in Project Settings > Custom Code > Head Code -->
+<script
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  defer
+></script>`}</pre>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    <strong className="text-foreground">Note:</strong> Custom code requires a paid Webflow site plan (Basic, CMS, Business, or Enterprise). The free Starter plan does not support custom code injection.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Step 3 */}
+              <motion.div
+                custom={2}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted border border-border text-sm font-mono font-semibold text-foreground">
+                      3
+                    </div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                      Publish your Webflow site
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Click Publish in Webflow. The cookie banner appears automatically on every page. It blocks analytics and marketing cookies until the visitor consents. You are compliant.
+                  </p>
+                </div>
+              </motion.div>
             </div>
 
             <motion.div
@@ -322,7 +345,7 @@ export default function WebflowIntegrationPage() {
             >
               <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
                 <Link href="/builder">
-                  Start Building My Banner
+                  Build Your Webflow Banner Now
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -330,46 +353,96 @@ export default function WebflowIntegrationPage() {
           </div>
         </section>
 
-        {/* Trust / Stats Section */}
-        <section className="py-16 border-t border-border bg-background">
+        {/* Features */}
+        <section className="py-16 border-t border-border bg-muted/30">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: Clock,
-                  title: '5-Minute Setup',
-                  desc: 'Zero maintenance after installation',
-                },
-                {
-                  icon: Shield,
-                  title: 'GDPR, CCPA & PIPEDA',
-                  desc: 'Works with all Webflow plans',
-                },
-                {
-                  icon: Zap,
-                  title: 'Under 10KB',
-                  desc: 'No impact on page load speed',
-                },
-              ].map((item, i) => {
-                const ItemIcon = item.icon
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                Why Webflow Designers Choose This Cookie Banner
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Built for Webflow sites. No bloat, no subscriptions, no compromises on design.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {features.map((feature, i) => {
+                const FeatureIcon = feature.icon
                 return (
                   <motion.div
-                    key={item.title}
+                    key={feature.title}
                     custom={i}
                     variants={cardVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center gap-3 text-center"
+                    viewport={{ once: true, margin: '-50px' }}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background border border-border">
-                      <ItemIcon className="h-5 w-5 text-foreground" />
+                    <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                          <FeatureIcon className="h-5 w-5 text-foreground" />
+                        </div>
+                        <h3 className="font-heading text-lg font-semibold text-foreground">
+                          {feature.title}
+                        </h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {feature.description}
+                      </p>
                     </div>
-                    <p className="font-heading font-semibold text-foreground">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </motion.div>
                 )
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <div className="max-w-3xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-12"
+              >
+                <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Common questions about adding cookie consent to Webflow
+                </p>
+              </motion.div>
+
+              <div className="space-y-6">
+                {faqData.map((faq, index) => (
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    variants={cardVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-50px' }}
+                  >
+                    <Card className="border border-border bg-background">
+                      <CardHeader>
+                        <CardTitle className="font-heading text-lg">{faq.question}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground">{faq.answer}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -387,22 +460,21 @@ export default function WebflowIntegrationPage() {
               >
                 <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
                   <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span>Works with all Webflow plans</span>
+                  <span>$99 one-time &middot; Under 10KB &middot; 1 script tag</span>
                 </div>
 
                 <h2 className="mb-5 font-heading text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl sm:mb-6">
-                  Ready to Make Your Webflow Site Compliant?
+                  Make Your Webflow Site Compliant Today
                 </h2>
 
                 <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                  5-minute setup, zero maintenance. 100% GDPR, PIPEDA, CCPA compliant.
-                  Build your cookie banner in the visual builder, then paste and publish.
+                  Build your cookie banner in the visual editor, paste the script into Webflow Project Settings, and publish. Three minutes from now, you are GDPR compliant.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
                     <Link href="/builder">
-                      Build My Webflow Banner
+                      Build Your Webflow Banner
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>

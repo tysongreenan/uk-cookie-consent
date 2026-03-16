@@ -16,7 +16,6 @@ import {
   Rocket,
   Globe,
   Settings,
-  ExternalLink,
   BarChart3,
   Gauge,
   Package,
@@ -55,52 +54,36 @@ const cardVariants = {
 export default function ReactIntegrationPage() {
   const faqData = [
     {
-      question: "Does this react cookie consent solution work with Next.js 14 and the App Router?",
-      answer: "Yes! Our react cookie consent banner works perfectly with Next.js 15, 14, 13, and older versions. It is compatible with both the App Router (app directory) and Pages Router (pages directory). For App Router, use the Next.js Script component with strategy='beforeInteractive'. For Pages Router, add it to _document.tsx. Both methods are shown in the installation guide above."
+      question: "Does this react cookie consent solution work with Next.js 15 and the App Router?",
+      answer: "Yes. Our react cookie consent banner works with Next.js 15, 14, 13, and older versions. It is compatible with both the App Router (app directory) and Pages Router (pages directory). For App Router, use the Next.js Script component with strategy='beforeInteractive'. For Pages Router, add it to _document.tsx. Both methods are shown in the installation guide above."
     },
     {
-      question: "Will this cookie consent npm solution affect my Core Web Vitals?",
-      answer: "No. Unlike heavy npm cookie consent packages that add 30-50KB to your bundle, our script loads asynchronously from a CDN. It will not block your page rendering or negatively impact your Largest Contentful Paint (LCP), Interaction to Next Paint (INP), or Cumulative Layout Shift (CLS) scores. Our lightweight cookie consent for React apps is specifically optimized for performance."
+      question: "Will this cookie consent solution affect my Core Web Vitals?",
+      answer: "No. Unlike npm cookie consent packages that add 15-50KB to your bundle, our script loads asynchronously from a CDN. It does not block your page rendering or negatively impact your Largest Contentful Paint (LCP), Interaction to Next Paint (INP), or Cumulative Layout Shift (CLS) scores. The external script is under 10KB gzipped and adds zero bytes to your JavaScript bundle."
     },
     {
       question: "Do I need to redeploy my React app to update the cookie banner?",
-      answer: "No! That is the key advantage of our hosted react cookie banner approach over npm packages like react-cookie-consent. Make changes in our visual dashboard and click 'Push Live' -- your changes appear on your live site within seconds. No code changes, no npm update, no CI/CD pipeline, no redeployment, no downtime."
+      answer: "No. That is the key advantage of our hosted react cookie banner over npm packages like react-cookie-consent. Make changes in the visual dashboard and click 'Push Live' -- updates appear on your site within seconds. No code changes, no npm update, no CI/CD pipeline, no redeployment, no downtime."
     },
     {
-      question: "Is there an npm package (cookie consent npm) available?",
-      answer: "We intentionally use a hosted script approach instead of an npm cookie consent package. This gives you instant updates without dependency management, zero bundle size impact, no version conflicts, and no need to rebuild your app. The script loads from our global CDN which is optimized for fast delivery. Many teams switch from npm packages like react-cookie-consent to our solution to reduce maintenance overhead."
+      question: "Why use a hosted script instead of an npm cookie consent package?",
+      answer: "We intentionally use a hosted script instead of an npm package. This gives you instant updates without dependency management, zero bundle size impact, no version conflicts, and no need to rebuild your app. The script loads from a global CDN optimized for fast delivery. Many teams switch from npm packages like react-cookie-consent to our solution to eliminate maintenance overhead."
     },
     {
-      question: "How does the react-cookie-consent Google Analytics integration work?",
-      answer: "Our cookie banner automatically manages Google Analytics consent. Place our script before your GA4 tag, and it will block Google Analytics from loading until the user accepts analytics cookies. When consent is granted, GA4 loads automatically. When consent is withdrawn, tracking stops. This works with both gtag.js and Google Tag Manager, and fully supports Google Consent Mode v2."
-    },
-    {
-      question: "How do I customize the react cookie banner colors and text?",
-      answer: "Use our visual builder in the dashboard. You can customize colors, fonts, text, button styles, position, animations, and all compliance settings. See your changes in real-time before deploying. No CSS overrides or custom styling code needed -- everything is configurable through the UI."
-    },
-    {
-      question: "Does this block Facebook Pixel and other tracking scripts automatically?",
-      answer: "Yes. When you place our react cookie consent script before your tracking scripts (using strategy='beforeInteractive' in Next.js or placing it first in your HTML head), it automatically blocks Facebook Pixel, Google Analytics, TikTok Pixel, LinkedIn Insight Tag, and other marketing scripts until the user consents. You can also use our cookie scanner tool to identify all cookies on your site."
-    },
-    {
-      question: "What is the lightest cookie consent solution for React apps?",
-      answer: "Our hosted solution adds zero bytes to your JavaScript bundle because it loads externally. Traditional npm cookie consent packages like react-cookie-consent add 15-50KB to your bundle. Our script is under 8KB gzipped, loads asynchronously, and is cached on a global CDN. This makes it the lightest cookie consent solution available for React applications."
-    },
-    {
-      question: "Can I use this react cookie consent with TypeScript?",
-      answer: "Absolutely. Since our solution uses a script tag rather than an npm package, there are no TypeScript types to configure. It works seamlessly in TypeScript React projects, TypeScript Next.js projects, and any other TypeScript setup. The integration code shown in our examples above is already TypeScript-compatible."
+      question: "How does the react cookie consent Google Analytics integration work?",
+      answer: "Our cookie banner automatically manages Google Analytics consent. Place our script before your GA4 tag, and it blocks Google Analytics from loading until the user accepts analytics cookies. When consent is granted, GA4 loads automatically. When consent is withdrawn, tracking stops. This works with both gtag.js and Google Tag Manager, and fully supports Google Consent Mode v2."
     },
     {
       question: "Is this react cookie banner GDPR, PIPEDA, and CCPA compliant?",
-      answer: "Yes. Our cookie consent banner supports GDPR (EU), PIPEDA (Canada), CCPA/CPRA (California), LGPD (Brazil), and other global privacy regulations. You can configure the compliance mode in our dashboard based on your audience location. The banner automatically adjusts its behavior -- for example, GDPR requires opt-in consent while CCPA requires opt-out. Learn more in our GDPR cookie consent requirements guide."
-    }
+      answer: "Yes. Our cookie consent banner supports GDPR (EU), PIPEDA (Canada), CCPA/CPRA (California), LGPD (Brazil), and other global privacy regulations. Configure the compliance mode in the dashboard based on your audience location. The banner automatically adjusts -- GDPR requires opt-in consent while CCPA requires opt-out."
+    },
   ]
 
   const articleData = {
     title: "React Cookie Consent: Complete Guide for 2026",
     description: "Learn how to add a lightweight, GDPR-compliant cookie consent banner to your React or Next.js application. Covers installation, Google Analytics integration, and best practices.",
     datePublished: "2025-01-15",
-    dateModified: "2026-03-09"
+    dateModified: "2026-03-16"
   }
 
   const breadcrumbData = [
@@ -155,12 +138,12 @@ export default function ReactIntegrationPage() {
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Lightweight, GDPR-Compliant
+                    Under 10KB. Zero Bundle Impact.
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Add a lightweight react cookie consent banner to your React or Next.js app in under 2 minutes. No npm packages to install, no bundle bloat, no maintenance headaches. Design your cookie banner in our visual builder, copy one script tag, and you are compliant.
+                  Add a lightweight react cookie consent banner to your React or Next.js app in under 2 minutes. No npm packages to install, no bundle bloat, no maintenance headaches. One async script tag and you are GDPR compliant.
                 </p>
               </motion.div>
 
@@ -188,7 +171,7 @@ export default function ReactIntegrationPage() {
           </div>
         </section>
 
-        {/* React Cookie Consent: Complete Guide */}
+        {/* Why Use a Hosted Script Instead of npm? */}
         <section className="py-16 sm:py-20 border-t border-border bg-muted/30">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
@@ -200,10 +183,10 @@ export default function ReactIntegrationPage() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  React Cookie Consent: Complete Guide
+                  Why Use a Hosted Script Instead of npm?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Everything you need to know about adding cookie consent to React applications
+                  Most developers reach for <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">react-cookie-consent</code> on npm. Here is why that costs you more than it saves.
                 </p>
               </motion.div>
 
@@ -215,18 +198,18 @@ export default function ReactIntegrationPage() {
               >
                 <div className="space-y-6 text-muted-foreground">
                   <p className="text-lg leading-relaxed">
-                    If you are building a React application that serves users in the EU, Canada, California, or Brazil, you need a <strong className="text-foreground">react cookie consent</strong> solution that actually works. GDPR, PIPEDA, CCPA, and LGPD all require you to get informed consent before setting non-essential cookies -- and violations can result in fines up to 4% of your annual revenue.
+                    If you are building a React application that serves users in the EU, Canada, California, or Brazil, you need a <strong className="text-foreground">react cookie consent</strong> solution. GDPR, PIPEDA, CCPA, and LGPD all require informed consent before setting non-essential cookies -- violations can result in fines up to 4% of your annual revenue.
                   </p>
                   <p className="text-lg leading-relaxed">
-                    Most developers reach for an npm cookie consent package like <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">react-cookie-consent</code> -- but these packages come with real trade-offs. They add 15-50KB to your bundle, require manual updates when privacy laws change, need custom CSS to match your brand, and often lack proper consent management for third-party scripts like Google Analytics or Facebook Pixel.
+                    Traditional npm cookie consent packages like <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">react-cookie-consent</code> add 15-50KB to your bundle, require manual updates when privacy laws change, need custom CSS to match your brand, and often lack proper consent management for third-party scripts like Google Analytics or Facebook Pixel.
                   </p>
                   <p className="text-lg leading-relaxed">
-                    Our approach is different. Instead of a <strong className="text-foreground">cookie consent npm</strong> package, we provide a hosted script that loads asynchronously from a global CDN. This means zero impact on your bundle size, no dependency maintenance, and instant updates when you change your banner design or compliance settings. It is the <strong className="text-foreground">lightweight cookie consent for React apps</strong> that developers actually want.
+                    Our approach is different. Instead of a <strong className="text-foreground">cookie consent npm</strong> package, we provide a hosted script that loads asynchronously from a global CDN. Zero impact on your bundle size. No dependency maintenance. Instant updates when you change your banner design or compliance settings. It is the <strong className="text-foreground">lightweight cookie consent for React apps</strong> that developers actually want.
                   </p>
                 </div>
               </motion.div>
 
-              {/* Why Not an NPM Package */}
+              {/* NPM vs Hosted Comparison */}
               <div className="mt-12 grid md:grid-cols-2 gap-6">
                 <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card className="border border-border bg-background h-full">
@@ -310,7 +293,7 @@ export default function ReactIntegrationPage() {
           </div>
         </section>
 
-        {/* Installing the Cookie Consent NPM Package */}
+        {/* Installation */}
         <section id="installation" className="py-16 sm:py-20 bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
@@ -322,24 +305,21 @@ export default function ReactIntegrationPage() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Installing the Cookie Consent NPM Package
+                  How Do You Add Cookie Consent to a React App?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  No npm install required -- just one script tag in your layout
+                  No npm install required -- one script tag in your layout. Here are copy-paste examples for every major React setup.
                 </p>
               </motion.div>
 
               <div className="space-y-6 text-muted-foreground mb-12">
                 <p className="text-lg leading-relaxed">
-                  Unlike traditional <strong className="text-foreground">cookie consent npm</strong> packages that require <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">npm install react-cookie-consent</code> followed by component imports, provider wrappers, and configuration objects, our solution takes a radically simpler approach. You add a single script tag to your application and the banner just works.
-                </p>
-                <p className="text-lg leading-relaxed">
-                  This is not a compromise -- it is an upgrade. The hosted script is under 8KB gzipped, loads asynchronously so it never blocks rendering, and gets served from a global CDN with edge caching. Your <Link href="/tools/cookie-scanner" className="text-primary underline hover:no-underline">cookie scanner</Link> results will confirm that it adds zero cookies before consent is given.
+                  Unlike traditional <strong className="text-foreground">cookie consent npm</strong> packages that require <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">npm install react-cookie-consent</code> followed by component imports and configuration objects, our approach is radically simpler. You add a single async script tag and the banner just works. The hosted script is under 10KB gzipped, loads asynchronously so it never blocks rendering, and gets served from a global CDN with edge caching.
                 </p>
               </div>
 
               <div className="space-y-8">
-                {/* Step 1: Create Account */}
+                {/* Step 1: Create Banner */}
                 <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card className="border border-border bg-background">
                     <CardHeader>
@@ -349,50 +329,25 @@ export default function ReactIntegrationPage() {
                         </div>
                         <div>
                           <CardTitle className="font-heading text-xl">Create Your Banner in the Dashboard</CardTitle>
-                          <CardDescription>Sign up for free and use our visual builder</CardDescription>
+                          <CardDescription>Sign up free, customize colors, layout, and compliance settings</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground mb-4">
-                        Head to our dashboard and create a free account. Our visual builder lets you configure every aspect of your react cookie banner:
-                      </p>
-                      <ul className="space-y-2 text-sm text-muted-foreground mb-4">
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>Choose your banner colors, fonts, and layout to match your brand</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>Write your cookie consent message in plain language</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>Configure cookie categories (Necessary, Analytics, Marketing, Preferences)</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>Set compliance mode for GDPR, PIPEDA, CCPA, or auto-detect by region</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>Preview your banner in real-time before going live</span>
-                        </li>
-                      </ul>
-                      <p className="text-muted-foreground mb-4">
-                        When you are happy with your design, click &quot;Get Code&quot; to get your unique script tag. Need help understanding <Link href="/blog/gdpr-cookie-consent-requirements" className="text-primary underline hover:no-underline">GDPR cookie consent requirements</Link>? Our guide covers everything.
+                        Our visual builder lets you configure every aspect of your react cookie banner -- colors, fonts, layout, cookie categories (Necessary, Analytics, Marketing, Preferences), and compliance mode (GDPR, PIPEDA, CCPA, or auto-detect by region). Preview in real-time before going live.
                       </p>
                       <Button asChild>
-                        <Link href="/auth/register">
+                        <Link href="/builder">
                           <Rocket className="mr-2 h-4 w-4" />
-                          Create Free Account
+                          Build Your Banner Free
                         </Link>
                       </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
 
-                {/* Step 2: Copy script */}
+                {/* Step 2: Copy Script */}
                 <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card className="border border-border bg-background">
                     <CardHeader>
@@ -422,7 +377,7 @@ export default function ReactIntegrationPage() {
                   </Card>
                 </motion.div>
 
-                {/* Step 3: Deploy */}
+                {/* Step 3: Next.js App Router */}
                 <motion.div custom={2} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card className="border border-primary/30 bg-background">
                     <CardHeader>
@@ -431,20 +386,20 @@ export default function ReactIntegrationPage() {
                           <span className="font-heading font-semibold text-foreground">3</span>
                         </div>
                         <div>
-                          <CardTitle className="font-heading text-xl">Deploy and You Are Done</CardTitle>
-                          <CardDescription>Your react cookie banner is now live</CardDescription>
+                          <CardTitle className="font-heading text-xl">Add to Your App</CardTitle>
+                          <CardDescription>Choose your framework below</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground mb-4">
-                        Deploy your React app and the cookie consent banner appears automatically. Future changes? Log into the dashboard, update your banner, and click &quot;Push Live&quot;. Changes appear on your site within seconds -- no code changes, no redeployment, no downtime.
+                        Deploy your React app and the cookie consent banner appears automatically. Future changes? Update in the dashboard and click &quot;Push Live&quot;. Changes appear within seconds -- no code changes, no redeployment.
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Badge variant="outline">No redeployment needed</Badge>
                         <Badge variant="outline">Instant updates</Badge>
                         <Badge variant="outline">Zero maintenance</Badge>
-                        <Badge variant="outline">Under 8KB gzipped</Badge>
+                        <Badge variant="outline">Under 10KB gzipped</Badge>
                       </div>
                     </CardContent>
                   </Card>
@@ -454,7 +409,7 @@ export default function ReactIntegrationPage() {
           </div>
         </section>
 
-        {/* Basic React Cookie Banner Setup */}
+        {/* Code Examples for Every React Setup */}
         <section className="py-16 sm:py-20 border-t border-border bg-muted/30">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
@@ -466,18 +421,12 @@ export default function ReactIntegrationPage() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Basic React Cookie Banner Setup
+                  How Do You Install a Cookie Banner in Next.js, Vite, or CRA?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Code examples for every React setup -- Next.js, Vite, Create React App, and more
+                  The script must load before any analytics or marketing scripts. Here are copy-paste examples for every major React framework.
                 </p>
               </motion.div>
-
-              <div className="space-y-6 text-muted-foreground mb-10">
-                <p className="text-lg leading-relaxed">
-                  The placement of your <strong className="text-foreground">react cookie banner</strong> script matters. It must load before any analytics or marketing scripts to ensure they are blocked until the user gives consent. Below are copy-paste examples for every major React framework.
-                </p>
-              </div>
 
               <div className="space-y-8">
                 {/* Next.js App Router */}
@@ -675,7 +624,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* React Cookie Consent with Google Analytics */}
+        {/* Configuration & Advanced Features */}
         <section className="py-16 sm:py-20 bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
@@ -687,10 +636,10 @@ export default function App() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  React Cookie Consent with Google Analytics
+                  How Does React Cookie Consent Work with Google Analytics?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Automatically manage GA4 consent in your React app
+                  Automatic GA4 consent management, Consent Mode v2, and a custom React hook for reading consent state
                 </p>
               </motion.div>
 
@@ -698,11 +647,9 @@ export default function App() {
                 <p className="text-lg leading-relaxed">
                   One of the most common requirements for a <strong className="text-foreground">react-cookie-consent Google Analytics</strong> integration is ensuring that GA4 does not fire until the user accepts analytics cookies. Our solution handles this automatically -- no custom event listeners, no manual consent state management, and full support for <strong className="text-foreground">Google Consent Mode v2</strong>.
                 </p>
-                <p className="text-lg leading-relaxed">
-                  Here is how it works: when our script loads, it sets the default Google consent state to &quot;denied&quot; for analytics and marketing. When a user accepts cookies, the consent state updates to &quot;granted&quot; and Google Analytics begins tracking. If the user later withdraws consent, tracking stops. All of this happens without any code on your end.
-                </p>
               </div>
 
+              {/* GA4 + Cookie Consent */}
               <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                 <Card className="border border-border bg-background mb-8">
                   <CardHeader>
@@ -758,269 +705,68 @@ export default function RootLayout({
                 </Card>
               </motion.div>
 
+              {/* React Hook for Consent State */}
               <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                 <Card className="border border-border bg-background mb-8">
                   <CardHeader>
                     <CardTitle className="font-heading flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-foreground" />
-                      Vite/CRA with GA4, Facebook Pixel, and Cookie Consent
+                      <Code className="h-5 w-5 text-foreground" />
+                      Reading Consent State in React Components
                     </CardTitle>
+                    <CardDescription>Access user consent choices from your React code</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto">
-                      <pre>{`<!-- index.html -->
-<head>
-  <!-- Cookie Consent - loads first, blocks tracking until consent -->
-  <script
-    src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
-    async
-  ></script>
+                      <pre>{`// hooks/use-cookie-consent.ts
+'use client'
 
-  <!-- Google Analytics - blocked until analytics consent -->
-  <script async
-    src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX">
-  </script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
+import { useState, useEffect } from 'react'
 
-  <!-- Facebook Pixel - blocked until marketing consent -->
-  <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
-    n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
-    s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window,document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', 'YOUR_PIXEL_ID');
-    fbq('track', 'PageView');
-  </script>
-</head>`}</pre>
+export function useCookieConsent() {
+  const [consent, setConsent] = useState<{
+    analytics: boolean
+    marketing: boolean
+    preferences: boolean
+  }>({
+    analytics: false,
+    marketing: false,
+    preferences: false,
+  })
+
+  useEffect(() => {
+    const handleConsent = (event: CustomEvent) => {
+      setConsent(event.detail)
+    }
+
+    window.addEventListener(
+      'cookie-consent-update',
+      handleConsent as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        'cookie-consent-update',
+        handleConsent as EventListener
+      )
+    }
+  }, [])
+
+  return consent
+}
+
+// Usage in a component:
+// const { analytics, marketing } = useCookieConsent()
+// if (analytics) { /* load analytics features */ }`}</pre>
                     </div>
                     <p className="text-sm text-muted-foreground mt-4">
-                      Our script categorizes third-party cookies automatically. Google Analytics is blocked under the &quot;Analytics&quot; category, while Facebook Pixel and similar marketing tags are blocked under the &quot;Marketing&quot; category. Users can grant or deny consent per category.
+                      Our cookie banner dispatches a <code className="bg-foreground/95 text-background font-mono px-1 py-0.5 rounded text-xs">cookie-consent-update</code> CustomEvent whenever the user changes their preferences. You can listen for this event in any React component to conditionally render features that require consent.
                     </p>
                   </CardContent>
                 </Card>
               </motion.div>
-
-              <div className="space-y-4 text-muted-foreground">
-                <h3 className="font-heading text-xl font-semibold text-foreground">Supported Third-Party Scripts</h3>
-                <p className="text-lg leading-relaxed">
-                  Our react cookie consent solution automatically manages consent for all major analytics and marketing platforms:
-                </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Google Analytics (GA4 / gtag.js)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Google Tag Manager</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Facebook / Meta Pixel</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>TikTok Pixel</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Microsoft Clarity</span>
-                    </li>
-                  </ul>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>LinkedIn Insight Tag</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Hotjar</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Mixpanel</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>Segment</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary shrink-0" />
-                      <span>HubSpot Tracking</span>
-                    </li>
-                  </ul>
-                </div>
-                <p className="text-lg leading-relaxed mt-4">
-                  Not sure which cookies your React app currently sets? Use our free <Link href="/tools/cookie-scanner" className="text-primary underline hover:no-underline">cookie scanner tool</Link> to get a full audit of all cookies and tracking scripts on your site.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Lightweight Cookie Consent for React Apps */}
-        <section className="py-16 sm:py-20 border-t border-border bg-muted/30">
-          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
-                <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Lightweight Cookie Consent for React Apps
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Why bundle size matters -- and how we keep it at zero
-                </p>
-              </motion.div>
-
-              <div className="space-y-6 text-muted-foreground mb-10">
-                <p className="text-lg leading-relaxed">
-                  React developers care about performance. Every kilobyte in your bundle affects load times, Core Web Vitals, and ultimately your Google search rankings. That is why choosing a <strong className="text-foreground">lightweight cookie consent for React apps</strong> is not just a nice-to-have -- it is a competitive advantage.
-                </p>
-                <p className="text-lg leading-relaxed">
-                  Here is how popular cookie consent solutions compare in terms of bundle impact:
-                </p>
-              </div>
-
-              {/* Performance Comparison */}
-              <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
-                <Card className="border border-border bg-background mb-10">
-                  <CardHeader>
-                    <CardTitle className="font-heading flex items-center gap-2">
-                      <Gauge className="h-5 w-5 text-foreground" />
-                      Bundle Size Comparison
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-48 text-sm font-medium shrink-0">Cookie Banner (ours)</div>
-                        <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
-                          <div className="bg-primary h-full rounded-full" style={{ width: '2%' }}></div>
-                        </div>
-                        <div className="text-sm font-bold text-primary w-20 text-right">0 KB</div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-48 text-sm font-medium shrink-0">react-cookie-consent</div>
-                        <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
-                          <div className="bg-foreground/40 h-full rounded-full" style={{ width: '30%' }}></div>
-                        </div>
-                        <div className="text-sm font-bold text-muted-foreground w-20 text-right">~15 KB</div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-48 text-sm font-medium shrink-0">cookieconsent (npm)</div>
-                        <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
-                          <div className="bg-foreground/50 h-full rounded-full" style={{ width: '50%' }}></div>
-                        </div>
-                        <div className="text-sm font-bold text-muted-foreground w-20 text-right">~25 KB</div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-48 text-sm font-medium shrink-0">Osano / OneTrust</div>
-                        <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
-                          <div className="bg-destructive h-full rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                        <div className="text-sm font-bold text-destructive w-20 text-right">50-200 KB</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-4">
-                      * Our solution adds 0 KB to your bundle because the script loads externally. The external script itself is under 8KB gzipped and is cached on a global CDN.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <div className="space-y-6 text-muted-foreground">
-                <h3 className="font-heading text-xl font-semibold text-foreground">Performance Features</h3>
-                <div className="grid md:grid-cols-3 gap-6">
-                  {[
-                    {
-                      icon: Zap,
-                      title: 'Async Loading',
-                      desc: 'The script loads asynchronously and never blocks your page critical rendering path. Your LCP score stays unaffected.',
-                    },
-                    {
-                      icon: Globe,
-                      title: 'Global CDN',
-                      desc: 'Served from edge locations worldwide. Users load the script from the nearest server, typically in under 50ms.',
-                    },
-                    {
-                      icon: Shield,
-                      title: 'No CLS Impact',
-                      desc: 'Our banner is designed to avoid Cumulative Layout Shift. It overlays your content rather than pushing it down.',
-                    },
-                  ].map((item, i) => {
-                    const ItemIcon = item.icon
-                    return (
-                      <motion.div
-                        key={item.title}
-                        custom={i}
-                        variants={cardVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                      >
-                        <Card className="border border-border bg-background h-full">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="font-heading text-base flex items-center gap-2">
-                              <ItemIcon className="h-4 w-4 text-foreground" />
-                              {item.title}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                              {item.desc}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Next.js Cookie Consent Integration */}
-        <section className="py-16 sm:py-20 bg-background">
-          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
-                <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Next.js Cookie Consent Integration
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Advanced patterns for Next.js App Router, middleware, and server components
-                </p>
-              </motion.div>
-
-              <div className="space-y-6 text-muted-foreground mb-10">
-                <p className="text-lg leading-relaxed">
-                  Next.js is the most popular React framework, and it has specific requirements for cookie consent. The App Router, server components, and middleware all affect how and where you should load your cookie banner script. Here are the patterns that work best.
-                </p>
-              </div>
 
               {/* Conditional Loading by Route */}
-              <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
+              <motion.div custom={2} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                 <Card className="border border-border bg-background mb-8">
                   <CardHeader>
                     <CardTitle className="font-heading flex items-center gap-2">
@@ -1069,68 +815,133 @@ export default function DashboardLayout({
                 </Card>
               </motion.div>
 
-              {/* React Hook for Consent State */}
-              <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
-                <Card className="border border-border bg-background mb-8">
-                  <CardHeader>
-                    <CardTitle className="font-heading flex items-center gap-2">
-                      <Code className="h-5 w-5 text-foreground" />
-                      Reading Consent State in React Components
-                    </CardTitle>
-                    <CardDescription>Access the user consent choices from your React code</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto">
-                      <pre>{`// hooks/use-cookie-consent.ts
-'use client'
+              {/* Performance & Bundle Size */}
+              <div className="mt-12">
+                <h3 className="font-heading text-xl font-semibold text-foreground mb-6 text-center">Bundle Size: How Does This Compare to react-cookie-consent?</h3>
+                <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
+                  <Card className="border border-border bg-background mb-8">
+                    <CardHeader>
+                      <CardTitle className="font-heading flex items-center gap-2">
+                        <Gauge className="h-5 w-5 text-foreground" />
+                        Bundle Size Comparison
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-48 text-sm font-medium shrink-0">Cookie Banner (ours)</div>
+                          <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+                            <div className="bg-primary h-full rounded-full" style={{ width: '2%' }}></div>
+                          </div>
+                          <div className="text-sm font-bold text-primary w-20 text-right">0 KB</div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-48 text-sm font-medium shrink-0">react-cookie-consent</div>
+                          <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+                            <div className="bg-foreground/40 h-full rounded-full" style={{ width: '30%' }}></div>
+                          </div>
+                          <div className="text-sm font-bold text-muted-foreground w-20 text-right">~15 KB</div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-48 text-sm font-medium shrink-0">cookieconsent (npm)</div>
+                          <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+                            <div className="bg-foreground/50 h-full rounded-full" style={{ width: '50%' }}></div>
+                          </div>
+                          <div className="text-sm font-bold text-muted-foreground w-20 text-right">~25 KB</div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-48 text-sm font-medium shrink-0">Osano / OneTrust</div>
+                          <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+                            <div className="bg-destructive h-full rounded-full" style={{ width: '100%' }}></div>
+                          </div>
+                          <div className="text-sm font-bold text-destructive w-20 text-right">50-200 KB</div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-4">
+                        * Our solution adds 0 KB to your bundle because the script loads externally. The external script itself is under 10KB gzipped and cached on a global CDN.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-import { useState, useEffect } from 'react'
+                <div className="grid md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      icon: Zap,
+                      title: 'Async Loading',
+                      desc: 'The script loads asynchronously and never blocks your critical rendering path. Your LCP score stays unaffected.',
+                    },
+                    {
+                      icon: Globe,
+                      title: 'Global CDN',
+                      desc: 'Served from edge locations worldwide. Users load the script from the nearest server, typically in under 50ms.',
+                    },
+                    {
+                      icon: Shield,
+                      title: 'No CLS Impact',
+                      desc: 'The banner overlays your content rather than pushing it down. Zero Cumulative Layout Shift.',
+                    },
+                  ].map((item, i) => {
+                    const ItemIcon = item.icon
+                    return (
+                      <motion.div
+                        key={item.title}
+                        custom={i}
+                        variants={cardVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                      >
+                        <Card className="border border-border bg-background h-full">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="font-heading text-base flex items-center gap-2">
+                              <ItemIcon className="h-4 w-4 text-foreground" />
+                              {item.title}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              {item.desc}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </div>
 
-export function useCookieConsent() {
-  const [consent, setConsent] = useState<{
-    analytics: boolean
-    marketing: boolean
-    preferences: boolean
-  }>({
-    analytics: false,
-    marketing: false,
-    preferences: false,
-  })
+              {/* Supported Scripts */}
+              <div className="mt-12 space-y-4 text-muted-foreground">
+                <h3 className="font-heading text-xl font-semibold text-foreground">Supported Third-Party Scripts</h3>
+                <p className="text-lg leading-relaxed">
+                  Our react cookie consent solution automatically manages consent for all major analytics and marketing platforms:
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <ul className="space-y-2 text-sm">
+                    {['Google Analytics (GA4 / gtag.js)', 'Google Tag Manager', 'Facebook / Meta Pixel', 'TikTok Pixel', 'Microsoft Clarity'].map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-primary shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <ul className="space-y-2 text-sm">
+                    {['LinkedIn Insight Tag', 'Hotjar', 'Mixpanel', 'Segment', 'HubSpot Tracking'].map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-primary shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="text-lg leading-relaxed mt-4">
+                  Not sure which cookies your React app currently sets? Use our free <Link href="/tools/cookie-scanner" className="text-primary underline hover:no-underline">cookie scanner tool</Link> to get a full audit.
+                </p>
+              </div>
 
-  useEffect(() => {
-    // Listen for consent changes from the cookie banner
-    const handleConsent = (event: CustomEvent) => {
-      setConsent(event.detail)
-    }
-
-    window.addEventListener(
-      'cookie-consent-update',
-      handleConsent as EventListener
-    )
-
-    return () => {
-      window.removeEventListener(
-        'cookie-consent-update',
-        handleConsent as EventListener
-      )
-    }
-  }, [])
-
-  return consent
-}
-
-// Usage in a component:
-// const { analytics, marketing } = useCookieConsent()
-// if (analytics) { /* load analytics features */ }`}</pre>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Our cookie banner dispatches a <code className="bg-foreground/95 text-background font-mono px-1 py-0.5 rounded text-xs">cookie-consent-update</code> CustomEvent whenever the user changes their preferences. You can listen for this event in any React component to conditionally render features that require consent.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <div className="space-y-6 text-muted-foreground">
+              {/* Next.js-Specific Benefits */}
+              <div className="mt-12 space-y-6 text-muted-foreground">
                 <h3 className="font-heading text-xl font-semibold text-foreground">Next.js-Specific Benefits</h3>
                 <ul className="space-y-3 text-lg">
                   <li className="flex items-start gap-3">
@@ -1139,7 +950,7 @@ export function useCookieConsent() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span><strong className="text-foreground">App Router and Pages Router</strong> -- tested and supported on both routing systems. We maintain code examples for both.</span>
+                    <span><strong className="text-foreground">App Router and Pages Router</strong> -- tested and supported on both routing systems with code examples for both.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-1 shrink-0" />
@@ -1151,7 +962,7 @@ export function useCookieConsent() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span><strong className="text-foreground">Turbopack ready</strong> -- because we do not use an npm package, there are no bundler compatibility issues with Turbopack or any other bundler.</span>
+                    <span><strong className="text-foreground">Turbopack ready</strong> -- no npm package means no bundler compatibility issues with Turbopack or any other bundler.</span>
                   </li>
                 </ul>
               </div>
@@ -1203,7 +1014,7 @@ export function useCookieConsent() {
           </div>
         </section>
 
-        {/* Other Platforms Section */}
+        {/* Other Platforms */}
         <section className="py-16 sm:py-20 bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
@@ -1276,23 +1087,30 @@ export function useCookieConsent() {
             <div className="mx-auto max-w-3xl text-center">
               <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
                 <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>2-minute setup for React &amp; Next.js</span>
+                <span>2-minute setup &middot; $99 one-time &middot; No npm install</span>
               </div>
 
               <h2 className="mb-5 font-heading text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl sm:mb-6">
-                Ready to Add Cookie Consent?
+                Ready to Add React Cookie Consent?
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                Build your cookie banner in the visual builder, copy one script tag, and your React app is compliant. No npm packages, no bundle bloat.
+                Build your cookie banner in the visual builder, copy one script tag, and your React app is compliant. Under 10KB, async loading, zero bundle impact.
               </p>
 
-              <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
-                <Link href="/builder">
-                  Build Your Cookie Banner
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
+                  <Link href="/builder">
+                    Build Your Cookie Banner
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-14 px-8 text-base">
+                  <Link href="/integrations">
+                    Browse All Integrations
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

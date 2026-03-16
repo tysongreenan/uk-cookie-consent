@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'React Cookie Consent: Lightweight Banner for React & Next.js (2026)',
-  description: 'Add a lightweight, GDPR-compliant react cookie consent banner to your app in 2 minutes. Works with Next.js App Router, Vite, and CRA. No npm package bloat. Integrates with Google Analytics, Facebook Pixel, and more.',
-  keywords: 'react cookie consent, react cookie banner, react-cookie-consent, npm cookie consent, cookie consent npm, lightweight cookie consent for react apps, react-cookie-consent google analytics, nextjs cookie banner, react gdpr compliance',
+  title: 'React Cookie Consent: Under 10KB Banner for React & Next.js',
+  description: 'Add a GDPR-compliant react cookie consent banner to your app in 2 minutes. No npm install, zero bundle impact, async loading. Works with Next.js App Router, Vite, and CRA.',
+  keywords: 'react cookie consent, react cookie banner, nextjs cookie banner, react-cookie-consent alternative, lightweight cookie consent react, react gdpr cookie banner, cookie consent npm, react-cookie-consent google analytics',
   openGraph: {
-    title: 'React Cookie Consent: Lightweight Banner for React & Next.js (2026)',
-    description: 'Add a lightweight, GDPR-compliant react cookie consent banner to your app in 2 minutes. No npm package bloat. Integrates with Google Analytics.',
+    title: 'React Cookie Consent: Under 10KB Banner for React & Next.js',
+    description: 'Add a GDPR-compliant react cookie consent banner in 2 minutes. No npm install, zero bundle impact. Works with Next.js, Vite, and CRA.',
     type: 'article',
   },
   alternates: {

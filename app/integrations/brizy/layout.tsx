@@ -1,16 +1,31 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Brizy Cookie Consent Integration | WordPress Page Builder Guide 2026',
+  title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
   description:
-    'Add a GDPR, PIPEDA, and CCPA compliant cookie banner to your Brizy-powered WordPress site. Step-by-step guide with code examples for functions.php, header plugins, and the Brizy HTML widget.',
-  keywords:
-    'brizy cookie consent, brizy cookie banner, brizy gdpr, brizy wordpress cookie compliance, brizy html widget cookie banner',
+    'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods: HTML widget, functions.php, or header plugin. Under 10 KB, 3-minute setup.',
+  keywords: [
+    'brizy cookie consent',
+    'brizy wordpress cookie banner',
+    'cookie banner brizy builder',
+    'brizy gdpr cookie banner',
+    'brizy html widget cookie consent',
+  ],
   openGraph: {
-    title: 'Brizy Cookie Consent Integration | WordPress Page Builder Guide 2026',
+    title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
     description:
-      'Add a GDPR, PIPEDA, and CCPA compliant cookie banner to your Brizy-powered WordPress site. Step-by-step guide with code examples.',
+      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, under 10 KB, 3-minute setup.',
     type: 'article',
+    url: 'https://www.cookie-banner.ca/integrations/brizy',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
+    description:
+      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, under 10 KB.',
+  },
+  alternates: {
+    canonical: '/integrations/brizy',
   },
 }
 

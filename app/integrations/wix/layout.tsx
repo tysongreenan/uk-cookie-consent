@@ -1,13 +1,16 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Wix Cookie Consent Integration | Velo Custom Code Guide 2025',
-  description: 'Complete Wix cookie consent integration guide. Velo integration, app market alternative, performance optimization. GDPR, PIPEDA, CCPA compliant cookie banner for Wix sites.',
-  keywords: 'wix cookie consent, wix gdpr compliance, wix velo integration, wix custom code, wix privacy banner, wix cookie banner',
+  title: 'Wix Cookie Banner — GDPR Consent Without App Market',
+  description: 'Add a GDPR-compliant cookie banner to Wix via HTML embed or Velo custom code. Under 10KB, $99 one-time, no monthly App Market fees. Step-by-step Wix integration guide.',
+  keywords: 'wix cookie banner, wix cookie consent, wix gdpr compliance, how to add cookie consent to wix, wix velo cookie banner',
   openGraph: {
-    title: 'Wix Cookie Consent Integration | Velo Custom Code Guide 2025',
-    description: 'Complete Wix cookie consent integration guide. Velo integration, app market alternative, performance optimization.',
+    title: 'Wix Cookie Banner — GDPR Consent Without App Market',
+    description: 'Add a GDPR-compliant cookie banner to Wix via HTML embed or Velo custom code. Under 10KB, $99 one-time.',
     type: 'article',
+  },
+  alternates: {
+    canonical: '/integrations/wix',
   },
 }
 

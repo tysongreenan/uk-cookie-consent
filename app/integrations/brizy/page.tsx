@@ -15,11 +15,16 @@ import {
   Layout,
   CheckCircle2,
   AlertTriangle,
-  Copy,
+  ChevronDown,
+  Eye,
+  Layers,
+  Globe,
 } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { motion } from 'framer-motion'
+import { StructuredData } from '@/components/seo/structured-data'
+import { useState } from 'react'
 
 const fadeUpVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -47,34 +52,89 @@ const cardVariants = {
   }),
 }
 
-const reasons = [
+const faqData = [
+  {
+    question: 'How do I add a cookie banner to a Brizy website?',
+    answer:
+      'You have three options: (1) Drag a Brizy HTML widget into your Global Header block and paste the script tag, (2) add the script to your child theme\'s functions.php, or (3) use a header/footer plugin like WPCode. All three methods take under 3 minutes.',
+  },
+  {
+    question: 'Does the cookie banner work with Brizy Pro and Brizy Free?',
+    answer:
+      'Yes. The banner loads via a standard script tag, so it works identically on Brizy Free and Brizy Pro. It does not depend on any Brizy-specific API or Pro-only feature.',
+  },
+  {
+    question: 'Will the cookie banner slow down my Brizy pages?',
+    answer:
+      'No. The script is under 10 KB gzipped and loads with the defer attribute, so it never blocks your page render. Brizy pages already load a page builder runtime — our banner adds virtually zero overhead on top of that.',
+  },
+  {
+    question: 'Can I style the cookie banner to match my Brizy design?',
+    answer:
+      'Yes. The visual builder lets you set custom colors, fonts, button styles, and positioning before you generate the script. The banner will match whatever design you have built in the Brizy editor.',
+  },
+  {
+    question: 'Do I need to place the script on every Brizy page?',
+    answer:
+      'No. If you use the functions.php method or a header plugin, the script loads site-wide automatically. If you use the Brizy HTML widget method, place it inside a Global Block so it appears on every page.',
+  },
+]
+
+const painPoints = [
+  {
+    icon: Eye,
+    title: 'Your Brizy site already tracks visitors',
+    description:
+      'Google Analytics, Facebook Pixel, HotJar, embedded YouTube videos — Brizy makes it easy to add these. Each one sets cookies the moment a visitor lands on your page.',
+  },
   {
     icon: Shield,
-    title: 'GDPR & UK PECR',
+    title: 'Privacy laws apply to page-builder sites too',
     description:
-      'European visitors require explicit cookie consent before any non-essential cookies are set. Fines can reach 4% of annual revenue.',
+      'GDPR, PIPEDA, and CCPA do not care whether you built your site in Brizy, Elementor, or raw HTML. If you collect data from EU, Canadian, or Californian visitors, you need consent.',
   },
   {
-    icon: Zap,
-    title: 'PIPEDA (Canada)',
+    icon: Layers,
+    title: 'Brizy has no built-in cookie consent',
     description:
-      'Canadian privacy law requires meaningful consent for collecting personal information, including cookie-based tracking.',
-  },
-  {
-    icon: Layout,
-    title: 'CCPA / CPRA (California)',
-    description:
-      'California residents must be able to opt out of the sale or sharing of personal information collected via cookies.',
+      'Unlike some enterprise platforms, Brizy does not ship a native cookie banner. You need an external solution — and most WordPress cookie plugins add bloat that fights with the page builder runtime.',
   },
 ]
 
 const installMethods = [
   {
     number: '01',
-    title: 'WordPress functions.php',
-    badge: 'Recommended',
+    title: 'Brizy HTML Widget (Page Builder Method)',
+    badge: 'Recommended for Brizy',
     description:
-      'Add the script directly to your child theme. Best performance, no extra plugins.',
+      'Stay inside the Brizy editor. Drag an HTML element into your Global Header block and paste the script. It will appear on every page without touching any files.',
+    icon: Blocks,
+    code: `<!-- Inside a Brizy HTML element (Global Header) -->
+<script
+  src="https://cdn.cookie-banner.ca/banner.js"
+  data-site-id="YOUR_SITE_ID"
+  defer>
+</script>`,
+    steps: [
+      'Open the Brizy editor on any page',
+      'Navigate to your Global Header block (or create one)',
+      'Drag an HTML element into the header',
+      'Paste the script tag inside the HTML element',
+      'Save and publish',
+    ],
+    pros: [
+      'Stays inside the Brizy visual editor',
+      'Visible in the Global Blocks panel',
+      'No file editing or extra plugins',
+    ],
+    cons: ['Must use a Global Block for site-wide coverage'],
+  },
+  {
+    number: '02',
+    title: 'WordPress functions.php',
+    badge: 'Best Performance',
+    description:
+      'Add the script to your child theme. This bypasses the page builder entirely and loads the banner directly from WordPress — the fastest option.',
     icon: Code,
     code: `// Add to your child theme's functions.php
 function add_cookie_banner_script() {
@@ -87,92 +147,92 @@ function add_cookie_banner_script() {
     <?php
 }
 add_action('wp_head', 'add_cookie_banner_script');`,
-    pros: [
-      'Best performance - no plugin overhead',
-      'Loads on every page automatically',
-      'Survives Brizy updates',
+    steps: [
+      'Open Appearance > Theme File Editor in your WordPress dashboard',
+      'Select your child theme\'s functions.php',
+      'Paste the code at the bottom of the file',
+      'Click Update File',
     ],
-    cons: ['Requires child theme or code snippets plugin'],
+    pros: [
+      'Best performance — no plugin overhead',
+      'Loads on every page automatically',
+      'Survives Brizy plugin updates',
+    ],
+    cons: ['Requires a child theme or code-snippets plugin'],
   },
   {
-    number: '02',
-    title: 'Header / Footer Plugin',
+    number: '03',
+    title: 'Header / Footer Plugin (WPCode)',
     badge: 'Easiest',
     description:
-      'Use a plugin like "Insert Headers and Footers" or "WPCode" to add the script without editing files.',
+      'Install a free header/footer plugin, paste the script into the Header section, and you are done. Zero file editing.',
     icon: FileText,
-    code: `<!-- Paste this into the "Header" section -->
+    code: `<!-- Paste into the "Header Scripts" field -->
 <script
   src="https://cdn.cookie-banner.ca/banner.js"
   data-site-id="YOUR_SITE_ID"
   defer>
 </script>`,
+    steps: [
+      'Install "WPCode" from the WordPress plugin directory',
+      'Go to Code Snippets > Header & Footer',
+      'Paste the script into the Header section',
+      'Click Save Changes',
+    ],
     pros: [
       'No file editing required',
       'Survives theme and Brizy updates',
       'Beginner-friendly',
     ],
-    cons: ['Requires an additional plugin'],
-  },
-  {
-    number: '03',
-    title: 'Brizy HTML Widget',
-    badge: 'Page Builder',
-    description:
-      'Drag an HTML element onto your Brizy Global Header or footer and paste the script inside.',
-    icon: Blocks,
-    code: `<!-- Inside a Brizy HTML element -->
-<script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
-</script>`,
-    pros: [
-      'Stays inside the Brizy editor',
-      'Visible in the Global Blocks panel',
-      'No plugins or file editing',
-    ],
-    cons: ['Must be placed in a Global Block to appear site-wide'],
+    cons: ['Requires one additional lightweight plugin'],
   },
 ]
 
-const steps = [
-  {
-    number: '01',
-    title: 'Build Your Banner',
-    description:
-      'Use the visual builder to pick colours, layout, and wording. No code required.',
-    icon: Layout,
-  },
-  {
-    number: '02',
-    title: 'Copy the Script',
-    description:
-      'The builder generates a single script tag. Copy it to your clipboard.',
-    icon: Copy,
-  },
-  {
-    number: '03',
-    title: 'Add to WordPress',
-    description:
-      'Paste the script via functions.php, a header plugin, or a Brizy HTML widget.',
-    icon: Code,
-  },
-  {
-    number: '04',
-    title: 'Test & Go Live',
-    description:
-      'Clear your cache, reload the page, and verify the banner appears. You are compliant.',
-    icon: CheckCircle2,
-  },
-]
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <motion.div
+      custom={index}
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left border border-border rounded-xl bg-background p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04]"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="font-heading text-base sm:text-lg font-semibold text-foreground pr-4">
+            {question}
+          </h3>
+          <ChevronDown
+            className={`h-5 w-5 text-muted-foreground shrink-0 mt-0.5 transition-transform duration-200 ${
+              open ? 'rotate-180' : ''
+            }`}
+          />
+        </div>
+        {open && (
+          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+            {answer}
+          </p>
+        )}
+      </button>
+    </motion.div>
+  )
+}
 
 export default function BrizyIntegrationPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <StructuredData
+        type="faq"
+        data={faqData}
+      />
       <main>
-        {/* ───────────────────────── Hero ───────────────────────── */}
+        {/* ───────────── Hero ───────────── */}
         <section className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-28">
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:14px_24px]" />
 
@@ -188,7 +248,7 @@ export default function BrizyIntegrationPage() {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border">
                   <Circle className="h-2 w-2 fill-foreground/60" />
                   <span className="text-sm text-muted-foreground tracking-wide">
-                    WordPress Page Builder
+                    Brizy Page Builder
                   </span>
                 </div>
               </motion.div>
@@ -203,18 +263,17 @@ export default function BrizyIntegrationPage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Brizy Cookie Consent
+                    Cookie Consent for Brizy
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Works with Your Page Builder
+                    Built for Your Page Builder
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Add a fully compliant cookie banner to your Brizy-powered
-                  WordPress site. One script tag, three installation options,
-                  under three minutes.
+                  Brizy does not include a cookie banner. Add one in under 3 minutes
+                  with a single script tag — right from the Brizy editor or your WordPress dashboard.
                 </p>
               </motion.div>
 
@@ -226,26 +285,39 @@ export default function BrizyIntegrationPage() {
                 animate="visible"
                 className="flex flex-col sm:flex-row items-center gap-3"
               >
-                <Button
-                  asChild
-                  size="lg"
-                  className="h-12 px-8 text-base font-semibold"
-                >
+                <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
                   <Link href="/builder">
-                    Build Your Banner Free
+                    Build Your Brizy Banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="h-12 px-8 text-base"
-                >
+                <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
                   <Link href="#installation">
-                    View Installation Methods
+                    See Install Methods
                   </Link>
                 </Button>
+              </motion.div>
+
+              {/* Trust signals */}
+              <motion.div
+                custom={3}
+                variants={fadeUpVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground"
+              >
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-foreground" />
+                  Works with Brizy Free &amp; Pro
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-foreground" />
+                  Under 10 KB
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-foreground" />
+                  $99 one-time
+                </span>
               </motion.div>
             </div>
           </div>
@@ -262,20 +334,20 @@ export default function BrizyIntegrationPage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Why Brizy Sites Need Cookie Consent
+                Why Does Your Brizy Site Need a Cookie Banner?
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Brizy sites are WordPress sites — they use Google Analytics,
-                Facebook Pixel, and other trackers that set cookies.
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Brizy makes it easy to build beautiful pages. It does not make you compliant
+                with privacy laws. That part is on you.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {reasons.map((reason, i) => {
-                const ReasonIcon = reason.icon
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {painPoints.map((point, i) => {
+                const Icon = point.icon
                 return (
                   <motion.div
-                    key={reason.title}
+                    key={point.title}
                     custom={i}
                     variants={cardVariants}
                     initial="hidden"
@@ -284,13 +356,13 @@ export default function BrizyIntegrationPage() {
                     className="relative text-center"
                   >
                     <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-background border border-border">
-                      <ReasonIcon className="h-5 w-5 text-foreground" />
+                      <Icon className="h-5 w-5 text-foreground" />
                     </div>
                     <h3 className="font-heading text-lg font-semibold text-foreground mb-2">
-                      {reason.title}
+                      {point.title}
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {reason.description}
+                      {point.description}
                     </p>
                   </motion.div>
                 )
@@ -299,7 +371,7 @@ export default function BrizyIntegrationPage() {
           </div>
         </section>
 
-        {/* ───────────── Installation Methods ───────────── */}
+        {/* ───────────── How to Add a Cookie Banner to Brizy ───────────── */}
         <section id="installation" className="py-16 sm:py-20 bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <motion.div
@@ -311,19 +383,19 @@ export default function BrizyIntegrationPage() {
             >
               <div className="flex items-center gap-3 mb-2">
                 <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground">
-                  Installation Methods
+                  How to Add a Cookie Banner to Brizy
                 </h2>
                 <Badge variant="outline" className="text-xs">
                   Pick one
                 </Badge>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Brizy runs on WordPress, so every standard WordPress method
-                works. Choose the one that fits your workflow.
+                Brizy runs on WordPress, so every standard WordPress method works.
+                Method 1 is native to the page builder. Methods 2 and 3 bypass it entirely.
               </p>
             </motion.div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 max-w-4xl">
               {installMethods.map((method, i) => {
                 const MethodIcon = method.icon
                 return (
@@ -362,11 +434,18 @@ export default function BrizyIntegrationPage() {
                       </p>
 
                       {/* Code block */}
-                      <div className="rounded-lg bg-muted border border-border p-4 overflow-x-auto mb-6">
-                        <pre className="text-sm font-mono text-foreground whitespace-pre-wrap">
+                      <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-6">
+                        <pre className="text-sm font-mono whitespace-pre">
                           {method.code}
                         </pre>
                       </div>
+
+                      {/* Steps */}
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-6">
+                        {method.steps.map((step) => (
+                          <li key={step}>{step}</li>
+                        ))}
+                      </ol>
 
                       {/* Pros / Cons */}
                       <div className="grid sm:grid-cols-2 gap-4">
@@ -401,7 +480,7 @@ export default function BrizyIntegrationPage() {
           </div>
         </section>
 
-        {/* ───────────── Step-by-Step Guide ───────────── */}
+        {/* ───────────── Brizy Compatibility ───────────── */}
         <section className="py-16 border-t border-border bg-muted/30">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <motion.div
@@ -412,64 +491,45 @@ export default function BrizyIntegrationPage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Step-by-Step Guide
+                What Brizy Features Does It Work With?
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                From zero to compliant in four steps.
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                The banner is a standalone script tag. It does not interfere with any Brizy feature
+                because it runs outside the page builder runtime.
               </p>
             </motion.div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
-              {steps.map((step, i) => {
-                const StepIcon = step.icon
-                return (
-                  <motion.div
-                    key={step.number}
-                    custom={i}
-                    variants={cardVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="relative text-center"
-                  >
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-background border border-border">
-                      <StepIcon className="h-5 w-5 text-foreground" />
-                    </div>
-                    <div className="text-xs font-mono text-muted-foreground mb-2 tracking-widest">
-                      {step.number}
-                    </div>
-                    <h3 className="font-heading text-lg font-semibold text-foreground mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ───────────── Trust / Stats ───────────── */}
-        <section className="py-16 border-t border-border bg-background">
-          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
-            <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
               {[
                 {
-                  icon: Clock,
-                  title: '3-Minute Setup',
-                  desc: 'Paste a single script tag into WordPress',
+                  icon: Blocks,
+                  title: 'Global Blocks',
+                  description: 'Place the HTML widget in a Global Block. It appears on every page you assign the block to.',
                 },
                 {
-                  icon: Shield,
-                  title: 'GDPR, CCPA & PIPEDA',
-                  desc: 'Compliant with major privacy laws',
+                  icon: Layout,
+                  title: 'Popups & Overlays',
+                  description: 'The banner renders at the viewport level, so it layers correctly above Brizy popups and slide-ins.',
+                },
+                {
+                  icon: Globe,
+                  title: 'Brizy Cloud & Self-Hosted',
+                  description: 'Works on Brizy Cloud sites and self-hosted Brizy-on-WordPress installations.',
                 },
                 {
                   icon: Zap,
-                  title: 'Under 10 KB',
-                  desc: 'No impact on Brizy page load speed',
+                  title: 'Dynamic Content',
+                  description: 'The banner loads independently of Brizy dynamic content. No conflicts with conditional display rules.',
+                },
+                {
+                  icon: Shield,
+                  title: 'Caching & CDN',
+                  description: 'Fully compatible with WP Rocket, LiteSpeed Cache, Cloudflare, and any CDN you run in front of WordPress.',
+                },
+                {
+                  icon: Clock,
+                  title: 'Multi-Language (WPML / Polylang)',
+                  description: 'The banner auto-detects visitor language. No extra configuration needed for translated Brizy pages.',
                 },
               ].map((item, i) => {
                 const ItemIcon = item.icon
@@ -480,19 +540,48 @@ export default function BrizyIntegrationPage() {
                     variants={cardVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center gap-3 text-center"
+                    viewport={{ once: true, margin: '-50px' }}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background border border-border">
-                      <ItemIcon className="h-5 w-5 text-foreground" />
+                    <div className="border border-border rounded-xl bg-background p-6 h-full transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted mb-4">
+                        <ItemIcon className="h-5 w-5 text-foreground" />
+                      </div>
+                      <h3 className="font-heading font-semibold text-foreground mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
-                    <p className="font-heading font-semibold text-foreground">
-                      {item.title}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </motion.div>
                 )
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* ───────────── FAQ ───────────── */}
+        <section className="py-16 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                Brizy Cookie Consent FAQ
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Answers to common questions about adding cookie consent to Brizy-powered WordPress sites.
+              </p>
+            </motion.div>
+
+            <div className="max-w-3xl mx-auto space-y-3">
+              {faqData.map((faq, i) => (
+                <FAQItem key={i} question={faq.question} answer={faq.answer} index={i} />
+              ))}
             </div>
           </div>
         </section>
@@ -508,24 +597,27 @@ export default function BrizyIntegrationPage() {
               </div>
 
               <h2 className="mb-5 font-heading text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl sm:mb-6">
-                Ready to Get Compliant?
+                Your Brizy Site Deserves Better Than a Bloated Plugin
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                Build your cookie banner in under a minute, then paste the
-                script into your Brizy site using any of the methods above.
+                Build your cookie banner in the visual editor. Paste 1 script tag
+                into your Brizy site. Done. Under 10 KB, $99 one-time, no subscription.
               </p>
 
-              <Button
-                asChild
-                size="lg"
-                className="h-14 px-8 text-base font-semibold"
-              >
-                <Link href="/builder">
-                  Build Your Cookie Banner
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
+                  <Link href="/builder">
+                    Build Your Brizy Banner
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-14 px-8 text-base">
+                  <Link href="/pricing">
+                    View Pricing
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

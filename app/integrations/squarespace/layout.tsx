@@ -1,16 +1,32 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Squarespace Cookie Consent Integration | Code Injection Guide 2025',
+  title: 'Squarespace Cookie Banner | Code Injection Setup',
   description:
-    'Complete Squarespace cookie consent integration guide. Code injection, template compatibility, e-commerce integration. GDPR, PIPEDA, CCPA compliant cookie banner for Squarespace sites.',
-  keywords:
-    'squarespace cookie consent, squarespace gdpr compliance, squarespace custom code, squarespace privacy banner, squarespace cookie banner',
+    'Add cookie consent to Squarespace in under 5 minutes using Code Injection. No developer needed. GDPR, CCPA, and PIPEDA compliant. $99 one-time, under 10KB.',
+  keywords: [
+    'squarespace cookie banner',
+    'squarespace cookie consent',
+    'squarespace gdpr compliance',
+    'how to add cookie consent to squarespace',
+    'squarespace code injection cookie',
+    'squarespace privacy compliance',
+  ],
+  alternates: {
+    canonical: '/integrations/squarespace',
+  },
   openGraph: {
-    title: 'Squarespace Cookie Consent Integration | Code Injection Guide 2025',
+    title: 'Squarespace Cookie Banner | Code Injection Setup',
     description:
-      'Complete Squarespace cookie consent integration guide. Code injection, template compatibility, e-commerce integration.',
+      'Add cookie consent to Squarespace in under 5 minutes using Code Injection. No developer needed. GDPR, CCPA, and PIPEDA compliant.',
     type: 'article',
+    url: '/integrations/squarespace',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Squarespace Cookie Banner | Code Injection Setup',
+    description:
+      'Add cookie consent to Squarespace in under 5 minutes using Code Injection. No developer needed. GDPR, CCPA, and PIPEDA compliant.',
   },
 }
 

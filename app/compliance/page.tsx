@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
+import { StructuredData } from '@/components/seo/structured-data'
 import { motion } from 'framer-motion'
 
 const fadeUpVariants = {
@@ -54,16 +55,16 @@ const frameworks = [
     icon: Shield,
     color: 'from-blue-500/10 via-indigo-500/5 to-violet-500/10',
     description:
-      'The strictest privacy law in the world. If anyone in the EU visits your site, GDPR applies to you — regardless of where your business is based.',
+      'The strictest cookie consent law in the world. If anyone in the EU visits your site, GDPR applies to you regardless of where your business is based. Requires explicit opt-in before any non-essential cookies load.',
     consentModel: 'Opt-in',
-    consentDetail: 'Users must actively consent before any non-essential cookies are set.',
+    consentDetail: 'Users must actively consent before any non-essential cookies are set. Pre-checked boxes and implied consent are not valid.',
     fines: 'Up to \u20AC20M or 4% of global annual revenue',
     appliesWhen: 'Any EU/EEA visitor accesses your site',
     highlights: [
-      'Explicit opt-in consent required before cookies',
+      'Explicit opt-in consent required before cookies load',
       'Right to withdraw consent at any time',
       'Cookie banner must not use dark patterns',
-      'Requires a link to your privacy policy',
+      'Granular consent by cookie category required',
     ],
   },
   {
@@ -74,16 +75,16 @@ const frameworks = [
     icon: Scale,
     color: 'from-amber-500/10 via-orange-500/5 to-red-500/10',
     description:
-      'California\'s privacy law focuses on the right to opt out of data sales. It applies to for-profit businesses that meet revenue or data processing thresholds.',
+      'California\'s privacy law uses an opt-out model for cookies. Cookies can load by default, but you must provide a "Do Not Sell or Share" link and honor Global Privacy Control signals from browsers.',
     consentModel: 'Opt-out',
-    consentDetail: 'Cookies can be set by default, but users must be able to opt out of data sale/sharing.',
+    consentDetail: 'Cookies can load by default, but users must be able to opt out of data sale and sharing at any time.',
     fines: 'Up to $7,500 per intentional violation',
-    appliesWhen: 'Business serves CA residents and meets revenue/data thresholds',
+    appliesWhen: 'For-profit business serves CA residents and meets revenue or data thresholds',
     highlights: [
-      '"Do Not Sell My Personal Information" link required',
-      'Right to know what data is collected',
-      'Right to request data deletion',
-      'No pre-consent needed (opt-out model)',
+      '"Do Not Sell or Share My Personal Information" link required',
+      'Must honor Global Privacy Control (GPC) browser signals',
+      'Right to know what data is collected and request deletion',
+      'No pre-consent needed but opt-out must be available',
     ],
   },
   {
@@ -94,16 +95,16 @@ const frameworks = [
     icon: Leaf,
     color: 'from-red-500/10 via-pink-500/5 to-rose-500/10',
     description:
-      'Canada\'s federal privacy law requires meaningful consent for collecting personal information through cookies. Quebec\'s Law 25 adds stricter requirements for Quebec residents.',
+      'Canada\'s federal privacy law requires meaningful consent for collecting personal information through cookies. Quebec\'s Law 25 adds GDPR-like opt-in requirements for Quebec residents.',
     consentModel: 'Meaningful consent',
-    consentDetail: 'Users must understand what they are consenting to. Implied consent may be acceptable for non-sensitive data.',
-    fines: 'Up to $100K per violation (OPC complaints)',
+    consentDetail: 'Users must understand what they are consenting to. Implied consent is acceptable for non-sensitive data with clear notice.',
+    fines: 'Up to $100K per violation (PIPEDA) / $25M or 4% (Quebec Law 25)',
     appliesWhen: 'Commercial activities across Canada',
     highlights: [
-      'Meaningful consent required (not just implied)',
+      'Meaningful consent required (not just a click)',
+      'Quebec Law 25 requires GDPR-like opt-in consent',
+      'Bilingual support (EN/FR) recommended for Quebec',
       'Enforced by the Office of the Privacy Commissioner',
-      'Quebec Law 25 adds stricter opt-in requirements',
-      'Bilingual support (EN/FR) recommended',
     ],
   },
 ]
@@ -134,16 +135,50 @@ const comparisonRows = [
     pipeda: true,
   },
   {
-    label: 'Fines',
+    label: 'GPC Signal Required',
+    gdpr: false,
+    ccpa: true,
+    pipeda: false,
+  },
+  {
+    label: 'Maximum Fines',
     gdpr: 'Up to \u20AC20M / 4%',
     ccpa: 'Up to $7,500/violation',
-    pipeda: 'Up to $100K',
+    pipeda: 'Up to $100K / $25M (QC)',
   },
   {
     label: 'Applies To',
     gdpr: 'Any site with EU visitors',
     ccpa: 'Businesses meeting CA thresholds',
     pipeda: 'Canadian commercial activity',
+  },
+]
+
+const faqData = [
+  {
+    question: 'Which privacy law applies to my website?',
+    answer:
+      'It depends on where your visitors are located, not where your business is. If you have visitors from the EU, GDPR applies. If you serve California residents and meet revenue or data thresholds, CCPA applies. If you conduct commercial activity in Canada, PIPEDA applies. Most websites with international traffic need to comply with multiple laws simultaneously.',
+  },
+  {
+    question: 'Do I need a cookie banner if my website only uses analytics?',
+    answer:
+      'Under GDPR, yes. Analytics cookies like Google Analytics are non-essential and require explicit opt-in consent before loading. Under CCPA, analytics cookies generally do not trigger the "Do Not Sell" requirement unless the data is shared with third parties. Under PIPEDA, implied consent with clear notice may be sufficient for basic analytics.',
+  },
+  {
+    question: 'Can one cookie banner comply with all three laws?',
+    answer:
+      'Yes. A well-configured cookie banner can detect visitor location and apply the correct consent model automatically. EU visitors get opt-in (GDPR), California visitors get opt-out with Do Not Sell (CCPA), and Canadian visitors get meaningful consent (PIPEDA) with opt-in for Quebec. Our banner handles this geo-detection automatically.',
+  },
+  {
+    question: 'What happens if I do not have a cookie banner?',
+    answer:
+      'The consequences depend on the law. GDPR fines can reach 20 million euros or 4% of global revenue. CCPA penalties are up to $7,500 per intentional violation, and each consumer interaction can be a separate violation. PIPEDA violations can result in $100,000 CAD fines, and Quebec Law 25 penalties reach $25 million CAD. Beyond fines, non-compliance creates legal liability and damages trust.',
+  },
+  {
+    question: 'Are essential cookies exempt from consent requirements?',
+    answer:
+      'Yes, across all three frameworks. Cookies that are strictly necessary for the website to function (session cookies, shopping cart cookies, security tokens, load balancers) do not require consent. However, you must still disclose them in your cookie policy. Analytics, marketing, and advertising cookies are never considered strictly necessary.',
   },
 ]
 
@@ -192,16 +227,16 @@ export default function CompliancePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Which Privacy Law
+                    Cookie Compliance:
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Applies to Your Website?
+                    Which Privacy Law Applies to You?
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  If your website has visitors from the EU, California, or Canada, you likely need a cookie consent banner. Here is what each law requires.
+                  Three major privacy laws govern how websites use cookies. GDPR requires opt-in. CCPA requires opt-out. PIPEDA requires meaningful consent. Here is what each one means for your website.
                 </p>
               </motion.div>
 
@@ -239,10 +274,10 @@ export default function CompliancePage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Not Sure Where to Start?
+                Which Cookie Consent Law Do You Need to Follow?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Most websites need to comply with more than one framework. Here is a quick guide.
+                Most websites need to comply with more than one framework. Start with where your visitors are located.
               </p>
             </motion.div>
 
@@ -251,23 +286,23 @@ export default function CompliancePage() {
                 {
                   icon: Globe,
                   question: 'Do you have visitors from Europe?',
-                  answer: 'You need GDPR compliance with an opt-in cookie banner.',
+                  answer: 'You need GDPR compliance: explicit opt-in consent before any non-essential cookies load.',
                   link: '/compliance/gdpr',
-                  label: 'GDPR',
+                  label: 'GDPR Guide',
                 },
                 {
                   icon: MapPin,
                   question: 'Do you serve California residents?',
-                  answer: 'You need CCPA compliance with opt-out controls.',
+                  answer: 'You need CCPA compliance: opt-out controls and a "Do Not Sell" link for cookie data.',
                   link: '/compliance/ccpa',
-                  label: 'CCPA',
+                  label: 'CCPA Guide',
                 },
                 {
                   icon: Leaf,
-                  question: 'Is your business in Canada?',
-                  answer: 'You need PIPEDA compliance with meaningful consent.',
+                  question: 'Is your business or audience in Canada?',
+                  answer: 'You need PIPEDA compliance: meaningful consent for cookies, plus Quebec Law 25 opt-in.',
                   link: '/compliance/pipeda',
-                  label: 'PIPEDA',
+                  label: 'PIPEDA Guide',
                 },
               ].map((item, i) => {
                 const ItemIcon = item.icon
@@ -329,10 +364,10 @@ export default function CompliancePage() {
               className="text-center mb-16"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Privacy Frameworks Explained
+                What Does Each Privacy Law Require for Cookies?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Understand what each law requires for cookie consent on your website.
+                Each law takes a different approach to cookie consent. Here is what matters for your website.
               </p>
             </motion.div>
 
@@ -451,10 +486,10 @@ export default function CompliancePage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                Quick Comparison
+                GDPR vs CCPA vs PIPEDA: Cookie Requirements Compared
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                See how the three major frameworks differ at a glance.
+                See how the three major privacy frameworks differ at a glance.
               </p>
             </motion.div>
 
@@ -514,6 +549,49 @@ export default function CompliancePage() {
           </div>
         </section>
 
+        {/* FAQ */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                Cookie Compliance FAQ
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Common questions about privacy laws and cookie consent requirements.
+              </p>
+            </motion.div>
+
+            <div className="max-w-3xl mx-auto space-y-4">
+              {faqData.map((item, i) => (
+                <motion.div
+                  key={item.question}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="rounded-xl border border-border bg-background p-6"
+                >
+                  <h3 className="font-heading text-base font-semibold text-foreground mb-2">
+                    {item.question}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {item.answer}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <StructuredData type="faq" data={faqData} />
+          </div>
+        </section>
+
         {/* Final CTA */}
         <section className="relative overflow-hidden bg-muted border-t border-border px-4 py-16 sm:px-6 sm:py-20">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:14px_24px]" />
@@ -529,7 +607,7 @@ export default function CompliancePage() {
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                Our cookie banner applies the right rules for each framework automatically. Build once, stay compliant everywhere.
+                Our cookie banner detects visitor location and applies the right consent model automatically. GDPR opt-in for Europe. CCPA opt-out for California. PIPEDA meaningful consent for Canada. Build once, stay compliant everywhere.
               </p>
 
               <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">

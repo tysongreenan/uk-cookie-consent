@@ -1,16 +1,19 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Cookie Compliance Frameworks | GDPR, CCPA & PIPEDA Guides',
+  title: 'Cookie Compliance Guide | Which Privacy Law Applies?',
   description:
-    'Explore cookie compliance requirements for every major privacy law. Get compliant with GDPR, CCPA/CPRA, and PIPEDA with our cookie consent platform.',
+    'Compare GDPR, CCPA, and PIPEDA cookie consent requirements side by side. Find out which privacy law applies to your website and what you need to do.',
   keywords:
-    'cookie compliance, privacy law compliance, gdpr compliance, ccpa compliance, pipeda compliance, cookie consent requirements, privacy frameworks',
+    'cookie compliance, privacy law cookie requirements, which privacy law applies to me, gdpr vs ccpa vs pipeda, cookie consent requirements',
   openGraph: {
-    title: 'Cookie Compliance Frameworks | GDPR, CCPA & PIPEDA Guides',
+    title: 'Cookie Compliance Guide | Which Privacy Law Applies?',
     description:
-      'Explore cookie compliance requirements for every major privacy law. Get compliant with GDPR, CCPA/CPRA, and PIPEDA with our cookie consent platform.',
+      'Compare GDPR, CCPA, and PIPEDA cookie consent requirements side by side. Find out which privacy law applies to your website and what you need to do.',
     type: 'website',
+  },
+  alternates: {
+    canonical: '/compliance',
   },
 }
 
