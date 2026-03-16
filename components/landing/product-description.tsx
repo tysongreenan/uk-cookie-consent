@@ -52,7 +52,7 @@ export function ProductDescription() {
             <section className="mb-8">
               <h3 className="text-2xl font-semibold mb-4">Pricing Model</h3>
               <p>
-                Cookie-Banner.ca offers <strong>"free forever"</strong> for the first 1,000 accounts, with no credit card required. Once the first 1,000 accounts are reached, new users will be charged a monthly fee. However, early adopters (the first 1,000 accounts) are grandfathered in at $0 forever with no hidden fees or surprise charges.
+                Cookie-Banner.ca offers a <strong>free plan</strong> to get started with no credit card required. When you're ready for advanced features like analytics, team collaboration, and custom branding, upgrade to <strong>Pro for a one-time payment of $99</strong> — no subscriptions, no recurring fees, and lifetime updates included.
               </p>
             </section>
 
@@ -95,12 +95,12 @@ export function ProductDescription() {
                 Unlike other cookie banner tools that charge $9-15/month and limit domains, Cookie-Banner.ca offers:
               </p>
               <ul className="list-disc list-inside space-y-2 mt-4">
-                <li>Unlimited cookie banners per account</li>
-                <li>Unlimited websites and domains</li>
-                <li>Free forever for early adopters (first 1,000 accounts)</li>
+                <li>Free plan with no credit card required</li>
+                <li>Pro upgrade for a one-time $99 payment — no subscriptions</li>
+                <li>Unlimited cookie banners and websites on Pro</li>
                 <li>Canadian-first compliance with bilingual support</li>
                 <li>Zero performance impact on your website</li>
-                <li>Full support even on the free tier</li>
+                <li>Lifetime updates and support included</li>
               </ul>
             </section>
 
@@ -132,7 +132,7 @@ export function ProductDescription() {
                 <li>Verify that non-essential cookies are blocked until consent is given</li>
               </ol>
               <p className="mt-4">
-                If you're one of the first 1,000 accounts, you'll have free access forever with unlimited banners and websites.
+                Start free and upgrade to Pro when you're ready for advanced features, analytics, and team collaboration.
               </p>
             </section>
           </div>

@@ -183,20 +183,20 @@ export default function AboutPage() {
           </section>
 
           <section className="rounded-xl border-2 border-brand-teal/20 bg-gradient-to-br from-brand-teal/5 to-brand-purple/5 p-8 md:p-10">
-            <h2 className="mb-6 text-3xl font-bold">Why We&apos;re Free (for the First 1,000)</h2>
-            
+            <h2 className="mb-6 text-3xl font-bold">Why We Keep It Simple</h2>
+
             <div className="space-y-4 text-lg leading-relaxed">
-              <p>Most startups throw up a paywall before they earn your trust.</p>
+              <p>Most tools charge $9-15/month and lock you into subscriptions.</p>
               <p className="font-semibold">We&apos;re doing the opposite.</p>
-              
+
               <p>
-                We&apos;re giving away the full product — no restrictions — to the first 1,000 accounts.
+                Start free — no credit card, no time limits. When you&apos;re ready for Pro features, it&apos;s a one-time $99 payment. No subscriptions. No recurring fees. Lifetime updates included.
               </p>
-              
+
               <p className="text-xl font-semibold">Why?</p>
-              
+
               <p className="text-xl">Because we&apos;re not here to extract. We&apos;re here to build trust.</p>
-              
+
               <p>
                 If the product&apos;s great, we won&apos;t need clever pricing tricks.<br />
                 You&apos;ll stick around because it&apos;s the right fit — not because we locked you in.
@@ -274,7 +274,7 @@ export default function AboutPage() {
           <section className="text-center">
             <div className="inline-block rounded-xl border-2 border-brand-teal bg-brand-teal/5 p-8">
               <p className="mb-4 text-xl font-bold">
-                🧠 First 1,000 accounts are free — for life.
+                🧠 Start free — Pro is just $99, one-time.
               </p>
               <Button asChild size="lg" className="text-base bg-brand-red hover:bg-brand-red/90 text-white">
                 <Link href="/builder">

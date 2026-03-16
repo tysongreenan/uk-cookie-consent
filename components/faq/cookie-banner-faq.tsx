@@ -29,8 +29,8 @@ const faqData = [
     answer: "Installation is simple — just copy the generated code and paste it into your website's HTML, right before the closing </body> tag. It works on WordPress, Webflow, Shopify, Squarespace, custom HTML sites, and virtually any other platform."
   },
   {
-    question: "What happens after the first 1,000 accounts?",
-    answer: "Once we reach 1,000 accounts, new users will be charged a monthly fee. But if you're one of the first 1,000, you're grandfathered in at $0 forever. No hidden fees, no surprise charges — you keep full access for free, permanently."
+    question: "How does pricing work?",
+    answer: "We offer a free plan to get started with no credit card required. When you're ready for advanced features like analytics, team collaboration, and custom branding, you can upgrade to Pro for a one-time payment of $99 — no subscriptions, no recurring fees, and lifetime updates included."
   },
   {
     question: "Can I manage my tracking scripts through the banner?",
@@ -38,7 +38,7 @@ const faqData = [
   },
   {
     question: "Do you offer support?",
-    answer: "Yes! Even though the first 1,000 accounts are free, you still get full support. If you run into any issues or have questions about compliance, customization, or installation, we're here to help."
+    answer: "Yes! We offer support on all plans, including free. If you run into any issues or have questions about compliance, customization, or installation, we're here to help."
   },
   {
     question: "Does the tool really block non-essential cookies until consent is given?",
@@ -151,13 +151,13 @@ export function CookieBannerFAQ() {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="pricing-later" className="rounded-lg border bg-background px-6">
+        <AccordionItem value="pricing" className="rounded-lg border bg-background px-6">
           <AccordionTrigger className="text-left hover:no-underline">
-            <span className="text-lg font-semibold">What happens after the first 1,000 accounts?</span>
+            <span className="text-lg font-semibold">How does pricing work?</span>
           </AccordionTrigger>
           <AccordionContent className="text-base text-muted-foreground">
             <p className="leading-relaxed">
-              Once we reach 1,000 accounts, new users will be charged a monthly fee. But if you&apos;re one of the first 1,000, you&apos;re <strong>grandfathered in at $0 forever</strong>. No hidden fees, no surprise charges — you keep full access for free, permanently.
+              We offer a <strong>free plan</strong> to get started with no credit card required. When you&apos;re ready for advanced features like analytics, team collaboration, and custom branding, upgrade to <strong>Pro for a one-time $99 payment</strong> — no subscriptions, no recurring fees, and lifetime updates included.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -179,7 +179,7 @@ export function CookieBannerFAQ() {
           </AccordionTrigger>
           <AccordionContent className="text-base text-muted-foreground">
             <p className="leading-relaxed">
-              Yes! Even though the first 1,000 accounts are free, you still get full support. If you run into any issues or have questions about compliance, customization, or installation, we&apos;re here to help.
+              Yes! We offer support on all plans, including free. If you run into any issues or have questions about compliance, customization, or installation, we&apos;re here to help.
             </p>
           </AccordionContent>
         </AccordionItem>

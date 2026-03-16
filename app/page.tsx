@@ -13,32 +13,32 @@ import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 import { ProductDescription } from '@/components/landing/product-description' 
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator for Canada | PIPEDA & GDPR Compliant',
-  description: 'Create GDPR and PIPEDA compliant cookie banners in 5 minutes. Free forever. Works on WordPress, Shopify, Webflow. No credit card needed.',
+  title: 'Cookie Banner Generator — Free & GDPR Compliant | Cookie-Banner.ca',
+  description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Quebec Law 25 compliant. Works on WordPress, Shopify & any site. No coding needed. Used by 1,000+ websites.',
   keywords: [
-    'cookie banner',
-    'cookie consent',
-    'GDPR compliant',
-    'PIPEDA compliant',
-    'CASL compliant',
-    'Quebec Law 25',
     'cookie banner generator',
-    'cookie banner Canada',
-    'privacy compliance',
-    'branded cookie banner',
-    'custom cookie consent',
-    'bilingual cookie banner',
+    'cookie banner generator free',
+    'free cookie banner generator',
+    'cookie banner',
+    'cookie consent banner',
+    'cookie consent banner generator',
+    'GDPR cookie banner',
+    'PIPEDA cookie banner',
+    'CCPA cookie banner',
+    'law 25 cookie banner',
     'cookie banner WordPress',
     'cookie banner Shopify',
     'cookie banner Webflow',
+    'free cookie consent banner',
+    'cookie banner Canada',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator for Canada | PIPEDA & GDPR Compliant',
-    description: 'Create GDPR and PIPEDA compliant cookie banners in 5 minutes. Free forever. Works on WordPress, Shopify, Webflow. No credit card needed.',
+    title: 'Cookie Banner Generator — Free & GDPR Compliant',
+    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Works on any site. No coding needed.',
     type: 'website',
   },
   alternates: {
-    canonical: '/',
+    canonical: 'https://www.cookie-banner.ca',
   },
 }
 
@@ -58,9 +58,9 @@ export default function HomePage() {
           badge={{
             text: "Used by 1,000+ websites",
           }}
-          title="Cookie Consent Banners"
-          title2="That Keep You Compliant"
-          description="Avoid privacy law fines. Match your brand perfectly. Free forever."
+          title="Free Cookie Banner Generator"
+          title2="GDPR, PIPEDA & Law 25 Compliant"
+          description="Generate cookie consent banners in 5 minutes. Match your brand. Works on any platform. Free plan available — upgrade to Pro for $99 one-time."
           emailCapture={true}
           useGeometricBackground={true}
           // Video temporarily hidden - uncomment when ready:

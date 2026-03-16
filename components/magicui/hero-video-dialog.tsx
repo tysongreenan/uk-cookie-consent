@@ -154,7 +154,7 @@ export function HeroVideoDialog({
                       ✓ We will search your website for any scripts and import them for you as well as branding
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Free forever. No credit card required.
+                      Start free. No credit card required.
                     </p>
                   </div>
                 </form>

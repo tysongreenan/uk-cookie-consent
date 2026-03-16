@@ -20,7 +20,7 @@ import {
 
 export const metadata: Metadata = {
   title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2026',
-  description: 'Free Webflow cookie consent banner. GDPR, PIPEDA, CCPA compliant. No coding required. Copy-paste integration with Webflow Designer. Free forever.',
+  description: 'Free Webflow cookie consent banner. GDPR, PIPEDA, CCPA compliant. No coding required. Copy-paste integration with Webflow Designer.',
   keywords: 'webflow cookie consent free, webflow gdpr free, webflow cookie banner free, webflow privacy compliance free, webflow cookie consent generator',
   openGraph: {
     title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2026',
@@ -39,7 +39,7 @@ export default function WebflowCookieConsentFreePage() {
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Is the free plan really free forever?",
+        "name": "Is the free plan really free?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Yes! Our free plan has no time limits, no hidden costs, and no credit card required. You can use it forever for your Webflow sites without any restrictions."
@@ -125,7 +125,7 @@ export default function WebflowCookieConsentFreePage() {
         {/* Hero Section */}
         <HeroSection
           badge={{
-            text: "Free Forever · No Credit Card",
+            text: "Free Plan · No Credit Card",
           }}
           title="Free Webflow Cookie Banner"
           title2="5-Minute Setup, Zero Cost"
@@ -231,7 +231,7 @@ export default function WebflowCookieConsentFreePage() {
                       <div className="p-2 bg-primary/10 rounded-lg">
                         <CheckCircle className="h-6 w-6 text-primary" />
                       </div>
-                      <CardTitle>Free Forever</CardTitle>
+                      <CardTitle>Free Plan</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -520,7 +520,7 @@ export default function WebflowCookieConsentFreePage() {
               <div className="space-y-6">
                 <Card className="border-2">
                   <CardHeader>
-                    <CardTitle>Is the free plan really free forever?</CardTitle>
+                    <CardTitle>Is the free plan really free?</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">

@@ -678,7 +678,7 @@ export default function CookieScannerPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl">
                       <Shield className="h-5 w-5 text-green-500" />
-                      Completely Free Forever
+                      Completely Free
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

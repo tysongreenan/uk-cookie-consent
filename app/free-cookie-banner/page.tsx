@@ -68,7 +68,7 @@ export default function FreeCookieBannerPage() {
               {/* Eyebrow */}
               <div className="inline-flex items-center gap-2 rounded-full border bg-green-100 px-4 py-2 text-sm font-medium text-green-800 mb-6">
                 <Heart className="h-4 w-4" />
-                <span>100% Free Forever — No Catch</span>
+                <span>Free Plan — No Credit Card Required</span>
               </div>
 
               {/* H1 */}
@@ -414,7 +414,7 @@ export default function FreeCookieBannerPage() {
                     <p className="text-gray-600">
                       There's no catch. We offer free cookie banners to build trust and showcase our technology. 
                       Advanced features like white-labeling and agency tools are available in paid plans, 
-                      but basic compliance is free forever.
+                      but basic compliance is free on our free plan.
                     </p>
                   </CardContent>
                 </Card>
@@ -438,7 +438,7 @@ export default function FreeCookieBannerPage() {
                   <CardContent>
                     <p className="text-gray-600">
                       Our free plan will always remain free. We may add premium features for agencies and enterprises, 
-                      but basic GDPR compliance will never require payment. Early users are grandfathered in forever.
+                      but basic GDPR compliance will always be available on our free plan. Pro is a one-time $99 upgrade.
                     </p>
                   </CardContent>
                 </Card>
@@ -485,7 +485,7 @@ export default function FreeCookieBannerPage() {
                 </Button>
               </div>
               <p className="text-sm text-green-200">
-                ✓ Free forever ✓ No credit card ✓ 5-minute setup ✓ Same compliance as $200/month tools
+                ✓ Free plan available ✓ No credit card ✓ 5-minute setup ✓ Pro for $99 one-time
               </p>
             </div>
           </div>

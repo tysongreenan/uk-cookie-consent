@@ -50,8 +50,8 @@ export function FeaturesBento() {
     },
     {
       Icon: DollarSign,
-      name: "Free Forever, Unlimited Websites",
-      description: "First 1,000 accounts get free forever with unlimited banners and websites. No monthly fees. Competitors charge $9-15/month and limit domains.",
+      name: "Free Plan + One-Time Pro Upgrade",
+      description: "Start free with no credit card. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features. No monthly fees. Competitors charge $9-15/month.",
       href: "/pricing",
       cta: "View pricing",
       gradient: "from-green-500/10 via-emerald-500/5 to-teal-500/10",

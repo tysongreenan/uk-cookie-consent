@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: 'Looking for a Cookiebot alternative? Compare Cookiebot vs CookieYes vs Complianz vs our free solution. Full pricing breakdown, feature matrix, and migration guide. Switch in 5 minutes.',
   keywords: 'cookiebot alternative, cookiebot alternatives, alternatives to cookiebot, cookiebot pricing, cookiebot shopify, cookiebot vs complianz, cookiebot vs cookieyes, cookiebot free, best cookiebot alternative 2026, cookiebot competitor, free cookiebot alternative',
   openGraph: {
-    title: 'Best Cookiebot Alternative 2026 — Save $2,388/Year | Free Forever',
+    title: 'Best Cookiebot Alternative 2026 — Save $2,388/Year | Free Plan Available',
     description: 'Full comparison: Cookiebot vs CookieYes vs Complianz vs free alternatives. Pricing breakdown, feature matrix, platform integrations. Switch in 5 minutes.',
     type: 'article',
   },
@@ -80,7 +80,7 @@ export default function CookiebotAlternativePage() {
           }}
           title="The Best Cookiebot Alternative"
           title2="Free, Faster, and Fully Compliant"
-          description="Stop paying $9-199/month for Cookiebot. Get 4x faster performance, unlimited customization, and complete GDPR compliance — 100% free forever. Over 10,000 sites have already switched. See how we compare to Cookiebot, CookieYes, and Complianz below."
+          description="Stop paying $9-199/month for Cookiebot. Get 4x faster performance, unlimited customization, and complete GDPR compliance — free plan or $99 one-time Pro. Over 10,000 sites have already switched. See how we compare to Cookiebot, CookieYes, and Complianz below."
           emailCapture={false}
           useGeometricBackground={true}
         />
@@ -242,7 +242,7 @@ export default function CookiebotAlternativePage() {
                 <Card className="border-2 border-green-500">
                   <CardContent className="pt-6 text-center">
                     <div className="text-4xl font-bold text-green-600 mb-2">$0</div>
-                    <p className="text-muted-foreground"><strong>UK Cookie Consent</strong> — unlimited everything, free forever</p>
+                    <p className="text-muted-foreground"><strong>Cookie Banner Generator</strong> — free plan or $99 one-time Pro</p>
                   </CardContent>
                 </Card>
               </div>
@@ -490,7 +490,7 @@ export default function CookiebotAlternativePage() {
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2 text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>$0/month — free forever</span>
+                        <span>$0/month free plan — or $99 one-time Pro</span>
                       </li>
                       <li className="flex items-start gap-2 text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -536,7 +536,7 @@ export default function CookiebotAlternativePage() {
                       <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
                         <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <CardTitle className="text-lg">Truly Free Forever</CardTitle>
+                      <CardTitle className="text-lg">Free Plan + One-Time Pro</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>

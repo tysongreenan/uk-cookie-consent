@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowRight, Clock, Crown } from 'lucide-react'
+import { ArrowRight, Clock } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -42,7 +42,7 @@ export function FinalCTA() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
             <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span>Limited to first 1,000 accounts</span>
+            <span>No subscriptions — one-time pricing</span>
           </div>
 
           <h2 className="mb-5 font-heading text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl lg:text-6xl sm:mb-6">
@@ -50,7 +50,7 @@ export function FinalCTA() {
           </h2>
           
           <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-            Start free. Upgrade to Pro for GA4 analytics & unlimited banners.
+            Start free with no credit card required. Upgrade to Pro for a one-time $99 payment — no subscriptions, no hidden fees.
           </p>
 
           <div className="mx-auto max-w-md">
@@ -90,11 +90,10 @@ export function FinalCTA() {
                   </p>
                 </form>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Free plan includes 1 banner.{' '}
+                  Start free, upgrade when you're ready.{' '}
                   <Link href="/pricing" className="text-foreground underline underline-offset-2 hover:text-primary transition-colors">
-                    See Pro features
+                    See pricing details
                   </Link>
-                  {' '}for $99 one-time.
                 </p>
               </>
             )}

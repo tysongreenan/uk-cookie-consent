@@ -25,7 +25,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "priceCurrency": "CAD",
         "availability": "https://schema.org/InStock",
         "priceValidUntil": "2026-12-31",
-        "description": "Free forever for first 1,000 accounts. Unlimited cookie banners and websites."
+        "description": "Free plan available. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features."
       },
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -34,7 +34,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "bestRating": "5",
         "worstRating": "1"
       },
-      "description": "Cookie consent banner generator built in Canada, tailored for Canadian privacy laws (PIPEDA, CASL, Quebec Law 25) as well as global laws like GDPR. Features brand-matching customization (colors, fonts, style), works across platforms (WordPress, Shopify, Webflow, custom sites), supports bilingual (English/French), and provides granular consent & blocking behavior. Free forever for first 1,000 accounts, no credit card required. Quick 5-minute setup: pick template, customize, copy code into site.",
+      "description": "Cookie consent banner generator built in Canada, tailored for Canadian privacy laws (PIPEDA, CASL, Quebec Law 25) as well as global laws like GDPR. Features brand-matching customization (colors, fonts, style), works across platforms (WordPress, Shopify, Webflow, custom sites), supports bilingual (English/French), and provides granular consent & blocking behavior. Free plan available, no credit card required. Pro upgrade for $99 one-time. Quick 5-minute setup: pick template, customize, copy code into site.",
       "featureList": [
         "Brand-matching customization (colors, fonts, style)",
         "Works across platforms (WordPress, Shopify, Webflow, custom sites)",
@@ -46,7 +46,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "Unlimited websites",
         "5-minute setup",
         "No credit card required",
-        "Free forever for first 1,000 accounts",
+        "Free plan with Pro upgrade for $99 one-time",
         "Consent transaction logging",
         "Multi-site/deployment scalability",
         "Integration with tag management (Google Tag Manager)",
@@ -105,7 +105,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "alternateName": "Cookie-Banner.ca",
       "url": baseUrl,
       "logo": `${baseUrl}/logo.svg`,
-      "description": "Canadian cookie consent banner generator providing GDPR, PIPEDA, CASL, and Quebec Law 25 compliant solutions. Free forever for first 1,000 accounts.",
+      "description": "Canadian cookie consent banner generator providing GDPR, PIPEDA, CASL, and Quebec Law 25 compliant solutions. Free plan available, Pro for $99 one-time.",
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "CA"
@@ -127,7 +127,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "@context": "https://schema.org",
       "@type": "Product",
       "name": "Cookie Consent Banner Generator",
-      "description": "Professional cookie consent banner generator for Canadian businesses. GDPR, PIPEDA, CASL, and Quebec Law 25 compliant. Brand-matching customization, unlimited banners, works on all platforms. Free forever for first 1,000 accounts.",
+      "description": "Professional cookie consent banner generator for Canadian businesses. GDPR, PIPEDA, CASL, and Quebec Law 25 compliant. Brand-matching customization, unlimited banners, works on all platforms. Free plan available, Pro for $99 one-time.",
       "brand": {
         "@type": "Brand",
         "name": "Cookie Banner Generator"
@@ -140,7 +140,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "price": "0",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
-        "description": "Free forever for first 1,000 accounts. Unlimited cookie banners and websites. No credit card required.",
+        "description": "Free plan available with no credit card required. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features.",
         "eligibleRegion": {
           "@type": "GeoCircle",
           "geoMidpoint": {
@@ -176,7 +176,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
           "@type": "HowToStep",
           "position": 1,
           "name": "Sign Up for Free Account",
-          "text": "Create a free account at cookie-banner.ca. No credit card required. First 1,000 accounts are free forever.",
+          "text": "Create a free account at cookie-banner.ca. No credit card required. Upgrade to Pro for $99 one-time when ready.",
           "url": `${baseUrl}/auth/signup`
         },
         {
