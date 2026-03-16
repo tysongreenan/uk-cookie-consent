@@ -41,7 +41,7 @@ export function Header() {
               Integrations
             </Link>
             <Link
-              href="/compliance/gdpr"
+              href="/compliance"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Compliance
@@ -101,7 +101,7 @@ export function Header() {
               Integrations
             </Link>
             <Link
-              href="/compliance/gdpr"
+              href="/compliance"
               onClick={() => setMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
