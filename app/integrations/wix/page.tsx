@@ -1,178 +1,359 @@
-import { Metadata } from 'next'
+'use client'
+
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Code, Zap, Users, CheckCircle, ExternalLink, Download, Settings, Smartphone } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Code,
+  Zap,
+  Users,
+  CheckCircle,
+  Download,
+  Settings,
+  Smartphone,
+  ArrowRight,
+  Circle,
+  Clock,
+  Shield,
+  Copy,
+  CheckCircle2,
+} from 'lucide-react'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
+import { motion } from 'framer-motion'
 
-export const metadata: Metadata = {
-  title: 'Wix Cookie Consent Integration | Velo Custom Code Guide 2025',
-  description: 'Complete Wix cookie consent integration guide. Velo integration, app market alternative, performance optimization. GDPR, PIPEDA, CCPA compliant cookie banner for Wix sites.',
-  keywords: 'wix cookie consent, wix gdpr compliance, wix velo integration, wix custom code, wix privacy banner, wix cookie banner',
-  openGraph: {
-    title: 'Wix Cookie Consent Integration | Velo Custom Code Guide 2025',
-    description: 'Complete Wix cookie consent integration guide. Velo integration, app market alternative, performance optimization.',
-    type: 'article',
-  },
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1,
+      delay: 0.3 + i * 0.15,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  }),
 }
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: i * 0.1,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  }),
+}
+
+const whyCards = [
+  {
+    icon: Code,
+    title: 'Wix Analytics',
+    description: 'Built-in Wix Analytics and visitor insights require cookie consent under GDPR, PIPEDA, and CCPA.',
+  },
+  {
+    icon: Zap,
+    title: 'Velo Custom Code',
+    description: 'Google Analytics, Facebook Pixel, and other tracking scripts added via Velo require explicit consent.',
+  },
+  {
+    icon: Users,
+    title: 'E-commerce Tracking',
+    description: 'Wix Stores uses cookies for cart tracking, conversion measurement, and customer analytics.',
+  },
+  {
+    icon: Settings,
+    title: 'Form Submissions',
+    description: 'Contact forms, newsletter signups, and other data collection forms require proper consent handling.',
+  },
+  {
+    icon: Smartphone,
+    title: 'App Market Integration',
+    description: 'Third-party apps from the Wix App Market often use cookies that require consent management.',
+  },
+  {
+    icon: CheckCircle,
+    title: 'Global Compliance',
+    description: 'Wix sites serving international audiences must comply with multiple privacy laws and regulations.',
+  },
+]
+
+const integrationSteps = [
+  {
+    number: '1',
+    title: 'Generate Your Cookie Banner Code',
+    description: 'Create your cookie consent banner using our builder:',
+    items: [
+      'Configure compliance framework (GDPR, PIPEDA, CCPA)',
+      'Customize design to match your Wix template',
+      'Set up cookie categories and tracking scripts',
+      'Configure consent behavior and preferences',
+      'Generate your implementation code',
+    ],
+  },
+  {
+    number: '2',
+    title: 'Add HTML Embed Element',
+    description: 'Add the code to your Wix site:',
+    items: [
+      'Open your Wix site in the Editor',
+      'Add an HTML Embed element to your page',
+      'Paste the cookie consent code',
+      'Position the element where you want the banner',
+      'Save and publish your site',
+    ],
+  },
+  {
+    number: '3',
+    title: 'Configure Wix Analytics',
+    description: 'Set up consent-aware analytics:',
+    items: [
+      'Enable Wix Analytics in your dashboard',
+      'Configure Google Analytics with consent checking',
+      'Set up Facebook Pixel with consent gates',
+      'Configure other tracking scripts',
+      'Test analytics firing after consent',
+    ],
+  },
+  {
+    number: '4',
+    title: 'Test and Customize',
+    description: 'Ensure everything works correctly:',
+    items: [
+      'Test consent banner appearance and functionality',
+      'Verify analytics only fire after consent',
+      'Test consent withdrawal and re-consent',
+      'Check mobile responsiveness',
+      'Validate compliance with your target regulations',
+    ],
+  },
+  {
+    number: '5',
+    title: 'Monitor and Maintain',
+    description: 'Keep your compliance up to date:',
+    items: [
+      'Monitor consent rates and user feedback',
+      'Update cookie categories as needed',
+      'Review and update privacy policies',
+      'Stay informed about regulation changes',
+      'Regular compliance audits',
+    ],
+  },
+]
+
+const featureSections = [
+  {
+    icon: Code,
+    title: 'Template Compatibility',
+    items: [
+      'Works with all Wix templates',
+      'Responsive design for all devices',
+      'Custom CSS integration',
+      'Template-specific styling options',
+    ],
+  },
+  {
+    icon: Users,
+    title: 'E-commerce Integration',
+    items: [
+      'Wix Stores integration',
+      'Cart tracking with consent',
+      'Conversion tracking compliance',
+      'Customer analytics protection',
+    ],
+  },
+  {
+    icon: Settings,
+    title: 'Form Integration',
+    items: [
+      'Contact form consent',
+      'Newsletter signup compliance',
+      'Data collection consent',
+      'Third-party form integrations',
+    ],
+  },
+  {
+    icon: Zap,
+    title: 'Performance Optimization',
+    items: [
+      'Minimal impact on page load speed',
+      'Wix hosting optimization',
+      'CDN integration for global performance',
+      'Lazy loading and conditional scripts',
+    ],
+  },
+]
 
 export default function WixIntegrationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-orange-600 to-red-700 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 bg-orange-500 text-white">Wix Integration</Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Wix Cookie Consent
-              <span className="block text-orange-200">Velo-Ready Solution</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-orange-100 mb-8">
-              Complete Wix cookie consent integration guide. Velo integration, app market alternative, performance optimization. GDPR, PIPEDA, CCPA compliant cookie banner for Wix sites.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50">
-                <Code className="mr-2 h-5 w-5" />
-                Get Wix Solution
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <Zap className="mr-2 h-5 w-5" />
-                View Integration Guide
-              </Button>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-background py-16 sm:py-20 md:py-28">
+          {/* Background grid */}
+          <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:14px_24px]" />
+
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto relative z-10">
+            <div className="flex flex-col items-center gap-8 relative z-10">
+              {/* Badge */}
+              <motion.div
+                custom={0}
+                variants={fadeUpVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border">
+                  <Circle className="h-2 w-2 fill-foreground/60" />
+                  <span className="text-sm text-muted-foreground tracking-wide">
+                    Wix Integration
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Title */}
+              <motion.div
+                custom={1}
+                variants={fadeUpVariants}
+                initial="hidden"
+                animate="visible"
+                className="text-center max-w-4xl space-y-4"
+              >
+                <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
+                    Wix Cookie Consent
+                  </span>
+                  <br />
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
+                    Velo-Ready Solution
+                  </span>
+                </h1>
+
+                <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Complete Wix cookie consent integration. Velo integration, app market alternative,
+                  performance optimization. GDPR, PIPEDA, CCPA compliant.
+                </p>
+              </motion.div>
+
+              {/* CTA */}
+              <motion.div
+                custom={2}
+                variants={fadeUpVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-col sm:flex-row items-center gap-3"
+              >
+                <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
+                  <Link href="/builder">
+                    Get Wix Solution
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
+                  <Link href="#guide">
+                    View Integration Guide
+                  </Link>
+                </Button>
+              </motion.div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Why Wix Needs Cookie Consent */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {/* Why Wix Needs Cookie Consent */}
+        <section className="py-16 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
                 Why Wix Sites Need Cookie Consent
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 Wix sites use various tracking and analytics tools that require compliance
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Code className="h-6 w-6 text-orange-500" />
-                    <CardTitle>Wix Analytics</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Built-in Wix Analytics and visitor insights require cookie consent under GDPR, PIPEDA, and CCPA.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-blue-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Zap className="h-6 w-6 text-blue-500" />
-                    <CardTitle>Velo Custom Code</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Google Analytics, Facebook Pixel, and other tracking scripts added via Velo require explicit consent.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-purple-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Users className="h-6 w-6 text-purple-500" />
-                    <CardTitle>E-commerce Tracking</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Wix Stores uses cookies for cart tracking, conversion measurement, and customer analytics.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-6 w-6 text-green-500" />
-                    <CardTitle>Form Submissions</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Contact forms, newsletter signups, and other data collection forms require proper consent handling.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-red-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-6 w-6 text-red-500" />
-                    <CardTitle>App Market Integration</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Third-party apps from the Wix App Market often use cookies that require consent management.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-l-4 border-l-indigo-500">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-6 w-6 text-indigo-500" />
-                    <CardTitle>Global Compliance</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Wix sites serving international audiences must comply with multiple privacy laws and regulations.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {whyCards.map((card, i) => {
+                const CardIcon = card.icon
+                return (
+                  <motion.div
+                    key={card.title}
+                    custom={i}
+                    variants={cardVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-50px' }}
+                  >
+                    <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                          <CardIcon className="h-5 w-5 text-foreground" />
+                        </div>
+                        <h3 className="font-heading text-lg font-semibold text-foreground">
+                          {card.title}
+                        </h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {card.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Integration Methods */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {/* Integration Methods */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
                 Wix Integration Methods
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 Multiple ways to integrate cookie consent with your Wix site
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5" />
-                    HTML Embed Element
-                  </CardTitle>
-                  <CardDescription>Easiest method for most Wix users</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* HTML Embed Element */}
+              <motion.div
+                custom={0}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04] h-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <Code className="h-5 w-5 text-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        HTML Embed Element
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Easiest method for most Wix users</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <div className="bg-foreground/95 text-background font-mono p-4 rounded-lg text-sm overflow-x-auto">
                       <pre>{`<!-- Add via HTML Embed Element -->
 <div id="cookie-consent-banner">
   <!-- Cookie banner HTML -->
@@ -191,39 +372,50 @@ export default function WixIntegrationPage() {
 }
 </style>`}</pre>
                     </div>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Works with all Wix plans</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>No coding knowledge required</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Visual editor compatible</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Easy to update and maintain</span>
                       </li>
                     </ul>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5" />
-                    Velo Integration
-                  </CardTitle>
-                  <CardDescription>Advanced integration for developers</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-gray-900 text-blue-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+              {/* Velo Integration */}
+              <motion.div
+                custom={1}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04] h-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <Zap className="h-5 w-5 text-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        Velo Integration
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Advanced integration for developers</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <div className="bg-foreground/95 text-background font-mono p-4 rounded-lg text-sm overflow-x-auto">
                       <pre>{`// Velo (Wix Code) integration
 import wixWindow from 'wix-window';
 
@@ -235,7 +427,7 @@ $w.onReady(function () {
 function initCookieConsent() {
   // Check if consent already given
   const consent = wixStorage.getItem('cookie-consent');
-  
+
   if (!consent) {
     // Show consent banner
     showConsentBanner();
@@ -245,98 +437,120 @@ function initCookieConsent() {
 function handleConsent(accepted) {
   // Store consent in Wix storage
   wixStorage.setItem('cookie-consent', accepted);
-  
+
   // Hide banner
   hideConsentBanner();
-  
+
   // Initialize tracking based on consent
   if (accepted) {
     initTracking();
   }
 }`}</pre>
                     </div>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Full Wix API integration</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Wix Storage integration</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Dynamic content management</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Advanced customization options</span>
                       </li>
                     </ul>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    App Market Alternative
-                  </CardTitle>
-                  <CardDescription>Custom solution vs. marketplace apps</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-gray-900 text-purple-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+              {/* App Market Alternative */}
+              <motion.div
+                custom={2}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04] h-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <Settings className="h-5 w-5 text-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        App Market Alternative
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Custom solution vs. marketplace apps</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <div className="bg-foreground/95 text-background font-mono p-4 rounded-lg text-sm overflow-x-auto">
                       <pre>{`// Why choose our solution over App Market apps:
 
-✅ No monthly subscription fees
-✅ No app marketplace limitations
-✅ Full customization control
-✅ Better performance optimization
-✅ Direct support and updates
-✅ No vendor lock-in
++ No monthly subscription fees
++ No app marketplace limitations
++ Full customization control
++ Better performance optimization
++ Direct support and updates
++ No vendor lock-in
 
 // App Market apps often have:
-❌ Limited customization options
-❌ Monthly subscription costs
-❌ Performance overhead
-❌ Dependency on third-party servers
-❌ Limited support and updates`}</pre>
+- Limited customization options
+- Monthly subscription costs
+- Performance overhead
+- Dependency on third-party servers
+- Limited support and updates`}</pre>
                     </div>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>No subscription fees</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Full customization control</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Better performance</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Direct support</span>
                       </li>
                     </ul>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    E-commerce Integration
-                  </CardTitle>
-                  <CardDescription>Specialized for Wix Stores</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-gray-900 text-orange-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+              {/* E-commerce Integration */}
+              <motion.div
+                custom={3}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/[0.04] h-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <Users className="h-5 w-5 text-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        E-commerce Integration
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Specialized for Wix Stores</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    <div className="bg-foreground/95 text-background font-mono p-4 rounded-lg text-sm overflow-x-auto">
                       <pre>{`// Wix Stores integration
 import wixStores from 'wix-stores';
 
@@ -347,7 +561,7 @@ $w.onReady(function () {
       trackCartEvent('add_to_cart', event.item);
     }
   });
-  
+
   // Listen for purchase events
   wixStores.onPurchaseComplete((event) => {
     if (hasConsent('analytics')) {
@@ -367,312 +581,229 @@ function trackPurchase(order) {
   }
 }`}</pre>
                     </div>
-                    <ul className="space-y-2 text-sm text-gray-600">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Wix Stores integration</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Cart tracking with consent</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Conversion tracking compliance</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Customer analytics protection</span>
                       </li>
                     </ul>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Step-by-Step Guide */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {/* Step-by-Step Guide */}
+        <section id="guide" className="py-16 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
                 Wix Integration Guide
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 Get your Wix site compliant in 5 simple steps
               </p>
-            </div>
+            </motion.div>
 
-            <div className="space-y-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</span>
-                    Generate Your Cookie Banner Code
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Create your cookie consent banner using our builder:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Configure compliance framework (GDPR, PIPEDA, CCPA)</li>
-                    <li>Customize design to match your Wix template</li>
-                    <li>Set up cookie categories and tracking scripts</li>
-                    <li>Configure consent behavior and preferences</li>
-                    <li>Generate your implementation code</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2</span>
-                    Add HTML Embed Element
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Add the code to your Wix site:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Open your Wix site in the Editor</li>
-                    <li>Add an HTML Embed element to your page</li>
-                    <li>Paste the cookie consent code</li>
-                    <li>Position the element where you want the banner</li>
-                    <li>Save and publish your site</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">3</span>
-                    Configure Wix Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Set up consent-aware analytics:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Enable Wix Analytics in your dashboard</li>
-                    <li>Configure Google Analytics with consent checking</li>
-                    <li>Set up Facebook Pixel with consent gates</li>
-                    <li>Configure other tracking scripts</li>
-                    <li>Test analytics firing after consent</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">4</span>
-                    Test and Customize
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Ensure everything works correctly:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Test consent banner appearance and functionality</li>
-                    <li>Verify analytics only fire after consent</li>
-                    <li>Test consent withdrawal and re-consent</li>
-                    <li>Check mobile responsiveness</li>
-                    <li>Validate compliance with your target regulations</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">5</span>
-                    Monitor and Maintain
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Keep your compliance up to date:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Monitor consent rates and user feedback</li>
-                    <li>Update cookie categories as needed</li>
-                    <li>Review and update privacy policies</li>
-                    <li>Stay informed about regulation changes</li>
-                    <li>Regular compliance audits</li>
-                  </ul>
-                </CardContent>
-              </Card>
+            <div className="max-w-4xl mx-auto space-y-4">
+              {integrationSteps.map((step, i) => (
+                <motion.div
+                  key={step.number}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-50px' }}
+                >
+                  <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted border border-border text-sm font-mono font-semibold text-foreground">
+                        {step.number}
+                      </div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        {step.title}
+                      </h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {step.description}
+                    </p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {step.items.map((item, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Wix-Specific Features */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {/* Wix-Specific Features */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
                 Wix-Specific Features
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 Built specifically for Wix templates and functionality
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5" />
-                    Template Compatibility
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Works with all Wix templates</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Responsive design for all devices</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Custom CSS integration</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Template-specific styling options</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    E-commerce Integration
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Wix Stores integration</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Cart tracking with consent</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Conversion tracking compliance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Customer analytics protection</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Form Integration
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Contact form consent</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Newsletter signup compliance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Data collection consent</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Third-party form integrations</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5" />
-                    Performance Optimization
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Minimal impact on page load speed</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Wix hosting optimization</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>CDN integration for global performance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Lazy loading and conditional scripts</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 gap-4">
+              {featureSections.map((section, i) => {
+                const SectionIcon = section.icon
+                return (
+                  <motion.div
+                    key={section.title}
+                    custom={i}
+                    variants={cardVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-50px' }}
+                  >
+                    <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                          <SectionIcon className="h-5 w-5 text-foreground" />
+                        </div>
+                        <h3 className="font-heading text-lg font-semibold text-foreground">
+                          {section.title}
+                        </h3>
+                      </div>
+                      <ul className="space-y-3 text-sm text-muted-foreground">
+                        {section.items.map((item, j) => (
+                          <li key={j} className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-orange-600 to-red-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Make Your Wix Site Compliant?
-            </h2>
-            <p className="text-xl text-orange-100 mb-8">
-              Join thousands of Wix users using our cookie consent solution. Easy integration, professional results, and full compliance without App Market limitations.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50">
-                <Code className="mr-2 h-5 w-5" />
-                Get Wix Solution
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <Download className="mr-2 h-5 w-5" />
-                Download Integration Guide
-              </Button>
+        {/* Trust / Stats Section */}
+        <section className="py-16 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Clock,
+                  title: '5-Minute Setup',
+                  desc: 'No App Market limitations',
+                },
+                {
+                  icon: Shield,
+                  title: 'GDPR, CCPA & PIPEDA',
+                  desc: 'Full compliance without subscriptions',
+                },
+                {
+                  icon: Zap,
+                  title: 'Under 10KB',
+                  desc: 'No impact on page load speed',
+                },
+              ].map((item, i) => {
+                const ItemIcon = item.icon
+                return (
+                  <motion.div
+                    key={item.title}
+                    custom={i}
+                    variants={cardVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="flex flex-col items-center gap-3 text-center"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background border border-border">
+                      <ItemIcon className="h-5 w-5 text-foreground" />
+                    </div>
+                    <p className="font-heading font-semibold text-foreground">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Final CTA */}
+        <section className="relative overflow-hidden bg-muted border-t border-border px-4 py-16 sm:px-6 sm:py-20">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] bg-[size:14px_24px]" />
+          <div className="container relative z-10">
+            <div className="mx-auto max-w-3xl text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>No App Market required</span>
+                </div>
+
+                <h2 className="mb-5 font-heading text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl sm:mb-6">
+                  Ready to Make Your Wix Site Compliant?
+                </h2>
+
+                <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
+                  Join thousands of Wix users using our cookie consent solution. Easy integration,
+                  professional results, and full compliance without App Market limitations.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
+                    <Link href="/builder">
+                      Get Wix Solution
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="h-14 px-8 text-base">
+                    <Link href="/integrations">
+                      Browse All Integrations
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
     </div>
   )
 }

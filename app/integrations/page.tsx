@@ -95,6 +95,15 @@ const websiteBuilders = [
     difficulty: 'Easy',
     time: '5 min',
   },
+  {
+    slug: 'brizy',
+    name: 'Brizy',
+    description: 'Add cookie consent to your Brizy-powered WordPress site. Works with the page builder.',
+    icon: Palette,
+    badge: 'WordPress',
+    difficulty: 'Easy',
+    time: '3 min',
+  },
 ]
 
 const developerTools = [
