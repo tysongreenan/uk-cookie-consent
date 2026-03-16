@@ -1046,7 +1046,8 @@ var TRANSLATIONS = {
     confirmChoices: "Confirm My Choices",
     saveButton: "Save",
     cancelButton: "Cancel",
-    cookieSettings: "Cookie Settings"
+    cookieSettings: "Cookie Settings",
+    privacyPolicy: ${JSON.stringify(config.branding.privacyPolicy.text || 'Privacy Policy')}
   },
   fr: {
     title: ${config.language === 'fr' ? JSON.stringify(config.text.title) : '"Nous utilisons des cookies"'},
@@ -1072,7 +1073,8 @@ var TRANSLATIONS = {
     confirmChoices: "Confirmer mes choix",
     saveButton: "Enregistrer",
     cancelButton: "Annuler",
-    cookieSettings: "Param\\u00e8tres des cookies"
+    cookieSettings: "Param\\u00e8tres des cookies",
+    privacyPolicy: "Politique de confidentialit\\u00e9"
   }
 };
 
@@ -1106,6 +1108,10 @@ function applyTranslations() {
       var firstText = msgEl.firstChild;
       if (firstText && firstText.nodeType === 3) {
         firstText.textContent = trans.message + ' ';
+      }
+      // Translate the privacy policy link text
+      if (trans.privacyPolicy) {
+        link.textContent = trans.privacyPolicy;
       }
     } else {
       msgEl.textContent = trans.message;

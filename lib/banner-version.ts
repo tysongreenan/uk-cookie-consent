@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 4
+export const GENERATOR_VERSION = 5
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,16 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 5,
+    date: '2026-03-16',
+    title: 'Translation & Brand Discovery Fixes',
+    changes: [
+      'Fixed privacy policy link text not translating to French',
+      'Fixed brand color import picking transparent/invisible colors',
+      'Brand discovery now correctly parses page builder CSS variables',
+    ],
+  },
   {
     version: 4,
     date: '2026-03-16',
