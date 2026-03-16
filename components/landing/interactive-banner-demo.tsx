@@ -24,6 +24,7 @@ import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
+import { detectFrameworkFromUrl } from '@/lib/compliance-detection'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -453,7 +454,7 @@ interface InteractiveBannerDemoProps {
 
 export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps = {}) {
   const [config, setConfig] = useState<BannerConfig>(defaultConfig)
-  const [activeTab, setActiveTab] = useState('compliance')
+  const [activeTab, setActiveTab] = useState(initialUrl ? 'design' : 'compliance')
   const [showSignupPrompt, setShowSignupPrompt] = useState(false)
   const [userPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   const [brandImportUrl, setBrandImportUrl] = useState(initialUrl || '')
@@ -468,7 +469,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
 
   // Simple mode maps 3 steps to underlying tabs
   const simpleSteps = [
-    { id: 'brand', label: 'Brand & Preview', icon: Palette, tabs: ['compliance', 'design'] },
+    { id: 'brand', label: 'Brand & Preview', icon: Palette, tabs: ['design', 'compliance'] },
     { id: 'customize', label: 'Customize', icon: Type, tabs: ['content', 'behavior'] },
     { id: 'getcode', label: 'Get Code', icon: Code, tabs: ['code'] },
   ] as const
@@ -836,6 +837,12 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
         }
       }
       
+      // Auto-detect compliance framework from URL TLD
+      const detectedFramework = detectFrameworkFromUrl(initialUrl) as ComplianceFramework
+      if (detectedFramework !== config.compliance.framework) {
+        handleComplianceFrameworkChange(detectedFramework)
+      }
+
       discoverBrand()
       discoverScripts()
       toast.success('Discovering your website branding and scripts...')
@@ -1128,6 +1135,86 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
 
               {/* Design Tab */}
               <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
+
+                {/* Scanning loading state */}
+                {(isDiscoveringBrand || isScanningScripts) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/5 p-6 overflow-hidden relative"
+                  >
+                    {/* Animated scan line */}
+                    <motion.div
+                      className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+                      animate={{ top: ['0%', '100%', '0%'] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+
+                    <div className="flex items-start gap-4">
+                      <div className="relative flex-shrink-0">
+                        <motion.div
+                          className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <Search className="w-6 h-6 text-primary" />
+                        </motion.div>
+                        <motion.div
+                          className="absolute -inset-1 rounded-xl border-2 border-primary/30"
+                          animate={{ opacity: [0.3, 0.8, 0.3], scale: [1, 1.08, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground mb-1">
+                          Scanning {(() => { try { return new URL(brandImportUrl.startsWith('http') ? brandImportUrl : `https://${brandImportUrl}`).hostname } catch { return 'your website' } })()}...
+                        </p>
+
+                        <div className="space-y-2 mt-3">
+                          <div className="flex items-center gap-2.5">
+                            {isDiscoveringBrand ? (
+                              <Loader2 className="w-3.5 h-3.5 text-primary animate-spin flex-shrink-0" />
+                            ) : brandDiscovery ? (
+                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                <Shield className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                              </motion.div>
+                            ) : (
+                              <div className="w-3.5 h-3.5 rounded-full border-2 border-muted flex-shrink-0" />
+                            )}
+                            <span className={`text-sm ${isDiscoveringBrand ? 'text-foreground' : brandDiscovery ? 'text-green-700' : 'text-muted-foreground'}`}>
+                              {isDiscoveringBrand ? 'Extracting brand colors & fonts...' : brandDiscovery ? `Found ${brandDiscovery.colors.length} colors${brandDiscovery.fonts?.length ? ` & ${brandDiscovery.fonts.length} fonts` : ''}` : 'Brand detection'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2.5">
+                            {isScanningScripts ? (
+                              <Loader2 className="w-3.5 h-3.5 text-primary animate-spin flex-shrink-0" />
+                            ) : config.scripts.trackingPerformance.length > 0 || config.scripts.targetingAdvertising.length > 0 ? (
+                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                <Shield className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                              </motion.div>
+                            ) : (
+                              <div className="w-3.5 h-3.5 rounded-full border-2 border-muted flex-shrink-0" />
+                            )}
+                            <span className={`text-sm ${isScanningScripts ? 'text-foreground' : !isScanningScripts && (config.scripts.trackingPerformance.length > 0 || config.scripts.targetingAdvertising.length > 0) ? 'text-green-700' : 'text-muted-foreground'}`}>
+                              {isScanningScripts ? 'Detecting tracking scripts...' : (config.scripts.trackingPerformance.length + config.scripts.targetingAdvertising.length) > 0 ? `Found ${config.scripts.trackingPerformance.length + config.scripts.targetingAdvertising.length} tracking scripts` : 'Script detection'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2.5">
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                              <Shield className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                            </motion.div>
+                            <span className="text-sm text-green-700">
+                              Compliance set to {config.compliance.framework.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
                   <Card>
                     <CardHeader>

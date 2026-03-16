@@ -2,7 +2,7 @@
  * Detects the likely compliance framework based on a URL's TLD.
  */
 
-const TLD_TO_FRAMEWORK: Record<string, 'gdpr' | 'ccpa' | 'pipeda' | 'lgpd'> = {
+const TLD_TO_FRAMEWORK: Record<string, 'gdpr' | 'ccpa' | 'pipeda'> = {
   // GDPR — EU/EEA member states and associated countries
   uk: 'gdpr',
   eu: 'gdpr',
@@ -29,8 +29,8 @@ const TLD_TO_FRAMEWORK: Record<string, 'gdpr' | 'ccpa' | 'pipeda' | 'lgpd'> = {
   // PIPEDA — Canada
   ca: 'pipeda',
 
-  // LGPD — Brazil
-  br: 'lgpd',
+  // Brazil — LGPD is similar to GDPR, map to gdpr
+  br: 'gdpr',
 };
 
 const DEFAULT_FRAMEWORK: 'gdpr' = 'gdpr';
@@ -53,7 +53,7 @@ function extractTldParts(hostname: string): string[] {
 
 export function detectFrameworkFromUrl(
   url: string
-): 'gdpr' | 'ccpa' | 'pipeda' | 'lgpd' {
+): 'gdpr' | 'ccpa' | 'pipeda' {
   try {
     const normalized = normalizeUrl(url);
     const { hostname } = new URL(normalized);
