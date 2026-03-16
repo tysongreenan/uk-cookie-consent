@@ -85,7 +85,9 @@ export async function POST(request: NextRequest) {
 
         // Extract metadata
         const userId = session.metadata?.userId
-        const planTier = session.metadata?.planTier || 'pro'
+        const VALID_PLAN_TIERS = ['pro', 'enterprise'] as const
+        const rawTier = session.metadata?.planTier
+        const planTier = VALID_PLAN_TIERS.includes(rawTier as any) ? rawTier! : 'pro'
 
         if (!userId) {
           console.error('[WEBHOOK] Missing userId in metadata:', {

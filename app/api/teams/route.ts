@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { CreateTeamForm } from '@/types'
+import { CreateTeamForm, PlanTier } from '@/types'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 
 // Use service role key for server-side operations (bypasses RLS)
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has team collaboration access (Pro plan required)
-    const userPlan = (session.user as any).planTier || 'free'
+    const userPlan = (session.user.planTier || 'free') as PlanTier
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
         { 

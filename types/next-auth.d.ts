@@ -9,6 +9,7 @@ declare module 'next-auth' {
       image?: string | null
       currentTeamId?: string | null
       userRole?: string
+      planTier?: string
     }
   }
 
@@ -19,6 +20,7 @@ declare module 'next-auth' {
     image?: string | null
     currentTeamId?: string | null
     userRole?: string
+    planTier?: string
   }
 }
 
@@ -27,6 +29,7 @@ declare module 'next-auth/jwt' {
     id: string
     currentTeamId?: string | null
     userRole?: string
+    planTier?: string
     rememberMe?: boolean
   }
 }

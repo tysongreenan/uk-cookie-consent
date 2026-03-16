@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check banner limit for user's plan
-    const userTier = ((session.user as any).planTier || 'free') as PlanTier
+    const userTier = (session.user.planTier || 'free') as PlanTier
     const { data: teamProjects } = await supabase
       .from('Project')
       .select('id')

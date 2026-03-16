@@ -42,10 +42,9 @@ export async function extractBrandColors(html: string, baseUrl: URL, $: CheerioA
 
       try {
         const stylesheetUrl = new URL(href, baseUrl)
-        if (stylesheetUrl.origin !== baseUrl.origin) {
-          // Restrict to same origin to avoid SSRF risks / CORS failures
-          return
-        }
+
+        // Only fetch http/https stylesheets (blocks file://, data:, etc.)
+        if (!stylesheetUrl.protocol.startsWith('http')) return
 
         const { text } = await fetchSafeText(stylesheetUrl, {
           timeoutMs: 8000,
@@ -67,6 +66,7 @@ export async function extractBrandColors(html: string, baseUrl: URL, $: CheerioA
   }
 
   const colors = buildColorCandidates(colorMap)
+  const colorsDiscovered = colors.length > 0
 
   if (colors.length === 0) {
     warnings.push('No colors detected; using default palette.')
@@ -74,7 +74,7 @@ export async function extractBrandColors(html: string, baseUrl: URL, $: CheerioA
 
   const suggestions = buildColorSuggestions(colors)
 
-  return { colors, suggestions, warnings } satisfies BrandColorSuggestions
+  return { colors, suggestions, warnings, colorsDiscovered } satisfies BrandColorSuggestions
 }
 
 function accumulateColorsFromContent(content: string, source: string, colorMap: Map<string, ColorAccumulator>) {

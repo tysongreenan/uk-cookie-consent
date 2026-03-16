@@ -127,7 +127,7 @@ async function handleBannerUpdate(
     // Validate layout/position against user's plan
     const requestedLayout = bannerData.config?.position
     if (requestedLayout) {
-      const userTier = ((session.user as any).planTier || 'free') as PlanTier
+      const userTier = (session.user.planTier || 'free') as PlanTier
       if (!canUseLayout(userTier, requestedLayout)) {
         return NextResponse.json({
           error: `The "${requestedLayout}" layout is not available on your current plan. Upgrade to Pro to unlock all layouts.`,

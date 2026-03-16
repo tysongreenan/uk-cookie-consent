@@ -81,7 +81,7 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const userPlan = ((session?.user as any)?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
+  const userPlan = (session?.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
   const isPro = userPlan === 'pro' || userPlan === 'enterprise'
 
   const toggleExpanded = (title: string) => {

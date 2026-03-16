@@ -28,9 +28,7 @@ import {
   XCircle, 
   Clock, 
   Eye,
-  ArrowUpRight,
-  Settings,
-  Copy
+  Settings
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
@@ -74,7 +72,6 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<BannerStats[]>([])
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
-  const [embedCode, setEmbedCode] = useState('')
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
   const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   
@@ -82,7 +79,6 @@ export default function AnalyticsPage() {
     if (session) {
       fetchUserPlan()
       fetchAnalytics()
-      generateEmbedCode()
       checkAnalyticsStatus()
     }
   }, [session])
@@ -90,11 +86,8 @@ export default function AnalyticsPage() {
   async function fetchUserPlan() {
     if (!session?.user) return
 
-    // Use planTier from session (set in NextAuth JWT callback) instead of querying Supabase directly
-    const planTier = (session.user as any).planTier as 'free' | 'pro' | 'enterprise' | undefined
-    if (planTier) {
-      setUserPlan(planTier)
-    }
+    const planTier = (session.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
+    setUserPlan(planTier)
   }
   
   async function fetchAnalytics() {
@@ -160,13 +153,6 @@ export default function AnalyticsPage() {
     })
   }
   
-  async function generateEmbedCode() {
-    if (!session?.user?.id) return
-    
-    const code = `<script src="${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/banner.js?id=${session.user.id}"></script>`
-    setEmbedCode(code)
-  }
-  
   async function toggleAnalytics() {
     if (!session?.user?.id) return
     
@@ -185,15 +171,6 @@ export default function AnalyticsPage() {
     } catch (error) {
       console.error('Error toggling analytics:', error)
       toast.error('Failed to update analytics settings')
-    }
-  }
-  
-  async function copyEmbedCode() {
-    try {
-      await navigator.clipboard.writeText(embedCode)
-      toast.success('Embed code copied to clipboard!')
-    } catch (error) {
-      toast.error('Failed to copy embed code')
     }
   }
   
@@ -264,29 +241,6 @@ export default function AnalyticsPage() {
           </Card>
         ) : (
           <>
-            {/* Embed Code Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpRight className="w-5 h-5" />
-                  Embed Code
-                </CardTitle>
-                <CardDescription>
-                  Add this script to your website to enable analytics tracking
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                  <code className="flex-1 text-sm font-mono">
-                    {embedCode}
-                  </code>
-                  <Button onClick={copyEmbedCode} size="sm" variant="outline">
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <StatCard 

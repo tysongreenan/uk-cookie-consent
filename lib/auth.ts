@@ -334,8 +334,8 @@ export const authOptions: NextAuthOptions = {
           if (data?.planTier) {
             token.planTier = data.planTier
           }
-        } catch {
-          // Keep existing planTier on error
+        } catch (err) {
+          console.error('[AUTH] Failed to refresh planTier from database:', err)
         }
       }
       return token

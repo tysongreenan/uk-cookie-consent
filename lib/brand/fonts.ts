@@ -181,10 +181,7 @@ export async function extractBrandFonts(html: string, baseUrl: URL, $: CheerioAP
 
       try {
         const stylesheetUrl = new URL(href, baseUrl)
-        if (stylesheetUrl.origin !== baseUrl.origin) {
-          // Only process same-origin stylesheets for security
-          return
-        }
+        if (!stylesheetUrl.protocol.startsWith('http')) return
 
         const { text } = await fetchSafeText(stylesheetUrl, {
           timeoutMs: 8000,

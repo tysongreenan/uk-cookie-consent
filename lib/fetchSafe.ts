@@ -21,9 +21,18 @@ export async function fetchSafe(input: string | URL, init: FetchSafeOptions = {}
   try {
     const response = await fetch(url.toString(), {
       ...init,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; CookieBannerBot/1.0)',
+        'Accept': 'text/html,text/css,*/*',
+        ...init.headers
+      },
       signal: init.signal ?? controller.signal,
       redirect: init.redirect ?? 'follow'
     })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} for ${url.toString()}`)
+    }
 
     const maxContentLength = init.maxContentLength ?? DEFAULT_MAX_CONTENT_LENGTH
     const contentLengthHeader = response.headers.get('content-length')

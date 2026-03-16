@@ -83,21 +83,30 @@ export function getUpgradeMessage(feature: string): string {
   return `Upgrade to Pro for $99 (one-time) to unlock ${feature}`
 }
 
+// Free positions: top/bottom bars + floating variants
+const FREE_POSITIONS = new Set([
+  'top', 'bottom',
+  'floating', 'floating-bottom-right', 'floating-bottom-left',
+  'floating-top-right', 'floating-top-left'
+])
+
+// Pro-only positions: modals + slide-ins
+const PRO_POSITIONS = new Set([
+  'modal-center', 'modal-bottom', 'modal-top',
+  'slide-in-right', 'slide-in-left', 'slide-in-top', 'slide-in-bottom'
+])
+
 export function getStandardLayouts(): string[] {
-  return ['bottom', 'top', 'center', 'side']
+  return Array.from(FREE_POSITIONS)
 }
 
 export function getProLayouts(): string[] {
-  return [
-    'bottom', 'top', 'center', 'side',
-    'modal', 'slide-in', 'minimalist', 'full-screen',
-    'floating', 'corner', 'inline'
-  ]
+  return [...Array.from(FREE_POSITIONS), ...Array.from(PRO_POSITIONS)]
 }
 
-export function canUseLayout(userTier: PlanTier, layout: string): boolean {
-  if (userTier === 'free') {
-    return getStandardLayouts().includes(layout)
-  }
-  return getProLayouts().includes(layout)
+export function canUseLayout(userTier: PlanTier, position: string): boolean {
+  if (FREE_POSITIONS.has(position)) return true
+  if (PRO_POSITIONS.has(position)) return userTier !== 'free'
+  // Allow unknown positions (don't block users on new positions)
+  return true
 }

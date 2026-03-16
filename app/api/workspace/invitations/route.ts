@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has Pro plan
-    const userPlan = (session.user as any).planTier || 'free'
+    const userPlan = (session.user.planTier || 'free') as PlanTier
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
         { 

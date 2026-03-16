@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [isLoadingPortal, setIsLoadingPortal] = useState(false)
 
-  const planTier = (session?.user as any)?.planTier || 'free'
+  const planTier = session?.user?.planTier || 'free'
 
   const handleManageBilling = async () => {
     setIsLoadingPortal(true)

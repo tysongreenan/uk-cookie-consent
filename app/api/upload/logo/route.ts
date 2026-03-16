@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userTier = ((session.user as any).planTier || 'free') as PlanTier
+  const userTier = (session.user.planTier || 'free') as PlanTier
   if (!canAccessFeature(userTier, 'hasImageUpload')) {
     return NextResponse.json(
       { error: 'Image upload requires a Pro plan.' },

@@ -513,10 +513,8 @@ function BannerBuilderContent() {
     if (!session) {
       router.push('/auth/signin')
     } else {
-      const planTier = (session.user as any)?.planTier as 'free' | 'pro' | 'enterprise' | undefined
-      if (planTier) {
-        setUserPlan(planTier)
-      }
+      const planTier = (session.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
+      setUserPlan(planTier)
     }
   }, [session, router])
 
@@ -4242,7 +4240,7 @@ function BannerBuilderContent() {
                     <CodeGenerator
                       config={config}
                       bannerId={bannerId || undefined}
-                      planTier={(session?.user as any)?.planTier || 'free'}
+                      planTier={session?.user?.planTier || 'free'}
                     />
                   </CardContent>
                 </Card>
