@@ -14,7 +14,7 @@ export async function discoverBrand(targetUrl: string): Promise<BrandDiscoveryRe
   const { text: html } = await fetchSafeText(url, { timeoutMs: 10000 })
   const $: CheerioAPI = load(html)
 
-  const { colors, suggestions, warnings } = await extractBrandColors(html, url, $)
+  const { colors, suggestions, warnings, colorsDiscovered } = await extractBrandColors(html, url, $)
   const logo = discoverLogo($, url)
   const fonts = await extractBrandFonts(html, url, $)
 
@@ -23,6 +23,7 @@ export async function discoverBrand(targetUrl: string): Promise<BrandDiscoveryRe
     colors,
     suggestions,
     warnings,
+    colorsDiscovered,
     fetchedAt: new Date().toISOString()
   }
 
