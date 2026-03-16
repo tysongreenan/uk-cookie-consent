@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Filter, Grid, List, Users, Crown, Shield, Edit, Eye } from 'lucide-react'
+import { Plus, Search, Filter, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Palette, Code } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
@@ -60,6 +60,30 @@ export function DashboardClient() {
       fetchTeamInfo().catch(err => {
         console.error('Failed to fetch team info:', err)
       })
+
+      // Safety net: if signup redirect failed to reach /builder, auto-save pending config
+      const pendingConfig = localStorage.getItem('pendingBannerConfig')
+      if (pendingConfig) {
+        // Remove immediately to prevent duplicate saves on session changes
+        localStorage.removeItem('pendingBannerConfig')
+        try {
+          const config = JSON.parse(pendingConfig)
+          fetch('/api/banners', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'My Cookie Banner', config }),
+          }).then(res => {
+            if (res.ok) {
+              fetchBanners()
+              toast.success('Your banner configuration has been saved!')
+            }
+          }).catch(() => {
+            // Silently fail — user can still create manually
+          })
+        } catch {
+          // Invalid JSON — already removed from localStorage
+        }
+      }
     }
   }, [session])
 
@@ -213,7 +237,7 @@ export function DashboardClient() {
 
   const copyEmbedCode = async (bannerId: string) => {
     try {
-      const embedCode = `<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${session?.user?.id}"></script>`
+      const embedCode = `<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}"></script>`
       await navigator.clipboard.writeText(embedCode)
       toast.success('Embed code copied to clipboard!', {
         duration: 4000,
@@ -381,25 +405,48 @@ export function DashboardClient() {
             ))}
           </div>
         ) : filteredBanners.length === 0 ? (
-          <Card className="p-12 text-center">
-            <CardContent>
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-muted-foreground" />
+          <Card className="p-0 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-10 text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Welcome! Set up your first cookie banner</h3>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  Get compliant in 3 easy steps — no coding experience needed.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
+                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">1</div>
+                    <Palette className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-xs font-medium">Design your banner</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">2</div>
+                    <Code className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-xs font-medium">Copy your code</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">3</div>
+                    <Shield className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-xs font-medium">You're compliant</span>
+                  </div>
+                </div>
+
+                <Link href="/dashboard/builder">
+                  <Button size="lg" className="h-12 px-8 text-base">
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <h3 className="text-xl font-semibold mb-2">No Banners Found</h3>
-              <p className="text-muted-foreground mb-6">
-                It looks like you haven't created any cookie banners yet.
-              </p>
-              <Link href="/dashboard/builder">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Your First Banner
-                </Button>
-              </Link>
               {searchTerm && (
-                <Button variant="link" onClick={() => setSearchTerm('')} className="mt-4">
-                  Clear Search
-                </Button>
+                <div className="p-4 text-center border-t">
+                  <Button variant="link" onClick={() => setSearchTerm('')}>
+                    Clear Search
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>

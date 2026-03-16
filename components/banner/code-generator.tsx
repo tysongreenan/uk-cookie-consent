@@ -4,28 +4,26 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Copy, Download, RefreshCw, AlertTriangle, X, Check, ChevronDown } from 'lucide-react'
+import { PlatformInstructions } from '@/components/banner/platform-instructions'
 import { toast } from 'react-hot-toast'
 import { BannerConfig } from '@/types'
 import {
   generateBannerHTML,
   generateBannerCSS,
   generateBannerJS,
-  generateConsentInitScript,
-  generateConsentInitScript as generateConsentInitScriptUtil
+  generateConsentInitScript
 } from '@/lib/banner-generator'
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 
 interface CodeGeneratorProps {
   config: BannerConfig
   bannerId?: string
-  updatedAt?: string | Date
   planTier?: string
 }
 
-export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, planTier }: CodeGeneratorProps) {
   const showBranding = !planTier || planTier === 'free'
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>(bannerId ? 'hosted' : 'head')
-  const [codeVersion, setCodeVersion] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
   const [showUpdateNotice, setShowUpdateNotice] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -47,7 +45,6 @@ export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGen
   const regenerateCode = async () => {
     setIsGenerating(true)
     await new Promise(resolve => setTimeout(resolve, 500))
-    setCodeVersion(prev => prev + 1)
     setIsGenerating(false)
     dismissUpdateNotice()
     toast.success('Code regenerated successfully!')
@@ -62,7 +59,7 @@ export function CodeGenerator({ config, bannerId, updatedAt, planTier }: CodeGen
 <!-- 🍁 IMPORTANT: Consent script MUST be first to block trackers 🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 
-${generateConsentInitScriptUtil()}
+${generateConsentInitScript()}
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -202,6 +199,19 @@ ${generateBannerHTML(config, { showBranding })}
           )}
         </Button>
 
+        {/* Platform-specific instructions */}
+        <PlatformInstructions />
+
+        {/* What's Next? */}
+        <div className="p-4 bg-muted/50 border rounded-lg">
+          <p className="text-sm font-semibold mb-3">What's Next?</p>
+          <ol className="text-sm text-muted-foreground space-y-2 ml-4 list-decimal">
+            <li className="flex items-start gap-2"><span>Paste the code on your website using the instructions above</span></li>
+            <li className="flex items-start gap-2"><span>Visit your site to verify the banner appears</span></li>
+            <li className="flex items-start gap-2"><span>Come back here anytime to customize — changes go live automatically</span></li>
+          </ol>
+        </div>
+
         {/* Explanation */}
         <p className="text-xs text-muted-foreground text-center">
           This script loads your cookie banner from our servers. When you update your banner in the builder and save, the changes go live automatically — no code changes needed on your website.
@@ -256,9 +266,13 @@ ${generateBannerHTML(config, { showBranding })}
               </Card>
               <Button
                 onClick={async () => {
-                  const code = manualTab === 'head' ? generateHeadCode() : generateBodyCode()
-                  await navigator.clipboard.writeText(code)
-                  toast.success(`${manualTab === 'head' ? 'Head' : 'Body'} code copied!`)
+                  try {
+                    const code = manualTab === 'head' ? generateHeadCode() : generateBodyCode()
+                    await navigator.clipboard.writeText(code)
+                    toast.success(`${manualTab === 'head' ? 'Head' : 'Body'} code copied!`)
+                  } catch {
+                    toast.error('Failed to copy code')
+                  }
                 }}
                 size="sm"
                 variant="outline"
@@ -378,6 +392,19 @@ ${generateBannerHTML(config, { showBranding })}
           </pre>
         </CardContent>
       </Card>
+
+      {/* Platform-specific instructions */}
+      <PlatformInstructions />
+
+      {/* What's Next? */}
+      <div className="p-4 bg-muted/50 border rounded-lg">
+        <p className="text-sm font-semibold mb-3">What's Next?</p>
+        <ol className="text-sm text-muted-foreground space-y-2 ml-4 list-decimal">
+          <li>Paste both Head and Body code on your website</li>
+          <li>Visit your site to verify the banner appears</li>
+          <li>Come back here to customize your banner anytime</li>
+        </ol>
+      </div>
     </div>
   )
 }

@@ -4242,7 +4242,6 @@ function BannerBuilderContent() {
                     <CodeGenerator
                       config={config}
                       bannerId={bannerId || undefined}
-                      updatedAt={bannerUpdatedAt || undefined}
                       planTier={(session?.user as any)?.planTier || 'free'}
                     />
                   </CardContent>

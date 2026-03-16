@@ -1,7 +1,5 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { Suspense, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -20,13 +18,15 @@ function SignUpContent() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState('')
   const [passwordStrength, setPasswordStrength] = useState(0)
   const router = useRouter()
+  const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  // Prevent open redirect — only allow relative paths
+  const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
 
   // Pre-fill email from query parameter or banner config
   useEffect(() => {
@@ -34,8 +34,7 @@ function SignUpContent() {
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam))
     } else {
-      // Check for banner config in localStorage
-      const bannerConfig = localStorage.getItem('bannerConfig')
+      const bannerConfig = localStorage.getItem('pendingBannerConfig')
       if (bannerConfig) {
         try {
           const config = JSON.parse(bannerConfig)
@@ -63,7 +62,7 @@ function SignUpContent() {
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true)
     try {
-      await signIn('google', { callbackUrl: '/dashboard' })
+      await signIn('google', { callbackUrl })
     } catch (error) {
       console.error('Google sign up error:', error)
       setError('An error occurred during Google sign up.')
@@ -75,12 +74,6 @@ function SignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      setIsLoading(false)
-      return
-    }
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters long')
@@ -120,7 +113,7 @@ function SignUpContent() {
         })
 
         if (signInResult?.ok) {
-          router.push('/dashboard')
+          router.push(callbackUrl)
         } else {
           router.push('/auth/signin')
         }
@@ -255,7 +248,7 @@ function SignUpContent() {
             {/* Google Sign Up */}
             <Button
               variant="outline"
-              className="w-full h-12 font-medium border-gray-200 hover:bg-gray-50 hover:text-gray-900 relative"
+              className="w-full h-14 text-base font-semibold border-gray-200 hover:bg-gray-50 hover:text-gray-900 relative shadow-sm"
               onClick={handleGoogleSignUp}
               disabled={isLoading || isGoogleLoading}
             >
@@ -291,7 +284,7 @@ function SignUpContent() {
                 <span className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-sm uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+                <span className="bg-white px-2 text-gray-500">Or use email</span>
               </div>
             </div>
 
@@ -364,23 +357,6 @@ function SignUpContent() {
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
-                    required
-                    disabled={isLoading || isGoogleLoading}
-                  />
-                </div>
               </div>
 
               <div className="flex items-start space-x-2 pt-2">

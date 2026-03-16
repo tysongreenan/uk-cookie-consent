@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Lock, ArrowRight, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search } from 'lucide-react'
+import { Gift, ArrowRight, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -464,10 +464,48 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
   const [isScanningScripts, setIsScanningScripts] = useState(false)
   const [scriptScanError, setScriptScanError] = useState<string | null>(null)
   const [hasAutoDiscovered, setHasAutoDiscovered] = useState(false)
+  const [builderMode, setBuilderMode] = useState<'simple' | 'advanced'>('simple')
+
+  // Simple mode maps 3 steps to underlying tabs
+  const simpleSteps = [
+    { id: 'brand', label: 'Brand & Preview', icon: Palette, tabs: ['compliance', 'design'] },
+    { id: 'customize', label: 'Customize', icon: Type, tabs: ['content', 'behavior'] },
+    { id: 'getcode', label: 'Get Code', icon: Code, tabs: ['code'] },
+  ] as const
+
+  type SimpleStepId = typeof simpleSteps[number]['id']
+  const [activeSimpleStep, setActiveSimpleStep] = useState<SimpleStepId>('brand')
+
+  const handleSimpleStepChange = (stepId: SimpleStepId) => {
+    setActiveSimpleStep(stepId)
+    const step = simpleSteps.find(s => s.id === stepId)
+    if (step) {
+      setActiveTab(step.tabs[0])
+    }
+  }
+
+  const handleAdvancedToggle = () => {
+    if (builderMode === 'simple') {
+      setBuilderMode('advanced')
+    } else {
+      setBuilderMode('simple')
+      // Map current tab back to a simple step
+      for (const step of simpleSteps) {
+        if ((step.tabs as readonly string[]).includes(activeTab)) {
+          setActiveSimpleStep(step.id)
+          break
+        }
+      }
+    }
+  }
 
   const handleGetCode = () => {
     // Save current config to localStorage before signup
-    localStorage.setItem('pendingBannerConfig', JSON.stringify(config))
+    try {
+      localStorage.setItem('pendingBannerConfig', JSON.stringify(config))
+    } catch {
+      // localStorage full or unavailable — continue without saving
+    }
     setShowSignupPrompt(true)
     setTimeout(() => {
       document.getElementById('signup-prompt')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -824,48 +862,98 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
               <div className="sticky top-6">
                 {/* Progress */}
                 <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {activeTab === 'compliance' ? 'Step 1 of 8' :
-                       activeTab === 'design' ? 'Step 2 of 8' : 
-                       activeTab === 'content' ? 'Step 3 of 8' : 
-                       activeTab === 'scripts' ? 'Step 4 of 8' : 
-                       activeTab === 'cookie-settings' ? 'Step 5 of 8' :
-                       activeTab === 'behavior' ? 'Step 6 of 8' : 
-                       activeTab === 'analytics' ? 'Step 7 of 8' : 'Step 8 of 8'}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {Math.round((activeTab === 'compliance' ? 12.5 : 
-                                   activeTab === 'design' ? 25 : 
-                                   activeTab === 'content' ? 37.5 : 
-                                   activeTab === 'scripts' ? 50 : 
-                                   activeTab === 'cookie-settings' ? 62.5 :
-                                   activeTab === 'behavior' ? 75 : 
-                                   activeTab === 'analytics' ? 87.5 : 100))}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${activeTab === 'compliance' ? 12.5 : 
-                                 activeTab === 'design' ? 25 : 
-                                 activeTab === 'content' ? 37.5 : 
-                                 activeTab === 'scripts' ? 50 : 
-                                 activeTab === 'cookie-settings' ? 62.5 :
-                                 activeTab === 'behavior' ? 75 : 
-                                 activeTab === 'analytics' ? 87.5 : 100}%` 
-                      }}
-                    ></div>
-                  </div>
+                  {builderMode === 'simple' ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Step {simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1} of 3
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / 3) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${((simpleSteps.findIndex(s => s.id === activeSimpleStep) + 1) / 3) * 100}%` }}
+                        ></div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {activeTab === 'compliance' ? 'Step 1 of 8' :
+                           activeTab === 'design' ? 'Step 2 of 8' :
+                           activeTab === 'content' ? 'Step 3 of 8' :
+                           activeTab === 'scripts' ? 'Step 4 of 8' :
+                           activeTab === 'cookie-settings' ? 'Step 5 of 8' :
+                           activeTab === 'behavior' ? 'Step 6 of 8' :
+                           activeTab === 'analytics' ? 'Step 7 of 8' : 'Step 8 of 8'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round((activeTab === 'compliance' ? 12.5 :
+                                       activeTab === 'design' ? 25 :
+                                       activeTab === 'content' ? 37.5 :
+                                       activeTab === 'scripts' ? 50 :
+                                       activeTab === 'cookie-settings' ? 62.5 :
+                                       activeTab === 'behavior' ? 75 :
+                                       activeTab === 'analytics' ? 87.5 : 100))}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${activeTab === 'compliance' ? 12.5 :
+                                     activeTab === 'design' ? 25 :
+                                     activeTab === 'content' ? 37.5 :
+                                     activeTab === 'scripts' ? 50 :
+                                     activeTab === 'cookie-settings' ? 62.5 :
+                                     activeTab === 'behavior' ? 75 :
+                                     activeTab === 'analytics' ? 87.5 : 100}%`
+                          }}
+                        ></div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Navigation Menu */}
                 <nav className="space-y-1">
                   <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Configuration Steps
+                    {builderMode === 'simple' ? 'Quick Setup' : 'Configuration Steps'}
                   </div>
-                  
+
+                  {builderMode === 'simple' ? (
+                    <>
+                      {simpleSteps.map((step) => {
+                        const StepIcon = step.icon
+                        return (
+                          <button
+                            key={step.id}
+                            onClick={() => handleSimpleStepChange(step.id)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                              activeSimpleStep === step.id
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            }`}
+                          >
+                            <StepIcon className="h-4 w-4" />
+                            <span className="flex-1 text-left">{step.label}</span>
+                          </button>
+                        )
+                      })}
+                      <button
+                        onClick={handleAdvancedToggle}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors mt-3"
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                        <span>Advanced Settings</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
                   <button
                     onClick={() => setActiveTab('compliance')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -878,7 +966,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <span className="flex-1 text-left">Compliance</span>
                     <NewBadge variant="sparkle" size="sm" />
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('design')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -890,7 +978,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <Palette className="h-4 w-4" />
                     <span className="flex-1 text-left">Design</span>
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('content')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -902,7 +990,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <Type className="h-4 w-4" />
                     <span className="flex-1 text-left">Content</span>
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('scripts')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -914,7 +1002,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <Code className="h-4 w-4" />
                     <span className="flex-1 text-left">Scripts</span>
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('cookie-settings')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -927,7 +1015,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <span className="flex-1 text-left">Cookie Settings</span>
                     <NewBadge variant="sparkle" size="sm" />
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('behavior')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -940,7 +1028,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <span className="flex-1 text-left">Behavior</span>
                     <NewBadge variant="sparkle" size="sm" />
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('analytics')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -952,7 +1040,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <BarChart3 className="h-4 w-4" />
                     <span className="flex-1 text-left">Analytics</span>
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab('code')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -964,6 +1052,16 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     <Code className="h-4 w-4" />
                     <span className="flex-1 text-left">Code</span>
                   </button>
+
+                  <button
+                    onClick={handleAdvancedToggle}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors mt-3"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>Simple Mode</span>
+                  </button>
+                    </>
+                  )}
                 </nav>
               </div>
             </div>
@@ -973,11 +1071,11 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-foreground capitalize">
                   {activeTab === 'compliance' ? 'Choose Compliance Framework' :
-                   activeTab === 'design' ? 'Customize Appearance' : 
-                   activeTab === 'content' ? 'Set Text & Messages' : 
-                   activeTab === 'scripts' ? 'Configure Tracking Scripts' : 
+                   activeTab === 'design' ? 'Customize Appearance' :
+                   activeTab === 'content' ? 'Set Text & Messages' :
+                   activeTab === 'scripts' ? 'Configure Tracking Scripts' :
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
-                   activeTab === 'behavior' ? 'Set Banner Behavior' : 
+                   activeTab === 'behavior' ? 'Set Banner Behavior' :
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -990,6 +1088,32 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                    activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
                    'Copy the code below and paste it into your website to activate your cookie banner.'}
                 </p>
+
+                {/* Simple mode sub-tabs for steps with multiple underlying tabs */}
+                {builderMode === 'simple' && (() => {
+                  const currentStep = simpleSteps.find(s => s.id === activeSimpleStep)
+                  if (!currentStep || currentStep.tabs.length <= 1) return null
+                  const tabLabels: Record<string, string> = {
+                    compliance: 'Compliance', design: 'Design', content: 'Text & Labels', behavior: 'Behavior'
+                  }
+                  return (
+                    <div className="flex space-x-1 bg-muted p-1 rounded-lg mt-3">
+                      {currentStep.tabs.map(tab => (
+                        <button
+                          key={tab}
+                          onClick={() => setActiveTab(tab)}
+                          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                            activeTab === tab
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {tabLabels[tab] || tab}
+                        </button>
+                      ))}
+                    </div>
+                  )
+                })()}
               </div>
               
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -3423,15 +3547,15 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                   <Card id="signup-prompt" className="border-2 border-primary/20">
                     <CardHeader>
                       <CardTitle className="flex items-center">
-                        <Lock className="mr-2 h-5 w-5 text-primary" />
-                        Sign up to unlock your code
+                        <Gift className="mr-2 h-5 w-5 text-primary" />
+                        Almost done! Create a free account
                       </CardTitle>
                       <CardDescription>
                         Create a free account to get the installation code for your cookie banner.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-8 text-center">
-                      <Link href="/auth/signup">
+                      <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(`/builder?url=${encodeURIComponent(brandImportUrl)}`)}`}>
                         <Button size="lg" className="w-full sm:w-auto">
                           Create Free Account
                           <ArrowRight className="ml-2 h-4 w-4" />
@@ -3443,8 +3567,8 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                   <Card className="border-2 border-dashed">
                     <CardHeader>
                       <CardTitle className="flex items-center">
-                        <Lock className="mr-2 h-5 w-5 text-muted-foreground" />
-                        Sign up to get your code
+                        <ArrowRight className="mr-2 h-5 w-5 text-muted-foreground" />
+                        Almost done! Create a free account
                       </CardTitle>
                       <CardDescription>
                         Create a free account to access your cookie banner installation code.
@@ -3452,8 +3576,8 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                     </CardHeader>
                     <CardContent className="p-8 text-center">
                       <Button onClick={handleGetCode} size="lg">
-                        <Lock className="mr-2 h-4 w-4" />
-                        Get Your Code
+                        <Gift className="mr-2 h-4 w-4" />
+                        Get Your Free Code
                       </Button>
                     </CardContent>
                   </Card>
