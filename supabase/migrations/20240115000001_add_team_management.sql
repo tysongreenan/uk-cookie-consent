@@ -65,69 +65,24 @@ ALTER TABLE "Team" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "TeamMember" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "TeamInvitation" ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for Team table
-CREATE POLICY "Users can view teams they belong to"
-  ON "Team" FOR SELECT
-  USING (
-    id IN (
-      SELECT team_id FROM "TeamMember" 
-      WHERE user_id = auth.uid()
-    )
-  );
+-- RLS Policies: service_role only (auth.uid() unavailable with NextAuth)
+CREATE POLICY "Service role full access to teams"
+  ON "Team" FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
-CREATE POLICY "Team owners can update their teams"
-  ON "Team" FOR UPDATE
-  USING (owner_id = auth.uid());
-
-CREATE POLICY "Team owners can delete their teams"
-  ON "Team" FOR DELETE
-  USING (owner_id = auth.uid());
-
--- RLS Policies for TeamMember table
-CREATE POLICY "Users can view team members of their teams"
-  ON "TeamMember" FOR SELECT
-  USING (
-    team_id IN (
-      SELECT team_id FROM "TeamMember" 
-      WHERE user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Team owners and admins can manage members"
+CREATE POLICY "Service role full access to team_members"
   ON "TeamMember" FOR ALL
-  USING (
-    team_id IN (
-      SELECT team_id FROM "TeamMember" 
-      WHERE user_id = auth.uid() 
-      AND role IN ('owner', 'admin')
-    )
-  );
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
--- RLS Policies for TeamInvitation table
-CREATE POLICY "Users can view invitations for their teams"
-  ON "TeamInvitation" FOR SELECT
-  USING (
-    team_id IN (
-      SELECT team_id FROM "TeamMember" 
-      WHERE user_id = auth.uid() 
-      AND role IN ('owner', 'admin')
-    )
-  );
-
-CREATE POLICY "Team owners and admins can manage invitations"
+CREATE POLICY "Service role full access to team_invitations"
   ON "TeamInvitation" FOR ALL
-  USING (
-    team_id IN (
-      SELECT team_id FROM "TeamMember" 
-      WHERE user_id = auth.uid() 
-      AND role IN ('owner', 'admin')
-    )
-  );
-
--- Public policy for invitation acceptance (no auth required)
-CREATE POLICY "Anyone can view invitation details by token"
-  ON "TeamInvitation" FOR SELECT
-  USING (token IS NOT NULL);
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- Function to create team for existing users
 CREATE OR REPLACE FUNCTION create_teams_for_existing_users()
@@ -159,18 +114,20 @@ BEGIN
     UPDATE "Project" SET team_id = team_id WHERE user_id = user_record.id;
   END LOOP;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 -- Function to clean up expired invitations
 CREATE OR REPLACE FUNCTION cleanup_expired_invitations()
 RETURNS void AS $$
 BEGIN
-  UPDATE "TeamInvitation" 
-  SET status = 'expired' 
-  WHERE status = 'pending' 
+  UPDATE "TeamInvitation"
+  SET status = 'expired'
+  WHERE status = 'pending'
   AND expires_at < now();
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 -- Function to generate invitation token
 CREATE OR REPLACE FUNCTION generate_invitation_token()
@@ -187,7 +144,8 @@ BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql
+SET search_path = public;
 
 -- Apply triggers
 DROP TRIGGER IF EXISTS update_team_updated_at ON "Team";

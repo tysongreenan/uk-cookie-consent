@@ -30,15 +30,12 @@ CREATE INDEX IF NOT EXISTS idx_banner_stats_user_date ON banner_stats(user_id, d
 -- Add RLS policies
 ALTER TABLE banner_stats ENABLE ROW LEVEL SECURITY;
 
--- Policy for users to view their own stats
-CREATE POLICY "Users can view their own stats"
-  ON banner_stats FOR SELECT
-  USING (user_id = auth.uid());
-
--- Policy for service role to insert/update stats
-CREATE POLICY "Service role can insert/update stats"
+-- Service role full access (API routes use service_role; auth.uid() unavailable with NextAuth)
+CREATE POLICY "Service role full access to banner_stats"
   ON banner_stats FOR ALL
-  USING (true);
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- Function to increment stats atomically
 CREATE OR REPLACE FUNCTION increment_banner_stat(
@@ -83,7 +80,8 @@ BEGIN
     returning_visitor_impressions = banner_stats.returning_visitor_impressions + CASE WHEN p_is_returning THEN 1 ELSE 0 END,
     updated_at = now();
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 -- Add subscription fields to User table (or create user_settings if it doesn't exist)
 ALTER TABLE "User" ADD COLUMN IF NOT EXISTS 
@@ -137,9 +135,11 @@ CREATE TABLE IF NOT EXISTS banner_configs (
 -- Add RLS for banner_configs
 ALTER TABLE banner_configs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can manage their own banner configs"
+CREATE POLICY "Service role full access to banner_configs"
   ON banner_configs FOR ALL
-  USING (user_id = auth.uid());
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- Index for banner_configs
 CREATE INDEX IF NOT EXISTS idx_banner_configs_user ON banner_configs(user_id);
@@ -151,7 +151,8 @@ BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql
+SET search_path = public;
 
 -- Apply trigger to both tables
 DROP TRIGGER IF EXISTS update_banner_stats_updated_at ON banner_stats;

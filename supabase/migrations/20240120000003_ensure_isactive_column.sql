@@ -39,7 +39,8 @@ BEGIN
     -- Return true if a row was updated, false otherwise
     RETURN rows_updated > 0;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
 -- 3. Ensure get_banners_simple includes isActive
 -- Drop and recreate to change return type
@@ -69,14 +70,13 @@ BEGIN
     WHERE sb."userId" = user_id
     ORDER BY sb."createdAt" DESC;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public;
 
--- Grant permissions
+-- Grant permissions (no anon — SECURITY DEFINER functions bypass RLS)
 GRANT EXECUTE ON FUNCTION toggle_banner_active(TEXT, TEXT, BOOLEAN) TO authenticated;
-GRANT EXECUTE ON FUNCTION toggle_banner_active(TEXT, TEXT, BOOLEAN) TO anon;
 GRANT EXECUTE ON FUNCTION toggle_banner_active(TEXT, TEXT, BOOLEAN) TO service_role;
 
 GRANT EXECUTE ON FUNCTION get_banners_simple(TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION get_banners_simple(TEXT) TO anon;
 GRANT EXECUTE ON FUNCTION get_banners_simple(TEXT) TO service_role;
 
