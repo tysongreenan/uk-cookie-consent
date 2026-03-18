@@ -256,24 +256,33 @@ export default function AnalyticsPage() {
                   <CardDescription>Daily consent decisions over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={stats}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="date" 
-                        tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="accepts" stroke="#10b981" name="Accepts" strokeWidth={2} />
-                      <Line type="monotone" dataKey="rejects" stroke="#ef4444" name="Rejects" strokeWidth={2} />
-                      <Line type="monotone" dataKey="dismisses" stroke="#6b7280" name="Dismisses" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {stats.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={stats}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="date"
+                          tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="accepts" stroke="#10b981" name="Accepts" strokeWidth={2} />
+                        <Line type="monotone" dataKey="rejects" stroke="#ef4444" name="Rejects" strokeWidth={2} />
+                        <Line type="monotone" dataKey="dismisses" stroke="#6b7280" name="Dismisses" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                      <div className="text-center">
+                        <TrendingUp className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">No data yet. Trends will appear once your banner starts receiving traffic.</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-              
+
               {/* Consent Distribution */}
               <Card>
                 <CardHeader>
@@ -281,37 +290,46 @@ export default function AnalyticsPage() {
                   <CardDescription>Overall user consent patterns</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={[
-                          { name: 'Accepts', value: summary?.accepts || 0, color: '#10b981' },
-                          { name: 'Rejects', value: summary?.rejects || 0, color: '#ef4444' },
-                          { name: 'Dismisses', value: summary?.dismisses || 0, color: '#6b7280' }
-                        ]}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {[
-                          { name: 'Accepts', value: summary?.accepts || 0, color: '#10b981' },
-                          { name: 'Rejects', value: summary?.rejects || 0, color: '#ef4444' },
-                          { name: 'Dismisses', value: summary?.dismisses || 0, color: '#6b7280' }
-                        ].map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {summary && summary.impressions > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Accepts', value: summary.accepts, color: '#10b981' },
+                            { name: 'Rejects', value: summary.rejects, color: '#ef4444' },
+                            { name: 'Dismisses', value: summary.dismisses, color: '#6b7280' }
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {[
+                            { color: '#10b981' },
+                            { color: '#ef4444' },
+                            { color: '#6b7280' }
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                      <div className="text-center">
+                        <Eye className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">No consent data yet. Distribution will appear after users interact with your banner.</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Traffic Impact Analysis */}
             <Card>
               <CardHeader>
@@ -321,27 +339,35 @@ export default function AnalyticsPage() {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold mb-2">📊 Missing Analytics Data</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Your Google Analytics is missing <strong>{summary?.rejects.toLocaleString()} visitors ({summary?.rejectRate}%)</strong> who rejected cookies.
-                    </p>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <p className="text-sm">
-                        <strong>Estimated Traffic Loss:</strong><br />
-                        If your GA shows 10,000 sessions, your actual traffic is likely closer to{' '}
-                        <strong>
-                          {summary?.acceptRate ? Math.round(10000 / (parseFloat(summary.acceptRate) / 100)).toLocaleString() : 'N/A'} visitors
-                        </strong>.
+                    <h3 className="font-semibold mb-2">Missing Analytics Data</h3>
+                    {summary && summary.impressions > 0 ? (
+                      <>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Your Google Analytics is missing <strong>{summary.rejects.toLocaleString()} visitors ({summary.rejectRate}%)</strong> who rejected cookies.
+                        </p>
+                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                          <p className="text-sm">
+                            <strong>Estimated Traffic Loss:</strong><br />
+                            If your GA shows 10,000 sessions, your actual traffic is likely closer to{' '}
+                            <strong>
+                              {parseFloat(summary.acceptRate) > 0 ? Math.round(10000 / (parseFloat(summary.acceptRate) / 100)).toLocaleString() : 'N/A'} visitors
+                            </strong>.
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Once your banner collects data, we&apos;ll show you how much traffic your analytics tools are missing due to cookie rejections.
                       </p>
-                    </div>
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">🎯 Optimization Opportunities</h3>
+                    <h3 className="font-semibold mb-2">Optimization Opportunities</h3>
                     <ul className="text-sm text-muted-foreground space-y-2">
-                      <li>• Consider A/B testing different banner copy</li>
-                      <li>• Try different positioning (top vs bottom)</li>
-                      <li>• Test different button colors and text</li>
-                      <li>• Add a "Learn More" link for transparency</li>
+                      <li>Consider A/B testing different banner copy</li>
+                      <li>Try different positioning (top vs bottom)</li>
+                      <li>Test different button colors and text</li>
+                      <li>Add a &quot;Learn More&quot; link for transparency</li>
                     </ul>
                   </div>
                 </div>
@@ -368,10 +394,10 @@ function StatCard({
   color?: 'blue' | 'green' | 'red' | 'purple'
 }) {
   const colors = {
-    blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    green: 'bg-green-50 border-green-200 text-green-700',
-    red: 'bg-red-50 border-red-200 text-red-700',
-    purple: 'bg-purple-50 border-purple-200 text-purple-700'
+    blue: 'bg-blue-500/10 text-blue-500',
+    green: 'bg-green-500/10 text-green-500',
+    red: 'bg-red-500/10 text-red-500',
+    purple: 'bg-purple-500/10 text-purple-500'
   }
   
   return (
@@ -383,7 +409,7 @@ function StatCard({
           </div>
           <span className="text-3xl font-bold">{value}</span>
         </div>
-        <p className="text-sm font-medium text-gray-700">{title}</p>
+        <p className="text-sm font-medium text-muted-foreground">{title}</p>
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
       </CardContent>
     </Card>
