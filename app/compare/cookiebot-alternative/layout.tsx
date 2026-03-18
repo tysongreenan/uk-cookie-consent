@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Best Cookiebot Alternative 2026 — Free Plan + $99 Pro | Cookie-Banner.ca',
-  description: 'Looking for a Cookiebot alternative? Compare Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Full pricing breakdown, feature matrix, and migration guide. Switch in 5 minutes.',
-  keywords: 'cookiebot alternative, cookiebot alternatives, alternatives to cookiebot, cookiebot pricing, cookiebot shopify, cookiebot vs complianz, cookiebot vs cookieyes, cookiebot free, best cookiebot alternative 2026, cookiebot competitor, free cookiebot alternative',
+  title: '7 Best Cookiebot Alternatives in 2026 (Free Options)',
+  description: 'Compare the best Cookiebot alternatives with pricing, features & migration guides. Switch to a faster, cheaper cookie banner in 5 minutes. Free plan available.',
+  keywords: 'cookiebot alternative, cookiebot alternatives, alternatives to cookiebot, cookiebot pricing, cookiebot shopify, cookiebot vs complianz, cookiebot vs cookieyes, cookiebot free, best cookiebot alternative 2026, cookiebot competitor, free cookiebot alternative, cookiebot alternative free, cookiebot alternative wordpress, cookiebot cost, cookiebot pricing plans, cookiebot price, cookiebot preise, cookiebot kosten',
   openGraph: {
-    title: 'Best Cookiebot Alternative 2026 — Free Plan + $99 One-Time Pro',
-    description: 'Full comparison: Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Pricing breakdown, feature matrix, platform integrations. Switch in 5 minutes.',
+    title: '7 Best Cookiebot Alternatives in 2026 (Free Options)',
+    description: 'Full comparison: Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Pricing breakdown, feature matrix. Switch in 5 minutes.',
     type: 'article',
   },
   alternates: {

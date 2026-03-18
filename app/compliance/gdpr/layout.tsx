@@ -1,15 +1,15 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'GDPR Cookie Consent Requirements | 2026 Guide',
+  title: 'GDPR Cookie Consent: Complete 2026 Guide',
   description:
-    'What does GDPR require for cookie consent? Complete checklist: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights. Stay compliant.',
+    'Everything you need for GDPR cookie compliance: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights. Free checklist & banner setup.',
   keywords:
-    'gdpr cookie consent requirements, gdpr cookie banner, do i need cookie consent for gdpr, gdpr cookie compliance checklist',
+    'gdpr cookie consent, gdpr cookie compliance, gdpr cookie consent requirements, gdpr cookies, gdpr cookie banner, gdpr cookie requirements, cookie consent gdpr, gdpr cookie policy, gdpr compliant cookie banner, eu cookie compliance, gdpr and cookies',
   openGraph: {
-    title: 'GDPR Cookie Consent Requirements | 2026 Guide',
+    title: 'GDPR Cookie Consent: Complete 2026 Guide',
     description:
-      'What does GDPR require for cookie consent? Complete checklist: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights.',
+      'Everything you need for GDPR cookie compliance: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights.',
     type: 'article',
   },
   alternates: {

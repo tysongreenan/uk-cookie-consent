@@ -5,12 +5,12 @@ import { FeaturePageLayout } from '@/components/features/feature-page-layout'
 import { ModernFeaturesSection, ComplianceSkeleton } from '@/components/landing/modern-features-section'
 
 export const metadata: Metadata = {
-  title: 'What Privacy Laws Does This Cookie Banner Cover? | Multi-Jurisdiction Compliance',
-  description: 'Our cookie banner covers GDPR (EU), PIPEDA, CASL, Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California). One banner, full multi-jurisdiction compliance.',
-  keywords: 'what privacy laws does cookie banner cover, cookie consent laws covered, GDPR PIPEDA cookie banner, multi-jurisdiction cookie consent, cookie banner privacy laws, cookie consent compliance laws',
+  title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
+  description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location and applies the right rules. Free plan.',
+  keywords: 'cookie consent laws, cookie banner privacy laws, GDPR PIPEDA cookie banner, multi-jurisdiction cookie consent, cookie consent compliance, cookie compliance, eu cookie compliance',
   openGraph: {
-    title: 'What Privacy Laws Does This Cookie Banner Cover? | Multi-Jurisdiction Compliance',
-    description: 'Our cookie banner covers GDPR (EU), PIPEDA, CASL, Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California). One banner, full multi-jurisdiction compliance.',
+    title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
+    description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location.',
     type: 'article',
   },
 }

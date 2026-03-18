@@ -10,8 +10,8 @@ import { CookieScanner } from './cookie-scanner'
 import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight, Globe, Eye, Search } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Scanner Tool | Website Cookie Audit & Checker',
-  description: 'Free cookie scanner tool to audit any website for cookies in 30 seconds. Best cookie audit tool for GDPR, CCPA & PIPEDA compliance. No signup. Scan cookies now.',
+  title: 'Free Cookie Scanner — Audit Any Website in Seconds',
+  description: 'Scan any website for cookies in 30 seconds — free, no signup. Find tracking cookies, check GDPR/CCPA compliance, and get a full cookie audit report instantly.',
   keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner',
   openGraph: {
     title: 'Free Cookie Scanner Tool | Scan & Audit Website Cookies',

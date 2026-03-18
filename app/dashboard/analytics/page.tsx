@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { createClient } from '@supabase/supabase-js'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -35,11 +34,6 @@ import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature } from '@/lib/plan-restrictions'
-
-const supabase = createClient(
-  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
-)
 
 interface BannerStats {
   id: string
@@ -78,54 +72,35 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (session) {
       fetchUserPlan()
-      fetchAnalytics()
-      checkAnalyticsStatus()
+      fetchAnalyticsData()
     }
   }, [session])
-  
+
   async function fetchUserPlan() {
     if (!session?.user) return
 
     const planTier = (session.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
     setUserPlan(planTier)
   }
-  
-  async function fetchAnalytics() {
+
+  async function fetchAnalyticsData() {
     if (!session?.user?.id) return
-    
+
     try {
-      // Fetch last 30 days
-      const { data, error } = await supabase
-        .from('banner_stats')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .order('date', { ascending: true })
-        .limit(30)
-      
-      if (data) {
-        setStats(data)
-        calculateSummary(data)
+      const res = await fetch('/api/analytics')
+      if (!res.ok) throw new Error('Failed to fetch analytics')
+
+      const data = await res.json()
+
+      if (data.stats) {
+        setStats(data.stats)
+        calculateSummary(data.stats)
       }
+      setAnalyticsEnabled(data.analyticsEnabled || false)
     } catch (error) {
       console.error('Error fetching analytics:', error)
     } finally {
       setLoading(false)
-    }
-  }
-  
-  async function checkAnalyticsStatus() {
-    if (!session?.user?.id) return
-    
-    try {
-      const { data } = await supabase
-        .from('User')
-        .select('analytics_enabled')
-        .eq('id', session.user.id)
-        .single()
-      
-      setAnalyticsEnabled(data?.analytics_enabled || false)
-    } catch (error) {
-      console.error('Error checking analytics status:', error)
     }
   }
   
@@ -155,17 +130,18 @@ export default function AnalyticsPage() {
   
   async function toggleAnalytics() {
     if (!session?.user?.id) return
-    
+
     try {
       const newStatus = !analyticsEnabled
-      
-      const { error } = await supabase
-        .from('User')
-        .update({ analytics_enabled: newStatus })
-        .eq('id', session.user.id)
-      
-      if (error) throw error
-      
+
+      const res = await fetch('/api/analytics', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: newStatus })
+      })
+
+      if (!res.ok) throw new Error('Failed to update analytics settings')
+
       setAnalyticsEnabled(newStatus)
       toast.success(`Analytics ${newStatus ? 'enabled' : 'disabled'}`)
     } catch (error) {

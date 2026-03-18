@@ -426,13 +426,16 @@ export function TeamSettings() {
       )}
 
       {/* Invite Modal */}
-      <InviteMemberModal
-        onClose={() => setShowInviteModal(false)}
-        onSuccess={() => {
-          setShowInviteModal(false)
-          fetchTeamData()
-        }}
-      />
+      {showInviteModal && (
+        <InviteMemberModal
+          open={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          onSuccess={() => {
+            setShowInviteModal(false)
+            fetchTeamData()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -30,11 +30,12 @@ import { toast } from 'react-hot-toast'
 import { TeamRole } from '@/types'
 
 interface InviteMemberModalProps {
+  open?: boolean
   onClose: () => void
   onSuccess: () => void
 }
 
-export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps) {
+export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMemberModalProps) {
   const { data: session } = useSession()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Exclude<TeamRole, 'owner'>>('editor')
@@ -132,7 +133,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
 
   if (inviteSent) {
     return (
-      <Dialog open onOpenChange={onClose}>
+      <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
@@ -195,7 +196,7 @@ export function InviteMemberModal({ onClose, onSuccess }: InviteMemberModalProps
   }
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">

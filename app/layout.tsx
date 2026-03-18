@@ -18,10 +18,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Cookie Banner Generator — Free & GDPR Compliant | Cookie-Banner.ca',
-    template: '%s | Cookie Banner Generator'
+    default: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
+    template: '%s'
   },
-  description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Quebec Law 25 compliant. Works on WordPress, Shopify & any site. No coding needed. Used by 1,000+ websites.',
+  description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/favicon.svg',
@@ -34,6 +34,8 @@ export const metadata: Metadata = {
     'free cookie banner generator',
     'cookie banner',
     'cookie consent banner',
+    'cookie banner for website',
+    'cookie consent banner generator',
     'law 25 cookie banner',
     'GDPR cookie banner',
     'PIPEDA cookie banner',
@@ -41,20 +43,23 @@ export const metadata: Metadata = {
     'cookie banner Canada',
     'cookie consent generator',
     'free cookie consent banner',
+    'free cookie banner',
+    'cookie banners',
+    'cookie consent',
   ],
   verification: {
     google: 'A3HHfv-cqaYqh6td64AMTu4v8TT8xuLZmpBQh2zWvBY',
   },
   openGraph: {
-    title: 'Cookie Banner Generator — Free & GDPR Compliant',
-    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Works on any site. No coding needed.',
+    title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
+    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on any site. No code needed.',
     type: 'website',
     locale: 'en_CA',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cookie Banner Generator — Free & GDPR Compliant',
-    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Used by 1,000+ websites.',
+    title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
+    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Used by 1,000+ websites.',
   },
   robots: {
     index: true,

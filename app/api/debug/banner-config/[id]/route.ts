@@ -6,7 +6,7 @@ import { migrateBannerConfig, needsMigration } from '@/lib/banner-migration'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
 )
 
 export async function GET(

@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Webflow Cookie Banner — Add GDPR Consent in 3 Min',
-  description: 'Add a GDPR-compliant cookie banner to Webflow with 1 script tag in Project Settings. Under 10KB, $99 one-time, works with every Webflow site plan. Step-by-step guide.',
-  keywords: 'webflow cookie banner, webflow cookie consent, webflow gdpr, how to add cookie banner to webflow, webflow custom code cookie consent',
+  title: 'Webflow Cookie Banner: Free GDPR Setup (2026)',
+  description: 'Add a cookie banner to Webflow in 3 minutes. GDPR compliant, under 10KB, works with every site plan. Free plan available. Just paste one script tag.',
+  keywords: 'webflow cookie banner, webflow cookie consent, cookie banner webflow, cookie consent webflow, webflow gdpr, webflow cookies, webflow gdpr compliance, webflow cookie consent free, webflow cookie consent banner, webflow cookie banner template',
   openGraph: {
-    title: 'Webflow Cookie Banner — Add GDPR Consent in 3 Min',
-    description: 'Add a GDPR-compliant cookie banner to Webflow with 1 script tag in Project Settings. Under 10KB, $99 one-time.',
+    title: 'Webflow Cookie Banner: Free GDPR Setup (2026)',
+    description: 'Add a cookie banner to Webflow in 3 minutes. GDPR compliant, under 10KB. Free plan available.',
     type: 'article',
   },
   alternates: {

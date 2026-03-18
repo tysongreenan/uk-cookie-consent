@@ -9,11 +9,16 @@ published: true
 canonical: "/blog/pipeda-compliance-checklist"
 keywords:
   - "pipeda compliance checklist"
+  - "pipeda compliance"
+  - "pipeda checklist"
   - "pipeda requirements 2026"
   - "canadian privacy law checklist"
   - "pipeda cookie consent"
   - "pipeda privacy policy requirements"
   - "pipeda website compliance"
+  - "pipeda compliance requirements"
+  - "pipeda compliant"
+  - "pipeda compliance authentication"
 schema:
   "@context": "https://schema.org"
   "@type": "FAQPage"

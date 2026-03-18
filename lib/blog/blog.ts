@@ -52,6 +52,7 @@ export interface BlogPost {
   author: string
   image?: string
   tags: string[]
+  keywords?: string[]
   content: string
   readingTime: string
   published: boolean
@@ -141,6 +142,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       content: contentHtml,
       readingTime: stats.text,
       published: data.published !== false,
+      keywords: data.keywords || undefined,
       canonical: data.canonical || undefined,
       schema: data.schema || null,
     }

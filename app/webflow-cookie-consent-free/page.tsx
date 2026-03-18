@@ -19,12 +19,12 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2026',
-  description: 'Free Webflow cookie consent banner. GDPR, PIPEDA, CCPA compliant. No coding required. Copy-paste integration with Webflow Designer.',
-  keywords: 'webflow cookie consent free, webflow gdpr free, webflow cookie banner free, webflow privacy compliance free, webflow cookie consent generator',
+  title: 'Free Webflow Cookie Consent Banner (2026)',
+  description: 'Add a free GDPR-compliant cookie banner to Webflow in 2 minutes. No code required — just copy and paste. Works with Webflow Designer and custom domains.',
+  keywords: 'webflow cookie consent, webflow cookie banner, cookie consent webflow, webflow gdpr, free cookie consent webflow, webflow cookie consent free, cookie banner webflow, webflow cookies, webflow cookie consent banner, webflow gdpr compliance, cookie consent webflow free, webflow cookie consent banner gdpr',
   openGraph: {
-    title: 'Webflow Cookie Consent Free | GDPR Compliant Banner Generator 2026',
-    description: 'Free Webflow cookie consent banner. GDPR, PIPEDA, CCPA compliant. No coding required.',
+    title: 'Free Webflow Cookie Consent Banner (2026)',
+    description: 'Add a free GDPR-compliant cookie banner to Webflow in 2 minutes. No code, no plugins. Copy-paste setup.',
     type: 'website',
   },
   alternates: {

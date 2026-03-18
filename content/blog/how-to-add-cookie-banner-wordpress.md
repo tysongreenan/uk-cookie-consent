@@ -1,11 +1,22 @@
 ---
-title: "How Do I Add a Cookie Banner to WordPress?"
-description: "Add a GDPR and PIPEDA compliant cookie banner to WordPress in 10 minutes. Step-by-step guide with no coding required. Works with any WordPress theme."
+title: "How to Add a Cookie Banner to WordPress (Free, No Plugin)"
+description: "Add a GDPR-compliant cookie banner to WordPress in under 5 minutes — no plugin required. Free setup guide with screenshots. Works with any WordPress theme."
 date: "2025-01-16"
-updatedDate: "2025-05-01"
+updatedDate: "2026-03-16"
 author: "cookie-banner-team"
-tags: ["WordPress", "Cookie Banner", "GDPR", "PIPEDA", "Tutorial"]
+tags: ["WordPress", "Cookie Banner", "GDPR", "PIPEDA", "Tutorial", "How-To"]
 published: true
+canonical: "/blog/how-to-add-cookie-banner-wordpress"
+keywords:
+  - "cookie banner wordpress"
+  - "wordpress cookie banner"
+  - "how to add cookie banner wordpress"
+  - "wordpress cookie banner plugin"
+  - "cookie banner wordpress free"
+  - "wordpress cookie consent"
+  - "wordpress cookie banner designing"
+  - "cookie banner integration with wordpress"
+  - "wordpress cookiebanner"
 ---
 
 # How Do I Add a Cookie Banner to WordPress?

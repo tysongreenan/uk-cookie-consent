@@ -13,8 +13,8 @@ import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 import { ProductDescription } from '@/components/landing/product-description' 
 
 export const metadata: Metadata = {
-  title: 'Cookie Banner Generator — Free & GDPR Compliant | Cookie-Banner.ca',
-  description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Quebec Law 25 compliant. Works on WordPress, Shopify & any site. No coding needed. Used by 1,000+ websites.',
+  title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
+  description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
   keywords: [
     'cookie banner generator',
     'cookie banner generator free',
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     'cookie banner',
     'cookie consent banner',
     'cookie consent banner generator',
+    'cookie banner for website',
     'GDPR cookie banner',
     'PIPEDA cookie banner',
     'CCPA cookie banner',
@@ -30,11 +31,15 @@ export const metadata: Metadata = {
     'cookie banner Shopify',
     'cookie banner Webflow',
     'free cookie consent banner',
+    'free cookie banner',
     'cookie banner Canada',
+    'cookie banners',
+    'cookie consent',
+    'custom cookie banner',
   ],
   openGraph: {
-    title: 'Cookie Banner Generator — Free & GDPR Compliant',
-    description: 'Generate cookie consent banners for free. GDPR, PIPEDA, CCPA & Law 25 compliant. Works on any site. No coding needed.',
+    title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
+    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on any site. No code needed.',
     type: 'website',
   },
   alternates: {

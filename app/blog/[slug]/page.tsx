@@ -43,6 +43,7 @@ export async function generateMetadata({
   return {
     title: `${post.title} | Cookie-Banner.ca`,
     description: post.description,
+    ...(post.keywords && { keywords: post.keywords.join(', ') }),
     authors: [{ name: post.author }],
     alternates: {
       canonical: post.canonical || `/blog/${params.slug}`,

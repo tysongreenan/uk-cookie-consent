@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge'
 import { Code, Database, Shield, Zap, Users, Globe, BarChart3, CheckCircle, AlertTriangle, ExternalLink, Download, Settings } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'SaaS Cookie Consent | B2B Privacy Compliance Solution 2025',
-  description: 'Complete SaaS cookie consent solution for B2B software companies. Multi-tenant compliance, API-first consent management, developer SDKs, enterprise authentication integration.',
-  keywords: 'saas gdpr compliance, b2b cookie consent, software privacy compliance, multi-tenant consent management, enterprise cookie consent',
+  title: 'Cookie Consent for SaaS — Free GDPR Solution (2026)',
+  description: 'Add cookie consent to your SaaS app in minutes. GDPR, CCPA & PIPEDA compliant. Multi-tenant support, developer API, and lightweight script under 10KB.',
+  keywords: 'cookie consent for saas, saas gdpr compliance, b2b cookie consent, software privacy compliance, multi-tenant consent management, enterprise cookie consent, saas cookie consent',
   openGraph: {
-    title: 'SaaS Cookie Consent | B2B Privacy Compliance Solution 2025',
-    description: 'Complete SaaS cookie consent solution for B2B software companies. Multi-tenant compliance, API-first consent management, developer SDKs.',
+    title: 'Cookie Consent for SaaS — Free GDPR Solution',
+    description: 'Add cookie consent to your SaaS app in minutes. GDPR, CCPA & PIPEDA compliant. Multi-tenant support, developer API.',
     type: 'article',
   },
 }
