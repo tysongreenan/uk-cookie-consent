@@ -29,7 +29,6 @@ import {
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
-import { canAccessFeature } from '@/lib/plan-restrictions'
 
 interface BannerStats {
   id: string
@@ -62,21 +61,13 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<BannerStats[]>([])
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
-  const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
-  
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
+
   useEffect(() => {
     if (session) {
-      fetchUserPlan()
       fetchAnalyticsData()
     }
   }, [session])
-
-  async function fetchUserPlan() {
-    if (!session?.user) return
-
-    const planTier = (session.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
-    setUserPlan(planTier)
-  }
 
   async function fetchAnalyticsData() {
     if (!session?.user?.id) return
@@ -86,6 +77,9 @@ export default function AnalyticsPage() {
       if (!res.ok) throw new Error('Failed to fetch analytics')
 
       const data = await res.json()
+
+      // Use the server's determination of analytics access (based on fresh DB planTier)
+      setAnalyticsEnabled(data.analyticsEnabled || false)
 
       if (data.stats) {
         setStats(data.stats)
@@ -122,8 +116,6 @@ export default function AnalyticsPage() {
     })
   }
   
-  const analyticsEnabled = canAccessFeature(userPlan, 'hasInternalAnalytics')
-
   if (loading) {
     return (
       <DashboardLayout>

@@ -17,7 +17,15 @@ export async function GET() {
     }
 
     const userId = session.user.id
-    const planTier = session.user?.planTier || 'free'
+
+    // Query planTier fresh from DB so upgrades take effect immediately
+    const { data: user } = await supabase
+      .from('User')
+      .select('planTier')
+      .eq('id', userId)
+      .single()
+
+    const planTier = user?.planTier || 'free'
     const analyticsEnabled = planTier !== 'free'
 
     if (!analyticsEnabled) {
