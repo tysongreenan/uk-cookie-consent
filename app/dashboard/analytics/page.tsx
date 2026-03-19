@@ -281,8 +281,10 @@ export default function AnalyticsPage() {
       }
 
       if (data.stats) {
-        setStats(data.stats)
-        calculateSummary(data.stats)
+        // Filter out pre-tracking rows with no banner assigned
+        const filtered = data.stats.filter((s: BannerStats) => s.banner_id !== null)
+        setStats(filtered)
+        calculateSummary(filtered)
       } else {
         setStats([])
         setSummary(null)
