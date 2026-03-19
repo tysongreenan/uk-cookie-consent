@@ -217,6 +217,11 @@ export async function GET(request: NextRequest) {
     // Build internal analytics tracking code (only when analytics is enabled)
     // Analytics is automatically enabled for pro/enterprise plans
     const analyticsUserId = (ownerPlanTier !== 'free') ? (bannerUserId || '') : ''
+    if (!analyticsUserId) {
+      console.log(`[BANNER] Analytics disabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
+    } else {
+      console.log(`[BANNER] Analytics enabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
+    }
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     const internalAnalyticsJs = `
   // Internal Analytics Tracking
@@ -228,7 +233,15 @@ export async function GET(request: NextRequest) {
   var _cbFlushTimer = null;
 
   function _cbQueueEvent(type, extra) {
-    if (!_cbAnalyticsUserId) return;
+    if (!_cbAnalyticsUserId) {
+      console.debug('[CookieBanner] Analytics skipped: no userId (free plan or missing owner)');
+      return;
+    }
+    if (!_cbAnalyticsBannerId) {
+      console.warn('[CookieBanner] Analytics skipped: no bannerId');
+      return;
+    }
+    console.debug('[CookieBanner] Queuing event:', type, 'banner:', _cbAnalyticsBannerId);
     var evt = { type: type };
     if (extra) {
       if (extra.decisionTime) evt.decisionTime = extra.decisionTime;
@@ -259,7 +272,9 @@ export async function GET(request: NextRequest) {
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(payload);
       }
-    } catch(e) {}
+    } catch(e) {
+      console.error('[CookieBanner] Failed to send analytics:', e);
+    }
   }
 
   // Flush remaining events when page unloads

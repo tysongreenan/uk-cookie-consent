@@ -109,9 +109,9 @@ export async function POST(request: NextRequest) {
       })
 
       if (rpcError) {
-        console.error('[TRACK] RPC failed:', { userId, event: event.type, error: rpcError.message })
+        console.error('[TRACK] RPC failed:', { userId, bannerId: safeBannerId, event: event.type, error: rpcError.message, code: rpcError.code, details: rpcError.details })
       } else {
-        console.log('[TRACK] Recorded:', { userId, event: event.type, date: today })
+        console.log('[TRACK] Recorded:', { userId, bannerId: safeBannerId, event: event.type, date: today })
       }
     }
 
