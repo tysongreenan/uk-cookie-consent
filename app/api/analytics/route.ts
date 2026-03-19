@@ -60,10 +60,16 @@ export async function GET(request: NextRequest) {
     if (statsResult.error) {
       console.error('Error fetching banner stats:', statsResult.error)
     }
+    if (bannersResult.error) {
+      console.error('Error fetching banners:', bannersResult.error)
+    }
 
     // Extract GA4 status from each banner's config
     const banners = (bannersResult.data || []).map((b: any) => {
-      const config = typeof b.config === 'string' ? JSON.parse(b.config) : b.config
+      let config: any = null
+      try {
+        config = typeof b.config === 'string' ? JSON.parse(b.config) : b.config
+      } catch { /* malformed config — treat as no GA4 */ }
       const ga4 = config?.integrations?.googleAnalytics
       return {
         id: b.id,

@@ -273,7 +273,10 @@ export default function AnalyticsPage() {
   }, [selectedBanner, banners])
 
   async function fetchAnalyticsData(isRefresh = false) {
-    if (!session?.user?.id) return
+    if (!session?.user?.id) {
+      if (isRefresh) setRefreshing(false)
+      return
+    }
     if (isRefresh) setRefreshing(true)
 
     try {
@@ -551,7 +554,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="flex flex-col items-start md:items-end gap-2 md:pt-1">
                           <Link
-                            href="/dashboard"
+                            href={bannersWithoutGa4.length === 1 ? `/dashboard/builder?id=${bannersWithoutGa4[0].id}` : '/dashboard/builder'}
                             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
                           >
                             Configure GA4
