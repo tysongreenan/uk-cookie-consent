@@ -11,6 +11,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasCustomLayouts: false,
     hasImageUpload: false,
     hasBrandingRemoval: false,
+    hasBenchmarkInsights: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
   },
@@ -24,6 +25,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasCustomLayouts: true,
     hasImageUpload: true,
     hasBrandingRemoval: true,
+    hasBenchmarkInsights: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'priority'
   },
@@ -37,6 +39,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasCustomLayouts: true,
     hasImageUpload: true,
     hasBrandingRemoval: true,
+    hasBenchmarkInsights: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'dedicated'
   }
@@ -58,6 +61,8 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasGA4Integration
     case 'hasBrandingRemoval':
       return features.hasBrandingRemoval
+    case 'hasBenchmarkInsights':
+      return features.hasBenchmarkInsights
     case 'maxWebsites':
       return features.maxWebsites === 'unlimited' || features.maxWebsites > 0
     case 'maxBanners':

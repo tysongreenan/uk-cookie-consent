@@ -398,6 +398,7 @@ export interface PlanFeatures {
   hasCustomLayouts: boolean
   hasImageUpload: boolean
   hasBrandingRemoval: boolean
+  hasBenchmarkInsights: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'dedicated'
 }

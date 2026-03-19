@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -33,10 +33,20 @@ import {
   AlertTriangle,
   ArrowUpRight,
   X,
+  Globe,
+  Monitor,
+  Smartphone,
+  Tablet,
+  FileText,
+  Users,
+  Trophy,
+  Lock,
 } from 'lucide-react'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { HelpCircle } from 'lucide-react'
 
 interface BannerStats {
   id: string
@@ -70,6 +80,31 @@ interface AnalyticsSummary {
   decisionCount: number
 }
 
+interface DimensionData {
+  value: string
+  impressions: number
+  accepts: number
+  rejects: number
+  dismisses: number
+}
+
+interface BenchmarkData {
+  platform: {
+    totalUsers: number
+    avgAcceptRate: number
+    avgRejectRate: number
+    avgDismissRate: number
+    avgDecisionTimeMs: number | null
+  } | null
+  user: {
+    acceptRate: number
+    rejectRate: number
+    dismissRate: number
+    avgDecisionTimeMs: number | null
+  }
+  insights: { metric: string; direction: 'above' | 'below'; diff: number }[]
+}
+
 type ComparisonMetric = 'impressions' | 'acceptRate' | 'rejectRate' | 'dismissRate' | 'avgDecisionTime'
 
 const METRIC_OPTIONS: { value: ComparisonMetric; label: string; suffix: string }[] = [
@@ -80,8 +115,8 @@ const METRIC_OPTIONS: { value: ComparisonMetric; label: string; suffix: string }
   { value: 'avgDecisionTime', label: 'Avg Decision Time', suffix: 's' },
 ]
 
-// Brand-aligned chart colors that work in both light and dark mode
-const CHART_COLORS = {
+// Brand-aligned chart colors — light/dark pairs
+const CHART_COLORS_LIGHT = {
   accept: '#0E768C',     // brand teal
   reject: '#d97757',     // brand orange accent
   dismiss: '#b0aea5',    // brand mid gray
@@ -89,6 +124,32 @@ const CHART_COLORS = {
   secondary: '#6a9bcc',  // brand blue accent
   tertiary: '#788c5d',   // brand green accent
 }
+const CHART_COLORS_DARK = {
+  accept: '#3AAFCA',
+  reject: '#E89A82',
+  dismiss: '#c4c2ba',
+  primary: '#3AAFCA',
+  secondary: '#8DB8E0',
+  tertiary: '#9BB377',
+}
+
+function useChartColors() {
+  const [isDark, setIsDark] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    // Also check for the class-based dark mode
+    const check = () => setIsDark(mq.matches || document.documentElement.classList.contains('dark'))
+    check()
+    mq.addEventListener('change', check)
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => { mq.removeEventListener('change', check); observer.disconnect() }
+  }, [])
+  return isDark ? CHART_COLORS_DARK : CHART_COLORS_LIGHT
+}
+
+// Static fallback for non-hook contexts
+const CHART_COLORS = CHART_COLORS_LIGHT
 
 // Custom tooltip component for polished chart tooltips
 function ChartTooltip({ active, payload, label, formatter }: any) {
@@ -127,18 +188,18 @@ export default function AnalyticsPage() {
   const [banners, setBanners] = useState<BannerOption[]>([])
   const [selectedBanner, setSelectedBanner] = useState<string>('all')
   const [comparisonMetric, setComparisonMetric] = useState<ComparisonMetric>('impressions')
+  const [dimensions, setDimensions] = useState<Record<string, DimensionData[]>>({})
+  const [dimensionsLoading, setDimensionsLoading] = useState(false)
+  const [benchmarks, setBenchmarks] = useState<BenchmarkData | null>(null)
+  const [benchmarksLoading, setBenchmarksLoading] = useState(false)
+  const chartColors = useChartColors()
 
   useEffect(() => {
     if (session) {
       fetchAnalyticsData()
     }
-  }, [session])
-
-  useEffect(() => {
-    if (session && analyticsEnabled) {
-      fetchAnalyticsData()
-    }
-  }, [selectedBanner])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, selectedBanner])
 
   // Compute per-banner comparison data from raw stats
   const bannerComparisonData = useMemo(() => {
@@ -163,13 +224,13 @@ export default function AnalyticsPage() {
     return Array.from(bannerMap.entries())
       .map(([bid, data]) => {
         const name = bannerNameMap.get(bid) || 'Pre-tracking data'
-        const imp = data.impressions || 1 // avoid division by zero
+        const hasImpressions = data.impressions > 0
         return {
           name,
           impressions: data.impressions,
-          acceptRate: parseFloat((data.accepts / imp * 100).toFixed(1)),
-          rejectRate: parseFloat((data.rejects / imp * 100).toFixed(1)),
-          dismissRate: parseFloat((data.dismisses / imp * 100).toFixed(1)),
+          acceptRate: hasImpressions ? parseFloat((data.accepts / data.impressions * 100).toFixed(1)) : 0,
+          rejectRate: hasImpressions ? parseFloat((data.rejects / data.impressions * 100).toFixed(1)) : 0,
+          dismissRate: hasImpressions ? parseFloat((data.dismisses / data.impressions * 100).toFixed(1)) : 0,
           avgDecisionTime: data.decisionCount > 0 ? parseFloat((data.totalDecisionTime / data.decisionCount / 1000).toFixed(1)) : 0,
         }
       })
@@ -202,7 +263,8 @@ export default function AnalyticsPage() {
 
       const data = await res.json()
 
-      setAnalyticsEnabled(data.analyticsEnabled || false)
+      const isEnabled = data.analyticsEnabled || false
+      setAnalyticsEnabled(isEnabled)
 
       if (data.banners) {
         setBanners(data.banners)
@@ -215,10 +277,51 @@ export default function AnalyticsPage() {
         setStats([])
         setSummary(null)
       }
+
+      // Lazy-load dimensions and benchmarks for pro users
+      if (isEnabled) {
+        fetchDimensions()
+        fetchBenchmarks()
+      }
     } catch (error) {
       console.error('Error fetching analytics:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function fetchDimensions() {
+    if (!session?.user?.id) return
+    setDimensionsLoading(true)
+    try {
+      const dims = ['source', 'device', 'country', 'page_path']
+      const bannerParam = selectedBanner !== 'all' ? `&bannerId=${selectedBanner}` : ''
+      const results = await Promise.all(
+        dims.map(d => fetch(`/api/analytics/dimensions?dimension=${d}${bannerParam}`).then(r => r.json()))
+      )
+      const map: Record<string, DimensionData[]> = {}
+      dims.forEach((d, i) => { map[d] = results[i].data || [] })
+      setDimensions(map)
+    } catch (error) {
+      console.error('Error fetching dimensions:', error)
+    } finally {
+      setDimensionsLoading(false)
+    }
+  }
+
+  async function fetchBenchmarks() {
+    if (!session?.user?.id) return
+    setBenchmarksLoading(true)
+    try {
+      const res = await fetch('/api/analytics/benchmarks')
+      if (res.ok) {
+        const data = await res.json()
+        setBenchmarks(data)
+      }
+    } catch (error) {
+      console.error('Error fetching benchmarks:', error)
+    } finally {
+      setBenchmarksLoading(false)
     }
   }
 
@@ -266,6 +369,7 @@ export default function AnalyticsPage() {
 
   return (
     <DashboardLayout>
+      <TooltipProvider delayDuration={200}>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
@@ -274,7 +378,7 @@ export default function AnalyticsPage() {
         ]} />
 
         {/* Header */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-heading font-bold tracking-tight">Analytics</h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -292,6 +396,7 @@ export default function AnalyticsPage() {
               <div className="relative">
                 <select
                   id="banner-filter"
+                  aria-label="Filter by banner"
                   value={selectedBanner}
                   onChange={(e) => setSelectedBanner(e.target.value)}
                   className="appearance-none rounded-md border border-border bg-card pl-3 pr-8 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
@@ -322,6 +427,7 @@ export default function AnalyticsPage() {
                 value={summary?.impressions.toLocaleString() || '0'}
                 icon={<Eye className="h-5 w-5" />}
                 color="teal"
+                tooltip="The number of times your cookie banner was shown to visitors. Each page load where the banner appears counts as one impression."
               />
               <StatCard
                 title="Accept Rate"
@@ -329,6 +435,7 @@ export default function AnalyticsPage() {
                 subtitle={`${summary?.accepts.toLocaleString() || 0} accepts`}
                 icon={<CheckCircle className="h-5 w-5" />}
                 color="green"
+                tooltip="Percentage of visitors who clicked 'Accept'. Calculated as accepts divided by total impressions."
               />
               <StatCard
                 title="Reject Rate"
@@ -336,12 +443,14 @@ export default function AnalyticsPage() {
                 subtitle={`${summary?.rejects.toLocaleString() || 0} rejects`}
                 icon={<XCircle className="h-5 w-5" />}
                 color="orange"
+                tooltip="Percentage of visitors who clicked 'Reject'. These visitors are invisible to analytics tools like Google Analytics."
               />
               <StatCard
                 title="Avg Decision Time"
                 value={`${summary?.avgDecisionTime || 0}s`}
                 icon={<Clock className="h-5 w-5" />}
                 color="blue"
+                tooltip="Average time in seconds between the banner appearing and the visitor making a choice. Lower times usually mean clearer banner copy."
               />
             </div>
 
@@ -354,18 +463,21 @@ export default function AnalyticsPage() {
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                         <BarChart3 className="h-4.5 w-4.5 text-primary" />
                       </div>
-                      <div>
-                        <CardTitle className="text-base">Banner Comparison</CardTitle>
-                        <CardDescription className="text-xs">Performance across your banners</CardDescription>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <CardTitle className="text-base">Banner Comparison</CardTitle>
+                          <CardDescription className="text-xs">Performance across your banners</CardDescription>
+                        </div>
+                        <InfoTooltip text="Compare how each of your banners performs side-by-side. Use the metric toggle to switch between impressions, accept rate, reject rate, dismiss rate, and decision time." />
                       </div>
                     </div>
-                    {/* Metric toggle pills */}
-                    <div className="flex gap-1 flex-wrap">
+                    {/* Metric toggle pills — scrollable on small screens */}
+                    <div className="flex gap-1 overflow-x-auto sm:flex-wrap -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
                       {METRIC_OPTIONS.map((metric) => (
                         <button
                           key={metric.value}
                           onClick={() => setComparisonMetric(metric.value)}
-                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                             comparisonMetric === metric.value
                               ? 'bg-foreground text-background shadow-sm'
                               : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
@@ -411,7 +523,7 @@ export default function AnalyticsPage() {
                       />
                       <Bar
                         dataKey={comparisonMetric}
-                        fill={CHART_COLORS.primary}
+                        fill={chartColors.primary}
                         radius={[0, 6, 6, 0]}
                         maxBarSize={28}
                       />
@@ -430,28 +542,32 @@ export default function AnalyticsPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                       <TrendingUp className="h-4.5 w-4.5 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-base">30-Day Trends</CardTitle>
-                      <CardDescription className="text-xs">Daily consent decisions over time</CardDescription>
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <CardTitle className="text-base">30-Day Trends</CardTitle>
+                        <CardDescription className="text-xs">Daily consent decisions over time</CardDescription>
+                      </div>
+                      <InfoTooltip text="Shows the daily count of accepts, rejects, and dismisses over the last 30 days. Look for trends after changing your banner design or copy." />
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {chartData.length > 0 ? (
+                    <div role="img" aria-label="Area chart showing daily accepts, rejects, and dismisses over the last 30 days">
                     <ResponsiveContainer width="100%" height={300}>
                       <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                         <defs>
                           <linearGradient id="gradAccept" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS.accept} stopOpacity={0.15} />
-                            <stop offset="100%" stopColor={CHART_COLORS.accept} stopOpacity={0} />
+                            <stop offset="0%" stopColor={chartColors.accept} stopOpacity={0.15} />
+                            <stop offset="100%" stopColor={chartColors.accept} stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="gradReject" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS.reject} stopOpacity={0.1} />
-                            <stop offset="100%" stopColor={CHART_COLORS.reject} stopOpacity={0} />
+                            <stop offset="0%" stopColor={chartColors.reject} stopOpacity={0.1} />
+                            <stop offset="100%" stopColor={chartColors.reject} stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="gradDismiss" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS.dismiss} stopOpacity={0.08} />
-                            <stop offset="100%" stopColor={CHART_COLORS.dismiss} stopOpacity={0} />
+                            <stop offset="0%" stopColor={chartColors.dismiss} stopOpacity={0.08} />
+                            <stop offset="100%" stopColor={chartColors.dismiss} stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid
@@ -477,7 +593,7 @@ export default function AnalyticsPage() {
                         <Area
                           type="monotone"
                           dataKey="accepts"
-                          stroke={CHART_COLORS.accept}
+                          stroke={chartColors.accept}
                           strokeWidth={2}
                           fill="url(#gradAccept)"
                           name="Accepts"
@@ -487,7 +603,7 @@ export default function AnalyticsPage() {
                         <Area
                           type="monotone"
                           dataKey="rejects"
-                          stroke={CHART_COLORS.reject}
+                          stroke={chartColors.reject}
                           strokeWidth={2}
                           fill="url(#gradReject)"
                           name="Rejects"
@@ -497,7 +613,7 @@ export default function AnalyticsPage() {
                         <Area
                           type="monotone"
                           dataKey="dismisses"
-                          stroke={CHART_COLORS.dismiss}
+                          stroke={chartColors.dismiss}
                           strokeWidth={2}
                           fill="url(#gradDismiss)"
                           name="Dismisses"
@@ -506,6 +622,7 @@ export default function AnalyticsPage() {
                         />
                       </AreaChart>
                     </ResponsiveContainer>
+                    </div>
                   ) : (
                     <EmptyChartState
                       icon={<TrendingUp className="h-8 w-8" />}
@@ -515,9 +632,9 @@ export default function AnalyticsPage() {
                   {/* Inline legend */}
                   {chartData.length > 0 && (
                     <div className="flex items-center justify-center gap-5 mt-3 pt-3 border-t border-border/50">
-                      <LegendItem color={CHART_COLORS.accept} label="Accepts" />
-                      <LegendItem color={CHART_COLORS.reject} label="Rejects" />
-                      <LegendItem color={CHART_COLORS.dismiss} label="Dismisses" />
+                      <LegendItem color={chartColors.accept} label="Accepts" />
+                      <LegendItem color={chartColors.reject} label="Rejects" />
+                      <LegendItem color={chartColors.dismiss} label="Dismisses" />
                     </div>
                   )}
                 </CardContent>
@@ -530,15 +647,19 @@ export default function AnalyticsPage() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                       <Eye className="h-4.5 w-4.5 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-base">Consent Split</CardTitle>
-                      <CardDescription className="text-xs">Overall distribution</CardDescription>
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <CardTitle className="text-base">Consent Split</CardTitle>
+                        <CardDescription className="text-xs">Overall distribution</CardDescription>
+                      </div>
+                      <InfoTooltip text="The overall breakdown of how visitors respond to your banner. Accepts + rejects + dismisses may not equal 100% since some visitors leave without interacting." />
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-2">
                   {summary && summary.impressions > 0 ? (
                     <>
+                      <div role="img" aria-label="Donut chart showing the split between accepts, rejects, and dismisses">
                       <ResponsiveContainer width="100%" height={220}>
                         <PieChart>
                           <Pie
@@ -555,9 +676,9 @@ export default function AnalyticsPage() {
                             dataKey="value"
                             strokeWidth={0}
                           >
-                            <Cell fill={CHART_COLORS.accept} />
-                            <Cell fill={CHART_COLORS.reject} />
-                            <Cell fill={CHART_COLORS.dismiss} />
+                            <Cell fill={chartColors.accept} />
+                            <Cell fill={chartColors.reject} />
+                            <Cell fill={chartColors.dismiss} />
                           </Pie>
                           <RechartsTooltip
                             content={
@@ -572,22 +693,23 @@ export default function AnalyticsPage() {
                           />
                         </PieChart>
                       </ResponsiveContainer>
+                      </div>
                       {/* Legend below donut */}
                       <div className="flex flex-col gap-2.5 mt-1">
                         <DonutLegendRow
-                          color={CHART_COLORS.accept}
+                          color={chartColors.accept}
                           label="Accepts"
                           value={summary.accepts}
                           pct={summary.acceptRate}
                         />
                         <DonutLegendRow
-                          color={CHART_COLORS.reject}
+                          color={chartColors.reject}
                           label="Rejects"
                           value={summary.rejects}
                           pct={summary.rejectRate}
                         />
                         <DonutLegendRow
-                          color={CHART_COLORS.dismiss}
+                          color={chartColors.dismiss}
                           label="Dismisses"
                           value={summary.dismisses}
                           pct={summary.dismissRate}
@@ -604,6 +726,269 @@ export default function AnalyticsPage() {
               </Card>
             </div>
 
+            {/* Visitor Insights — 2x2 dimension grid */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#6a9bcc]/10">
+                  <Globe className="h-4.5 w-4.5 text-[#6a9bcc]" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div>
+                    <h2 className="text-base font-semibold">Visitor Insights</h2>
+                    <p className="text-xs text-muted-foreground">Where your visitors come from and how they interact</p>
+                  </div>
+                  <InfoTooltip text="Breaks down your consent data by traffic source, device type, country, and page. Collected automatically from each visitor's browser — no cookies or third-party services required." />
+                </div>
+              </div>
+              {dimensionsLoading ? (
+                <div className="flex items-center justify-center h-[200px]">
+                  <div className="relative h-8 w-8">
+                    <div className="absolute inset-0 rounded-full border-2 border-muted" />
+                    <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Traffic Sources */}
+                  <Card className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-1.5">Traffic Sources <InfoTooltip text="Detected from UTM parameters or the referring website. 'Direct' means no referrer was detected (typed URL, bookmarks, or apps)." /></CardTitle>
+                      <CardDescription className="text-xs">Where visitors find your site</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      {(dimensions.source?.length ?? 0) > 0 ? (
+                        <ResponsiveContainer width="100%" height={220}>
+                          <BarChart data={dimensions.source?.slice(0, 8)} layout="vertical" margin={{ left: 4, right: 16, top: 4, bottom: 4 }}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
+                            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+                            <YAxis type="category" dataKey="value" width={80} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(var(--foreground))' }} />
+                            <RechartsTooltip content={<ChartTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }} />
+                            <Bar dataKey="impressions" fill={chartColors.primary} radius={[0, 6, 6, 0]} maxBarSize={24} name="Impressions" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <EmptyChartState icon={<Globe className="h-8 w-8" />} message="Source data will appear as visitors interact with your banner." />
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Device Breakdown */}
+                  <Card className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-1.5">Device Breakdown <InfoTooltip text="Based on screen width: mobile (under 768px), tablet (768-1023px), desktop (1024px+). Helps you optimise banner layout for your most common devices." /></CardTitle>
+                      <CardDescription className="text-xs">Desktop, mobile, and tablet split</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      {(dimensions.device?.length ?? 0) > 0 ? (
+                        <>
+                          <ResponsiveContainer width="100%" height={180}>
+                            <PieChart>
+                              <Pie
+                                data={dimensions.device?.map(d => ({ name: d.value, value: d.impressions }))}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={45}
+                                outerRadius={70}
+                                paddingAngle={3}
+                                dataKey="value"
+                                strokeWidth={0}
+                              >
+                                <Cell fill={chartColors.primary} />
+                                <Cell fill={chartColors.reject} />
+                                <Cell fill={chartColors.dismiss} />
+                              </Pie>
+                              <RechartsTooltip content={<ChartTooltip />} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="flex flex-col gap-2 mt-1">
+                            {dimensions.device?.map((d, i) => {
+                              const colors = [chartColors.primary, chartColors.reject, chartColors.dismiss]
+                              const icons: Record<string, React.ReactNode> = {
+                                desktop: <Monitor className="h-3.5 w-3.5" />,
+                                mobile: <Smartphone className="h-3.5 w-3.5" />,
+                                tablet: <Tablet className="h-3.5 w-3.5" />,
+                              }
+                              return (
+                                <div key={d.value} className="flex items-center justify-between text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: colors[i] || chartColors.dismiss }} />
+                                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                                      {icons[d.value] || null}
+                                      {d.value}
+                                    </span>
+                                  </div>
+                                  <span className="font-medium tabular-nums">{d.impressions.toLocaleString()}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </>
+                      ) : (
+                        <EmptyChartState icon={<Monitor className="h-8 w-8" />} message="Device data will appear as visitors interact with your banner." />
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Top Countries */}
+                  <Card className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-1.5">Top Countries <InfoTooltip text="Approximated from the visitor's browser language setting (e.g. en-GB = GB). This is privacy-friendly but not exact — a visitor with en-US set while abroad will show as US." /></CardTitle>
+                      <CardDescription className="text-xs">Approximate location by browser language</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      {(dimensions.country?.length ?? 0) > 0 ? (
+                        <ResponsiveContainer width="100%" height={220}>
+                          <BarChart data={dimensions.country?.slice(0, 8)} layout="vertical" margin={{ left: 4, right: 16, top: 4, bottom: 4 }}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
+                            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+                            <YAxis type="category" dataKey="value" width={60} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(var(--foreground))' }} />
+                            <RechartsTooltip content={<ChartTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }} />
+                            <Bar dataKey="impressions" fill={chartColors.tertiary} radius={[0, 6, 6, 0]} maxBarSize={24} name="Impressions" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <EmptyChartState icon={<Globe className="h-8 w-8" />} message="Country data will appear as visitors interact with your banner." />
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Top Pages */}
+                  <Card className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-1.5">Top Pages <InfoTooltip text="The pages where visitors see and interact with your banner most. The accept rate per page can help you identify which pages might need different banner copy or positioning." /></CardTitle>
+                      <CardDescription className="text-xs">Pages with the most consent interactions</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      {(dimensions.page_path?.length ?? 0) > 0 ? (
+                        <div className="space-y-2.5">
+                          {dimensions.page_path?.slice(0, 8).map((d, i) => {
+                            const maxImp = dimensions.page_path?.[0]?.impressions || 1
+                            const pct = Math.round((d.impressions / maxImp) * 100)
+                            const acceptRate = d.impressions > 0 ? ((d.accepts / d.impressions) * 100).toFixed(1) : '0'
+                            return (
+                              <div key={d.value} className="space-y-1">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="flex-1 min-w-0 truncate text-foreground font-mono text-xs">{d.value}</span>
+                                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                    <span className="tabular-nums">{d.impressions.toLocaleString()} views</span>
+                                    <span className="tabular-nums text-[#788c5d]">{acceptRate}% accept</span>
+                                  </div>
+                                </div>
+                                <div className="h-1.5 w-full rounded-full bg-muted">
+                                  <div
+                                    className="h-full rounded-full bg-primary/60 transition-all"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <EmptyChartState icon={<FileText className="h-8 w-8" />} message="Page data will appear as visitors interact with your banner." />
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </div>
+
+            {/* Platform Benchmarks */}
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#788c5d]/10">
+                    <Trophy className="h-4.5 w-4.5 text-[#788c5d]" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <CardTitle className="text-base">Platform Benchmarks</CardTitle>
+                      <CardDescription className="text-xs">How you compare to other sites on the platform</CardDescription>
+                    </div>
+                    <InfoTooltip text="Compares your banner's performance against anonymized averages from all sites on the platform. Requires at least 5 active sites for privacy. No individual site data is ever shared." />
+                  </div>
+                  <Badge className="ml-auto bg-primary/10 text-primary border-primary/20 text-xs">Pro</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {benchmarksLoading ? (
+                  <div className="flex items-center justify-center h-[120px]">
+                    <div className="relative h-8 w-8">
+                      <div className="absolute inset-0 rounded-full border-2 border-muted" />
+                      <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                    </div>
+                  </div>
+                ) : benchmarks?.platform ? (
+                  <div className="space-y-5">
+                    {/* Metric comparison grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                      <BenchmarkMetric
+                        label="Accept Rate"
+                        yours={`${benchmarks.user.acceptRate}%`}
+                        platform={`${benchmarks.platform.avgAcceptRate}%`}
+                        better={benchmarks.user.acceptRate >= benchmarks.platform.avgAcceptRate}
+                        tooltip="Higher is better. A higher accept rate means more visitors are opting in to cookies, giving your analytics tools better data coverage."
+                      />
+                      <BenchmarkMetric
+                        label="Reject Rate"
+                        yours={`${benchmarks.user.rejectRate}%`}
+                        platform={`${benchmarks.platform.avgRejectRate}%`}
+                        better={benchmarks.user.rejectRate <= benchmarks.platform.avgRejectRate}
+                        tooltip="Lower is better. Visitors who reject cookies become invisible to analytics tools like Google Analytics."
+                      />
+                      <BenchmarkMetric
+                        label="Dismiss Rate"
+                        yours={`${benchmarks.user.dismissRate}%`}
+                        platform={`${benchmarks.platform.avgDismissRate}%`}
+                        better={benchmarks.user.dismissRate <= benchmarks.platform.avgDismissRate}
+                        tooltip="Lower is better. A dismiss means the visitor closed the banner without making a clear choice. High dismiss rates may indicate confusing banner copy."
+                      />
+                      <BenchmarkMetric
+                        label="Decision Time"
+                        yours={benchmarks.user.avgDecisionTimeMs != null ? `${(benchmarks.user.avgDecisionTimeMs / 1000).toFixed(1)}s` : 'N/A'}
+                        platform={benchmarks.platform.avgDecisionTimeMs != null ? `${(benchmarks.platform.avgDecisionTimeMs / 1000).toFixed(1)}s` : 'N/A'}
+                        better={benchmarks.user.avgDecisionTimeMs != null && benchmarks.platform.avgDecisionTimeMs != null ? benchmarks.user.avgDecisionTimeMs <= benchmarks.platform.avgDecisionTimeMs : false}
+                        tooltip="Lower is better. The average time visitors take to decide. Faster decisions usually mean your banner copy is clear and your buttons are easy to find."
+                      />
+                    </div>
+                    {/* Insight badges */}
+                    {benchmarks.insights.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
+                        {benchmarks.insights.map((insight, i) => (
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className={`text-xs font-medium ${
+                              (insight.metric === 'accept rate' && insight.direction === 'above') ||
+                              (insight.metric !== 'accept rate' && insight.direction === 'below')
+                                ? 'bg-[#788c5d]/10 text-[#788c5d] dark:text-[#9BB377] border-[#788c5d]/20'
+                                : 'bg-[#d97757]/10 text-[#d97757] dark:text-[#E89A82] border-[#d97757]/20'
+                            }`}
+                          >
+                            Your {insight.metric} is {insight.diff}% {insight.direction} average
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Based on anonymized data from {benchmarks.platform.totalUsers} sites over the last 30 days.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-[120px]">
+                    <div className="text-center max-w-[280px]">
+                      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground/40">
+                        <Users className="h-6 w-6" />
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Benchmarks require at least 5 active sites on the platform. Check back soon.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Traffic Impact Analysis */}
             <Card className="overflow-hidden">
               <CardHeader className="pb-4">
@@ -611,9 +996,12 @@ export default function AnalyticsPage() {
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[hsl(var(--accent-warm))]/10">
                     <AlertTriangle className="h-4.5 w-4.5 text-[hsl(var(--accent-warm))]" />
                   </div>
-                  <div>
-                    <CardTitle className="text-base">Traffic Impact Analysis</CardTitle>
-                    <CardDescription className="text-xs">Understanding your true website traffic</CardDescription>
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <CardTitle className="text-base">Traffic Impact Analysis</CardTitle>
+                      <CardDescription className="text-xs">Understanding your true website traffic</CardDescription>
+                    </div>
+                    <InfoTooltip text="Visitors who reject cookies are invisible to tools like Google Analytics. This section estimates how much traffic you're actually missing based on your reject rate." />
                   </div>
                 </div>
               </CardHeader>
@@ -674,6 +1062,7 @@ export default function AnalyticsPage() {
           </>
         )}
       </div>
+      </TooltipProvider>
     </DashboardLayout>
   )
 }
@@ -682,18 +1071,35 @@ export default function AnalyticsPage() {
    Sub-components
    ------------------------------------------------------------------- */
 
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button type="button" className="inline-flex items-center justify-center min-h-[28px] min-w-[28px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+          <HelpCircle className="h-3.5 w-3.5" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+        {text}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
 function StatCard({
   title,
   value,
   subtitle,
   icon,
-  color = 'teal'
+  color = 'teal',
+  tooltip,
 }: {
   title: string
   value: string
   subtitle?: string
   icon: React.ReactNode
   color?: 'teal' | 'green' | 'orange' | 'blue'
+  tooltip?: string
 }) {
   const colorMap = {
     teal: {
@@ -721,11 +1127,14 @@ function StatCard({
   const c = colorMap[color]
 
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              {title}
+              {tooltip && <InfoTooltip text={tooltip} />}
+            </p>
             <p className="text-2xl font-bold tracking-tight font-heading">{value}</p>
             {subtitle && (
               <p className="text-xs text-muted-foreground">{subtitle}</p>
@@ -766,12 +1175,48 @@ function DonutLegendRow({ color, label, value, pct }: { color: string; label: st
 
 function EmptyChartState({ icon, message }: { icon: React.ReactNode; message: string }) {
   return (
-    <div className="flex items-center justify-center h-[280px]">
+    <div className="flex items-center justify-center h-[220px]">
       <div className="text-center max-w-[240px]">
         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground/40">
           {icon}
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">{message}</p>
+      </div>
+    </div>
+  )
+}
+
+function BenchmarkMetric({
+  label,
+  yours,
+  platform,
+  better,
+  tooltip,
+}: {
+  label: string
+  yours: string
+  platform: string
+  better: boolean
+  tooltip?: string
+}) {
+  return (
+    <div className="rounded-lg border border-border p-3.5 space-y-2">
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+        {label}
+        {tooltip && <InfoTooltip text={tooltip} />}
+      </p>
+      <div className="flex items-end justify-between gap-2">
+        <div>
+          <p className="text-lg font-bold tracking-tight font-heading">{yours}</p>
+          <p className="text-[10px] text-muted-foreground">You</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-medium text-muted-foreground">{platform}</p>
+          <p className="text-[10px] text-muted-foreground">Platform avg</p>
+        </div>
+      </div>
+      <div className={`text-[10px] font-medium ${better ? 'text-[#788c5d]' : 'text-[#d97757]'}`}>
+        {better ? 'Above average' : 'Below average'}
       </div>
     </div>
   )

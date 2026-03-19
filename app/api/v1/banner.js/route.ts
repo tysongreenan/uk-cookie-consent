@@ -210,8 +210,8 @@ export async function GET(request: NextRequest) {
     
     // Extract the inner JS from the consent init script tag
     const consentInitJs = consentInit
-      .replace('<script>', '')
-      .replace('</script>', '')
+      .replace(/<script[^>]*>/i, '')
+      .replace(/<\/script>/i, '')
       .trim()
 
     // Build internal analytics tracking code (only when analytics is enabled)
@@ -232,6 +232,33 @@ export async function GET(request: NextRequest) {
   var _cbEventQueue = [];
   var _cbFlushTimer = null;
 
+  // Visitor dimension collection
+  var _cbSource = (function() {
+    try {
+      var params = new URLSearchParams(location.search);
+      var utm = params.get('utm_source');
+      if (utm) return utm.toLowerCase().slice(0, 50);
+      var ref = document.referrer;
+      if (!ref) return 'direct';
+      var host = new URL(ref).hostname.replace('www.', '');
+      if (host.indexOf('google') !== -1) return 'google';
+      if (host.indexOf('facebook') !== -1 || host.indexOf('fb.') !== -1) return 'facebook';
+      if (host.indexOf('twitter') !== -1 || host === 'x.com' || host === 't.co') return 'twitter';
+      if (host.indexOf('linkedin') !== -1) return 'linkedin';
+      if (host.indexOf('bing') !== -1) return 'bing';
+      if (host.indexOf('youtube') !== -1) return 'youtube';
+      return host.slice(0, 50);
+    } catch(e) { return 'direct'; }
+  })();
+  var _cbDevice = screen.width < 768 ? 'mobile' : (screen.width < 1024 ? 'tablet' : 'desktop');
+  var _cbCountry = (function() {
+    try {
+      var parts = (navigator.language || '').split('-');
+      return parts.length > 1 ? parts[parts.length - 1].toUpperCase().slice(0, 2) : 'unknown';
+    } catch(e) { return 'unknown'; }
+  })();
+  var _cbPagePath = location.pathname.slice(0, 200);
+
   function _cbQueueEvent(type, extra) {
     if (!_cbAnalyticsUserId) {
       console.debug('[CookieBanner] Analytics skipped: no userId (free plan or missing owner)');
@@ -242,7 +269,7 @@ export async function GET(request: NextRequest) {
       return;
     }
     console.debug('[CookieBanner] Queuing event:', type, 'banner:', _cbAnalyticsBannerId);
-    var evt = { type: type };
+    var evt = { type: type, source: _cbSource, device: _cbDevice, country: _cbCountry, pagePath: _cbPagePath };
     if (extra) {
       if (extra.decisionTime) evt.decisionTime = extra.decisionTime;
       if (extra.isReturning) evt.isReturning = true;

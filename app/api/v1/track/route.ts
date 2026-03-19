@@ -9,6 +9,7 @@ const CORS_HEADERS = {
 }
 
 const VALID_EVENT_TYPES = ['impression', 'accept', 'reject', 'dismiss']
+const VALID_DEVICES = new Set(['mobile', 'tablet', 'desktop'])
 
 // 30 requests per minute per IP (one page load = ~2 requests max)
 const trackRateLimit = new RateLimit({
@@ -23,8 +24,8 @@ function getSupabase() {
   )
 }
 
-// Validate userId format (UUID)
-function isValidUserId(id: string): boolean {
+// Validate UUID format (used for both userId and bannerId)
+function isValidUuid(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
 }
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     console.log('[TRACK] Received:', { userId, bannerId, eventCount: events?.length, events })
 
-    if (!userId || !isValidUserId(userId)) {
+    if (!userId || !isValidUuid(userId)) {
       console.warn('[TRACK] Invalid userId:', userId)
       return NextResponse.json(
         { error: 'Invalid user ID' },
@@ -85,7 +86,12 @@ export async function POST(request: NextRequest) {
 
     const today = new Date().toISOString().split('T')[0]
 
-    // Process batched events
+    // Validate bannerId format if provided
+    const safeBannerId = bannerId && isValidUuid(bannerId) ? bannerId : null
+
+    // Build all RPC calls first, then fire in parallel
+    const rpcCalls: PromiseLike<{ event: string; type: 'stat' | 'visitor'; error: any }>[] = []
+
     for (const event of events) {
       if (!event.type || !VALID_EVENT_TYPES.includes(event.type)) {
         console.warn('[TRACK] Skipping invalid event type:', event.type)
@@ -96,22 +102,47 @@ export async function POST(request: NextRequest) {
         ? Math.round(event.decisionTime)
         : null
 
-      // Validate bannerId format if provided
-      const safeBannerId = bannerId && isValidUserId(bannerId) ? bannerId : null
+      // Validate and sanitize dimension fields (backward compatible — defaults if missing)
+      const safeSource = (typeof event.source === 'string' && /^[a-zA-Z0-9._+\-]{1,50}$/.test(event.source))
+        ? event.source.toLowerCase() : 'direct'
+      const safeDevice = (typeof event.device === 'string' && VALID_DEVICES.has(event.device))
+        ? event.device : 'desktop'
+      const safeCountry = (typeof event.country === 'string' && /^[A-Z]{2}$/.test(event.country))
+        ? event.country : 'unknown'
+      const safePagePath = (typeof event.pagePath === 'string')
+        ? event.pagePath.replace(/[<>"']/g, '').slice(0, 200) : '/'
 
-      const { error: rpcError } = await supabase.rpc('increment_banner_stat', {
-        p_user_id: userId,
-        p_date: today,
-        p_event_type: event.type,
-        p_decision_time_ms: decisionTime,
-        p_is_returning: Boolean(event.isReturning),
-        p_banner_id: safeBannerId
-      })
+      rpcCalls.push(
+        supabase.rpc('increment_banner_stat', {
+          p_user_id: userId,
+          p_date: today,
+          p_event_type: event.type,
+          p_decision_time_ms: decisionTime,
+          p_is_returning: Boolean(event.isReturning),
+          p_banner_id: safeBannerId
+        }).then(r => ({ event: event.type, type: 'stat' as const, error: r.error }))
+      )
 
-      if (rpcError) {
-        console.error('[TRACK] RPC failed:', { userId, bannerId: safeBannerId, event: event.type, error: rpcError.message, code: rpcError.code, details: rpcError.details })
-      } else {
-        console.log('[TRACK] Recorded:', { userId, bannerId: safeBannerId, event: event.type, date: today })
+      rpcCalls.push(
+        supabase.rpc('increment_banner_visitor', {
+          p_user_id: userId,
+          p_banner_id: safeBannerId,
+          p_date: today,
+          p_event_type: event.type,
+          p_source: safeSource,
+          p_device: safeDevice,
+          p_country: safeCountry,
+          p_page_path: safePagePath,
+          p_decision_time_ms: decisionTime
+        }).then(r => ({ event: event.type, type: 'visitor' as const, error: r.error }))
+      )
+    }
+
+    // Fire all RPCs in parallel (up to 20 calls for a full batch of 10 events)
+    const results = await Promise.all(rpcCalls)
+    for (const r of results) {
+      if (r.error) {
+        console.error(`[TRACK] ${r.type} RPC failed:`, { userId, bannerId: safeBannerId, event: r.event, error: r.error.message })
       }
     }
 
