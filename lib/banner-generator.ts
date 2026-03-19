@@ -965,6 +965,8 @@ ${config.fontFamily ? `// Load Google Font for banner
 ${ga4Integration}
 
 initGA4Default();
+initGA4(); // Advanced Consent Mode: load GA4 immediately with consent denied
+           // Google sends cookieless pings to model unconsented sessions
 
 var injectedScripts = window.__cookieBannerInjected || (window.__cookieBannerInjected = {});
 var injectedExternalScripts = window.__cookieBannerExternal || (window.__cookieBannerExternal = {});
