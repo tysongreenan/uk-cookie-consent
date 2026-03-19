@@ -40,6 +40,7 @@ import {
   Trophy,
   Lock,
   HelpCircle,
+  RefreshCw,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
@@ -180,6 +181,8 @@ export default function AnalyticsPage() {
   const [dimensionsLoading, setDimensionsLoading] = useState(false)
   const [benchmarks, setBenchmarks] = useState<BenchmarkData | null>(null)
   const [benchmarksLoading, setBenchmarksLoading] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
   const chartColors = useChartColors()
 
   useEffect(() => {
@@ -263,8 +266,9 @@ export default function AnalyticsPage() {
     return banners.find(b => b.id === selectedBanner)?.name || 'Banner'
   }, [selectedBanner, banners])
 
-  async function fetchAnalyticsData() {
+  async function fetchAnalyticsData(isRefresh = false) {
     if (!session?.user?.id) return
+    if (isRefresh) setRefreshing(true)
 
     try {
       const params = selectedBanner !== 'all' ? `?bannerId=${selectedBanner}` : ''
@@ -290,6 +294,8 @@ export default function AnalyticsPage() {
         setSummary(null)
       }
 
+      setLastUpdated(new Date())
+
       // Lazy-load dimensions and benchmarks for pro users
       if (isEnabled) {
         fetchDimensions()
@@ -299,6 +305,7 @@ export default function AnalyticsPage() {
       console.error('Error fetching analytics:', error)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -395,11 +402,28 @@ export default function AnalyticsPage() {
               Banner performance and visitor consent patterns
             </p>
           </div>
-          {analyticsEnabled && (
-            <Badge className="bg-primary/10 text-primary border-primary/20 font-medium">
-              Pro
-            </Badge>
-          )}
+          <div className="flex items-center gap-3">
+            {analyticsEnabled && lastUpdated && (
+              <span className="text-xs text-muted-foreground tabular-nums">
+                Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            {analyticsEnabled && (
+              <button
+                onClick={() => fetchAnalyticsData(true)}
+                disabled={refreshing}
+                className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:text-foreground hover:border-primary/40 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </button>
+            )}
+            {analyticsEnabled && (
+              <Badge className="bg-primary/10 text-primary border-primary/20 font-medium">
+                Pro
+              </Badge>
+            )}
+          </div>
         </div>
 
         {!analyticsEnabled ? (
