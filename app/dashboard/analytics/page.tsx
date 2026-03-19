@@ -10,8 +10,6 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -26,12 +24,12 @@ import {
   XCircle,
   Clock,
   Eye,
-  Filter,
-  ChevronDown,
+  ChevronRight,
   BarChart3,
   Lightbulb,
   AlertTriangle,
   ArrowUpRight,
+  ArrowLeft,
   X,
   Globe,
   Monitor,
@@ -41,12 +39,13 @@ import {
   Users,
   Trophy,
   Lock,
+  HelpCircle,
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { HelpCircle } from 'lucide-react'
 
 interface BannerStats {
   id: string
@@ -104,16 +103,6 @@ interface BenchmarkData {
   }
   insights: { metric: string; direction: 'above' | 'below'; diff: number }[]
 }
-
-type ComparisonMetric = 'impressions' | 'acceptRate' | 'rejectRate' | 'dismissRate' | 'avgDecisionTime'
-
-const METRIC_OPTIONS: { value: ComparisonMetric; label: string; suffix: string }[] = [
-  { value: 'impressions', label: 'Impressions', suffix: '' },
-  { value: 'acceptRate', label: 'Accept Rate', suffix: '%' },
-  { value: 'rejectRate', label: 'Reject Rate', suffix: '%' },
-  { value: 'dismissRate', label: 'Dismiss Rate', suffix: '%' },
-  { value: 'avgDecisionTime', label: 'Avg Decision Time', suffix: 's' },
-]
 
 // Brand-aligned chart colors — light/dark pairs
 const CHART_COLORS_LIGHT = {
@@ -187,7 +176,6 @@ export default function AnalyticsPage() {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
   const [banners, setBanners] = useState<BannerOption[]>([])
   const [selectedBanner, setSelectedBanner] = useState<string>('all')
-  const [comparisonMetric, setComparisonMetric] = useState<ComparisonMetric>('impressions')
   const [dimensions, setDimensions] = useState<Record<string, DimensionData[]>>({})
   const [dimensionsLoading, setDimensionsLoading] = useState(false)
   const [benchmarks, setBenchmarks] = useState<BenchmarkData | null>(null)
@@ -226,6 +214,7 @@ export default function AnalyticsPage() {
         const name = bannerNameMap.get(bid) || 'Pre-tracking data'
         const hasImpressions = data.impressions > 0
         return {
+          id: bid,
           name,
           impressions: data.impressions,
           acceptRate: hasImpressions ? parseFloat((data.accepts / data.impressions * 100).toFixed(1)) : 0,
@@ -252,6 +241,26 @@ export default function AnalyticsPage() {
     }
     return Array.from(dateMap.values()).sort((a, b) => a.date.localeCompare(b.date))
   }, [stats, selectedBanner])
+
+  // Determine which banners have had impressions in the last 7 days
+  const bannerActivity = useMemo(() => {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - 7)
+    const cutoffStr = cutoff.toISOString().split('T')[0]
+    const activeSet = new Set<string>()
+    for (const row of stats) {
+      if (row.date >= cutoffStr && row.impressions > 0 && row.banner_id) {
+        activeSet.add(row.banner_id)
+      }
+    }
+    return activeSet
+  }, [stats])
+
+  // Resolve selected banner name for the detail back bar
+  const selectedBannerName = useMemo(() => {
+    if (selectedBanner === 'all') return ''
+    return banners.find(b => b.id === selectedBanner)?.name || 'Banner'
+  }, [selectedBanner, banners])
 
   async function fetchAnalyticsData() {
     if (!session?.user?.id) return
@@ -365,8 +374,6 @@ export default function AnalyticsPage() {
     )
   }
 
-  const activeMetric = METRIC_OPTIONS.find(m => m.value === comparisonMetric)!
-
   return (
     <DashboardLayout>
       <TooltipProvider delayDuration={200}>
@@ -385,31 +392,11 @@ export default function AnalyticsPage() {
               Banner performance and visitor consent patterns
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {analyticsEnabled && (
-              <Badge className="bg-primary/10 text-primary border-primary/20 font-medium">
-                Pro
-              </Badge>
-            )}
-            {/* Inline banner filter */}
-            {analyticsEnabled && banners.length > 1 && (
-              <div className="relative">
-                <select
-                  id="banner-filter"
-                  aria-label="Filter by banner"
-                  value={selectedBanner}
-                  onChange={(e) => setSelectedBanner(e.target.value)}
-                  className="appearance-none rounded-md border border-border bg-card pl-3 pr-8 py-1.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  <option value="all">All banners</option>
-                  {banners.map((b) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              </div>
-            )}
-          </div>
+          {analyticsEnabled && (
+            <Badge className="bg-primary/10 text-primary border-primary/20 font-medium">
+              Pro
+            </Badge>
+          )}
         </div>
 
         {!analyticsEnabled ? (
@@ -420,6 +407,31 @@ export default function AnalyticsPage() {
           />
         ) : (
           <>
+            {/* Detail Back Bar — shown when drilling into a single banner */}
+            <AnimatePresence mode="wait">
+              {selectedBanner !== 'all' && (
+                <motion.div
+                  key="detail-bar"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-4 py-2.5">
+                    <button
+                      onClick={() => setSelectedBanner('all')}
+                      className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      All Banners
+                    </button>
+                    <span className="text-border">/</span>
+                    <span className="text-sm font-semibold text-foreground">{selectedBannerName}</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
@@ -454,84 +466,118 @@ export default function AnalyticsPage() {
               />
             </div>
 
-            {/* Banner Comparison Chart -- only on "All Banners" with multiple banners */}
-            {selectedBanner === 'all' && bannerComparisonData.length > 1 && (
-              <Card className="overflow-hidden">
-                <CardHeader className="pb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                        <BarChart3 className="h-4.5 w-4.5 text-primary" />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div>
-                          <CardTitle className="text-base">Banner Comparison</CardTitle>
-                          <CardDescription className="text-xs">Performance across your banners</CardDescription>
+            {/* Banner Hub Table — shown when viewing all banners */}
+            <AnimatePresence mode="wait">
+              {selectedBanner === 'all' && banners.length > 0 && (
+                <motion.div
+                  key="hub-table"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                          <BarChart3 className="h-4.5 w-4.5 text-primary" />
                         </div>
-                        <InfoTooltip text="Compare how each of your banners performs side-by-side. Use the metric toggle to switch between impressions, accept rate, reject rate, dismiss rate, and decision time." />
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <CardTitle className="text-base">Your Banners</CardTitle>
+                            <CardDescription className="text-xs">Click a banner to view detailed analytics</CardDescription>
+                          </div>
+                          <InfoTooltip text="Overview of all your banners. Click any row to drill into that banner's detailed analytics, including visitor dimensions and page-level data." />
+                        </div>
                       </div>
-                    </div>
-                    {/* Metric toggle pills — scrollable on small screens */}
-                    <div className="flex gap-1 overflow-x-auto sm:flex-wrap -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
-                      {METRIC_OPTIONS.map((metric) => (
-                        <button
-                          key={metric.value}
-                          onClick={() => setComparisonMetric(metric.value)}
-                          className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                            comparisonMetric === metric.value
-                              ? 'bg-foreground text-background shadow-sm'
-                              : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground'
-                          }`}
-                        >
-                          {metric.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <ResponsiveContainer width="100%" height={Math.max(180, bannerComparisonData.length * 52)}>
-                    <BarChart data={bannerComparisonData} layout="vertical" margin={{ left: 8, right: 24, top: 4, bottom: 4 }}>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        horizontal={false}
-                        stroke="hsl(var(--border))"
-                        strokeOpacity={0.6}
-                      />
-                      <XAxis
-                        type="number"
-                        tickFormatter={(v) => `${v}${activeMetric.suffix}`}
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={140}
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
-                      />
-                      <RechartsTooltip
-                        content={
-                          <ChartTooltip
-                            formatter={(value: number) => `${value.toLocaleString()}${activeMetric.suffix}`}
-                          />
-                        }
-                        cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
-                      />
-                      <Bar
-                        dataKey={comparisonMetric}
-                        fill={chartColors.primary}
-                        radius={[0, 6, 6, 0]}
-                        maxBarSize={28}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
+                    </CardHeader>
+                    <CardContent className="px-0 pt-0 pb-0">
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[580px]">
+                          <thead>
+                            <tr className="border-b border-border">
+                              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4">Banner</th>
+                              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4">Impressions</th>
+                              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden sm:table-cell">Accept Rate</th>
+                              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden sm:table-cell">Reject Rate</th>
+                              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden md:table-cell">Decision Time</th>
+                              <th className="w-8 px-2"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {bannerComparisonData.map((row) => {
+                              const isActive = bannerActivity.has(row.id)
+                              return (
+                                <tr
+                                  key={row.id}
+                                  onClick={() => setSelectedBanner(row.id)}
+                                  className="border-b border-border/50 last:border-b-0 cursor-pointer transition-colors hover:bg-muted/50 group"
+                                >
+                                  <td className="py-3.5 px-4">
+                                    <div className="flex items-center gap-2.5">
+                                      <span className={`inline-block h-2 w-2 rounded-full shrink-0 ${isActive ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`} />
+                                      <span className="text-sm font-medium text-foreground truncate max-w-[200px]">{row.name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right">
+                                    <span className="text-sm font-semibold tabular-nums text-foreground">{row.impressions.toLocaleString()}</span>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right hidden sm:table-cell">
+                                    <div className="inline-flex flex-col items-end gap-1">
+                                      <span className="text-sm font-semibold tabular-nums text-foreground">{row.acceptRate}%</span>
+                                      <div className="h-0.5 w-16 rounded-full bg-border/50">
+                                        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(row.acceptRate, 100)}%`, backgroundColor: chartColors.accept }} />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right hidden sm:table-cell">
+                                    <div className="inline-flex flex-col items-end gap-1">
+                                      <span className="text-sm font-semibold tabular-nums text-foreground">{row.rejectRate}%</span>
+                                      <div className="h-0.5 w-16 rounded-full bg-border/50">
+                                        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(row.rejectRate, 100)}%`, backgroundColor: chartColors.reject }} />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right hidden md:table-cell">
+                                    <span className="text-sm font-semibold tabular-nums text-foreground">{row.avgDecisionTime}s</span>
+                                  </td>
+                                  <td className="px-2">
+                                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                            {/* Show banners with no stats yet */}
+                            {banners.filter(b => !bannerComparisonData.some(r => r.id === b.id)).map((b) => (
+                              <tr
+                                key={b.id}
+                                onClick={() => setSelectedBanner(b.id)}
+                                className="border-b border-border/50 last:border-b-0 cursor-pointer transition-colors hover:bg-muted/50 group"
+                              >
+                                <td className="py-3.5 px-4">
+                                  <div className="flex items-center gap-2.5">
+                                    <span className="inline-block h-2 w-2 rounded-full shrink-0 bg-muted-foreground/30" />
+                                    <span className="text-sm font-medium text-foreground truncate max-w-[200px]">{b.name}</span>
+                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">No data</Badge>
+                                  </div>
+                                </td>
+                                <td className="py-3.5 px-4 text-right text-sm text-muted-foreground">—</td>
+                                <td className="py-3.5 px-4 text-right hidden sm:table-cell text-sm text-muted-foreground">—</td>
+                                <td className="py-3.5 px-4 text-right hidden sm:table-cell text-sm text-muted-foreground">—</td>
+                                <td className="py-3.5 px-4 text-right hidden md:table-cell text-sm text-muted-foreground">—</td>
+                                <td className="px-2">
+                                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
