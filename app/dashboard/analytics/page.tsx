@@ -196,7 +196,8 @@ export default function AnalyticsPage() {
     const bannerMap = new Map<string, { impressions: number; accepts: number; rejects: number; dismisses: number; totalDecisionTime: number; decisionCount: number }>()
 
     for (const row of stats) {
-      const bid = row.banner_id || 'unknown'
+      if (!row.banner_id) continue // Skip pre-tracking data with no banner assigned
+      const bid = row.banner_id
       const existing = bannerMap.get(bid) || { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0 }
       existing.impressions += row.impressions
       existing.accepts += row.accepts
@@ -211,7 +212,7 @@ export default function AnalyticsPage() {
 
     return Array.from(bannerMap.entries())
       .map(([bid, data]) => {
-        const name = bannerNameMap.get(bid) || 'Pre-tracking data'
+        const name = bannerNameMap.get(bid) || bid
         const hasImpressions = data.impressions > 0
         return {
           id: bid,
