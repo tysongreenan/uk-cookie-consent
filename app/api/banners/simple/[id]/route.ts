@@ -89,9 +89,8 @@ export async function PUT(
 
     // Check if this is just a toggle request (only isActive field)
     if ('isActive' in bannerData && Object.keys(bannerData).length === 1) {
-      // Check both SimpleBanners and ConsentBanner tables (for old banners)
+      // Check SimpleBanners table
       let bannerFound = false
-      let bannerTable: 'SimpleBanners' | 'ConsentBanner' | null = null
       let currentState: boolean | null = null
 
       // First, try SimpleBanners (new system)
@@ -103,34 +102,12 @@ export async function PUT(
         const existingBanner = userBanners.find((b: any) => b.id === params.id)
         if (existingBanner) {
           bannerFound = true
-          bannerTable = 'SimpleBanners'
           currentState = existingBanner.isActive ?? true
         }
       }
 
-      // If not found in SimpleBanners, check ConsentBanner (old system)
       if (!bannerFound) {
-        // Get user's team to check ConsentBanner (session already available from above)
-        const currentTeamId = session?.user?.currentTeamId
-
-        if (currentTeamId) {
-          const { data: consentBanner, error: consentError } = await supabase
-            .from('ConsentBanner')
-            .select('id, "isActive", Project!inner(teamId)')
-            .eq('id', params.id)
-            .eq('Project.teamId', currentTeamId)
-            .maybeSingle()
-
-          if (!consentError && consentBanner) {
-            bannerFound = true
-            bannerTable = 'ConsentBanner'
-            currentState = consentBanner.isActive ?? false
-          }
-        }
-      }
-
-      if (!bannerFound) {
-        console.error('❌ Simple Toggle: Banner not found in either table:', {
+        console.error('❌ Simple Toggle: Banner not found:', {
           bannerId: params.id,
           userId: session.user.id
         })
@@ -141,56 +118,32 @@ export async function PUT(
         }, { status: 404 })
       }
 
-      console.log('✅ Simple Toggle: Banner found in', bannerTable, 'current state:', currentState, 'new state:', bannerData.isActive)
+      console.log('✅ Simple Toggle: current state:', currentState, 'new state:', bannerData.isActive)
 
-      // Update based on which table the banner is in
-      if (bannerTable === 'SimpleBanners') {
-        // Use RPC function for SimpleBanners
-        const { data: rpcResult, error: rpcError } = await supabase.rpc('toggle_banner_active', {
-          banner_id: params.id,
-          user_id: session.user.id,
-          is_active: bannerData.isActive
-        })
+      const { data: rpcResult, error: rpcError } = await supabase.rpc('toggle_banner_active', {
+        banner_id: params.id,
+        user_id: session.user.id,
+        is_active: bannerData.isActive
+      })
 
-        if (rpcError) {
-          console.error('❌ Simple Toggle: RPC failed:', rpcError)
-          return NextResponse.json({ 
-            error: 'Failed to toggle banner status',
-            details: rpcError?.message || 'Unknown error',
-            code: rpcError?.code
-          }, { status: 500 })
-        }
-
-        if (rpcResult === false) {
-          return NextResponse.json({ 
-            error: 'Banner not found',
-            details: 'Banner was not updated',
-            code: 'NOT_FOUND'
-          }, { status: 404 })
-        }
-      } else {
-        // Direct update for ConsentBanner (old system)
-        const { data: updateData, error: updateError } = await supabase
-          .from('ConsentBanner')
-          .update({ 
-            isActive: bannerData.isActive,
-            updatedAt: new Date().toISOString()
-          })
-          .eq('id', params.id)
-          .select('id, "isActive"')
-          .maybeSingle()
-
-        if (updateError || !updateData) {
-          console.error('❌ Simple Toggle: ConsentBanner update failed:', updateError)
-          return NextResponse.json({ 
-            error: 'Failed to toggle banner status',
-            details: updateError?.message || 'Unknown error',
-            code: updateError?.code
-          }, { status: 500 })
-        }
+      if (rpcError) {
+        console.error('❌ Simple Toggle: RPC failed:', rpcError)
+        return NextResponse.json({
+          error: 'Failed to toggle banner status',
+          details: rpcError?.message || 'Unknown error',
+          code: rpcError?.code
+        }, { status: 500 })
       }
 
-      console.log('✅ Simple Toggle: Banner toggled in', bannerTable)
+      if (rpcResult === false) {
+        return NextResponse.json({
+          error: 'Banner not found',
+          details: 'Banner was not updated',
+          code: 'NOT_FOUND'
+        }, { status: 404 })
+      }
+
+      console.log('✅ Simple Toggle: Banner toggled')
       
       return NextResponse.json({ 
         success: true, 

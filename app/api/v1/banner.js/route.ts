@@ -99,17 +99,6 @@ export async function GET(request: NextRequest) {
 
     if (bannerMeta?.updatedAt) {
       updatedAt = new Date(bannerMeta.updatedAt).getTime()
-    } else {
-      // Fallback to ConsentBanner
-      const { data: consentMeta } = await supabase
-        .from('ConsentBanner')
-        .select('"updatedAt"')
-        .eq('id', bannerId)
-        .single()
-
-      if (consentMeta?.updatedAt) {
-        updatedAt = new Date(consentMeta.updatedAt).getTime()
-      }
     }
 
     // Generate ETag based on database updatedAt (source of truth)
@@ -146,18 +135,7 @@ export async function GET(request: NextRequest) {
     if (!simpleError && simpleBanner) {
       banner = simpleBanner
     } else {
-      // Fallback to ConsentBanner table (legacy system)
-      const { data: consentBanner, error: consentError } = await supabase
-        .from('ConsentBanner')
-        .select('id, name, config, "isActive", "updatedAt"')
-        .eq('id', bannerId)
-        .single()
-      
-      if (!consentError && consentBanner) {
-        banner = consentBanner
-      } else {
-        error = consentError || simpleError
-      }
+      error = simpleError
     }
     
     if (error || !banner) {
@@ -205,45 +183,15 @@ export async function GET(request: NextRequest) {
     
     // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'
-    let ownerAnalyticsEnabled = false
     const bannerUserId = banner.userId || null
     if (bannerUserId) {
       const { data: bannerOwner } = await supabase
         .from('User')
-        .select('planTier, analytics_enabled')
+        .select('planTier')
         .eq('id', bannerUserId)
         .single()
       if (bannerOwner?.planTier) {
         ownerPlanTier = bannerOwner.planTier
-      }
-      ownerAnalyticsEnabled = Boolean(bannerOwner?.analytics_enabled)
-    } else {
-      // For ConsentBanner (legacy), look up via project -> team -> owner
-      try {
-        const { data: consentBannerFull } = await supabase
-          .from('ConsentBanner')
-          .select('projectId')
-          .eq('id', bannerId)
-          .single()
-        if (consentBannerFull?.projectId) {
-          const { data: project } = await supabase
-            .from('Project')
-            .select('userId')
-            .eq('id', consentBannerFull.projectId)
-            .single()
-          if (project?.userId) {
-            const { data: owner } = await supabase
-              .from('User')
-              .select('planTier')
-              .eq('id', project.userId)
-              .single()
-            if (owner?.planTier) {
-              ownerPlanTier = owner.planTier
-            }
-          }
-        }
-      } catch (e) {
-        // Default to free tier on error
       }
     }
 
@@ -267,7 +215,8 @@ export async function GET(request: NextRequest) {
       .trim()
 
     // Build internal analytics tracking code (only when analytics is enabled)
-    const analyticsUserId = ownerAnalyticsEnabled ? (bannerUserId || '') : ''
+    // Analytics is automatically enabled for pro/enterprise plans
+    const analyticsUserId = (ownerPlanTier !== 'free') ? (bannerUserId || '') : ''
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     const internalAnalyticsJs = `
   // Internal Analytics Tracking

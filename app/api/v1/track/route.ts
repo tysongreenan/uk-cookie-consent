@@ -63,10 +63,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabase()
 
-    // Validate user has analytics enabled
+    // Validate user is on a plan that includes analytics (pro/enterprise)
     const { data: user, error: userError } = await supabase
       .from('User')
-      .select('analytics_enabled')
+      .select('planTier')
       .eq('id', userId)
       .single()
 
@@ -74,10 +74,11 @@ export async function POST(request: NextRequest) {
       console.error('[TRACK] User lookup failed:', { userId, error: userError.message })
     }
 
-    if (!user?.analytics_enabled) {
-      console.log('[TRACK] Analytics disabled for user:', userId)
+    const tier = user?.planTier || 'free'
+    if (tier === 'free') {
+      console.log('[TRACK] Analytics not available on free plan:', userId)
       return NextResponse.json(
-        { success: false, reason: 'analytics_disabled' },
+        { success: false, reason: 'plan_required' },
         { status: 200, headers: CORS_HEADERS }
       )
     }

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
   BarChart, 
@@ -21,15 +20,12 @@ import {
   Cell
 } from 'recharts'
 import { 
-  TrendingUp, 
-  Users, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Eye,
-  Settings
+  TrendingUp,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Eye
 } from 'lucide-react'
-import { toast } from 'react-hot-toast'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
@@ -66,7 +62,6 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<BannerStats[]>([])
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
   const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
   
   useEffect(() => {
@@ -96,7 +91,6 @@ export default function AnalyticsPage() {
         setStats(data.stats)
         calculateSummary(data.stats)
       }
-      setAnalyticsEnabled(data.analyticsEnabled || false)
     } catch (error) {
       console.error('Error fetching analytics:', error)
     } finally {
@@ -128,28 +122,8 @@ export default function AnalyticsPage() {
     })
   }
   
-  async function toggleAnalytics() {
-    if (!session?.user?.id) return
+  const analyticsEnabled = canAccessFeature(userPlan, 'hasInternalAnalytics')
 
-    try {
-      const newStatus = !analyticsEnabled
-
-      const res = await fetch('/api/analytics', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: newStatus })
-      })
-
-      if (!res.ok) throw new Error('Failed to update analytics settings')
-
-      setAnalyticsEnabled(newStatus)
-      toast.success(`Analytics ${newStatus ? 'enabled' : 'disabled'}`)
-    } catch (error) {
-      console.error('Error toggling analytics:', error)
-      toast.error('Failed to update analytics settings')
-    }
-  }
-  
   if (loading) {
     return (
       <DashboardLayout>
@@ -180,41 +154,17 @@ export default function AnalyticsPage() {
               Track your banner performance and user consent patterns
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge variant={analyticsEnabled ? 'default' : 'secondary'}>
-              {analyticsEnabled ? 'Analytics Enabled' : 'Analytics Disabled'}
-            </Badge>
-            <Button onClick={toggleAnalytics} variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              {analyticsEnabled ? 'Disable' : 'Enable'} Analytics
-            </Button>
-          </div>
+          {analyticsEnabled && (
+            <Badge variant="default">Pro Analytics</Badge>
+          )}
         </div>
         
-        {/* Plan Gate */}
-        {!canAccessFeature(userPlan, 'hasInternalAnalytics') && (
-          <UpgradePrompt 
+        {!analyticsEnabled ? (
+          <UpgradePrompt
             feature="Analytics Dashboard"
-            description="Track impressions, acceptance rates, and traffic estimation with detailed analytics"
+            description="Upgrade to Pro to track impressions, acceptance rates, decision time, and traffic estimation with detailed analytics."
             variant="banner"
           />
-        )}
-        
-        {!analyticsEnabled ? (
-          <Card className="p-8 text-center">
-            <CardContent>
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Analytics Disabled</h3>
-              <p className="text-muted-foreground mb-6">
-                Enable analytics to start tracking your banner performance and user consent patterns.
-              </p>
-              <Button onClick={toggleAnalytics}>
-                Enable Analytics
-              </Button>
-            </CardContent>
-          </Card>
         ) : (
           <>
             {/* Summary Cards */}
