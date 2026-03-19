@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
@@ -9,7 +9,7 @@ const supabase = createClient(
 )
 
 // GET /api/analytics - Fetch banner stats (analytics is automatic for pro/enterprise)
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -29,23 +29,41 @@ export async function GET() {
     const analyticsEnabled = planTier !== 'free'
 
     if (!analyticsEnabled) {
-      return NextResponse.json({ stats: [], analyticsEnabled: false })
+      return NextResponse.json({ stats: [], banners: [], analyticsEnabled: false })
     }
 
-    // Fetch stats (only for pro/enterprise)
-    const { data: stats, error: statsError } = await supabase
+    // Optional banner filter
+    const { searchParams } = new URL(request.url)
+    const bannerId = searchParams.get('bannerId')
+
+    // Fetch stats and banner list in parallel
+    let statsQuery = supabase
       .from('banner_stats')
       .select('*')
       .eq('user_id', userId)
       .order('date', { ascending: true })
-      .limit(30)
+      .limit(90)
 
-    if (statsError) {
-      console.error('Error fetching banner stats:', statsError)
+    if (bannerId && bannerId !== 'all') {
+      statsQuery = statsQuery.eq('banner_id', bannerId)
+    }
+
+    const [statsResult, bannersResult] = await Promise.all([
+      statsQuery,
+      supabase
+        .from('SimpleBanners')
+        .select('id, name')
+        .eq('userId', userId)
+        .order('name', { ascending: true })
+    ])
+
+    if (statsResult.error) {
+      console.error('Error fetching banner stats:', statsResult.error)
     }
 
     return NextResponse.json({
-      stats: stats || [],
+      stats: statsResult.data || [],
+      banners: bannersResult.data || [],
       analyticsEnabled
     })
   } catch (error) {

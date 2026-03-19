@@ -4,14 +4,12 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -19,12 +17,13 @@ import {
   Pie,
   Cell
 } from 'recharts'
-import { 
+import {
   TrendingUp,
   CheckCircle,
   XCircle,
   Clock,
-  Eye
+  Eye,
+  Filter
 } from 'lucide-react'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
@@ -33,6 +32,7 @@ import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 interface BannerStats {
   id: string
   user_id: string
+  banner_id: string | null
   date: string
   accepts: number
   rejects: number
@@ -41,6 +41,11 @@ interface BannerStats {
   total_decision_time_ms: number
   decision_count: number
   returning_visitor_impressions: number
+}
+
+interface BannerOption {
+  id: string
+  name: string
 }
 
 interface AnalyticsSummary {
@@ -62,6 +67,8 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
+  const [banners, setBanners] = useState<BannerOption[]>([])
+  const [selectedBanner, setSelectedBanner] = useState<string>('all')
 
   useEffect(() => {
     if (session) {
@@ -69,21 +76,34 @@ export default function AnalyticsPage() {
     }
   }, [session])
 
+  useEffect(() => {
+    if (session && analyticsEnabled) {
+      fetchAnalyticsData()
+    }
+  }, [selectedBanner])
+
   async function fetchAnalyticsData() {
     if (!session?.user?.id) return
 
     try {
-      const res = await fetch('/api/analytics')
+      const params = selectedBanner !== 'all' ? `?bannerId=${selectedBanner}` : ''
+      const res = await fetch(`/api/analytics${params}`)
       if (!res.ok) throw new Error('Failed to fetch analytics')
 
       const data = await res.json()
 
-      // Use the server's determination of analytics access (based on fresh DB planTier)
       setAnalyticsEnabled(data.analyticsEnabled || false)
+
+      if (data.banners) {
+        setBanners(data.banners)
+      }
 
       if (data.stats) {
         setStats(data.stats)
         calculateSummary(data.stats)
+      } else {
+        setStats([])
+        setSummary(null)
       }
     } catch (error) {
       console.error('Error fetching analytics:', error)
@@ -91,7 +111,7 @@ export default function AnalyticsPage() {
       setLoading(false)
     }
   }
-  
+
   function calculateSummary(data: BannerStats[]) {
     const totals = data.reduce((acc, day) => ({
       impressions: acc.impressions + day.impressions,
@@ -101,12 +121,12 @@ export default function AnalyticsPage() {
       totalDecisionTime: acc.totalDecisionTime + day.total_decision_time_ms,
       decisionCount: acc.decisionCount + day.decision_count
     }), { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0 })
-    
+
     const acceptRate = totals.impressions > 0 ? (totals.accepts / totals.impressions * 100).toFixed(1) : '0'
     const rejectRate = totals.impressions > 0 ? (totals.rejects / totals.impressions * 100).toFixed(1) : '0'
     const dismissRate = totals.impressions > 0 ? (totals.dismisses / totals.impressions * 100).toFixed(1) : '0'
     const avgDecisionTime = totals.decisionCount > 0 ? (totals.totalDecisionTime / totals.decisionCount / 1000).toFixed(1) : '0'
-    
+
     setSummary({
       ...totals,
       acceptRate,
@@ -115,7 +135,7 @@ export default function AnalyticsPage() {
       avgDecisionTime
     })
   }
-  
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -128,7 +148,7 @@ export default function AnalyticsPage() {
       </DashboardLayout>
     )
   }
-  
+
   return (
     <DashboardLayout>
       <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -137,7 +157,7 @@ export default function AnalyticsPage() {
           { label: 'Cookie Banner' },
           { label: 'Analytics' }
         ]} />
-        
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -150,7 +170,7 @@ export default function AnalyticsPage() {
             <Badge variant="default">Pro Analytics</Badge>
           )}
         </div>
-        
+
         {!analyticsEnabled ? (
           <UpgradePrompt
             feature="Analytics Dashboard"
@@ -159,36 +179,69 @@ export default function AnalyticsPage() {
           />
         ) : (
           <>
+            {/* Banner Filter */}
+            {banners.length > 1 && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Filter className="w-4 h-4 text-muted-foreground" />
+                    <label htmlFor="banner-filter" className="text-sm font-medium">
+                      Filter by banner:
+                    </label>
+                    <select
+                      id="banner-filter"
+                      value={selectedBanner}
+                      onChange={(e) => setSelectedBanner(e.target.value)}
+                      className="border rounded-md px-3 py-1.5 text-sm bg-background"
+                    >
+                      <option value="all">All Banners</option>
+                      {banners.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                    {selectedBanner !== 'all' && (
+                      <button
+                        onClick={() => setSelectedBanner('all')}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        Clear filter
+                      </button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <StatCard 
-                title="Total Impressions" 
-                value={summary?.impressions.toLocaleString() || '0'} 
+              <StatCard
+                title="Total Impressions"
+                value={summary?.impressions.toLocaleString() || '0'}
                 icon={<Eye className="w-5 h-5" />}
                 color="blue"
               />
-              <StatCard 
-                title="Accept Rate" 
+              <StatCard
+                title="Accept Rate"
                 value={`${summary?.acceptRate}%`}
                 subtitle={`${summary?.accepts.toLocaleString()} accepts`}
                 icon={<CheckCircle className="w-5 h-5" />}
                 color="green"
               />
-              <StatCard 
-                title="Reject Rate" 
+              <StatCard
+                title="Reject Rate"
                 value={`${summary?.rejectRate}%`}
                 subtitle={`${summary?.rejects.toLocaleString()} rejects`}
                 icon={<XCircle className="w-5 h-5" />}
                 color="red"
               />
-              <StatCard 
-                title="Avg Decision Time" 
+              <StatCard
+                title="Avg Decision Time"
                 value={`${summary?.avgDecisionTime}s`}
                 icon={<Clock className="w-5 h-5" />}
                 color="purple"
               />
             </div>
-            
+
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Daily Trends */}
@@ -322,12 +375,12 @@ export default function AnalyticsPage() {
   )
 }
 
-function StatCard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  color = 'blue' 
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  color = 'blue'
 }: {
   title: string
   value: string
@@ -341,7 +394,7 @@ function StatCard({
     red: 'bg-red-500/10 text-red-500',
     purple: 'bg-purple-500/10 text-purple-500'
   }
-  
+
   return (
     <Card>
       <CardContent className="p-6">

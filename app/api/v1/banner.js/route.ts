@@ -221,6 +221,7 @@ export async function GET(request: NextRequest) {
     const internalAnalyticsJs = `
   // Internal Analytics Tracking
   var _cbAnalyticsUserId = ${JSON.stringify(analyticsUserId)};
+  var _cbAnalyticsBannerId = ${JSON.stringify(bannerId)};
   var _cbTrackUrl = ${JSON.stringify(baseUrl + '/api/v1/track')};
   var _cbBannerShownAt = 0;
   var _cbEventQueue = [];
@@ -246,7 +247,7 @@ export async function GET(request: NextRequest) {
   function _cbFlushEvents() {
     if (_cbEventQueue.length === 0) return;
     var batch = _cbEventQueue.splice(0, 10);
-    var payload = JSON.stringify({ userId: _cbAnalyticsUserId, events: batch });
+    var payload = JSON.stringify({ userId: _cbAnalyticsUserId, bannerId: _cbAnalyticsBannerId, events: batch });
     try {
       var sent = false;
       if (navigator.sendBeacon) {

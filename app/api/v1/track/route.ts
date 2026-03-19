@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userId, events } = body
+    const { userId, bannerId, events } = body
 
-    console.log('[TRACK] Received:', { userId, eventCount: events?.length, events })
+    console.log('[TRACK] Received:', { userId, bannerId, eventCount: events?.length, events })
 
     if (!userId || !isValidUserId(userId)) {
       console.warn('[TRACK] Invalid userId:', userId)
@@ -96,12 +96,16 @@ export async function POST(request: NextRequest) {
         ? Math.round(event.decisionTime)
         : null
 
+      // Validate bannerId format if provided
+      const safeBannerId = bannerId && isValidUserId(bannerId) ? bannerId : null
+
       const { error: rpcError } = await supabase.rpc('increment_banner_stat', {
         p_user_id: userId,
         p_date: today,
         p_event_type: event.type,
         p_decision_time_ms: decisionTime,
-        p_is_returning: Boolean(event.isReturning)
+        p_is_returning: Boolean(event.isReturning),
+        p_banner_id: safeBannerId
       })
 
       if (rpcError) {
