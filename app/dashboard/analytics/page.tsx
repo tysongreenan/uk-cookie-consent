@@ -47,6 +47,7 @@ import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import Link from 'next/link'
 
 interface BannerStats {
   id: string
@@ -65,6 +66,7 @@ interface BannerStats {
 interface BannerOption {
   id: string
   name: string
+  hasGa4?: boolean
 }
 
 interface AnalyticsSummary {
@@ -183,7 +185,11 @@ export default function AnalyticsPage() {
   const [benchmarksLoading, setBenchmarksLoading] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [ga4NoticeDismissed, setGa4NoticeDismissed] = useState(false)
   const chartColors = useChartColors()
+
+  const bannersWithoutGa4 = useMemo(() => banners.filter(b => !b.hasGa4), [banners])
+  const showGa4Notice = analyticsEnabled && selectedBanner === 'all' && bannersWithoutGa4.length > 0 && !ga4NoticeDismissed
 
   useEffect(() => {
     if (session) {
@@ -492,6 +498,75 @@ export default function AnalyticsPage() {
                 tooltip="Average time in seconds between the banner appearing and the visitor making a choice. Lower times usually mean clearer banner copy."
               />
             </div>
+
+            {/* GA4 Setup Notice */}
+            <AnimatePresence>
+              {showGa4Notice && (
+                <motion.div
+                  key="ga4-notice"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="relative border-l-4 border-l-primary/70 bg-primary/[0.03] overflow-hidden">
+                    <button
+                      onClick={() => setGa4NoticeDismissed(true)}
+                      className="absolute top-3 right-3 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                      aria-label="Dismiss notice"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                          <Lightbulb className="h-4.5 w-4.5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-base">Unlock Full Session Tracking with GA4</CardTitle>
+                          <CardDescription className="text-xs">See every visitor in Google Analytics, not just those who accept cookies</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-6 items-start">
+                        <div className="space-y-3">
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Connect your GA4 Measurement ID to activate Advanced Consent Mode. Google Analytics will record all sessions — including visitors who reject cookies — using cookieless pings. You&apos;ll see your true traffic, not just the slice that clicked &quot;Accept&quot;.
+                          </p>
+                          <ol className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2.5">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary mt-0.5">1</span>
+                              <span>Open your banner in the builder and add your GA4 Measurement ID <span className="font-mono text-xs text-foreground">(G-XXXXXXXXXX)</span> in the Analytics tab.</span>
+                            </li>
+                            <li className="flex items-start gap-2.5">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary mt-0.5">2</span>
+                              <span>In GA4, go to <strong className="text-foreground">Admin &gt; Data Settings &gt; Data Collection</strong> and turn on Google Signals.</span>
+                            </li>
+                            <li className="flex items-start gap-2.5">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary mt-0.5">3</span>
+                              <span>Set <strong className="text-foreground">Reporting Identity</strong> to <strong className="text-foreground">Blended</strong> so GA4 models unconsented sessions.</span>
+                            </li>
+                          </ol>
+                        </div>
+                        <div className="flex flex-col items-start md:items-end gap-2 md:pt-1">
+                          <Link
+                            href="/dashboard"
+                            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                          >
+                            Configure GA4
+                            <ArrowUpRight className="h-3.5 w-3.5" />
+                          </Link>
+                          <span className="text-xs text-muted-foreground">
+                            {bannersWithoutGa4.length} banner{bannersWithoutGa4.length !== 1 ? 's' : ''} without GA4
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Banner Hub Table — shown when viewing all banners */}
             <AnimatePresence mode="wait">

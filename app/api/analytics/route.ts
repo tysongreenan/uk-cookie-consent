@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       statsQuery,
       supabase
         .from('SimpleBanners')
-        .select('id, name')
+        .select('id, name, config')
         .eq('userId', userId)
         .order('name', { ascending: true })
     ])
@@ -61,9 +61,20 @@ export async function GET(request: NextRequest) {
       console.error('Error fetching banner stats:', statsResult.error)
     }
 
+    // Extract GA4 status from each banner's config
+    const banners = (bannersResult.data || []).map((b: any) => {
+      const config = typeof b.config === 'string' ? JSON.parse(b.config) : b.config
+      const ga4 = config?.integrations?.googleAnalytics
+      return {
+        id: b.id,
+        name: b.name,
+        hasGa4: !!(ga4?.enabled && ga4?.measurementId),
+      }
+    })
+
     return NextResponse.json({
       stats: statsResult.data || [],
-      banners: bannersResult.data || [],
+      banners,
       analyticsEnabled
     })
   } catch (error) {
