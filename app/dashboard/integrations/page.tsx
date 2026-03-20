@@ -341,32 +341,6 @@ export default function IntegrationsPage() {
           )}
         </div>
 
-        {/* Coming Soon Card */}
-        <Card className="opacity-75">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Target className="w-6 h-6 text-gray-600" />
-              </div>
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  More Integrations
-                  <Badge variant="outline">Coming Soon</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Facebook Pixel, Google Tag Manager, and more tracking platforms
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              We're working on adding support for more popular tracking and analytics platforms. 
-              Stay tuned for updates!
-            </p>
-          </CardContent>
-        </Card>
-
         {/* Help Section */}
         <Card>
           <CardHeader>
