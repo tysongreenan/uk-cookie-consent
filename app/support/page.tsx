@@ -147,8 +147,8 @@ export default function SupportPage() {
                     Do you offer custom banner development?
                   </h3>
                   <p className="text-muted-foreground">
-                    Yes! For complex requirements or custom integrations, we can create tailored solutions. 
-                    Contact us with your specific needs and we'll provide a custom quote.
+                    Our Pro plan offers extensive customization — 13 layout positions, full branding control,
+                    and custom script templates. Contact us if you need help with setup.
                   </p>
                 </div>
               </div>

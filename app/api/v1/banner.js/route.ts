@@ -101,11 +101,16 @@ export async function GET(request: NextRequest) {
       updatedAt = new Date(bannerMeta.updatedAt).getTime()
     }
 
-    // Generate ETag based on database updatedAt (source of truth)
-    const etag = updatedAt ? `"${bannerId}-${updatedAt}"` : `"${bannerId}-${Date.now()}"`
+    // Generate ETag based on database updatedAt + geo data (source of truth)
+    // Geo data is included because the same banner serves different JS to different regions
+    const earlyGeoCountry = request.headers.get('x-vercel-ip-country') || 'unknown'
+    const earlyGeoRegion = request.headers.get('x-vercel-ip-country-region') || ''
+    const etag = updatedAt
+      ? `"${bannerId}-${updatedAt}-${earlyGeoCountry}-${earlyGeoRegion}"`
+      : `"${bannerId}-${Date.now()}-${earlyGeoCountry}-${earlyGeoRegion}"`
     const ifNoneMatch = request.headers.get('if-none-match')
 
-    // If client has matching ETag (same updatedAt), return 304 Not Modified
+    // If client has matching ETag (same updatedAt + same geo), return 304 Not Modified
     // The ETag is based on database timestamp, so this works correctly across serverless instances
     if (ifNoneMatch === etag && updatedAt) {
       return new NextResponse(null, {
@@ -150,8 +155,9 @@ export async function GET(request: NextRequest) {
     }
     
     // Use updatedAt from banner (already fetched above)
+    // Reuse earlyGeoCountry/earlyGeoRegion from above for consistent ETag format
     const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
-    const finalEtag = `"${bannerId}-${bannerUpdatedAt}"`
+    const finalEtag = `"${bannerId}-${bannerUpdatedAt}-${earlyGeoCountry}-${earlyGeoRegion}"`
     
     if (banner.isActive === false) {
       // Check if client has cached version (304 Not Modified)
@@ -177,10 +183,10 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    const config = typeof banner.config === 'string' 
-      ? JSON.parse(banner.config) 
+    const config = typeof banner.config === 'string'
+      ? JSON.parse(banner.config)
       : banner.config
-    
+
     // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'
     const bannerUserId = banner.userId || null
@@ -200,6 +206,39 @@ export async function GET(request: NextRequest) {
     // Strip GA4 integration for free users (server-side enforcement)
     if (ownerPlanTier === 'free' && config.integrations?.googleAnalytics) {
       config.integrations.googleAnalytics.enabled = false
+    }
+
+    // Geo-targeting: read Vercel geo headers and apply matching rule overrides
+    // Only apply geo rules for paid plans (server-side enforcement)
+    const visitorCountry = request.headers.get('x-vercel-ip-country') || ''
+    const visitorRegion = request.headers.get('x-vercel-ip-country-region') || ''
+    const geoRules = ownerPlanTier !== 'free' ? (config.geoRules || []) : []
+    // Try specific match (country + region) first, then fall back to country-only match
+    const matchedGeoRule = geoRules.find((rule: any) => {
+      if (!rule.enabled) return false
+      return rule.country === visitorCountry && rule.region && rule.region === visitorRegion
+    }) || geoRules.find((rule: any) => {
+      if (!rule.enabled) return false
+      return rule.country === visitorCountry && !rule.region
+    })
+
+    if (matchedGeoRule) {
+      const overrides = matchedGeoRule.overrides
+      if (overrides.showRejectButton !== undefined) {
+        config.behavior.showRejectButton = overrides.showRejectButton
+      }
+      if (overrides.dismissOnScroll !== undefined) {
+        config.behavior.dismissOnScroll = overrides.dismissOnScroll
+      }
+      if (overrides.language) {
+        config.language = overrides.language
+      }
+      if (overrides.requiresOptIn) {
+        // Strict opt-in: force reject button, disable scroll dismiss, hide close button
+        config.behavior.showRejectButton = true
+        config.behavior.dismissOnScroll = false
+        config._geoRequiresOptIn = true
+      }
     }
 
     // Generate all components
@@ -251,12 +290,7 @@ export async function GET(request: NextRequest) {
     } catch(e) { return 'direct'; }
   })();
   var _cbDevice = screen.width < 768 ? 'mobile' : (screen.width < 1024 ? 'tablet' : 'desktop');
-  var _cbCountry = (function() {
-    try {
-      var parts = (navigator.language || '').split('-');
-      return parts.length > 1 ? parts[parts.length - 1].toUpperCase().slice(0, 2) : 'unknown';
-    } catch(e) { return 'unknown'; }
-  })();
+  var _cbCountry = ${JSON.stringify(visitorCountry || 'unknown')};
   var _cbPagePath = location.pathname.slice(0, 200);
 
   function _cbQueueEvent(type, extra) {

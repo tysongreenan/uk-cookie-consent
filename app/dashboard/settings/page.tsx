@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession, signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown, FileText, Download } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
@@ -26,8 +26,35 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [isLoadingPortal, setIsLoadingPortal] = useState(false)
+  const [invoices, setInvoices] = useState<Array<{
+    id: string
+    number: string | null
+    amount: number
+    currency: string
+    status: string | null
+    created: number
+    pdf: string | null
+    hosted_url: string | null
+  }>>([])
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState(false)
+  const [invoiceError, setInvoiceError] = useState(false)
 
   const planTier = session?.user?.planTier || 'free'
+
+  useEffect(() => {
+    if (planTier !== 'free') {
+      setIsLoadingInvoices(true)
+      setInvoiceError(false)
+      fetch('/api/stripe/invoices')
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to fetch invoices')
+          return res.json()
+        })
+        .then((data) => setInvoices(data.invoices || []))
+        .catch(() => setInvoiceError(true))
+        .finally(() => setIsLoadingInvoices(false))
+    }
+  }, [planTier])
 
   const handleManageBilling = async () => {
     setIsLoadingPortal(true)
@@ -184,6 +211,75 @@ export default function SettingsPage() {
                     </>
                   )}
                 </Button>
+              )}
+
+              {/* Invoices */}
+              {planTier !== 'free' && (
+                <div className="pt-2">
+                  <h4 className="font-medium text-sm flex items-center gap-2 mb-3">
+                    <FileText className="h-4 w-4" />
+                    Invoices & Receipts
+                  </h4>
+                  {isLoadingInvoices ? (
+                    <div className="text-sm text-muted-foreground">Loading invoices...</div>
+                  ) : invoiceError ? (
+                    <div className="text-sm text-red-600">Failed to load invoices. You can view them in the billing portal above.</div>
+                  ) : invoices.length === 0 ? (
+                    <div className="text-sm text-muted-foreground">No invoices yet</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {invoices.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/20"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">
+                                {inv.number || 'Invoice'}
+                              </span>
+                              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                                inv.status === 'paid'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-yellow-100 text-yellow-700'
+                              }`}>
+                                {inv.status || 'pending'}
+                              </span>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {new Date(inv.created * 1000).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                              {' · '}
+                              {new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: inv.currency,
+                              }).format(inv.amount / 100)}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 ml-2">
+                            {inv.hosted_url && (
+                              <Button variant="ghost" size="sm" asChild>
+                                <a href={inv.hosted_url} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                              </Button>
+                            )}
+                            {inv.pdf && (
+                              <Button variant="ghost" size="sm" asChild>
+                                <a href={inv.pdf} target="_blank" rel="noopener noreferrer">
+                                  <Download className="h-3.5 w-3.5" />
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>

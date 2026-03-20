@@ -61,12 +61,10 @@ export default function PricingPage() {
       description: 'For large organizations',
       features: [
         'Everything in Pro',
-        'White-Label for Your Clients',
-        'Dedicated Support Manager',
-        'Custom Integrations Built for You',
-        'API Access',
-        '99.9% Uptime SLA Guarantee',
-        'On-Premise Deployment Available'
+        'Priority Support with Named Contact',
+        'Custom Onboarding & Setup',
+        'Increased Team Member Limits',
+        'Annual Support Agreement'
       ],
       cta: 'Contact Sales',
       tier: 'enterprise',
@@ -180,8 +178,8 @@ export default function PricingPage() {
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">Is there a free trial for Pro?</h3>
               <p className="text-sm text-muted-foreground">
-                You can use the Free plan with unlimited websites and GA4 integration. 
-                Upgrade to Pro when you need advanced features like analytics and team collaboration.
+                You can use the Free plan with unlimited websites to test our banner builder.
+                Upgrade to Pro when you need analytics, GA4 integration, team collaboration, and advanced layouts.
               </p>
             </div>
           </div>

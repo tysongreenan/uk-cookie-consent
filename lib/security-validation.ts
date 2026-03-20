@@ -157,10 +157,11 @@ export function validateInvitationToken(token: string): { valid: boolean; error?
 /**
  * Validate payment amount (in cents)
  * Pro plan is $99.00 (9900 cents). With promotion codes we allow discounts
- * down to $1.00 (100 cents), but never above the listed price.
+ * down to $1.00 (100 cents). Tax is added on top (exclusive), so the max
+ * accounts for the highest possible tax rate (~30% buffer).
  */
-export const PAYMENT_AMOUNT_MIN_CENTS = 100   // $1.00 — deepest allowed discount
-export const PAYMENT_AMOUNT_MAX_CENTS = 9900  // $99.00 — full listed price
+export const PAYMENT_AMOUNT_MIN_CENTS = 100    // $1.00 — deepest allowed discount
+export const PAYMENT_AMOUNT_MAX_CENTS = 13000  // $130.00 — $99 + up to ~30% tax
 
 export function validatePaymentAmount(amount: number): { valid: boolean; error?: string } {
   if (!Number.isFinite(amount) || !Number.isInteger(amount)) {

@@ -1,5 +1,20 @@
 export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'custom'
 
+// Geo-targeting rules for region-specific consent behavior
+export interface GeoRule {
+  id: string
+  name: string // e.g., "Quebec - Law 25"
+  country: string // ISO 3166-1 alpha-2, e.g., "CA"
+  region?: string // ISO 3166-2 region code, e.g., "QC"
+  enabled: boolean
+  overrides: {
+    requiresOptIn: boolean // true = strict opt-in, no implied consent
+    showRejectButton: boolean // force showing reject button
+    dismissOnScroll: boolean // override scroll dismiss behavior
+    language?: 'en' | 'fr' | 'auto' // override language
+  }
+}
+
 // Button layout presets for cookie banners
 export type ButtonLayout = 'standard' | 'soft-consent' | 'accept-only'
 
@@ -143,6 +158,9 @@ export interface BannerConfig {
     }
   }
   
+  // Geo-targeting
+  geoRules?: GeoRule[]
+
   // Integrations
   integrations?: {
     googleAnalytics?: {
@@ -153,6 +171,11 @@ export interface BannerConfig {
       anonymizeIp: boolean
     }
   }
+}
+
+// Internal config type used at serving time — includes runtime overrides not persisted to DB
+export interface BannerConfigWithGeoOverrides extends BannerConfig {
+  _geoRequiresOptIn?: boolean
 }
 
 export interface TrackingScript {
@@ -399,6 +422,7 @@ export interface PlanFeatures {
   hasImageUpload: boolean
   hasBrandingRemoval: boolean
   hasBenchmarkInsights: boolean
+  hasGeoTargeting: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'dedicated'
 }

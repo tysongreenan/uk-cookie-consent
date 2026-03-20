@@ -12,6 +12,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasImageUpload: false,
     hasBrandingRemoval: false,
     hasBenchmarkInsights: false,
+    hasGeoTargeting: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
   },
@@ -26,6 +27,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasImageUpload: true,
     hasBrandingRemoval: true,
     hasBenchmarkInsights: true,
+    hasGeoTargeting: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'priority'
   },
@@ -40,6 +42,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasImageUpload: true,
     hasBrandingRemoval: true,
     hasBenchmarkInsights: true,
+    hasGeoTargeting: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'dedicated'
   }
@@ -63,6 +66,8 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasBrandingRemoval
     case 'hasBenchmarkInsights':
       return features.hasBenchmarkInsights
+    case 'hasGeoTargeting':
+      return features.hasGeoTargeting
     case 'maxWebsites':
       return features.maxWebsites === 'unlimited' || features.maxWebsites > 0
     case 'maxBanners':

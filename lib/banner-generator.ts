@@ -1,4 +1,4 @@
-import { BannerConfig, TrackingScript } from '@/types'
+import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {
@@ -782,7 +782,7 @@ input:checked + span:before {
 ${config.advanced.customCSS}`
 }
 
-export const generateBannerJS = (config: BannerConfig) => {
+export const generateBannerJS = (config: BannerConfigWithGeoOverrides) => {
   const performanceOptions = config.advanced?.performance ?? {}
   const useLazyLoader = Boolean(
     performanceOptions.deferNonCriticalScripts ||
@@ -938,6 +938,7 @@ var COOKIE_NAME = 'cookie_consent';
 var COOKIE_EXPIRY = ${Number(config.behavior.cookieExpiry) || 182};
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
+var GEO_REQUIRES_OPT_IN = ${Boolean(config._geoRequiresOptIn)};
 
 // Load Material Symbols font for cookie icons (if not already loaded)
 (function loadMaterialSymbolsFont() {
@@ -1403,7 +1404,13 @@ function init() {
   var cancelPrefsBtn = document.getElementById('cookie-cancel-prefs-btn');
   
   if (!banner) return;
-  
+
+  // Geo-targeting: strict opt-in enforcement
+  // When a geo rule requires opt-in, hide the close button so visitors must explicitly choose
+  if (GEO_REQUIRES_OPT_IN && closeBtn) {
+    closeBtn.style.display = 'none';
+  }
+
   // Apply language translations
   applyTranslations();
   
@@ -1430,7 +1437,7 @@ function init() {
     rejectBtn.dataset.handlerAttached = 'true';
   }
 
-  if (closeBtn && !closeBtn.dataset.handlerAttached) {
+  if (closeBtn && !closeBtn.dataset.handlerAttached && !GEO_REQUIRES_OPT_IN) {
     closeBtn.addEventListener('click', function() {
       banner.style.display = 'none';
       trackConsentEvent('dismiss');

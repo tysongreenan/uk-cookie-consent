@@ -43,11 +43,10 @@ const plans = [
     description: 'For large organizations',
     features: [
       'Everything in Pro',
-      'White-label options',
-      'API access',
-      'Custom integrations',
-      'Dedicated support',
-      '99.9% SLA guarantee',
+      'Priority support with named contact',
+      'Custom onboarding & setup',
+      'Increased team member limits',
+      'Annual support agreement',
     ],
     buttonText: 'Contact Sales',
     popular: false,
@@ -62,7 +61,7 @@ export function Pricing() {
           Simple, transparent pricing
         </h2>
         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-          Choose the plan that fits your needs. Upgrade or downgrade at any time.
+          Choose the plan that fits your needs. Start free, upgrade when ready.
         </p>
       </div>
       

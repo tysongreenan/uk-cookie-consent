@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -34,6 +35,18 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe checkout session
     const stripe = getStripe()
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
+
+    // Check for existing Stripe customer to avoid creating duplicates
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { stripeCustomerId: true },
+    })
+
+    const customerParams: Record<string, unknown> = user?.stripeCustomerId
+      ? { customer: user.stripeCustomerId }
+      : { customer_email: session.user.email || undefined, customer_creation: 'always' as const }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -43,26 +56,39 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: 'UK Cookie Consent Pro - Lifetime Access',
               description: 'Analytics dashboard, team collaboration, custom layouts, logo uploads, and priority support - lifetime access with all future updates included',
-              images: [`${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/logo.png`],
+              images: [`${BASE_URL}/logo.png`],
             },
             unit_amount: 9900, // $99.00 in cents
+            tax_behavior: 'exclusive',
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/upgrade`,
-      customer_email: session.user.email,
+      success_url: `${BASE_URL}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${BASE_URL}/upgrade`,
+      ...customerParams,
       metadata: {
         userId: session.user.id,
         userEmail: session.user.email || '',
         planTier: 'pro'
       },
       allow_promotion_codes: true,
-      billing_address_collection: 'auto',
+      billing_address_collection: 'required',
+      tax_id_collection: {
+        enabled: true,
+      },
+      automatic_tax: {
+        enabled: true,
+      },
       invoice_creation: {
         enabled: true,
+        invoice_data: {
+          footer: 'Thank you for your purchase. This invoice serves as your tax receipt.',
+        },
+      },
+      payment_intent_data: {
+        receipt_email: session.user.email || undefined,
       },
     })
 

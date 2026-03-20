@@ -12,14 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'react-hot-toast'
-import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner } from '@/types'
+import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
@@ -1137,23 +1137,25 @@ function BannerBuilderContent() {
                                    activeTab === 'design' ? 33 :
                                    activeTab === 'content' ? 44 :
                                    activeTab === 'scripts' ? 56 :
-                                   activeTab === 'cookie-settings' ? 67 :
-                                   activeTab === 'behavior' ? 78 :
-                                   activeTab === 'analytics' ? 89 : 100))}%
+                                   activeTab === 'cookie-settings' ? 60 :
+                                   activeTab === 'behavior' ? 70 :
+                                   activeTab === 'geo-targeting' ? 80 :
+                                   activeTab === 'analytics' ? 90 : 100))}%
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${activeTab === 'compliance' ? 11 :
-                                 activeTab === 'brand' ? 22 :
-                                 activeTab === 'design' ? 33 :
-                                 activeTab === 'content' ? 44 :
-                                 activeTab === 'scripts' ? 56 :
-                                 activeTab === 'cookie-settings' ? 67 :
-                                 activeTab === 'behavior' ? 78 :
-                                 activeTab === 'analytics' ? 89 : 100}%`
+                        width: `${activeTab === 'compliance' ? 10 :
+                                 activeTab === 'brand' ? 20 :
+                                 activeTab === 'design' ? 30 :
+                                 activeTab === 'content' ? 40 :
+                                 activeTab === 'scripts' ? 50 :
+                                 activeTab === 'cookie-settings' ? 60 :
+                                 activeTab === 'behavior' ? 70 :
+                                 activeTab === 'geo-targeting' ? 80 :
+                                 activeTab === 'analytics' ? 90 : 100}%`
                       }}
                     ></div>
                   </div>
@@ -1257,6 +1259,19 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    onClick={() => setActiveTab('geo-targeting')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'geo-targeting'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Globe className="h-4 w-4" />
+                    <span className="flex-1 text-left">Geo-Targeting</span>
+                    {(config.geoRules?.length ?? 0) > 0 && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                  </button>
+
+                  <button
                     onClick={() => setActiveTab('analytics')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'analytics'
@@ -1296,6 +1311,7 @@ function BannerBuilderContent() {
                    activeTab === 'scripts' ? 'Configure Tracking Scripts' :
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
                    activeTab === 'behavior' ? 'Set Banner Behavior' :
+                   activeTab === 'geo-targeting' ? 'Geo-Targeting Rules' :
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -1306,6 +1322,7 @@ function BannerBuilderContent() {
                    activeTab === 'scripts' ? 'Configure tracking scripts and cookie categories.' :
                    activeTab === 'cookie-settings' ? 'Configure how users can manage their cookie preferences after initial consent.' :
                    activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
+                   activeTab === 'geo-targeting' ? 'Show different consent behavior based on visitor location. Requires Pro plan.' :
                    activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
                    'Copy the code below and paste it into your website to activate your cookie banner.'}
                 </p>
@@ -3711,6 +3728,320 @@ function BannerBuilderContent() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Geo-Targeting Tab */}
+              <TabsContent value="geo-targeting" className="space-y-6" id="geo-targeting-panel" role="tabpanel" aria-labelledby="geo-targeting-tab">
+                {!canAccessFeature(userPlan, 'hasGeoTargeting') ? (
+                  <UpgradePrompt feature="Geo-Targeting" description="Show different consent behavior based on visitor location. Perfect for Quebec Law 25 compliance." />
+                ) : (
+                  <>
+                    <Card className="relative border-l-4 border-l-emerald-500">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <Globe className="h-5 w-5" />
+                            Geo-Targeting Rules
+                          </CardTitle>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newRule: GeoRule = {
+                                id: crypto.randomUUID(),
+                                name: '',
+                                country: 'CA',
+                                region: '',
+                                enabled: true,
+                                overrides: {
+                                  requiresOptIn: true,
+                                  showRejectButton: true,
+                                  dismissOnScroll: false,
+                                  language: 'auto'
+                                }
+                              }
+                              setConfig((prev: BannerConfig) => ({
+                                ...prev,
+                                geoRules: [...(prev.geoRules || []), newRule]
+                              }))
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-1" /> Add Rule
+                          </Button>
+                        </div>
+                        <CardDescription>
+                          Show different consent behavior based on visitor location. Uses server-side IP detection via Vercel for accurate geo-targeting.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Quebec Law 25 Preset */}
+                        {!(config.geoRules || []).some((r: GeoRule) => r.country === 'CA' && r.region === 'QC') && (
+                          <Alert className="border-amber-200 bg-amber-50">
+                            <AlertDescription className="flex items-center justify-between">
+                              <span className="text-sm">
+                                <strong>Quebec Law 25</strong> requires strict opt-in consent with French language support.
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="ml-4 shrink-0"
+                                onClick={() => {
+                                  const quebecRule: GeoRule = {
+                                    id: crypto.randomUUID(),
+                                    name: 'Quebec - Law 25',
+                                    country: 'CA',
+                                    region: 'QC',
+                                    enabled: true,
+                                    overrides: {
+                                      requiresOptIn: true,
+                                      showRejectButton: true,
+                                      dismissOnScroll: false,
+                                      language: 'fr'
+                                    }
+                                  }
+                                  setConfig((prev: BannerConfig) => ({
+                                    ...prev,
+                                    geoRules: [...(prev.geoRules || []), quebecRule]
+                                  }))
+                                }}
+                              >
+                                Add Quebec Rule
+                              </Button>
+                            </AlertDescription>
+                          </Alert>
+                        )}
+
+                        {(!config.geoRules || config.geoRules.length === 0) && (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Globe className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                            <p className="text-sm">No geo-targeting rules configured.</p>
+                            <p className="text-xs mt-1">Your banner will show the same behavior to all visitors.</p>
+                          </div>
+                        )}
+
+                        {(config.geoRules || []).map((rule: GeoRule, index: number) => {
+                          const isDuplicate = (config.geoRules || []).some((other: GeoRule) =>
+                            other.id !== rule.id && other.country === rule.country && (other.region || '') === (rule.region || '')
+                          )
+                          return (
+                          <Card key={rule.id} className={`border ${isDuplicate ? 'border-amber-400' : ''}`}>
+                            <CardContent className="pt-4 space-y-4">
+                              {isDuplicate && (
+                                <Alert className="border-amber-200 bg-amber-50 py-2">
+                                  <AlertDescription className="text-xs text-amber-700">
+                                    Duplicate rule — another rule targets the same country/region. Only the first matching rule will apply.
+                                  </AlertDescription>
+                                </Alert>
+                              )}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={rule.enabled}
+                                    onCheckedChange={(checked) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, enabled: checked } : r
+                                        )
+                                      }))
+                                    }}
+                                  />
+                                  <Input
+                                    value={rule.name}
+                                    onChange={(e) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, name: e.target.value } : r
+                                        )
+                                      }))
+                                    }}
+                                    placeholder="Rule name (e.g., Quebec - Law 25)"
+                                    className="max-w-[250px]"
+                                  />
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setConfig((prev: BannerConfig) => ({
+                                      ...prev,
+                                      geoRules: (prev.geoRules || []).filter((r: GeoRule) => r.id !== rule.id)
+                                    }))
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Country</Label>
+                                  <Select
+                                    value={rule.country}
+                                    onValueChange={(value) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, country: value, region: '' } : r
+                                        )
+                                      }))
+                                    }}
+                                  >
+                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="CA">Canada</SelectItem>
+                                      <SelectItem value="US">United States</SelectItem>
+                                      <SelectItem value="GB">United Kingdom</SelectItem>
+                                      <SelectItem value="DE">Germany</SelectItem>
+                                      <SelectItem value="FR">France</SelectItem>
+                                      <SelectItem value="AU">Australia</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label>Region (optional)</Label>
+                                  {rule.country === 'CA' ? (
+                                    <Select
+                                      value={rule.region || '__none__'}
+                                      onValueChange={(value) => {
+                                        setConfig((prev: BannerConfig) => ({
+                                          ...prev,
+                                          geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                            r.id === rule.id ? { ...r, region: value === '__none__' ? '' : value } : r
+                                          )
+                                        }))
+                                      }}
+                                    >
+                                      <SelectTrigger><SelectValue /></SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="__none__">All regions</SelectItem>
+                                        <SelectItem value="QC">Quebec</SelectItem>
+                                        <SelectItem value="ON">Ontario</SelectItem>
+                                        <SelectItem value="BC">British Columbia</SelectItem>
+                                        <SelectItem value="AB">Alberta</SelectItem>
+                                        <SelectItem value="SK">Saskatchewan</SelectItem>
+                                        <SelectItem value="MB">Manitoba</SelectItem>
+                                        <SelectItem value="NB">New Brunswick</SelectItem>
+                                        <SelectItem value="NS">Nova Scotia</SelectItem>
+                                        <SelectItem value="PE">Prince Edward Island</SelectItem>
+                                        <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <Input
+                                      value={rule.region || ''}
+                                      onChange={(e) => {
+                                        setConfig((prev: BannerConfig) => ({
+                                          ...prev,
+                                          geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                            r.id === rule.id ? { ...r, region: e.target.value.toUpperCase().slice(0, 3) } : r
+                                          )
+                                        }))
+                                      }}
+                                      placeholder="e.g., CA, NY, TX"
+                                      maxLength={3}
+                                    />
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="space-y-3 pt-2 border-t">
+                                <Label className="text-xs font-semibold uppercase text-muted-foreground">Overrides for this region</Label>
+
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <Label className="text-sm">Require strict opt-in</Label>
+                                    <p className="text-xs text-muted-foreground">Hides close button, forces explicit accept/reject</p>
+                                  </div>
+                                  <Switch
+                                    checked={rule.overrides.requiresOptIn}
+                                    onCheckedChange={(checked) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, requiresOptIn: checked, ...(checked ? { showRejectButton: true, dismissOnScroll: false } : {}) } } : r
+                                        )
+                                      }))
+                                    }}
+                                  />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <Label className="text-sm">Show reject button</Label>
+                                    <p className="text-xs text-muted-foreground">Always show reject option for this region</p>
+                                  </div>
+                                  <Switch
+                                    checked={rule.overrides.showRejectButton}
+                                    disabled={rule.overrides.requiresOptIn}
+                                    onCheckedChange={(checked) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, showRejectButton: checked } } : r
+                                        )
+                                      }))
+                                    }}
+                                  />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <Label className="text-sm">Allow dismiss on scroll</Label>
+                                    <p className="text-xs text-muted-foreground">Let visitors dismiss banner by scrolling</p>
+                                  </div>
+                                  <Switch
+                                    checked={rule.overrides.dismissOnScroll}
+                                    disabled={rule.overrides.requiresOptIn}
+                                    onCheckedChange={(checked) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, dismissOnScroll: checked } } : r
+                                        )
+                                      }))
+                                    }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <Label className="text-sm">Language override</Label>
+                                  <Select
+                                    value={rule.overrides.language || 'auto'}
+                                    onValueChange={(value) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, language: value as 'en' | 'fr' | 'auto' } } : r
+                                        )
+                                      }))
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="auto">Auto-detect</SelectItem>
+                                      <SelectItem value="en">English</SelectItem>
+                                      <SelectItem value="fr">French</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          )
+                        })}
+                      </CardContent>
+                    </Card>
+
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        Geo-targeting uses Vercel&apos;s server-side IP detection headers. Rules are matched from most specific (country + region) to least specific (country only). When no rule matches, your default banner behavior is used. In local development, geo headers are not available so rules will not match.
+                      </AlertDescription>
+                    </Alert>
+                  </>
+                )}
               </TabsContent>
 
               {/* Performance Tab */}

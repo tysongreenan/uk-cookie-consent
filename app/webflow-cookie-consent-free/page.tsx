@@ -82,7 +82,7 @@ export default function WebflowCookieConsentFreePage() {
         "name": "What's the difference between free and paid plans?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The free plan covers all essential compliance features. Paid plans add advanced analytics, white-label options, client management, and priority support for agencies."
+          "text": "The free plan covers all essential compliance features. Paid plans add advanced analytics, additional layout options, team collaboration, and priority support."
         }
       }
     ]
@@ -445,7 +445,7 @@ export default function WebflowCookieConsentFreePage() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5 text-primary" />
-                        <span>Basic analytics</span>
+                        <span>GDPR &amp; PIPEDA compliant</span>
                       </li>
                     </ul>
                     <Link href="/auth/register">
@@ -463,7 +463,7 @@ export default function WebflowCookieConsentFreePage() {
                       <Zap className="h-8 w-8 text-accent-cool" />
                     </div>
                     <CardTitle className="text-2xl">Pro Plan</CardTitle>
-                    <CardDescription className="text-lg font-semibold text-muted-foreground">$19/month</CardDescription>
+                    <CardDescription className="text-lg font-semibold text-muted-foreground">$99 one-time</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
@@ -477,7 +477,7 @@ export default function WebflowCookieConsentFreePage() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5 text-muted-foreground" />
-                        <span>White-label options</span>
+                        <span>14 layout positions</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5 text-muted-foreground" />
@@ -585,7 +585,7 @@ export default function WebflowCookieConsentFreePage() {
                   <CardContent>
                     <p className="text-muted-foreground">
                       The free plan covers all essential compliance features. Paid plans add advanced
-                      analytics, white-label options, client management, and priority support for agencies.
+                      analytics, additional layout options, team collaboration, and priority support.
                     </p>
                   </CardContent>
                 </Card>

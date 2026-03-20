@@ -413,7 +413,7 @@ export default function FreeCookieBannerPage() {
                   <CardContent>
                     <p className="text-gray-600">
                       There's no catch. We offer free cookie banners to build trust and showcase our technology. 
-                      Advanced features like white-labeling and agency tools are available in paid plans, 
+                      Advanced features like analytics, team collaboration, and additional layouts are available in paid plans,
                       but basic compliance is free on our free plan.
                     </p>
                   </CardContent>

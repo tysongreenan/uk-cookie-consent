@@ -41,6 +41,7 @@ import {
   Lock,
   HelpCircle,
   RefreshCw,
+  Download,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
@@ -186,6 +187,7 @@ export default function AnalyticsPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [ga4NoticeDismissed, setGa4NoticeDismissed] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
   const chartColors = useChartColors()
 
   const bannersWithoutGa4 = useMemo(() => banners.filter(b => !b.hasGa4), [banners])
@@ -416,6 +418,38 @@ export default function AnalyticsPage() {
               <span className="text-xs text-muted-foreground tabular-nums">
                 Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
+            )}
+            {analyticsEnabled && (
+              <div className="relative">
+                <button
+                  onClick={() => setExportOpen(!exportOpen)}
+                  className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:text-foreground hover:border-primary/40"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export
+                </button>
+                {exportOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setExportOpen(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-20 rounded-md border border-border bg-card shadow-lg py-1 min-w-[120px]">
+                      <a
+                        href={`/api/analytics/export?format=csv${selectedBanner !== 'all' ? `&bannerId=${selectedBanner}` : ''}`}
+                        className="block px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        onClick={() => setExportOpen(false)}
+                      >
+                        Download CSV
+                      </a>
+                      <a
+                        href={`/api/analytics/export?format=json${selectedBanner !== 'all' ? `&bannerId=${selectedBanner}` : ''}`}
+                        className="block px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        onClick={() => setExportOpen(false)}
+                      >
+                        Download JSON
+                      </a>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
             {analyticsEnabled && (
               <button
