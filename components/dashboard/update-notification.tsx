@@ -25,7 +25,7 @@ export function UpdateNotification({
 
   useEffect(() => {
     // Check if user has dismissed this notification before
-    const dismissed = localStorage.getItem('banner-update-dismissed')
+    const dismissed = localStorage.getItem('banner-update-dismissed-v2.1')
     if (dismissed === 'true') {
       setIsDismissed(true)
     }
@@ -42,7 +42,7 @@ export function UpdateNotification({
 
   const handleDismiss = () => {
     setIsDismissed(true)
-    localStorage.setItem('banner-update-dismissed', 'true')
+    localStorage.setItem('banner-update-dismissed-v2.1', 'true')
     onDismiss()
   }
 
@@ -51,11 +51,9 @@ export function UpdateNotification({
   }
 
   const features = migrationNotes.length > 0 ? migrationNotes : [
-    '🎯 Perfect icon centering with Material Symbols integration',
-    '🛡️ Bulletproof CSS that resists external website interference',
-    '⏱️ Enhanced banner timing - floating button appears after consent',
-    '🔧 Improved toggle functionality and modal state management',
-    '✨ Better user experience with centered icons and smooth interactions'
+    'Geo-Targeting — show different consent rules by visitor location (e.g., Quebec Law 25)',
+    'Improved Analytics — accurate country tracking via server-side IP detection',
+    'Add your GA4 Measurement ID in the Analytics tab to pass consent data to Google Analytics',
   ]
 
   return (
@@ -138,7 +136,7 @@ export function UpdateNotification({
                     >
                       <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 shadow-md">
                         <Zap className="w-3 h-3 mr-1" />
-                        v2.0.1
+                        v2.1
                       </Badge>
                     </motion.div>
                   </div>
@@ -149,7 +147,7 @@ export function UpdateNotification({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                   >
-                    Your cookie banners have been <span className="font-semibold text-purple-600">automatically upgraded</span> with reliability improvements:
+                    New features are now available for <span className="font-semibold text-purple-600">Pro users</span>:
                   </motion.p>
                   
                   {/* Feature list with staggered animation */}
