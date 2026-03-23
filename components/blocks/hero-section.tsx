@@ -251,15 +251,18 @@ export function HeroSection({
   const handleUrlSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!url) return
-    
+
     setIsLoading(true)
     try {
-      // Normalize URL
-      let normalizedUrl = url.trim()
-      if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
-        normalizedUrl = `https://${normalizedUrl}`
-      }
-      
+      // Normalize: strip protocol, www, paths — just get the clean domain
+      let domain = url.trim().toLowerCase()
+      domain = domain.replace(/^https?:\/\//, '')
+      domain = domain.replace(/^www\./, '')
+      domain = domain.replace(/\/+$/, '')
+      domain = domain.split('/')[0].split('?')[0].split('#')[0]
+
+      const normalizedUrl = `https://${domain}`
+
       // Navigate to builder with URL as query param
       // The builder will handle discovery
       router.push(`/builder?url=${encodeURIComponent(normalizedUrl)}`)
@@ -479,8 +482,8 @@ export function HeroSection({
                     <div className="flex flex-col sm:flex-row gap-3 p-1 bg-muted/50 rounded-lg border border-border relative z-30">
                       <Input
                         ref={urlInputRef}
-                        type="url"
-                        placeholder="millerwaste.ca"
+                        type="text"
+                        placeholder="yourdomain.com"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         onFocus={handleUrlFocus}
