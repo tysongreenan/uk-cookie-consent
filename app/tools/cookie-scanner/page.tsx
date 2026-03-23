@@ -6,7 +6,7 @@ import { FinalCTA } from '@/components/landing/final-cta'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CookieScanner } from './cookie-scanner'
-import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight, Globe, Eye } from 'lucide-react'
+import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Free Website Cookie Scanner — GDPR, CCPA & PIPEDA Check in 30s',
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     title: 'Free Website Cookie Scanner — Find Every Cookie in 30 Seconds',
     description: 'Scan any website for cookies in 30 seconds. Free cookie audit tool checks GDPR, CCPA & PIPEDA compliance. No signup needed. Instant actionable results.',
     type: 'website',
+    url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
@@ -132,16 +133,19 @@ export default function CookieScannerPage() {
     "step": [
       {
         "@type": "HowToStep",
+        "position": 1,
         "name": "Enter your website URL",
         "text": "Type or paste your website URL into the cookie scanner input field. The scanner accepts any public website URL."
       },
       {
         "@type": "HowToStep",
+        "position": 2,
         "name": "Run the cookie scan",
         "text": "Click the Scan Now button. The cookie scanning tool will load your website in a real browser environment and detect all cookies and tracking scripts."
       },
       {
         "@type": "HowToStep",
+        "position": 3,
         "name": "Review your cookie audit results",
         "text": "Review the compliance report showing all detected cookies, their categories, security settings, and specific recommendations for GDPR, CCPA, PIPEDA, and Law 25 compliance."
       }
@@ -175,7 +179,7 @@ export default function CookieScannerPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <div className="border border-border rounded-full px-3 py-1 text-xs font-mono tracking-wide uppercase text-muted-foreground inline-block mb-4">
-                Free -- No Signup Required
+                Free &mdash; No Signup Required
               </div>
               <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight mb-3">
                 Scan any website for cookies

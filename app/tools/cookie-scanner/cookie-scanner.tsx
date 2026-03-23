@@ -1,15 +1,12 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   ArrowRight,
   Loader2,
   Check,
-  Globe,
-  Search,
   Shield,
   Zap,
   Activity,
@@ -19,7 +16,6 @@ import {
   ChevronUp,
   Lock,
   Unlock,
-  ExternalLink,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -88,6 +84,15 @@ const GRADE_COLORS: Record<string, { bg: string; text: string; border: string }>
 }
 
 const EXAMPLE_URLS = ['shopify.com', 'wordpress.org', 'stripe.com']
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.4, 0.25, 1] },
+  }),
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -193,7 +198,7 @@ async function performScan(targetUrl: string): Promise<ScanResult> {
 
 // ─── SVG Donut Chart ─────────────────────────────────────────────────────────
 
-function DonutChart({ cookies }: { cookies: CookieData[] }) {
+const DonutChart = React.memo(function DonutChart({ cookies }: { cookies: CookieData[] }) {
   const categories = ['necessary', 'analytics', 'marketing', 'functional'] as const
   const counts = categories.map(cat => cookies.filter(c => c.category === cat).length)
   const total = cookies.length
@@ -203,7 +208,7 @@ function DonutChart({ cookies }: { cookies: CookieData[] }) {
 
   return (
     <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 200" className="w-48 h-48">
+      <svg viewBox="0 0 200 200" className="w-48 h-48" role="img" aria-label="Cookie category breakdown chart">
         {categories.map((cat, i) => {
           const pct = total > 0 ? counts[i] / total : 0
           const strokeLen = pct * circumference
@@ -244,7 +249,7 @@ function DonutChart({ cookies }: { cookies: CookieData[] }) {
       </div>
     </div>
   )
-}
+})
 
 // ─── Circular Score Gauge ────────────────────────────────────────────────────
 
@@ -264,12 +269,11 @@ function ScoreGauge({ score, size = 64 }: { score: number; size?: number }) {
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={score >= 80 ? '#059669' : score >= 65 ? '#d97706' : score >= 50 ? '#ea580c' : '#dc2626'}
+          className={`transition-all duration-1000 ${score >= 80 ? 'stroke-emerald-600' : score >= 65 ? 'stroke-amber-600' : score >= 50 ? 'stroke-orange-600' : 'stroke-red-600'}`}
           strokeWidth="5"
           strokeDasharray={`${filled} ${circumference - filled}`}
           strokeDashoffset={circumference * 0.25}
           strokeLinecap="round"
-          className="transition-all duration-1000"
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
@@ -334,16 +338,10 @@ export function CookieScanner() {
     }
   }
 
-  const filteredCookies = result?.cookies.filter(c => activeFilter === 'all' || c.category === activeFilter) ?? []
-
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.4, 0.25, 1] },
-    }),
-  }
+  const filteredCookies = useMemo(
+    () => result?.cookies.filter(c => activeFilter === 'all' || c.category === activeFilter) ?? [],
+    [result, activeFilter]
+  )
 
   return (
     <div className="w-full">
@@ -355,6 +353,7 @@ export function CookieScanner() {
               <span className="text-muted-foreground text-sm font-mono hidden sm:inline select-none">https://</span>
               <input
                 type="text"
+                aria-label="Website URL"
                 placeholder="Enter your website URL..."
                 value={url}
                 onChange={(e) => { setUrl(e.target.value); setError('') }}
@@ -435,7 +434,7 @@ export function CookieScanner() {
                 </motion.div>
               ))}
             </div>
-            <div className="mt-4 h-1 bg-muted rounded-full overflow-hidden">
+            <div className="mt-4 h-1 bg-muted rounded-full overflow-hidden" role="progressbar" aria-label="Scan progress" aria-valuemin={0} aria-valuemax={100}>
               <motion.div
                 className="h-full bg-primary rounded-full"
                 initial={{ width: '0%' }}
@@ -466,7 +465,7 @@ export function CookieScanner() {
             {EXAMPLE_URLS.map((example) => (
               <button
                 key={example}
-                onClick={() => { setUrl(example); handleScan(example) }}
+                onClick={() => handleScan(example)}
                 className="font-mono px-2 py-1 rounded border border-border hover:bg-accent transition-colors cursor-pointer"
               >
                 {example}
@@ -599,6 +598,7 @@ export function CookieScanner() {
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
+                    aria-pressed={activeFilter === filter}
                     className={`text-xs px-3 py-1.5 rounded-md capitalize transition-colors ${
                       activeFilter === filter
                         ? 'bg-primary text-primary-foreground'
@@ -626,11 +626,13 @@ export function CookieScanner() {
                 </thead>
                 <tbody>
                   {filteredCookies.map((cookie, i) => (
-                    <>
+                    <React.Fragment key={cookie.name}>
                       <tr
-                        key={`row-${i}`}
                         onClick={() => setExpandedCookie(expandedCookie === i ? null : i)}
                         className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-colors"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && setExpandedCookie(expandedCookie === i ? null : i)}
                       >
                         <td className="py-3 pr-4 font-mono text-sm font-medium">{cookie.name}</td>
                         <td className="py-3 pr-4 font-mono text-sm text-muted-foreground">{cookie.domain}</td>
@@ -642,14 +644,14 @@ export function CookieScanner() {
                         <td className="py-3 pr-4 text-sm">{cookie.expires}</td>
                         <td className="py-3 pr-4">
                           {cookie.secure ? (
-                            <Lock className="h-4 w-4 text-emerald-600" />
+                            <Lock className="h-4 w-4 text-emerald-600" aria-label="Secure" />
                           ) : (
-                            <Unlock className="h-4 w-4 text-red-500" />
+                            <Unlock className="h-4 w-4 text-red-500" aria-label="Not secure" />
                           )}
                         </td>
                         <td className="py-3 font-mono text-xs">{cookie.sameSite}</td>
                       </tr>
-                      <AnimatePresence key={`expand-${i}`}>
+                      <AnimatePresence>
                         {expandedCookie === i && (
                           <tr>
                             <td colSpan={6}>
@@ -669,7 +671,7 @@ export function CookieScanner() {
                           </tr>
                         )}
                       </AnimatePresence>
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
@@ -679,8 +681,11 @@ export function CookieScanner() {
             <div className="md:hidden space-y-3">
               {filteredCookies.map((cookie, i) => (
                 <div
-                  key={i}
+                  key={cookie.name}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setExpandedCookie(expandedCookie === i ? null : i)}
+                  onKeyDown={(e) => e.key === 'Enter' && setExpandedCookie(expandedCookie === i ? null : i)}
                   className="p-3 rounded-lg border border-border cursor-pointer hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-1">
@@ -759,12 +764,14 @@ export function CookieScanner() {
                   className="border-background/30 text-background hover:bg-background/10 px-6 py-3 h-auto rounded-lg font-medium"
                   onClick={() => {
                     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
-                    const url = URL.createObjectURL(blob)
+                    const downloadUrl = URL.createObjectURL(blob)
                     const a = document.createElement('a')
-                    a.href = url
+                    a.href = downloadUrl
                     a.download = `cookie-scan-${new Date().toISOString().slice(0, 10)}.json`
+                    document.body.appendChild(a)
                     a.click()
-                    URL.revokeObjectURL(url)
+                    document.body.removeChild(a)
+                    URL.revokeObjectURL(downloadUrl)
                   }}
                 >
                   <Download className="mr-2 h-4 w-4" />
