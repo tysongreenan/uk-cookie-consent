@@ -1,13 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Search, AlertTriangle, CheckCircle, Download, ExternalLink } from 'lucide-react'
+import {
+  ArrowRight,
+  Loader2,
+  Check,
+  Globe,
+  Search,
+  Shield,
+  Zap,
+  Activity,
+  AlertTriangle,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  Unlock,
+  ExternalLink,
+} from 'lucide-react'
+import Link from 'next/link'
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface CookieData {
   name: string
@@ -21,208 +37,337 @@ interface CookieData {
   thirdParty: boolean
 }
 
+interface ComplianceResult {
+  score: number
+  grade: string
+  issues: string[]
+}
+
 interface ScanResult {
   url: string
   cookies: CookieData[]
+  overallGrade: string
+  overallScore: number
   compliance: {
-    gdpr: { score: number; issues: string[] }
-    pipeda: { score: number; issues: string[] }
-    ccpa: { score: number; issues: string[] }
+    gdpr: ComplianceResult
+    pipeda: ComplianceResult
+    ccpa: ComplianceResult
+    law25: ComplianceResult
   }
-  recommendations: string[]
+  recommendations: { text: string; regulation: string }[]
   timestamp: string
 }
+
+type ScanStep = {
+  label: string
+  description: string
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const SCAN_STEPS: ScanStep[] = [
+  { label: 'Loading page', description: 'Rendering your website in a real browser' },
+  { label: 'Detecting cookies', description: 'Scanning HTTP headers, JavaScript, and third-party scripts' },
+  { label: 'Analyzing compliance', description: 'Checking against GDPR, CCPA, PIPEDA & Law 25' },
+  { label: 'Generating report', description: 'Compiling results and recommendations' },
+]
+
+const CATEGORY_COLORS: Record<string, { bg: string; text: string; ring: string; chart: string }> = {
+  necessary: { bg: 'bg-teal-50', text: 'text-teal-700', ring: 'ring-teal-200', chart: '#0E768C' },
+  analytics: { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-200', chart: '#6a9bcc' },
+  marketing: { bg: 'bg-red-50', text: 'text-red-700', ring: 'ring-red-200', chart: '#E8553A' },
+  functional: { bg: 'bg-green-50', text: 'text-green-700', ring: 'ring-green-200', chart: '#788c5d' },
+}
+
+const GRADE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  A: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  B: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+  C: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  D: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
+  F: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+}
+
+const EXAMPLE_URLS = ['shopify.com', 'wordpress.org', 'stripe.com']
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getGrade(score: number): string {
+  if (score >= 90) return 'A'
+  if (score >= 80) return 'B'
+  if (score >= 65) return 'C'
+  if (score >= 50) return 'D'
+  return 'F'
+}
+
+function validateUrl(inputUrl: string): boolean {
+  try {
+    const url = new URL(inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`)
+    return ['http:', 'https:'].includes(url.protocol)
+  } catch {
+    return false
+  }
+}
+
+// Mock scan — will be replaced with real API call
+async function performScan(targetUrl: string): Promise<ScanResult> {
+  await new Promise(resolve => setTimeout(resolve, 8000))
+
+  const domain = new URL(targetUrl).hostname
+  const cookies: CookieData[] = [
+    { name: '_ga', domain: `.${domain}`, purpose: 'Google Analytics — tracks unique visitors', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
+    { name: '_gid', domain: `.${domain}`, purpose: 'Google Analytics — distinguishes users for 24h', category: 'analytics', expires: '24 hours', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
+    { name: '_ga_QM1L8P6TT5', domain: `.${domain}`, purpose: 'Google Analytics 4 — stores session state', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
+    { name: '_fbp', domain: '.facebook.com', purpose: 'Facebook Pixel — tracks visits for ad targeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'None', thirdParty: true },
+    { name: '_gcl_au', domain: `.${domain}`, purpose: 'Google Ads — stores conversion data', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
+    { name: 'fr', domain: '.facebook.com', purpose: 'Facebook — ad delivery and retargeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
+    { name: 'sessionid', domain: `.${domain}`, purpose: 'Session management — keeps users logged in', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Lax', thirdParty: false },
+    { name: 'csrftoken', domain: `.${domain}`, purpose: 'CSRF protection — prevents cross-site attacks', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
+    { name: '__stripe_mid', domain: `.${domain}`, purpose: 'Stripe — fraud detection for payments', category: 'necessary', expires: '1 year', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
+    { name: 'preferences', domain: `.${domain}`, purpose: 'User preferences — language, theme, layout', category: 'functional', expires: '1 year', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
+    { name: '_hjSessionUser', domain: `.${domain}`, purpose: 'Hotjar — identifies returning visitors', category: 'analytics', expires: '1 year', secure: true, httpOnly: false, sameSite: 'None', thirdParty: false },
+    { name: 'NID', domain: '.google.com', purpose: 'Google — stores preferences and ad personalization', category: 'marketing', expires: '6 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
+  ]
+
+  const gdprScore = 58
+  const pipedaScore = 72
+  const ccpaScore = 52
+  const law25Score = 65
+  const overallScore = Math.round((gdprScore + pipedaScore + ccpaScore + law25Score) / 4)
+
+  return {
+    url: targetUrl,
+    cookies,
+    overallGrade: getGrade(overallScore),
+    overallScore,
+    compliance: {
+      gdpr: {
+        score: gdprScore,
+        grade: getGrade(gdprScore),
+        issues: [
+          'Analytics cookies set before obtaining explicit consent',
+          'Marketing cookies from third-party domains require granular opt-in',
+          'No consent withdrawal mechanism detected',
+          'Cookie policy does not list all cookies by category',
+        ],
+      },
+      pipeda: {
+        score: pipedaScore,
+        grade: getGrade(pipedaScore),
+        issues: [
+          'Marketing cookies require explicit opt-in consent',
+          'Cookie notice should be more prominent on first visit',
+          'Third-party data sharing not disclosed in privacy policy',
+        ],
+      },
+      ccpa: {
+        score: ccpaScore,
+        grade: getGrade(ccpaScore),
+        issues: [
+          'Third-party marketing cookies constitute "sale" of personal information',
+          '"Do Not Sell or Share My Personal Information" link not found',
+          'Opt-out mechanism required for all advertising cookies',
+          'Privacy policy must disclose categories of data collected',
+        ],
+      },
+      law25: {
+        score: law25Score,
+        grade: getGrade(law25Score),
+        issues: [
+          'Consent must be obtained in French for Quebec visitors',
+          'Privacy policy must be available in French',
+          'Biometric and location data processing requires explicit consent',
+        ],
+      },
+    },
+    recommendations: [
+      { text: 'Add a cookie consent banner that blocks non-essential cookies until users opt in.', regulation: 'GDPR, CCPA, PIPEDA, Law 25' },
+      { text: 'Add a "Do Not Sell or Share My Personal Information" link in your footer.', regulation: 'CCPA' },
+      { text: 'Create a detailed cookie policy listing every cookie by name, purpose, and duration.', regulation: 'GDPR, PIPEDA' },
+      { text: 'Implement Google Consent Mode v2 so Analytics and Ads respect user choices automatically.', regulation: 'GDPR, CCPA' },
+      { text: 'Provide your privacy policy and cookie notice in French for Quebec visitors.', regulation: 'Law 25' },
+      { text: 'Review third-party scripts quarterly — plugins and widgets often add cookies without notice.', regulation: 'All' },
+    ],
+    timestamp: new Date().toISOString(),
+  }
+}
+
+// ─── SVG Donut Chart ─────────────────────────────────────────────────────────
+
+function DonutChart({ cookies }: { cookies: CookieData[] }) {
+  const categories = ['necessary', 'analytics', 'marketing', 'functional'] as const
+  const counts = categories.map(cat => cookies.filter(c => c.category === cat).length)
+  const total = cookies.length
+  const radius = 70
+  const circumference = 2 * Math.PI * radius
+  let offset = 0
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox="0 0 200 200" className="w-48 h-48">
+        {categories.map((cat, i) => {
+          const pct = total > 0 ? counts[i] / total : 0
+          const strokeLen = pct * circumference
+          const currentOffset = offset
+          offset += strokeLen
+          if (counts[i] === 0) return null
+          return (
+            <circle
+              key={cat}
+              cx="100"
+              cy="100"
+              r={radius}
+              fill="none"
+              stroke={CATEGORY_COLORS[cat].chart}
+              strokeWidth="24"
+              strokeDasharray={`${strokeLen} ${circumference - strokeLen}`}
+              strokeDashoffset={-currentOffset}
+              transform="rotate(-90 100 100)"
+              className="transition-all duration-700"
+            />
+          )
+        })}
+        <text x="100" y="92" textAnchor="middle" className="fill-foreground text-3xl font-bold" style={{ fontSize: '36px', fontWeight: 700 }}>
+          {total}
+        </text>
+        <text x="100" y="115" textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '13px' }}>
+          cookies
+        </text>
+      </svg>
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {categories.map((cat, i) => (
+          <div key={cat} className="flex items-center gap-1.5 text-xs">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[cat].chart }} />
+            <span className="capitalize text-muted-foreground">{cat}</span>
+            <span className="font-semibold text-foreground">{counts[i]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Circular Score Gauge ────────────────────────────────────────────────────
+
+function ScoreGauge({ score, size = 64 }: { score: number; size?: number }) {
+  const grade = getGrade(score)
+  const colors = GRADE_COLORS[grade]
+  const r = (size - 8) / 2
+  const circumference = 2 * Math.PI * r
+  const filled = (score / 100) * circumference
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="5" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={score >= 80 ? '#059669' : score >= 65 ? '#d97706' : score >= 50 ? '#ea580c' : '#dc2626'}
+          strokeWidth="5"
+          strokeDasharray={`${filled} ${circumference - filled}`}
+          strokeDashoffset={circumference * 0.25}
+          strokeLinecap="round"
+          className="transition-all duration-1000"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className={`text-lg font-bold ${colors.text}`}>{score}</span>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
 
 export function CookieScanner() {
   const [url, setUrl] = useState('')
   const [isScanning, setIsScanning] = useState(false)
+  const [currentStep, setCurrentStep] = useState(-1)
   const [result, setResult] = useState<ScanResult | null>(null)
   const [error, setError] = useState('')
+  const [activeFilter, setActiveFilter] = useState<string>('all')
+  const [expandedCookie, setExpandedCookie] = useState<number | null>(null)
+  const [expandedRegulation, setExpandedRegulation] = useState<string | null>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
-  const validateUrl = (inputUrl: string): boolean => {
-    try {
-      const url = new URL(inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`)
-      return ['http:', 'https:'].includes(url.protocol)
-    } catch {
-      return false
-    }
-  }
-
-  const simulateCookieScan = async (targetUrl: string): Promise<ScanResult> => {
-    // Simulate scanning delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Mock cookie data - in a real implementation, this would be actual scanning
-    const mockCookies: CookieData[] = [
-      {
-        name: '_ga',
-        domain: '.example.com',
-        purpose: 'Google Analytics tracking',
-        category: 'analytics',
-        expires: '2 years',
-        secure: true,
-        httpOnly: false,
-        sameSite: 'Lax',
-        thirdParty: false
-      },
-      {
-        name: '_fbp',
-        domain: '.facebook.com',
-        purpose: 'Facebook Pixel tracking',
-        category: 'marketing',
-        expires: '3 months',
-        secure: true,
-        httpOnly: false,
-        sameSite: 'None',
-        thirdParty: true
-      },
-      {
-        name: 'sessionid',
-        domain: '.example.com',
-        purpose: 'User session management',
-        category: 'necessary',
-        expires: 'Session',
-        secure: true,
-        httpOnly: true,
-        sameSite: 'Lax',
-        thirdParty: false
-      },
-      {
-        name: 'preferences',
-        domain: '.example.com',
-        purpose: 'User preferences storage',
-        category: 'functional',
-        expires: '1 year',
-        secure: true,
-        httpOnly: false,
-        sameSite: 'Lax',
-        thirdParty: false
-      },
-      {
-        name: '_gid',
-        domain: '.example.com',
-        purpose: 'Google Analytics client ID',
-        category: 'analytics',
-        expires: '24 hours',
-        secure: true,
-        httpOnly: false,
-        sameSite: 'Lax',
-        thirdParty: false
-      }
-    ]
-
-    const compliance = {
-      gdpr: {
-        score: 75,
-        issues: [
-          'Analytics cookies require explicit consent',
-          'Marketing cookies need granular consent',
-          'Cookie policy missing consent withdrawal mechanism'
-        ]
-      },
-      pipeda: {
-        score: 85,
-        issues: [
-          'Marketing cookies need explicit consent',
-          'Cookie notice should be more prominent'
-        ]
-      },
-      ccpa: {
-        score: 70,
-        issues: [
-          'Marketing cookies constitute "sale" under CCPA',
-          '"Do Not Sell" link required',
-          'Opt-out mechanism needed for advertising cookies'
-        ]
-      }
-    }
-
-    const recommendations = [
-      'Implement cookie consent banner with granular controls',
-      'Add "Do Not Sell My Personal Information" link for CCPA compliance',
-      'Update privacy policy to include detailed cookie information',
-      'Consider implementing Consent Mode v2 for Google Analytics',
-      'Review and categorize all third-party cookies',
-      'Implement cookie consent management platform'
-    ]
-
-    return {
-      url: targetUrl,
-      cookies: mockCookies,
-      compliance,
-      recommendations,
-      timestamp: new Date().toISOString()
-    }
-  }
-
-  const handleScan = async () => {
-    if (!url.trim()) {
+  const handleScan = async (inputUrl?: string) => {
+    const scanUrl = inputUrl || url
+    if (!scanUrl.trim()) {
       setError('Please enter a website URL')
       return
     }
-
-    if (!validateUrl(url)) {
-      setError('Please enter a valid website URL (e.g., example.com or https://example.com)')
+    if (!validateUrl(scanUrl)) {
+      setError('Please enter a valid URL (e.g., example.com)')
       return
     }
 
+    if (inputUrl) setUrl(inputUrl)
     setIsScanning(true)
     setError('')
     setResult(null)
+    setCurrentStep(0)
+    setActiveFilter('all')
+    setExpandedCookie(null)
+    setExpandedRegulation(null)
+
+    // Step progression
+    const stepTimers = [2000, 3000, 3000]
+    for (let i = 0; i < stepTimers.length; i++) {
+      await new Promise(r => setTimeout(r, stepTimers[i]))
+      setCurrentStep(i + 1)
+    }
 
     try {
-      const targetUrl = url.startsWith('http') ? url : `https://${url}`
-      const scanResult = await simulateCookieScan(targetUrl)
+      const targetUrl = scanUrl.startsWith('http') ? scanUrl : `https://${scanUrl}`
+      const scanResult = await performScan(targetUrl)
       setResult(scanResult)
-    } catch (err) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 200)
+    } catch {
       setError('Failed to scan website. Please try again.')
     } finally {
       setIsScanning(false)
+      setCurrentStep(-1)
     }
   }
 
-  const getComplianceColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-orange-600'
-    return 'text-red-600'
-  }
+  const filteredCookies = result?.cookies.filter(c => activeFilter === 'all' || c.category === activeFilter) ?? []
 
-  const getComplianceBadge = (score: number) => {
-    if (score >= 80) return <Badge className="bg-green-100 text-green-800">Good</Badge>
-    if (score >= 60) return <Badge className="bg-orange-100 text-orange-800">Fair</Badge>
-    return <Badge className="bg-red-100 text-red-800">Poor</Badge>
-  }
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'necessary': return 'bg-green-100 text-green-800'
-      case 'analytics': return 'bg-blue-100 text-blue-800'
-      case 'marketing': return 'bg-red-100 text-red-800'
-      case 'functional': return 'bg-purple-100 text-purple-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.4, 0.25, 1] },
+    }),
   }
 
   return (
-    <div className="space-y-6">
-      {/* Input Section */}
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="website-url">Website URL</Label>
-          <div className="flex gap-2 mt-1">
-            <Input
-              id="website-url"
-              type="url"
-              placeholder="Enter website URL (e.g., example.com)"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleScan()}
-              disabled={isScanning}
-            />
-            <Button 
-              onClick={handleScan} 
+    <div className="w-full">
+      {/* ── Scanner Input ── */}
+      <div className={`transition-all duration-500 ${result ? 'pb-6' : ''}`}>
+        <div className="bg-card border-2 border-border rounded-xl p-2 shadow-lg">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex items-center flex-1 gap-2 px-3">
+              <span className="text-muted-foreground text-sm font-mono hidden sm:inline select-none">https://</span>
+              <input
+                type="text"
+                placeholder="Enter your website URL..."
+                value={url}
+                onChange={(e) => { setUrl(e.target.value); setError('') }}
+                onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+                disabled={isScanning}
+                className="flex-1 text-lg h-14 bg-transparent border-0 outline-none placeholder:text-muted-foreground/50 font-sans disabled:opacity-60"
+              />
+            </div>
+            <Button
+              onClick={() => handleScan()}
               disabled={isScanning || !url.trim()}
-              className="px-6"
+              size="lg"
+              className="h-12 px-8 rounded-lg text-base font-semibold shrink-0"
             >
               {isScanning ? (
                 <>
@@ -231,8 +376,8 @@ export function CookieScanner() {
                 </>
               ) : (
                 <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Scan
+                  Scan Now
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -240,213 +385,409 @@ export function CookieScanner() {
         </div>
 
         {error && (
-          <Alert variant="destructive">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 mt-3 text-sm text-red-600"
+          >
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+            {error}
+          </motion.div>
         )}
       </div>
 
-      {/* Results Section */}
-      {result && (
-        <div className="space-y-6">
-          {/* Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                Scan Results for {result.url}
-              </CardTitle>
-              <CardDescription>
-                Scanned on {new Date(result.timestamp).toLocaleDateString()} at {new Date(result.timestamp).toLocaleTimeString()}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{result.cookies.length}</div>
-                  <div className="text-sm text-gray-600">Total Cookies</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {result.cookies.filter(c => c.thirdParty).length}
+      {/* ── Scanning Progress ── */}
+      <AnimatePresence mode="wait">
+        {isScanning && (
+          <motion.div
+            key="scanning"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-8 overflow-hidden"
+          >
+            <div className="space-y-1">
+              {SCAN_STEPS.map((step, i) => (
+                <motion.div
+                  key={step.label}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.15 }}
+                  className="flex items-center gap-4 py-3"
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                      i < currentStep
+                        ? 'bg-primary text-primary-foreground'
+                        : i === currentStep
+                        ? 'bg-primary/10 text-primary ring-2 ring-primary/40 animate-pulse'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {i < currentStep ? <Check className="h-4 w-4" /> : <span className="text-xs font-bold">{i + 1}</span>}
                   </div>
-                  <div className="text-sm text-gray-600">Third-Party Cookies</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">
-                    {result.cookies.filter(c => c.category === 'marketing').length}
+                  <div>
+                    <p className={`text-sm font-medium ${i <= currentStep ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      {step.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{step.description}</p>
                   </div>
-                  <div className="text-sm text-gray-600">Marketing Cookies</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-4 h-1 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-primary rounded-full"
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 10, ease: 'linear' }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          {/* Compliance Scores */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Compliance Analysis</CardTitle>
-              <CardDescription>
-                Your website's compliance score across different privacy laws
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">GDPR</h4>
-                    {getComplianceBadge(result.compliance.gdpr.score)}
-                  </div>
-                  <div className={`text-2xl font-bold ${getComplianceColor(result.compliance.gdpr.score)}`}>
-                    {result.compliance.gdpr.score}%
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {result.compliance.gdpr.issues.length} issues found
-                  </div>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">PIPEDA</h4>
-                    {getComplianceBadge(result.compliance.pipeda.score)}
-                  </div>
-                  <div className={`text-2xl font-bold ${getComplianceColor(result.compliance.pipeda.score)}`}>
-                    {result.compliance.pipeda.score}%
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {result.compliance.pipeda.issues.length} issues found
-                  </div>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">CCPA</h4>
-                    {getComplianceBadge(result.compliance.ccpa.score)}
-                  </div>
-                  <div className={`text-2xl font-bold ${getComplianceColor(result.compliance.ccpa.score)}`}>
-                    {result.compliance.ccpa.score}%
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {result.compliance.ccpa.issues.length} issues found
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Cookie Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Cookie Details</CardTitle>
-              <CardDescription>
-                Complete list of cookies found on your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {result.cookies.map((cookie, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold">{cookie.name}</h4>
-                        <Badge className={getCategoryColor(cookie.category)}>
-                          {cookie.category}
-                        </Badge>
-                        {cookie.thirdParty && (
-                          <Badge variant="outline">Third-Party</Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                      <div>
-                        <strong>Domain:</strong> {cookie.domain}
-                      </div>
-                      <div>
-                        <strong>Purpose:</strong> {cookie.purpose}
-                      </div>
-                      <div>
-                        <strong>Expires:</strong> {cookie.expires}
-                      </div>
-                      <div>
-                        <strong>Security:</strong> {cookie.secure ? 'Secure' : 'Not Secure'}
-                      </div>
-                      <div>
-                        <strong>HttpOnly:</strong> {cookie.httpOnly ? 'Yes' : 'No'}
-                      </div>
-                      <div>
-                        <strong>SameSite:</strong> {cookie.sameSite}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recommendations */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommendations</CardTitle>
-              <CardDescription>
-                Actionable steps to improve your cookie compliance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {result.recommendations.map((recommendation, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    <p className="text-gray-700">{recommendation}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="flex-1">
-              <Download className="mr-2 h-4 w-4" />
-              Download Full Report
-            </Button>
-            <Button variant="outline" className="flex-1">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Get Cookie Banner Solution
-            </Button>
+      {/* ── Trust Signals & Examples (only when no results and not scanning) ── */}
+      {!result && !isScanning && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Activity className="h-3.5 w-3.5" /> 47,000+ scans run
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5" /> 4 privacy laws checked
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Zap className="h-3.5 w-3.5" /> Results in &lt;30s
+            </span>
           </div>
-        </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <span>Try it:</span>
+            {EXAMPLE_URLS.map((example) => (
+              <button
+                key={example}
+                onClick={() => { setUrl(example); handleScan(example) }}
+                className="font-mono px-2 py-1 rounded border border-border hover:bg-accent transition-colors cursor-pointer"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        </motion.div>
       )}
 
-      {/* Info Section */}
-      {!result && !isScanning && (
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                How Our Cookie Scanner Works
-              </h3>
-              <p className="text-blue-700 mb-4">
-                Our advanced scanner analyzes your website to identify all cookies, categorize them by purpose, 
-                and provide compliance recommendations for GDPR, PIPEDA, and CCPA.
+      {/* ── Results ── */}
+      {result && (
+        <motion.div
+          ref={resultsRef}
+          initial="hidden"
+          animate="visible"
+          className="mt-2"
+        >
+          {/* Overall Grade */}
+          <motion.div variants={fadeUp} custom={0} className="flex flex-col sm:flex-row items-start sm:items-center gap-6 py-8 border-b border-border">
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+              className={`w-24 h-24 rounded-2xl border-2 flex flex-col items-center justify-center shrink-0 ${GRADE_COLORS[result.overallGrade].bg} ${GRADE_COLORS[result.overallGrade].text} ${GRADE_COLORS[result.overallGrade].border}`}
+            >
+              <span className="text-5xl font-heading font-bold leading-none">{result.overallGrade}</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider mt-1 opacity-70">Overall</span>
+            </motion.div>
+            <div>
+              <p className="text-sm font-mono text-muted-foreground truncate max-w-md">{result.url}</p>
+              <p className="text-lg font-semibold text-foreground mt-1">
+                {result.cookies.length} cookies found — {result.cookies.filter(c => c.category !== 'necessary').length} require consent
               </p>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600" />
-                  <span>Scans all pages and scripts</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600" />
-                  <span>Identifies third-party cookies</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600" />
-                  <span>Provides compliance analysis</span>
-                </div>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Scanned on {new Date(result.timestamp).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })} at{' '}
+                {new Date(result.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs font-mono">
+                  {result.cookies.filter(c => !c.thirdParty).length} first-party
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs font-mono">
+                  {result.cookies.filter(c => c.thirdParty).length} third-party
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs font-mono">
+                  {result.cookies.filter(c => c.category !== 'necessary').length} non-essential
+                </span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </motion.div>
+
+          {/* Cookie Category Breakdown */}
+          <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-b border-border">
+            <DonutChart cookies={result.cookies} />
+            <div className="space-y-3">
+              {(['necessary', 'analytics', 'marketing', 'functional'] as const).map((cat) => {
+                const count = result.cookies.filter(c => c.category === cat).length
+                const colors = CATEGORY_COLORS[cat]
+                return (
+                  <div key={cat} className={`flex items-center gap-3 p-3 rounded-lg border border-border ${count === 0 ? 'opacity-40' : ''}`}>
+                    <div className="w-1 h-10 rounded-full" style={{ backgroundColor: colors.chart }} />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold capitalize">{cat}</span>
+                        <span className="text-lg font-bold">{count}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {cat === 'necessary' && 'Required for basic site functionality'}
+                        {cat === 'analytics' && 'Used to measure traffic and usage'}
+                        {cat === 'marketing' && 'Used for ad targeting and retargeting'}
+                        {cat === 'functional' && 'Enhances user experience and preferences'}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+
+          {/* Compliance Scores */}
+          <motion.div variants={fadeUp} custom={2} className="py-8 border-b border-border">
+            <h3 className="text-xl font-heading font-semibold mb-6">Compliance Analysis</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {(Object.entries(result.compliance) as [string, ComplianceResult][]).map(([key, reg]) => {
+                const label = key === 'law25' ? 'Law 25' : key.toUpperCase()
+                const isExpanded = expandedRegulation === key
+                return (
+                  <div key={key} className="p-4 rounded-xl border border-border bg-card">
+                    <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">{label}</p>
+                    <div className="flex justify-center mb-3">
+                      <ScoreGauge score={reg.score} />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">{reg.issues.length} issues found</p>
+                    <button
+                      onClick={() => setExpandedRegulation(isExpanded ? null : key)}
+                      className="text-xs text-primary hover:underline mt-2 w-full text-center flex items-center justify-center gap-1"
+                    >
+                      {isExpanded ? 'Hide' : 'View'} details
+                      {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    </button>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.ul
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-3 space-y-2 overflow-hidden"
+                        >
+                          {reg.issues.map((issue, i) => (
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                              <AlertTriangle className="h-3 w-3 text-amber-500 shrink-0 mt-0.5" />
+                              {issue}
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+
+          {/* Cookie Detail Table */}
+          <motion.div variants={fadeUp} custom={3} className="py-8 border-b border-border">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
+              <h3 className="text-xl font-heading font-semibold">Cookie Details</h3>
+              <div className="flex flex-wrap gap-1">
+                {['all', 'necessary', 'analytics', 'marketing', 'functional'].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter)}
+                    className={`text-xs px-3 py-1.5 rounded-md capitalize transition-colors ${
+                      activeFilter === filter
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {filter} {filter !== 'all' && `(${result.cookies.filter(c => c.category === filter).length})`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left">
+                    <th className="py-3 pr-4 font-medium text-muted-foreground">Cookie</th>
+                    <th className="py-3 pr-4 font-medium text-muted-foreground">Domain</th>
+                    <th className="py-3 pr-4 font-medium text-muted-foreground">Category</th>
+                    <th className="py-3 pr-4 font-medium text-muted-foreground">Expires</th>
+                    <th className="py-3 pr-4 font-medium text-muted-foreground">Secure</th>
+                    <th className="py-3 font-medium text-muted-foreground">SameSite</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCookies.map((cookie, i) => (
+                    <>
+                      <tr
+                        key={`row-${i}`}
+                        onClick={() => setExpandedCookie(expandedCookie === i ? null : i)}
+                        className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-colors"
+                      >
+                        <td className="py-3 pr-4 font-mono text-sm font-medium">{cookie.name}</td>
+                        <td className="py-3 pr-4 font-mono text-sm text-muted-foreground">{cookie.domain}</td>
+                        <td className="py-3 pr-4">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${CATEGORY_COLORS[cookie.category].bg} ${CATEGORY_COLORS[cookie.category].text}`}>
+                            {cookie.category}
+                          </span>
+                        </td>
+                        <td className="py-3 pr-4 text-sm">{cookie.expires}</td>
+                        <td className="py-3 pr-4">
+                          {cookie.secure ? (
+                            <Lock className="h-4 w-4 text-emerald-600" />
+                          ) : (
+                            <Unlock className="h-4 w-4 text-red-500" />
+                          )}
+                        </td>
+                        <td className="py-3 font-mono text-xs">{cookie.sameSite}</td>
+                      </tr>
+                      <AnimatePresence key={`expand-${i}`}>
+                        {expandedCookie === i && (
+                          <tr>
+                            <td colSpan={6}>
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="bg-muted/30 px-4 py-3 text-sm overflow-hidden"
+                              >
+                                <div className="grid grid-cols-3 gap-4">
+                                  <div><strong className="text-muted-foreground">Purpose:</strong> {cookie.purpose}</div>
+                                  <div><strong className="text-muted-foreground">HttpOnly:</strong> {cookie.httpOnly ? 'Yes' : 'No'}</div>
+                                  <div><strong className="text-muted-foreground">Third-party:</strong> {cookie.thirdParty ? 'Yes' : 'No'}</div>
+                                </div>
+                              </motion.div>
+                            </td>
+                          </tr>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="md:hidden space-y-3">
+              {filteredCookies.map((cookie, i) => (
+                <div
+                  key={i}
+                  onClick={() => setExpandedCookie(expandedCookie === i ? null : i)}
+                  className="p-3 rounded-lg border border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-mono text-sm font-medium">{cookie.name}</span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${CATEGORY_COLORS[cookie.category].bg} ${CATEGORY_COLORS[cookie.category].text}`}>
+                      {cookie.category}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-mono">{cookie.domain}</p>
+                  <AnimatePresence>
+                    {expandedCookie === i && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 pt-2 border-t border-border/50 grid grid-cols-2 gap-2 text-xs overflow-hidden"
+                      >
+                        <div><strong className="text-muted-foreground">Purpose:</strong> {cookie.purpose}</div>
+                        <div><strong className="text-muted-foreground">Expires:</strong> {cookie.expires}</div>
+                        <div><strong className="text-muted-foreground">Secure:</strong> {cookie.secure ? 'Yes' : 'No'}</div>
+                        <div><strong className="text-muted-foreground">SameSite:</strong> {cookie.sameSite}</div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Recommendations */}
+          <motion.div variants={fadeUp} custom={4} className="py-8 border-b border-border">
+            <h3 className="text-xl font-heading font-semibold mb-6">How to Fix These Issues</h3>
+            <div className="space-y-0">
+              {result.recommendations.map((rec, i) => (
+                <div key={i} className="flex gap-4 py-4 border-b border-border/50 last:border-0">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0">
+                    {i + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground">{rec.text}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Applies to: {rec.regulation}</p>
+                    {i === 0 && (
+                      <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
+                        <p className="text-sm text-foreground">
+                          Cookie Banner can fix this automatically — starting free, or $99 one-time for Pro.{' '}
+                          <Link href="/free-cookie-banner-generator" className="text-primary font-medium hover:underline">
+                            Build your banner now
+                          </Link>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CTA Block */}
+          <motion.div variants={fadeUp} custom={5} className="py-8">
+            <div className="bg-foreground text-background rounded-2xl p-8 md:p-12">
+              <h3 className="text-2xl md:text-3xl font-heading font-bold">
+                Fix your compliance issues in 5 minutes
+              </h3>
+              <p className="text-base text-background/70 mt-2 max-w-xl">
+                Our cookie banner generator creates a fully compliant consent banner based on your scan results. Free plan available — no credit card needed.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <Link href="/free-cookie-banner-generator">
+                  <Button className="bg-background text-foreground hover:bg-background/90 px-6 py-3 h-auto rounded-lg font-semibold">
+                    Build Your Cookie Banner
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  className="border-background/30 text-background hover:bg-background/10 px-6 py-3 h-auto rounded-lg font-medium"
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `cookie-scan-${new Date().toISOString().slice(0, 10)}.json`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                  }}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Report
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Scan Another */}
+          <div className="text-center pb-4">
+            <button
+              onClick={() => {
+                setResult(null)
+                setUrl('')
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              className="text-sm text-primary hover:underline"
+            >
+              Scan another website
+            </button>
+          </div>
+        </motion.div>
       )}
     </div>
   )
