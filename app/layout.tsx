@@ -105,6 +105,19 @@ export default function RootLayout({
         {/* 🍁 End HOSTED SCRIPT - Powered by cookie-banner.ca           🍁 */}
         {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
 
+        {/* Google Analytics (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-QM1L8P6TT5');
+            `,
+          }}
+        />
+
         {/* Deferred Google Tag Manager - loads after page is interactive */}
         <script
           dangerouslySetInnerHTML={{
