@@ -104,13 +104,26 @@ function getGrade(score: number): string {
   return 'F'
 }
 
+function normalizeUrl(input: string): string {
+  let cleaned = input.trim().toLowerCase()
+  // Strip leading protocol if present
+  cleaned = cleaned.replace(/^https?:\/\//, '')
+  // Strip leading www.
+  cleaned = cleaned.replace(/^www\./, '')
+  // Remove trailing slashes
+  cleaned = cleaned.replace(/\/+$/, '')
+  // Remove any path/query — we only need the domain for scanning
+  cleaned = cleaned.split('/')[0].split('?')[0].split('#')[0]
+  return cleaned
+}
+
 function validateUrl(inputUrl: string): boolean {
-  try {
-    const url = new URL(inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`)
-    return ['http:', 'https:'].includes(url.protocol)
-  } catch {
+  const domain = normalizeUrl(inputUrl)
+  // Must have at least one dot and a TLD of 2+ chars
+  if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/.test(domain)) {
     return false
   }
+  return true
 }
 
 // Mock scan — will be replaced with real API call
@@ -297,17 +310,20 @@ export function CookieScanner() {
   const resultsRef = useRef<HTMLDivElement>(null)
 
   const handleScan = async (inputUrl?: string) => {
-    const scanUrl = inputUrl || url
-    if (!scanUrl.trim()) {
+    const rawUrl = inputUrl || url
+    if (!rawUrl.trim()) {
       setError('Please enter a website URL')
       return
     }
-    if (!validateUrl(scanUrl)) {
-      setError('Please enter a valid URL (e.g., example.com)')
+
+    const domain = normalizeUrl(rawUrl)
+    if (!validateUrl(rawUrl)) {
+      setError('Enter a valid domain (e.g., example.com)')
       return
     }
 
-    if (inputUrl) setUrl(inputUrl)
+    // Show the clean domain in the input
+    setUrl(domain)
     setIsScanning(true)
     setError('')
     setResult(null)
@@ -324,7 +340,7 @@ export function CookieScanner() {
     }
 
     try {
-      const targetUrl = scanUrl.startsWith('http') ? scanUrl : `https://${scanUrl}`
+      const targetUrl = `https://${domain}`
       const scanResult = await performScan(targetUrl)
       setResult(scanResult)
       setTimeout(() => {
@@ -354,7 +370,7 @@ export function CookieScanner() {
               <input
                 type="text"
                 aria-label="Website URL"
-                placeholder="Enter your website URL..."
+                placeholder="example.com"
                 value={url}
                 onChange={(e) => { setUrl(e.target.value); setError('') }}
                 onKeyDown={(e) => e.key === 'Enter' && handleScan()}
