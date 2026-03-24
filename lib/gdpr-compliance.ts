@@ -23,7 +23,9 @@ export interface DataRetentionPolicy {
 const DEFAULT_RETENTION_POLICY: DataRetentionPolicy = {
   teamInactiveDays: 730, // 2 years
   invitationExpiryDays: 30, // 1 month
-  auditLogRetentionDays: 2555 // 7 years
+  auditLogRetentionDays: 395 // ~13 months (aligned with audit log cron cleanup)
+  // Note: banner_visitors retained for 24 months (DSAR report range)
+  // Note: data_access_requests retained for 36 months (proof of compliance)
 }
 
 /**
@@ -35,10 +37,10 @@ export async function handleDataAccessRequest(userId: string): Promise<{
   error?: string
 }> {
   try {
-    // Get all user data
+    // Get user data (explicitly select fields — never use select('*') to avoid leaking password hash)
     const { data: user, error: userError } = await supabase
       .from('User')
-      .select('*')
+      .select('id, email, name, createdAt, updatedAt, planTier, upgradedAt, currentTeamId, emailVerified')
       .eq('id', userId)
       .single()
 
@@ -295,23 +297,15 @@ export async function enforceDataRetentionPolicy(
  */
 export async function logGDPRRequest(request: GDPRRequest): Promise<void> {
   try {
-    // In production, this should be stored in a secure audit log
-    console.log('[GDPR] Request logged:', {
-      userId: request.userId,
-      type: request.requestType,
-      timestamp: request.timestamp,
-      details: request.details
+    // Log to audit_log table (GDPRRequests table does not exist — use existing audit infrastructure)
+    await supabase.from('audit_log').insert({
+      user_id: request.userId,
+      action: `gdpr.${request.requestType}`,
+      metadata: {
+        details: request.details,
+        timestamp: request.timestamp.toISOString(),
+      },
     })
-
-    // Store in database for audit trail
-    await supabase.from('GDPRRequests').insert({
-      userId: request.userId,
-      requestType: request.requestType,
-      details: request.details,
-      timestamp: request.timestamp.toISOString(),
-      status: 'processed'
-    })
-
   } catch (error) {
     console.error('Error logging GDPR request:', error)
   }

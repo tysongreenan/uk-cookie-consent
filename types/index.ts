@@ -77,6 +77,7 @@ export interface BannerConfig {
     // Button layout controls
     buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'
     showRejectButton?: boolean // Granular control - defaults to true for backward compatibility
+    gpc?: { enabled: boolean; mode: 'auto' | 'off' }
   }
   
   // Branding
@@ -210,12 +211,17 @@ export interface ConsentBanner {
   updatedAt: Date
 }
 
+export type UserType = 'business' | 'consumer' | 'both'
+export type ConsumerTier = 'free' | 'premium'
+
 export interface User {
   id: string
   name?: string
   email: string
   emailVerified?: Date
   image?: string
+  userType?: UserType
+  consumerTier?: ConsumerTier
   createdAt: Date
   updatedAt: Date
 }
@@ -423,6 +429,170 @@ export interface PlanFeatures {
   hasBrandingRemoval: boolean
   hasBenchmarkInsights: boolean
   hasGeoTargeting: boolean
+  hasGpcConfig: boolean
+  hasGpcAnalytics: boolean
+  hasDataAccessRequests: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'dedicated'
+}
+
+// Consumer Platform Types
+export type ConsentAction = 'auto_accept' | 'auto_reject' | 'auto_custom' | 'manual' | 'skipped'
+
+export interface ConsumerPreferences {
+  strictlyNecessary: 'accept'
+  functionality: 'accept' | 'reject'
+  analytics: 'accept' | 'reject'
+  marketing: 'accept' | 'reject'
+}
+
+export interface ConsumerPreferencesRow {
+  id: string
+  user_id: string
+  preferences: ConsumerPreferences
+  default_action: 'accept_all' | 'reject_all' | 'accept_essential' | 'custom'
+  auto_apply: boolean
+  show_notification: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ConsumerConsentLogEntry {
+  id: number
+  user_id: string
+  domain: string
+  action: ConsentAction
+  categories_applied: Record<string, boolean> | null
+  extension_version: string | null
+  created_at: string
+}
+
+export interface ConsumerDailyStats {
+  id: string
+  user_id: string
+  date: string
+  sites_visited: number
+  banners_handled: number
+  auto_accepts: number
+  auto_rejects: number
+  auto_custom: number
+  manual_overrides: number
+  time_saved_ms: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ConsumerApiKey {
+  id: string
+  user_id: string
+  name: string
+  prefix: string
+  last_used_at: string | null
+  expires_at: string | null
+  revoked_at: string | null
+  created_at: string
+}
+
+export interface ConsumerPlanFeatures {
+  tier: ConsumerTier
+  maxBannersPerDay: number | 'unlimited'
+  historyRetentionDays: number
+  maxDomainAnalytics: number | 'unlimited'
+  hasExport: boolean
+  hasMultipleProfiles: boolean
+}
+
+export const CONSUMER_PLAN_FEATURES: Record<ConsumerTier, ConsumerPlanFeatures> = {
+  free: {
+    tier: 'free',
+    maxBannersPerDay: 50,
+    historyRetentionDays: 7,
+    maxDomainAnalytics: 10,
+    hasExport: false,
+    hasMultipleProfiles: false,
+  },
+  premium: {
+    tier: 'premium',
+    maxBannersPerDay: 'unlimited',
+    historyRetentionDays: 90,
+    maxDomainAnalytics: 'unlimited',
+    hasExport: true,
+    hasMultipleProfiles: true,
+  },
+}
+
+// ── Data Subject Access Request (DSAR) Types ─────────────────────────
+
+export type DSARIdentifierType = 'email' | 'ip' | 'name'
+
+export type DSARStatus =
+  | 'pending'
+  | 'identity_verified'
+  | 'processing'
+  | 'completed'
+  | 'partially_refused'
+  | 'refused'
+  | 'failed'
+
+export type DSARReportFormat = 'json' | 'csv' | 'pdf'
+
+export type DSARVerificationMethod = 'government_id' | 'email_confirmation' | 'in_person' | 'other'
+
+export interface DataAccessRequest {
+  id: string
+  organizationUserId: string
+  teamId: string | null
+  subjectIdentifierType: DSARIdentifierType
+  subjectIdentifierValue: string
+  subjectEmail: string | null
+  status: DSARStatus
+  reportFormat: DSARReportFormat
+  reportStoragePath: string | null
+  identityVerified: boolean
+  verificationMethod: DSARVerificationMethod | null
+  verificationNotes: string | null
+  verifiedAt: string | null
+  verifiedBy: string | null
+  refusedSections: Array<{ section: string; reason: string }>
+  refusalReason: string | null
+  requestedAt: string
+  orgTimezone: string
+  deadlineAt: string
+  completedAt: string | null
+  deletedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DSARReportSection {
+  name: string
+  description: string
+  data: Record<string, unknown>[]
+  refused: boolean
+  refusalReason?: string
+}
+
+export interface DSARReport {
+  generatedAt: string
+  requestId: string
+  subjectIdentifier: { type: DSARIdentifierType; value: string }
+  organization: { name: string; teamId: string }
+  sections: DSARReportSection[]
+  language: 'en' | 'fr'
+  metadata: {
+    dataSourcesQueried: string[]
+    recordsFound: number
+    generationDurationMs: number
+  }
+}
+
+/** Valid DSAR status transitions — maps current status to allowed next statuses */
+export const DSAR_STATUS_TRANSITIONS: Record<DSARStatus, DSARStatus[]> = {
+  pending: ['identity_verified', 'refused'],
+  identity_verified: ['processing'],
+  processing: ['completed', 'partially_refused', 'failed'],
+  completed: [],
+  partially_refused: [],
+  refused: [],
+  failed: ['identity_verified'], // Allow retry after transient generation failures
 }

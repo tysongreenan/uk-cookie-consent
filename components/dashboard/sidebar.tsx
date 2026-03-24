@@ -3,13 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { 
-  LayoutDashboard, 
-  Palette, 
-  FileText, 
-  Settings, 
-  BarChart3, 
-  Users, 
+import {
+  LayoutDashboard,
+  Palette,
+  FileText,
+  FileSearch,
+  Settings,
+  BarChart3,
+  Users,
   HelpCircle,
   ChevronDown,
   ChevronRight,
@@ -17,7 +18,10 @@ import {
   Code,
   Globe,
   Target,
-  Crown
+  Crown,
+  SlidersHorizontal,
+  History,
+  Key
 } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
@@ -172,6 +176,30 @@ export function Sidebar({ className }: SidebarProps) {
             Main Menu
           </p>
           {navigationItems.map(item => renderNavItem(item))}
+        </div>
+
+        {isPro && (
+          <div className="space-y-0.5 pt-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              Compliance
+            </p>
+            {[
+              { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch, badge: 'new' as const },
+            ].map(item => renderNavItem(item))}
+          </div>
+        )}
+
+        <div className="space-y-0.5 pt-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 border-l-2 border-[#0E768C] pl-2 flex items-center gap-2">
+            My Privacy
+            <NewBadge variant="glow" size="sm" />
+          </p>
+          {[
+            { title: 'Overview', href: '/dashboard/privacy', icon: Shield },
+            { title: 'Preferences', href: '/dashboard/privacy/preferences', icon: SlidersHorizontal },
+            { title: 'History', href: '/dashboard/privacy/history', icon: History },
+            { title: 'Extension', href: '/dashboard/privacy/settings', icon: Key },
+          ].map(item => renderNavItem(item))}
         </div>
 
         <div className="space-y-0.5 pt-4">

@@ -13,6 +13,9 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasBrandingRemoval: false,
     hasBenchmarkInsights: false,
     hasGeoTargeting: false,
+    hasGpcConfig: false,
+    hasGpcAnalytics: false,
+    hasDataAccessRequests: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
   },
@@ -28,6 +31,9 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasBrandingRemoval: true,
     hasBenchmarkInsights: true,
     hasGeoTargeting: true,
+    hasGpcConfig: true,
+    hasGpcAnalytics: true,
+    hasDataAccessRequests: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'priority'
   },
@@ -43,6 +49,9 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasBrandingRemoval: true,
     hasBenchmarkInsights: true,
     hasGeoTargeting: true,
+    hasGpcConfig: true,
+    hasGpcAnalytics: true,
+    hasDataAccessRequests: true,
     maxTeamMembers: 'unlimited',
     supportLevel: 'dedicated'
   }
@@ -68,6 +77,12 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasBenchmarkInsights
     case 'hasGeoTargeting':
       return features.hasGeoTargeting
+    case 'hasGpcConfig':
+      return features.hasGpcConfig
+    case 'hasGpcAnalytics':
+      return features.hasGpcAnalytics
+    case 'hasDataAccessRequests':
+      return features.hasDataAccessRequests
     case 'maxWebsites':
       return features.maxWebsites === 'unlimited' || features.maxWebsites > 0
     case 'maxBanners':

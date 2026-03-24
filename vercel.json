@@ -7,6 +7,22 @@
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
+    },
+    "app/api/data-access-requests/*/generate/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/cron/dsar-deadlines/route.ts": {
+      "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-audit-log",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/dsar-deadlines",
+      "schedule": "0 8 * * *"
+    }
+  ]
 }
