@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendDSARDeadlineReminder } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
 
   const { data: approaching, error } = await supabase
     .from('data_access_requests')
-    .select('id, organization_user_id, team_id, deadline_at, status, subject_identifier_type')
+    .select('id, organization_user_id, team_id, deadline_at, status, subject_identifier_type, subject_identifier_value')
     .in('status', ['pending', 'identity_verified', 'processing'])
     .is('deleted_at', null)
     .gte('deadline_at', oneDayAgo.toISOString())
@@ -87,6 +88,23 @@ export async function GET(request: NextRequest) {
         deadlineAt: req.deadline_at,
       },
     })
+
+    // Send email reminder to the org user
+    const { data: orgUser } = await supabase
+      .from('User')
+      .select('email')
+      .eq('id', req.organization_user_id)
+      .single()
+
+    if (orgUser?.email) {
+      await sendDSARDeadlineReminder(
+        orgUser.email,
+        req.id,
+        daysRemaining,
+        `${req.subject_identifier_type}: ${req.subject_identifier_value}`
+      )
+    }
+
     warningCount++
   }
 

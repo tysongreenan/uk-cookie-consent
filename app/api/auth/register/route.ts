@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { registrationRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail, sanitizeUserName, validatePassword } from '@/lib/sanitize'
 import { logActivity, AuditAction } from '@/lib/audit-log'
+import { sendWelcomeEmail } from '@/lib/email'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -256,6 +257,9 @@ export async function POST(request: NextRequest) {
 
     // Log registration
     logActivity(user.id, AuditAction.REGISTER, request, { email: sanitizedEmail })
+
+    // Send welcome email (fire-and-forget)
+    sendWelcomeEmail(sanitizedEmail, sanitizedName || '', isPrivacySignup ? 'privacy' : 'banner')
 
     return NextResponse.json({
       success: true,
