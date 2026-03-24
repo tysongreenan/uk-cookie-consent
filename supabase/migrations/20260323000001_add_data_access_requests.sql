@@ -25,7 +25,7 @@ CREATE TABLE data_access_requests (
   verified_at timestamptz,
   verified_by text,
 
-  -- Partial refusal (Law 25 s.28)
+  -- Partial refusal (Law 25 ss.37-41)
   refused_sections jsonb DEFAULT '[]'::jsonb,
   refusal_reason text,
 

@@ -25,12 +25,12 @@ schema:
       name: "How long do I have to respond to a Law 25 data access request?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "You have 30 calendar days from the date you receive the request. This deadline runs from the date of receipt in your organization's local timezone, not the date you begin processing. Failing to respond within 30 days can result in penalties of up to $25 million CAD or 4% of worldwide turnover."
+        text: "You have 30 calendar days from the date you receive the request. This deadline runs from the date of receipt in your organization's local timezone. You can apply to the CAI for an extension before the 30 days expire (section 46), but must justify the delay. Failing to respond can result in penalties of up to $25 million CAD or 4% of worldwide turnover."
     - "@type": "Question"
       name: "Can I refuse a data access request under Law 25?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "Yes. Under Law 25 section 28, you can fully or partially refuse a request if disclosure would reveal information about a third party, prejudice an investigation, or if the information cannot be isolated without unreasonable effort. You must document the reason for refusal."
+        text: "Yes. Under Law 25 sections 37-41, you can fully or partially refuse a request if disclosure would seriously harm a third party (s.40), prejudice an investigation or crime detection (s.39), or cause serious health-related harm (s.37). You must document the reason for refusal and inform the requester of their right to contest with the CAI."
     - "@type": "Question"
       name: "Do I need to verify identity before responding to a DSAR?"
       acceptedAnswer:
@@ -122,7 +122,7 @@ Here is how the deadline works:
 
 - **Day 1** starts when you receive the request (in your organization's local timezone)
 - **Calendar days** count, including weekends and holidays
-- The 30-day clock **cannot be paused** (unlike GDPR, which allows a 2-month extension for complex requests)
+- You can apply to the **CAI for an extension** before the 30 days expire (section 46), but you must justify the delay — extensions are not automatic
 - You must respond within 30 days **even if you are refusing** the request
 
 ### What happens if you miss the deadline?
@@ -133,7 +133,7 @@ The CAI can impose:
 - **Penal penalties**: up to **$25 million CAD** or 4% of worldwide turnover for more serious violations
 - **Reputational damage**: CAI decisions are public and searchable
 
-These penalties escalated significantly when [Law 25's final provisions came into force in September 2024](https://www.cai.gouv.qc.ca/english/). Organizations that previously had informal DSAR processes now face real enforcement risk.
+These penalties came into force in **September 2023** when the majority of Law 25's provisions took effect. The final phase (data portability) followed in September 2024. The CAI published its [first enforcement decision](https://www.cai.gouv.qc.ca/) under the amended law in late 2024. Organizations that previously had informal DSAR processes now face real enforcement risk.
 
 ---
 
@@ -187,7 +187,7 @@ Your report should include:
 4. **Retention periods** — how long each data type is kept
 5. **Third-party disclosures** — who else has access
 
-If the requester speaks French, you should provide the report in French. Quebec's [Charter of the French Language](https://www.oqlf.gouv.qc.ca/) applies here.
+If the requester communicates in French, you are required to respond in French under Quebec's [Charter of the French Language](https://www.oqlf.gouv.qc.ca/) (Bill 101), which guarantees the right to be served in French.
 
 ### Step 5: Deliver the Response
 
@@ -217,13 +217,13 @@ For organizations using cookie consent management platforms, here is what Law 25
 
 ## When Can You Refuse a Request?
 
-Law 25 section 28 allows you to refuse a data access request — fully or partially — in specific circumstances:
+Law 25 sections 37-41 allows you to refuse a data access request — fully or partially — in specific circumstances:
 
-- **Third-party information**: Disclosure would reveal personal information about another individual
-- **Investigation prejudice**: Releasing the data would compromise an ongoing investigation
-- **Legal privilege**: The information is protected by solicitor-client privilege
-- **Unreasonable effort**: The information cannot be isolated from other data without disproportionate effort
-- **Commercial secrets**: Disclosure would reveal confidential commercial information
+- **Third-party harm (s.40)**: Disclosure would reveal personal information about another individual and could seriously harm that person
+- **Investigation prejudice (s.39)**: Releasing the data would hinder an investigation or the detection/prevention of a crime
+- **Health-related harm (s.37)**: The information could cause serious harm to the person's health if disclosed directly
+- **Judicial proceedings (s.39)**: The information is relevant to ongoing judicial proceedings
+- **Minor's information (s.38)**: Medical or social information about a minor under 14
 
 ### Partial refusal
 
@@ -301,7 +301,7 @@ You have **30 calendar days** from the date you receive the request. This deadli
 
 ### Can I refuse a data access request under Law 25?
 
-Yes. Under Law 25 section 28, you can fully or partially refuse a request if disclosure would reveal information about a third party, prejudice an investigation, or if the information cannot be isolated without unreasonable effort. You must document the reason for refusal and inform the requester of their right to contest with the CAI.
+Yes. Under Law 25 sections 37-41, you can fully or partially refuse a request if disclosure would seriously harm a third party (s.40), prejudice an investigation or crime detection (s.39), or cause serious health-related harm (s.37). You must document the reason for refusal and inform the requester of their right to contest with the CAI.
 
 ### Do I need to verify identity before responding to a DSAR?
 
@@ -321,7 +321,7 @@ The CAI can impose administrative penalties of up to **$10 million CAD** or 2% o
 
 ### How is a Law 25 DSAR different from a GDPR subject access request?
 
-The core concept is the same, but Law 25 has a **stricter 30-day deadline** with no extension option (GDPR allows up to 3 months). Law 25 also carries penalties scaled to the Canadian market — up to $25 million CAD — making it the most stringent privacy law in Canada.
+The core concept is the same. Both have a 30-day baseline deadline, though Law 25 requires applying to the CAI for an extension (GDPR allows a simpler 2-month extension for complex requests). Law 25 also carries penalties scaled to the Canadian market — up to $25 million CAD — making it the most stringent privacy law in Canada.
 
 ### Do I need to provide the report in French?
 
