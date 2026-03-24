@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Banner Privacy Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="logo-text">Cookie Banner</span>
+      </div>
+      <div id="status-dot" class="status-dot disconnected" title="Disconnected"></div>
+    </header>
+
+    <!-- Setup view (no API key) -->
+    <div id="view-setup" class="view" style="display:none">
+      <div class="setup-content">
+        <h2>Connect Your Account</h2>
+        <p>Enter your API key from the <a href="https://cookie-banner.ca/dashboard/privacy/settings" target="_blank">dashboard</a> to get started.</p>
+        <div class="input-group">
+          <input type="password" id="api-key-input" placeholder="ck_xxxxxxxxxxxxxxxx" autocomplete="off">
+          <button id="btn-connect" class="btn btn-primary">Connect</button>
+        </div>
+        <p id="setup-error" class="error" style="display:none"></p>
+      </div>
+    </div>
+
+    <!-- Connected view -->
+    <div id="view-connected" class="view" style="display:none">
+      <!-- Today's stats -->
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value" id="daily-count">0</span>
+          <span class="stat-label">Banners today</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="tier-badge">Free</span>
+          <span class="stat-label">Plan</span>
+        </div>
+      </div>
+
+      <!-- Current preferences -->
+      <div class="section">
+        <h3>Your Preferences</h3>
+        <div class="pref-grid" id="pref-grid">
+          <div class="pref-item">
+            <span class="pref-label">Default Action</span>
+            <span class="pref-value" id="pref-action">—</span>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Auto-apply</span>
+            <span class="pref-value" id="pref-auto">—</span>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Analytics</span>
+            <span class="pref-value" id="pref-analytics">—</span>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Marketing</span>
+            <span class="pref-value" id="pref-marketing">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a href="https://cookie-banner.ca/dashboard/privacy/preferences" target="_blank" class="btn btn-secondary">
+          Edit Preferences
+        </a>
+        <a href="https://cookie-banner.ca/dashboard/privacy" target="_blank" class="btn btn-secondary">
+          Dashboard
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <button id="btn-refresh" class="btn-link">Refresh</button>
+        <button id="btn-disconnect" class="btn-link danger">Disconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
