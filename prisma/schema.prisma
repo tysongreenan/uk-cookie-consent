@@ -52,6 +52,11 @@ model User {
   stripeCustomerId String?
   stripePaymentIntentId String?
 
+  // Product access flags — one account, multiple products
+  hasConsentBanner Boolean @default(false) // Cookie consent banner tool
+  hasPrivacyConsumer Boolean @default(false) // Consumer privacy dashboard + extension
+  hasCommentTool Boolean @default(false) // Comment tool
+
   accounts Account[]
   sessions Session[]
   projects Project[]

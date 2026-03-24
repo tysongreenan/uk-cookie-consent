@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { createClient } from '@supabase/supabase-js'
 import { registrationRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail, sanitizeUserName, validatePassword } from '@/lib/sanitize'
+import { logActivity, AuditAction } from '@/lib/audit-log'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -120,6 +121,7 @@ export async function POST(request: NextRequest) {
         email: sanitizedEmail,
         name: sanitizedName || null,
         password: hashedPassword,
+        hasConsentBanner: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       })
@@ -246,6 +248,9 @@ export async function POST(request: NextRequest) {
         // Don't fail the registration if banner creation fails
       }
     }
+
+    // Log registration
+    logActivity(user.id, AuditAction.REGISTER, request, { email: sanitizedEmail })
 
     return NextResponse.json({
       success: true,

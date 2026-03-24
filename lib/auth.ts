@@ -16,6 +16,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
+import { logActivity, AuditAction } from '@/lib/audit-log'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -68,7 +69,7 @@ export const authOptions: NextAuthOptions = {
           // Basic user query (only existing fields)
           const { data: user, error } = await supabase
             .from('User')
-            .select('id, email, name, password, emailVerified, planTier')
+            .select('id, email, name, password, emailVerified, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
             .eq('email', credentials.email.toLowerCase().trim())
             .single()
 
@@ -92,8 +93,8 @@ export const authOptions: NextAuthOptions = {
           )
 
           if (!isPasswordValid) {
-            // Skip login attempt tracking since fields don't exist yet
             console.warn(`Invalid password for email: ${credentials.email}`)
+            logActivity(user.id, AuditAction.LOGIN_FAILED, null, { email: credentials.email })
             return null
           }
 
@@ -135,10 +136,13 @@ export const authOptions: NextAuthOptions = {
           // Update last login time (only update existing fields)
           await supabase
             .from('User')
-            .update({ 
+            .update({
               updatedAt: new Date().toISOString()
             })
             .eq('id', user.id)
+
+          // Log successful login (no request object available in authorize callback)
+          logActivity(user.id, AuditAction.LOGIN, null, { email: user.email, provider: 'credentials' })
 
           return {
             id: user.id,
@@ -147,7 +151,12 @@ export const authOptions: NextAuthOptions = {
             rememberMe: credentials.rememberMe === 'true',
             currentTeamId: teamMember?.team_id || null,
             userRole: teamMember?.role || 'owner',
-            planTier: user.planTier || 'free'
+            planTier: user.planTier || 'free',
+            userType: user.userType || 'business',
+            consumerTier: user.consumerTier || 'free',
+            hasConsentBanner: user.hasConsentBanner ?? true,
+            hasPrivacyConsumer: user.hasPrivacyConsumer ?? false,
+            hasCommentTool: user.hasCommentTool ?? false,
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -177,7 +186,7 @@ export const authOptions: NextAuthOptions = {
         // Check if user already exists
         const { data: existingUser } = await supabase
           .from('User')
-          .select('id, name, planTier')
+          .select('id, name, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
           .eq('email', email)
           .single()
 
@@ -237,7 +246,13 @@ export const authOptions: NextAuthOptions = {
           // Attach workspace info so the jwt callback can read it
           ;(user as any).id = existingUser.id
           ;(user as any).planTier = existingUser.planTier || 'free'
+          ;(user as any).userType = existingUser.userType || 'business'
+          ;(user as any).consumerTier = existingUser.consumerTier || 'free'
+          ;(user as any).hasConsentBanner = existingUser.hasConsentBanner ?? true
+          ;(user as any).hasPrivacyConsumer = existingUser.hasPrivacyConsumer ?? false
+          ;(user as any).hasCommentTool = existingUser.hasCommentTool ?? false
 
+          logActivity(existingUser.id, AuditAction.LOGIN, null, { email, provider: 'google' })
           console.log('✅ Google OAuth: Linked to existing account:', email)
           return true
         }
@@ -257,6 +272,7 @@ export const authOptions: NextAuthOptions = {
             email,
             name: displayName,
             image: user.image || null,
+            hasConsentBanner: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           })
@@ -307,6 +323,7 @@ export const authOptions: NextAuthOptions = {
         ;(user as any).userRole = 'owner'
         ;(user as any).planTier = 'free'
 
+        logActivity(userId, AuditAction.REGISTER, null, { email, provider: 'google' })
         console.log('✅ Google OAuth: Created user + workspace for:', email)
         return true
       } catch (error) {
@@ -322,20 +339,30 @@ export const authOptions: NextAuthOptions = {
         token.currentTeamId = (user as any).currentTeamId || null
         token.userRole = (user as any).userRole || 'owner'
         token.planTier = (user as any).planTier || 'free'
+        token.userType = (user as any).userType || 'business'
+        token.consumerTier = (user as any).consumerTier || 'free'
+        token.hasConsentBanner = (user as any).hasConsentBanner ?? true
+        token.hasPrivacyConsumer = (user as any).hasPrivacyConsumer ?? false
+        token.hasCommentTool = (user as any).hasCommentTool ?? false
       } else if (token.id) {
-        // Refresh planTier from database on token rotation so upgrades take effect without re-login
+        // Refresh plan data from database on token rotation so upgrades take effect without re-login
         try {
           const supabase = getSupabaseClient()
           const { data } = await supabase
             .from('User')
-            .select('planTier')
+            .select('planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
             .eq('id', token.id)
             .single()
-          if (data?.planTier) {
-            token.planTier = data.planTier
+          if (data?.planTier) token.planTier = data.planTier
+          if (data?.userType) token.userType = data.userType
+          if (data?.consumerTier) token.consumerTier = data.consumerTier
+          if (data) {
+            token.hasConsentBanner = data.hasConsentBanner ?? true
+            token.hasPrivacyConsumer = data.hasPrivacyConsumer ?? false
+            token.hasCommentTool = data.hasCommentTool ?? false
           }
         } catch (err) {
-          console.error('[AUTH] Failed to refresh planTier from database:', err)
+          console.error('[AUTH] Failed to refresh plan data from database:', err)
         }
       }
       return token
@@ -362,6 +389,11 @@ export const authOptions: NextAuthOptions = {
           currentTeamId: token.currentTeamId,
           userRole: token.userRole,
           planTier: token.planTier || 'free',
+          userType: token.userType || 'business',
+          consumerTier: token.consumerTier || 'free',
+          hasConsentBanner: token.hasConsentBanner ?? true,
+          hasPrivacyConsumer: token.hasPrivacyConsumer ?? false,
+          hasCommentTool: token.hasCommentTool ?? false,
         },
         expires: new Date(Date.now() + maxAge * 1000).toISOString(),
       };

@@ -222,6 +222,10 @@ export interface User {
   image?: string
   userType?: UserType
   consumerTier?: ConsumerTier
+  // Product access flags — one account, multiple products
+  hasConsentBanner?: boolean
+  hasPrivacyConsumer?: boolean
+  hasCommentTool?: boolean
   createdAt: Date
   updatedAt: Date
 }
