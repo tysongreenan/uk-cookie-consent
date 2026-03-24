@@ -326,7 +326,7 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
             >
               <option value="json">JSON</option>
               <option value="csv">CSV</option>
-              <option value="pdf">PDF (coming soon)</option>
+              <option value="pdf">PDF</option>
             </select>
           </div>
 

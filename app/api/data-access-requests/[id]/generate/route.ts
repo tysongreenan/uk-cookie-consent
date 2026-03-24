@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeDSAR, getSupabaseAdmin, rowToDataAccessRequest } from '@/lib/dsar-helpers'
 import { generateDSARReport, formatReportAsCSV, formatReportAsJSON } from '@/lib/data-access-report'
+import { renderDSARReportPDF } from '@/lib/dsar-pdf-template'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import type { DataAccessRequest } from '@/types'
 
@@ -102,16 +103,19 @@ export async function POST(
       })
 
       // Format based on requested format
-      let content: string
+      let content: string | Buffer
       let contentType: string
       let fileExtension: string
 
-      if (dsarRequest.reportFormat === 'csv') {
+      if (dsarRequest.reportFormat === 'pdf') {
+        content = await renderDSARReportPDF(report)
+        contentType = 'application/pdf'
+        fileExtension = 'pdf'
+      } else if (dsarRequest.reportFormat === 'csv') {
         content = formatReportAsCSV(report)
         contentType = 'text/csv'
         fileExtension = 'csv'
       } else {
-        // Default to JSON (PDF is a future enhancement — falls back to JSON for now)
         content = formatReportAsJSON(report)
         contentType = 'application/json'
         fileExtension = 'json'
