@@ -87,6 +87,8 @@ export function Sidebar({ className }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const userPlan = (session?.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
   const isPro = userPlan === 'pro' || userPlan === 'enterprise'
+  const hasBanner = (session?.user as any)?.hasConsentBanner ?? true
+  const hasPrivacy = (session?.user as any)?.hasPrivacyConsumer ?? false
 
   const toggleExpanded = (title: string) => {
     setExpandedItems(prev => 
@@ -171,14 +173,16 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-1">
-        <div className="space-y-0.5">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Main Menu
-          </p>
-          {navigationItems.map(item => renderNavItem(item))}
-        </div>
+        {hasBanner && (
+          <div className="space-y-0.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              {hasPrivacy ? 'Banner Tools' : 'Main Menu'}
+            </p>
+            {navigationItems.map(item => renderNavItem(item))}
+          </div>
+        )}
 
-        {isPro && (
+        {hasBanner && isPro && (
           <div className="space-y-0.5 pt-4">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               Compliance
@@ -189,18 +193,20 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         )}
 
-        <div className="space-y-0.5 pt-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 border-l-2 border-[#0E768C] pl-2 flex items-center gap-2">
-            My Privacy
-            <NewBadge variant="glow" size="sm" />
-          </p>
-          {[
-            { title: 'Overview', href: '/dashboard/privacy', icon: Shield },
-            { title: 'Preferences', href: '/dashboard/privacy/preferences', icon: SlidersHorizontal },
-            { title: 'History', href: '/dashboard/privacy/history', icon: History },
-            { title: 'Extension', href: '/dashboard/privacy/settings', icon: Key },
-          ].map(item => renderNavItem(item))}
-        </div>
+        {hasPrivacy && (
+          <div className="space-y-0.5 pt-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 border-l-2 border-[#0E768C] pl-2 flex items-center gap-2">
+              My Privacy
+              {hasBanner && <NewBadge variant="glow" size="sm" />}
+            </p>
+            {[
+              { title: 'Overview', href: '/dashboard/privacy', icon: Shield },
+              { title: 'Preferences', href: '/dashboard/privacy/preferences', icon: SlidersHorizontal },
+              { title: 'History', href: '/dashboard/privacy/history', icon: History },
+              { title: 'Extension', href: '/dashboard/privacy/settings', icon: Key },
+            ].map(item => renderNavItem(item))}
+          </div>
+        )}
 
         <div className="space-y-0.5 pt-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">

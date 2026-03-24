@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, name, password, bannerConfig } = await request.json()
+    const { email, name, password, bannerConfig, product } = await request.json()
 
     // Sanitize and validate input
     const sanitizedEmail = sanitizeEmail(email);
@@ -114,6 +114,10 @@ export async function POST(request: NextRequest) {
     const userId = crypto.randomUUID()
 
     // Create user
+    // Determine product access based on signup flow
+    const isPrivacySignup = product === 'privacy'
+    const isBannerSignup = !isPrivacySignup // Default to banner product
+
     const { data: user, error: insertError } = await supabase
       .from('User')
       .insert({
@@ -121,7 +125,8 @@ export async function POST(request: NextRequest) {
         email: sanitizedEmail,
         name: sanitizedName || null,
         password: hashedPassword,
-        hasConsentBanner: true,
+        hasConsentBanner: isBannerSignup,
+        hasPrivacyConsumer: isPrivacySignup,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       })
