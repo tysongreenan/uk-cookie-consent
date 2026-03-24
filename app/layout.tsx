@@ -92,6 +92,23 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
+        {/* Google Consent Mode v2 — MUST be first, before any trackers or banner script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'wait_for_update': 500
+              });
+            `,
+          }}
+        />
+
         {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
         {/* 🍁 Cookie Consent Banner - HOSTED SCRIPT (cookie-banner.ca)  🍁 */}
         {/* 🍁 Place this code in your <head> section                    🍁 */}
@@ -105,13 +122,11 @@ export default function RootLayout({
         {/* 🍁 End HOSTED SCRIPT - Powered by cookie-banner.ca           🍁 */}
         {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
 
-        {/* Google Analytics (gtag.js) */}
+        {/* Google Analytics (gtag.js) — loads after consent defaults are set */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-QM1L8P6TT5');
             `,

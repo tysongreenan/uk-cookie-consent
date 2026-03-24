@@ -10,7 +10,8 @@ import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 import { HeroSection } from '@/components/blocks/hero-section'
 import { LogoMarquee } from '@/components/landing/logo-marquee'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
-import { ProductDescription } from '@/components/landing/product-description' 
+import { ProductDescription } from '@/components/landing/product-description'
+import { ABTracker } from '@/components/ab-tracker'
 
 export const metadata: Metadata = {
   title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
@@ -55,6 +56,7 @@ export default function HomePage() {
       {/* AEO Structured Data - Optimized for AI Assistants */}
       <AEOStructuredData baseUrl={baseUrl} />
       
+      <ABTracker experiment="homepage" variant="v1" />
       <LiveCookieBanner />
       <Header />
       <main>

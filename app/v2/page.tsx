@@ -11,6 +11,7 @@ import { HeroSectionV2 } from './hero-section-v2'
 import { LogoMarquee } from '@/components/landing/logo-marquee'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 import { ProductDescription } from '@/components/landing/product-description'
+import { ABTracker } from '@/components/ab-tracker'
 
 export const metadata: Metadata = {
   title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
@@ -55,6 +56,7 @@ export default function HomePageV2() {
     <div className="min-h-screen bg-background">
       <AEOStructuredData baseUrl={baseUrl} />
 
+      <ABTracker experiment="homepage" variant="v2" />
       <LiveCookieBanner />
       <Header />
       <main>
