@@ -213,17 +213,29 @@ export default function DataRequestsPage() {
   )
 }
 
-// ── Create Request Modal ──────────────────────────────────────────────
+// ── Create Request Modal (search-first flow) ─────────────────────────
+
+interface SearchResult {
+  found: boolean
+  totalRecords: number
+  sources: {
+    banner_visitors: { count: number; banners: string[]; dateRange: { first: string; last: string } | null }
+    banner_analytics: { count: number }
+  }
+  hint: string | null
+}
 
 function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const [identifierType, setIdentifierType] = useState<'email' | 'ip' | 'name'>('email')
+  const [step, setStep] = useState<'search' | 'create'>('search')
+  const [identifierType, setIdentifierType] = useState<'ip' | 'email' | 'name'>('ip')
   const [identifierValue, setIdentifierValue] = useState('')
   const [subjectEmail, setSubjectEmail] = useState('')
   const [reportFormat, setReportFormat] = useState<'json' | 'csv' | 'pdf'>('json')
+  const [searching, setSearching] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
 
-  // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -232,8 +244,33 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!identifierValue.trim()) return
+    setSearching(true)
+    setError('')
+    setSearchResult(null)
+
+    try {
+      const params = new URLSearchParams({ type: identifierType, value: identifierValue.trim() })
+      const res = await fetch(`/api/data-access-requests/search?${params}`, {
+        headers: { 'x-requested-with': 'dashboard' },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setSearchResult(json.data)
+      } else {
+        const json = await res.json()
+        setError(json.error || 'Search failed')
+      }
+    } catch {
+      setError('Network error')
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  const handleCreate = async () => {
     setSubmitting(true)
     setError('')
 
@@ -243,7 +280,7 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
         headers: { 'Content-Type': 'application/json', 'x-requested-with': 'dashboard' },
         body: JSON.stringify({
           subjectIdentifierType: identifierType,
-          subjectIdentifierValue: identifierValue,
+          subjectIdentifierValue: identifierValue.trim(),
           subjectEmail: subjectEmail || undefined,
           reportFormat,
         }),
@@ -274,83 +311,157 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-background rounded-xl shadow-xl max-w-md w-full p-6"
+        className="bg-background rounded-xl shadow-xl max-w-lg w-full p-6"
       >
-        <h2 id="create-dsar-title" className="text-lg font-semibold mb-4">New Data Access Request</h2>
+        {step === 'search' ? (
+          <>
+            <h2 id="create-dsar-title" className="text-lg font-semibold mb-1">Find Person in Your Data</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Search your banner data to check if you hold records for this person. Cookie banners collect <strong>IP addresses</strong> — search by IP for best results.
+            </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium block mb-1">Identifier Type</label>
-            <select
-              value={identifierType}
-              onChange={(e) => setIdentifierType(e.target.value as typeof identifierType)}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="email">Email Address</option>
-              <option value="ip">IP Address</option>
-              <option value="name">Name</option>
-            </select>
-          </div>
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="flex gap-3">
+                <div className="w-32">
+                  <label className="text-sm font-medium block mb-1">Search by</label>
+                  <select
+                    value={identifierType}
+                    onChange={(e) => { setIdentifierType(e.target.value as typeof identifierType); setSearchResult(null) }}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="ip">IP Address</option>
+                    <option value="email">Email</option>
+                    <option value="name">Name</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium block mb-1">Value</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={identifierValue}
+                      onChange={(e) => { setIdentifierValue(e.target.value); setSearchResult(null) }}
+                      placeholder={identifierType === 'ip' ? '192.168.1.1' : identifierType === 'email' ? 'user@example.com' : 'John Doe'}
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={searching || !identifierValue.trim()}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+                    >
+                      {searching ? 'Searching...' : 'Search'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
 
-          <div>
-            <label className="text-sm font-medium block mb-1">
-              {identifierType === 'email' ? 'Email Address' : identifierType === 'ip' ? 'IP Address' : 'Full Name'}
-            </label>
-            <input
-              type={identifierType === 'email' ? 'email' : 'text'}
-              value={identifierValue}
-              onChange={(e) => setIdentifierValue(e.target.value)}
-              placeholder={identifierType === 'email' ? 'user@example.com' : identifierType === 'ip' ? '192.168.1.1' : 'John Doe'}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-              required
-            />
-          </div>
+            {/* Search results */}
+            {searchResult && (
+              <div className={`mt-4 p-4 rounded-lg border ${searchResult.found ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                {searchResult.found ? (
+                  <div>
+                    <p className="text-sm font-medium text-green-800">
+                      Found {searchResult.totalRecords} record{searchResult.totalRecords !== 1 ? 's' : ''}
+                    </p>
+                    {searchResult.sources.banner_visitors.count > 0 && (
+                      <div className="mt-2 text-xs text-green-700">
+                        <p>{searchResult.sources.banner_visitors.count} visitor records across {searchResult.sources.banner_visitors.banners.length} banner{searchResult.sources.banner_visitors.banners.length !== 1 ? 's' : ''}</p>
+                        {searchResult.sources.banner_visitors.dateRange && (
+                          <p>Date range: {searchResult.sources.banner_visitors.dateRange.first} to {searchResult.sources.banner_visitors.dateRange.last}</p>
+                        )}
+                        <p className="mt-1">Banners: {searchResult.sources.banner_visitors.banners.join(', ')}</p>
+                      </div>
+                    )}
+                    {searchResult.sources.banner_analytics.count > 0 && (
+                      <p className="mt-1 text-xs text-green-700">{searchResult.sources.banner_analytics.count} analytics events</p>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">No records found</p>
+                    {searchResult.hint && (
+                      <p className="text-xs text-yellow-700 mt-1">{searchResult.hint}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
-          <div>
-            <label className="text-sm font-medium block mb-1">Contact Email (for delivery)</label>
-            <input
-              type="email"
-              value={subjectEmail}
-              onChange={(e) => setSubjectEmail(e.target.value)}
-              placeholder="Optional — where to send the report"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-            />
-          </div>
+            {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
 
-          <div>
-            <label className="text-sm font-medium block mb-1">Report Format</label>
-            <select
-              value={reportFormat}
-              onChange={(e) => setReportFormat(e.target.value as typeof reportFormat)}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="json">JSON</option>
-              <option value="csv">CSV</option>
-              <option value="pdf">PDF</option>
-            </select>
-          </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setStep('create')}
+                disabled={!identifierValue.trim()}
+                className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+              >
+                {searchResult?.found ? 'Create Request' : 'Create Anyway'}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-lg font-semibold mb-1">Create Data Access Request</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Searching for: <strong>{identifierType}</strong> = <strong>{identifierValue}</strong>
+              {searchResult && <span className="ml-1">({searchResult.totalRecords} records found)</span>}
+            </p>
 
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium block mb-1">Contact Email (to deliver the report)</label>
+                <input
+                  type="email"
+                  value={subjectEmail}
+                  onChange={(e) => setSubjectEmail(e.target.value)}
+                  placeholder="person@example.com"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || !identifierValue}
-              className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {submitting ? 'Creating...' : 'Create Request'}
-            </button>
-          </div>
-        </form>
+              <div>
+                <label className="text-sm font-medium block mb-1">Report Format</label>
+                <select
+                  value={reportFormat}
+                  onChange={(e) => setReportFormat(e.target.value as typeof reportFormat)}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="pdf">PDF</option>
+                  <option value="csv">CSV</option>
+                  <option value="json">JSON</option>
+                </select>
+              </div>
+
+              {error && <p className="text-sm text-red-600">{error}</p>}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStep('search')}
+                  className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleCreate}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {submitting ? 'Creating...' : 'Create Request'}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </motion.div>
     </div>
   )
