@@ -227,7 +227,7 @@ interface SearchResult {
 
 function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [step, setStep] = useState<'search' | 'create'>('search')
-  const [identifierType, setIdentifierType] = useState<'ip' | 'email' | 'name'>('ip')
+  const [identifierType, setIdentifierType] = useState<'ip'>('ip')
   const [identifierValue, setIdentifierValue] = useState('')
   const [subjectEmail, setSubjectEmail] = useState('')
   const [reportFormat, setReportFormat] = useState<'json' | 'csv' | 'pdf'>('json')
@@ -317,42 +317,28 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
           <>
             <h2 id="create-dsar-title" className="text-lg font-semibold mb-1">Find Person in Your Data</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Search your banner data to check if you hold records for this person. Cookie banners collect <strong>IP addresses</strong> — search by IP for best results.
+              Cookie banners collect <strong>IP addresses</strong>. Enter the person's IP to check if you hold any data about them. Ask the requester for their IP, or look it up from your other systems.
             </p>
 
             <form onSubmit={handleSearch} className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-32">
-                  <label className="text-sm font-medium block mb-1">Search by</label>
-                  <select
-                    value={identifierType}
-                    onChange={(e) => { setIdentifierType(e.target.value as typeof identifierType); setSearchResult(null) }}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              <div>
+                <label className="text-sm font-medium block mb-1">IP Address</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={identifierValue}
+                    onChange={(e) => { setIdentifierValue(e.target.value); setSearchResult(null) }}
+                    placeholder="e.g. 192.168.1.1 or 2001:db8::1"
+                    className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={searching || !identifierValue.trim()}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
                   >
-                    <option value="ip">IP Address</option>
-                    <option value="email">Email</option>
-                    <option value="name">Name</option>
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="text-sm font-medium block mb-1">Value</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={identifierValue}
-                      onChange={(e) => { setIdentifierValue(e.target.value); setSearchResult(null) }}
-                      placeholder={identifierType === 'ip' ? '192.168.1.1' : identifierType === 'email' ? 'user@example.com' : 'John Doe'}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      disabled={searching || !identifierValue.trim()}
-                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
-                    >
-                      {searching ? 'Searching...' : 'Search'}
-                    </button>
-                  </div>
+                    {searching ? 'Searching...' : 'Search'}
+                  </button>
                 </div>
               </div>
             </form>
@@ -412,8 +398,8 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
           <>
             <h2 className="text-lg font-semibold mb-1">Create Data Access Request</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Searching for: <strong>{identifierType}</strong> = <strong>{identifierValue}</strong>
-              {searchResult && <span className="ml-1">({searchResult.totalRecords} records found)</span>}
+              IP: <strong className="font-mono">{identifierValue}</strong>
+              {searchResult && <span className="ml-1">— {searchResult.totalRecords} record{searchResult.totalRecords !== 1 ? 's' : ''} found</span>}
             </p>
 
             <div className="space-y-4">
