@@ -16,7 +16,7 @@ function getResend() {
   return new Resend(key)
 }
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Cookie Banner <noreply@cookie-banner.ca>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Cookie Banner <onboarding@resend.dev>'
 
 // ── Generic send ──────────────────────────────────────────────────────
 
