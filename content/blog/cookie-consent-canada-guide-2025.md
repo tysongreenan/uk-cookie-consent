@@ -78,7 +78,7 @@ Cookie consent in Canada is the legal requirement for websites to obtain user pe
 
 ## What Canadian Privacy Laws Require Cookie Consent?
 
-Canadian websites must comply with three main privacy laws that require cookie consent:
+Canadian websites must comply with three main privacy laws that require cookie consent: **PIPEDA** (federal), **CASL** (anti-spam), and **Quebec's Law 25** (provincial, strictest of the three). Here's what each one requires.
 
 ### What Is PIPEDA and How Does It Apply to Cookies?
 
@@ -103,11 +103,17 @@ CASL (Canada's Anti-Spam Legislation) primarily deals with email marketing, but 
 
 ### What Is Quebec's Law 25 and How Is It Different?
 
-Quebec has its own privacy law, Bill 64 (Law 25), which is even stricter than PIPEDA:
+Quebec has its own privacy law, Bill 64 (Law 25), which is the **strictest privacy law in Canada**. It goes further than PIPEDA in several ways:
 
 - Requires **explicit consent** for cookies (not just implied)
 - Mandates **opt-in** (not opt-out) for non-essential cookies
-- Includes **significant fines** for non-compliance
+- Includes **significant fines** for non-compliance — up to **$25 million CAD** or 4% of worldwide turnover
+- Gives individuals the **right to access their personal data** — if someone requests it, you must provide all the data you hold about them within **30 calendar days**
+- Requires a **designated privacy officer** and breach notification
+
+**The right of access is particularly important for websites using cookie banners.** If a Quebec resident asks for their data, you need to be able to pull their consent records, IP addresses, and analytics data into a report and deliver it on time. Failure to respond within 30 days can result in a formal complaint to the [Commission d'accès à l'information (CAI)](https://www.cai.gouv.qc.ca/).
+
+cookie-banner.ca includes a [built-in data access request tool](/blog/law-25-data-access-request-dsar-guide) that handles the entire process: identity verification, report generation, deadline tracking, and audit trail — so you're ready when a request comes in.
 
 If you have users in Quebec, you need to follow the stricter standard. Learn more about [Quebec's Law 25 requirements](https://www.quebec.ca/en/government/departments-and-agencies/justice/access-to-information-and-privacy).
 
