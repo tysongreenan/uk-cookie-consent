@@ -61,6 +61,8 @@ Cookie consent in Canada is the legal requirement for websites to obtain user pe
 [Learn more about PIPEDA compliance →](/compliance/pipeda)
 </div>
 
+> **Need a compliant cookie banner?** cookie-banner.ca generates a free, PIPEDA and Law 25 compliant banner for your website in under 2 minutes. [Get your free banner →](/free-cookie-banner)
+
 ---
 
 ## Table of Contents
