@@ -65,7 +65,7 @@ export default function HomePage() {
           badge={{
             text: "Used by 1,000+ websites",
           }}
-          title="Free Cookie Banner Generator"
+          title="Cookie Banner Generator"
           title2="GDPR, PIPEDA & Law 25 Compliant"
           description="Generate cookie consent banners in 5 minutes. Match your brand. Works on any platform. Free plan available — upgrade to Pro for $99 one-time."
           emailCapture={true}
