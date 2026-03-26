@@ -258,7 +258,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // Defensive defaults for optional nested objects (older banners may lack these)
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
-  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true }
+  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true, required: false }
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
   if (!config.text) {
@@ -859,7 +859,7 @@ ${config.advanced.customCSS}`
 export const generateBannerJS = (config: BannerConfigWithGeoOverrides) => {
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
-  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true }
+  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true, required: false }
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
   if (!config.scripts) config.scripts = { strictlyNecessary: [], functionality: [], trackingPerformance: [], targetingAdvertising: [] } as any
