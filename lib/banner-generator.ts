@@ -16,7 +16,7 @@ const encodeScriptCode = (scriptCode: string): string => {
 }
 
 const escapeHtml = (value: string): string =>
-  value
+  (value || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -255,13 +255,28 @@ const generateScriptLoaders = (
 }
 
 export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
+  // Defensive defaults for optional nested objects (older banners may lack these)
+  if (!config.branding) config.branding = {} as any
+  if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
+  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true }
+  if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
+  if (!config.behavior) config.behavior = {} as any
+  if (!config.text) {
+    config.text = {
+      title: (config as any).content?.heading || 'Cookie Consent',
+      message: (config as any).content?.description || 'We use cookies to enhance your browsing experience and provide personalized content.',
+      acceptButton: (config as any).content?.acceptButtonText || 'Accept All',
+      rejectButton: (config as any).content?.rejectButtonText || 'Reject All',
+    } as any
+  }
+
   const showBranding = options?.showBranding !== false // default true
-  const logoElement = config.branding.logo.enabled && config.branding.logo.url
-    ? `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; object-fit: contain;" />`
+  const logoElement = config.branding?.logo?.enabled && config.branding?.logo?.url
+    ? `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth || 120}px; max-height: ${config.branding.logo.maxHeight || 40}px; object-fit: contain;" />`
     : ''
 
-  const privacyPolicyLink = config.branding.privacyPolicy.url
-    ? `<a href="${escapeHtml(config.branding.privacyPolicy.url)}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${escapeHtml(config.colors.link)} !important; text-decoration: underline;">${escapeHtml(config.branding.privacyPolicy.text)}</a>`
+  const privacyPolicyLink = config.branding?.privacyPolicy?.url
+    ? `<a href="${escapeHtml(config.branding.privacyPolicy.url)}" ${config.branding.privacyPolicy.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''} style="color: ${escapeHtml(config.colors.link)} !important; text-decoration: underline;">${escapeHtml(config.branding.privacyPolicy.text || 'Privacy Policy')}</a>`
     : ''
 
   // Helper function to calculate border color based on theme
@@ -630,6 +645,10 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
 }
 
 export const generateBannerCSS = (config: BannerConfig) => {
+  if (!config.branding) config.branding = {} as any
+  if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
+  if (!config.behavior) config.behavior = {} as any
+
   return `/* Material Symbols CSS - font file loaded asynchronously via <link> */
 .material-symbols-outlined {
   font-variation-settings:
@@ -838,6 +857,21 @@ ${config.advanced.customCSS}`
 }
 
 export const generateBannerJS = (config: BannerConfigWithGeoOverrides) => {
+  if (!config.branding) config.branding = {} as any
+  if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
+  if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true }
+  if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
+  if (!config.behavior) config.behavior = {} as any
+  if (!config.scripts) config.scripts = { strictlyNecessary: [], functionality: [], trackingPerformance: [], targetingAdvertising: [] } as any
+  if (!config.text) {
+    config.text = {
+      title: (config as any).content?.heading || 'Cookie Consent',
+      message: (config as any).content?.description || 'We use cookies.',
+      acceptButton: (config as any).content?.acceptButtonText || 'Accept All',
+      rejectButton: (config as any).content?.rejectButtonText || 'Reject All',
+    } as any
+  }
+
   const performanceOptions = config.advanced?.performance ?? {}
   const useLazyLoader = Boolean(
     performanceOptions.deferNonCriticalScripts ||
