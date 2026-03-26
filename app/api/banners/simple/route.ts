@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
+import { logActivity, AuditAction } from '@/lib/audit-log'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -92,11 +93,13 @@ function rejectCookies() {
     }
 
     console.log('✅ Simple Save: Banner created successfully:', bannerId)
-    return NextResponse.json({ 
-      success: true, 
+    logActivity(session.user.id, AuditAction.BANNER_CREATE, request, { bannerId, bannerName })
+
+    return NextResponse.json({
+      success: true,
       bannerId,
       code,
-      message: 'Banner saved successfully!' 
+      message: 'Banner saved successfully!'
     })
 
   } catch (error) {

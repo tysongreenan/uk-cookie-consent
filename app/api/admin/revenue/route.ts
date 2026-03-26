@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 // Admin emails - can be overridden via ADMIN_EMAILS env var (comma-separated)
 const ADMIN_EMAILS = process.env.ADMIN_EMAILS
   ? process.env.ADMIN_EMAILS.split(',').map((e) => e.trim())
-  : ['greenantyson@gmail.com']
+  : ['support@cookie-banner.ca']
 
 export async function GET(request: NextRequest) {
   try {

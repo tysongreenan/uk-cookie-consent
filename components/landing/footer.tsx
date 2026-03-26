@@ -8,12 +8,19 @@ export function Footer() {
         {/* Logo Section */}
         <div className="mb-8">
           <Link href="/" className="inline-block">
-            <img 
-              src="/logos/logo.svg" 
-              alt="Cookie Banner Generator" 
+            <img
+              src="/logos/logo.svg"
+              alt="Cookie Banner Generator"
               width="120"
               height="32"
-              className="h-8 w-auto"
+              className="h-8 w-auto dark:hidden"
+            />
+            <img
+              src="/logos/logo-dark.svg"
+              alt="Cookie Banner Generator"
+              width="120"
+              height="32"
+              className="h-8 w-auto hidden dark:block"
             />
           </Link>
           <div className="mt-4 h-px bg-border"></div>

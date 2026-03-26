@@ -35,13 +35,13 @@ export async function GET(request: NextRequest) {
     // Fetch daily stats and dimension data in parallel
     let statsQuery = supabase
       .from('banner_stats')
-      .select('date, banner_id, impressions, accepts, rejects, dismisses, total_decision_time_ms, decision_count, returning_visitor_impressions')
+      .select('date, banner_id, impressions, accepts, rejects, dismisses, total_decision_time_ms, decision_count, returning_visitor_impressions, gpc_impressions')
       .eq('user_id', userId)
       .order('date', { ascending: true })
 
     let visitorsQuery = supabase
       .from('banner_visitors')
-      .select('date, banner_id, source, device, country, page_path, impressions, accepts, rejects, dismisses')
+      .select('date, banner_id, source, device, country, page_path, impressions, accepts, rejects, dismisses, gpc')
       .eq('user_id', userId)
       .order('date', { ascending: true })
 
@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
       dismiss_rate: row.impressions > 0 ? +(row.dismisses / row.impressions * 100).toFixed(1) : 0,
       avg_decision_time_s: row.decision_count > 0 ? +(row.total_decision_time_ms / row.decision_count / 1000).toFixed(1) : 0,
       returning_visitor_impressions: row.returning_visitor_impressions,
+      gpc_impressions: row.gpc_impressions || 0,
     }))
 
     const visitorBreakdown = (visitorsResult.data || []).map((row: any) => ({
@@ -88,6 +89,7 @@ export async function GET(request: NextRequest) {
       accepts: row.accepts,
       rejects: row.rejects,
       dismisses: row.dismisses,
+      gpc: row.gpc || false,
     }))
 
     if (format === 'json') {
@@ -106,8 +108,8 @@ export async function GET(request: NextRequest) {
     }
 
     // CSV format — two sheets combined with a separator
-    const statsHeaders = ['date', 'banner', 'impressions', 'accepts', 'rejects', 'dismisses', 'accept_rate_%', 'reject_rate_%', 'dismiss_rate_%', 'avg_decision_time_s', 'returning_visitor_impressions']
-    const visitorHeaders = ['date', 'banner', 'source', 'device', 'country', 'page_path', 'impressions', 'accepts', 'rejects', 'dismisses']
+    const statsHeaders = ['date', 'banner', 'impressions', 'accepts', 'rejects', 'dismisses', 'accept_rate_%', 'reject_rate_%', 'dismiss_rate_%', 'avg_decision_time_s', 'returning_visitor_impressions', 'gpc_impressions']
+    const visitorHeaders = ['date', 'banner', 'source', 'device', 'country', 'page_path', 'impressions', 'accepts', 'rejects', 'dismisses', 'gpc']
 
     let csv = '# Daily Stats\n'
     csv += statsHeaders.join(',') + '\n'
@@ -115,7 +117,7 @@ export async function GET(request: NextRequest) {
       csv += [
         row.date, csvEscape(row.banner), row.impressions, row.accepts, row.rejects, row.dismisses,
         row.accept_rate, row.reject_rate, row.dismiss_rate, row.avg_decision_time_s,
-        row.returning_visitor_impressions,
+        row.returning_visitor_impressions, row.gpc_impressions,
       ].join(',') + '\n'
     }
 
@@ -125,7 +127,7 @@ export async function GET(request: NextRequest) {
       csv += [
         row.date, csvEscape(row.banner), csvEscape(row.source), csvEscape(row.device),
         csvEscape(row.country), csvEscape(row.page_path), row.impressions, row.accepts,
-        row.rejects, row.dismisses,
+        row.rejects, row.dismisses, row.gpc,
       ].join(',') + '\n'
     }
 

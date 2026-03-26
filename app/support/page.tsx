@@ -57,9 +57,9 @@ export default function SupportPage() {
                   We typically respond within 24 hours
                 </p>
                 <Button asChild className="w-full">
-                  <a href="mailto:greenantyson@gmail.com">
+                  <a href="mailto:support@cookie-banner.ca">
                     <Mail className="w-4 h-4 mr-2" />
-                    greenantyson@gmail.com
+                    support@cookie-banner.ca
                   </a>
                 </Button>
               </CardContent>
@@ -83,7 +83,7 @@ export default function SupportPage() {
                   We can help you get it working
                 </p>
                 <Button asChild variant="outline" className="w-full">
-                  <a href="mailto:greenantyson@gmail.com?subject=Webflow Extension Support">
+                  <a href="mailto:support@cookie-banner.ca?subject=Webflow Extension Support">
                     <Code className="w-4 h-4 mr-2" />
                     Extension Support
                   </a>
@@ -191,9 +191,9 @@ export default function SupportPage() {
             </CardHeader>
             <CardContent className="text-center">
               <Button asChild size="lg" className="mt-4">
-                <a href="mailto:greenantyson@gmail.com">
+                <a href="mailto:support@cookie-banner.ca">
                   <Mail className="w-5 h-5 mr-2" />
-                  greenantyson@gmail.com
+                  support@cookie-banner.ca
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </Button>

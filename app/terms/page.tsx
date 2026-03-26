@@ -215,7 +215,7 @@ export default function TermsPage() {
                 </p>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-gray-600">
-                    <strong>Email:</strong> <a href="mailto:greenantyson@gmail.com" className="text-blue-600 hover:underline">greenantyson@gmail.com</a>
+                    <strong>Email:</strong> <a href="mailto:support@cookie-banner.ca" className="text-blue-600 hover:underline">support@cookie-banner.ca</a>
                   </p>
                   <p className="text-gray-600 mt-2">
                     <strong>Website:</strong> <a href="https://www.cookie-banner.ca" className="text-blue-600 hover:underline">https://www.cookie-banner.ca</a>

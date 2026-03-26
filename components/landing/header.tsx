@@ -15,13 +15,21 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:h-14">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <Image 
-            src="/logos/logo.svg" 
-            alt="Cookie Banner Generator" 
+          <Image
+            src="/logos/logo.svg"
+            alt="Cookie Banner Generator"
             width={120}
             height={32}
             priority
-            className="h-7 w-auto sm:h-8"
+            className="h-7 w-auto sm:h-8 dark:hidden"
+          />
+          <Image
+            src="/logos/logo-dark.svg"
+            alt="Cookie Banner Generator"
+            width={120}
+            height={32}
+            priority
+            className="h-7 w-auto sm:h-8 hidden dark:block"
           />
         </Link>
         

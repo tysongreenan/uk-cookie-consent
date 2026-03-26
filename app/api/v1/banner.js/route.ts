@@ -261,8 +261,14 @@ export async function GET(request: NextRequest) {
     } else {
       console.log(`[BANNER] Analytics enabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
     }
+    // Server-side GPC detection via Sec-GPC header (W3C spec Section 3.3)
+    const secGpc = request.headers.get('sec-gpc') === '1'
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     const internalAnalyticsJs = `
+  // Server-side GPC detection (Sec-GPC header) — defense-in-depth alongside client-side navigator.globalPrivacyControl
+  window.__cbServerGpc = ${secGpc};
+
   // Internal Analytics Tracking
   var _cbAnalyticsUserId = ${JSON.stringify(analyticsUserId)};
   var _cbAnalyticsBannerId = ${JSON.stringify(bannerId)};
@@ -303,7 +309,7 @@ export async function GET(request: NextRequest) {
       return;
     }
     console.debug('[CookieBanner] Queuing event:', type, 'banner:', _cbAnalyticsBannerId);
-    var evt = { type: type, source: _cbSource, device: _cbDevice, country: _cbCountry, pagePath: _cbPagePath };
+    var evt = { type: type, source: _cbSource, device: _cbDevice, country: _cbCountry, pagePath: _cbPagePath, gpc: !!window.__cbGpcActive };
     if (extra) {
       if (extra.decisionTime) evt.decisionTime = extra.decisionTime;
       if (extra.isReturning) evt.isReturning = true;

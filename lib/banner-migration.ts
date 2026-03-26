@@ -1,7 +1,7 @@
 import { BannerConfig } from '@/types'
 
 // Current version of banner configurations
-export const CURRENT_BANNER_VERSION = '2.1.0'
+export const CURRENT_BANNER_VERSION = '2.2.0'
 
 /**
  * Migrates a banner configuration to the latest version
@@ -132,6 +132,10 @@ export function migrateBannerConfig(config: any): BannerConfig {
     } else if (currentVersion === '2.0.2') {
       migratedConfig = migrateToV2_1_0(migratedConfig)
       currentVersion = '2.1.0'
+      migratedConfig.version = currentVersion
+    } else if (currentVersion === '2.1.0') {
+      migratedConfig = migrateToV2_2_0(migratedConfig)
+      currentVersion = '2.2.0'
       migratedConfig.version = currentVersion
     } else {
       // Unknown version or already at latest - break to avoid infinite loop
@@ -361,6 +365,25 @@ function migrateToV2_1_0(config: any): any {
 }
 
 /**
+ * Migration from v2.1.0 to v2.2.0 - Global Privacy Control (GPC) support
+ * Adds behavior.gpc config for respecting browser-level privacy signals
+ */
+function migrateToV2_2_0(config: any): any {
+  const migrated = { ...config }
+
+  if (!migrated.behavior) {
+    migrated.behavior = {}
+  }
+
+  if (migrated.behavior.gpc === undefined) {
+    migrated.behavior.gpc = { enabled: true, mode: 'auto' }
+  }
+
+  migrated.version = '2.2.0'
+  return migrated
+}
+
+/**
  * Checks if a banner configuration needs migration
  */
 export function needsMigration(config: any): boolean {
@@ -397,6 +420,13 @@ export function getMigrationNotes(oldVersion: string, newVersion: string): strin
     notes.push('🎨 All shapes (Circle, Square, Pill) now support icon-only mode')
     notes.push('⚙️ Consistent behavior across all floating button shapes')
     notes.push('🎯 Enhanced user choice and customization options')
+  }
+
+  if (oldVersion === '2.1.0' && newVersion === '2.2.0') {
+    notes.push('🛡️ Global Privacy Control (GPC) support — automatically respects browser privacy signals')
+    notes.push('🔒 Marketing cookies are blocked when GPC is active (CCPA compliance)')
+    notes.push('📊 GPC detection included in analytics as a dimension')
+    notes.push('💬 Slim acknowledgment bar informs visitors their GPC signal is respected')
   }
 
   if (oldVersion === '2.0.2' && newVersion === '2.1.0') {

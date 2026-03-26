@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validatePaymentAmount } from '@/lib/security-validation'
+import { logActivity, AuditAction } from '@/lib/audit-log'
+import { generateDisputeEvidence } from '@/lib/dispute-evidence'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -173,6 +175,12 @@ export async function POST(request: NextRequest) {
           }),
         ])
 
+        logActivity(userId, AuditAction.PLAN_UPGRADE, null, {
+          planTier,
+          amount: amount / 100,
+          stripeSessionId: session.id,
+        })
+
         console.log('[WEBHOOK] User upgraded successfully:', {
           sessionId: session.id,
           userId,
@@ -248,6 +256,12 @@ export async function POST(request: NextRequest) {
           }),
         ])
 
+        logActivity(refundUser.id, AuditAction.PLAN_DOWNGRADE, null, {
+          reason: 'refund',
+          chargeId: charge.id,
+          amount: charge.amount_refunded / 100,
+        })
+
         console.log('[WEBHOOK] User downgraded due to refund:', {
           chargeId: charge.id,
           userId: refundUser.id,
@@ -306,6 +320,12 @@ export async function POST(request: NextRequest) {
           }),
         ])
 
+        logActivity(disputeUser.id, AuditAction.PLAN_DOWNGRADE, null, {
+          reason: 'dispute',
+          disputeId: dispute.id,
+          amount: dispute.amount / 100,
+        })
+
         console.log('[WEBHOOK] User downgraded due to chargeback:', {
           disputeId: dispute.id,
           userId: disputeUser.id,
@@ -315,6 +335,16 @@ export async function POST(request: NextRequest) {
           disputeAmount: dispute.amount / 100,
           reason: dispute.reason,
         })
+
+        // Generate dispute evidence for admin review (does NOT touch Stripe)
+        try {
+          const evidence = await generateDisputeEvidence(disputeCustomerId)
+          if (evidence) {
+            console.log('[WEBHOOK] Dispute evidence generated. Review at /api/admin/dispute-evidence?customerId=' + disputeCustomerId)
+          }
+        } catch (evidenceError) {
+          console.error('[WEBHOOK] Failed to generate dispute evidence:', evidenceError)
+        }
 
         break
       }

@@ -957,7 +957,7 @@ export default function RoadmapPage() {
                 {!session && <span className="text-xs opacity-70 ml-1">(Login)</span>}
               </Button>
               <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
-                <a href="mailto:greenantyson@gmail.com">
+                <a href="mailto:support@cookie-banner.ca">
                   <ArrowRight className="w-4 h-4 mr-2" />
                   Contact Us
                 </a>

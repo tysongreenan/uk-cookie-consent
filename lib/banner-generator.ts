@@ -460,7 +460,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
     <!-- Content -->
     <div style="display: flex; flex-direction: column; height: 100%; max-height: calc(90vh - 80px);">
-      <div style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
+      <div id="cookie-prefs-content" style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
         <!-- Title -->
         <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0;">
           Privacy Center
@@ -779,6 +779,61 @@ input:checked + span:before {
   }
 }
 
+/* GPC Acknowledgment Bar */
+#gpc-acknowledgment {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99998;
+  background: ${config.colors.background};
+  color: ${config.colors.text};
+  border-left: 4px solid ${config.colors.button};
+  padding: 12px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  animation: gpcSlideIn 0.3s ease-out;
+  transition: opacity 0.4s ease;
+}
+
+#gpc-acknowledgment a {
+  color: ${config.colors.link};
+}
+
+@keyframes gpcSlideIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* GPC Modal Notice */
+#gpc-modal-notice {
+  background: ${config.theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'};
+  border: 1px solid ${config.colors.button};
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: ${config.colors.text};
+  animation: gpcFadeIn 0.3s ease-out;
+}
+
+@keyframes gpcFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  #gpc-acknowledgment {
+    font-size: 12px;
+    padding: 10px 0;
+  }
+  #gpc-acknowledgment > div {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+}
+
 ${config.advanced.customCSS}`
 }
 
@@ -939,6 +994,10 @@ var COOKIE_EXPIRY = ${Number(config.behavior.cookieExpiry) || 182};
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
 var GEO_REQUIRES_OPT_IN = ${Boolean(config._geoRequiresOptIn)};
+var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
+// Detect GPC via client-side DOM property OR server-side Sec-GPC header (defense-in-depth per W3C spec)
+var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
+window.__cbGpcActive = GPC_ACTIVE;
 
 // Load Material Symbols font for cookie icons (if not already loaded)
 (function loadMaterialSymbolsFont() {
@@ -1288,6 +1347,7 @@ function showPreferencesModal() {
   }
 
   modal.style.display = 'flex';
+  applyGpcModalState();
 }
 
 function showFloatingButton() {
@@ -1393,6 +1453,81 @@ ${marketingLoaders || '      // No marketing scripts configured'}
   }
 }
 
+function showGpcAcknowledgment() {
+  if (document.getElementById('gpc-acknowledgment')) return;
+  var bar = document.createElement('div');
+  bar.id = 'gpc-acknowledgment';
+  bar.setAttribute('role', 'status');
+  bar.setAttribute('aria-live', 'polite');
+  var lang = detectLanguage();
+  var gpcMsg = lang === 'fr'
+    ? 'Votre signal Global Privacy Control a \u00e9t\u00e9 respect\u00e9. Les cookies marketing sont d\u00e9sactiv\u00e9s.'
+    : 'Your Global Privacy Control signal has been respected. Marketing cookies are off.';
+  var gpcManage = lang === 'fr' ? 'G\u00e9rer les autres cookies' : 'Manage other cookies';
+  // Build acknowledgment bar using safe DOM methods (no innerHTML - all content is trusted static strings)
+  var inner = document.createElement('div');
+  inner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 16px;gap:12px;flex-wrap:wrap;';
+  var msgSpan = document.createElement('span');
+  msgSpan.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  var icon = document.createElement('span');
+  icon.textContent = '\u2713';
+  icon.style.cssText = 'flex-shrink:0;font-weight:bold;';
+  var text = document.createElement('span');
+  text.textContent = gpcMsg;
+  msgSpan.appendChild(icon);
+  msgSpan.appendChild(text);
+  var link = document.createElement('a');
+  link.href = '#';
+  link.id = 'gpc-manage-link';
+  link.style.cssText = 'white-space:nowrap;text-decoration:underline;opacity:0.9;';
+  link.textContent = gpcManage;
+  inner.appendChild(msgSpan);
+  inner.appendChild(link);
+  bar.appendChild(inner);
+  document.body.appendChild(bar);
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    showPreferencesModal();
+    bar.style.display = 'none';
+  });
+  setTimeout(function() {
+    bar.style.opacity = '0';
+    setTimeout(function() { if (bar.parentNode) bar.parentNode.removeChild(bar); }, 400);
+  }, 8000);
+}
+
+function applyGpcModalState() {
+  if (!GPC_ACTIVE) return;
+  // Inject GPC notice at top of modal content using safe DOM methods
+  var modalContent = document.getElementById('cookie-prefs-content');
+  if (modalContent && !document.getElementById('gpc-modal-notice')) {
+    var notice = document.createElement('div');
+    notice.id = 'gpc-modal-notice';
+    var noticeInner = document.createElement('div');
+    noticeInner.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    var lockIcon = document.createElement('span');
+    lockIcon.textContent = '\uD83D\uDD12';
+    lockIcon.style.cssText = 'flex-shrink:0;';
+    var noticeText = document.createElement('span');
+    noticeText.style.cssText = 'font-size:13px;font-weight:500;';
+    noticeText.textContent = 'Global Privacy Control is active. Marketing cookies are automatically disabled.';
+    noticeInner.appendChild(lockIcon);
+    noticeInner.appendChild(noticeText);
+    notice.appendChild(noticeInner);
+    modalContent.insertBefore(notice, modalContent.firstChild);
+  }
+  // Lock targeting/social toggles when GPC is active
+  var targeting = document.getElementById('cookie-targeting-toggle-modal');
+  var social = document.getElementById('cookie-social-toggle-modal');
+  if (targeting) { targeting.checked = false; targeting.disabled = true; }
+  if (social) { social.checked = false; social.disabled = true; }
+  // Visually dim the targeting/social toggle sliders
+  var targetSlider = document.getElementById('cookie-targeting-toggle-slider');
+  var socialSlider = document.getElementById('cookie-social-toggle-slider');
+  if (targetSlider) targetSlider.style.opacity = '0.4';
+  if (socialSlider) socialSlider.style.opacity = '0.4';
+}
+
 function init() {
   var banner = document.getElementById('cookie-consent-banner');
   var acceptBtn = document.getElementById('cookie-accept-btn');
@@ -1420,10 +1555,13 @@ function init() {
   // Use addEventListener to prevent handlers from being overwritten
   if (acceptBtn && !acceptBtn.dataset.handlerAttached) {
     acceptBtn.addEventListener('click', function() {
-      saveConsent({ essential: true, functionality: true, analytics: true, marketing: true });
+      var consent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
+      if (GPC_ACTIVE) consent.gpc_auto = true;
+      saveConsent(consent);
       initGA4(); // Initialize GA4
       trackConsentEvent('accept'); // Track consent event
       banner.style.display = 'none';
+      if (GPC_ACTIVE) showGpcAcknowledgment();
     });
     acceptBtn.dataset.handlerAttached = 'true';
   }
@@ -1458,6 +1596,7 @@ function init() {
         } else {
           loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
         }
+        applyGpcModalState();
       }
     });
     prefsBtn.dataset.handlerAttached = 'true';
@@ -1490,14 +1629,17 @@ function init() {
 
   if (acceptAllBtn && !acceptAllBtn.dataset.handlerAttached) {
     acceptAllBtn.addEventListener('click', function() {
-      var consent = { essential: true, functionality: true, analytics: true, marketing: true };
+      var consent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
+      if (GPC_ACTIVE) consent.gpc_auto = true;
       saveConsent(consent);
+      trackConsentEvent('accept');
 
       // Update modal toggles to show all ON before closing
       loadConsentIntoModal(consent);
 
       banner.style.display = 'none';
       modal.style.display = 'none';
+      if (GPC_ACTIVE) showGpcAcknowledgment();
     });
     acceptAllBtn.dataset.handlerAttached = 'true';
   }
@@ -1509,12 +1651,15 @@ function init() {
       var targeting = document.getElementById('cookie-targeting-toggle-modal');
       var social = document.getElementById('cookie-social-toggle-modal');
 
+      var marketing = (targeting ? targeting.checked : false) || (social ? social.checked : false);
+      if (GPC_ACTIVE) marketing = false;
       var consent = {
         essential: true,
         functionality: func ? func.checked : false,
         analytics: performance ? performance.checked : false,
-        marketing: (targeting ? targeting.checked : false) || (social ? social.checked : false)
+        marketing: marketing
       };
+      if (GPC_ACTIVE) consent.gpc_auto = true;
 
       console.log('User confirmed cookie preferences:', consent);
       saveConsent(consent);
@@ -1538,29 +1683,49 @@ function init() {
   // Initialize toggles
   setupToggleSwitches();
   
+  // GPC reconciliation — MUST run BEFORE any loadScripts call
+  if (existingConsent && GPC_ACTIVE) {
+    var gpcChanged = false;
+    if (existingConsent.marketing) { existingConsent.marketing = false; gpcChanged = true; }
+    if (!existingConsent.gpc_auto) { existingConsent.gpc_auto = true; gpcChanged = true; }
+    if (gpcChanged) setCookie(COOKIE_NAME, JSON.stringify(existingConsent), COOKIE_EXPIRY);
+  } else if (existingConsent && existingConsent.gpc_auto && !GPC_ACTIVE) {
+    // GPC was active before but is now off — delete cookie, show banner fresh
+    setCookie(COOKIE_NAME, '', -1);
+    existingConsent = null;
+  }
+
   // If consent already exists, restore it and show floating button (but don't show banner)
   // All handlers are now set up above, so banner will work when reopened
   if (existingConsent) {
     loadScripts(existingConsent);
-    
+
     // Initialize GA4 if analytics was accepted
     if (existingConsent.analytics) {
       initGA4();
     }
-    
+
     // Show floating button if consent already exists
     showFloatingButton();
     updateFloatingButtonIcon(existingConsent);
-    
+
+    // Show GPC acknowledgment bar only on the first visit where GPC is newly detected
+    if (GPC_ACTIVE && gpcChanged) {
+      showGpcAcknowledgment();
+    }
+
     // Don't show banner, but all handlers are already set up above
     return;
   }
   
   // No existing consent - show banner
+  // Apply GPC state to modal toggles for first-time visitors
+  if (GPC_ACTIVE) applyGpcModalState();
+
   ${config.behavior.autoShow ? `
   banner.style.display = 'block';
   trackConsentEvent('impression'); // Track banner impression
-  
+
   // Hide floating button while main banner is showing
   hideFloatingButton();
   ` : ''}

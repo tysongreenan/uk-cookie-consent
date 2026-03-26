@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { StructuredData } from '@/components/seo/structured-data'
 import { FeaturePageLayout } from '@/components/features/feature-page-layout'
 import { ModernFeaturesSection, VerificationSkeleton } from '@/components/landing/modern-features-section'
+import { HowItWorksDemo } from '@/components/features/how-it-works-demo'
 import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -133,12 +134,14 @@ export default function HowItWorksPage() {
           { href: "/features/what-you-get", text: "What Else Do I Get?" },
         ]}
       >
+        <HowItWorksDemo />
+
         <ModernFeaturesSection
           title="Verification Methods"
           description="Multiple ways to verify your cookie banner is working correctly"
           features={verificationFeatures}
         />
-                
+
         <h2 id="how-can-i-verify-cookies-are-being-blocked">How Can I Verify Cookies Are Being Blocked?</h2>
         
         <p>
@@ -349,6 +352,20 @@ export default function HowItWorksPage() {
                   <li>✓ Email notifications for issues</li>
                 </ul>
 
+                <div className="not-prose my-12 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+                  <h3 className="text-2xl font-bold tracking-tight text-foreground mb-3">
+                    Not Sure If Your Banner Is Working?
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                    Run our free cookie scanner on your website. It checks for tracking cookies, consent issues, and compliance gaps in under 30 seconds — no signup required.
+                  </p>
+                  <Link
+                    href="/tools/cookie-scanner"
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                  >
+                    Scan Your Website Free
+                  </Link>
+                </div>
 
                 <h2 id="conclusion">Conclusion / TL;DR</h2>
                 

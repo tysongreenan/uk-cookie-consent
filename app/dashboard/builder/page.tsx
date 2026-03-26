@@ -1483,6 +1483,82 @@ function BannerBuilderContent() {
                   </CardContent>
                 </Card>
 
+                {/* Browser Privacy Signals (GPC) */}
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Browser Privacy Signals
+                    </CardTitle>
+                    <CardDescription>
+                      Respect Global Privacy Control (GPC) — a browser signal that tells websites not to sell or share personal data.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Auto-detect (free, default) */}
+                      <div
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          (config.behavior.gpc?.mode || 'auto') === 'auto'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/50'
+                        }`}
+                        onClick={() => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            gpc: { enabled: true, mode: 'auto' }
+                          }
+                        }))}
+                      >
+                        <div className="font-medium mb-1">Auto-detect</div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          Automatically detect and respect GPC signals. Marketing cookies are blocked when GPC is active.
+                        </div>
+                        <Badge variant="secondary" className="text-xs">Free</Badge>
+                        <div className="mt-2 text-xs text-green-600">Recommended — CCPA compliant</div>
+                      </div>
+
+                      {/* Disabled (Pro only) */}
+                      <div
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          (config.behavior.gpc?.mode || 'auto') === 'off'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/50'
+                        } ${session?.user?.planTier === 'free' ? 'opacity-60' : 'cursor-pointer'}`}
+                        onClick={() => {
+                          if (session?.user?.planTier === 'free') return
+                          setConfig(prev => ({
+                            ...prev,
+                            behavior: {
+                              ...prev.behavior,
+                              gpc: { enabled: false, mode: 'off' }
+                            }
+                          }))
+                        }}
+                      >
+                        <div className="font-medium mb-1">Disabled</div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          Ignore GPC browser signals. Not recommended — may violate CCPA requirements.
+                        </div>
+                        <Badge variant="outline" className="text-xs">Pro</Badge>
+                        {session?.user?.planTier === 'free' && (
+                          <div className="mt-3">
+                            <UpgradePrompt feature="GPC Configuration" description="Configure GPC behavior. Auto-detect is free and recommended for compliance." />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription className="text-sm">
+                        When GPC is detected, visitors see a slim acknowledgment bar confirming their privacy signal is respected. Marketing/targeting cookie toggles are locked off in the preferences modal. Visitors can still manually override if they choose.
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+
                 {/* Framework Comparison */}
                 <Card>
                   <CardHeader>
@@ -3697,7 +3773,7 @@ function BannerBuilderContent() {
                       <Label htmlFor="dismiss-scroll">Dismiss on scroll</Label>
                     </div>
 
-                    <div className="relative p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100">
+                    <div className="relative p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 border border-purple-100 dark:border-purple-800">
                       <div className="absolute top-2 right-2">
                       </div>
                       <div className="flex items-center space-x-2 pr-16">
@@ -3710,7 +3786,7 @@ function BannerBuilderContent() {
                           Show preferences button
                         </Label>
                       </div>
-                      <p className="text-xs text-purple-600 mt-2 ml-6">
+                      <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 ml-6">
                         ✨ Enables the advanced preferences modal with cookie category toggles
                       </p>
                     </div>
@@ -3776,9 +3852,9 @@ function BannerBuilderContent() {
                       <CardContent className="space-y-4">
                         {/* Quebec Law 25 Preset */}
                         {!(config.geoRules || []).some((r: GeoRule) => r.country === 'CA' && r.region === 'QC') && (
-                          <Alert className="border-amber-200 bg-amber-50">
+                          <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
                             <AlertDescription className="flex items-center justify-between">
-                              <span className="text-sm">
+                              <span className="text-sm text-amber-900 dark:text-amber-200">
                                 <strong>Quebec Law 25</strong> requires strict opt-in consent with French language support.
                               </span>
                               <Button
@@ -3827,8 +3903,8 @@ function BannerBuilderContent() {
                           <Card key={rule.id} className={`border ${isDuplicate ? 'border-amber-400' : ''}`}>
                             <CardContent className="pt-4 space-y-4">
                               {isDuplicate && (
-                                <Alert className="border-amber-200 bg-amber-50 py-2">
-                                  <AlertDescription className="text-xs text-amber-700">
+                                <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 py-2">
+                                  <AlertDescription className="text-xs text-amber-700 dark:text-amber-300">
                                     Duplicate rule — another rule targets the same country/region. Only the first matching rule will apply.
                                   </AlertDescription>
                                 </Alert>
@@ -4309,7 +4385,7 @@ function BannerBuilderContent() {
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
                 {/* GA4 Events Reference */}
-                <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 border-l-4 border-l-rose-500">
+                <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 border-l-4 border-l-rose-500">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center text-base">
                       <Info className="mr-2 h-4 w-4 text-blue-600" />
@@ -4606,7 +4682,7 @@ function BannerBuilderContent() {
                       </CardTitle>
                     </div>
                     {config.behavior.showPreferences && (
-                      <CardDescription className="text-purple-600">
+                      <CardDescription className="text-purple-600 dark:text-purple-400">
                         ✨ Try clicking the "Preferences" button to see the new modal!
                       </CardDescription>
                     )}

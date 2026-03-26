@@ -42,6 +42,7 @@ import {
   HelpCircle,
   RefreshCw,
   Download,
+  Shield,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
@@ -62,6 +63,7 @@ interface BannerStats {
   total_decision_time_ms: number
   decision_count: number
   returning_visitor_impressions: number
+  gpc_impressions: number
 }
 
 interface BannerOption {
@@ -81,6 +83,8 @@ interface AnalyticsSummary {
   avgDecisionTime: string
   totalDecisionTime: number
   decisionCount: number
+  gpcImpressions: number
+  gpcRate: string
 }
 
 interface DimensionData {
@@ -116,6 +120,7 @@ const CHART_COLORS_LIGHT = {
   primary: '#0E768C',
   secondary: '#6a9bcc',  // brand blue accent
   tertiary: '#788c5d',   // brand green accent
+  gpc: '#8b5cf6',        // purple for GPC
 }
 const CHART_COLORS_DARK = {
   accept: '#3AAFCA',
@@ -124,6 +129,7 @@ const CHART_COLORS_DARK = {
   primary: '#3AAFCA',
   secondary: '#8DB8E0',
   tertiary: '#9BB377',
+  gpc: '#A78BFA',
 }
 
 function useChartColors() {
@@ -204,18 +210,19 @@ export default function AnalyticsPage() {
   const bannerComparisonData = useMemo(() => {
     if (selectedBanner !== 'all' || banners.length === 0) return []
 
-    const bannerMap = new Map<string, { impressions: number; accepts: number; rejects: number; dismisses: number; totalDecisionTime: number; decisionCount: number }>()
+    const bannerMap = new Map<string, { impressions: number; accepts: number; rejects: number; dismisses: number; totalDecisionTime: number; decisionCount: number; gpcImpressions: number }>()
 
     for (const row of stats) {
       if (!row.banner_id) continue // Skip pre-tracking data with no banner assigned
       const bid = row.banner_id
-      const existing = bannerMap.get(bid) || { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0 }
+      const existing = bannerMap.get(bid) || { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0, gpcImpressions: 0 }
       existing.impressions += row.impressions
       existing.accepts += row.accepts
       existing.rejects += row.rejects
       existing.dismisses += row.dismisses
       existing.totalDecisionTime += row.total_decision_time_ms
       existing.decisionCount += row.decision_count
+      existing.gpcImpressions += (row.gpc_impressions || 0)
       bannerMap.set(bid, existing)
     }
 
@@ -233,6 +240,7 @@ export default function AnalyticsPage() {
           rejectRate: hasImpressions ? parseFloat((data.rejects / data.impressions * 100).toFixed(1)) : 0,
           dismissRate: hasImpressions ? parseFloat((data.dismisses / data.impressions * 100).toFixed(1)) : 0,
           avgDecisionTime: data.decisionCount > 0 ? parseFloat((data.totalDecisionTime / data.decisionCount / 1000).toFixed(1)) : 0,
+          gpcRate: hasImpressions ? parseFloat((data.gpcImpressions / data.impressions * 100).toFixed(1)) : 0,
         }
       })
       .sort((a, b) => b.impressions - a.impressions)
@@ -242,13 +250,14 @@ export default function AnalyticsPage() {
   const chartData = useMemo(() => {
     if (selectedBanner !== 'all') return stats
 
-    const dateMap = new Map<string, { date: string; accepts: number; rejects: number; dismisses: number; impressions: number }>()
+    const dateMap = new Map<string, { date: string; accepts: number; rejects: number; dismisses: number; impressions: number; gpcImpressions: number }>()
     for (const row of stats) {
-      const existing = dateMap.get(row.date) || { date: row.date, accepts: 0, rejects: 0, dismisses: 0, impressions: 0 }
+      const existing = dateMap.get(row.date) || { date: row.date, accepts: 0, rejects: 0, dismisses: 0, impressions: 0, gpcImpressions: 0 }
       existing.accepts += row.accepts
       existing.rejects += row.rejects
       existing.dismisses += row.dismisses
       existing.impressions += row.impressions
+      existing.gpcImpressions += (row.gpc_impressions || 0)
       dateMap.set(row.date, existing)
     }
     return Array.from(dateMap.values()).sort((a, b) => a.date.localeCompare(b.date))
@@ -362,20 +371,23 @@ export default function AnalyticsPage() {
       rejects: acc.rejects + day.rejects,
       dismisses: acc.dismisses + day.dismisses,
       totalDecisionTime: acc.totalDecisionTime + day.total_decision_time_ms,
-      decisionCount: acc.decisionCount + day.decision_count
-    }), { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0 })
+      decisionCount: acc.decisionCount + day.decision_count,
+      gpcImpressions: acc.gpcImpressions + (day.gpc_impressions || 0)
+    }), { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0, gpcImpressions: 0 })
 
     const acceptRate = totals.impressions > 0 ? (totals.accepts / totals.impressions * 100).toFixed(1) : '0'
     const rejectRate = totals.impressions > 0 ? (totals.rejects / totals.impressions * 100).toFixed(1) : '0'
     const dismissRate = totals.impressions > 0 ? (totals.dismisses / totals.impressions * 100).toFixed(1) : '0'
     const avgDecisionTime = totals.decisionCount > 0 ? (totals.totalDecisionTime / totals.decisionCount / 1000).toFixed(1) : '0'
+    const gpcRate = totals.impressions > 0 ? (totals.gpcImpressions / totals.impressions * 100).toFixed(1) : '0'
 
     setSummary({
       ...totals,
       acceptRate,
       rejectRate,
       dismissRate,
-      avgDecisionTime
+      avgDecisionTime,
+      gpcRate
     })
   }
 
@@ -503,7 +515,7 @@ export default function AnalyticsPage() {
             </AnimatePresence>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               <StatCard
                 title="Total Impressions"
                 value={summary?.impressions.toLocaleString() || '0'}
@@ -533,6 +545,14 @@ export default function AnalyticsPage() {
                 icon={<Clock className="h-5 w-5" />}
                 color="blue"
                 tooltip="Average time in seconds between the banner appearing and the visitor making a choice. Lower times usually mean clearer banner copy."
+              />
+              <StatCard
+                title="GPC Visitors"
+                value={`${summary?.gpcRate || 0}%`}
+                subtitle={`${summary?.gpcImpressions?.toLocaleString() || 0} impressions`}
+                icon={<Shield className="h-5 w-5" />}
+                color="purple"
+                tooltip="Percentage of impressions from visitors with Global Privacy Control enabled. These visitors have marketing cookies automatically blocked."
               />
             </div>
 
@@ -587,16 +607,16 @@ export default function AnalyticsPage() {
                           </ol>
                         </div>
                         <div className="flex flex-col items-start md:items-end gap-2 md:pt-1">
-                          <Link
-                            href={bannersWithoutGa4.length === 1 ? `/dashboard/builder?id=${bannersWithoutGa4[0].id}` : '/dashboard/builder'}
-                            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
-                          >
-                            Configure GA4
-                            <ArrowUpRight className="h-3.5 w-3.5" />
-                          </Link>
-                          <span className="text-xs text-muted-foreground">
-                            {bannersWithoutGa4.length} banner{bannersWithoutGa4.length !== 1 ? 's' : ''} without GA4
-                          </span>
+                          {bannersWithoutGa4.map((b) => (
+                            <Link
+                              key={b.id}
+                              href={`/dashboard/builder?id=${b.id}`}
+                              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                            >
+                              Configure {bannersWithoutGa4.length > 1 ? b.name : 'GA4'}
+                              <ArrowUpRight className="h-3.5 w-3.5" />
+                            </Link>
+                          ))}
                         </div>
                       </div>
                     </CardContent>
@@ -640,6 +660,7 @@ export default function AnalyticsPage() {
                               <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden sm:table-cell">Accept Rate</th>
                               <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden sm:table-cell">Reject Rate</th>
                               <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden md:table-cell">Decision Time</th>
+                              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2.5 px-4 hidden md:table-cell">GPC</th>
                               <th className="w-8 px-2"></th>
                             </tr>
                           </thead>
@@ -680,6 +701,13 @@ export default function AnalyticsPage() {
                                   <td className="py-3.5 px-4 text-right hidden md:table-cell">
                                     <span className="text-sm font-semibold tabular-nums text-foreground">{row.avgDecisionTime}s</span>
                                   </td>
+                                  <td className="py-3.5 px-4 text-right hidden md:table-cell">
+                                    {row.gpcRate > 0 ? (
+                                      <span className="text-sm font-semibold tabular-nums text-[#8b5cf6]">{row.gpcRate}%</span>
+                                    ) : (
+                                      <span className="text-sm text-muted-foreground">—</span>
+                                    )}
+                                  </td>
                                   <td className="px-2">
                                     <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
                                   </td>
@@ -703,6 +731,7 @@ export default function AnalyticsPage() {
                                 <td className="py-3.5 px-4 text-right text-sm text-muted-foreground">—</td>
                                 <td className="py-3.5 px-4 text-right hidden sm:table-cell text-sm text-muted-foreground">—</td>
                                 <td className="py-3.5 px-4 text-right hidden sm:table-cell text-sm text-muted-foreground">—</td>
+                                <td className="py-3.5 px-4 text-right hidden md:table-cell text-sm text-muted-foreground">—</td>
                                 <td className="py-3.5 px-4 text-right hidden md:table-cell text-sm text-muted-foreground">—</td>
                                 <td className="px-2">
                                   <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
@@ -753,6 +782,10 @@ export default function AnalyticsPage() {
                           <linearGradient id="gradDismiss" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor={chartColors.dismiss} stopOpacity={0.08} />
                             <stop offset="100%" stopColor={chartColors.dismiss} stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="gradGpc" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={chartColors.gpc} stopOpacity={0.12} />
+                            <stop offset="100%" stopColor={chartColors.gpc} stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid
@@ -805,6 +838,17 @@ export default function AnalyticsPage() {
                           dot={false}
                           activeDot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--card))' }}
                         />
+                        <Area
+                          type="monotone"
+                          dataKey="gpcImpressions"
+                          stroke={chartColors.gpc}
+                          strokeWidth={2}
+                          strokeDasharray="4 3"
+                          fill="url(#gradGpc)"
+                          name="GPC Visitors"
+                          dot={false}
+                          activeDot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--card))' }}
+                        />
                       </AreaChart>
                     </ResponsiveContainer>
                     </div>
@@ -820,6 +864,7 @@ export default function AnalyticsPage() {
                       <LegendItem color={chartColors.accept} label="Accepts" />
                       <LegendItem color={chartColors.reject} label="Rejects" />
                       <LegendItem color={chartColors.dismiss} label="Dismisses" />
+                      <LegendItem color={chartColors.gpc} label="GPC Visitors" />
                     </div>
                   )}
                 </CardContent>
@@ -1283,7 +1328,7 @@ function StatCard({
   value: string
   subtitle?: string
   icon: React.ReactNode
-  color?: 'teal' | 'green' | 'orange' | 'blue'
+  color?: 'teal' | 'green' | 'orange' | 'blue' | 'purple'
   tooltip?: string
 }) {
   const colorMap = {
@@ -1306,6 +1351,11 @@ function StatCard({
       bg: 'bg-[#6a9bcc]/8 dark:bg-[#6a9bcc]/15',
       icon: 'text-[#6a9bcc] dark:text-[#8DB8E0]',
       ring: 'ring-[#6a9bcc]/10',
+    },
+    purple: {
+      bg: 'bg-[#8b5cf6]/8 dark:bg-[#8b5cf6]/15',
+      icon: 'text-[#8b5cf6] dark:text-[#A78BFA]',
+      ring: 'ring-[#8b5cf6]/10',
     },
   }
 

@@ -102,6 +102,8 @@ export async function POST(request: NextRequest) {
         ? Math.round(event.decisionTime)
         : null
 
+      const safeGpc = Boolean(event.gpc)
+
       // Validate and sanitize dimension fields (backward compatible — defaults if missing)
       const safeSource = (typeof event.source === 'string' && /^[a-zA-Z0-9._+\-]{1,50}$/.test(event.source))
         ? event.source.toLowerCase() : 'direct'
@@ -119,7 +121,8 @@ export async function POST(request: NextRequest) {
           p_event_type: event.type,
           p_decision_time_ms: decisionTime,
           p_is_returning: Boolean(event.isReturning),
-          p_banner_id: safeBannerId
+          p_banner_id: safeBannerId,
+          p_gpc: safeGpc
         }).then(r => ({ event: event.type, type: 'stat' as const, error: r.error }))
       )
 
@@ -133,7 +136,8 @@ export async function POST(request: NextRequest) {
           p_device: safeDevice,
           p_country: safeCountry,
           p_page_path: safePagePath,
-          p_decision_time_ms: decisionTime
+          p_decision_time_ms: decisionTime,
+          p_gpc: safeGpc
         }).then(r => ({ event: event.type, type: 'visitor' as const, error: r.error }))
       )
     }

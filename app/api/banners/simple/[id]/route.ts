@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
+import { logActivity, AuditAction } from '@/lib/audit-log'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -215,6 +216,7 @@ function rejectCookies() {
       .single()
 
     console.log('✅ Simple Update: Banner updated:', params.id)
+    logActivity(session.user.id, AuditAction.BANNER_UPDATE, request, { bannerId: params.id, bannerName })
 
     return NextResponse.json({
       success: true,
@@ -260,9 +262,11 @@ export async function DELETE(
     }
 
     console.log('✅ Simple Delete: Banner deleted successfully:', params.id)
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Banner deleted successfully!' 
+    logActivity(session.user.id, AuditAction.BANNER_DELETE, request, { bannerId: params.id })
+
+    return NextResponse.json({
+      success: true,
+      message: 'Banner deleted successfully!'
     })
 
   } catch (error) {
