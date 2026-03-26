@@ -61,7 +61,7 @@ const faqData = [
   {
     question: 'How do I add a cookie banner to WordPress without a plugin?',
     answer:
-      'Generate your banner with our visual builder, then paste the single script tag into your theme\'s functions.php file using wp_head, or use a lightweight code-snippets plugin like WPCode. No cookie consent plugin needed — just one line of HTML.',
+      'Generate your banner with our visual builder, then paste one script tag into WPCode or your theme header. No cookie consent plugin needed — takes under 2 minutes.',
   },
   {
     question: 'Is a cookie banner required on WordPress sites?',
@@ -332,8 +332,121 @@ export default function WordPressIntegrationPage() {
             </motion.div>
 
             <div className="max-w-4xl mx-auto space-y-6">
-              {/* Method 1: functions.php */}
+              {/* Method 1: WPCode Plugin (Easiest) */}
               <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+                <div className="relative overflow-hidden rounded-xl border-2 border-primary/30 bg-background p-6 sm:p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                        <FileText className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">01</div>
+                        <h3 className="font-heading text-lg font-semibold text-foreground">
+                          Use WPCode Plugin
+                        </h3>
+                      </div>
+                    </div>
+                    <Badge className="text-xs w-fit bg-primary text-primary-foreground">Recommended</Badge>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-2xl">
+                    The easiest way. Install a free plugin, paste your script, done. No file editing, no coding.
+                  </p>
+
+                  <ol className="list-decimal list-inside space-y-3 text-sm text-muted-foreground mb-6">
+                    <li>In WordPress, go to <strong>Plugins &rarr; Add New</strong> and search for <strong>&quot;WPCode&quot;</strong></li>
+                    <li>Install and activate it</li>
+                    <li>Go to <strong>Code Snippets &rarr; Header &amp; Footer</strong></li>
+                    <li>Paste your banner script into the <strong>&quot;Header&quot;</strong> section:</li>
+                  </ol>
+
+                  <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-6">
+                    <pre className="text-sm font-mono whitespace-pre">{`<!-- Paste into the "Header" field in WPCode -->
+<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}</pre>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground mb-6">
+                    Replace <code className="bg-muted px-1 rounded font-mono">YOUR_BANNER_ID</code> with the ID from your dashboard&apos;s <strong>Code</strong> tab. Then click <strong>Save Changes</strong>.
+                  </p>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>No code editing required</span>
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>Survives theme switches and updates</span>
+                      </li>
+                    </ul>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>Works with every WordPress theme</span>
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>Takes under 2 minutes</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Method 2: Block Editor */}
+              <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 sm:p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <Globe className="h-5 w-5 text-foreground" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">02</div>
+                        <h3 className="font-heading text-lg font-semibold text-foreground">
+                          Full Site Editor (Block Themes)
+                        </h3>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-xs w-fit">No Plugins Needed</Badge>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-2xl">
+                    Using a block theme like Twenty Twenty-Four? No plugin needed — just add a Custom HTML block.
+                  </p>
+
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-6">
+                    <li>Go to <strong>Appearance &rarr; Editor</strong></li>
+                    <li>Select <strong>Template Parts &rarr; Header</strong></li>
+                    <li>Add a <strong>Custom HTML</strong> block</li>
+                    <li>Paste your banner script:</li>
+                  </ol>
+
+                  <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-6">
+                    <pre className="text-sm font-mono whitespace-pre">{`<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}</pre>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
+                        <span>Native WordPress, no plugins</span>
+                      </li>
+                    </ul>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <span>Only works with block-based themes</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Method 3: functions.php (Advanced) */}
+              <motion.div custom={2} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 sm:p-8">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
                     <div className="flex items-center gap-3">
@@ -341,30 +454,24 @@ export default function WordPressIntegrationPage() {
                         <Code className="h-5 w-5 text-foreground" />
                       </div>
                       <div>
-                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">01</div>
+                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">03</div>
                         <h3 className="font-heading text-lg font-semibold text-foreground">
                           Add to functions.php
                         </h3>
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-xs w-fit">Best Performance</Badge>
+                    <Badge variant="outline" className="text-xs w-fit">Developers Only</Badge>
                   </div>
 
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-2xl">
-                    Paste this into your child theme&apos;s <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">functions.php</code>.
-                    It hooks into <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">wp_head</code> and loads on every page with zero overhead.
+                    For developers who prefer no plugins. Add to your <strong>child theme&apos;s</strong>{' '}
+                    <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">functions.php</code>.
                   </p>
 
                   <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-6">
                     <pre className="text-sm font-mono whitespace-pre">{`// Add to your child theme's functions.php
 function add_cookie_banner_script() {
-    ?>
-    <script
-      src="https://cdn.cookie-banner.ca/banner.js"
-      data-site-id="YOUR_SITE_ID"
-      defer>
-    </script>
-    <?php
+    echo '<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>';
 }
 add_action('wp_head', 'add_cookie_banner_script');`}</pre>
                   </div>
@@ -375,129 +482,46 @@ add_action('wp_head', 'add_cookie_banner_script');`}</pre>
                         <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
                         <span>Zero plugin overhead</span>
                       </li>
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
-                        <span>Survives plugin and core updates</span>
-                      </li>
                     </ul>
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2 text-sm text-muted-foreground">
                         <AlertTriangle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <span>Use a child theme so parent updates don&apos;t overwrite it</span>
+                        <span>Must use a child theme — parent updates will overwrite</span>
                       </li>
                     </ul>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Method 2: Header/Footer Plugin */}
-              <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 sm:p-8">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <FileText className="h-5 w-5 text-foreground" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">02</div>
-                        <h3 className="font-heading text-lg font-semibold text-foreground">
-                          Use WPCode or Insert Headers and Footers
-                        </h3>
-                      </div>
+              {/* Troubleshooting: CSP */}
+              <motion.div custom={3} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+                <div className="relative overflow-hidden rounded-xl border border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-950/20 p-6 sm:p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
+                      <Shield className="h-5 w-5 text-yellow-700 dark:text-yellow-400" />
                     </div>
-                    <Badge variant="outline" className="text-xs w-fit">No File Editing</Badge>
+                    <div>
+                      <h3 className="font-heading text-lg font-semibold text-foreground">
+                        Banner not showing? Check your Content Security Policy
+                      </h3>
+                    </div>
                   </div>
 
-                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-2xl">
-                    If you prefer not to touch theme files, install a free code-snippets plugin.
-                    Paste the script into the &quot;Header&quot; section from your WordPress dashboard.
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed max-w-2xl">
+                    If your WordPress site has a security plugin (Sucuri, Wordfence, Headers Security, etc.) that sets a <strong>Content Security Policy (CSP)</strong>, you may need to whitelist our domain. Add these to your CSP:
                   </p>
 
-                  <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-6">
-                    <pre className="text-sm font-mono whitespace-pre">{`<!-- Paste into the "Header Scripts" field -->
-<script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
-</script>`}</pre>
+                  <div className="rounded-lg bg-foreground/95 text-background p-4 overflow-x-auto mb-4">
+                    <pre className="text-sm font-mono whitespace-pre">{`script-src: https://www.cookie-banner.ca
+connect-src: https://www.cookie-banner.ca
+style-src: https://fonts.googleapis.com`}</pre>
                   </div>
 
-                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-6">
-                    <li>Install &quot;WPCode&quot; or &quot;Insert Headers and Footers&quot; from the plugin directory</li>
-                    <li>Go to <strong>Code Snippets &rarr; Header &amp; Footer</strong></li>
-                    <li>Paste the script into the Header section</li>
-                    <li>Click Save</li>
-                  </ol>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
-                        <span>No theme file editing</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
-                        <span>Survives theme switches</span>
-                      </li>
-                    </ul>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <AlertTriangle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <span>Requires one additional lightweight plugin</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Method 3: Theme Customizer */}
-              <motion.div custom={2} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <div className="relative overflow-hidden rounded-xl border border-border bg-background p-6 sm:p-8">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <Globe className="h-5 w-5 text-foreground" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-mono text-muted-foreground tracking-widest mb-0.5">03</div>
-                        <h3 className="font-heading text-lg font-semibold text-foreground">
-                          WordPress Full Site Editor (Block Themes)
-                        </h3>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-xs w-fit">Block Themes</Badge>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-2xl">
-                    Using Twenty Twenty-Four or another block theme? Add a Custom HTML block
-                    to your site&apos;s header template part in the Full Site Editor.
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    <strong>How to check:</strong> Open your browser&apos;s DevTools (F12) &rarr; Console tab. If you see a message like{' '}
+                    <code className="text-xs bg-muted px-1 rounded font-mono">Refused to load the script... violates Content Security Policy</code>,
+                    this is the issue. Contact your hosting provider or check your security plugin&apos;s CSP settings.
                   </p>
-
-                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-6">
-                    <li>Go to <strong>Appearance &rarr; Editor</strong></li>
-                    <li>Select <strong>Template Parts &rarr; Header</strong></li>
-                    <li>Add a <strong>Custom HTML</strong> block</li>
-                    <li>Paste the script tag and save</li>
-                  </ol>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
-                        <span>Native WordPress workflow</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
-                        <span>No plugins, no file editing</span>
-                      </li>
-                    </ul>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <AlertTriangle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <span>Only works with block-based themes</span>
-                      </li>
-                    </ul>
-                  </div>
                 </div>
               </motion.div>
             </div>
