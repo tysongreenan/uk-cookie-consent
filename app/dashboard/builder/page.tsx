@@ -19,7 +19,7 @@ import { CodeGenerator } from '@/components/banner/code-generator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'react-hot-toast'
-import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule } from '@/types'
+import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule, PlanTier } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
@@ -498,7 +498,7 @@ function BannerBuilderContent() {
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
-  const [userPlan, setUserPlan] = useState<'free' | 'pro' | 'enterprise'>('free')
+  const [userPlan, setUserPlan] = useState<PlanTier>('free')
   const [brandImportUrl, setBrandImportUrl] = useState('')
   const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
   const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
@@ -513,7 +513,7 @@ function BannerBuilderContent() {
     if (!session) {
       router.push('/auth/signin')
     } else {
-      const planTier = (session.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
+      const planTier = (session.user?.planTier || 'free') as PlanTier
       setUserPlan(planTier)
     }
   }, [session, router])

@@ -47,7 +47,13 @@ model User {
   currentTeamId String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  planTier String @default("free") // 'free', 'pro', 'enterprise'
+  planTier String @default("free") // 'free', 'pro_lifetime', 'pro_annual', 'enterprise'
+  billingCycle String? // 'one_time', 'annual'
+  subscriptionStatus String? // 'active', 'past_due', 'canceled'
+  stripeSubscriptionId String?
+  featureFreezeDate DateTime? // When features were frozen for lifetime users
+  subscriptionEndsAt DateTime? // When current subscription period ends
+  loyaltyUpgradeEligible Boolean @default(false) // Existing one-time customers eligible for $49/yr
   upgradedAt DateTime?
   stripeCustomerId String?
   stripePaymentIntentId String?
@@ -199,8 +205,9 @@ model Payment {
   userId               String
   amount               Int      // Amount in cents
   currency             String   @default("usd")
-  status               String   // 'succeeded', 'failed', 'refunded'
-  planTier             String   // 'pro', 'enterprise'
+  status               String   // 'succeeded', 'failed', 'refunded', 'disputed'
+  planTier             String   // 'pro_lifetime', 'pro_annual', 'enterprise'
+  paymentType          String   @default("one_time") // 'one_time', 'subscription', 'subscription_renewal'
   stripeSessionId      String?  @unique
   stripePaymentIntentId String? @unique
   stripeCustomerId     String?

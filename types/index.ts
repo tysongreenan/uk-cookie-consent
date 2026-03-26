@@ -419,7 +419,9 @@ export function hasTeamPermission(
 }
 
 // Plan Management Types
-export type PlanTier = 'free' | 'pro' | 'enterprise'
+export type PlanTier = 'free' | 'pro' | 'pro_lifetime' | 'pro_annual' | 'enterprise'
+export type BillingCycle = 'one_time' | 'annual' | null
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | null
 
 export interface PlanFeatures {
   tier: PlanTier
@@ -436,8 +438,9 @@ export interface PlanFeatures {
   hasGpcConfig: boolean
   hasGpcAnalytics: boolean
   hasDataAccessRequests: boolean
+  includesNewFeatures: boolean
   maxTeamMembers: number | 'unlimited'
-  supportLevel: 'community' | 'priority' | 'dedicated'
+  supportLevel: 'community' | 'priority' | 'priority_plus' | 'dedicated'
 }
 
 // Consumer Platform Types

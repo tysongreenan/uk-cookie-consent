@@ -41,7 +41,7 @@ export function WorkspaceSwitcher() {
   const [loading, setLoading] = useState(true)
   const [switching, setSwitching] = useState(false)
   const userPlan = (session?.user?.planTier || 'free') as string
-  const isPro = userPlan === 'pro' || userPlan === 'enterprise'
+  const isPro = userPlan !== 'free'
 
   useEffect(() => {
     if (session?.user?.id) {

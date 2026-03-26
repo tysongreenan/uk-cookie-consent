@@ -216,7 +216,7 @@ function PricingCard({
 }) {
   const isFree = tier === 'free'
   const isEnterprise = tier === 'enterprise'
-  const isPro = tier === 'pro'
+  const isPro = tier === 'pro' || tier === 'pro_lifetime' || tier === 'pro_annual'
   
   return (
     <Card className={`relative ${popular ? 'border-primary shadow-lg scale-105' : ''}`}>

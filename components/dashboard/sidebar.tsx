@@ -85,8 +85,8 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const userPlan = (session?.user?.planTier || 'free') as 'free' | 'pro' | 'enterprise'
-  const isPro = userPlan === 'pro' || userPlan === 'enterprise'
+  const userPlan = (session?.user?.planTier || 'free') as string
+  const isPro = userPlan !== 'free'
   const hasBanner = (session?.user as any)?.hasConsentBanner ?? true
   const hasPrivacy = (session?.user as any)?.hasPrivacyConsumer ?? false
 

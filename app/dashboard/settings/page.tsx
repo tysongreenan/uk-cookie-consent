@@ -181,7 +181,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-lg capitalize">{planTier} Plan</span>
-                    {planTier === 'pro' && <Crown className="h-4 w-4 text-amber-500" />}
+                    {planTier !== 'free' && <Crown className="h-4 w-4 text-amber-500" />}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     {planTier === 'free'
