@@ -4,6 +4,7 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { HeroSection } from '@/components/blocks/hero-section'
 import { FinalCTA } from '@/components/landing/final-cta'
+import { InteractiveBannerDemo } from '@/components/landing/interactive-banner-demo'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -245,153 +246,56 @@ export default function WebflowCookieConsentFreePage() {
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* Interactive Demo — Build Your Banner */}
+        <InteractiveBannerDemo />
+
+        {/* Quick Webflow Setup */}
         <section className="py-24 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-                  How to Add Cookie Consent to Your Webflow Site
+                  Add to Webflow in 60 Seconds
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Get compliant in under 5 minutes with our free solution
+                  After building your banner above, just paste one line into Webflow
                 </p>
               </div>
 
-              <div className="space-y-8">
-                <Card className="border-2">
+              <div className="grid md:grid-cols-3 gap-6">
+                <Card className="border-2 text-center">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</span>
-                      Create Your Free Banner
-                    </CardTitle>
+                    <span className="bg-primary text-primary-foreground rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold mx-auto mb-2">1</span>
+                    <CardTitle>Copy Your Code</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Use our free banner builder to create your cookie consent banner:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                          <li>Choose your compliance framework (GDPR, PIPEDA, CCPA)</li>
-                          <li>Customize colors to match your Webflow site</li>
-                          <li>Set your cookie categories and descriptions</li>
-                          <li>Configure consent behavior and preferences</li>
-                        </ul>
-                      </div>
-                      <div className="bg-card border rounded-lg p-4 font-mono text-sm">
-                        <pre className="text-muted-foreground">{`// Free banner configuration
-{
-  "compliance": "GDPR",
-  "design": {
-    "colors": {
-      "primary": "#your-brand-color"
-    }
-  },
-  "cookies": {
-    "essential": true,
-    "analytics": true,
-    "marketing": false
-  }
-}`}</pre>
-                      </div>
-                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      Build your banner above, then copy the single script tag from the code tab.
+                    </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2">
+                <Card className="border-2 text-center">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2</span>
-                      Copy the Code
-                    </CardTitle>
+                    <span className="bg-primary text-primary-foreground rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold mx-auto mb-2">2</span>
+                    <CardTitle>Paste in Webflow</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Get your personalized code and copy it to your clipboard:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                          <li>Generated code is ready to use</li>
-                          <li>No additional configuration needed</li>
-                          <li>Includes all compliance features</li>
-                          <li>Works with any Webflow plan</li>
-                        </ul>
-                      </div>
-                      <div className="bg-card border rounded-lg p-4 font-mono text-sm overflow-x-auto">
-                        <pre className="text-muted-foreground">{`<!-- Copy this to Webflow -->
-<script src="https://www.cookie-banner.ca
-  /api/v1/banner.js?id=YOUR_ID">
-</script>`}</pre>
-                      </div>
-                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      In Webflow Designer, go to <strong>Project Settings → Custom Code → Head Code</strong> and paste.
+                    </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2">
+                <Card className="border-2 text-center">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">3</span>
-                      Add to Webflow
-                    </CardTitle>
+                    <span className="bg-primary text-primary-foreground rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold mx-auto mb-2">3</span>
+                    <CardTitle>Publish & Done</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Paste the code into your Webflow project settings:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                          <li>Go to Project Settings in Webflow Designer</li>
-                          <li>Navigate to Custom Code section</li>
-                          <li>Paste code in the &quot;Head Code&quot; field</li>
-                          <li>Save and publish your site</li>
-                        </ul>
-                      </div>
-                      <div className="bg-muted/50 p-4 rounded-lg border">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Code className="h-4 w-4 text-primary" />
-                          <span className="font-semibold">Webflow Project Settings</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Settings &rarr; Custom Code &rarr; Head Code &rarr; Paste your banner code &rarr; Save & Publish
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">4</span>
-                      Test & Go Live
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Test your banner and make sure everything works:
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                          <li>Visit your live Webflow site</li>
-                          <li>Check banner appearance and functionality</li>
-                          <li>Test consent acceptance and withdrawal</li>
-                          <li>Verify analytics only fire after consent</li>
-                        </ul>
-                      </div>
-                      <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CheckCircle className="h-4 w-4 text-primary" />
-                          <span className="font-semibold">You&apos;re Compliant!</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Your Webflow site is now GDPR, PIPEDA, and CCPA compliant with our free solution.
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      Hit publish. Your Webflow site is now GDPR, PIPEDA, and CCPA compliant.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
