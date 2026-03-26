@@ -183,9 +183,13 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    const config = typeof banner.config === 'string'
+    let config = typeof banner.config === 'string'
       ? JSON.parse(banner.config)
       : banner.config
+    // Handle double-nested configs (older format stores { name, config: { ...actual } })
+    if (config.config && typeof config.config === 'object') {
+      config = { ...config.config, ...config, config: undefined }
+    }
 
     // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'
