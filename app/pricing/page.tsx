@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Crown, BarChart3, Users, Palette, Upload, Shield, Clock } from 'lucide-react'
+import { Check, Zap, Crown, Shield } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -11,271 +12,246 @@ import Link from 'next/link'
 
 export default function PricingPage() {
   const { data: session } = useSession()
-  
-  const plans = [
-    {
-      name: 'Free',
-      price: '$0',
-      period: '',
-      description: 'Start free, upgrade when ready',
-      features: [
-        '1 Cookie Banner',
-        'GDPR & CCPA Compliance Built-In',
-        '4 Standard Layouts',
-        'Works on Unlimited Websites',
-        'Copy & Paste in 5 Minutes',
-        'Includes "Powered by" Branding',
-        'Community Support'
-      ],
-      cta: 'Get Started Free',
-      tier: 'free',
-      icon: <Zap className="w-6 h-6" />,
-      ctaLink: '/builder'
-    },
-    {
-      name: 'Pro',
-      price: '$99',
-      period: ' one-time',
-      description: 'Everything you need, forever',
-      features: [
-        'Unlimited Banners',
-        'GA4 Analytics Integration',
-        '11 Layouts Including Modal & Slide-In',
-        'Remove "Powered by" Branding',
-        'Analytics Dashboard & Insights',
-        'Invite Unlimited Team Members',
-        'Upload Your Logo & Images',
-        'Priority Email Support',
-        'Lifetime Updates Included'
-      ],
-      cta: 'Upgrade to Pro',
-      tier: 'pro',
-      icon: <Crown className="w-6 h-6" />,
-      popular: true,
-      ctaLink: '/upgrade'
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: '',
-      description: 'For large organizations',
-      features: [
-        'Everything in Pro',
-        'Priority Support with Named Contact',
-        'Custom Onboarding & Setup',
-        'Increased Team Member Limits',
-        'Annual Support Agreement'
-      ],
-      cta: 'Contact Sales',
-      tier: 'enterprise',
-      icon: <Shield className="w-6 h-6" />,
-      ctaLink: 'mailto:sales@cookie-banner.ca'
-    }
-  ]
-  
+  const [billingCycle, setBillingCycle] = useState<'annual' | 'one_time'>('annual')
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">One Price. Unlimited Banners. Yours Forever.</h1>
+          <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Save $200+ vs competitors. No subscriptions. No hidden fees.
+            Start free. Upgrade when you're ready. No surprises.
           </p>
-          
-          <div className="flex items-center justify-center space-x-4 mb-8">
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Save $200+ vs competitors
-            </Badge>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Lifetime updates included
-            </Badge>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              No recurring fees ever
-            </Badge>
+
+          {/* Billing toggle */}
+          <div className="inline-flex items-center rounded-full border p-1 mb-8">
+            <button
+              onClick={() => setBillingCycle('annual')}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                billingCycle === 'annual'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Annual
+              <span className="ml-1.5 text-xs opacity-80">Save 100%+ vs monthly competitors</span>
+            </button>
+            <button
+              onClick={() => setBillingCycle('one_time')}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                billingCycle === 'one_time'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              One-Time
+            </button>
           </div>
         </div>
-        
+
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan) => (
-            <PricingCard key={plan.name} {...plan} />
-          ))}
+          {/* Free */}
+          <Card>
+            <CardHeader className="text-center pb-4">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 rounded-lg bg-muted">
+                  <Zap className="w-6 h-6" />
+                </div>
+              </div>
+              <CardTitle className="text-xl">Free</CardTitle>
+              <div className="flex items-baseline justify-center">
+                <span className="text-4xl font-bold">$0</span>
+              </div>
+              <CardDescription>Build your first banner free</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ul className="space-y-3">
+                {[
+                  '1 Cookie Banner',
+                  'GDPR, PIPEDA & CCPA Compliance',
+                  '7 Standard Layouts',
+                  'Works on Unlimited Websites',
+                  'Copy & Paste in 5 Minutes',
+                  '"Powered by" Branding',
+                  'Community Support',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <Link href="/builder">Get Started Free</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Pro */}
+          <Card className="relative border-primary shadow-lg scale-105">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+              <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                Recommended
+              </Badge>
+            </div>
+            <CardHeader className="text-center pb-4">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 rounded-lg bg-primary text-primary-foreground">
+                  <Crown className="w-6 h-6" />
+                </div>
+              </div>
+              <CardTitle className="text-xl">Pro</CardTitle>
+              <div className="flex items-baseline justify-center">
+                <span className="text-4xl font-bold">$99</span>
+                <span className="text-muted-foreground ml-1">
+                  {billingCycle === 'annual' ? '/year' : ' one-time'}
+                </span>
+              </div>
+              <CardDescription>
+                {billingCycle === 'annual'
+                  ? 'All features, always updated'
+                  : 'Everything today, yours forever'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ul className="space-y-3">
+                {[
+                  'Unlimited Banners',
+                  'GA4 Analytics Integration',
+                  '14 Layouts Including Modal & Slide-In',
+                  'Remove "Powered by" Branding',
+                  'Analytics Dashboard & Insights',
+                  'Invite Unlimited Team Members',
+                  'Upload Your Logo & Images',
+                  'Geo-Targeting (Quebec Law 25)',
+                  'Priority Email Support',
+                  billingCycle === 'annual'
+                    ? 'All Future Features Included'
+                    : 'Current Features — Frozen at Purchase',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button size="lg" className="w-full" asChild>
+                <Link href={`/upgrade?billing=${billingCycle}`}>
+                  Upgrade to Pro
+                </Link>
+              </Button>
+              {billingCycle === 'one_time' && (
+                <p className="text-xs text-center text-muted-foreground">
+                  Security patches included forever. New features require annual plan.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Enterprise */}
+          <Card>
+            <CardHeader className="text-center pb-4">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 rounded-lg bg-muted">
+                  <Shield className="w-6 h-6" />
+                </div>
+              </div>
+              <CardTitle className="text-xl">Enterprise</CardTitle>
+              <div className="flex items-baseline justify-center">
+                <span className="text-4xl font-bold">Custom</span>
+              </div>
+              <CardDescription>For large organizations</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ul className="space-y-3">
+                {[
+                  'Everything in Pro',
+                  'Dedicated Support Contact',
+                  'Custom Onboarding & Setup',
+                  'SLA & Uptime Guarantee',
+                  'Annual Support Agreement',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <a href="mailto:sales@cookie-banner.ca">Contact Sales</a>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-        
-        {/* Value Proposition Section */}
+
+        {/* Value Proposition */}
         <div className="bg-muted/50 rounded-2xl p-8 mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">Why Pro Pays for Itself</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Why Choose Cookie Banner?</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">💰</span>
-              </div>
-              <h3 className="font-semibold mb-2">Save $200+ Per Year</h3>
+              <h3 className="font-semibold mb-2">No Monthly Fees</h3>
               <p className="text-sm text-muted-foreground">
-                $99 once vs competitors charging $9-19/month.
-                You save money after just 6-11 months.
+                Competitors charge $9-19/month. Our one-time option saves you $200+ over 2 years.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🚀</span>
-              </div>
-              <h3 className="font-semibold mb-2">Never Pay Again</h3>
+              <h3 className="font-semibold mb-2">Multi-Law Compliance</h3>
               <p className="text-sm text-muted-foreground">
-                Lifetime updates included. New features, 
-                compliance updates, and improvements forever.
+                GDPR, PIPEDA, CCPA, and Quebec Law 25 built in. Automatic geo-targeting on Pro.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">👥</span>
-              </div>
-              <h3 className="font-semibold mb-2">Scale Your Team</h3>
+              <h3 className="font-semibold mb-2">Under 10KB</h3>
               <p className="text-sm text-muted-foreground">
-                Invite team members, collaborate on banners, 
-                and manage permissions. Perfect for agencies.
+                Our banner script won't slow your site. No impact on page load speed or Core Web Vitals.
               </p>
             </div>
           </div>
         </div>
-        
-        {/* FAQ Section */}
+
+        {/* FAQ */}
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What happens after I upgrade to Pro?</h3>
+              <h3 className="font-semibold mb-2">What's the difference between one-time and annual?</h3>
               <p className="text-sm text-muted-foreground">
-                You'll immediately get access to all Pro features including analytics dashboard, 
-                team collaboration, custom layouts, and image uploads. Your account will be 
-                upgraded instantly after payment.
+                Both plans include all current Pro features. The annual plan ($99/year) also includes every new feature we release, priority support, and early access. The one-time plan ($99 once) gives you everything available today, forever — security patches included, but new features require the annual plan.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Do I get lifetime updates?</h3>
+              <h3 className="font-semibold mb-2">What happens if I cancel my annual plan?</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! All future features, compliance updates, and improvements are included 
-                in your one-time payment. No additional charges ever.
+                You keep access to all features through the end of your paid period. After that, you keep everything you had at the time of cancellation — just like a one-time purchase. You never lose access to features you've already paid for.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Can I invite team members with Pro?</h3>
+              <h3 className="font-semibold mb-2">Is there a money-back guarantee?</h3>
               <p className="text-sm text-muted-foreground">
-                Absolutely! Pro includes unlimited team members with role-based permissions. 
-                Perfect for agencies and businesses with multiple team members.
+                Yes — 30-day money-back guarantee on both plans. If you're not satisfied, contact us for a full refund.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-semibold mb-2">Can I switch from one-time to annual later?</h3>
               <p className="text-sm text-muted-foreground">
-                We accept all major credit cards, debit cards, and PayPal through our secure 
-                Stripe payment processor.
+                Absolutely. One-time Pro customers get a loyalty discount when upgrading to annual — $49/year instead of $99/year.
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Is there a free trial for Pro?</h3>
+              <h3 className="font-semibold mb-2">Is there a free trial?</h3>
               <p className="text-sm text-muted-foreground">
-                You can use the Free plan with unlimited websites to test our banner builder.
-                Upgrade to Pro when you need analytics, GA4 integration, team collaboration, and advanced layouts.
+                The Free plan is your trial. Build a banner, install it on your site, and see how it works. Upgrade to Pro whenever you're ready.
               </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
-  )
-}
-
-function PricingCard({ 
-  name, 
-  price, 
-  period, 
-  description, 
-  features, 
-  cta, 
-  tier, 
-  icon,
-  popular,
-  ctaLink
-}: {
-  name: string
-  price: string
-  period: string
-  description: string
-  features: string[]
-  cta: string
-  tier: string
-  icon: React.ReactNode
-  popular?: boolean
-  ctaLink?: string
-}) {
-  const isFree = tier === 'free'
-  const isEnterprise = tier === 'enterprise'
-  const isPro = tier === 'pro' || tier === 'pro_lifetime' || tier === 'pro_annual'
-  
-  return (
-    <Card className={`relative ${popular ? 'border-primary shadow-lg scale-105' : ''}`}>
-      {popular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <Badge className="bg-primary text-primary-foreground px-4 py-1">
-            {tier === 'free' ? 'Best Value' : 'Better Value'}
-          </Badge>
-        </div>
-      )}
-      
-      <CardHeader className="text-center pb-4">
-        <div className="flex justify-center mb-4">
-          <div className={`p-3 rounded-lg ${popular ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-            {icon}
-          </div>
-        </div>
-        <CardTitle className="text-xl">{name}</CardTitle>
-        <div className="flex items-baseline justify-center">
-          <span className="text-4xl font-bold">{price}</span>
-          {period && <span className="text-muted-foreground ml-1">{period}</span>}
-        </div>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <ul className="space-y-3">
-          {features.map((feature, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm">
-              <div className="text-green-500 mt-0.5">
-                <Check className="w-4 h-4" />
-              </div>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-        
-        <Button 
-          className={`w-full ${popular ? 'bg-primary hover:bg-primary/90' : ''}`}
-          variant={popular ? 'default' : 'outline'}
-          size="lg"
-        >
-          {isEnterprise ? (
-            <a href={ctaLink} className="w-full">
-              {cta}
-            </a>
-          ) : (
-            <Link href={ctaLink || '#'} className="w-full">
-              {cta}
-            </Link>
-          )}
-        </Button>
-        
-        {isPro && (
-          <p className="text-xs text-center text-green-600 font-semibold mt-2">
-            ✓ 30-Day Money-Back Guarantee
-          </p>
-        )}
-      </CardContent>
-    </Card>
   )
 }

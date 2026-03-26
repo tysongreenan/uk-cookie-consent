@@ -1,24 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft } from 'lucide-react'
+import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft, RefreshCw } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
-export default function UpgradePage() {
+function UpgradeContent() {
   const { data: session, status } = useSession()
+  const searchParams = useSearchParams()
+  const initialBilling = searchParams.get('billing') === 'one_time' ? 'one_time' : 'annual'
+  const [billingCycle, setBillingCycle] = useState<'one_time' | 'annual'>(initialBilling)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const isLifetimeUser = session?.user?.planTier === 'pro_lifetime' || session?.user?.planTier === 'pro'
+
   const handleUpgrade = async () => {
-    // Check if user is logged in
     if (!session?.user?.id) {
-      setError('Please sign in to upgrade')
       window.location.href = '/auth/signin?callbackUrl=/upgrade'
       return
     }
@@ -30,14 +34,13 @@ export default function UpgradePage() {
       const response = await fetch('/api/upgrade/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: session.user.id })
+        body: JSON.stringify({ userId: session.user.id, billingCycle }),
       })
 
       const data = await response.json()
 
       if (data.error) {
         setError(data.error)
-        console.error('Checkout error:', data.error)
         return
       }
 
@@ -45,40 +48,27 @@ export default function UpgradePage() {
         window.location.href = data.url
       } else {
         setError('Failed to create checkout session. Please try again.')
-        console.error('No checkout URL received')
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.')
-      console.error('Error creating checkout session:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
   const proFeatures = [
-    { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', description: 'Create as many banners as you need (Free plan limited to 1)' },
-    { icon: <BarChart3 className="h-5 w-5" />, title: 'GA4 Analytics Integration', description: 'Track consent events, banner impressions, and user behavior in Google Analytics' },
-    { icon: <Shield className="h-5 w-5" />, title: 'Remove Branding', description: 'Remove "Powered by cookie-banner.ca" from your banners' },
-    { icon: <Users className="h-5 w-5" />, title: 'Team Collaboration', description: 'Invite team members with role-based permissions' },
-    { icon: <Palette className="h-5 w-5" />, title: '11 Custom Layouts', description: 'Modal, slide-in, minimalist, full-screen, and more' },
-    { icon: <Upload className="h-5 w-5" />, title: 'Image Upload', description: 'Upload custom logos and branding elements' },
-    { icon: <Clock className="h-5 w-5" />, title: 'Lifetime Updates', description: 'All future features and improvements included forever' }
+    { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', desc: 'Create as many banners as you need' },
+    { icon: <BarChart3 className="h-5 w-5" />, title: 'GA4 Analytics Integration', desc: 'Track consent events and impressions in Google Analytics' },
+    { icon: <Shield className="h-5 w-5" />, title: 'Remove Branding', desc: 'Remove "Powered by cookie-banner.ca"' },
+    { icon: <Users className="h-5 w-5" />, title: 'Team Collaboration', desc: 'Invite team members with role-based permissions' },
+    { icon: <Palette className="h-5 w-5" />, title: '14 Custom Layouts', desc: 'Modal, slide-in, floating, and more' },
+    { icon: <Upload className="h-5 w-5" />, title: 'Logo & Image Upload', desc: 'Add custom branding to your banners' },
   ]
 
-  const freeFeatures = [
-    '1 cookie banner',
-    'Unlimited websites',
-    '4 standard layouts',
-    'All compliance frameworks',
-    '"Powered by" branding included',
-    'Community support'
-  ]
-
-  // Show sign-up prompt for non-logged-in users
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
       </div>
     )
   }
@@ -91,21 +81,19 @@ export default function UpgradePage() {
           <Crown className="h-16 w-16 mx-auto mb-6 text-primary" />
           <h1 className="text-4xl font-bold mb-4">Upgrade to Pro</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Sign up for a free account to unlock Pro features
+            Sign up for a free account first, then upgrade
           </p>
-          <div className="space-y-4">
-            <Button size="lg" className="w-full max-w-md" asChild>
-              <Link href="/auth/signup?callbackUrl=/upgrade">
-                Create Free Account & Upgrade
-              </Link>
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link href="/auth/signin?callbackUrl=/upgrade" className="text-primary hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <Button size="lg" className="w-full max-w-md" asChild>
+            <Link href="/auth/signup?callbackUrl=/upgrade">
+              Create Free Account & Upgrade
+            </Link>
+          </Button>
+          <p className="text-sm text-muted-foreground mt-4">
+            Already have an account?{' '}
+            <Link href="/auth/signin?callbackUrl=/upgrade" className="text-primary hover:underline">
+              Sign in
+            </Link>
+          </p>
         </div>
         <Footer />
       </div>
@@ -116,189 +104,179 @@ export default function UpgradePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="pt-20 pb-12 px-4 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Link href="/dashboard" className="flex items-center text-sm text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Link>
-          </div>
-          <h1 className="text-4xl font-bold mb-4">Upgrade to Pro</h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Unlock advanced features and team collaboration for just $99
+      <div className="pt-20 pb-12 px-4 max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Link>
+          <h1 className="text-4xl font-bold mb-4">
+            {isLifetimeUser ? 'Upgrade to Annual' : 'Upgrade to Pro'}
+          </h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            {isLifetimeUser
+              ? 'Get all new features as they launch for $49/year (loyalty discount)'
+              : 'Choose the plan that works for you'}
           </p>
-          <div className="flex items-center justify-center space-x-4">
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              One-time payment
-            </Badge>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Lifetime updates
-            </Badge>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              No recurring fees
-            </Badge>
-          </div>
         </div>
 
-        {/* Comparison */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {/* Free Plan */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Zap className="h-5 w-5" />
-                <span>Free Plan</span>
+        {/* Billing toggle (hide for lifetime users — they only see annual) */}
+        {!isLifetimeUser && (
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center rounded-full border p-1">
+              <button
+                onClick={() => setBillingCycle('annual')}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                  billingCycle === 'annual'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                $99/year
+              </button>
+              <button
+                onClick={() => setBillingCycle('one_time')}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                  billingCycle === 'one_time'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                $99 one-time
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Plan card */}
+        <Card className="border-primary shadow-lg max-w-2xl mx-auto mb-12">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-primary" />
+                {isLifetimeUser ? 'Pro Annual' : billingCycle === 'annual' ? 'Pro Annual' : 'Pro Lifetime'}
               </CardTitle>
-              <CardDescription>What you have now</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {freeFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-3">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Pro Plan */}
-          <Card className="border-primary shadow-lg">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <span>Pro Plan</span>
-                </CardTitle>
-                <Badge className="bg-primary text-primary-foreground">
-                  Best Value
-                </Badge>
-              </div>
-              <CardDescription>Everything in Free, plus:</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                {proFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-start space-x-3">
-                    <div className="text-primary mt-0.5">{feature.icon}</div>
-                    <div>
-                      <div className="font-medium text-sm">{feature.title}</div>
-                      <div className="text-xs text-muted-foreground">{feature.description}</div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div className="border-t pt-4">
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold">$99</div>
-                  <div className="text-sm text-muted-foreground">One-time payment</div>
-                </div>
-                <Button 
-                  onClick={handleUpgrade}
-                  disabled={isLoading}
-                  className="w-full"
-                  size="lg"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="h-4 w-4 mr-2" />
-                      Upgrade to Pro
-                    </>
-                  )}
-                </Button>
-                {error && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-sm text-red-600 text-center">{error}</p>
+              {(billingCycle === 'annual' || isLifetimeUser) && (
+                <Badge className="bg-primary text-primary-foreground">Recommended</Badge>
+              )}
+            </div>
+            <CardDescription>
+              {isLifetimeUser
+                ? 'Everything you have now, plus all future features'
+                : billingCycle === 'annual'
+                  ? 'All current + future features, always updated'
+                  : 'All current features, yours forever'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ul className="space-y-3">
+              {proFeatures.map((f, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="text-primary mt-0.5">{f.icon}</div>
+                  <div>
+                    <span className="text-sm font-medium">{f.title}</span>
+                    <span className="text-xs text-muted-foreground ml-2">{f.desc}</span>
                   </div>
+                </li>
+              ))}
+              <li className="flex items-start gap-3">
+                <div className="text-primary mt-0.5">
+                  {billingCycle === 'annual' || isLifetimeUser
+                    ? <RefreshCw className="h-5 w-5" />
+                    : <Clock className="h-5 w-5" />}
+                </div>
+                <div>
+                  <span className="text-sm font-medium">
+                    {billingCycle === 'annual' || isLifetimeUser
+                      ? 'All Future Features Included'
+                      : 'Current Features — Frozen at Purchase'}
+                  </span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {billingCycle === 'annual' || isLifetimeUser
+                      ? 'Every new feature we ship is yours automatically'
+                      : 'Security patches forever. New features require annual.'}
+                  </span>
+                </div>
+              </li>
+            </ul>
+
+            <div className="border-t pt-6">
+              <div className="text-center mb-4">
+                <div className="text-3xl font-bold">
+                  {isLifetimeUser ? '$49' : '$99'}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {isLifetimeUser
+                    ? '/year (loyalty discount — regular $99/year)'
+                    : billingCycle === 'annual' ? '/year' : 'one-time payment'}
+                </div>
+              </div>
+
+              <Button
+                onClick={handleUpgrade}
+                disabled={isLoading}
+                className="w-full"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Crown className="h-4 w-4 mr-2" />
+                    {isLifetimeUser
+                      ? 'Upgrade to Annual — $49/year'
+                      : billingCycle === 'annual'
+                        ? 'Start Annual Plan — $99/year'
+                        : 'Buy Lifetime — $99'}
+                  </>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </Button>
 
-        {/* Value Proposition */}
-        <div className="bg-muted/50 rounded-2xl p-8 mb-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">Why Pro is a No-Brainer</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">💰</span>
-              </div>
-              <h3 className="font-semibold mb-2">Save Money</h3>
-              <p className="text-sm text-muted-foreground">
-                $99 once vs competitors charging $9-19/month.
-                You save money after just 6-11 months.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🚀</span>
-              </div>
-              <h3 className="font-semibold mb-2">Future-Proof</h3>
-              <p className="text-sm text-muted-foreground">
-                Lifetime updates included. New features, 
-                compliance updates, and improvements forever.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">👥</span>
-              </div>
-              <h3 className="font-semibold mb-2">Team Ready</h3>
-              <p className="text-sm text-muted-foreground">
-                Invite team members, collaborate on banners, 
-                and manage permissions. Perfect for agencies.
-              </p>
-            </div>
-          </div>
-        </div>
+              {error && (
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md">
+                  <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+                </div>
+              )}
 
-        {/* FAQ */}
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
-          <div className="space-y-6">
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What happens after I upgrade?</h3>
-              <p className="text-sm text-muted-foreground">
-                You'll immediately get access to all Pro features including analytics dashboard, 
-                team collaboration, custom layouts, and image uploads. Your account will be 
-                upgraded instantly.
+              <p className="text-xs text-center text-muted-foreground mt-4">
+                30-day money-back guarantee. Cancel anytime.
               </p>
             </div>
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Do I get lifetime updates?</h3>
-              <p className="text-sm text-muted-foreground">
-                Yes! All future features, compliance updates, and improvements are included 
-                in your one-time payment. No additional charges ever.
-              </p>
-            </div>
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Can I invite team members?</h3>
-              <p className="text-sm text-muted-foreground">
-                Absolutely! Pro includes unlimited team members with role-based permissions. 
-                Perfect for agencies and businesses with multiple team members.
-              </p>
-            </div>
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
-              <p className="text-sm text-muted-foreground">
-                We accept all major credit cards, debit cards, and PayPal through our secure 
-                Stripe payment processor.
-              </p>
-            </div>
+          </CardContent>
+        </Card>
+
+        {/* Comparison for non-lifetime users */}
+        {!isLifetimeUser && billingCycle === 'one_time' && (
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-sm text-muted-foreground">
+              Want all future features too?{' '}
+              <button
+                onClick={() => setBillingCycle('annual')}
+                className="text-primary hover:underline font-medium"
+              >
+                Switch to annual ($99/year)
+              </button>
+            </p>
           </div>
-        </div>
+        )}
       </div>
-      
+
       <Footer />
     </div>
+  )
+}
+
+export default function UpgradePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    }>
+      <UpgradeContent />
+    </Suspense>
   )
 }
