@@ -44,12 +44,17 @@ export function WorkspaceSwitcher() {
   const isPro = userPlan === 'pro' || userPlan === 'enterprise'
 
   useEffect(() => {
-    fetchWorkspaces()
-  }, [])
+    if (session?.user?.id) {
+      fetchWorkspaces()
+    }
+  }, [session?.user?.id])
 
   const fetchWorkspaces = async () => {
     try {
-      const response = await fetch('/api/teams')
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      const response = await fetch('/api/teams', { signal: controller.signal })
+      clearTimeout(timeoutId)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
