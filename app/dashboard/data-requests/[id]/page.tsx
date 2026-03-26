@@ -226,7 +226,7 @@ export default function DataRequestDetailPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 max-w-4xl">
+      <div className="p-6 lg:p-8 space-y-6 max-w-4xl">
         <Breadcrumbs items={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Data Requests', href: '/dashboard/data-requests' },

@@ -73,7 +73,7 @@ export default function DataRequestsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
         <Breadcrumbs items={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Data Requests' },
@@ -213,28 +213,14 @@ export default function DataRequestsPage() {
   )
 }
 
-// ── Create Request Modal (search-first flow) ─────────────────────────
-
-interface SearchResult {
-  found: boolean
-  totalRecords: number
-  sources: {
-    banner_visitors: { count: number; banners: string[]; dateRange: { first: string; last: string } | null }
-    banner_analytics: { count: number }
-  }
-  hint: string | null
-}
+// ── Create Request Modal (DSAR response workflow) ─────────────────────
 
 function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const [step, setStep] = useState<'search' | 'create'>('search')
-  const [identifierType, setIdentifierType] = useState<'ip'>('ip')
+  const [identifierType, setIdentifierType] = useState<'name' | 'email' | 'ip'>('name')
   const [identifierValue, setIdentifierValue] = useState('')
   const [subjectEmail, setSubjectEmail] = useState('')
-  const [reportFormat, setReportFormat] = useState<'json' | 'csv' | 'pdf'>('json')
-  const [searching, setSearching] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -244,33 +230,13 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!identifierValue.trim()) return
-    setSearching(true)
-    setError('')
-    setSearchResult(null)
-
-    try {
-      const params = new URLSearchParams({ type: identifierType, value: identifierValue.trim() })
-      const res = await fetch(`/api/data-access-requests/search?${params}`, {
-        headers: { 'x-requested-with': 'dashboard' },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setSearchResult(json.data)
-      } else {
-        const json = await res.json()
-        setError(json.error || 'Search failed')
-      }
-    } catch {
-      setError('Network error')
-    } finally {
-      setSearching(false)
+    if (!subjectEmail.trim()) {
+      setError('Email is required to send the response')
+      return
     }
-  }
-
-  const handleCreate = async () => {
     setSubmitting(true)
     setError('')
 
@@ -281,8 +247,8 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
         body: JSON.stringify({
           subjectIdentifierType: identifierType,
           subjectIdentifierValue: identifierValue.trim(),
-          subjectEmail: subjectEmail || undefined,
-          reportFormat,
+          subjectEmail: subjectEmail.trim(),
+          reportFormat: 'pdf',
         }),
       })
 
@@ -313,141 +279,100 @@ function CreateRequestModal({ onClose, onCreated }: { onClose: () => void; onCre
         animate={{ opacity: 1, scale: 1 }}
         className="bg-background rounded-xl shadow-xl max-w-lg w-full p-6"
       >
-        {step === 'search' ? (
-          <>
-            <h2 id="create-dsar-title" className="text-lg font-semibold mb-1">Find Person in Your Data</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Cookie banners collect <strong>IP addresses</strong>. Enter the person's IP to check if you hold any data about them. Ask the requester for their IP, or look it up from your other systems.
-            </p>
+        <h2 id="create-dsar-title" className="text-lg font-semibold mb-1">New Data Access Request</h2>
+        <p className="text-sm text-muted-foreground mb-5">
+          Log a data access request and generate a compliance response. Under Law 25, you have <strong>30 days</strong> to respond.
+        </p>
 
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium block mb-1">IP Address</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={identifierValue}
-                    onChange={(e) => { setIdentifierValue(e.target.value); setSearchResult(null) }}
-                    placeholder="e.g. 192.168.1.1 or 2001:db8::1"
-                    className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    disabled={searching || !identifierValue.trim()}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
-                  >
-                    {searching ? 'Searching...' : 'Search'}
-                  </button>
-                </div>
-              </div>
-            </form>
+        {/* Info box */}
+        <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 mb-5">
+          <p className="text-xs text-blue-800 dark:text-blue-300">
+            <strong>Note:</strong> Our cookie banner collects only aggregate, anonymized data (total accept/reject counts). No personal information such as IP addresses, names, or emails is stored. The generated response will confirm this to the requester.
+          </p>
+        </div>
 
-            {/* Search results */}
-            {searchResult && (
-              <div className={`mt-4 p-4 rounded-lg border ${searchResult.found ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-                {searchResult.found ? (
-                  <div>
-                    <p className="text-sm font-medium text-green-800">
-                      Found {searchResult.totalRecords} record{searchResult.totalRecords !== 1 ? 's' : ''}
-                    </p>
-                    {searchResult.sources.banner_visitors.count > 0 && (
-                      <div className="mt-2 text-xs text-green-700">
-                        <p>{searchResult.sources.banner_visitors.count} visitor records across {searchResult.sources.banner_visitors.banners.length} banner{searchResult.sources.banner_visitors.banners.length !== 1 ? 's' : ''}</p>
-                        {searchResult.sources.banner_visitors.dateRange && (
-                          <p>Date range: {searchResult.sources.banner_visitors.dateRange.first} to {searchResult.sources.banner_visitors.dateRange.last}</p>
-                        )}
-                        <p className="mt-1">Banners: {searchResult.sources.banner_visitors.banners.join(', ')}</p>
-                      </div>
-                    )}
-                    {searchResult.sources.banner_analytics.count > 0 && (
-                      <p className="mt-1 text-xs text-green-700">{searchResult.sources.banner_analytics.count} analytics events</p>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm font-medium text-yellow-800">No records found</p>
-                    {searchResult.hint && (
-                      <p className="text-xs text-yellow-700 mt-1">{searchResult.hint}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+        <form onSubmit={handleCreate} className="space-y-4">
+          {/* Requester identification */}
+          <div>
+            <label className="text-sm font-medium block mb-1">How did they identify themselves?</label>
+            <div className="flex gap-2">
+              {(['name', 'email', 'ip'] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setIdentifierType(type)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    identifierType === type
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background text-muted-foreground border-input hover:bg-muted'
+                  }`}
+                >
+                  {type === 'name' ? 'Name' : type === 'email' ? 'Email' : 'IP Address'}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+          <div>
+            <label className="text-sm font-medium block mb-1">
+              {identifierType === 'name' ? "Requester's Name" : identifierType === 'email' ? "Requester's Email" : 'IP Address'}
+            </label>
+            <input
+              type={identifierType === 'email' ? 'email' : 'text'}
+              value={identifierValue}
+              onChange={(e) => setIdentifierValue(e.target.value)}
+              placeholder={
+                identifierType === 'name' ? 'Jean Tremblay'
+                : identifierType === 'email' ? 'jean@example.com'
+                : '192.168.1.1'
+              }
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              required
+            />
+          </div>
 
-            <div className="flex gap-3 mt-5">
+          <div>
+            <label className="text-sm font-medium block mb-1">
+              Response Email <span className="text-muted-foreground font-normal">(where to send the response)</span>
+            </label>
+            <input
+              type="email"
+              value={subjectEmail}
+              onChange={(e) => setSubjectEmail(e.target.value)}
+              placeholder="jean@example.com"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+              required
+            />
+            {identifierType === 'email' && identifierValue && !subjectEmail && (
               <button
                 type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
+                onClick={() => setSubjectEmail(identifierValue)}
+                className="text-xs text-primary hover:underline mt-1"
               >
-                Cancel
+                Use same as above
               </button>
-              <button
-                onClick={() => setStep('create')}
-                disabled={!identifierValue.trim()}
-                className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
-              >
-                {searchResult?.found ? 'Create Request' : 'Create Anyway'}
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <h2 className="text-lg font-semibold mb-1">Create Data Access Request</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              IP: <strong className="font-mono">{identifierValue}</strong>
-              {searchResult && <span className="ml-1">— {searchResult.totalRecords} record{searchResult.totalRecords !== 1 ? 's' : ''} found</span>}
-            </p>
+            )}
+          </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium block mb-1">Contact Email (to deliver the report)</label>
-                <input
-                  type="email"
-                  value={subjectEmail}
-                  onChange={(e) => setSubjectEmail(e.target.value)}
-                  placeholder="person@example.com"
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                />
-              </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
-              <div>
-                <label className="text-sm font-medium block mb-1">Report Format</label>
-                <select
-                  value={reportFormat}
-                  onChange={(e) => setReportFormat(e.target.value as typeof reportFormat)}
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="pdf">PDF</option>
-                  <option value="csv">CSV</option>
-                  <option value="json">JSON</option>
-                </select>
-              </div>
-
-              {error && <p className="text-sm text-red-600">{error}</p>}
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep('search')}
-                  className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handleCreate}
-                  disabled={submitting}
-                  className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
-                >
-                  {submitting ? 'Creating...' : 'Create Request'}
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 rounded-lg border border-input text-sm font-medium hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || !identifierValue.trim() || !subjectEmail.trim()}
+              className="flex-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+            >
+              {submitting ? 'Creating...' : 'Create & Track Deadline'}
+            </button>
+          </div>
+        </form>
       </motion.div>
     </div>
   )
