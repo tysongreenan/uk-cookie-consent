@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
     template: '%s'
   },
-  description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
+  description: 'Create a free cookie consent banner in 5 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/favicon.svg',
@@ -52,14 +52,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
-    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on any site. No code needed.',
+    description: 'Create a free cookie consent banner in 5 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on any site. No code needed.',
     type: 'website',
     locale: 'en_CA',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
-    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Used by 1,000+ websites.',
+    description: 'Create a free cookie consent banner in 5 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Used by 1,000+ websites.',
   },
   robots: {
     index: true,
@@ -116,7 +116,7 @@ export default function RootLayout({
         {/* 🍁 Updates automatically - no need to change this code!      🍁 */}
         {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
 
-        <script src="https://www.cookie-banner.ca/api/v1/banner.js?id=eb2e7ccc-3c74-4ca4-86ca-2bf2cd1fc6b8"></script>
+        <script async src="https://www.cookie-banner.ca/api/v1/banner.js?id=eb2e7ccc-3c74-4ca4-86ca-2bf2cd1fc6b8"></script>
 
         {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
         {/* 🍁 End HOSTED SCRIPT - Powered by cookie-banner.ca           🍁 */}

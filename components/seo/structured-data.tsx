@@ -19,12 +19,12 @@ export function StructuredData({ type, data }: StructuredDataProps) {
         return {
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          "mainEntity": data.map((item: FAQItem) => ({
+          "mainEntity": data.map((item: any) => ({
             "@type": "Question",
-            "name": item.question,
+            "name": item.question || item.name || '',
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": item.answer
+              "text": item.answer || item.acceptedAnswer?.text || ''
             }
           }))
         }

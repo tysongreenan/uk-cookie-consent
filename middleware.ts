@@ -4,37 +4,49 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ── A/B Test: Homepage V2 ──
+  // ── A/B Test: Homepage V2 (disabled for bots) ──
   // Split traffic 50/50 between / and /v2. A cookie keeps the user on
   // the same variant for the duration of the session.
+  // IMPORTANT: Always serve v1 to search engine crawlers so Google sees
+  // consistent content — serving random variants caused ranking instability.
   if (pathname === '/') {
-    const abCookie = request.cookies.get('ab-homepage')
-    if (abCookie?.value === 'v2') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/v2'
-      return NextResponse.rewrite(url)
-    }
-    if (!abCookie) {
-      const variant = Math.random() < 0.5 ? 'v1' : 'v2'
-      if (variant === 'v2') {
+    const ua = request.headers.get('user-agent') || ''
+    const isBot = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|msnbot|petalbot|linkedinbot|facebookexternalhit|twitterbot|applebot|gptbot|oai-searchbot|claudebot|perplexitybot|bytespider/i.test(ua)
+
+    if (!isBot) {
+      const abCookie = request.cookies.get('ab-homepage')
+      if (abCookie?.value === 'v2') {
         const url = request.nextUrl.clone()
         url.pathname = '/v2'
-        const response = NextResponse.rewrite(url)
-        response.cookies.set('ab-homepage', 'v2', { maxAge: 60 * 60 * 24 * 30, path: '/' })
+        return NextResponse.rewrite(url)
+      }
+      if (!abCookie) {
+        const variant = Math.random() < 0.5 ? 'v1' : 'v2'
+        if (variant === 'v2') {
+          const url = request.nextUrl.clone()
+          url.pathname = '/v2'
+          const response = NextResponse.rewrite(url)
+          response.cookies.set('ab-homepage', 'v2', { maxAge: 60 * 60 * 24 * 30, path: '/' })
+          return response
+        }
+        const response = NextResponse.next()
+        response.cookies.set('ab-homepage', 'v1', { maxAge: 60 * 60 * 24 * 30, path: '/' })
         return response
       }
-      const response = NextResponse.next()
-      response.cookies.set('ab-homepage', 'v1', { maxAge: 60 * 60 * 24 * 30, path: '/' })
-      return response
     }
   }
 
-  // Block direct access to location pages (only allow from landing page)
+  // Block direct access to location pages (only allow from landing page or bots)
   if (pathname.startsWith('/locations/')) {
-    const referer = request.headers.get('referer')
-    const host = request.headers.get('host')
-    if (!referer || !referer.includes(host || 'cookie-banner.ca')) {
-      return NextResponse.redirect(new URL('/', request.url))
+    const ua = request.headers.get('user-agent') || ''
+    const isCrawler = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|msnbot|petalbot|gptbot|oai-searchbot|claudebot|perplexitybot|bytespider/i.test(ua)
+
+    if (!isCrawler) {
+      const referer = request.headers.get('referer')
+      const host = request.headers.get('host')
+      if (!referer || !referer.includes(host || 'cookie-banner.ca')) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
     }
   }
 
