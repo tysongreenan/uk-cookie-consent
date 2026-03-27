@@ -67,11 +67,12 @@ export function TeamSwitcher() {
       const data = await response.json()
 
       if (data.success) {
-        // Update the session with new team info
+        // Update the session JWT with the new team ID
         await update()
-        toast.success(data.message)
-        // Refresh the page to update all team-scoped data
-        router.refresh()
+        // Full page reload to ensure all team-scoped data refreshes
+        // (router.refresh() only does a soft RSC refresh, which doesn't
+        // clear client-side state in hooks like useSession across components)
+        window.location.reload()
       } else {
         toast.error(data.error || 'Failed to switch team')
       }

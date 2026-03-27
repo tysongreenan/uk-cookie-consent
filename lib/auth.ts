@@ -350,12 +350,13 @@ export const authOptions: NextAuthOptions = {
           const supabase = getSupabaseClient()
           const { data } = await supabase
             .from('User')
-            .select('planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
+            .select('planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool, current_team_id')
             .eq('id', token.id)
             .single()
           if (data?.planTier) token.planTier = data.planTier
           if (data?.userType) token.userType = data.userType
           if (data?.consumerTier) token.consumerTier = data.consumerTier
+          if (data?.current_team_id) token.currentTeamId = data.current_team_id
           if (data) {
             token.hasConsentBanner = data.hasConsentBanner ?? true
             token.hasPrivacyConsumer = data.hasPrivacyConsumer ?? false
