@@ -17,6 +17,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 import { logActivity, AuditAction } from '@/lib/audit-log'
+import { sanitizeEmail } from '@/lib/sanitize'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -62,15 +63,21 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        // Validate and sanitize email before querying
+        const email = sanitizeEmail(credentials.email)
+        if (!email) {
+          return null
+        }
+
         try {
           // Get Supabase client
           const supabase = getSupabaseClient()
-          
+
           // Basic user query (only existing fields)
           const { data: user, error } = await supabase
             .from('User')
             .select('id, email, name, password, emailVerified, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
-            .eq('email', credentials.email.toLowerCase().trim())
+            .eq('email', email)
             .single()
 
           if (error || !user) {

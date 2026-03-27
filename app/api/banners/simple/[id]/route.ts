@@ -28,6 +28,31 @@ function getSupabaseClient() {
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
+/**
+ * Get the user IDs that the current user is allowed to access banners for.
+ * If in a team workspace, returns all team member IDs. Otherwise just the user's own ID.
+ */
+async function getAccessibleUserIds(
+  supabase: ReturnType<typeof getSupabaseClient>,
+  userId: string,
+  currentTeamId: string | null | undefined
+): Promise<string[]> {
+  if (!currentTeamId) return [userId]
+
+  const { data: members, error } = await supabase
+    .from('TeamMember')
+    .select('user_id')
+    .eq('team_id', currentTeamId)
+
+  if (error) {
+    console.error('Error fetching team members for banner access:', error)
+    return [userId]
+  }
+
+  const ids = members?.map(m => m.user_id) || []
+  return ids.length > 0 ? ids : [userId]
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -41,28 +66,23 @@ export async function GET(
 
     // Get Supabase client
     const supabase = getSupabaseClient()
+    const accessibleUserIds = await getAccessibleUserIds(supabase, session.user.id, session.user.currentTeamId)
 
-    // Get single banner by ID
-    const { data, error } = await supabase.rpc('get_banners_simple', {
-      user_id: session.user.id
-    })
+    // Get single banner by ID, checking all accessible user IDs
+    const { data: banner, error } = await supabase
+      .from('SimpleBanners')
+      .select('*')
+      .eq('id', params.id)
+      .in('userId', accessibleUserIds)
+      .single()
 
-    if (error) {
-      console.error('❌ Simple Get Single: Error fetching banner:', error)
-      return NextResponse.json({ error: 'Failed to fetch banner' }, { status: 500 })
-    }
-
-    // Find the specific banner by ID
-    const banner = data?.find((b: any) => b.id === params.id)
-    
-    if (!banner) {
+    if (error || !banner) {
       return NextResponse.json({ error: 'Banner not found' }, { status: 404 })
     }
 
-    console.log('✅ Simple Get Single: Banner fetched successfully:', params.id)
-    return NextResponse.json({ 
-      success: true, 
-      banner: banner
+    return NextResponse.json({
+      success: true,
+      banner: { ...banner, isActive: banner.isActive ?? true }
     })
 
   } catch (error) {
@@ -84,46 +104,31 @@ export async function PUT(
 
     // Get Supabase client
     const supabase = getSupabaseClient()
+    const accessibleUserIds = await getAccessibleUserIds(supabase, session.user.id, session.user.currentTeamId)
 
     const bannerData = await request.json()
-    console.log('🎯 Simple Update: Banner data received:', JSON.stringify(bannerData).slice(0, 200))
 
     // Check if this is just a toggle request (only isActive field)
     if ('isActive' in bannerData && Object.keys(bannerData).length === 1) {
-      // Check SimpleBanners table
-      let bannerFound = false
-      let currentState: boolean | null = null
+      // Verify the banner belongs to an accessible user
+      const { data: existingBanner } = await supabase
+        .from('SimpleBanners')
+        .select('id, isActive, userId')
+        .eq('id', params.id)
+        .in('userId', accessibleUserIds)
+        .single()
 
-      // First, try SimpleBanners (new system)
-      const { data: userBanners, error: fetchError } = await supabase.rpc('get_banners_simple', {
-        user_id: session.user.id
-      })
-
-      if (!fetchError && userBanners) {
-        const existingBanner = userBanners.find((b: any) => b.id === params.id)
-        if (existingBanner) {
-          bannerFound = true
-          currentState = existingBanner.isActive ?? true
-        }
-      }
-
-      if (!bannerFound) {
-        console.error('❌ Simple Toggle: Banner not found:', {
-          bannerId: params.id,
-          userId: session.user.id
-        })
-        return NextResponse.json({ 
+      if (!existingBanner) {
+        return NextResponse.json({
           error: 'Banner not found',
-          details: 'Banner does not exist or does not belong to this user',
           code: 'NOT_FOUND'
         }, { status: 404 })
       }
 
-      console.log('✅ Simple Toggle: current state:', currentState, 'new state:', bannerData.isActive)
-
+      // Toggle using the banner owner's userId (RPC requires the owner)
       const { data: rpcResult, error: rpcError } = await supabase.rpc('toggle_banner_active', {
         banner_id: params.id,
-        user_id: session.user.id,
+        user_id: existingBanner.userId,
         is_active: bannerData.isActive
       })
 
@@ -139,18 +144,15 @@ export async function PUT(
       if (rpcResult === false) {
         return NextResponse.json({
           error: 'Banner not found',
-          details: 'Banner was not updated',
           code: 'NOT_FOUND'
         }, { status: 404 })
       }
 
-      console.log('✅ Simple Toggle: Banner toggled')
-      
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         bannerId: params.id,
         isActive: bannerData.isActive,
-        message: 'Banner status updated successfully!' 
+        message: 'Banner status updated successfully!'
       })
     }
 
@@ -192,14 +194,25 @@ function rejectCookies() {
 }
 </script>`
 
-    // Update banner using direct SQL to bypass RLS issues
-    // Note: is_active parameter removed temporarily until SQL migration is run
+    // Verify banner is accessible (own or team member's)
+    const { data: bannerToUpdate } = await supabase
+      .from('SimpleBanners')
+      .select('userId')
+      .eq('id', params.id)
+      .in('userId', accessibleUserIds)
+      .single()
+
+    if (!bannerToUpdate) {
+      return NextResponse.json({ error: 'Banner not found' }, { status: 404 })
+    }
+
+    // Update banner using the banner owner's userId (RPC requires the owner)
     const { data, error } = await supabase.rpc('update_banner_simple', {
       banner_id: params.id,
       banner_name: bannerName,
       banner_config: bannerConfig,
       banner_code: code,
-      user_id: session.user.id
+      user_id: bannerToUpdate.userId
     })
 
     if (error) {
@@ -211,7 +224,7 @@ function rejectCookies() {
     // This is critical for ETag-based cache invalidation to work correctly
     const { data: updatedBanner } = await supabase
       .from('SimpleBanners')
-      .select('id, name, "updatedAt"')
+      .select('id, name, updatedAt')
       .eq('id', params.id)
       .single()
 
@@ -249,11 +262,24 @@ export async function DELETE(
 
     // Get Supabase client
     const supabase = getSupabaseClient()
+    const accessibleUserIds = await getAccessibleUserIds(supabase, session.user.id, session.user.currentTeamId)
 
-    // Delete banner using direct SQL to bypass RLS issues
+    // Verify banner is accessible (own or team member's)
+    const { data: bannerToDelete } = await supabase
+      .from('SimpleBanners')
+      .select('userId')
+      .eq('id', params.id)
+      .in('userId', accessibleUserIds)
+      .single()
+
+    if (!bannerToDelete) {
+      return NextResponse.json({ error: 'Banner not found' }, { status: 404 })
+    }
+
+    // Delete banner using the banner owner's userId (RPC requires the owner)
     const { data, error } = await supabase.rpc('delete_banner_simple', {
       banner_id: params.id,
-      user_id: session.user.id
+      user_id: bannerToDelete.userId
     })
 
     if (error) {

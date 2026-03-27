@@ -111,12 +111,50 @@ function rejectCookies() {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get banners using direct SQL to bypass RLS issues
+    const currentTeamId = session.user.currentTeamId
+
+    // If user is in a team workspace, fetch banners for all team members
+    if (currentTeamId) {
+      const { data: teamMembers, error: teamError } = await supabase
+        .from('TeamMember')
+        .select('user_id')
+        .eq('team_id', currentTeamId)
+
+      if (teamError) {
+        console.error('❌ Simple Get: Error fetching team members:', teamError)
+        return NextResponse.json({ error: 'Failed to fetch team banners' }, { status: 500 })
+      }
+
+      const memberIds = teamMembers?.map(m => m.user_id) || []
+      if (memberIds.length === 0) memberIds.push(session.user.id)
+
+      // Fetch banners for all team members
+      const { data, error } = await supabase
+        .from('SimpleBanners')
+        .select('*')
+        .in('userId', memberIds)
+        .order('createdAt', { ascending: false })
+
+      if (error) {
+        console.error('❌ Simple Get: Error fetching team banners:', error)
+        return NextResponse.json({ error: 'Failed to fetch banners' }, { status: 500 })
+      }
+
+      // Coalesce null isActive to true (matches RPC behavior)
+      const banners = (data || []).map((b: any) => ({
+        ...b,
+        isActive: b.isActive ?? true
+      }))
+
+      return NextResponse.json({ banners })
+    }
+
+    // Personal workspace — fetch only the user's own banners
     const { data, error } = await supabase.rpc('get_banners_simple', {
       user_id: session.user.id
     })
@@ -126,7 +164,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch banners' }, { status: 500 })
     }
 
-    console.log('✅ Simple Get: Banners fetched successfully:', data?.length || 0)
     return NextResponse.json({ banners: data || [] })
 
   } catch (error) {
