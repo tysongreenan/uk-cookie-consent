@@ -82,6 +82,26 @@ const faqData = [
     question: "Does Cookiebot slow down my website?",
     answer: "Cookiebot's script bundle is heavier than some alternatives and can add noticeable load time to your pages, which may affect Core Web Vitals and SEO. Cookie-Banner.ca's script is under 10KB and loads asynchronously, so it has minimal impact on page performance."
   },
+  {
+    question: "Cookiebot vs OneTrust: which is better for small businesses?",
+    answer: "OneTrust is an enterprise-grade privacy platform with pricing typically starting at several thousand dollars per year. Cookiebot is much cheaper ($9-199/month) but still uses monthly subscriptions. For small businesses, both are overkill. Cookie-Banner.ca offers a free plan for basic needs or a $99 one-time Pro plan for advanced features like analytics and unlimited banners — no enterprise sales calls required."
+  },
+  {
+    question: "Does Cookiebot work with React or Next.js?",
+    answer: "Cookiebot can be added to React or Next.js applications, but it requires manual integration — there is no official React package or hook. You need to embed the Cookiebot script tag and handle consent callbacks yourself. Cookie-Banner.ca also works with React and Next.js via a simple script tag, with dedicated integration guides for both App Router and Pages Router setups."
+  },
+  {
+    question: "Is Cookiebot GDPR and PIPEDA compliant?",
+    answer: "Cookiebot is well-established for GDPR compliance in the EU. For Canadian regulations like PIPEDA and Quebec's Law 25, Cookiebot supports the basic consent framework but does not offer dedicated Canadian compliance modes. Cookie-Banner.ca was built for the Canadian market with native PIPEDA and Law 25 support, including bilingual French/English banners."
+  },
+  {
+    question: "Can I use a free Cookiebot alternative for a commercial website?",
+    answer: "Yes. Cookie-Banner.ca's free plan can be used on commercial websites with unlimited pages. The free plan includes 1 cookie banner, 4 layout options, GDPR and CCPA compliance, and Google Consent Mode v2 support. The only limitation is 'Powered by' branding on the banner, which is removed on the $99 one-time Pro plan."
+  },
+  {
+    question: "What happens to my consent data if I switch from Cookiebot?",
+    answer: "When you switch from Cookiebot to Cookie-Banner.ca, existing visitors will see your new cookie banner and be asked for consent again. This is normal and expected — the new banner will collect fresh consent that meets current regulatory requirements. There is no need to migrate historical consent data, as each consent management platform stores consent independently."
+  },
 ]
 
 export default function CookiebotAlternativePage() {
@@ -90,8 +110,8 @@ export default function CookiebotAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "Best Cookiebot Alternative 2026 — Cookie-Banner.ca",
-          description: "Complete comparison between Cookiebot and cookie consent alternatives including CookieYes, Complianz, and Cookie-Banner.ca",
+          title: "Cookiebot Alternatives 2026: Pricing, Cookiebot vs CookieYes & Complianz",
+          description: "Compare Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Full pricing breakdown, feature matrix, and migration guide.",
           datePublished: "2025-01-01",
           dateModified: "2026-03-16",
         }}
@@ -141,11 +161,11 @@ export default function CookiebotAlternativePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    The Best Cookiebot Alternative
+                    Best Cookiebot Alternatives in 2026
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Free, Lightweight, and Fully Compliant
+                    Free Options, Pricing & Migration Guide
                   </span>
                 </h1>
 
@@ -261,10 +281,10 @@ export default function CookiebotAlternativePage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                How Much Does Cookiebot Cost in 2026?
+                Cookiebot Pricing Plans in 2026: How Much Does It Cost?
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                A transparent look at Cookiebot pricing vs Cookie-Banner.ca
+                A transparent look at Cookiebot pricing plans vs Cookie-Banner.ca
               </p>
             </motion.div>
 
@@ -583,8 +603,120 @@ export default function CookiebotAlternativePage() {
           </div>
         </section>
 
-        {/* Cookiebot on Shopify */}
+        {/* Cookiebot vs Cookie-Banner.ca */}
         <section className="py-16 sm:py-20 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-12"
+              >
+                <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
+                  Cookiebot vs Cookie-Banner.ca: Head-to-Head
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  A direct comparison of pricing, performance, and features
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="prose prose-lg dark:prose-invert max-w-none mb-12 text-muted-foreground"
+              >
+                <p>
+                  <strong className="text-foreground">Cookie-Banner.ca</strong> was built as a modern, lightweight alternative to legacy consent management platforms like Cookiebot. While Cookiebot has been in the market since 2015, Cookie-Banner.ca takes a fundamentally different approach to pricing, performance, and developer experience.
+                </p>
+
+                <h3 className="font-heading text-foreground">Pricing Model</h3>
+                <p>
+                  Cookiebot uses <strong className="text-foreground">monthly per-domain pricing</strong> that scales with page count. A single site with 500+ subpages costs $9/month ($108/year). Multi-site businesses or agencies pay $49-$199/month. Cookie-Banner.ca offers a <strong className="text-foreground">free plan with unlimited pages</strong>, plus a one-time $99 Pro upgrade that never renews. Over 3 years, a Cookiebot Essential subscription costs $324 versus $99 total for Cookie-Banner.ca Pro.
+                </p>
+
+                <h3 className="font-heading text-foreground">Script Performance</h3>
+                <p>
+                  Cookiebot&apos;s JavaScript bundle weighs 50KB+ and can delay page rendering on slower connections. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning it never blocks your page from rendering. For websites where <Link href="/blog/core-web-vitals-cookie-consent" className="text-primary underline hover:no-underline">Core Web Vitals</Link> matter — especially ecommerce and ad-supported sites — this difference can directly affect Google rankings.
+                </p>
+
+                <h3 className="font-heading text-foreground">Canada-Specific Compliance</h3>
+                <p>
+                  Cookiebot focuses primarily on GDPR (EU) and CCPA (California). Cookie-Banner.ca was built for the Canadian market first, with native support for <Link href="/compliance/pipeda" className="text-primary underline hover:no-underline">PIPEDA</Link>, <Link href="/compliance/canada" className="text-primary underline hover:no-underline">Quebec&apos;s Law 25</Link>, and bilingual French/English banners. If your audience includes Canadian visitors, Cookie-Banner.ca provides compliance out of the box that Cookiebot requires manual configuration to achieve.
+                </p>
+
+                <h3 className="font-heading text-foreground">Developer Experience</h3>
+                <p>
+                  Cookiebot requires creating an account, configuring domains, and embedding a domain-specific script. Changes require logging into the Cookiebot dashboard. Cookie-Banner.ca offers a <Link href="/builder" className="text-primary underline hover:no-underline">visual banner builder</Link> where you can design your banner, click &ldquo;Push Live,&rdquo; and see changes reflected immediately — no code changes or redeployment needed. Integration guides are available for <Link href="/integrations/react" className="text-primary underline hover:no-underline">React</Link>, <Link href="/integrations/shopify" className="text-primary underline hover:no-underline">Shopify</Link>, <Link href="/integrations/wordpress" className="text-primary underline hover:no-underline">WordPress</Link>, and more.
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="overflow-x-auto mb-12"
+              >
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-border">
+                      <th className="text-left py-4 px-4 font-heading font-semibold text-foreground min-w-[200px]">Category</th>
+                      <th className="text-center py-4 px-4 font-heading font-semibold text-foreground min-w-[180px]">Cookiebot</th>
+                      <th className="text-center py-4 px-4 font-heading font-semibold text-primary min-w-[180px]">Cookie-Banner.ca</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { category: "Starting Price", cookiebot: "$9/month", ours: "Free (forever)" },
+                      { category: "Paid Plan", cookiebot: "$9-$199/month", ours: "$99 one-time" },
+                      { category: "3-Year Total Cost", cookiebot: "$324-$7,164", ours: "$99" },
+                      { category: "Script Size", cookiebot: "~50KB+", ours: "Under 10KB" },
+                      { category: "Loading", cookiebot: "Synchronous", ours: "Async (non-blocking)" },
+                      { category: "Free Tier Pages", cookiebot: "100 subpages", ours: "Unlimited" },
+                      { category: "PIPEDA / Law 25", cookiebot: "Manual config", ours: "Native support" },
+                      { category: "Google Consent Mode v2", cookiebot: "Yes", ours: "Yes" },
+                      { category: "IAB TCF 2.2", cookiebot: "Yes", ours: "Yes" },
+                      { category: "Visual Banner Builder", cookiebot: "Limited", ours: "Full builder + live preview" },
+                      { category: "Live Updates", cookiebot: "Dashboard only", ours: "Push Live — instant" },
+                      { category: "Platform Support", cookiebot: "All platforms", ours: "All platforms" },
+                    ].map((row, i) => (
+                      <tr key={i} className={`border-b border-border ${i % 2 === 1 ? 'bg-muted/30' : ''}`}>
+                        <td className="py-3 px-4 font-medium text-foreground">{row.category}</td>
+                        <td className="py-3 px-4 text-center text-muted-foreground text-sm">{row.cookiebot}</td>
+                        <td className="py-3 px-4 text-center text-sm font-medium text-primary bg-primary/[0.03]">{row.ours}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="rounded-xl border-2 border-primary bg-primary/5 p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <Star className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-heading font-semibold text-foreground text-lg mb-2">The Verdict: Cookiebot vs Cookie-Banner.ca</h3>
+                    <p className="text-muted-foreground">
+                      Cookiebot is a well-established platform with broad enterprise features. But for small to mid-size businesses, agencies, and developers who want a lightweight, affordable cookie consent solution with Canadian compliance built in, Cookie-Banner.ca offers better value — especially with its free plan and one-time Pro pricing.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Cookiebot on Shopify */}
+        <section className="py-16 sm:py-20 border-t border-border bg-background">
           <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
             <div className="max-w-4xl mx-auto">
               <motion.div

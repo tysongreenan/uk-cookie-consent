@@ -380,6 +380,10 @@ export default function PIPEDACompliancePage() {
                   ))}
                 </ul>
               </div>
+
+              <p className="text-sm text-muted-foreground text-center mt-6">
+                For a detailed walkthrough of each requirement, see our <Link href="/blog/pipeda-compliance-checklist" className="text-primary underline hover:no-underline font-medium">complete PIPEDA compliance checklist</Link> with step-by-step instructions for Canadian websites.
+              </p>
             </div>
           </div>
         </section>

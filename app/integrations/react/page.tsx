@@ -80,7 +80,7 @@ export default function ReactIntegrationPage() {
   ]
 
   const articleData = {
-    title: "React Cookie Consent: Complete Guide for 2026",
+    title: "React Cookie Banner: Complete Integration Guide for 2026",
     description: "Learn how to add a lightweight, GDPR-compliant cookie consent banner to your React or Next.js application. Covers installation, Google Analytics integration, and best practices.",
     datePublished: "2025-01-15",
     dateModified: "2026-03-16"
@@ -89,7 +89,7 @@ export default function ReactIntegrationPage() {
   const breadcrumbData = [
     { name: "Home", url: "https://www.cookie-banner.ca" },
     { name: "Integrations", url: "https://www.cookie-banner.ca/integrations" },
-    { name: "React Cookie Consent", url: "https://www.cookie-banner.ca/integrations/react" }
+    { name: "React Cookie Banner", url: "https://www.cookie-banner.ca/integrations/react" }
   ]
 
   return (
@@ -134,16 +134,16 @@ export default function ReactIntegrationPage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    React Cookie Consent
+                    React Cookie Banner
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Under 10KB. Zero Bundle Impact.
+                    No npm Install. Under 10KB.
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Add a lightweight react cookie consent banner to your React or Next.js app in under 2 minutes. No npm packages to install, no bundle bloat, no maintenance headaches. One async script tag and you are GDPR compliant.
+                  Add a cookie consent banner to your React or Next.js app in 5 minutes. No npm packages to install, no bundle bloat, no maintenance headaches. One async script tag and you are GDPR and PIPEDA compliant.
                 </p>
               </motion.div>
 

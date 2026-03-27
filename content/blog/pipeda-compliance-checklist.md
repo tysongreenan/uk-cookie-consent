@@ -63,6 +63,21 @@ schema:
       acceptedAnswer:
         "@type": "Answer"
         text: "Start with: (1) install a cookie consent banner, (2) write/update privacy policy, (3) enable HTTPS, (4) add privacy policy links, and (5) create account deletion process."
+    - "@type": "Question"
+      name: "Does PIPEDA apply to small businesses in Canada?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Yes. PIPEDA applies to all private-sector organizations engaged in commercial activities, regardless of size. Whether you run a one-person consultancy or a large enterprise, if you collect personal information from customers — including through website cookies and analytics — PIPEDA applies."
+    - "@type": "Question"
+      name: "What is the difference between PIPEDA and Quebec's Law 25?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "PIPEDA is Canada's federal privacy law, while Law 25 is Quebec's provincial privacy legislation. Law 25 is stricter in several areas: it requires a designated privacy officer, mandatory privacy impact assessments, and explicit consent for sharing personal information with third parties. If your business operates in Quebec, you must comply with both."
+    - "@type": "Question"
+      name: "How does PIPEDA compare to GDPR?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Both require consent for data collection, transparency about data use, and user rights to access and delete data. However, GDPR carries much heavier penalties (up to 4% of global revenue), requires a legal basis for all processing, and mandates Data Protection Officers. PIPEDA's enforcement is lighter but still includes Privacy Commissioner investigations and Federal Court actions."
 ---
 
 # What Is the PIPEDA Compliance Checklist for Canadian Websites?
@@ -72,6 +87,23 @@ schema:
 
 [Learn more about PIPEDA from the Privacy Commissioner of Canada →](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/)
 </div>
+
+---
+
+## PIPEDA Compliance Quick Reference Table
+
+| Requirement | What to Do | Priority |
+|------------|-----------|----------|
+| Cookie Consent Banner | Install a banner that blocks tracking until opt-in. Offer Accept, Reject, and Customize options | **Critical** |
+| Privacy Policy | Write a clear policy covering data collection, use, sharing, retention, security, and user rights | **Critical** |
+| HTTPS Encryption | Enable SSL/TLS on your entire website | **Critical** |
+| User Data Access | Allow users to request and receive copies of their personal data | **High** |
+| Data Correction | Provide a way for users to correct inaccurate information | **High** |
+| Account Deletion | Offer an account deletion process or deletion request form | **High** |
+| Cookie Categorization | Organize cookies into Necessary, Functional, Analytics, and Marketing categories | **High** |
+| Third-Party Disclosure | List all third parties (Google Analytics, payment processors, etc.) in your privacy policy | **Medium** |
+| Data Retention Policy | Document how long you keep each type of personal data | **Medium** |
+| Breach Response Plan | Create a plan to notify the Privacy Commissioner and affected individuals | **Medium** |
 
 ---
 
@@ -586,6 +618,18 @@ Your privacy policy must include: what data you collect, why you collect it, how
 ### How do I make my website PIPEDA compliant?
 
 Start with: (1) install a cookie consent banner, (2) write/update privacy policy, (3) enable HTTPS, (4) add privacy policy links, and (5) create account deletion process.
+
+### Does PIPEDA apply to small businesses in Canada?
+
+Yes. PIPEDA applies to all private-sector organizations engaged in commercial activities, regardless of size. Whether you run a one-person consultancy, a small e-commerce store, or a large enterprise, if you collect personal information from customers — including through website cookies and analytics — PIPEDA applies. The good news is that compliance for small businesses with basic websites can be achieved in 1-2 hours.
+
+### What is the difference between PIPEDA and Quebec's Law 25?
+
+PIPEDA is Canada's federal privacy law, while [Law 25](/compliance/canada) (formerly Bill 64) is Quebec's provincial privacy legislation. Law 25 is stricter than PIPEDA in several areas: it requires a designated privacy officer, mandatory privacy impact assessments for certain projects, and explicit consent for sharing personal information with third parties. If your business operates in Quebec or serves Quebec residents, you must comply with both PIPEDA and Law 25.
+
+### How does PIPEDA compare to GDPR?
+
+Both PIPEDA and [GDPR](/compliance/gdpr) require consent for data collection, transparency about data use, and user rights to access and delete data. However, GDPR carries much heavier penalties (up to 4% of global revenue or €20 million), requires a legal basis for all processing, and mandates Data Protection Officers for certain organizations. PIPEDA's enforcement is lighter but still includes Privacy Commissioner investigations and Federal Court actions. Many businesses that comply with GDPR find PIPEDA compliance straightforward.
 
 ---
 

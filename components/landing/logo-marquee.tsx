@@ -30,7 +30,19 @@ export function LogoMarquee() {
     fetchShowcase()
   }, [])
 
-  if (loading || items.length === 0) {
+  if (loading) {
+    return (
+      <div className="w-full py-12 border-b bg-slate-50/50" style={{ minHeight: '120px' }}>
+        <div className="container px-4 md:px-6 mb-8 text-center">
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Trusted by growing businesses worldwide
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (items.length === 0) {
     return null
   }
 
@@ -38,14 +50,14 @@ export function LogoMarquee() {
   const marqueeItems = [...items, ...items]
 
   return (
-    <div className="w-full py-12 border-b bg-slate-50/50">
+    <div className="w-full py-12 border-b bg-slate-50/50" style={{ minHeight: '120px' }}>
       <div className="container px-4 md:px-6 mb-8 text-center">
         <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Trusted by growing businesses worldwide
         </p>
       </div>
-      
-      <div className="relative flex overflow-x-hidden group">
+
+      <div className="relative flex overflow-x-hidden group" style={{ height: '48px' }}>
         <div className="animate-marquee whitespace-nowrap flex items-center gap-16 px-8">
           {marqueeItems.map((item, index) => (
             <LogoItem key={`${item.id}-${index}`} item={item} />

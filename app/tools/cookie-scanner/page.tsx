@@ -34,7 +34,7 @@ export default function CookieScannerPage() {
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "CAD"
     },
     "author": {
       "@type": "Organization",
@@ -121,36 +121,40 @@ export default function CookieScannerPage() {
           "@type": "Answer",
           "text": "A comprehensive cookie checker detects HTTP cookies, JavaScript cookies, third-party tracking pixels, localStorage and sessionStorage usage. Our web cookie scanner identifies both first-party and third-party cookies, including those set dynamically by JavaScript after page load."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the cookie scanner work with WordPress, Shopify, and other platforms?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our cookie scanner works with any publicly accessible website regardless of platform — WordPress, Shopify, Wix, Squarespace, Webflow, Next.js, custom-built sites, and any other web platform. The scanner loads your site in a real browser, so it detects cookies the same way your visitors experience them."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between first-party and third-party cookies?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "First-party cookies are set by your own domain and typically handle sessions, authentication, and user preferences. Third-party cookies are set by external services embedded on your site — like Google Analytics, Facebook Pixel, or advertising networks. Third-party cookies are more heavily regulated because they can track users across multiple websites."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I fix compliance issues found by the cookie scanner?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "After identifying compliance issues, you should: (1) install a cookie consent banner that blocks non-essential cookies until consent is given, (2) update your privacy policy to accurately list all cookies, (3) remove any unnecessary tracking scripts, and (4) configure Google Consent Mode v2 for proper analytics handling. Our free cookie banner generator can help with step 1."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is a cookie scan the same as a privacy audit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A cookie scan is one component of a broader privacy audit. It focuses specifically on cookies and tracking technologies. A full privacy audit also covers data processing agreements, privacy policies, data retention practices, user rights fulfillment, and organizational security measures. However, a cookie scan is often the most actionable first step because it reveals concrete, fixable issues."
+        }
       }
     ]
-  }
-
-  const howToSchema = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    "name": "How to Scan Your Website for Cookies",
-    "description": "Use our free cookie scanner to audit your website cookies and check compliance with GDPR, CCPA, PIPEDA, and Law 25.",
-    "step": [
-      {
-        "@type": "HowToStep",
-        "position": 1,
-        "name": "Enter your website URL",
-        "text": "Type or paste your website URL into the cookie scanner input field. The scanner accepts any public website URL."
-      },
-      {
-        "@type": "HowToStep",
-        "position": 2,
-        "name": "Run the cookie scan",
-        "text": "Click the Scan Now button. The cookie scanning tool will load your website in a real browser environment and detect all cookies and tracking scripts."
-      },
-      {
-        "@type": "HowToStep",
-        "position": 3,
-        "name": "Review your cookie audit results",
-        "text": "Review the compliance report showing all detected cookies, their categories, security settings, and specific recommendations for GDPR, CCPA, PIPEDA, and Law 25 compliance."
-      }
-    ],
-    "totalTime": "PT30S"
   }
 
   const breadcrumbSchema = {
@@ -168,7 +172,6 @@ export default function CookieScannerPage() {
       {/* Static JSON-LD structured data for SEO - all content is hardcoded, no user input */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       <Header />
@@ -371,7 +374,8 @@ export default function CookieScannerPage() {
                   <CardContent>
                     <p className="text-muted-foreground">
                       Analyzes your cookies against{' '}
-                      <Link href="/compliance/gdpr" className="text-primary hover:underline">GDPR</Link>, PIPEDA, Law 25, and{' '}
+                      <Link href="/compliance/gdpr" className="text-primary hover:underline">GDPR</Link>,{' '}
+                      <Link href="/compliance/pipeda" className="text-primary hover:underline">PIPEDA</Link>, Law 25, and{' '}
                       <Link href="/compliance/ccpa" className="text-primary hover:underline">CCPA</Link>{' '}
                       requirements with specific, actionable recommendations.
                     </p>
@@ -430,8 +434,44 @@ export default function CookieScannerPage() {
           </div>
         </section>
 
-        {/* Why You Need a Website Cookie Scanner */}
+        {/* Cookie Types Explained */}
         <section className="py-12 md:py-16 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">
+                Cookie Types Explained: What the Scanner Detects
+              </h2>
+              <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
+                <p>
+                  Understanding what each cookie category means is essential for configuring your consent banner correctly. Here is what our <strong>cookie scanner</strong> looks for in each category:
+                </p>
+
+                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Strictly Necessary Cookies</h3>
+                <p>
+                  These cookies are essential for your website to function. They handle session management, authentication, shopping cart functionality, and security features. Under <Link href="/compliance/gdpr" className="text-primary hover:underline font-medium">GDPR</Link>, <Link href="/compliance/ccpa" className="text-primary hover:underline font-medium">CCPA</Link>, and <Link href="/compliance/pipeda" className="text-primary hover:underline font-medium">PIPEDA</Link>, strictly necessary cookies do not require user consent because the website cannot operate without them. Examples include session IDs, CSRF tokens, and load balancer cookies.
+                </p>
+
+                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Functional Cookies</h3>
+                <p>
+                  Functional cookies remember user preferences like language selection, theme (dark/light mode), and region settings. They improve the user experience but are not strictly required for the site to work. Most privacy laws require consent before setting functional cookies, though PIPEDA allows implied consent for non-sensitive functional cookies when clear notice is provided.
+                </p>
+
+                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Analytics Cookies</h3>
+                <p>
+                  Analytics cookies track how visitors interact with your website — page views, scroll depth, click patterns, and session duration. Google Analytics (_ga, _gid), Hotjar, Mixpanel, and similar tools use these cookies. Under GDPR, analytics cookies require explicit opt-in consent. Under CCPA, they generally do not trigger the &quot;Do Not Sell&quot; requirement unless the data is shared with third parties for cross-context advertising.
+                </p>
+
+                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Marketing &amp; Advertising Cookies</h3>
+                <p>
+                  Marketing cookies track users across websites to build advertising profiles. These include Facebook Pixel (_fbp), Google Ads (IDE, _gcl_*), and programmatic advertising cookies. Marketing cookies always require explicit opt-in consent under GDPR and trigger the &quot;Do Not Sell or Share&quot; disclosure under CCPA. These are typically the highest-risk cookies on any website and should be blocked by default until consent is granted.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why You Need a Website Cookie Scanner */}
+        <section className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">
@@ -646,6 +686,29 @@ export default function CookieScannerPage() {
                   <h3 className="text-lg font-semibold mb-3">Does the cookie scanner work with any website platform?</h3>
                   <p className="text-muted-foreground">
                     Yes, our cookie scanner works with any publicly accessible website — WordPress, Shopify, Wix, Squarespace, Webflow, custom-built sites, and any other web platform.
+                  </p>
+                </div>
+
+                <div className="border-2 rounded-xl p-6 bg-card">
+                  <h3 className="text-lg font-semibold mb-3">What is the difference between first-party and third-party cookies?</h3>
+                  <p className="text-muted-foreground">
+                    First-party cookies are set by your own domain and typically handle sessions, authentication, and user preferences. Third-party cookies are set by external services embedded on your site — like Google Analytics, Facebook Pixel, or advertising networks. Third-party cookies are more heavily regulated because they can track users across multiple websites.
+                  </p>
+                </div>
+
+                <div className="border-2 rounded-xl p-6 bg-card">
+                  <h3 className="text-lg font-semibold mb-3">How do I fix compliance issues found by the cookie scanner?</h3>
+                  <p className="text-muted-foreground">
+                    After identifying compliance issues: (1) install a{' '}
+                    <Link href="/free-cookie-banner-generator" className="text-primary hover:underline">cookie consent banner</Link>{' '}
+                    that blocks non-essential cookies until consent is given, (2) update your privacy policy to accurately list all cookies, (3) remove unnecessary tracking scripts, and (4) configure Google Consent Mode v2 for proper analytics handling.
+                  </p>
+                </div>
+
+                <div className="border-2 rounded-xl p-6 bg-card">
+                  <h3 className="text-lg font-semibold mb-3">Is a cookie scan the same as a privacy audit?</h3>
+                  <p className="text-muted-foreground">
+                    A cookie scan is one component of a broader privacy audit. It focuses specifically on cookies and tracking technologies. A full privacy audit also covers data processing agreements, privacy policies, data retention practices, and security measures. However, a cookie scan is often the most actionable first step because it reveals concrete, fixable issues.
                   </p>
                 </div>
               </div>
