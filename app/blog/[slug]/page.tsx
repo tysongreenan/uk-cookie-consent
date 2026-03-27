@@ -117,11 +117,21 @@ export default async function BlogPostPage({
       
       {/* FAQ Structured Data if available */}
       {post.schema && (
-        <StructuredData 
-          type="faq" 
-          data={post.schema.mainEntity || []} 
+        <StructuredData
+          type="faq"
+          data={post.schema.mainEntity || []}
         />
       )}
+
+      {/* Breadcrumb Structured Data */}
+      <StructuredData
+        type="breadcrumb"
+        data={[
+          { name: 'Home', url: 'https://www.cookie-banner.ca' },
+          { name: 'Blog', url: 'https://www.cookie-banner.ca/blog' },
+          { name: post.title, url: `https://www.cookie-banner.ca/blog/${post.slug}` },
+        ]}
+      />
 
       <div className="min-h-screen bg-background relative">
         <HashScrollHandler />

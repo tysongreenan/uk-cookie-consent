@@ -166,6 +166,14 @@ function FAQItem({ item, index }: { item: typeof faqData[0]; index: number }) {
 export default function GDPRCompliancePage() {
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData
+        type="breadcrumb"
+        data={[
+          { name: 'Home', url: 'https://www.cookie-banner.ca' },
+          { name: 'Compliance', url: 'https://www.cookie-banner.ca/compliance' },
+          { name: 'GDPR Compliance', url: 'https://www.cookie-banner.ca/compliance/gdpr' },
+        ]}
+      />
       <Header />
       <main>
         {/* Hero Section */}

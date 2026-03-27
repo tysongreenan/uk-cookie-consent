@@ -97,6 +97,14 @@ export default function CookiebotAlternativePage() {
         }}
       />
       <StructuredData type="faq" data={faqData} />
+      <StructuredData
+        type="breadcrumb"
+        data={[
+          { name: 'Home', url: 'https://www.cookie-banner.ca' },
+          { name: 'Compare', url: 'https://www.cookie-banner.ca/compare' },
+          { name: 'Cookiebot Alternative', url: 'https://www.cookie-banner.ca/compare/cookiebot-alternative' },
+        ]}
+      />
 
       <Header />
 
