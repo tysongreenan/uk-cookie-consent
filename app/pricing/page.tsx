@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Crown, Star, Shield } from 'lucide-react'
+import { Check, Zap, Crown, Star, Shield, Lock, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -80,32 +80,75 @@ export default function PricingPage() {
               <CardDescription>Everything today, yours forever</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Included features */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Locked in today. Yours forever.</p>
+                <ul className="space-y-3">
+                  {[
+                    '14 Layouts Including Modal & Slide-In',
+                    'Remove "Powered by" Branding',
+                    'Unlimited Banners',
+                    'GA4 Analytics Integration',
+                    'Analytics Dashboard & Insights',
+                    'Upload Your Logo & Images',
+                    'Geo-Targeting (Quebec Law 25)',
+                    'Invite Unlimited Team Members',
+                    'Priority Email Support',
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-dashed border-muted-foreground/25" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-card px-3 text-xs font-medium text-muted-foreground/60 uppercase tracking-wider">
+                    Coming Soon — Annual Only
+                  </span>
+                </div>
+              </div>
+
+              {/* Locked future features */}
               <ul className="space-y-3">
                 {[
-                  'Unlimited Banners',
-                  'Remove "Powered by" Branding',
-                  'GA4 Analytics Integration',
-                  '14 Layouts Including Modal & Slide-In',
-                  'Analytics Dashboard & Insights',
-                  'Upload Your Logo & Images',
-                  'Invite Unlimited Team Members',
-                  'Geo-Targeting (Quebec Law 25)',
-                  'Priority Email Support',
-                  'Current Features — Frozen at Purchase',
+                  'Consent Logs & DSAR Proof',
+                  'A/B Testing for Banners',
+                  'Google CMP Certification',
+                  'Multi-Language Auto-Detection',
+                  'Shopify & WordPress Plugins',
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                    <span>{feature}</span>
+                  <li key={i} className="flex items-start gap-3 text-sm opacity-40">
+                    <Lock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}
               </ul>
+
+              {/* Upsell nudge */}
+              <p className="text-xs text-center text-muted-foreground/70 flex items-center justify-center gap-1">
+                Want these features?
+                <Link
+                  href="/upgrade?billing=annual"
+                  className="text-primary hover:underline font-medium inline-flex items-center gap-0.5"
+                >
+                  Go Annual <ArrowRight className="w-3 h-3" />
+                </Link>
+              </p>
+
               <Button size="lg" className="w-full" asChild>
                 <Link href="/upgrade?billing=one_time">
                   Buy Pro — $99
                 </Link>
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                Security patches included forever. New features require annual plan.
+                Security patches included forever.
               </p>
             </CardContent>
           </Card>
@@ -128,20 +171,20 @@ export default function PricingPage() {
                 <span className="text-4xl font-bold">$99</span>
                 <span className="text-muted-foreground ml-1">/year</span>
               </div>
-              <CardDescription>Always up to date, always covered</CardDescription>
+              <CardDescription>Every new feature, the day we ship it</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* All current features */}
               <ul className="space-y-3">
                 {[
-                  'Every New Feature, the Day We Ship It',
-                  'Unlimited Banners',
-                  'Remove "Powered by" Branding',
-                  'GA4 Analytics Integration',
                   '14 Layouts Including Modal & Slide-In',
+                  'Remove "Powered by" Branding',
+                  'Unlimited Banners',
+                  'GA4 Analytics Integration',
                   'Analytics Dashboard & Insights',
                   'Upload Your Logo & Images',
-                  'Invite Unlimited Team Members',
                   'Geo-Targeting (Quebec Law 25)',
+                  'Invite Unlimited Team Members',
                   'Priority Email Support',
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm">
@@ -150,6 +193,35 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
+
+              {/* Divider — upcoming features included */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-primary/30" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-card px-3 text-xs font-medium text-primary uppercase tracking-wider">
+                    Plus Everything Coming Next
+                  </span>
+                </div>
+              </div>
+
+              {/* Future features — included */}
+              <ul className="space-y-3">
+                {[
+                  'Consent Logs & DSAR Proof',
+                  'A/B Testing for Banners',
+                  'Google CMP Certification',
+                  'Multi-Language Auto-Detection',
+                  'Shopify & WordPress Plugins',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
               <Button size="lg" className="w-full" asChild>
                 <Link href="/upgrade?billing=annual">
                   Upgrade to Pro Annual
