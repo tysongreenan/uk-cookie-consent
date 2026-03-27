@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, XCircle, Loader2, Users, Calendar, Shield } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { CheckCircle, XCircle, Loader2, Users, Calendar, Shield, LogIn, AlertTriangle } from 'lucide-react'
 
 interface InvitationData {
   id: string
@@ -29,12 +31,18 @@ interface InvitationData {
 }
 
 export default function InvitePage({ params }: { params: { token: string } }) {
+  const { data: session, status: sessionStatus } = useSession()
   const [invitation, setInvitation] = useState<InvitationData | null>(null)
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [emailMismatch, setEmailMismatch] = useState(false)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+
+  const callbackUrl = encodeURIComponent(`/invite/${params.token}`)
+  const isAuthenticated = sessionStatus === 'authenticated'
+  const isAuthLoading = sessionStatus === 'loading'
 
   useEffect(() => {
     const fetchInvitation = async () => {
@@ -59,19 +67,21 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
   const handleAcceptInvitation = async () => {
     setAccepting(true)
+    setEmailMismatch(false)
     try {
       const response = await fetch(`/api/invitations/${params.token}/accept`, {
         method: 'POST'
       })
       const data = await response.json()
 
-    if (data.success) {
-      setSuccess(true)
-      // Redirect to dashboard after 3 seconds to show success message
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 3000)
-    } else {
+      if (data.success) {
+        setSuccess(true)
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 3000)
+      } else if (data.emailMismatch) {
+        setEmailMismatch(true)
+      } else {
         setError(data.error || 'Failed to accept invitation')
       }
     } catch (err) {
@@ -79,6 +89,17 @@ export default function InvitePage({ params }: { params: { token: string } }) {
     } finally {
       setAccepting(false)
     }
+  }
+
+  const handleSignOutAndRetry = async () => {
+    await signOut({ callbackUrl: `/invite/${params.token}` })
+  }
+
+  const maskEmail = (email: string) => {
+    const [local, domain] = email.split('@')
+    if (!domain) return email
+    const visible = local.slice(0, 2)
+    return `${visible}${'*'.repeat(Math.max(local.length - 2, 1))}@${domain}`
   }
 
   const formatDate = (dateString: string) => {
@@ -91,7 +112,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
   const isExpired = invitation && new Date(invitation.expires_at) < new Date()
 
-  if (loading) {
+  if (loading || isAuthLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -108,7 +129,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-xl">Invitation Not Found</CardTitle>
+            <CardTitle className="text-xl">Something Went Wrong</CardTitle>
             <CardDescription>{error}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -129,9 +150,15 @@ export default function InvitePage({ params }: { params: { token: string } }) {
             <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
             <CardTitle className="text-xl">Welcome to the Team!</CardTitle>
             <CardDescription>
-              You've successfully joined the workspace. You can switch to this workspace using the workspace switcher in the dashboard header.
+              You&apos;ve successfully joined the workspace. You can switch to this workspace using the workspace switcher in the dashboard header.
             </CardDescription>
           </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/dashboard')} className="w-full">
+              Go to Dashboard
+            </Button>
+            <p className="text-xs text-gray-400 text-center mt-2">Redirecting automatically...</p>
+          </CardContent>
         </Card>
       </div>
     )
@@ -163,7 +190,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
           <Users className="h-12 w-12 text-blue-500 mx-auto mb-4" />
           <CardTitle className="text-2xl">Workspace Invitation</CardTitle>
           <CardDescription>
-            You've been invited to join a workspace
+            You&apos;ve been invited to join a workspace
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -190,14 +217,21 @@ export default function InvitePage({ params }: { params: { token: string } }) {
             )}
           </div>
 
-          {/* Status */}
-          <div className="flex items-center gap-2 text-sm">
-            <Shield className="h-4 w-4" />
-            <span>Status: </span>
-            <Badge variant={invitation.status === 'pending' ? 'default' : 'secondary'}>
-              {invitation.status}
-            </Badge>
-          </div>
+          {/* Email mismatch warning — shown inline, not a dead end */}
+          {emailMismatch && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <p className="mb-2">
+                  This invitation was sent to <strong>{maskEmail(invitation.email)}</strong>.
+                  You&apos;re currently signed in as <strong>{session?.user?.email}</strong>.
+                </p>
+                <p className="text-sm">
+                  Please sign in with the email address that received this invitation.
+                </p>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Actions */}
           <div className="space-y-3">
@@ -215,10 +249,47 @@ export default function InvitePage({ params }: { params: { token: string } }) {
                   Go to Homepage
                 </Button>
               </div>
+            ) : emailMismatch ? (
+              <div className="space-y-3">
+                <Button
+                  onClick={handleSignOutAndRetry}
+                  className="w-full"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In with a Different Account
+                </Button>
+                <Button
+                  onClick={() => router.push('/')}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Go to Homepage
+                </Button>
+              </div>
+            ) : !isAuthenticated ? (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600 text-center">
+                  You need to sign in to accept this invitation.
+                </p>
+                <Button
+                  onClick={() => router.push(`/auth/signin?callbackUrl=${callbackUrl}`)}
+                  className="w-full"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In to Accept
+                </Button>
+                <Button
+                  onClick={() => router.push(`/auth/signup?callbackUrl=${callbackUrl}`)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Create an Account
+                </Button>
+              </div>
             ) : (
               <div className="space-y-3">
-                <Button 
-                  onClick={handleAcceptInvitation} 
+                <Button
+                  onClick={handleAcceptInvitation}
                   disabled={accepting}
                   className="w-full"
                 >
@@ -231,12 +302,12 @@ export default function InvitePage({ params }: { params: { token: string } }) {
                     'Accept Invitation'
                   )}
                 </Button>
-                <Button 
-                  onClick={() => router.push('/')} 
-                  variant="outline" 
+                <Button
+                  onClick={() => router.push('/')}
+                  variant="outline"
                   className="w-full"
                 >
-                  Decline
+                  Not Now
                 </Button>
               </div>
             )}
@@ -244,7 +315,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
           {/* Info */}
           <div className="text-xs text-gray-500 text-center">
-            By accepting this invitation, you'll gain access to collaborate on banners and projects in this workspace.
+            By accepting this invitation, you&apos;ll gain access to collaborate on banners and projects in this workspace.
           </div>
         </CardContent>
       </Card>

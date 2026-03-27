@@ -183,9 +183,21 @@ export function TeamSettings() {
     }
   }
 
-  const copyInviteLink = (link: string) => {
-    navigator.clipboard.writeText(link)
-    toast.success('Invite link copied to clipboard')
+  const copyInviteLink = async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link)
+      toast.success('Invite link copied to clipboard')
+    } catch (error) {
+      console.error('Error copying to clipboard:', error)
+      toast.error('Failed to copy invite link')
+    }
+  }
+
+  const handleCancelInvitationWithConfirm = async (invitationId: string, email: string) => {
+    if (!confirm(`Are you sure you want to cancel the invitation for ${email}?`)) {
+      return
+    }
+    handleCancelInvitation(invitationId)
   }
 
   const getRoleIcon = (role: string) => {
@@ -368,24 +380,37 @@ export function TeamSettings() {
       </Card>
 
       {/* Pending Invitations */}
-      {pendingInvitations.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Invitations</CardTitle>
-            <CardDescription>
-              Invitations that haven't been accepted yet
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Pending Invitations</CardTitle>
+          <CardDescription>
+            Invitations that haven&apos;t been accepted yet
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {pendingInvitations.length === 0 ? (
+            <div className="text-center py-6 text-gray-500">
+              <UserPlus className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm">No pending invitations</p>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => setShowInviteModal(true)}
+                className="mt-1"
+              >
+                Invite someone to your workspace
+              </Button>
+            </div>
+          ) : (
             <div className="space-y-4">
               {pendingInvitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <div key={invitation.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-3">
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <UserPlus className="h-5 w-5 text-gray-600" />
                     </div>
-                    <div>
-                      <p className="font-medium">{invitation.email}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{invitation.email}</p>
                       <p className="text-sm text-gray-600">
                         Invited {new Date(invitation.created_at).toLocaleDateString()}
                       </p>
@@ -394,7 +419,7 @@ export function TeamSettings() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center flex-wrap gap-2 sm:flex-nowrap">
                     <Badge className={getStatusBadgeColor(invitation.status)}>
                       {getStatusIcon(invitation.status)}
                       <span className="ml-1">{invitation.status}</span>
@@ -407,13 +432,15 @@ export function TeamSettings() {
                       variant="ghost"
                       size="sm"
                       onClick={() => copyInviteLink(invitation.invite_link)}
+                      aria-label={`Copy invite link for ${invitation.email}`}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleCancelInvitation(invitation.id)}
+                      onClick={() => handleCancelInvitationWithConfirm(invitation.id, invitation.email)}
+                      aria-label={`Cancel invitation for ${invitation.email}`}
                     >
                       <XCircle className="h-4 w-4" />
                     </Button>
@@ -421,9 +448,9 @@ export function TeamSettings() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
 
       {/* Invite Modal */}
       {showInviteModal && (

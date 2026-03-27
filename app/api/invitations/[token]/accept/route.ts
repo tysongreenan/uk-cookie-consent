@@ -59,6 +59,19 @@ export async function POST(
       )
     }
 
+    // Verify the logged-in user's email matches the invitation email
+    const userEmail = session.user.email?.toLowerCase()
+    const inviteEmail = invitation.email?.toLowerCase()
+    if (!userEmail || !inviteEmail || userEmail !== inviteEmail) {
+      return NextResponse.json(
+        {
+          error: 'This invitation was sent to a different email address. Please sign in with the correct account.',
+          emailMismatch: true
+        },
+        { status: 403 }
+      )
+    }
+
     // Check if user is already a member of this team
     const { data: existingMember } = await supabase
       .from('TeamMember')
@@ -70,6 +83,26 @@ export async function POST(
     if (existingMember) {
       return NextResponse.json(
         { error: 'You are already a member of this workspace' },
+        { status: 400 }
+      )
+    }
+
+    // Atomically claim the invitation to prevent race conditions
+    // Only proceeds if status is still 'pending'
+    const { data: claimed, error: claimError } = await supabase
+      .from('TeamInvitation')
+      .update({
+        status: 'accepted',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', invitation.id)
+      .eq('status', 'pending')
+      .select('id')
+      .single()
+
+    if (claimError || !claimed) {
+      return NextResponse.json(
+        { error: 'Invitation has already been processed' },
         { status: 400 }
       )
     }
@@ -89,25 +122,17 @@ export async function POST(
       })
 
     if (memberError) {
+      // Roll back invitation status if member insert fails
+      await supabase
+        .from('TeamInvitation')
+        .update({ status: 'pending', updated_at: new Date().toISOString() })
+        .eq('id', invitation.id)
+
       console.error('Error adding user to team:', memberError)
       return NextResponse.json(
         { error: 'Failed to join workspace' },
         { status: 500 }
       )
-    }
-
-    // Update invitation status
-    const { error: updateError } = await supabase
-      .from('TeamInvitation')
-      .update({ 
-        status: 'accepted',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', invitation.id)
-
-    if (updateError) {
-      console.error('Error updating invitation status:', updateError)
-      // Don't fail the request for this
     }
 
     // Don't auto-switch user's current workspace

@@ -152,7 +152,7 @@ export async function getTeamMembers(teamId: string) {
         role,
         joined_at,
         created_at,
-        User!inner(
+        User(
           id,
           name,
           email,
@@ -195,7 +195,7 @@ export async function getTeamInvitations(teamId: string) {
         status,
         expires_at,
         created_at,
-        User!inner(
+        User(
           id,
           name,
           email

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,15 +16,16 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Copy, 
-  CheckCircle, 
-  XCircle, 
-  Shield, 
-  Edit, 
+import {
+  Copy,
+  CheckCircle,
+  XCircle,
+  Shield,
+  Edit,
   Eye,
   Send,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Loader2
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { TeamRole } from '@/types'
@@ -43,6 +44,17 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
   const [loading, setLoading] = useState(false)
   const [inviteLink, setInviteLink] = useState('')
   const [inviteSent, setInviteSent] = useState(false)
+
+  // Reset state when modal reopens
+  useEffect(() => {
+    if (open) {
+      setEmail('')
+      setRole('editor')
+      setInviteLink('')
+      setInviteSent(false)
+      setLoading(false)
+    }
+  }, [open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -171,6 +183,7 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
                   variant="outline"
                   size="sm"
                   onClick={copyInviteLink}
+                  aria-label="Copy invite link"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -180,15 +193,10 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
               </p>
             </div>
 
-            <div className="flex space-x-2">
-              <Button onClick={onSuccess} className="flex-1">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Done
-              </Button>
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-            </div>
+            <Button onClick={onSuccess} className="w-full">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Done
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -224,7 +232,7 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
             <Select value={role} onValueChange={(value: Exclude<TeamRole, 'owner'>) => setRole(value)}>
-              <SelectTrigger>
+              <SelectTrigger id="role">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -273,7 +281,7 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Creating...
                 </>
               ) : (

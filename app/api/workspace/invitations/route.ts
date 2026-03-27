@@ -22,11 +22,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, role = 'editor', sendEmail = true } = body
+    const { email, role = 'editor' } = body
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
         { error: 'Valid email address is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate role — only allow non-owner roles
+    const VALID_INVITE_ROLES = ['admin', 'editor', 'viewer']
+    if (!VALID_INVITE_ROLES.includes(role)) {
+      return NextResponse.json(
+        { error: 'Invalid role. Must be admin, editor, or viewer.' },
         { status: 400 }
       )
     }
@@ -62,9 +71,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check workspace member limit (max 5 people)
-    const { data: memberCount, error: countError } = await supabase
+    const { count: memberTotal, error: countError } = await supabase
       .from('TeamMember')
-      .select('id', { count: 'exact' })
+      .select('*', { count: 'exact', head: true })
       .eq('team_id', teamId)
 
     if (countError) {
@@ -75,11 +84,56 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (memberCount && memberCount.length >= 5) {
+    if (memberTotal != null && memberTotal >= 5) {
       return NextResponse.json(
         { error: 'Workspace is at capacity (maximum 5 members). Upgrade to invite more collaborators.' },
         { status: 400 }
       )
+    }
+
+    // Check if the invitee is already a member of this workspace (by email)
+    const normalizedEmail = email.trim().toLowerCase()
+    const { data: existingMember } = await supabase
+      .from('TeamMember')
+      .select('id, User!inner(email)')
+      .eq('team_id', teamId)
+      .eq('User.email', normalizedEmail)
+      .single()
+
+    if (existingMember) {
+      return NextResponse.json(
+        { error: 'This person is already a member of your workspace.' },
+        { status: 400 }
+      )
+    }
+
+    // Check for existing pending invitation for this email in this team
+    const { data: existingInvite } = await supabase
+      .from('TeamInvitation')
+      .select('id, token, expires_at')
+      .eq('team_id', teamId)
+      .eq('email', normalizedEmail)
+      .eq('status', 'pending')
+      .gt('expires_at', new Date().toISOString())
+      .single()
+
+    if (existingInvite) {
+      // Return the existing invite link instead of creating a duplicate
+      const baseUrl = request.headers.get('origin') ||
+                     process.env.NEXT_PUBLIC_BASE_URL ||
+                     process.env.NEXTAUTH_URL ||
+                     'http://localhost:3000'
+      const inviteLink = `${baseUrl}/invite/${existingInvite.token}`
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          invitation: existingInvite,
+          inviteLink,
+          shareableLink: inviteLink
+        },
+        message: 'A pending invitation already exists for this email. Here is the existing invite link.'
+      }, { status: 200 })
     }
 
     // Create invitation record
@@ -88,7 +142,7 @@ export async function POST(request: NextRequest) {
       .insert({
         id: crypto.randomUUID(),
         team_id: teamId,
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         role,
         token,
         invited_by: session.user.id,
@@ -113,8 +167,6 @@ export async function POST(request: NextRequest) {
                    'http://localhost:3000'
     const inviteLink = `${baseUrl}/invite/${token}`
     
-    console.log('Generated invite link:', inviteLink) // Debug log
-
     return NextResponse.json({
       success: true,
       data: {
