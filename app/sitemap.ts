@@ -176,6 +176,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/free-cookie-banner`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/solutions`,
       lastModified: now,
       changeFrequency: 'monthly',
@@ -269,6 +275,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
+  // Priority 0.7 - Location pages
+  const locationPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/locations/canada`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/locations/eu`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/locations/us`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/locations/uk`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+  ]
+
   // Priority 0.5 - Legal/Supporting pages
   const legalPages: MetadataRoute.Sitemap = [
     {
@@ -314,6 +348,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...importantPages,
     ...integrationPages,
     ...solutionPages,
+    ...locationPages,
     ...blogPosts,
     ...legalPages,
   ]

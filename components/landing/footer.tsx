@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, Github } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -33,22 +32,22 @@ export function Footer() {
             <h3 className="text-sm font-semibold mb-4">Product & Tools</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/dashboard" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Dashboard
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/builder" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/dashboard/builder" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Banner Builder
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/analytics" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/dashboard/analytics" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Analytics
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard/integrations" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/dashboard/integrations" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Integrations
                 </Link>
               </li>
@@ -58,7 +57,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/demo" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/demo" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Live Demo
                 </Link>
               </li>
@@ -231,7 +230,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/upgrade" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/upgrade" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Upgrade
                 </Link>
               </li>
@@ -239,31 +238,9 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Social Media & Separator */}
+        {/* Separator */}
         <div className="mb-8">
-          <div className="h-px bg-border mb-6"></div>
-          <div className="flex justify-end">
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Youtube className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
+          <div className="h-px bg-border"></div>
         </div>
 
         {/* Bottom Section */}
