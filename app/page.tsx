@@ -14,33 +14,32 @@ import { ProductDescription } from '@/components/landing/product-description'
 import { ABTracker } from '@/components/ab-tracker'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
-  description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
+  title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
+  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
   keywords: [
     'cookie banner generator',
-    'cookie banner generator free',
+    'cookie banner Canada',
+    'PIPEDA cookie banner',
+    'law 25 cookie banner',
     'free cookie banner generator',
-    'cookie banner',
+    'cookie banner generator free',
     'cookie consent banner',
     'cookie consent banner generator',
     'cookie banner for website',
     'GDPR cookie banner',
-    'PIPEDA cookie banner',
     'CCPA cookie banner',
-    'law 25 cookie banner',
     'cookie banner WordPress',
     'cookie banner Shopify',
     'cookie banner Webflow',
     'free cookie consent banner',
     'free cookie banner',
-    'cookie banner Canada',
     'cookie banners',
     'cookie consent',
     'custom cookie banner',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator — GDPR Compliant (2026)',
-    description: 'Create a free cookie consent banner in 2 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Works on any site. No code needed.',
+    title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
+    description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site. No code needed.',
     type: 'website',
   },
   alternates: {
@@ -66,7 +65,7 @@ export default function HomePage() {
             text: "Used by 1,000+ websites",
           }}
           title="Free Cookie Banner Generator"
-          title2="GDPR, PIPEDA & Law 25 Compliant"
+          title2="PIPEDA, Law 25 & GDPR Compliant"
           description="Generate cookie consent banners in 5 minutes. Match your brand. Works on any platform. Free plan available — upgrade to Pro for $99 one-time."
           emailCapture={true}
           useGeometricBackground={true}

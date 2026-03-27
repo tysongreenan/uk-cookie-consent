@@ -13,6 +13,9 @@ import { getAllPosts } from '@/lib/blog/blog'
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
+  // Use a fixed date for static pages so crawlers don't re-crawl unchanged content.
+  // Update this date when you actually modify these pages.
+  const staticDate = new Date('2026-03-27')
   const now = new Date()
 
   // Priority 1.0 - Homepage (most important)
@@ -29,61 +32,61 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const highPriorityPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/pricing`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/integrations`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/compliance`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/features/will-this-keep-me-compliant`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/features/privacy-laws`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/features/how-it-works`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/features/what-you-get`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/compliance/gdpr`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/compliance/pipeda`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/compliance/ccpa`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
@@ -93,7 +96,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const importantPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/about`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
@@ -105,31 +108,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/tools/cookie-scanner`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/tools`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/compare/cookiebot-alternative`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/support`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/docs`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
@@ -141,49 +144,49 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/webflow-cookie-consent-free`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/ccpa-cookie-banner`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/law-25-cookie-banner`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/free-cookie-banner-generator`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/cookie-banner-text-generator`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/cookie-policy-template`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/free-cookie-banner`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/solutions`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
@@ -193,49 +196,49 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const integrationPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/integrations/wordpress`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/shopify`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/webflow`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/google-tag-manager`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/squarespace`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/wix`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/react`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/integrations/brizy`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
@@ -245,31 +248,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const solutionPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/solutions/ecommerce`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/solutions/saas`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/solutions/healthcare`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/solutions/finance`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/solutions/education`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
@@ -279,25 +282,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const locationPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/locations/canada`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/locations/eu`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/locations/us`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/locations/uk`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
@@ -307,13 +310,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const legalPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/privacy`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },

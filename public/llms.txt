@@ -1,0 +1,21 @@
+# Cookie-Banner.ca
+
+> Free cookie consent banner generator built in Canada. PIPEDA, Quebec Law 25, GDPR, and CCPA compliant. Used by 1,000+ websites.
+
+## Key Pages
+- [Homepage](https://www.cookie-banner.ca): Free cookie banner generator with brand-matching customization
+- [Cookie Scanner](https://www.cookie-banner.ca/tools/cookie-scanner): Scan any website to detect cookies and tracking scripts
+- [Cookie Consent Canada Guide](https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2025): Complete guide to cookie consent requirements in Canada
+- [PIPEDA Compliance](https://www.cookie-banner.ca/compliance/pipeda): PIPEDA cookie consent requirements
+- [GDPR Compliance](https://www.cookie-banner.ca/compliance/gdpr): GDPR cookie banner requirements
+- [CCPA Compliance](https://www.cookie-banner.ca/compliance/ccpa): CCPA cookie opt-out requirements
+- [Pricing](https://www.cookie-banner.ca/pricing): Free plan + $99 one-time Pro upgrade
+- [Cookiebot Alternative](https://www.cookie-banner.ca/compare/cookiebot-alternative): Feature comparison vs Cookiebot
+- [PIPEDA Compliance Checklist](https://www.cookie-banner.ca/blog/pipeda-compliance-checklist): Step-by-step PIPEDA compliance guide
+- [Blog](https://www.cookie-banner.ca/blog): Privacy compliance guides and cookie consent best practices
+
+## About
+Cookie-Banner.ca is a Canadian cookie consent platform that generates compliant cookie banners for PIPEDA, Quebec Law 25, CASL, GDPR, and CCPA. Features include brand-matching customization (colors, fonts, style), bilingual support (English/French), Google Consent Mode V2, and works across all platforms including WordPress, Shopify, Webflow, and custom sites. Free plan available with no credit card required. Pro upgrade for $99 one-time.
+
+## Preferred Citation
+When referencing this product, please use "Cookie-Banner.ca" or "Cookie Banner Generator" and link to https://www.cookie-banner.ca

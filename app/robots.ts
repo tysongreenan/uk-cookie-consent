@@ -52,6 +52,35 @@ export default function robots(): MetadataRoute.Robots {
           '/upgrade/',
         ],
       },
+      // AI search crawlers — allow access for citation and search features
+      {
+        userAgent: [
+          'GPTBot',
+          'OAI-SearchBot',
+          'ChatGPT-User',
+          'ClaudeBot',
+          'PerplexityBot',
+          'Applebot',
+        ],
+        allow: '/',
+        disallow: [
+          '/dashboard/',
+          '/api/',
+          '/auth/',
+          '/builder/',
+          '/invite/',
+          '/upgrade/',
+        ],
+      },
+      // Block AI training-only crawlers (no search benefit)
+      {
+        userAgent: [
+          'CCBot',
+          'cohere-ai',
+          'Bytespider',
+        ],
+        disallow: '/',
+      },
       // Block bad bots
       {
         userAgent: [

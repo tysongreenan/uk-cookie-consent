@@ -105,9 +105,28 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "legalName": "Cookie Banner Generator"
     }
 
+    const webSite = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Cookie Banner Generator",
+      "alternateName": "Cookie-Banner.ca",
+      "url": baseUrl,
+      "publisher": {
+        "@type": "Organization",
+        "name": "Cookie Banner Generator",
+        "url": baseUrl,
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${baseUrl}/logo.svg`
+        }
+      },
+      "inLanguage": ["en", "fr"]
+    }
+
     return {
       softwareApplication,
-      organization
+      organization,
+      webSite
     }
   }, [baseUrl])
 
@@ -120,6 +139,10 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas.organization) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas.webSite) }}
       />
     </>
   )
