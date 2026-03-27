@@ -16,6 +16,7 @@ const PRO_FEATURES_BASE: Omit<PlanFeatures, 'tier' | 'includesNewFeatures' | 'su
   hasGpcConfig: true,
   hasGpcAnalytics: true,
   hasDataAccessRequests: true,
+  hasConsentLogs: true,
   maxTeamMembers: 'unlimited',
 }
 
@@ -35,6 +36,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasGpcConfig: false,
     hasGpcAnalytics: false,
     hasDataAccessRequests: false,
+    hasConsentLogs: false,
     includesNewFeatures: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
@@ -106,6 +108,8 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasGpcAnalytics
     case 'hasDataAccessRequests':
       return features.hasDataAccessRequests
+    case 'hasConsentLogs':
+      return features.hasConsentLogs
     case 'includesNewFeatures':
       return features.includesNewFeatures
     case 'maxWebsites':
@@ -129,9 +133,7 @@ export const FEATURE_CUTOFF_DATE = new Date('2026-04-01')
  *  All existing features pre-date the cutoff so they're available to everyone.
  *  Add new features here as they ship. */
 export const FEATURE_RELEASE_DATES: Record<string, Date> = {
-  // Example (uncomment when shipping):
-  // 'hasAdvancedABTesting': new Date('2026-05-15'),
-  // 'hasWhiteLabel': new Date('2026-06-01'),
+  'hasConsentLogs': new Date('2026-04-15'),
 }
 
 /** Check feature access considering the lifetime freeze date.

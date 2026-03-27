@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
+import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 // NOTE: In-memory banner cache removed intentionally.
 // On Vercel serverless, each instance has its own memory — invalidating cache
 // on one instance doesn't clear others, causing stale banners after updates.
@@ -193,15 +195,19 @@ export async function GET(request: NextRequest) {
 
     // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'
+    let ownerFeatureFreezeDate: string | null = null
     const bannerUserId = banner.userId || null
     if (bannerUserId) {
       const { data: bannerOwner } = await supabase
         .from('User')
-        .select('planTier')
+        .select('planTier, featureFreezeDate')
         .eq('id', bannerUserId)
         .single()
       if (bannerOwner?.planTier) {
         ownerPlanTier = bannerOwner.planTier
+      }
+      if (bannerOwner?.featureFreezeDate) {
+        ownerFeatureFreezeDate = bannerOwner.featureFreezeDate
       }
     }
 
@@ -356,6 +362,89 @@ export async function GET(request: NextRequest) {
   }
 `
 
+    // Check if consent logging is enabled for this banner owner
+    const hasConsentLogs = canAccessFeatureWithFreeze(
+      ownerPlanTier as PlanTier,
+      'hasConsentLogs',
+      ownerFeatureFreezeDate
+    )
+
+    const consentLoggingJs = hasConsentLogs ? `
+  // Consent Logging
+  var _cbConsentLogUrl = ${JSON.stringify(baseUrl + '/api/v1/consent-log')};
+  var _cbConsentLogUserId = ${JSON.stringify(bannerUserId || '')};
+  var _cbConsentLogBannerId = ${JSON.stringify(bannerId)};
+  var _cbConsentLogCountry = ${JSON.stringify(visitorCountry || 'unknown')};
+
+  function _cbGenerateUUID() {
+    // UUID v4 using crypto.getRandomValues
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 1
+    var hex = [];
+    for (var i = 0; i < 16; i++) {
+      hex.push(('0' + bytes[i].toString(16)).slice(-2));
+    }
+    return hex[0]+hex[1]+hex[2]+hex[3]+'-'+hex[4]+hex[5]+'-'+hex[6]+hex[7]+'-'+hex[8]+hex[9]+'-'+hex[10]+hex[11]+hex[12]+hex[13]+hex[14]+hex[15];
+  }
+
+  function _cbHashSHA256(str) {
+    var encoder = new TextEncoder();
+    var data = encoder.encode(str);
+    return crypto.subtle.digest('SHA-256', data).then(function(buffer) {
+      var bytes = new Uint8Array(buffer);
+      var hex = [];
+      for (var i = 0; i < bytes.length; i++) {
+        hex.push(('0' + bytes[i].toString(16)).slice(-2));
+      }
+      return hex.join('');
+    });
+  }
+
+  function _cbSendConsentLog(decision, categories) {
+    if (!_cbConsentLogUserId || !_cbConsentLogBannerId) return;
+
+    var consentId = _cbGenerateUUID();
+
+    // Read the cookie_consent cookie value for hashing
+    var cookieMatch = document.cookie.match(/(^|; )cookie_consent=([^;]*)/);
+    var cookieValue = cookieMatch ? decodeURIComponent(cookieMatch[2]) : consentId;
+
+    _cbHashSHA256(cookieValue).then(function(hashedCookieId) {
+      var payload = JSON.stringify({
+        userId: _cbConsentLogUserId,
+        bannerId: _cbConsentLogBannerId,
+        consentId: consentId,
+        hashedCookieId: hashedCookieId,
+        decision: decision,
+        categories: categories,
+        country: _cbConsentLogCountry,
+        pagePath: location.pathname.slice(0, 200)
+      });
+
+      console.log('[CookieBanner] Your consent reference:', consentId);
+
+      try {
+        var sent = false;
+        if (navigator.sendBeacon) {
+          sent = navigator.sendBeacon(_cbConsentLogUrl, new Blob([payload], { type: 'application/json' }));
+        }
+        if (!sent) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', _cbConsentLogUrl, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(payload);
+        }
+      } catch(e) {
+        console.error('[CookieBanner] Failed to send consent log:', e);
+      }
+    }).catch(function(e) {
+      console.error('[CookieBanner] Failed to hash cookie ID:', e);
+    });
+  }
+` : ''
+
     // Combine into a single executable script
     const combinedScript = `
 (function() {
@@ -364,6 +453,9 @@ export async function GET(request: NextRequest) {
 
   // 1b. Internal Analytics
   ${internalAnalyticsJs}
+
+  // 1c. Consent Logging
+  ${consentLoggingJs}
 
   // 2. Inject CSS
   var style = document.createElement('style');
@@ -377,14 +469,24 @@ export async function GET(request: NextRequest) {
   // Hook into trackConsentEvent for internal analytics
   // This runs before the banner JS defines trackConsentEvent, so we
   // set up a global hook that the banner JS will call
-  function _cbInternalTrack(action) {
+  function _cbInternalTrack(action, consentCategories) {
     if (action === 'impression') {
       _cbBannerShownAt = Date.now();
       var isReturning = document.cookie.indexOf('cookie_consent=') !== -1;
       _cbQueueEvent('impression', { isReturning: isReturning });
-    } else if (action === 'accept' || action === 'reject' || action === 'dismiss') {
+    } else if (action === 'accept' || action === 'reject' || action === 'dismiss' || action === 'custom') {
       var decisionTime = _cbBannerShownAt > 0 ? Date.now() - _cbBannerShownAt : null;
       _cbQueueEvent(action, { decisionTime: decisionTime });
+
+      // Consent logging (only for accept/reject/custom, not dismiss)
+      if (action !== 'dismiss' && typeof _cbSendConsentLog === 'function') {
+        var cats = consentCategories || {};
+        _cbSendConsentLog(action, {
+          analytics: !!cats.analytics,
+          marketing: !!cats.marketing,
+          functionality: !!cats.functionality
+        });
+      }
     }
   }
 

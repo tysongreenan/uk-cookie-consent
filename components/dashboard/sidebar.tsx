@@ -189,6 +189,7 @@ export function Sidebar({ className }: SidebarProps) {
             </p>
             {[
               { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch, badge: 'new' as const },
+              { title: 'Consent Logs', href: '/dashboard/consent-logs', icon: FileText, badge: 'new' as const },
             ].map(item => renderNavItem(item))}
           </div>
         )}

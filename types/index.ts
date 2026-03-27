@@ -438,6 +438,7 @@ export interface PlanFeatures {
   hasGpcConfig: boolean
   hasGpcAnalytics: boolean
   hasDataAccessRequests: boolean
+  hasConsentLogs: boolean
   includesNewFeatures: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'priority_plus' | 'dedicated'

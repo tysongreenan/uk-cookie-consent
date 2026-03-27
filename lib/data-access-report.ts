@@ -8,6 +8,7 @@
  * Never query by subject identifier alone without an org-level filter.
  */
 
+import { createHash } from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { prisma } from '@/lib/prisma'
 import type {
@@ -51,6 +52,11 @@ const LABELS: Record<string, Record<'en' | 'fr', string>> = {
   retention_info_desc: {
     en: 'How long different categories of personal data are retained.',
     fr: 'Durée de conservation des différentes catégories de données personnelles.',
+  },
+  individual_consent_logs: { en: 'Individual Consent Logs', fr: 'Journaux de consentement individuels' },
+  individual_consent_logs_desc: {
+    en: 'Individual consent records showing each consent decision made by the data subject, including the consent reference ID, decision, cookie categories, and page visited.',
+    fr: 'Enregistrements individuels de consentement montrant chaque décision prise par la personne concernée, incluant l\'identifiant de référence du consentement, la décision, les catégories de cookies et la page visitée.',
   },
   truncated: {
     en: 'Results truncated. Contact support for full export.',
@@ -151,6 +157,68 @@ async function generateConsentRecords(
   return section
 }
 
+async function generateIndividualConsentLogs(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  identifierType: DSARIdentifierType,
+  identifierValue: string,
+  userId: string,
+  teamId: string | null,
+  bannerIds: string[],
+  lang: 'en' | 'fr'
+): Promise<DSARReportSection> {
+  const emptySection: DSARReportSection = {
+    name: t('individual_consent_logs', lang),
+    description: t('individual_consent_logs_desc', lang),
+    data: [],
+    refused: false,
+  }
+
+  if (bannerIds.length === 0) return emptySection
+
+  // Consent logs don't store PII (name/email) — only hashed cookie IDs and consent IDs
+  if (identifierType === 'name' || identifierType === 'email') return emptySection
+
+  let hashedCookieId: string | null = null
+  let consentId: string | null = null
+
+  if (identifierType === 'ip') {
+    hashedCookieId = createHash('sha256').update(identifierValue).digest('hex')
+  } else if (identifierType === 'consent_id') {
+    consentId = identifierValue
+  }
+
+  const { data: records, error } = await supabase.rpc('search_consent_records_for_dsar', {
+    p_user_id: userId,
+    p_team_id: teamId,
+    p_hashed_cookie_id: hashedCookieId,
+    p_consent_id: consentId,
+    p_limit: ROW_LIMIT,
+  })
+
+  if (error || !records) return emptySection
+
+  const section: DSARReportSection = {
+    name: t('individual_consent_logs', lang),
+    description: t('individual_consent_logs_desc', lang),
+    data: (records as Record<string, unknown>[]).map((r) => ({
+      consent_id: r.consent_id,
+      recorded_at: r.recorded_at,
+      decision: r.decision,
+      categories: r.categories,
+      country: r.country,
+      page_path: r.page_path,
+      banner_id: r.banner_id,
+    })),
+    refused: false,
+  }
+
+  if (records.length >= ROW_LIMIT) {
+    section.description += ` ${t('truncated', lang)}`
+  }
+
+  return section
+}
+
 async function generateAnalyticsEvents(
   identifierType: DSARIdentifierType,
   identifierValue: string,
@@ -225,6 +293,14 @@ function generateProcessingPurposes(lang: 'en' | 'fr'): DSARReportSection {
       retention: lang === 'fr' ? '24 mois' : '24 months',
     },
     {
+      category: lang === 'fr' ? 'Journaux de consentement individuels' : 'Individual Consent Logs',
+      purpose: lang === 'fr'
+        ? 'Enregistrer les décisions de consentement individuelles comme preuve de consentement conformément à la Loi 25 et au RGPD.'
+        : 'Record individual consent decisions as proof of consent per Law 25 and GDPR.',
+      legal_basis: lang === 'fr' ? 'Obligation légale' : 'Legal obligation',
+      retention: lang === 'fr' ? '24 mois' : '24 months',
+    },
+    {
       category: lang === 'fr' ? 'Données analytiques' : 'Analytics Data',
       purpose: lang === 'fr'
         ? 'Statistiques agrégées sur les taux de consentement pour aider les organisations à optimiser la conformité.'
@@ -246,6 +322,10 @@ function generateRetentionInfo(lang: 'en' | 'fr'): DSARReportSection {
   const policies = [
     {
       data_category: lang === 'fr' ? 'Interactions des visiteurs avec les bannières' : 'Banner visitor interactions',
+      retention_period: lang === 'fr' ? '24 mois' : '24 months',
+    },
+    {
+      data_category: lang === 'fr' ? 'Journaux de consentement individuels' : 'Individual consent logs',
       retention_period: lang === 'fr' ? '24 mois' : '24 months',
     },
     {
@@ -295,7 +375,7 @@ export async function generateDSARReport(
   )
 
   // Generate sections in parallel (only non-refused ones query the DB)
-  const [consentRecords, analyticsEvents] = await Promise.all([
+  const [consentRecords, individualConsentLogs, analyticsEvents] = await Promise.all([
     refusedSet.has('consent_records')
       ? Promise.resolve({
           name: t('consent_records', lang),
@@ -305,6 +385,15 @@ export async function generateDSARReport(
           refusalReason: request.refusedSections.find((s) => s.section === 'consent_records')?.reason,
         })
       : generateConsentRecords(supabase, request.subjectIdentifierType, request.subjectIdentifierValue, bannerIds, lang),
+    refusedSet.has('individual_consent_logs')
+      ? Promise.resolve({
+          name: t('individual_consent_logs', lang),
+          description: t('individual_consent_logs_desc', lang),
+          data: [],
+          refused: true,
+          refusalReason: request.refusedSections.find((s) => s.section === 'individual_consent_logs')?.reason,
+        })
+      : generateIndividualConsentLogs(supabase, request.subjectIdentifierType, request.subjectIdentifierValue, request.organizationUserId, request.teamId, bannerIds, lang),
     refusedSet.has('analytics_events')
       ? Promise.resolve({
           name: t('analytics_events', lang),
@@ -321,6 +410,7 @@ export async function generateDSARReport(
 
   const sections: DSARReportSection[] = [
     consentRecords,
+    individualConsentLogs,
     analyticsEvents,
     processingPurposes,
     retentionInfo,
@@ -342,7 +432,7 @@ export async function generateDSARReport(
     sections,
     language: lang,
     metadata: {
-      dataSourcesQueried: ['banner_visitors', 'BannerAnalytics'],
+      dataSourcesQueried: ['banner_visitors', 'consent_records', 'BannerAnalytics'],
       recordsFound: totalRecords,
       generationDurationMs: Date.now() - startTime,
     },

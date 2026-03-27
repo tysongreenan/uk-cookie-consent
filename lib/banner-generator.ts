@@ -954,9 +954,9 @@ function initGA4() {
   }
 }
 
-function trackConsentEvent(action) {
+function trackConsentEvent(action, consentCategories) {
   // Send to internal analytics if available
-  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action);
+  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action, consentCategories);
   // For reject events, we need to track them even if GA4 isn't loaded yet
   // This respects user privacy while still providing analytics insights
   if (action === 'reject' && GA_TRACK_CONSENT_EVENTS) {
@@ -996,8 +996,8 @@ function initGA4() {
   console.log('GA4 integration not configured');
 }
 
-function trackConsentEvent(action) {
-  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action);
+function trackConsentEvent(action, consentCategories) {
+  if (typeof _cbInternalTrack === 'function') _cbInternalTrack(action, consentCategories);
 }`
 
   // Determine icon color for the floating button in JS section
@@ -1593,7 +1593,7 @@ function init() {
       if (GPC_ACTIVE) consent.gpc_auto = true;
       saveConsent(consent);
       initGA4(); // Initialize GA4
-      trackConsentEvent('accept'); // Track consent event
+      trackConsentEvent('accept', consent); // Track consent event
       banner.style.display = 'none';
       if (GPC_ACTIVE) showGpcAcknowledgment();
     });
@@ -1602,8 +1602,9 @@ function init() {
 
   if (rejectBtn && !rejectBtn.dataset.handlerAttached) {
     rejectBtn.addEventListener('click', function() {
-      saveConsent({ essential: true, functionality: false, analytics: false, marketing: false });
-      trackConsentEvent('reject'); // Track consent event (but don't init GA4)
+      var consent = { essential: true, functionality: false, analytics: false, marketing: false };
+      saveConsent(consent);
+      trackConsentEvent('reject', consent); // Track consent event (but don't init GA4)
       banner.style.display = 'none';
     });
     rejectBtn.dataset.handlerAttached = 'true';
@@ -1666,7 +1667,7 @@ function init() {
       var consent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
       if (GPC_ACTIVE) consent.gpc_auto = true;
       saveConsent(consent);
-      trackConsentEvent('accept');
+      trackConsentEvent('accept', consent);
 
       // Update modal toggles to show all ON before closing
       loadConsentIntoModal(consent);
@@ -1697,6 +1698,7 @@ function init() {
 
       console.log('User confirmed cookie preferences:', consent);
       saveConsent(consent);
+      trackConsentEvent('custom', consent);
 
       banner.style.display = 'none';
       modal.style.display = 'none';
