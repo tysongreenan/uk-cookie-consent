@@ -31,6 +31,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import { ColorPicker } from '@/components/ui/color-picker'
 import { Slider } from '@/components/ui/slider'
 import { ContrastBadge } from '@/components/ui/contrast-badge'
+import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS, getGoogleFontUrl } from '@/lib/font-presets'
 
@@ -4354,6 +4355,52 @@ function BannerBuilderContent() {
                         </div>
                       )}
                       </>
+                      )}
+                    </div>
+
+                    {/* IAB TCF 2.2 */}
+                    <div className="space-y-4 p-4 border rounded-lg bg-purple-50 dark:bg-purple-950/30 dark:border-purple-800">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          <div>
+                            <h3 className="font-semibold text-purple-900 dark:text-purple-300">IAB TCF 2.2</h3>
+                            <p className="text-xs text-muted-foreground">Transparency & Consent Framework for ad tech compliance</p>
+                          </div>
+                        </div>
+                        {!canAccessFeature(userPlan, 'hasTcfSupport') && (
+                          <Badge variant="secondary" className="text-xs">Pro</Badge>
+                        )}
+                      </div>
+
+                      {!canAccessFeature(userPlan, 'hasTcfSupport') ? (
+                        <UpgradePrompt
+                          feature="IAB TCF 2.2"
+                          description="Enable IAB Transparency & Consent Framework for programmatic advertising compliance"
+                          variant="inline"
+                        />
+                      ) : (
+                        <TCFConfigPanel
+                          config={config.integrations?.tcf || {
+                            enabled: false,
+                            cmpId: 0,
+                            cmpVersion: 1,
+                            publisherCountryCode: 'CA',
+                            purposeIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                            specialFeatureIds: [],
+                            vendorIds: [],
+                            publisherRestrictions: [],
+                            showVendorList: true,
+                            storeConsentGlobally: false,
+                          }}
+                          onChange={(tcfUpdates) => updateConfig('integrations', {
+                            ...config.integrations,
+                            tcf: {
+                              ...config.integrations?.tcf,
+                              ...tcfUpdates,
+                            },
+                          })}
+                        />
                       )}
                     </div>
 

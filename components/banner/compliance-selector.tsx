@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Shield, Globe, Building, Info } from 'lucide-react'
+import { Check, Shield, Globe, Building, Info, Fingerprint } from 'lucide-react'
 import { ComplianceFramework } from '@/types'
 
 interface ComplianceSelectorProps {
@@ -8,34 +8,37 @@ interface ComplianceSelectorProps {
   onFrameworkChange: (framework: ComplianceFramework) => void
 }
 
-const frameworkIcons = {
+const frameworkIcons: Record<ComplianceFramework, typeof Shield> = {
   pipeda: Building, // Canada
   gdpr: Shield, // EU
   ccpa: Globe, // California
+  tcf: Fingerprint, // IAB TCF
   custom: Info
 }
 
-const frameworkColors = {
+const frameworkColors: Record<ComplianceFramework, string> = {
   pipeda: 'bg-red-100 text-red-800 border-red-200',
   gdpr: 'bg-blue-100 text-blue-800 border-blue-200',
   ccpa: 'bg-green-100 text-green-800 border-green-200',
+  tcf: 'bg-amber-100 text-amber-800 border-amber-200',
   custom: 'bg-purple-100 text-purple-800 border-purple-200'
 }
 
 export function ComplianceSelector({ selectedFramework, onFrameworkChange }: ComplianceSelectorProps) {
-  const frameworks: ComplianceFramework[] = ['pipeda', 'gdpr', 'ccpa', 'custom']
+  const frameworks: ComplianceFramework[] = ['pipeda', 'gdpr', 'ccpa', 'tcf', 'custom']
 
-  const frameworkLabels = {
+  const frameworkLabels: Record<ComplianceFramework, string> = {
     pipeda: 'Canada',
     gdpr: 'European Union',
     ccpa: 'California, USA',
+    tcf: 'IAB TCF v2.2',
     custom: 'Custom Requirements'
   }
 
   return (
     <div className="space-y-4">
       {/* Compact Framework Selector */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {frameworks.map((framework) => {
           const Icon = frameworkIcons[framework]
           const isSelected = selectedFramework === framework

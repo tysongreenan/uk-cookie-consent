@@ -218,6 +218,16 @@ export async function GET(request: NextRequest) {
       config.integrations.googleAnalytics.enabled = false
     }
 
+    // Strip TCF integration for users without TCF support (server-side enforcement)
+    const hasTcfSupport = canAccessFeatureWithFreeze(
+      ownerPlanTier as PlanTier,
+      'hasTcfSupport',
+      ownerFeatureFreezeDate
+    )
+    if (!hasTcfSupport && config.integrations?.tcf?.enabled) {
+      config.integrations.tcf = undefined
+    }
+
     // Geo-targeting: read Vercel geo headers and apply matching rule overrides
     // Only apply geo rules for paid plans (server-side enforcement)
     const visitorCountry = request.headers.get('x-vercel-ip-country') || ''
@@ -255,7 +265,7 @@ export async function GET(request: NextRequest) {
     const html = generateBannerHTML(config, { showBranding })
     const css = generateBannerCSS(config)
     const js = generateBannerJS(config)
-    const consentInit = generateConsentInitScript()
+    const consentInit = generateConsentInitScript(config)
     
     // Extract the inner JS from the consent init script tag
     const consentInitJs = consentInit

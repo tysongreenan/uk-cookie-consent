@@ -31,6 +31,16 @@ export const COMPLIANCE_FRAMEWORKS: Record<ComplianceFramework, ComplianceRequir
     maxPenalty: '$7,500 per violation',
     consentExpiry: 12, // 12 months for CCPA
   },
+  tcf: {
+    framework: 'tcf',
+    requiresExplicitConsent: true, // TCF inherits GDPR strict consent requirements
+    requiresOptIn: true, // TCF requires opt-in for all consent-based purposes
+    requiresGranularConsent: true, // TCF requires per-purpose and per-vendor consent
+    requiresPrivacyPolicy: true,
+    requiresDataRetentionPolicy: true, // Inherits GDPR data retention requirements
+    maxPenalty: '€20 million or 4% of annual revenue', // GDPR penalties apply
+    consentExpiry: 12, // 12 months per GDPR
+  },
   custom: {
     framework: 'custom',
     requiresExplicitConsent: true,
@@ -47,6 +57,7 @@ export const COMPLIANCE_DESCRIPTIONS: Record<ComplianceFramework, string> = {
   pipeda: 'PIPEDA (Personal Information Protection and Electronic Documents Act) is Canada\'s federal privacy law. It\'s less strict than GDPR and allows for implied consent in many cases.',
   gdpr: 'GDPR (General Data Protection Regulation) is the EU\'s strict privacy law. It requires explicit opt-in consent and granular controls for all data processing.',
   ccpa: 'CCPA (California Consumer Privacy Act) applies to California residents. It\'s opt-out based and requires clear disclosure of data practices.',
+  tcf: 'IAB Transparency and Consent Framework (TCF) v2.2 is the industry standard for programmatic advertising consent. It builds on GDPR requirements and adds standardized purpose definitions, vendor management, and TC String encoding for the ad tech ecosystem.',
   custom: 'Custom compliance framework for specific regional requirements or multi-jurisdictional compliance needs.'
 }
 
@@ -74,6 +85,16 @@ export const COMPLIANCE_FEATURES: Record<ComplianceFramework, string[]> = {
     'Right to opt-out of sale',
     'Non-discrimination protection',
     '$7,500 per violation'
+  ],
+  tcf: [
+    'IAB TCF v2.2 compliant',
+    'Standardized 11 purposes + special features',
+    'Per-vendor consent management',
+    'TC String encoding for ad tech',
+    'Publisher restriction support',
+    'Global Vendor List (GVL) integration',
+    'Google Consent Mode compatible',
+    'GDPR penalties apply (€20M maximum)'
   ],
   custom: [
     'Fully customizable requirements',

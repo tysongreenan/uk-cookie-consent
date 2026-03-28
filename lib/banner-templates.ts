@@ -399,6 +399,11 @@ export function getLegalText(framework: ComplianceFramework, section: 'banner' |
       preferences: 'Manage your privacy settings. California residents can opt-out of the sale of personal information and access their data.',
       privacy: 'California residents have the right to know, delete, and opt-out of the sale of personal information under CCPA.'
     },
+    tcf: {
+      banner: 'We and our partners use cookies and similar technologies to process personal data. You can accept or manage your choices, including your right to object where legitimate interest is used. Your preferences will be signaled to our partners using the IAB Transparency and Consent Framework.',
+      preferences: 'Manage your consent choices for each processing purpose. You can also manage vendor-level consent and legitimate interest settings below.',
+      privacy: 'Under GDPR and the IAB TCF v2.2, you have the right to accept or refuse consent for each purpose, manage vendor relationships, and withdraw consent at any time.'
+    },
     custom: {
       banner: 'We use cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content. You can manage your preferences or learn more in our Privacy Policy.',
       preferences: 'Customize your cookie preferences. You can enable or disable different types of cookies below.',

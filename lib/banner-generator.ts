@@ -456,6 +456,60 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // (the floating button always opens the preferences modal)
   const hasFloatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both')
   const needsPreferencesModal = config.behavior.showPreferences || hasFloatingButton
+  const tcfEnabled = config.integrations?.tcf?.enabled === true
+
+  // TCF purpose toggle HTML helper
+  const generateTcfPurposeToggle = (id: number, name: string, description: string, legalBasis: string) => {
+    const toggleId = `tcf-purpose-${id}-toggle`
+    const sliderId = `tcf-purpose-${id}-slider`
+    const thumbId = `tcf-purpose-${id}-thumb`
+    const isLI = legalBasis === 'legitimate-interest'
+    const thumbBg = config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText
+    const inactiveBg = config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'
+    return `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
+              <div style="flex: 1; min-width: 0; margin-right: 12px;">
+                <div style="font-weight: 500; color: ${config.colors.text}; font-size: 13px;">${escapeHtml(name)}</div>
+                <div style="font-size: 11px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">${escapeHtml(description)}</div>
+                ${isLI ? `<div style="font-size: 10px; color: ${secondaryTextColor}; margin-top: 4px; font-style: italic;">Legitimate Interest</div>` : ''}
+              </div>
+              <div style="flex-shrink: 0;">
+                <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+                  <input type="checkbox" id="${toggleId}" data-tcf-purpose="${id}" style="opacity: 0; width: 0; height: 0;" />
+                  <span id="${sliderId}" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${inactiveBg}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="${thumbId}" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${thumbBg}; transition: .4s; border-radius: 50%;"></span>
+                </label>
+              </div>
+            </div>`
+  }
+
+  // TCF 2.2 purpose definitions
+  const tcfPurposes = [
+    { id: 1, name: 'Store and/or access information on a device', description: 'Cookies, device or similar online identifiers are used to store and access information on a device.', legalBasis: 'consent' },
+    { id: 2, name: 'Select basic ads', description: 'Ads can be shown to you based on the content you are viewing, the app you are using, your approximate location, or your device type.', legalBasis: 'legitimate-interest' },
+    { id: 3, name: 'Create a personalised ads profile', description: 'A profile can be built about you and your interests to show you personalised ads that are relevant to you.', legalBasis: 'consent' },
+    { id: 4, name: 'Select personalised ads', description: 'Personalised ads can be shown to you based on a profile about you.', legalBasis: 'consent' },
+    { id: 5, name: 'Create a personalised content profile', description: 'A profile can be built about you and your interests to show you personalised content that is relevant to you.', legalBasis: 'consent' },
+    { id: 6, name: 'Select personalised content', description: 'Personalised content can be shown to you based on a profile about you.', legalBasis: 'consent' },
+    { id: 7, name: 'Measure ad performance', description: 'The performance and effectiveness of ads that you see or interact with can be measured.', legalBasis: 'legitimate-interest' },
+    { id: 8, name: 'Measure content performance', description: 'The performance and effectiveness of content that you see or interact with can be measured.', legalBasis: 'legitimate-interest' },
+    { id: 9, name: 'Understand audiences through statistics or combinations of data from different sources', description: 'Reports can be generated based on the combination of data sets regarding your interactions and those of other users.', legalBasis: 'legitimate-interest' },
+    { id: 10, name: 'Develop and improve services', description: 'Your data can be used to improve existing systems and software, and to develop new products.', legalBasis: 'legitimate-interest' },
+    { id: 11, name: 'Use limited data to select content', description: 'Content can be selected based on limited data, such as the content you are viewing or your approximate location.', legalBasis: 'legitimate-interest' },
+  ]
+
+  const consentPurposes = tcfPurposes.filter(p => p.legalBasis === 'consent')
+  const liPurposes = tcfPurposes.filter(p => p.legalBasis === 'legitimate-interest')
+
+  const tcfVendorSection = (tcfEnabled && config.integrations?.tcf?.showVendorList) ? `
+        <!-- Vendors Section -->
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Vendors</h3>
+          <div id="tcf-vendor-list" style="max-height: 200px; overflow-y: auto; border: 1px solid ${borderColor}; border-radius: 8px; padding: 12px;">
+            <p style="font-size: 12px; color: ${secondaryTextColor}; margin: 0;">Vendor list loaded from your TCF configuration.</p>
+          </div>
+        </div>` : ''
+
   const preferencesModal = needsPreferencesModal ? `
 <!-- Preferences Modal -->
 <div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
@@ -467,7 +521,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       ` : `
       <span id="prefs-header-title" style="font-weight: 600; color: ${config.colors.text};">Cookie Settings</span>
       `}
-      
+
       <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: ${config.colors.text}; font-size: 20px; line-height: 1; flex-shrink: 0; opacity: 0.7;" aria-label="Close">
         ×
       </button>
@@ -480,23 +534,47 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
         <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0;">
           Privacy Center
         </h2>
-        
+
         <!-- Description -->
         <p id="prefs-description" style="font-size: 14px; color: ${secondaryTextColor}; margin: 0 0 24px 0; line-height: 1.5;">
-          By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
+          ${tcfEnabled ? 'We and our partners use technologies such as cookies to store and access information on your device. We process personal data for the purposes described below. You may consent to or object to processing based on legitimate interest, for each purpose.' : "By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts."}
         </p>
 
-        <!-- Accept All Button -->
-        <button id="cookie-accept-all-btn" style="width: 100%; height: 48px; margin-bottom: 24px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
-          Accept All
-        </button>
+        <!-- Accept All / Reject All Buttons -->
+        <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+          <button id="cookie-accept-all-btn" style="flex: 1; height: 48px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
+            Accept All
+          </button>
+          ${tcfEnabled ? `<button id="cookie-reject-all-btn" style="flex: 1; height: 48px; font-size: 16px; font-weight: 500; border-radius: 8px; border: 1px solid ${escapeHtml(config.colors.rejectButtonText || config.colors.text)}; cursor: pointer; background-color: ${escapeHtml(config.colors.rejectButton || 'transparent')}; color: ${escapeHtml(config.colors.rejectButtonText || config.colors.text)};">
+            Reject All
+          </button>` : ''}
+        </div>
 
+        ${tcfEnabled ? `
+        <!-- TCF Purposes Section: Consent Required -->
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Consent Required</h3>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${consentPurposes.map(p => generateTcfPurposeToggle(p.id, p.name, p.description, p.legalBasis)).join('')}
+          </div>
+        </div>
+
+        <!-- TCF Purposes Section: Legitimate Interest -->
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Legitimate Interest</h3>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${liPurposes.map(p => generateTcfPurposeToggle(p.id, p.name, p.description, p.legalBasis)).join('')}
+          </div>
+        </div>
+
+        ${tcfVendorSection}
+        ` : `
         <!-- Cookie Preferences Section -->
         <div style="margin-bottom: 24px;">
           <h3 id="prefs-manage-heading" style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 16px 0;">
             Manage cookie preferences
           </h3>
-          
+
           <div style="display: flex; flex-direction: column; gap: 12px;">
             <!-- Strictly Necessary -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px; background-color: ${cardBackgroundColor};">
@@ -582,6 +660,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             </div>
           </div>
         </div>
+        `}
       </div>
 
       <!-- Footer with buttons -->
@@ -1062,6 +1141,144 @@ initGA4Default();
 initGA4(); // Advanced Consent Mode: load GA4 immediately with consent denied
            // Google sends cookieless pings to model unconsented sessions
 
+${config.integrations?.tcf?.enabled ? `
+// ── IAB TCF 2.2 CMP Implementation ────────────────────────────────
+var TCF_ENABLED = true;
+var TCF_CMP_ID = ${Number(config.integrations.tcf.cmpId) || 0};
+var TCF_CMP_VERSION = ${Number(config.integrations.tcf.cmpVersion) || 1};
+var TCF_PUBLISHER_CC = ${JSON.stringify(config.integrations.tcf.publisherCountryCode || 'GB')};
+
+var tcfListeners = {};
+var tcfListenerId = 0;
+var tcfData = {
+  tcString: '',
+  cmpId: TCF_CMP_ID,
+  cmpVersion: TCF_CMP_VERSION,
+  gdprApplies: true,
+  tcfPolicyVersion: 4,
+  publisherCC: TCF_PUBLISHER_CC,
+  purpose: { consents: {}, legitimateInterests: {} },
+  vendor: { consents: {}, legitimateInterests: {} },
+  cmpStatus: 'loaded',
+  displayStatus: 'hidden',
+  eventStatus: null,
+  isServiceSpecific: true
+};
+
+// Full CMP API — replaces the stub from init script
+window.__tcfapi = function(command, version, callback, param) {
+  if (command === 'ping') {
+    callback({
+      gdprApplies: tcfData.gdprApplies,
+      cmpLoaded: true,
+      cmpStatus: tcfData.cmpStatus,
+      displayStatus: tcfData.displayStatus,
+      apiVersion: '2.2',
+      cmpVersion: tcfData.cmpVersion,
+      cmpId: tcfData.cmpId,
+      gvlVersion: 0,
+      tcfPolicyVersion: tcfData.tcfPolicyVersion
+    });
+  } else if (command === 'getTCData') {
+    callback(Object.assign({}, tcfData, { eventStatus: tcfData.eventStatus }), true);
+  } else if (command === 'addEventListener') {
+    var id = ++tcfListenerId;
+    tcfListeners[id] = callback;
+    callback(Object.assign({}, tcfData, { listenerId: id, eventStatus: tcfData.displayStatus === 'visible' ? 'cmpuishown' : 'tcloaded' }), true);
+  } else if (command === 'removeEventListener') {
+    delete tcfListeners[param];
+    if (typeof callback === 'function') callback(true);
+  }
+};
+
+// Process queued calls from the init script stub
+if (window.__tcfapi.queue) {
+  var q = window.__tcfapi.queue;
+  delete window.__tcfapi.queue;
+  q.forEach(function(args) { window.__tcfapi.apply(null, args); });
+}
+
+function tcfNotifyListeners(eventStatus) {
+  tcfData.eventStatus = eventStatus;
+  Object.keys(tcfListeners).forEach(function(id) {
+    try {
+      tcfListeners[id](Object.assign({}, tcfData, { listenerId: Number(id), eventStatus: eventStatus }), true);
+    } catch(e) { console.error('[TCF] Listener error:', e); }
+  });
+}
+
+function getTcfConsent() {
+  var raw = getCookie('euconsent-v2');
+  if (raw) {
+    try { return JSON.parse(raw); } catch(e) { return null; }
+  }
+  return null;
+}
+
+function saveTcfConsent(purposes, vendors) {
+  var now = Date.now();
+  var record = {
+    purposes: purposes,
+    vendors: vendors || {},
+    created: now,
+    updated: now
+  };
+
+  // Merge with existing record to preserve created timestamp
+  var existing = getTcfConsent();
+  if (existing && existing.created) {
+    record.created = existing.created;
+  }
+
+  setCookie('euconsent-v2', JSON.stringify(record), COOKIE_EXPIRY);
+
+  // Update tcfData with purpose consents
+  var purposeConsents = {};
+  var purposeLI = {};
+  // Consent-basis purposes: 1, 3, 4, 5, 6
+  [1, 3, 4, 5, 6].forEach(function(id) { purposeConsents[id] = !!purposes[id]; });
+  // LI-basis purposes: 2, 7, 8, 9, 10, 11
+  [2, 7, 8, 9, 10, 11].forEach(function(id) { purposeLI[id] = !!purposes[id]; });
+  tcfData.purpose.consents = purposeConsents;
+  tcfData.purpose.legitimateInterests = purposeLI;
+  tcfData.vendor = { consents: vendors || {}, legitimateInterests: {} };
+
+  // Map TCF purposes to Google Consent Mode signals
+  var analyticsGranted = !!purposes[7] || !!purposes[8] || !!purposes[9];
+  var adGranted = !!purposes[2] || !!purposes[3] || !!purposes[4];
+  var personalizationGranted = !!purposes[3] || !!purposes[4] || !!purposes[5] || !!purposes[6];
+
+  if (typeof gtag !== 'undefined') {
+    gtag('consent', 'update', {
+      'analytics_storage': analyticsGranted ? 'granted' : 'denied',
+      'ad_storage': adGranted ? 'granted' : 'denied',
+      'ad_user_data': adGranted ? 'granted' : 'denied',
+      'ad_personalization': personalizationGranted ? 'granted' : 'denied'
+    });
+  }
+
+  // Notify all TCF listeners
+  tcfNotifyListeners('useractioncomplete');
+}
+
+function loadTcfConsentOnPageLoad() {
+  var tcfRecord = getTcfConsent();
+  if (tcfRecord && tcfRecord.purposes) {
+    var purposeConsents = {};
+    var purposeLI = {};
+    [1, 3, 4, 5, 6].forEach(function(id) { purposeConsents[id] = !!tcfRecord.purposes[id]; });
+    [2, 7, 8, 9, 10, 11].forEach(function(id) { purposeLI[id] = !!tcfRecord.purposes[id]; });
+    tcfData.purpose.consents = purposeConsents;
+    tcfData.purpose.legitimateInterests = purposeLI;
+    tcfData.vendor = { consents: tcfRecord.vendors || {}, legitimateInterests: {} };
+    tcfData.eventStatus = 'tcloaded';
+    tcfNotifyListeners('tcloaded');
+  }
+}
+` : `
+var TCF_ENABLED = false;
+`}
+
 var injectedScripts = window.__cookieBannerInjected || (window.__cookieBannerInjected = {});
 var injectedExternalScripts = window.__cookieBannerExternal || (window.__cookieBannerExternal = {});
 
@@ -1278,7 +1495,12 @@ function getConsent() {
   var cookie = getCookie(COOKIE_NAME);
   if (cookie) {
     try {
-      return JSON.parse(cookie);
+      var parsed = JSON.parse(cookie);
+      // TCF: also load euconsent-v2 data and populate __tcfapi
+      if (TCF_ENABLED && typeof loadTcfConsentOnPageLoad === 'function') {
+        loadTcfConsentOnPageLoad();
+      }
+      return parsed;
     } catch(e) {
       return null;
     }
@@ -1286,7 +1508,7 @@ function getConsent() {
   return null;
 }
 
-function saveConsent(consent) {
+function saveConsent(consent, tcfPurposes) {
   setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
   loadScripts(consent);
   showFloatingButton();
@@ -1294,6 +1516,12 @@ function saveConsent(consent) {
   if (consent.analytics) {
     initGA4();
   }
+
+  // TCF: save purpose consents to euconsent-v2 cookie and fire __tcfapi events
+  if (TCF_ENABLED && tcfPurposes) {
+    saveTcfConsent(tcfPurposes, {});
+  }
+
   // Notify GTM template and any registered listeners of consent change
   if (window.__cbConsentCallbacks && window.__cbConsentCallbacks.length) {
     window.__cbConsentCallbacks.forEach(function(cb) {
@@ -1351,7 +1579,73 @@ function setupToggleSwitches() {
   });
 }
 
+function setupTcfToggleSwitches() {
+  if (!TCF_ENABLED) return;
+  var buttonColor = ${JSON.stringify(config.colors.button)};
+  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
+
+  for (var pid = 1; pid <= 11; pid++) {
+    (function(id) {
+      var input = document.getElementById('tcf-purpose-' + id + '-toggle');
+      var slider = document.getElementById('tcf-purpose-' + id + '-slider');
+      var thumb = document.getElementById('tcf-purpose-' + id + '-thumb');
+      if (!input || !slider || !thumb) return;
+
+      if (input.checked) {
+        slider.style.backgroundColor = buttonColor;
+        thumb.style.transform = 'translateX(20px)';
+      } else {
+        slider.style.backgroundColor = inactiveColor;
+        thumb.style.transform = 'translateX(0)';
+      }
+
+      if (!input.dataset.listenerAttached) {
+        input.addEventListener('change', function() {
+          if (this.checked) {
+            slider.style.backgroundColor = buttonColor;
+            thumb.style.transform = 'translateX(20px)';
+          } else {
+            slider.style.backgroundColor = inactiveColor;
+            thumb.style.transform = 'translateX(0)';
+          }
+        });
+        slider.addEventListener('click', function() {
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event('change'));
+        });
+        input.dataset.listenerAttached = 'true';
+      }
+    })(pid);
+  }
+}
+
+function loadTcfConsentIntoModal() {
+  if (!TCF_ENABLED) return;
+  var tcfRecord = getTcfConsent();
+  if (tcfRecord && tcfRecord.purposes) {
+    for (var id = 1; id <= 11; id++) {
+      var toggle = document.getElementById('tcf-purpose-' + id + '-toggle');
+      if (toggle) toggle.checked = !!tcfRecord.purposes[id];
+    }
+  }
+  setupTcfToggleSwitches();
+}
+
+function getTcfPurposeConsentsFromModal() {
+  var purposes = {};
+  for (var id = 1; id <= 11; id++) {
+    var toggle = document.getElementById('tcf-purpose-' + id + '-toggle');
+    purposes[id] = toggle ? toggle.checked : false;
+  }
+  return purposes;
+}
+
 function loadConsentIntoModal(consent) {
+  if (TCF_ENABLED) {
+    loadTcfConsentIntoModal();
+    return;
+  }
+
   var func = document.getElementById('cookie-func-toggle-modal');
   var performance = document.getElementById('cookie-performance-toggle-modal');
   var targeting = document.getElementById('cookie-targeting-toggle-modal');
@@ -1591,7 +1885,13 @@ function init() {
     acceptBtn.addEventListener('click', function() {
       var consent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
       if (GPC_ACTIVE) consent.gpc_auto = true;
-      saveConsent(consent);
+      // TCF: accept all purposes
+      var tcfPurposes = null;
+      if (TCF_ENABLED) {
+        tcfPurposes = {};
+        for (var i = 1; i <= 11; i++) tcfPurposes[i] = true;
+      }
+      saveConsent(consent, tcfPurposes);
       initGA4(); // Initialize GA4
       trackConsentEvent('accept', consent); // Track consent event
       banner.style.display = 'none';
@@ -1603,7 +1903,13 @@ function init() {
   if (rejectBtn && !rejectBtn.dataset.handlerAttached) {
     rejectBtn.addEventListener('click', function() {
       var consent = { essential: true, functionality: false, analytics: false, marketing: false };
-      saveConsent(consent);
+      // TCF: reject all purposes
+      var tcfPurposes = null;
+      if (TCF_ENABLED) {
+        tcfPurposes = {};
+        for (var i = 1; i <= 11; i++) tcfPurposes[i] = false;
+      }
+      saveConsent(consent, tcfPurposes);
       trackConsentEvent('reject', consent); // Track consent event (but don't init GA4)
       banner.style.display = 'none';
     });
@@ -1666,7 +1972,13 @@ function init() {
     acceptAllBtn.addEventListener('click', function() {
       var consent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
       if (GPC_ACTIVE) consent.gpc_auto = true;
-      saveConsent(consent);
+      // TCF: accept all purposes
+      var tcfPurposes = null;
+      if (TCF_ENABLED) {
+        tcfPurposes = {};
+        for (var i = 1; i <= 11; i++) tcfPurposes[i] = true;
+      }
+      saveConsent(consent, tcfPurposes);
       trackConsentEvent('accept', consent);
 
       // Update modal toggles to show all ON before closing
@@ -1679,25 +1991,64 @@ function init() {
     acceptAllBtn.dataset.handlerAttached = 'true';
   }
 
+  // TCF: Reject All button in modal
+  var rejectAllBtn = document.getElementById('cookie-reject-all-btn');
+  if (rejectAllBtn && !rejectAllBtn.dataset.handlerAttached) {
+    rejectAllBtn.addEventListener('click', function() {
+      var consent = { essential: true, functionality: false, analytics: false, marketing: false };
+      var tcfPurposes = null;
+      if (TCF_ENABLED) {
+        tcfPurposes = {};
+        for (var i = 1; i <= 11; i++) tcfPurposes[i] = false;
+      }
+      saveConsent(consent, tcfPurposes);
+      trackConsentEvent('reject', consent);
+      banner.style.display = 'none';
+      modal.style.display = 'none';
+    });
+    rejectAllBtn.dataset.handlerAttached = 'true';
+  }
+
   if (confirmChoicesBtn && !confirmChoicesBtn.dataset.handlerAttached) {
     confirmChoicesBtn.addEventListener('click', function() {
-      var func = document.getElementById('cookie-func-toggle-modal');
-      var performance = document.getElementById('cookie-performance-toggle-modal');
-      var targeting = document.getElementById('cookie-targeting-toggle-modal');
-      var social = document.getElementById('cookie-social-toggle-modal');
+      var tcfPurposes = null;
 
-      var marketing = (targeting ? targeting.checked : false) || (social ? social.checked : false);
-      if (GPC_ACTIVE) marketing = false;
-      var consent = {
-        essential: true,
-        functionality: func ? func.checked : false,
-        analytics: performance ? performance.checked : false,
-        marketing: marketing
-      };
-      if (GPC_ACTIVE) consent.gpc_auto = true;
+      if (TCF_ENABLED) {
+        // Read TCF purpose toggles from modal
+        tcfPurposes = getTcfPurposeConsentsFromModal();
+        // Map TCF purposes to legacy consent categories
+        var analyticsGranted = !!tcfPurposes[7] || !!tcfPurposes[8] || !!tcfPurposes[9];
+        var marketingGranted = !!tcfPurposes[2] || !!tcfPurposes[3] || !!tcfPurposes[4];
+        var funcGranted = !!tcfPurposes[1];
+        if (GPC_ACTIVE) marketingGranted = false;
+        var consent = {
+          essential: true,
+          functionality: funcGranted,
+          analytics: analyticsGranted,
+          marketing: marketingGranted
+        };
+        if (GPC_ACTIVE) consent.gpc_auto = true;
+
+        console.log('User confirmed TCF preferences:', tcfPurposes);
+      } else {
+        var func = document.getElementById('cookie-func-toggle-modal');
+        var performance = document.getElementById('cookie-performance-toggle-modal');
+        var targeting = document.getElementById('cookie-targeting-toggle-modal');
+        var social = document.getElementById('cookie-social-toggle-modal');
+
+        var marketing = (targeting ? targeting.checked : false) || (social ? social.checked : false);
+        if (GPC_ACTIVE) marketing = false;
+        var consent = {
+          essential: true,
+          functionality: func ? func.checked : false,
+          analytics: performance ? performance.checked : false,
+          marketing: marketing
+        };
+        if (GPC_ACTIVE) consent.gpc_auto = true;
+      }
 
       console.log('User confirmed cookie preferences:', consent);
-      saveConsent(consent);
+      saveConsent(consent, tcfPurposes);
       trackConsentEvent('custom', consent);
 
       banner.style.display = 'none';
@@ -1718,7 +2069,8 @@ function init() {
   
   // Initialize toggles
   setupToggleSwitches();
-  
+  if (TCF_ENABLED) setupTcfToggleSwitches();
+
   // GPC reconciliation — MUST run BEFORE any loadScripts call
   if (existingConsent && GPC_ACTIVE) {
     var gpcChanged = false;
@@ -1761,6 +2113,11 @@ function init() {
   ${config.behavior.autoShow ? `
   banner.style.display = 'block';
   trackConsentEvent('impression'); // Track banner impression
+  // TCF: update display status and notify listeners
+  if (TCF_ENABLED) {
+    tcfData.displayStatus = 'visible';
+    tcfNotifyListeners('cmpuishown');
+  }
 
   // Hide floating button while main banner is showing
   hideFloatingButton();
@@ -1788,14 +2145,21 @@ if (document.readyState === 'loading') {
 })();`
 }
 
-export const generateConsentInitScript = () => {
+export const generateConsentInitScript = (config?: BannerConfig) => {
+  const tcfEnabled = config?.integrations?.tcf?.enabled === true
+
   return `<script>
 // CRITICAL: Initialize consent mode BEFORE any trackers load
 // This MUST be synchronous and run immediately to block trackers
 // Place this script FIRST in your <head> section, before any other scripts
 (function() {
   'use strict';
-  
+  ${tcfEnabled ? `
+  // IAB TCF 2.2 __tcfapi stub — must be the very first thing so ad tech finds it immediately
+  window.__tcfapi = window.__tcfapi || function() {
+    (window.__tcfapi.queue = window.__tcfapi.queue || []).push(arguments);
+  };
+  ` : ''}
   // Initialize dataLayer immediately (for GTM/GA4)
   window.dataLayer = window.dataLayer || [];
 

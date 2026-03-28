@@ -1,4 +1,32 @@
-export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'custom'
+export type ComplianceFramework = 'pipeda' | 'gdpr' | 'ccpa' | 'tcf' | 'custom'
+
+// IAB TCF 2.2
+export interface TCFConfig {
+  enabled: boolean
+  cmpId: number
+  cmpVersion: number
+  publisherCountryCode: string
+  purposeIds: number[]
+  specialFeatureIds: number[]
+  vendorIds: number[]
+  publisherRestrictions: PublisherRestriction[]
+  showVendorList: boolean
+  storeConsentGlobally: boolean
+}
+
+export interface PublisherRestriction {
+  purposeId: number
+  restrictionType: 0 | 1 | 2
+  vendorIds: number[]
+}
+
+export interface TCFPurpose {
+  id: number
+  name: string
+  description: string
+  descriptionFr: string
+  legalBasis: 'consent' | 'legitimate-interest'
+}
 
 // Geo-targeting rules for region-specific consent behavior
 export interface GeoRule {
@@ -171,6 +199,7 @@ export interface BannerConfig {
       trackImpressions: boolean // Track banner impressions as GA events
       anonymizeIp: boolean
     }
+    tcf?: TCFConfig
   }
 }
 
@@ -441,6 +470,7 @@ export interface PlanFeatures {
   hasConsentLogs: boolean
   hasPrivacyPolicyGenerator: boolean
   hasPrivacyPolicyVersioning: boolean
+  hasTcfSupport: boolean
   includesNewFeatures: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'priority_plus' | 'dedicated'
