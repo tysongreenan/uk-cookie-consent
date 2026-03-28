@@ -57,6 +57,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/tools/privacy-policy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy Generator
+                </Link>
+              </li>
+              <li>
                 <Link href="/demo" rel="nofollow" className="text-muted-foreground hover:text-foreground transition-colors">
                   Live Demo
                 </Link>

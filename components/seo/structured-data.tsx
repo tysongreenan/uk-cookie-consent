@@ -8,7 +8,7 @@ interface FAQItem {
 }
 
 interface StructuredDataProps {
-  type: 'faq' | 'article' | 'breadcrumb'
+  type: 'faq' | 'article' | 'breadcrumb' | 'webpage'
   data: any
 }
 
@@ -63,7 +63,22 @@ export function StructuredData({ type, data }: StructuredDataProps) {
             "item": item.url
           }))
         }
-      
+
+      case 'webpage':
+        return {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": data.name,
+          "description": data.description,
+          "url": data.url,
+          "dateModified": data.dateModified,
+          "publisher": data.publisher || {
+            "@type": "Organization",
+            "name": "Cookie Banner",
+            "url": "https://www.cookie-banner.ca"
+          }
+        }
+
       default:
         return null
     }

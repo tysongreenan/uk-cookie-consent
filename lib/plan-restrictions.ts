@@ -17,6 +17,8 @@ const PRO_FEATURES_BASE: Omit<PlanFeatures, 'tier' | 'includesNewFeatures' | 'su
   hasGpcAnalytics: true,
   hasDataAccessRequests: true,
   hasConsentLogs: true,
+  hasPrivacyPolicyGenerator: true,
+  hasPrivacyPolicyVersioning: false,
   maxTeamMembers: 'unlimited',
 }
 
@@ -37,6 +39,8 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasGpcAnalytics: false,
     hasDataAccessRequests: false,
     hasConsentLogs: false,
+    hasPrivacyPolicyGenerator: false,
+    hasPrivacyPolicyVersioning: false,
     includesNewFeatures: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
@@ -57,12 +61,14 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
   pro_annual: {
     tier: 'pro_annual',
     ...PRO_FEATURES_BASE,
+    hasPrivacyPolicyVersioning: true,
     includesNewFeatures: true,
     supportLevel: 'priority_plus'
   },
   enterprise: {
     tier: 'enterprise',
     ...PRO_FEATURES_BASE,
+    hasPrivacyPolicyVersioning: true,
     includesNewFeatures: true,
     supportLevel: 'dedicated'
   }
@@ -110,6 +116,10 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasDataAccessRequests
     case 'hasConsentLogs':
       return features.hasConsentLogs
+    case 'hasPrivacyPolicyGenerator':
+      return features.hasPrivacyPolicyGenerator
+    case 'hasPrivacyPolicyVersioning':
+      return features.hasPrivacyPolicyVersioning
     case 'includesNewFeatures':
       return features.includesNewFeatures
     case 'maxWebsites':

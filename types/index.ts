@@ -439,6 +439,8 @@ export interface PlanFeatures {
   hasGpcAnalytics: boolean
   hasDataAccessRequests: boolean
   hasConsentLogs: boolean
+  hasPrivacyPolicyGenerator: boolean
+  hasPrivacyPolicyVersioning: boolean
   includesNewFeatures: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'priority_plus' | 'dedicated'
@@ -591,6 +593,55 @@ export interface DSARReport {
     dataSourcesQueried: string[]
     recordsFound: number
     generationDurationMs: number
+  }
+}
+
+// ── Privacy Policy Generator Types ───────────────────────────────────
+
+export interface PrivacyPolicyInputs {
+  businessName: string
+  businessType: 'website' | 'saas' | 'ecommerce' | 'mobile_app' | 'other'
+  websiteUrl: string
+  contactEmail: string
+  country: string
+  province?: string
+  dataCollected: string[]
+  collectionMethods: string[]
+  cookieCategories: string[]
+  thirdPartyServices: string[]
+  dataPurposes: string[]
+  sharesDataWithThirdParties: boolean
+  thirdPartyRecipients?: string[]
+  transfersDataInternationally: boolean
+  dataRetentionPeriod: string
+  customRetentionPeriod?: string
+  allowsUserDeletion: boolean
+  allowsUserExport: boolean
+  jurisdictions: string[]
+  language: 'en' | 'fr'
+  collectsChildrenData: boolean
+  minimumAge?: number
+}
+
+export interface PolicySection {
+  id: string
+  heading: string
+  subheading?: string
+  content: string
+  faqQuestion?: string
+  faqAnswer?: string
+  applicableJurisdictions: string[]
+}
+
+export interface PolicyOutput {
+  sections: PolicySection[]
+  contentHtml: string
+  contentJson: { sections: PolicySection[] }
+  metadata: {
+    generatedAt: string
+    jurisdictions: string[]
+    language: string
+    businessName: string
   }
 }
 

@@ -38,11 +38,11 @@ const tools = [
     description: 'Generate compliant privacy policies for your website',
     icon: FileText,
     path: '/tools/privacy-policy',
-    features: ['GDPR compliant', 'Multiple languages', 'Auto-updates'],
+    features: ['GDPR, PIPEDA, CCPA, Law 25', 'Free to generate', 'Hosted policy pages'],
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
-    status: 'Coming Soon'
+    status: 'Available'
   },
   {
     name: 'Cookie Audit Tool',
