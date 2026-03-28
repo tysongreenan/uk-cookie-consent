@@ -163,10 +163,11 @@ export default function PricingPage() {
               {/* Future features — included */}
               <ul className="space-y-3">
                 {[
+                  'Auto Cookie Categorization',
                   'A/B Testing for Banners',
+                  'IAB TCF 2.2 Support',
+                  'Privacy Policy Generator',
                   'Google CMP Certification',
-                  'Multi-Language Auto-Detection',
-                  'Shopify & WordPress Plugins',
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
