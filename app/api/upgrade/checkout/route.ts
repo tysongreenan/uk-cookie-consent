@@ -61,8 +61,6 @@ export async function POST(request: NextRequest) {
       cancel_url: `${BASE_URL}/upgrade`,
       allow_promotion_codes: true,
       billing_address_collection: 'required' as const,
-      tax_id_collection: { enabled: true },
-      automatic_tax: { enabled: true },
     }
 
     let checkoutSession: Stripe.Checkout.Session
