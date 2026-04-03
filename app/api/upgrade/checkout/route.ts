@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 const getStripe = () => {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -36,10 +43,12 @@ export async function POST(request: NextRequest) {
     const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
 
     // Check for existing Stripe customer
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true, planTier: true, loyaltyUpgradeEligible: true },
-    })
+    const supabase = getSupabase()
+    const { data: user } = await supabase
+      .from('User')
+      .select('stripeCustomerId, planTier, loyaltyUpgradeEligible')
+      .eq('id', session.user.id)
+      .single()
 
     // Prevent double upgrades (allow loyalty upgrade from pro_lifetime to pro_annual)
     if (user?.planTier && user.planTier !== 'free') {
