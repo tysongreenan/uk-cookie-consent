@@ -51,16 +51,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const customerParams: Record<string, unknown> = user?.stripeCustomerId
-      ? { customer: user.stripeCustomerId }
-      : { customer_email: session.user.email || undefined, customer_creation: 'always' as const }
-
-    const commonParams = {
-      ...customerParams,
+    const commonParams: Record<string, unknown> = {
       success_url: `${BASE_URL}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/upgrade`,
       allow_promotion_codes: true,
       billing_address_collection: 'required' as const,
+    }
+
+    // Attach existing Stripe customer or email for new customers
+    if (user?.stripeCustomerId) {
+      commonParams.customer = user.stripeCustomerId
+    } else {
+      commonParams.customer_email = session.user.email || undefined
     }
 
     let checkoutSession: Stripe.Checkout.Session
@@ -142,8 +144,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: checkoutSession.url })
 
-  } catch (error) {
-    console.error('Error creating checkout session:', error)
+  } catch (error: any) {
+    console.error('[CHECKOUT] Error creating checkout session:', {
+      message: error?.message,
+      type: error?.type,
+      code: error?.code,
+      statusCode: error?.statusCode,
+      raw: error?.raw?.message,
+    })
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })
   }
 }
