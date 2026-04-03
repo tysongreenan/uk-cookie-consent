@@ -84,7 +84,7 @@ function UpgradeContent() {
             Sign up for a free account first, then upgrade
           </p>
           <Button size="lg" className="w-full max-w-md" asChild>
-            <Link href="/auth/signup?callbackUrl=/upgrade">
+            <Link href={`/auth/signup?callbackUrl=/upgrade${billingCycle !== 'annual' ? `%3Fbilling%3D${billingCycle}` : ''}`}>
               Create Free Account & Upgrade
             </Link>
           </Button>

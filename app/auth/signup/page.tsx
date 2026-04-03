@@ -27,6 +27,7 @@ function SignUpContent() {
   const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   // Prevent open redirect — only allow relative paths
   const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
+  const isUpgradeFlow = callbackUrl.startsWith('/upgrade')
 
   // Pre-fill email from query parameter or banner config
   useEffect(() => {
@@ -180,25 +181,51 @@ function SignUpContent() {
 
           {/* Pricing model */}
           <div className="rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 p-5">
-            <p className="text-sm font-semibold text-white mb-3">Start free — upgrade to Pro for $99 one-time</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>No subscriptions or recurring fees</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>No hidden fees or surprise charges</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>GDPR, CCPA & PIPEDA compliant</span>
-              </div>
-            </div>
+            {isUpgradeFlow ? (
+              <>
+                <p className="text-sm font-semibold text-white mb-3">Create your account to complete your Pro upgrade</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>All Pro features unlocked immediately</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>Every new feature we ship, automatically</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>30-day money-back guarantee</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>GDPR, CCPA & PIPEDA compliant</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-white mb-3">Start free — upgrade to Pro for $99 one-time</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>No credit card required</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>No subscriptions or recurring fees</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>No hidden fees or surprise charges</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                    <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span>GDPR, CCPA & PIPEDA compliant</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
