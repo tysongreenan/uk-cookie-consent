@@ -219,7 +219,16 @@ export function Sidebar({ className }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border space-y-2">
+        {!isPro && (
+          <Link href="/upgrade" className="flex items-center space-x-3 p-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+            <Crown className="w-4 h-4 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Upgrade to Pro</p>
+              <p className="text-xs opacity-80">$99/year — all features</p>
+            </div>
+          </Link>
+        )}
         <Link href="/roadmap" className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
             <Globe className="w-4 h-4 text-primary-foreground" />

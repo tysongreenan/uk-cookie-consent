@@ -57,6 +57,8 @@ model User {
   upgradedAt DateTime?
   stripeCustomerId String?
   stripePaymentIntentId String?
+  resetToken           String?
+  resetTokenExpiresAt  DateTime?
 
   // Product access flags — one account, multiple products
   hasConsentBanner Boolean @default(false) // Cookie consent banner tool
