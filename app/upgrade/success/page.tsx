@@ -7,10 +7,14 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function UpgradeSuccessPage() {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const planTier = session?.user?.planTier || 'pro_lifetime'
+
+  // Force session refresh so the new planTier from the webhook is reflected immediately
+  useEffect(() => { update() }, [])
   const isAnnual = planTier === 'pro_annual'
 
   const nextSteps = [

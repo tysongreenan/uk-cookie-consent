@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession, signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -35,8 +34,7 @@ interface Workspace {
 }
 
 export function WorkspaceSwitcher() {
-  const { data: session } = useSession()
-  const router = useRouter()
+  const { data: session, update } = useSession()
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [loading, setLoading] = useState(true)
   const [switching, setSwitching] = useState(false)
@@ -101,12 +99,9 @@ export function WorkspaceSwitcher() {
 
       if (data.success) {
         toast.success(`Switched to ${data.data.teamName}`)
-        
-        // Refresh session to get updated currentTeamId
-        await signIn('credentials', { redirect: false })
-        
-        // Reload page to fetch new workspace data
-        router.refresh()
+
+        // Update the session JWT with the new team ID, then full reload
+        await update()
         window.location.reload()
       } else {
         toast.error(data.error || 'Failed to switch workspace')
@@ -133,8 +128,8 @@ export function WorkspaceSwitcher() {
 
       if (response.ok && data.success) {
         toast.success('Left workspace successfully')
-        // Refresh the page to update workspace list
-        router.refresh()
+        // Refetch workspaces so local state reflects the change
+        await fetchWorkspaces()
       } else {
         toast.error(data.error || 'Failed to leave workspace')
       }
@@ -175,11 +170,11 @@ export function WorkspaceSwitcher() {
   }
 
   // Determine current workspace: use currentTeamId if set, otherwise use the user's personal workspace (where they are owner)
-  const currentWorkspace = workspaces.find(w => w.id === session?.user?.currentTeamId) || 
+  const currentWorkspace = workspaces.find(w => w.id === session?.user?.currentTeamId) ||
                           workspaces.find(w => w.userRole === 'owner')
-  
-  // Other workspaces are those where user is not the owner
-  const otherWorkspaces = workspaces.filter(w => w.userRole !== 'owner')
+
+  // Other workspaces are all workspaces except the current one
+  const otherWorkspaces = workspaces.filter(w => w.id !== currentWorkspace?.id)
 
   if (loading) {
     return (
@@ -276,14 +271,6 @@ export function WorkspaceSwitcher() {
               Leave this workspace
             </DropdownMenuItem>
           </>
-        )}
-
-        {workspaces.length === 0 && (
-          <DropdownMenuItem disabled>
-            <div className="text-center text-muted-foreground py-2">
-              No workspaces available
-            </div>
-          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

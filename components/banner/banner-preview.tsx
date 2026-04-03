@@ -9,7 +9,7 @@ interface BannerConfig {
   name: string
   position: 'top' | 'bottom' | 'floating-bottom-right' | 'floating-bottom-left' | 'floating-top-right' | 'floating-top-left' | 'modal-center' | 'modal-bottom' | 'modal-top' | 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom'
   theme: 'light' | 'dark' | 'custom'
-  language: 'en' | 'fr' | 'auto'
+  language: 'en' | 'fr' | 'es' | 'auto'
   colors: {
     background: string
     text: string

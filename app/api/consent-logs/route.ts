@@ -64,15 +64,9 @@ export async function GET(request: NextRequest) {
 
     // ── Team lookup ──────────────────────────────────────────────────
 
-    const { data: membership } = await supabase
-      .from('TeamMember')
-      .select('teamId')
-      .eq('userId', session.user.id)
-      .single()
-
-    const teamId = membership?.teamId || null
+    const teamId = session.user.currentTeamId
     if (!teamId) {
-      return NextResponse.json({ error: 'No team found' }, { status: 404 })
+      return NextResponse.json({ error: 'No team selected' }, { status: 400 })
     }
 
     // ── Parse query params ───────────────────────────────────────────

@@ -75,6 +75,44 @@ export const translations = {
     close: 'Fermer',
     learnMore: 'En savoir plus',
     cookieSettings: 'Paramètres des cookies',
+  },
+  es: {
+    title: 'Usamos cookies',
+    message: 'Este sitio web utiliza cookies para mejorar su experiencia de navegación y proporcionar contenido personalizado.',
+    acceptButton: 'Aceptar todo',
+    rejectButton: 'Rechazar',
+    preferencesButton: 'Preferencias',
+    privacyPolicy: 'Política de privacidad',
+    footerLink: 'Configuración de cookies',
+
+    // Preferences panel
+    preferencesTitle: 'Centro de privacidad',
+    preferencesDescription: "Al hacer clic en 'Aceptar', acepta el almacenamiento de cookies en su dispositivo para mejorar la navegación del sitio, analizar el uso del sitio y colaborar con nuestros esfuerzos de marketing.",
+    managePreferences: 'Gestionar preferencias de cookies',
+    savePreferences: 'Guardar preferencias',
+    acceptAll: 'Aceptar todo',
+    rejectAll: 'Rechazar todo',
+    confirmChoices: 'Confirmar mis opciones',
+
+    // Cookie categories
+    strictlyNecessary: 'Cookies estrictamente necesarias',
+    strictlyNecessaryDescription: 'Siempre activas',
+    functionality: 'Cookies funcionales',
+    functionalityDescription: 'Estas cookies permiten funciones mejoradas y personalización, como preferencias de idioma y configuraciones de usuario.',
+    trackingPerformance: 'Cookies de rendimiento',
+    trackingPerformanceDescription: 'Estas cookies nos ayudan a entender cómo los visitantes interactúan con nuestro sitio web al recopilar e informar datos de forma anónima.',
+    targetingAdvertising: 'Cookies de segmentación',
+    targetingAdvertisingDescription: 'Estas cookies se utilizan para hacer que los mensajes publicitarios sean más relevantes para usted y sus intereses.',
+    socialMedia: 'Cookies de redes sociales',
+    socialMediaDescription: 'Estas cookies permiten la integración de redes sociales y funciones para compartir.',
+
+    // Always active
+    alwaysActive: 'Siempre activas',
+
+    // Additional UI elements
+    close: 'Cerrar',
+    learnMore: 'Más información',
+    cookieSettings: 'Configuración de cookies',
   }
 }
 
@@ -85,7 +123,7 @@ export function getTranslation(language: Language, key: keyof typeof translation
 }
 
 // Get all translations for a language
-export function getAllTranslations(language: 'en' | 'fr' | 'auto') {
+export function getAllTranslations(language: 'en' | 'fr' | 'es' | 'auto') {
   const selectedLanguage: Language = language === 'auto' ? detectLanguage() : language
   return translations[selectedLanguage]
 }
@@ -100,13 +138,18 @@ export function detectLanguage(): Language {
   if (browserLang.startsWith('fr')) {
     return 'fr'
   }
-  
+
+  // Check for Spanish variants
+  if (browserLang.startsWith('es')) {
+    return 'es'
+  }
+
   // Default to English
   return 'en'
 }
 
 // Apply translations to banner config text
-export function applyTranslations(language: 'en' | 'fr' | 'auto') {
+export function applyTranslations(language: 'en' | 'fr' | 'es' | 'auto') {
   let selectedLanguage: Language = language === 'auto' ? detectLanguage() : language
   
   return {

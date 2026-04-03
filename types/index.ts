@@ -25,6 +25,7 @@ export interface TCFPurpose {
   name: string
   description: string
   descriptionFr: string
+  descriptionEs?: string
   legalBasis: 'consent' | 'legitimate-interest'
 }
 
@@ -39,7 +40,7 @@ export interface GeoRule {
     requiresOptIn: boolean // true = strict opt-in, no implied consent
     showRejectButton: boolean // force showing reject button
     dismissOnScroll: boolean // override scroll dismiss behavior
-    language?: 'en' | 'fr' | 'auto' // override language
+    language?: 'en' | 'fr' | 'es' | 'auto' // override language
   }
 }
 
@@ -85,7 +86,7 @@ export interface BannerConfig {
   fontFamily?: string
   
   // Language
-  language: 'en' | 'fr' | 'auto'
+  language: 'en' | 'fr' | 'es' | 'auto'
   
   // Text content
   text: {

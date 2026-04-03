@@ -352,7 +352,8 @@ export const authOptions: NextAuthOptions = {
         token.hasPrivacyConsumer = (user as any).hasPrivacyConsumer ?? false
         token.hasCommentTool = (user as any).hasCommentTool ?? false
       } else if (token.id) {
-        // Refresh plan data from database on token rotation so upgrades take effect without re-login
+        // Refresh plan data and team role from database on token rotation
+        // so upgrades and team switches take effect without re-login
         try {
           const supabase = getSupabaseClient()
           const { data } = await supabase
@@ -368,6 +369,17 @@ export const authOptions: NextAuthOptions = {
             token.hasConsentBanner = data.hasConsentBanner ?? true
             token.hasPrivacyConsumer = data.hasPrivacyConsumer ?? false
             token.hasCommentTool = data.hasCommentTool ?? false
+          }
+
+          // Re-fetch user's role for their current team so it stays in sync after team switches
+          if (data?.current_team_id) {
+            const { data: member } = await supabase
+              .from('TeamMember')
+              .select('role')
+              .eq('user_id', token.id)
+              .eq('team_id', data.current_team_id)
+              .single()
+            if (member?.role) token.userRole = member.role
           }
         } catch (err) {
           console.error('[AUTH] Failed to refresh plan data from database:', err)

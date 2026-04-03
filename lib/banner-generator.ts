@@ -1388,13 +1388,42 @@ var TRANSLATIONS = {
     cancelButton: "Annuler",
     cookieSettings: "Param\\u00e8tres des cookies",
     privacyPolicy: "Politique de confidentialit\\u00e9"
+  },
+  es: {
+    title: ${config.language === 'es' ? JSON.stringify(config.text.title) : '"Usamos cookies"'},
+    message: ${config.language === 'es' ? JSON.stringify(config.text.message) : '"Este sitio web utiliza cookies para mejorar su experiencia de navegaci\\u00f3n y proporcionar contenido personalizado."'},
+    acceptButton: ${config.language === 'es' ? JSON.stringify(config.text.acceptButton) : '"Aceptar todo"'},
+    rejectButton: ${config.language === 'es' ? JSON.stringify(config.text.rejectButton) : '"Rechazar"'},
+    preferencesButton: ${config.language === 'es' ? JSON.stringify(config.text.preferencesButton) : '"Preferencias"'},
+    footerLink: ${config.language === 'es' ? JSON.stringify(config.branding.footerLink.text) : '"Configuraci\\u00f3n de cookies"'},
+    preferencesTitle: "Centro de privacidad",
+    preferencesDescription: "Al hacer clic en 'Aceptar', acepta el almacenamiento de cookies en su dispositivo para mejorar la navegaci\\u00f3n del sitio, analizar el uso del sitio y colaborar con nuestros esfuerzos de marketing.",
+    acceptAll: "Aceptar todo",
+    managePreferences: "Gestionar preferencias de cookies",
+    strictlyNecessary: "Cookies estrictamente necesarias",
+    strictlyNecessaryDesc: "Siempre activas",
+    functionality: "Cookies funcionales",
+    functionalityDesc: "Recordar preferencias y opciones",
+    analytics: "Cookies de rendimiento",
+    analyticsDesc: "Ayudarnos a mejorar nuestro sitio",
+    marketing: "Cookies de segmentaci\\u00f3n",
+    marketingDesc: "Anuncios y contenido personalizado",
+    socialMedia: "Cookies de redes sociales",
+    socialMediaDesc: "Integraci\\u00f3n de redes sociales",
+    confirmChoices: "Confirmar mis opciones",
+    saveButton: "Guardar",
+    cancelButton: "Cancelar",
+    cookieSettings: "Configuraci\\u00f3n de cookies",
+    privacyPolicy: "Pol\\u00edtica de privacidad"
   }
 };
 
 function detectLanguage() {
   ${config.language === 'auto' ? `
   var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-  return browserLang.startsWith('fr') ? 'fr' : 'en';
+  if (browserLang.startsWith('fr')) return 'fr';
+  if (browserLang.startsWith('es')) return 'es';
+  return 'en';
   ` : `
   return ${JSON.stringify(config.language)};
   `}

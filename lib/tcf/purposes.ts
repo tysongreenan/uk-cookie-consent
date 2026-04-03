@@ -10,6 +10,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Cookies, device or similar online identifiers (e.g. login-based identifiers, randomly assigned identifiers, network based identifiers) together with other information (e.g. browser type and information, language, screen size, supported technologies etc.) can be stored or read on your device to recognise it each time it connects to an app or to a website, for one or several of the purposes presented here.',
     descriptionFr:
       "Des cookies, identifiants de votre appareil ou autres informations peuvent être stockés ou consultés sur votre appareil pour les finalités qui vous sont présentées.",
+    descriptionEs:
+      "Se pueden almacenar o consultar cookies, identificadores de su dispositivo u otra información en su dispositivo para los fines que se le presentan.",
     legalBasis: 'consent',
   },
   {
@@ -19,6 +21,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Ads can be shown to you based on the content you are viewing, the app you are using, your approximate location, or your device type.',
     descriptionFr:
       "Des publicités peuvent vous être présentées en fonction du contenu que vous consultez, de l'application que vous utilisez, de votre localisation approximative ou de votre type d'appareil.",
+    descriptionEs:
+      "Se le pueden mostrar anuncios en función del contenido que está viendo, la aplicación que usa, su ubicación aproximada o su tipo de dispositivo.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -28,6 +32,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Information about your activity on this service (such as forms you submit, content you look at) can be stored and combined with other information about you (for example, information from your previous activity on this service and other websites or apps, information you provided) or similar users. This is then used to build or improve a profile about you (that might include possible interests and personal aspects). Your profile can be used (also later) to present advertising that appears more relevant based on your possible interests by this and other entities.',
     descriptionFr:
       "Un profil peut être créé à partir de vos données pour vous présenter des publicités personnalisées.",
+    descriptionEs:
+      "Se puede crear un perfil a partir de sus datos para mostrarle publicidad personalizada.",
     legalBasis: 'consent',
   },
   {
@@ -37,6 +43,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Advertising presented to you on this service can be based on your advertising profiles, which can reflect your activity on this service or other websites or apps (like the forms you submit, content you look at), possible interests and personal aspects.',
     descriptionFr:
       "Des publicités personnalisées peuvent vous être présentées en fonction de votre profil publicitaire.",
+    descriptionEs:
+      "Se le puede mostrar publicidad personalizada en función de su perfil publicitario.",
     legalBasis: 'consent',
   },
   {
@@ -46,6 +54,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Information about your activity on this service (for instance, forms you submit, non-advertising content you look at) can be stored and combined with other information about you (such as your previous activity on this service or other websites or apps) or similar users. This is then used to build or improve a profile about you (which might for example include possible interests and personal aspects). Your profile can be used (also later) to present content that appears more relevant based on your possible interests, such as by adapting the order in which content is shown to you, so that it is even easier for you to find content that matches your interests.',
     descriptionFr:
       "Un profil peut être créé à partir de vos données pour vous présenter du contenu personnalisé.",
+    descriptionEs:
+      "Se puede crear un perfil a partir de sus datos para mostrarle contenido personalizado.",
     legalBasis: 'consent',
   },
   {
@@ -55,6 +65,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Content presented to you on this service can be based on your content personalisation profiles, which can reflect your activity on this or other services (for instance, the forms you submit, content you look at), possible interests and personal aspects. This can for example be used to adapt the order in which content is shown to you, so that it is even easier for you to find (non-advertising) content that matches your interests.',
     descriptionFr:
       "Du contenu personnalisé peut vous être présenté en fonction de votre profil de personnalisation.",
+    descriptionEs:
+      "Se le puede mostrar contenido personalizado en función de su perfil de personalización.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -64,6 +76,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Information regarding which advertising is presented to you and how you interact with it can be used to determine how well an advert has worked for you or other users and whether the goals of the advertising were reached.',
     descriptionFr:
       "La performance des publicités peut être mesurée afin de déterminer l'efficacité des campagnes.",
+    descriptionEs:
+      "Se puede medir el rendimiento de los anuncios para determinar la eficacia de las campañas.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -73,6 +87,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Information regarding which content is presented to you and how you interact with it can be used to determine whether the (non-advertising) content e.g. reached its intended audience and matched your interests.',
     descriptionFr:
       "La performance du contenu peut être mesurée pour évaluer s'il atteint son audience cible.",
+    descriptionEs:
+      "Se puede medir el rendimiento del contenido para evaluar si alcanza a su audiencia objetivo.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -82,6 +98,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Reports can be generated based on the combination of data sets (like user profiles, statistics, market research, analytics data) regarding your interactions and those of other users with advertising or (non-advertising) content to identify common characteristics (for instance, to determine which target audiences are more receptive to an ad campaign or to certain contents).',
     descriptionFr:
       "Des rapports peuvent être générés en combinant des ensembles de données pour comprendre les audiences.",
+    descriptionEs:
+      "Se pueden generar informes combinando conjuntos de datos para comprender las audiencias.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -91,6 +109,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Information about your activity on this service, such as your interaction with ads or content, can be very helpful to improve products and services and to build new products and services based on user interactions, the type of audience, etc.',
     descriptionFr:
       "Les informations sur votre activité peuvent être utilisées pour améliorer les produits et services existants.",
+    descriptionEs:
+      "La información sobre su actividad puede utilizarse para mejorar los productos y servicios existentes.",
     legalBasis: 'legitimate-interest',
   },
   {
@@ -100,6 +120,8 @@ export const TCF_PURPOSES: TCFPurpose[] = [
       'Content presented to you on this service can be based on limited data, such as the website or app you are using, your non-precise location, your device type, or which content you are interacting with (or have interacted with) (for example, to limit the number of times a video or an article is presented to you).',
     descriptionFr:
       "Du contenu peut vous être présenté sur la base de données limitées, comme le site que vous consultez ou votre type d'appareil.",
+    descriptionEs:
+      "Se le puede mostrar contenido basado en datos limitados, como el sitio que visita o su tipo de dispositivo.",
     legalBasis: 'legitimate-interest',
   },
 ]
@@ -111,6 +133,7 @@ export interface TCFSpecialFeature {
   name: string
   description: string
   descriptionFr: string
+  descriptionEs?: string
 }
 
 export const TCF_SPECIAL_FEATURES: TCFSpecialFeature[] = [
@@ -121,6 +144,8 @@ export const TCF_SPECIAL_FEATURES: TCFSpecialFeature[] = [
       'With your acceptance, your precise location (within a radius of less than 500 metres) may be used in support of the purposes explained in this notice.',
     descriptionFr:
       "Avec votre consentement, votre localisation précise (dans un rayon de moins de 500 mètres) peut être utilisée.",
+    descriptionEs:
+      "Con su consentimiento, su ubicación precisa (dentro de un radio de menos de 500 metros) puede ser utilizada.",
   },
   {
     id: 2,
@@ -129,6 +154,8 @@ export const TCF_SPECIAL_FEATURES: TCFSpecialFeature[] = [
       'With your acceptance, certain characteristics specific to your device might be requested and used to distinguish it from other devices (such as the installed fonts or plugins, the resolution of your screen) in support of the purposes explained in this notice.',
     descriptionFr:
       "Avec votre consentement, certaines caractéristiques de votre appareil peuvent être analysées pour l'identifier.",
+    descriptionEs:
+      "Con su consentimiento, se pueden analizar ciertas características de su dispositivo para identificarlo.",
   },
 ]
 
@@ -139,6 +166,7 @@ export interface TCFSpecialPurpose {
   name: string
   description: string
   descriptionFr: string
+  descriptionEs?: string
 }
 
 export const TCF_SPECIAL_PURPOSES: TCFSpecialPurpose[] = [
@@ -149,6 +177,8 @@ export const TCF_SPECIAL_PURPOSES: TCFSpecialPurpose[] = [
       'Your data can be used to monitor for and prevent unusual and possibly fraudulent activity (for example, regarding advertising, ad clicks by bots), and ensure systems and processes work properly and securely. It can also be used to correct any problems you, the provider or the domain operator experience in the delivery of content and ads and in your interaction with them.',
     descriptionFr:
       "Vos données peuvent être utilisées pour surveiller et prévenir les activités frauduleuses et assurer le bon fonctionnement des systèmes.",
+    descriptionEs:
+      "Sus datos pueden utilizarse para supervisar y prevenir actividades fraudulentas y garantizar el correcto funcionamiento de los sistemas.",
   },
   {
     id: 2,
@@ -157,6 +187,8 @@ export const TCF_SPECIAL_PURPOSES: TCFSpecialPurpose[] = [
       'Certain information (like an IP address or device capabilities) is used to ensure the technical compatibility of the content or advertising, and to facilitate the transmission of the content or ad to your device.',
     descriptionFr:
       "Certaines informations techniques sont utilisées pour assurer la compatibilité et la diffusion des publicités et contenus.",
+    descriptionEs:
+      "Se utiliza cierta información técnica para garantizar la compatibilidad y la entrega de anuncios y contenido.",
   },
 ]
 

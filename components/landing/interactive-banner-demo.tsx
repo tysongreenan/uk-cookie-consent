@@ -702,12 +702,12 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
     toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
-  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'auto') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'auto') => {
     setConfig(prev => ({
       ...prev,
       language: newLanguage
     }))
-    
+
     // If user selects specific language (not auto), apply translations
     if (newLanguage !== 'auto') {
       const translations = applyTranslations(newLanguage)
@@ -716,7 +716,8 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
         language: newLanguage,
         text: translations
       }))
-      toast.success(`Banner text updated to ${newLanguage === 'fr' ? 'French' : 'English'}`)
+      const langNames: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish' }
+      toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
 
@@ -1671,12 +1672,14 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                           <SelectItem value="auto">Auto-detect (Recommended)</SelectItem>
                           <SelectItem value="en">English</SelectItem>
                           <SelectItem value="fr">Français (French)</SelectItem>
+                          <SelectItem value="es">Español (Spanish)</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && '🇨🇦 Language will be detected from user\'s browser. Perfect for Canadian sites serving English and French users.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports English, French, and Spanish.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
                         {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
+                        {config.language === 'es' && 'El banner siempre se mostrará en español.'}
                       </p>
                     </div>
                   </CardContent>
