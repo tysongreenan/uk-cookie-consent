@@ -40,7 +40,7 @@ export interface GeoRule {
     requiresOptIn: boolean // true = strict opt-in, no implied consent
     showRejectButton: boolean // force showing reject button
     dismissOnScroll: boolean // override scroll dismiss behavior
-    language?: 'en' | 'fr' | 'es' | 'auto' // override language
+    language?: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto' // override language
   }
 }
 
@@ -86,7 +86,7 @@ export interface BannerConfig {
   fontFamily?: string
   
   // Language
-  language: 'en' | 'fr' | 'es' | 'auto'
+  language: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto'
   
   // Text content
   text: {

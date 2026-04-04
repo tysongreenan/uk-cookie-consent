@@ -817,7 +817,7 @@ function BannerBuilderContent() {
     toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
-  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'auto') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto') => {
     setConfig(prev => ({
       ...prev,
       language: newLanguage
@@ -831,7 +831,7 @@ function BannerBuilderContent() {
         language: newLanguage,
         text: translations
       }))
-      const langNames: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish' }
+      const langNames: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
       toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
@@ -2329,7 +2329,7 @@ function BannerBuilderContent() {
                   <CardHeader>
                     <CardTitle>Language</CardTitle>
                     <CardDescription>
-                      Choose your banner language. Auto-detect matches the visitor's browser language across English, French, and Spanish.
+                      Choose your banner language. Auto-detect matches the visitor's browser language across 10 languages.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -2345,12 +2345,19 @@ function BannerBuilderContent() {
                         <SelectContent>
                           <SelectItem value="auto">Auto-detect (Recommended)</SelectItem>
                           <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="fr">Français (French)</SelectItem>
                           <SelectItem value="es">Español (Spanish)</SelectItem>
+                          <SelectItem value="fr">Français (French)</SelectItem>
+                          <SelectItem value="de">Deutsch (German)</SelectItem>
+                          <SelectItem value="pt">Português (Portuguese)</SelectItem>
+                          <SelectItem value="ja">日本語 (Japanese)</SelectItem>
+                          <SelectItem value="zh">中文 (Chinese)</SelectItem>
+                          <SelectItem value="ko">한국어 (Korean)</SelectItem>
+                          <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                          <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports English, French, and Spanish.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, and Hindi.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
                         {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
                         {config.language === 'es' && 'El banner siempre se mostrará en español.'}
@@ -4093,7 +4100,7 @@ function BannerBuilderContent() {
                                       setConfig((prev: BannerConfig) => ({
                                         ...prev,
                                         geoRules: (prev.geoRules || []).map((r: GeoRule) =>
-                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, language: value as 'en' | 'fr' | 'es' | 'auto' } } : r
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, language: value as 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto' } } : r
                                         )
                                       }))
                                     }}
@@ -4102,8 +4109,15 @@ function BannerBuilderContent() {
                                     <SelectContent>
                                       <SelectItem value="auto">Auto-detect</SelectItem>
                                       <SelectItem value="en">English</SelectItem>
-                                      <SelectItem value="fr">French</SelectItem>
                                       <SelectItem value="es">Spanish</SelectItem>
+                                      <SelectItem value="fr">French</SelectItem>
+                                      <SelectItem value="de">German</SelectItem>
+                                      <SelectItem value="pt">Portuguese</SelectItem>
+                                      <SelectItem value="ja">Japanese</SelectItem>
+                                      <SelectItem value="zh">Chinese</SelectItem>
+                                      <SelectItem value="ko">Korean</SelectItem>
+                                      <SelectItem value="ar">Arabic</SelectItem>
+                                      <SelectItem value="hi">Hindi</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>

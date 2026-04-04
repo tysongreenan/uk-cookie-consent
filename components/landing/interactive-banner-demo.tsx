@@ -702,7 +702,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
     toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
-  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'auto') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto') => {
     setConfig(prev => ({
       ...prev,
       language: newLanguage
