@@ -818,20 +818,12 @@ function BannerBuilderContent() {
   }
 
   const handleLanguageChange = (newLanguage: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto') => {
-    setConfig(prev => ({
-      ...prev,
-      language: newLanguage
-    }))
-
-    // If user selects specific language (not auto), apply translations
-    if (newLanguage !== 'auto') {
+    if (newLanguage === 'auto') {
+      setConfig(prev => ({ ...prev, language: 'auto' }))
+    } else {
       const translations = applyTranslations(newLanguage)
-      setConfig(prev => ({
-        ...prev,
-        language: newLanguage,
-        text: translations
-      }))
-      const langNames: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
+      setConfig(prev => ({ ...prev, language: newLanguage, text: translations }))
+      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
       toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
