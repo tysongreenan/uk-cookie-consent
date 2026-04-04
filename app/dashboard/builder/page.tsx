@@ -2357,10 +2357,17 @@ function BannerBuilderContent() {
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, and Hindi.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 10 languages.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
                         {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
                         {config.language === 'es' && 'El banner siempre se mostrará en español.'}
+                        {config.language === 'de' && 'Das Banner wird immer auf Deutsch angezeigt.'}
+                        {config.language === 'pt' && 'O banner será sempre exibido em português.'}
+                        {config.language === 'ja' && 'バナーは常に日本語で表示されます。'}
+                        {config.language === 'zh' && '横幅将始终以中文显示。'}
+                        {config.language === 'ko' && '배너가 항상 한국어로 표시됩니다.'}
+                        {config.language === 'ar' && 'سيتم عرض الشعار دائمًا باللغة العربية.'}
+                        {config.language === 'hi' && 'बैनर हमेशा हिन्दी में प्रदर्शित होगा।'}
                       </p>
                     </div>
                   </CardContent>

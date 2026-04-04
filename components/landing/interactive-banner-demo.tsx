@@ -716,7 +716,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
         language: newLanguage,
         text: translations
       }))
-      const langNames: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish' }
+      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
       toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
@@ -1671,15 +1671,29 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                         <SelectContent>
                           <SelectItem value="auto">Auto-detect (Recommended)</SelectItem>
                           <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="fr">Français (French)</SelectItem>
                           <SelectItem value="es">Español (Spanish)</SelectItem>
+                          <SelectItem value="fr">Français (French)</SelectItem>
+                          <SelectItem value="de">Deutsch (German)</SelectItem>
+                          <SelectItem value="pt">Português (Portuguese)</SelectItem>
+                          <SelectItem value="ja">日本語 (Japanese)</SelectItem>
+                          <SelectItem value="zh">中文 (Chinese)</SelectItem>
+                          <SelectItem value="ko">한국어 (Korean)</SelectItem>
+                          <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                          <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports English, French, and Spanish.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 10 languages.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
                         {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
                         {config.language === 'es' && 'El banner siempre se mostrará en español.'}
+                        {config.language === 'de' && 'Das Banner wird immer auf Deutsch angezeigt.'}
+                        {config.language === 'pt' && 'O banner será sempre exibido em português.'}
+                        {config.language === 'ja' && 'バナーは常に日本語で表示されます。'}
+                        {config.language === 'zh' && '横幅将始终以中文显示。'}
+                        {config.language === 'ko' && '배너가 항상 한국어로 표시됩니다.'}
+                        {config.language === 'ar' && 'سيتم عرض الشعار دائمًا باللغة العربية.'}
+                        {config.language === 'hi' && 'बैनर हमेशा हिन्दी में प्रदर्शित होगा।'}
                       </p>
                     </div>
                   </CardContent>

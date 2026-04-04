@@ -1444,7 +1444,7 @@ var TRANSLATIONS = {
     privacyPolicy: "Datenschutzerkl\\u00e4rung"
   },
   pt: {
-    title: ${config.language === 'pt' ? JSON.stringify(config.text.title) : '"Usamos cookies"'},
+    title: ${config.language === 'pt' ? JSON.stringify(config.text.title) : '"Utilizamos cookies"'},
     message: ${config.language === 'pt' ? JSON.stringify(config.text.message) : '"Este site utiliza cookies para melhorar sua experi\\u00eancia de navega\\u00e7\\u00e3o e fornecer conte\\u00fado personalizado."'},
     acceptButton: ${config.language === 'pt' ? JSON.stringify(config.text.acceptButton) : '"Aceitar tudo"'},
     rejectButton: ${config.language === 'pt' ? JSON.stringify(config.text.rejectButton) : '"Rejeitar"'},
@@ -1628,6 +1628,13 @@ function detectLanguage() {
 function applyTranslations() {
   var lang = detectLanguage();
   var trans = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
+  // Set RTL direction for Arabic
+  var container = document.getElementById('cookie-consent-container');
+  if (container) {
+    container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    if (lang === 'ar') container.style.textAlign = 'right';
+  }
 
   // Helper to set text by ID without destroying child HTML
   function setText(id, text) {
