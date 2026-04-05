@@ -19,7 +19,6 @@ import {
   AlertTriangle,
   Star,
   Circle,
-  Clock,
   Users,
 } from 'lucide-react'
 import { motion } from 'framer-motion'

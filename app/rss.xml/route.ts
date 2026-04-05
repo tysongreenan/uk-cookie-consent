@@ -1,7 +1,7 @@
 import { getAllPosts } from '@/lib/blog/blog'
 
 export async function GET() {
-  const baseUrl = 'https://www.cookie-banner.ca'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
   const posts = getAllPosts()
 
   const items = posts

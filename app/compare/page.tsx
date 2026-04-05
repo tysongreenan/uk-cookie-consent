@@ -54,8 +54,9 @@ export default function ComparePage() {
       <StructuredData
         type="webpage"
         data={{
-          title: 'Cookie Consent Tool Comparison 2026',
+          name: 'Cookie Consent Tool Comparison 2026',
           description: 'Compare top cookie consent platforms side-by-side. See how Cookie-Banner.ca stacks up against Cookiebot, OneTrust, CookieYes, and Termly.',
+          url: 'https://www.cookie-banner.ca/compare',
         }}
       />
       <StructuredData
