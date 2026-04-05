@@ -12,8 +12,24 @@ import Link from 'next/link'
 export default function PricingPage() {
   const { data: session } = useSession()
 
+  // Developer-defined schema — not user input
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Cookie Banner Generator",
+    "description": "Cookie consent banner generator with PIPEDA, Law 25, GDPR & CCPA compliance.",
+    "brand": { "@type": "Organization", "name": "Cookie-Banner.ca" },
+    "offers": [
+      { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro (One-Time)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Pro (Annual)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Product structured data for Google rich results — developer-controlled schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <Header />
 
       <div className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
