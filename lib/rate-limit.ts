@@ -17,12 +17,16 @@ import { Ratelimit } from '@upstash/ratelimit'
 let redis: Redis | null = null
 function getRedis(): Redis | null {
   if (redis) return redis
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null
-  redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  })
-  return redis
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim()
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+  if (!url || !token) return null
+  try {
+    redis = new Redis({ url, token })
+    return redis
+  } catch (error) {
+    console.error('[RATE-LIMIT] Failed to create Redis client:', error)
+    return null
+  }
 }
 
 export interface RateLimitOptions {
@@ -66,14 +70,12 @@ export class RateLimit {
 
   public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
     const key = this.keyGenerator(req)
-    const limiter = this.getLimiter()
-
-    if (!limiter) {
-      // No Redis configured — allow all requests (dev mode / fallback)
-      return { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
-    }
+    const fallback = { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
 
     try {
+      const limiter = this.getLimiter()
+      if (!limiter) return fallback
+
       const result = await limiter.limit(key)
       return {
         allowed: result.success,
@@ -83,7 +85,7 @@ export class RateLimit {
     } catch (error) {
       // Redis error — fail open (don't block users if Redis is down)
       console.error('[RATE-LIMIT] Upstash error, failing open:', error)
-      return { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
+      return fallback
     }
   }
 }
