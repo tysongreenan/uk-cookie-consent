@@ -122,48 +122,55 @@ export default function PrivacyPolicyPage() {
       <Header />
 
       <main>
-        {/* Hero: Generator Above the Fold */}
-        <section className="py-12 sm:py-16 md:py-24">
+        {/* Hero: Generator Above the Fold — tight padding to get the tool visible fast */}
+        <section className="pt-8 sm:pt-10 pb-6">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="border border-border rounded-full px-3 py-1 text-xs font-mono tracking-wide uppercase text-muted-foreground inline-block mb-4">
-                Free &mdash; No Signup Required
-              </div>
-              <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight mb-3">
-                Privacy Policy Generator
-              </h1>
-              <p className="text-lg text-muted-foreground mb-8">
-                Create a legally compliant privacy policy for your website in minutes.
-                Covers GDPR, PIPEDA, CCPA, and Quebec Law 25.
-              </p>
-            </div>
-
             <div className="max-w-4xl mx-auto">
+              {/* Compact header */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2.5 py-1 rounded-full">
+                      100% Free
+                    </div>
+                    <span className="text-xs text-muted-foreground">No signup required</span>
+                  </div>
+                  <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
+                    Privacy Policy Generator
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    Answer 3 quick questions. Get a legally compliant privacy policy. Copy &amp; paste it on your site.
+                  </p>
+                </div>
+                <div className="flex items-center gap-4 text-center sm:text-right">
+                  <div>
+                    <div className="text-2xl font-bold text-foreground">5 min</div>
+                    <div className="text-[11px] text-muted-foreground">to generate</div>
+                  </div>
+                  <div className="h-8 w-px bg-border hidden sm:block" />
+                  <div>
+                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-[11px] text-muted-foreground">laws covered</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generator — immediately visible */}
               <PrivacyPolicyGenerator />
             </div>
           </div>
         </section>
 
-        {/* Social Proof Bar */}
-        <section className="bg-muted/50 py-6 border-y border-border">
+        {/* What you get strip */}
+        <section className="bg-muted/50 py-5 border-y border-border">
           <div className="container mx-auto px-4">
-            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 text-center">
-              <div>
-                <div className="text-2xl font-bold text-foreground">4</div>
-                <div className="text-xs text-muted-foreground">Privacy laws covered</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">5 min</div>
-                <div className="text-xs text-muted-foreground">Average generation time</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">100%</div>
-                <div className="text-xs text-muted-foreground">Free to generate</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">12+</div>
-                <div className="text-xs text-muted-foreground">Sections included</div>
-              </div>
+            <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />GDPR compliant</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />PIPEDA compliant</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />CCPA compliant</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Law 25 compliant</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Copy &amp; paste ready</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />No signup</span>
             </div>
           </div>
         </section>

@@ -201,37 +201,33 @@ export function PrivacyPolicyGenerator() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        {/* Step indicator */}
-        <div className="flex items-center justify-between mb-2">
-          {STEPS.map((step, index) => (
-            <div key={step.id} className="flex items-center flex-1">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors ${
-                    index < currentStep
-                      ? 'bg-primary border-primary text-primary-foreground'
-                      : index === currentStep
-                      ? 'border-primary text-primary'
-                      : 'border-border text-muted-foreground'
-                  }`}
-                >
-                  {index < currentStep ? <Check className="h-4 w-4" /> : index + 1}
-                </div>
-                <span className={`text-sm hidden sm:inline ${
-                  index <= currentStep ? 'font-medium text-foreground' : 'text-muted-foreground'
-                }`}>
-                  {step.label}
-                </span>
-              </div>
-              {index < STEPS.length - 1 && (
-                <div className={`flex-1 h-px mx-3 ${
-                  index < currentStep ? 'bg-primary' : 'bg-border'
-                }`} />
-              )}
-            </div>
-          ))}
+    <Card className="border-2 border-primary/20 shadow-lg">
+      <CardHeader className="pb-4">
+        {/* What to do — clear instruction */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <CardTitle className="text-lg">
+              {currentStep === 0 && 'Step 1: Tell us about your business'}
+              {currentStep === 1 && 'Step 2: What data do you collect?'}
+              {currentStep === 2 && 'Step 3: Cookies & third-party services'}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {currentStep === 0 && 'We use this to customize your privacy policy.'}
+              {currentStep === 1 && 'Select all types of personal data your site collects.'}
+              {currentStep === 2 && 'Almost done — select the services and cookies you use.'}
+            </p>
+          </div>
+          <div className="text-xs text-muted-foreground font-medium bg-muted px-2.5 py-1 rounded-full shrink-0">
+            {currentStep + 1} of {STEPS.length}
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-300"
+            style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+          />
         </div>
       </CardHeader>
       <CardContent>
