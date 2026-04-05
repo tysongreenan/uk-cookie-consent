@@ -1,141 +1,130 @@
-// Simple in-memory rate limiter
-// For production, consider using Redis or a dedicated service
+/**
+ * Rate Limiter — Upstash Redis for Vercel serverless
+ *
+ * Previous version used in-memory Map which reset on every cold start.
+ * This version uses Upstash Redis for persistent, distributed rate limiting.
+ *
+ * Falls back to in-memory (permissive) if Upstash is not configured,
+ * so the app still works without Redis — just without rate limiting.
+ *
+ * API is unchanged: new RateLimit({ windowMs, maxRequests }) → .check(request)
+ */
 
-interface RateLimitEntry {
-  count: number;
-  resetTime: number;
+import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit'
+
+// Lazy init — only create Redis client if env vars exist
+let redis: Redis | null = null
+function getRedis(): Redis | null {
+  if (redis) return redis
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  })
+  return redis
 }
 
-const rateLimitStore = new Map<string, RateLimitEntry>();
-
 export interface RateLimitOptions {
-  windowMs: number; // Time window in milliseconds
-  maxRequests: number; // Max requests per window
-  keyGenerator?: (req: Request) => string; // Custom key generator
+  windowMs: number
+  maxRequests: number
+  keyGenerator?: (req: Request) => string
 }
 
 export class RateLimit {
-  private windowMs: number;
-  private maxRequests: number;
-  private keyGenerator: (req: Request) => string;
+  private windowMs: number
+  private maxRequests: number
+  private keyGenerator: (req: Request) => string
+  private upstashLimiter: Ratelimit | null = null
 
   constructor(options: RateLimitOptions) {
-    this.windowMs = options.windowMs;
-    this.maxRequests = options.maxRequests;
-    this.keyGenerator = options.keyGenerator || this.defaultKeyGenerator;
+    this.windowMs = options.windowMs
+    this.maxRequests = options.maxRequests
+    this.keyGenerator = options.keyGenerator || this.defaultKeyGenerator
   }
 
   private defaultKeyGenerator(req: Request): string {
-    // Get IP from various headers (for different hosting platforms)
-    const forwarded = req.headers.get('x-forwarded-for');
-    const realIp = req.headers.get('x-real-ip');
-    const cfConnectingIp = req.headers.get('cf-connecting-ip');
-    
-    const ip = forwarded?.split(',')[0] || realIp || cfConnectingIp || 'unknown';
-    
-    // Combine IP with user agent for better uniqueness
-    const userAgent = req.headers.get('user-agent') || '';
-    return `${ip}-${userAgent.slice(0, 50)}`;
+    const forwarded = req.headers.get('x-forwarded-for')
+    const realIp = req.headers.get('x-real-ip')
+    const ip = forwarded?.split(',')[0]?.trim() || realIp || 'unknown'
+    return ip
+  }
+
+  private getLimiter(): Ratelimit | null {
+    if (this.upstashLimiter) return this.upstashLimiter
+    const r = getRedis()
+    if (!r) return null
+    // Convert windowMs to seconds for Upstash sliding window
+    const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
+    this.upstashLimiter = new Ratelimit({
+      redis: r,
+      limiter: Ratelimit.slidingWindow(this.maxRequests, `${windowSeconds} s`),
+      analytics: false, // Keep it fast
+    })
+    return this.upstashLimiter
   }
 
   public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
-    const key = this.keyGenerator(req);
-    const now = Date.now();
-    const entry = rateLimitStore.get(key);
+    const key = this.keyGenerator(req)
+    const limiter = this.getLimiter()
 
-    // Clean up expired entries periodically
-    if (Math.random() < 0.01) { // 1% chance
-      this.cleanup();
+    if (!limiter) {
+      // No Redis configured — allow all requests (dev mode / fallback)
+      return { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
     }
 
-    if (!entry || now > entry.resetTime) {
-      // New window or expired entry
-      const newEntry: RateLimitEntry = {
-        count: 1,
-        resetTime: now + this.windowMs
-      };
-      rateLimitStore.set(key, newEntry);
-      
+    try {
+      const result = await limiter.limit(key)
       return {
-        allowed: true,
-        remaining: this.maxRequests - 1,
-        resetTime: newEntry.resetTime
-      };
-    }
-
-    if (entry.count >= this.maxRequests) {
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: entry.resetTime
-      };
-    }
-
-    // Increment count
-    entry.count++;
-    rateLimitStore.set(key, entry);
-
-    return {
-      allowed: true,
-      remaining: this.maxRequests - entry.count,
-      resetTime: entry.resetTime
-    };
-  }
-
-  private cleanup(): void {
-    const now = Date.now();
-    const keysToDelete: string[] = [];
-    
-    rateLimitStore.forEach((entry, key) => {
-      if (now > entry.resetTime) {
-        keysToDelete.push(key);
+        allowed: result.success,
+        remaining: result.remaining,
+        resetTime: result.reset,
       }
-    });
-    
-    keysToDelete.forEach(key => {
-      rateLimitStore.delete(key);
-    });
+    } catch (error) {
+      // Redis error — fail open (don't block users if Redis is down)
+      console.error('[RATE-LIMIT] Upstash error, failing open:', error)
+      return { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
+    }
   }
 }
 
-// Pre-configured enterprise rate limiters
+// Pre-configured rate limiters (same config as before)
 export const authRateLimit = new RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5, // 5 attempts per 15 minutes
-});
+  maxRequests: 5,
+})
 
 export const strictAuthRateLimit = new RateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 10, // 10 attempts per hour (stricter for suspicious activity)
-});
+  maxRequests: 10,
+})
 
 export const apiRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 60, // 60 requests per minute
-});
+  maxRequests: 60,
+})
 
 export const bannerRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 10, // 10 banner operations per minute
-});
+  maxRequests: 10,
+})
 
 export const registrationRateLimit = new RateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3, // 3 registrations per hour per IP
-});
+  maxRequests: 3,
+})
 
 export const passwordResetRateLimit = new RateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3, // 3 password reset attempts per hour
-});
+  maxRequests: 3,
+})
 
-// Advanced rate limiting for different user types
 export const enterpriseRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 100, // Higher limits for enterprise users
-});
+  maxRequests: 100,
+})
 
 export const freeTierRateLimit = new RateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30, // Lower limits for free tier
-});
+  maxRequests: 30,
+})
