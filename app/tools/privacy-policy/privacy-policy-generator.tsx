@@ -70,10 +70,28 @@ export function PrivacyPolicyGenerator() {
     setIsGenerating(true)
     setError(null)
     try {
+      // Auto-detect jurisdictions from country selection
+      const jurisdictions: string[] = []
+      const euCountries = ['DE', 'FR', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'ES', 'IT', 'PT', 'BE', 'AT', 'CH']
+      if (euCountries.includes(inputs.country) || inputs.country === 'GB') jurisdictions.push('gdpr')
+      if (inputs.country === 'CA') {
+        jurisdictions.push('pipeda')
+        if (inputs.province === 'QC') jurisdictions.push('law25')
+      }
+      if (inputs.country === 'US') jurisdictions.push('ccpa')
+      // Global sites should cover all
+      if (['AU', 'NZ', 'SG', 'JP', 'IN', 'BR', 'MX', 'ZA'].includes(inputs.country)) {
+        jurisdictions.push('gdpr') // GDPR-style best practice
+      }
+      // Always include at least one framework
+      if (jurisdictions.length === 0) jurisdictions.push('gdpr')
+
+      const payload = { ...inputs, jurisdictions }
+
       const res = await fetch('/api/privacy-policy/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inputs),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => null)

@@ -86,7 +86,33 @@ function CheckboxGrid({
   )
 }
 
+const PRESETS: Record<string, { data: string[]; methods: string[] }> = {
+  website: {
+    data: ['name', 'email', 'ip_address', 'device_info', 'browsing_history'],
+    methods: ['forms', 'cookies', 'analytics', 'automatic_collection'],
+  },
+  ecommerce: {
+    data: ['name', 'email', 'phone', 'ip_address', 'device_info', 'payment_data', 'location', 'browsing_history'],
+    methods: ['forms', 'cookies', 'analytics', 'account_creation', 'purchases', 'automatic_collection'],
+  },
+  saas: {
+    data: ['name', 'email', 'ip_address', 'device_info', 'account_credentials', 'browsing_history'],
+    methods: ['forms', 'cookies', 'analytics', 'account_creation', 'automatic_collection'],
+  },
+  mobile_app: {
+    data: ['name', 'email', 'ip_address', 'device_info', 'location', 'account_credentials'],
+    methods: ['forms', 'analytics', 'account_creation', 'automatic_collection'],
+  },
+}
+
 export function StepDataCollection({ inputs, onChange }: StepProps) {
+  const applyPreset = () => {
+    const preset = PRESETS[inputs.businessType] || PRESETS.website
+    onChange({ dataCollected: preset.data, collectionMethods: preset.methods })
+  }
+
+  const hasSelections = inputs.dataCollected.length > 0 || inputs.collectionMethods.length > 0
+
   const toggleDataType = (value: string) => {
     const current = inputs.dataCollected
     const next = current.includes(value)
@@ -111,6 +137,20 @@ export function StepDataCollection({ inputs, onChange }: StepProps) {
           What personal data do you collect and how do you collect it?
         </p>
       </div>
+
+      {/* Quick preset — one click to pre-fill based on business type */}
+      {!hasSelections && (
+        <button
+          type="button"
+          onClick={applyPreset}
+          className="w-full p-4 rounded-lg border-2 border-dashed border-primary/30 hover:border-primary/60 bg-primary/5 hover:bg-primary/10 transition-colors text-center"
+        >
+          <p className="font-medium text-sm text-primary">
+            Auto-fill for {inputs.businessType === 'ecommerce' ? 'E-Commerce' : inputs.businessType === 'saas' ? 'SaaS' : inputs.businessType === 'mobile_app' ? 'Mobile App' : 'Website'}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Pre-selects the most common data types and collection methods for your business type</p>
+        </button>
+      )}
 
       <div className="space-y-2">
         <Label>Types of Data Collected</Label>
