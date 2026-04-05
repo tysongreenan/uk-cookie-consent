@@ -344,7 +344,7 @@ export default function CCPACookieBannerPage() {
                 <p className="text-lg text-muted-foreground mb-6">
                   With our free cookie banner, CCPA compliance takes 5 minutes — not $50,000 in legal fees.
                 </p>
-                <Link href="/auth/register">
+                <Link href="/auth/signup">
                   <Button size="lg" className="px-8">
                     Get CCPA Compliant Free
                     <ArrowRight className="ml-2 h-4 w-4" />

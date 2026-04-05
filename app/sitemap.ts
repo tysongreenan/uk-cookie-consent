@@ -67,6 +67,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/features/multi-language`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/features/what-you-get`,
       lastModified: staticDate,
       changeFrequency: 'monthly',

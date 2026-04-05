@@ -18,11 +18,18 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('q')?.trim()
 
     if (!query || query.length < 2) {
-      return NextResponse.json({ 
-        roadmapItems: [], 
+      return NextResponse.json({
+        roadmapItems: [],
         suggestions: [],
         message: 'Query must be at least 2 characters'
       })
+    }
+
+    // Sanitize query to prevent PostgREST filter injection
+    // Remove characters that have special meaning in PostgREST filters
+    const sanitized = query.replace(/[%,().*\\]/g, '').slice(0, 100)
+    if (!sanitized) {
+      return NextResponse.json({ roadmapItems: [], suggestions: [] })
     }
 
     const supabase = getSupabaseClient()
@@ -30,14 +37,14 @@ export async function GET(request: NextRequest) {
     const { data: roadmapItems, error: roadmapError } = await supabase
       .from('RoadmapItem')
       .select('id, title, description, category, status, priority')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+      .or(`title.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)
       .limit(5)
 
     // Search feature suggestions (case-insensitive, partial match)
     const { data: suggestions, error: suggestionsError } = await supabase
       .from('FeatureSuggestion')
       .select('id, title, description, category, status, votes')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+      .or(`title.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)
       .limit(5)
 
     if (roadmapError) {

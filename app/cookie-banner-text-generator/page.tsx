@@ -360,7 +360,7 @@ export default function CookieBannerTextGeneratorPage() {
               <p className="text-muted-foreground mb-8">
                 Auto-detects your cookies, matches your brand colors, and generates the right text for every privacy law &mdash; GDPR, CCPA, PIPEDA, and Law 25.
               </p>
-              <Link href="/auth/register">
+              <Link href="/auth/signup">
                 <Button size="lg" className="px-8">
                   Generate My Banner Free
                   <ArrowRight className="ml-2 h-4 w-4" />

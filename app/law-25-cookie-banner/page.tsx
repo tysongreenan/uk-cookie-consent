@@ -497,7 +497,7 @@ export default function Law25CookieBannerPage() {
                 <p className="text-lg text-muted-foreground mb-6">
                   Our free cookie banner makes Law 25 compliance effortless — 5 minutes, not $50,000 in legal fees.
                 </p>
-                <Link href="/auth/register">
+                <Link href="/auth/signup">
                   <Button size="lg" className="px-8">
                     Get Law 25 Compliant Free
                     <ArrowRight className="ml-2 h-4 w-4" />

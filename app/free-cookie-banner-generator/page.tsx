@@ -243,7 +243,7 @@ export default function FreeCookieBannerGeneratorPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href="/auth/register" className="block mt-8">
+                    <Link href="/auth/signup" className="block mt-8">
                       <Button className="w-full" size="lg">
                         Get Started Free
                         <ArrowRight className="ml-2 h-4 w-4" />

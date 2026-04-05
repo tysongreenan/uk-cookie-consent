@@ -452,7 +452,7 @@ export default function CookiePolicyTemplatePage() {
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
                 Our free cookie banner generator automatically creates a compliant banner that links to your cookie policy, blocks non-essential cookies until consent is given, and logs every consent transaction for your records. It works with GDPR, CCPA, PIPEDA, and Law 25 out of the box.
               </p>
-              <Link href="/auth/register">
+              <Link href="/auth/signup">
                 <Button size="lg" className="px-8">
                   Generate My Free Cookie Banner
                   <ArrowRight className="ml-2 h-4 w-4" />

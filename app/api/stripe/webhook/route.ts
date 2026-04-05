@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
 
         if (session.payment_status !== 'paid') {
           console.error('[WEBHOOK] Payment not completed:', { sessionId: session.id, paymentStatus: session.payment_status })
-          return fail('Payment not completed')
+          return ok() // Acknowledge to stop Stripe retries — payment isn't complete yet
         }
 
         const userId = session.metadata?.userId
         if (!userId) {
           console.error('[WEBHOOK] Missing userId in metadata:', { sessionId: session.id })
-          return fail('Missing user metadata')
+          return ok() // Acknowledge — can't process without userId, don't retry
         }
 
         const user = await prisma.user.findUnique({
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         })
         if (!user) {
           console.error('[WEBHOOK] User not found:', { sessionId: session.id, userId })
-          return fail('User not found', 404)
+          return ok() // User may have been deleted — don't retry
         }
 
         const billingCycle = session.metadata?.billingCycle || 'one_time'

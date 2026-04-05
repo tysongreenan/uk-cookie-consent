@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
           }
 
           return {
-            id: user.id,
             companyName: user.name || project.domain,
             logoUrl,
             websiteUrl,

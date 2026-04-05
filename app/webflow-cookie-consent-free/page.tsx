@@ -352,7 +352,7 @@ export default function WebflowCookieConsentFreePage() {
                         <span>GDPR &amp; PIPEDA compliant</span>
                       </li>
                     </ul>
-                    <Link href="/auth/register">
+                    <Link href="/auth/signup">
                       <Button className="w-full mt-6" size="lg">
                         Get Free Banner
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -396,7 +396,7 @@ export default function WebflowCookieConsentFreePage() {
                         <span>Advanced analytics</span>
                       </li>
                     </ul>
-                    <Link href="/auth/register">
+                    <Link href="/auth/signup">
                       <Button className="w-full mt-6" variant="outline" size="lg">
                         Upgrade to Pro
                       </Button>
