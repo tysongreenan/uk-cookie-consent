@@ -35,35 +35,52 @@ const THIRD_PARTY_SERVICES = [
 function CheckboxGrid({
   items,
   selected,
+  onSelectAll,
+  onDeselectAll,
   onToggle,
 }: {
   items: { value: string; label: string }[]
   selected: string[]
+  onSelectAll: () => void
+  onDeselectAll: () => void
   onToggle: (value: string) => void
 }) {
+  const allSelected = items.every((item) => selected.includes(item.value))
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {items.map((item) => {
-        const isChecked = selected.includes(item.value)
-        return (
-          <label
-            key={item.value}
-            className={`flex items-center gap-2.5 rounded-md border px-3 py-2.5 text-sm cursor-pointer transition-colors ${
-              isChecked
-                ? 'border-primary bg-primary/5 text-foreground'
-                : 'border-border bg-background text-muted-foreground hover:border-primary/50'
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => onToggle(item.value)}
-              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-            />
-            {item.label}
-          </label>
-        )
-      })}
+    <div className="space-y-2">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={allSelected ? onDeselectAll : onSelectAll}
+          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+        >
+          {allSelected ? 'Deselect All' : 'Select All'}
+        </button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {items.map((item) => {
+          const isChecked = selected.includes(item.value)
+          return (
+            <label
+              key={item.value}
+              className={`flex items-center gap-2.5 rounded-md border px-3 py-2.5 text-sm cursor-pointer transition-colors ${
+                isChecked
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border bg-background text-muted-foreground hover:border-primary/50'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggle(item.value)}
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              />
+              {item.label}
+            </label>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -100,6 +117,8 @@ export function StepCookies({ inputs, onChange }: StepProps) {
           items={COOKIE_CATEGORIES}
           selected={inputs.cookieCategories}
           onToggle={toggleCategory}
+          onSelectAll={() => onChange({ cookieCategories: COOKIE_CATEGORIES.map((c) => c.value) })}
+          onDeselectAll={() => onChange({ cookieCategories: [] })}
         />
       </div>
 
@@ -109,6 +128,8 @@ export function StepCookies({ inputs, onChange }: StepProps) {
           items={THIRD_PARTY_SERVICES}
           selected={inputs.thirdPartyServices}
           onToggle={toggleService}
+          onSelectAll={() => onChange({ thirdPartyServices: THIRD_PARTY_SERVICES.map((s) => s.value) })}
+          onDeselectAll={() => onChange({ thirdPartyServices: [] })}
         />
       </div>
     </div>
