@@ -1141,14 +1141,15 @@ function BannerBuilderContent() {
                     <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${activeTab === 'compliance' ? 10 :
-                                 activeTab === 'brand' ? 20 :
-                                 activeTab === 'design' ? 30 :
-                                 activeTab === 'content' ? 40 :
-                                 activeTab === 'scripts' ? 50 :
-                                 activeTab === 'cookie-settings' ? 60 :
-                                 activeTab === 'behavior' ? 70 :
-                                 activeTab === 'geo-targeting' ? 80 :
+                        width: `${activeTab === 'compliance' ? 9 :
+                                 activeTab === 'brand' ? 18 :
+                                 activeTab === 'design' ? 27 :
+                                 activeTab === 'content' ? 36 :
+                                 activeTab === 'language' ? 45 :
+                                 activeTab === 'scripts' ? 54 :
+                                 activeTab === 'cookie-settings' ? 63 :
+                                 activeTab === 'behavior' ? 72 :
+                                 activeTab === 'geo-targeting' ? 81 :
                                  activeTab === 'analytics' ? 90 : 100}%`
                       }}
                     ></div>
@@ -1213,6 +1214,19 @@ function BannerBuilderContent() {
                     {isStepComplete('content') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
+                  <button
+                    onClick={() => setActiveTab('language')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'language'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Globe className="h-4 w-4" />
+                    <span className="flex-1 text-left">Language</span>
+                    {config.language !== 'auto' && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                  </button>
+
                   <button
                     onClick={() => setActiveTab('scripts')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
@@ -2314,21 +2328,20 @@ function BannerBuilderContent() {
 
               </TabsContent>
 
-              {/* Content Tab */}
-              <TabsContent value="content" className="space-y-6" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
-
+              {/* Language Tab */}
+              <TabsContent value="language" className="space-y-6" id="language-panel" role="tabpanel" aria-labelledby="language-tab">
                 <Card className="border-l-4 border-l-purple-500">
                   <CardHeader>
-                    <CardTitle>Language</CardTitle>
+                    <CardTitle>Banner Language</CardTitle>
                     <CardDescription>
-                      Choose your banner language. Auto-detect matches the visitor's browser language across 10 languages.
+                      Your banner auto-translates into 10 languages. Buttons, text, cookie categories — everything switches to the visitor&apos;s language.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="language">Banner Language</Label>
-                      <Select 
-                        value={config.language} 
+                      <Label htmlFor="language">Language Mode</Label>
+                      <Select
+                        value={config.language}
                         onValueChange={handleLanguageChange}
                       >
                         <SelectTrigger>
@@ -2362,8 +2375,43 @@ function BannerBuilderContent() {
                         {config.language === 'hi' && 'बैनर हमेशा हिन्दी में प्रदर्शित होगा।'}
                       </p>
                     </div>
+
+                    {/* Language preview */}
+                    <div className="border border-border rounded-lg p-4 bg-muted/30">
+                      <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Translation Preview</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {[
+                          { code: 'en', label: 'English', sample: 'We use cookies' },
+                          { code: 'es', label: 'Español', sample: 'Usamos cookies' },
+                          { code: 'fr', label: 'Français', sample: 'Nous utilisons des cookies' },
+                          { code: 'de', label: 'Deutsch', sample: 'Wir verwenden Cookies' },
+                          { code: 'pt', label: 'Português', sample: 'Utilizamos cookies' },
+                          { code: 'ja', label: '日本語', sample: 'Cookieの使用について' },
+                          { code: 'zh', label: '中文', sample: '我们使用Cookie' },
+                          { code: 'ko', label: '한국어', sample: '쿠키를 사용합니다' },
+                          { code: 'ar', label: 'العربية', sample: 'نستخدم ملفات تعريف الارتباط' },
+                          { code: 'hi', label: 'हिन्दी', sample: 'हम कुकीज़ का उपयोग करते हैं' },
+                        ].map((lang) => (
+                          <div
+                            key={lang.code}
+                            className={`p-2 rounded border transition-colors ${
+                              config.language === lang.code || (config.language === 'auto')
+                                ? 'border-primary/50 bg-primary/5'
+                                : 'border-border'
+                            }`}
+                          >
+                            <span className="font-medium">{lang.label}</span>
+                            <p className="text-muted-foreground mt-0.5" dir={lang.code === 'ar' ? 'rtl' : undefined}>{lang.sample}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Content Tab */}
+              <TabsContent value="content" className="space-y-6" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
 
                 <Card>
                   <CardHeader>
