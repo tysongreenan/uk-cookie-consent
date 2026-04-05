@@ -125,61 +125,93 @@ export function PrivacyPolicyGenerator() {
   if (output) {
     return (
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <CardTitle className="text-xl">
-                Privacy Policy for {output.metadata.businessName}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleCopy}>
-                  {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                  {hasCopied ? 'Copied' : 'Copy HTML'}
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleDownload}>
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleStartOver}>
-                  Start Over
-                </Button>
+        {/* Success header */}
+        <Card className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center shrink-0">
+                <Check className="h-5 w-5 text-green-600" />
               </div>
+              <div className="flex-1">
+                <p className="font-semibold">Your privacy policy is ready!</p>
+                <p className="text-sm text-muted-foreground">
+                  Covers: {output.metadata.jurisdictions.join(', ')} &middot; {new Date(output.metadata.generatedAt).toLocaleDateString()}
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleStartOver}>Start Over</Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Generated {new Date(output.metadata.generatedAt).toLocaleDateString()} &middot; Covers: {output.metadata.jurisdictions.join(', ')}
-            </p>
-          </CardHeader>
-          <CardContent>
-            {/* Content is generated server-side by our own generator from validated inputs, not user-supplied raw HTML */}
-            <div
-              className="prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card max-h-[600px] overflow-y-auto"
-              dangerouslySetInnerHTML={{ __html: output.contentHtml }}
-            />
           </CardContent>
         </Card>
 
-        {/* CTA for non-authenticated users */}
+        {/* Signup CTA FIRST for non-signed-in users */}
         {!session && (
-          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 border-purple-200 dark:border-purple-800">
-            <CardContent className="p-6 text-center">
-              <Crown className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold mb-2">Save and Host This Policy</h3>
-              <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
-                Upgrade to Pro to save your policy, get a hosted URL, automatic updates when laws change, and version history for compliance audits.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button asChild>
-                  <Link href="/auth/signin">Sign Up Free</Link>
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link href="/pricing">View Pro Features</Link>
-                </Button>
+          <Card className="border-2 border-primary">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold mb-1">Create a free account to get your policy</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Sign up (free) to copy, download, and save your privacy policy. Pro users also get a hosted URL, automatic updates, and version history.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
+                  <Button asChild size="lg" className="w-full sm:w-auto">
+                    <Link href="/auth/signup">
+                      Sign Up Free
+                      <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground text-center">No credit card required</p>
+                </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* CTA for authenticated users */}
+        {/* Policy content */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <CardTitle className="text-lg">
+                Privacy Policy for {output.metadata.businessName}
+              </CardTitle>
+              {session && (
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleCopy}>
+                    {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                    {hasCopied ? 'Copied' : 'Copy HTML'}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleDownload}>
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              {/* Server-generated content from validated inputs, not user-supplied HTML */}
+              <div
+                className={`prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card overflow-y-auto ${session ? 'max-h-[600px]' : 'max-h-[300px]'}`}
+                dangerouslySetInnerHTML={{ __html: output.contentHtml }}
+              />
+              {/* Blur overlay — sign up to see full policy */}
+              {!session && (
+                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent rounded-b-lg flex items-end justify-center pb-6">
+                  <Button asChild size="lg">
+                    <Link href="/auth/signup">
+                      Sign Up Free to View Full Policy
+                      <ArrowRight className="h-4 w-4 ml-1" />
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save CTA for authenticated users */}
         {session && (
           <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-green-200 dark:border-green-800">
             <CardContent className="p-6 text-center">

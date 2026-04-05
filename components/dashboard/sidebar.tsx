@@ -182,15 +182,17 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         )}
 
-        {hasBanner && isPro && (
+        {hasBanner && (
           <div className="space-y-0.5 pt-4">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               Compliance
             </p>
             {[
-              { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch, badge: 'new' as const },
-              { title: 'Consent Logs', href: '/dashboard/consent-logs', icon: FileText, badge: 'new' as const },
-              { title: 'Privacy Policy', href: '/dashboard/privacy-policy', icon: FileText, badge: 'new' as const },
+              { title: 'Privacy Policy', href: '/dashboard/privacy-policy', icon: FileText },
+              ...(isPro ? [
+                { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch, badge: 'new' as const },
+                { title: 'Consent Logs', href: '/dashboard/consent-logs', icon: FileText, badge: 'new' as const },
+              ] : []),
             ].map(item => renderNavItem(item))}
           </div>
         )}
