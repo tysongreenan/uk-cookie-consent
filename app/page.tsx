@@ -11,6 +11,7 @@ import { HeroSection } from '@/components/blocks/hero-section'
 import { LogoMarquee } from '@/components/landing/logo-marquee'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 import { ProductDescription } from '@/components/landing/product-description'
+import { LanguageSection } from '@/components/landing/language-section'
 import { ABTracker } from '@/components/ab-tracker'
 
 export const metadata: Metadata = {
@@ -85,6 +86,7 @@ export default function HomePage() {
         <InteractiveBannerDemo />
         <FeaturesBento />
         <ProductDescription />
+        <LanguageSection />
         <RoadmapPreview />
         <FinalCTA />
         <CookieBannerFAQ />
