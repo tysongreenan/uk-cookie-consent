@@ -48,9 +48,33 @@ export function PrivacyPolicyGenerator() {
   const [currentStep, setCurrentStep] = useState(0)
   const [inputs, setInputs] = useState<PrivacyPolicyInputs>(DEFAULT_INPUTS)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [output, setOutput] = useState<PolicyOutput | null>(null)
+
+  // Restore saved policy after signup/signin redirect
+  const [restoredOnMount, setRestoredOnMount] = useState(false)
+  const [output, setOutput] = useState<PolicyOutput | null>(() => {
+    // Try to restore from sessionStorage on mount (after signup redirect)
+    if (typeof window === 'undefined') return null
+    try {
+      const saved = sessionStorage.getItem('privacy-policy-output')
+      if (saved) {
+        sessionStorage.removeItem('privacy-policy-output')
+        return JSON.parse(saved)
+      }
+    } catch {}
+    return null
+  })
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Save policy to sessionStorage before navigating to signup
+  const saveAndNavigate = useCallback((href: string) => {
+    if (output) {
+      try {
+        sessionStorage.setItem('privacy-policy-output', JSON.stringify(output))
+      } catch {}
+    }
+    window.location.href = href
+  }, [output])
 
   const handleChange = useCallback((updates: Partial<PrivacyPolicyInputs>) => {
     setInputs((prev) => ({ ...prev, ...updates }))
@@ -173,11 +197,9 @@ export function PrivacyPolicyGenerator() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
-                  <Button asChild size="lg" className="w-full sm:w-auto">
-                    <Link href="/auth/signup">
-                      Sign Up Free
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Link>
+                  <Button size="lg" className="w-full sm:w-auto" onClick={() => saveAndNavigate('/auth/signup?callbackUrl=/tools/privacy-policy')}>
+                    Sign Up Free
+                    <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                   <p className="text-[11px] text-muted-foreground text-center">No credit card required</p>
                 </div>
@@ -217,11 +239,9 @@ export function PrivacyPolicyGenerator() {
               {/* Blur overlay — sign up to see full policy */}
               {!session && (
                 <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent rounded-b-lg flex items-end justify-center pb-6">
-                  <Button asChild size="lg">
-                    <Link href="/auth/signup">
-                      Sign Up Free to View Full Policy
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Link>
+                  <Button size="lg" onClick={() => saveAndNavigate('/auth/signup?callbackUrl=/tools/privacy-policy')}>
+                    Sign Up Free to View Full Policy
+                    <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               )}
