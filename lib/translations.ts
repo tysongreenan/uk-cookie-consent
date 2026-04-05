@@ -20,7 +20,7 @@ export const translations = {
 
     // Cookie categories
     strictlyNecessary: 'Strictly Necessary Cookies',
-    strictlyNecessaryDescription: 'Always active',
+    strictlyNecessaryDescription: 'Always Active',
     functionality: 'Functional Cookies',
     functionalityDescription: 'These cookies enable enhanced functionality and personalization, such as language preferences and user settings.',
     trackingPerformance: 'Performance Cookies',
@@ -183,7 +183,7 @@ export const translations = {
     socialMediaDescription: 'Estes cookies permitem a integração com redes sociais e recursos de compartilhamento.',
 
     // Always active
-    alwaysActive: 'Sempre ativo',
+    alwaysActive: 'Sempre ativos',
 
     // Additional UI elements
     close: 'Fechar',
@@ -335,7 +335,7 @@ export const translations = {
     socialMediaDescription: 'تتيح ملفات تعريف الارتباط هذه التكامل مع وسائل التواصل الاجتماعي وميزات المشاركة.',
 
     // Always active
-    alwaysActive: 'نشط دائمًا',
+    alwaysActive: 'نشطة دائمًا',
 
     // Additional UI elements
     close: 'إغلاق',
@@ -534,7 +534,7 @@ export const translations = {
   },
   it: {
     title: 'Utilizziamo i cookie',
-    message: 'Questo sito web utilizza i cookie per migliorare la tua esperienza di navigazione e offrire contenuti personalizzati.',
+    message: 'Questo sito web utilizza i cookie per migliorare la Sua esperienza di navigazione e offrire contenuti personalizzati.',
     acceptButton: 'Accetta tutto',
     rejectButton: 'Rifiuta',
     preferencesButton: 'Preferenze',
@@ -543,7 +543,7 @@ export const translations = {
 
     // Preferences panel
     preferencesTitle: 'Centro privacy',
-    preferencesDescription: 'Cliccando su \u201cAccetta\u201d, acconsenti alla memorizzazione dei cookie sul tuo dispositivo per migliorare la navigazione, analizzare l\u2019utilizzo del sito e supportare le nostre attivit\u00e0 di marketing.',
+    preferencesDescription: 'Cliccando su \u201cAccetta\u201d, acconsente alla memorizzazione dei cookie sul Suo dispositivo per migliorare la navigazione, analizzare l\u2019utilizzo del sito e supportare le nostre attivit\u00e0 di marketing.',
     managePreferences: 'Gestisci le preferenze dei cookie',
     savePreferences: 'Salva preferenze',
     acceptAll: 'Accetta tutto',
@@ -558,7 +558,7 @@ export const translations = {
     trackingPerformance: 'Cookie di prestazione',
     trackingPerformanceDescription: 'Questi cookie ci aiutano a capire come i visitatori interagiscono con il nostro sito web raccogliendo e riportando informazioni in modo anonimo.',
     targetingAdvertising: 'Cookie di targeting',
-    targetingAdvertisingDescription: 'Questi cookie vengono utilizzati per rendere i messaggi pubblicitari pi\u00f9 pertinenti per te e per i tuoi interessi.',
+    targetingAdvertisingDescription: 'Questi cookie vengono utilizzati per rendere i messaggi pubblicitari pi\u00f9 pertinenti per Lei e per i Suoi interessi.',
     socialMedia: 'Cookie dei social media',
     socialMediaDescription: 'Questi cookie abilitano l\u2019integrazione con i social media e le funzionalit\u00e0 di condivisione.',
 
