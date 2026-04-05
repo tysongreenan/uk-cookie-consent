@@ -14,6 +14,12 @@ const LANGUAGES = [
   { code: 'ko', name: 'Korean', native: '한국어', sample: '쿠키를 사용합니다' },
   { code: 'ar', name: 'Arabic', native: 'العربية', sample: 'نستخدم ملفات تعريف الارتباط', rtl: true },
   { code: 'hi', name: 'Hindi', native: 'हिन्दी', sample: 'हम कुकीज़ का उपयोग करते हैं' },
+  { code: 'nl', name: 'Dutch', native: 'Nederlands', sample: 'Wij gebruiken cookies' },
+  { code: 'sv', name: 'Swedish', native: 'Svenska', sample: 'Vi anv\u00e4nder cookies' },
+  { code: 'nb', name: 'Norwegian', native: 'Norsk', sample: 'Vi bruker informasjonskapsler' },
+  { code: 'da', name: 'Danish', native: 'Dansk', sample: 'Vi bruger cookies' },
+  { code: 'it', name: 'Italian', native: 'Italiano', sample: 'Utilizziamo i cookie' },
+  { code: 'fi', name: 'Finnish', native: 'Suomi', sample: 'K\u00e4yt\u00e4mme ev\u00e4steit\u00e4' },
 ]
 
 export function LanguageSection() {
@@ -27,7 +33,7 @@ export function LanguageSection() {
             Global Coverage
           </Badge>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-            One banner, 10 languages
+            One banner, 16 languages
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Your cookie banner automatically detects your visitor&apos;s browser language and displays

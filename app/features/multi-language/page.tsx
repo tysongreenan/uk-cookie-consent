@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { StructuredData } from '@/components/seo/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Multi-Language Cookie Banner — 10 Languages, Auto-Detect | Cookie Banner Generator',
-  description: 'Cookie consent banners that auto-translate into 10 languages including English, French, Spanish, German, Japanese, Chinese, Korean, Arabic, Hindi, and Portuguese. GDPR & PIPEDA compliant in every language.',
+  title: 'Multi-Language Cookie Banner — 16 Languages, Auto-Detect | Cookie Banner Generator',
+  description: 'Cookie consent banners that auto-translate into 16 languages including English, French, Spanish, German, Japanese, Chinese, Korean, Arabic, Hindi, Portuguese, Dutch, Swedish, Norwegian, Danish, Italian, and Finnish. GDPR & PIPEDA compliant in every language.',
   keywords: [
     'multi-language cookie banner',
     'translated cookie banner',
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     'cookie banner multiple languages',
   ],
   openGraph: {
-    title: 'Multi-Language Cookie Banner — 10 Languages with Auto-Detect',
-    description: 'One banner, 10 languages. Auto-detects visitor language. GDPR, PIPEDA, Law 25 compliant in every language.',
+    title: 'Multi-Language Cookie Banner — 16 Languages with Auto-Detect',
+    description: 'One banner, 16 languages. Auto-detects visitor language. GDPR, PIPEDA, Law 25 compliant in every language.',
     type: 'website',
   },
   alternates: {
@@ -45,6 +45,12 @@ const LANGUAGES = [
   { code: 'ko', name: 'Korean', native: '한국어', title: '쿠키를 사용합니다', accept: '모두 수락', reject: '거부', necessary: '필수 쿠키', functional: '기능 쿠키', performance: '성능 쿠키', targeting: '타겟팅 쿠키' },
   { code: 'ar', name: 'Arabic', native: 'العربية', title: 'نستخدم ملفات تعريف الارتباط', accept: 'قبول الكل', reject: 'رفض', necessary: 'ملفات تعريف الارتباط الضرورية', functional: 'ملفات تعريف الارتباط الوظيفية', performance: 'ملفات تعريف الارتباط الأدائية', targeting: 'ملفات تعريف الارتباط الاستهدافية', rtl: true },
   { code: 'hi', name: 'Hindi', native: 'हिन्दी', title: 'हम कुकीज़ का उपयोग करते हैं', accept: 'सभी स्वीकार करें', reject: 'अस्वीकार', necessary: 'आवश्यक कुकीज़', functional: 'कार्यात्मक कुकीज़', performance: 'प्रदर्शन कुकीज़', targeting: 'लक्ष्य कुकीज़' },
+  { code: 'nl', name: 'Dutch', native: 'Nederlands', title: 'Wij gebruiken cookies', accept: 'Alles accepteren', reject: 'Weigeren', necessary: 'Strikt noodzakelijke cookies', functional: 'Functionele cookies', performance: 'Prestatiecookies', targeting: 'Targeting-cookies' },
+  { code: 'sv', name: 'Swedish', native: 'Svenska', title: 'Vi anv\u00e4nder cookies', accept: 'Acceptera alla', reject: 'Avvisa', necessary: 'Strikt n\u00f6dv\u00e4ndiga cookies', functional: 'Funktionella cookies', performance: 'Prestandacookies', targeting: 'M\u00e5linriktade cookies' },
+  { code: 'nb', name: 'Norwegian', native: 'Norsk bokm\u00e5l', title: 'Vi bruker informasjonskapsler', accept: 'Godta alle', reject: 'Avvis', necessary: 'Strengt n\u00f8dvendige informasjonskapsler', functional: 'Funksjonelle informasjonskapsler', performance: 'Ytelsesrelaterte informasjonskapsler', targeting: 'M\u00e5lrettede informasjonskapsler' },
+  { code: 'da', name: 'Danish', native: 'Dansk', title: 'Vi bruger cookies', accept: 'Accepter alle', reject: 'Afvis', necessary: 'Strengt n\u00f8dvendige cookies', functional: 'Funktionelle cookies', performance: 'Pr\u00e6stationscookies', targeting: 'M\u00e5lretningscookies' },
+  { code: 'it', name: 'Italian', native: 'Italiano', title: 'Utilizziamo i cookie', accept: 'Accetta tutto', reject: 'Rifiuta', necessary: 'Cookie strettamente necessari', functional: 'Cookie funzionali', performance: 'Cookie di prestazione', targeting: 'Cookie di targeting' },
+  { code: 'fi', name: 'Finnish', native: 'Suomi', title: 'K\u00e4yt\u00e4mme ev\u00e4steit\u00e4', accept: 'Hyv\u00e4ksy kaikki', reject: 'Hylk\u00e4\u00e4', necessary: 'V\u00e4ltt\u00e4m\u00e4tt\u00f6m\u00e4t ev\u00e4steet', functional: 'Toiminnalliset ev\u00e4steet', performance: 'Suorituskykyev\u00e4steet', targeting: 'Kohdennusev\u00e4steet' },
 ]
 
 const FEATURES = [
@@ -80,7 +86,7 @@ export default function MultiLanguagePage() {
       <StructuredData
         type="faq"
         data={[
-          { question: 'How many languages does the cookie banner support?', answer: 'The cookie banner supports 10 languages: English, Spanish, French, German, Portuguese, Japanese, Chinese (Simplified), Korean, Arabic, and Hindi.' },
+          { question: 'How many languages does the cookie banner support?', answer: 'The cookie banner supports 16 languages: English, Spanish, French, German, Portuguese, Japanese, Chinese (Simplified), Korean, Arabic, Hindi, Dutch, Swedish, Norwegian, Danish, Italian, and Finnish.' },
           { question: 'Does the banner automatically detect the visitor language?', answer: 'Yes. When set to Auto-detect mode, the banner reads the visitor\'s browser language and displays in their native language automatically.' },
           { question: 'Does the Arabic cookie banner support RTL?', answer: 'Yes. When Arabic is detected, the banner automatically switches to right-to-left layout with proper text alignment.' },
           { question: 'Can I customize the translated text?', answer: 'Yes. Select a language in the builder and customize every string — title, message, buttons, cookie categories — in your own words.' },
@@ -94,14 +100,14 @@ export default function MultiLanguagePage() {
         {/* Hero */}
         <section className="py-20 md:py-28 border-b border-border">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <Badge variant="outline" className="mb-6">10 Languages Supported</Badge>
+            <Badge variant="outline" className="mb-6">16 Languages Supported</Badge>
             <h1 className="text-4xl md:text-6xl font-semibold tracking-tight mb-6">
               Cookie banners that speak
               <br />
               <span className="text-primary">your visitor&apos;s language</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-              One banner, auto-translated into 10 languages. Japanese visitors see Japanese. German visitors see German.
+              One banner, auto-translated into 16 languages. Japanese visitors see Japanese. German visitors see German.
               Arabic visitors get full RTL support. Zero configuration needed.
             </p>
             <div className="flex items-center justify-center gap-4">
@@ -175,7 +181,7 @@ export default function MultiLanguagePage() {
             <div className="space-y-8">
               <div>
                 <h3 className="font-semibold mb-2">How many languages does the cookie banner support?</h3>
-                <p className="text-sm text-muted-foreground">10 languages: English, Spanish, French, German, Portuguese, Japanese, Chinese (Simplified), Korean, Arabic, and Hindi. We&apos;re adding more based on demand.</p>
+                <p className="text-sm text-muted-foreground">16 languages: English, Spanish, French, German, Portuguese, Japanese, Chinese (Simplified), Korean, Arabic, Hindi, Dutch, Swedish, Norwegian, Danish, Italian, and Finnish. We&apos;re adding more based on demand.</p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Does auto-detect work on mobile?</h3>

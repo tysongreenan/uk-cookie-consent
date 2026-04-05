@@ -380,6 +380,234 @@ export const translations = {
     learnMore: 'और जानें',
     cookieSettings: 'कुकी सेटिंग्स',
   },
+  nl: {
+    title: 'Wij gebruiken cookies',
+    message: 'Deze website maakt gebruik van cookies om uw browse-ervaring te verbeteren en gepersonaliseerde inhoud aan te bieden.',
+    acceptButton: 'Alles accepteren',
+    rejectButton: 'Weigeren',
+    preferencesButton: 'Voorkeuren',
+    privacyPolicy: 'Privacybeleid',
+    footerLink: 'Cookie-instellingen',
+
+    // Preferences panel
+    preferencesTitle: 'Privacycentrum',
+    preferencesDescription: 'Door op \u201eAccepteren\u201d te klikken, gaat u akkoord met het opslaan van cookies op uw apparaat om de sitenavigatie te verbeteren, het sitegebruik te analyseren en onze marketingactiviteiten te ondersteunen.',
+    managePreferences: 'Cookievoorkeuren beheren',
+    savePreferences: 'Voorkeuren opslaan',
+    acceptAll: 'Alles accepteren',
+    rejectAll: 'Alles weigeren',
+    confirmChoices: 'Mijn keuzes bevestigen',
+
+    // Cookie categories
+    strictlyNecessary: 'Strikt noodzakelijke cookies',
+    strictlyNecessaryDescription: 'Altijd actief',
+    functionality: 'Functionele cookies',
+    functionalityDescription: 'Deze cookies maken verbeterde functionaliteit en personalisatie mogelijk, zoals taalvoorkeuren en gebruikersinstellingen.',
+    trackingPerformance: 'Prestatiecookies',
+    trackingPerformanceDescription: 'Deze cookies helpen ons te begrijpen hoe bezoekers met onze website omgaan door anoniem informatie te verzamelen en te rapporteren.',
+    targetingAdvertising: 'Targeting-cookies',
+    targetingAdvertisingDescription: 'Deze cookies worden gebruikt om advertenties relevanter te maken voor u en uw interesses.',
+    socialMedia: 'Sociale-mediacookies',
+    socialMediaDescription: 'Deze cookies maken sociale-media-integratie en deelfuncties mogelijk.',
+
+    // Always active
+    alwaysActive: 'Altijd actief',
+
+    // Additional UI elements
+    close: 'Sluiten',
+    learnMore: 'Meer informatie',
+    cookieSettings: 'Cookie-instellingen',
+  },
+  sv: {
+    title: 'Vi anv\u00e4nder cookies',
+    message: 'Denna webbplats anv\u00e4nder cookies f\u00f6r att f\u00f6rb\u00e4ttra din upplevelse och erbjuda anpassat inneh\u00e5ll.',
+    acceptButton: 'Acceptera alla',
+    rejectButton: 'Avvisa',
+    preferencesButton: 'Inst\u00e4llningar',
+    privacyPolicy: 'Integritetspolicy',
+    footerLink: 'Cookieinst\u00e4llningar',
+
+    // Preferences panel
+    preferencesTitle: 'Integritetscenter',
+    preferencesDescription: 'Genom att klicka p\u00e5 \u201dAcceptera\u201d samtycker du till att cookies lagras p\u00e5 din enhet f\u00f6r att f\u00f6rb\u00e4ttra navigeringen, analysera anv\u00e4ndningen och st\u00f6dja v\u00e5ra marknadsf\u00f6ringsinsatser.',
+    managePreferences: 'Hantera cookieinst\u00e4llningar',
+    savePreferences: 'Spara inst\u00e4llningar',
+    acceptAll: 'Acceptera alla',
+    rejectAll: 'Avvisa alla',
+    confirmChoices: 'Bekr\u00e4fta mina val',
+
+    // Cookie categories
+    strictlyNecessary: 'Strikt n\u00f6dv\u00e4ndiga cookies',
+    strictlyNecessaryDescription: 'Alltid aktiv',
+    functionality: 'Funktionella cookies',
+    functionalityDescription: 'Dessa cookies m\u00f6jligg\u00f6r f\u00f6rb\u00e4ttrad funktionalitet och anpassning, s\u00e5som spr\u00e5kinst\u00e4llningar och anv\u00e4ndarinst\u00e4llningar.',
+    trackingPerformance: 'Prestandacookies',
+    trackingPerformanceDescription: 'Dessa cookies hj\u00e4lper oss att f\u00f6rst\u00e5 hur bes\u00f6kare interagerar med v\u00e5r webbplats genom att samla in och rapportera information anonymt.',
+    targetingAdvertising: 'M\u00e5linriktade cookies',
+    targetingAdvertisingDescription: 'Dessa cookies anv\u00e4nds f\u00f6r att g\u00f6ra reklammeddelanden mer relevanta f\u00f6r dig och dina intressen.',
+    socialMedia: 'Sociala medier-cookies',
+    socialMediaDescription: 'Dessa cookies m\u00f6jligg\u00f6r integration med sociala medier och delningsfunktioner.',
+
+    // Always active
+    alwaysActive: 'Alltid aktiv',
+
+    // Additional UI elements
+    close: 'St\u00e4ng',
+    learnMore: 'L\u00e4s mer',
+    cookieSettings: 'Cookieinst\u00e4llningar',
+  },
+  nb: {
+    title: 'Vi bruker informasjonskapsler',
+    message: 'Denne nettsiden bruker informasjonskapsler for \u00e5 forbedre din nettleseropplevelse og tilby tilpasset innhold.',
+    acceptButton: 'Godta alle',
+    rejectButton: 'Avvis',
+    preferencesButton: 'Innstillinger',
+    privacyPolicy: 'Personvernerkl\u00e6ring',
+    footerLink: 'Innstillinger for informasjonskapsler',
+
+    // Preferences panel
+    preferencesTitle: 'Personvernsenter',
+    preferencesDescription: 'Ved \u00e5 klikke p\u00e5 \u00abGodta\u00bb samtykker du til lagring av informasjonskapsler p\u00e5 enheten din for \u00e5 forbedre navigasjonen, analysere nettstedets bruk og st\u00f8tte v\u00e5re markedsf\u00f8ringsaktiviteter.',
+    managePreferences: 'Administrer innstillinger for informasjonskapsler',
+    savePreferences: 'Lagre innstillinger',
+    acceptAll: 'Godta alle',
+    rejectAll: 'Avvis alle',
+    confirmChoices: 'Bekreft mine valg',
+
+    // Cookie categories
+    strictlyNecessary: 'Strengt n\u00f8dvendige informasjonskapsler',
+    strictlyNecessaryDescription: 'Alltid aktiv',
+    functionality: 'Funksjonelle informasjonskapsler',
+    functionalityDescription: 'Disse informasjonskapslene muliggj\u00f8r forbedret funksjonalitet og tilpasning, som spr\u00e5kinnstillinger og brukerinnstillinger.',
+    trackingPerformance: 'Ytelsesrelaterte informasjonskapsler',
+    trackingPerformanceDescription: 'Disse informasjonskapslene hjelper oss \u00e5 forst\u00e5 hvordan bes\u00f8kende samhandler med nettstedet v\u00e5rt ved \u00e5 samle inn og rapportere informasjon anonymt.',
+    targetingAdvertising: 'M\u00e5lrettede informasjonskapsler',
+    targetingAdvertisingDescription: 'Disse informasjonskapslene brukes for \u00e5 gj\u00f8re reklamebudskap mer relevante for deg og dine interesser.',
+    socialMedia: 'Sosiale medier-informasjonskapsler',
+    socialMediaDescription: 'Disse informasjonskapslene muliggj\u00f8r integrasjon med sosiale medier og delingsfunksjoner.',
+
+    // Always active
+    alwaysActive: 'Alltid aktiv',
+
+    // Additional UI elements
+    close: 'Lukk',
+    learnMore: 'Les mer',
+    cookieSettings: 'Innstillinger for informasjonskapsler',
+  },
+  da: {
+    title: 'Vi bruger cookies',
+    message: 'Denne hjemmeside bruger cookies til at forbedre din browsingoplevelse og levere personligt indhold.',
+    acceptButton: 'Accepter alle',
+    rejectButton: 'Afvis',
+    preferencesButton: 'Indstillinger',
+    privacyPolicy: 'Privatlivspolitik',
+    footerLink: 'Cookieindstillinger',
+
+    // Preferences panel
+    preferencesTitle: 'Privatlivscenter',
+    preferencesDescription: 'Ved at klikke p\u00e5 \u201dAccepter\u201d accepterer du lagring af cookies p\u00e5 din enhed for at forbedre navigationen, analysere brugen af hjemmesiden og st\u00f8tte vores markedsf\u00f8ringsindsats.',
+    managePreferences: 'Administrer cookieindstillinger',
+    savePreferences: 'Gem indstillinger',
+    acceptAll: 'Accepter alle',
+    rejectAll: 'Afvis alle',
+    confirmChoices: 'Bekr\u00e6ft mine valg',
+
+    // Cookie categories
+    strictlyNecessary: 'Strengt n\u00f8dvendige cookies',
+    strictlyNecessaryDescription: 'Altid aktiv',
+    functionality: 'Funktionelle cookies',
+    functionalityDescription: 'Disse cookies muligg\u00f8r forbedret funktionalitet og tilpasning, s\u00e5som sprogindstillinger og brugerindstillinger.',
+    trackingPerformance: 'Pr\u00e6stationscookies',
+    trackingPerformanceDescription: 'Disse cookies hj\u00e6lper os med at forst\u00e5, hvordan bes\u00f8gende interagerer med vores hjemmeside ved anonymt at indsamle og rapportere information.',
+    targetingAdvertising: 'M\u00e5lretningscookies',
+    targetingAdvertisingDescription: 'Disse cookies bruges til at g\u00f8re reklamebudskaber mere relevante for dig og dine interesser.',
+    socialMedia: 'Sociale medier-cookies',
+    socialMediaDescription: 'Disse cookies muligg\u00f8r integration af sociale medier og delingsfunktioner.',
+
+    // Always active
+    alwaysActive: 'Altid aktiv',
+
+    // Additional UI elements
+    close: 'Luk',
+    learnMore: 'L\u00e6s mere',
+    cookieSettings: 'Cookieindstillinger',
+  },
+  it: {
+    title: 'Utilizziamo i cookie',
+    message: 'Questo sito web utilizza i cookie per migliorare la tua esperienza di navigazione e offrire contenuti personalizzati.',
+    acceptButton: 'Accetta tutto',
+    rejectButton: 'Rifiuta',
+    preferencesButton: 'Preferenze',
+    privacyPolicy: 'Informativa sulla privacy',
+    footerLink: 'Impostazioni cookie',
+
+    // Preferences panel
+    preferencesTitle: 'Centro privacy',
+    preferencesDescription: 'Cliccando su \u201cAccetta\u201d, acconsenti alla memorizzazione dei cookie sul tuo dispositivo per migliorare la navigazione, analizzare l\u2019utilizzo del sito e supportare le nostre attivit\u00e0 di marketing.',
+    managePreferences: 'Gestisci le preferenze dei cookie',
+    savePreferences: 'Salva preferenze',
+    acceptAll: 'Accetta tutto',
+    rejectAll: 'Rifiuta tutto',
+    confirmChoices: 'Conferma le mie scelte',
+
+    // Cookie categories
+    strictlyNecessary: 'Cookie strettamente necessari',
+    strictlyNecessaryDescription: 'Sempre attivo',
+    functionality: 'Cookie funzionali',
+    functionalityDescription: 'Questi cookie consentono funzionalit\u00e0 avanzate e personalizzazione, come le preferenze linguistiche e le impostazioni utente.',
+    trackingPerformance: 'Cookie di prestazione',
+    trackingPerformanceDescription: 'Questi cookie ci aiutano a capire come i visitatori interagiscono con il nostro sito web raccogliendo e riportando informazioni in modo anonimo.',
+    targetingAdvertising: 'Cookie di targeting',
+    targetingAdvertisingDescription: 'Questi cookie vengono utilizzati per rendere i messaggi pubblicitari pi\u00f9 pertinenti per te e per i tuoi interessi.',
+    socialMedia: 'Cookie dei social media',
+    socialMediaDescription: 'Questi cookie abilitano l\u2019integrazione con i social media e le funzionalit\u00e0 di condivisione.',
+
+    // Always active
+    alwaysActive: 'Sempre attivo',
+
+    // Additional UI elements
+    close: 'Chiudi',
+    learnMore: 'Scopri di pi\u00f9',
+    cookieSettings: 'Impostazioni cookie',
+  },
+  fi: {
+    title: 'K\u00e4yt\u00e4mme ev\u00e4steit\u00e4',
+    message: 'T\u00e4m\u00e4 verkkosivusto k\u00e4ytt\u00e4\u00e4 ev\u00e4steit\u00e4 selauskokemuksesi parantamiseksi ja sis\u00e4ll\u00f6n personoimiseksi.',
+    acceptButton: 'Hyv\u00e4ksy kaikki',
+    rejectButton: 'Hylk\u00e4\u00e4',
+    preferencesButton: 'Asetukset',
+    privacyPolicy: 'Tietosuojaseloste',
+    footerLink: 'Ev\u00e4steasetukset',
+
+    // Preferences panel
+    preferencesTitle: 'Tietosuojakeskus',
+    preferencesDescription: 'Napsauttamalla \u201dHyv\u00e4ksy\u201d hyv\u00e4ksyt ev\u00e4steiden tallentamisen laitteellesi sivuston navigoinnin parantamiseksi, k\u00e4yt\u00f6n analysoimiseksi ja markkinointitoimiemme tukemiseksi.',
+    managePreferences: 'Hallitse ev\u00e4steasetuksia',
+    savePreferences: 'Tallenna asetukset',
+    acceptAll: 'Hyv\u00e4ksy kaikki',
+    rejectAll: 'Hylk\u00e4\u00e4 kaikki',
+    confirmChoices: 'Vahvista valintani',
+
+    // Cookie categories
+    strictlyNecessary: 'V\u00e4ltt\u00e4m\u00e4tt\u00f6m\u00e4t ev\u00e4steet',
+    strictlyNecessaryDescription: 'Aina aktiivinen',
+    functionality: 'Toiminnalliset ev\u00e4steet',
+    functionalityDescription: 'N\u00e4m\u00e4 ev\u00e4steet mahdollistavat parannetun toiminnallisuuden ja mukauttamisen, kuten kieliasetukset ja k\u00e4ytt\u00e4j\u00e4asetukset.',
+    trackingPerformance: 'Suorituskykyev\u00e4steet',
+    trackingPerformanceDescription: 'N\u00e4m\u00e4 ev\u00e4steet auttavat meit\u00e4 ymm\u00e4rt\u00e4m\u00e4\u00e4n, miten k\u00e4vij\u00e4t k\u00e4ytt\u00e4v\u00e4t verkkosivustoamme ker\u00e4\u00e4m\u00e4ll\u00e4 ja raportoimalla tietoja nimett\u00f6m\u00e4sti.',
+    targetingAdvertising: 'Kohdennusev\u00e4steet',
+    targetingAdvertisingDescription: 'N\u00e4it\u00e4 ev\u00e4steit\u00e4 k\u00e4ytet\u00e4\u00e4n mainosviestien tekemiseen sinulle ja kiinnostuksen kohteillesi osuvammiksi.',
+    socialMedia: 'Sosiaalisen median ev\u00e4steet',
+    socialMediaDescription: 'N\u00e4m\u00e4 ev\u00e4steet mahdollistavat sosiaalisen median integroinnin ja jakamistoiminnot.',
+
+    // Always active
+    alwaysActive: 'Aina aktiivinen',
+
+    // Additional UI elements
+    close: 'Sulje',
+    learnMore: 'Lue lis\u00e4\u00e4',
+    cookieSettings: 'Ev\u00e4steasetukset',
+  },
 }
 
 export type Language = keyof typeof translations
@@ -443,6 +671,36 @@ export function detectLanguage(): Language {
   // Check for Hindi
   if (browserLang.startsWith('hi')) {
     return 'hi'
+  }
+
+  // Check for Dutch
+  if (browserLang.startsWith('nl')) {
+    return 'nl'
+  }
+
+  // Check for Swedish
+  if (browserLang.startsWith('sv')) {
+    return 'sv'
+  }
+
+  // Check for Norwegian (Bokmål) — browsers may report 'no' or 'nb'
+  if (browserLang.startsWith('nb') || browserLang.startsWith('no')) {
+    return 'nb'
+  }
+
+  // Check for Danish
+  if (browserLang.startsWith('da')) {
+    return 'da'
+  }
+
+  // Check for Italian
+  if (browserLang.startsWith('it')) {
+    return 'it'
+  }
+
+  // Check for Finnish
+  if (browserLang.startsWith('fi')) {
+    return 'fi'
   }
 
   // Default to English

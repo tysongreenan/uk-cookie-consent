@@ -823,7 +823,7 @@ function BannerBuilderContent() {
     } else {
       const translations = applyTranslations(newLanguage)
       setConfig(prev => ({ ...prev, language: newLanguage, text: translations }))
-      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
+      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi', nl: 'Dutch', sv: 'Swedish', nb: 'Norwegian', da: 'Danish', it: 'Italian', fi: 'Finnish' }
       toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
@@ -2334,7 +2334,7 @@ function BannerBuilderContent() {
                   <CardHeader>
                     <CardTitle>Banner Language</CardTitle>
                     <CardDescription>
-                      Your banner auto-translates into 10 languages. Buttons, text, cookie categories — everything switches to the visitor&apos;s language.
+                      Your banner auto-translates into 16 languages. Buttons, text, cookie categories — everything switches to the visitor&apos;s language.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -2359,20 +2359,32 @@ function BannerBuilderContent() {
                           <SelectItem value="ko">한국어 (Korean)</SelectItem>
                           <SelectItem value="ar">العربية (Arabic)</SelectItem>
                           <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
+                          <SelectItem value="nl">Nederlands (Dutch)</SelectItem>
+                          <SelectItem value="sv">Svenska (Swedish)</SelectItem>
+                          <SelectItem value="nb">Norsk (Norwegian)</SelectItem>
+                          <SelectItem value="da">Dansk (Danish)</SelectItem>
+                          <SelectItem value="it">Italiano (Italian)</SelectItem>
+                          <SelectItem value="fi">Suomi (Finnish)</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 10 languages.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 16 languages.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
-                        {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
-                        {config.language === 'es' && 'El banner siempre se mostrará en español.'}
+                        {config.language === 'fr' && 'La banni\u00e8re sera toujours affich\u00e9e en fran\u00e7ais.'}
+                        {config.language === 'es' && 'El banner siempre se mostrar\u00e1 en espa\u00f1ol.'}
                         {config.language === 'de' && 'Das Banner wird immer auf Deutsch angezeigt.'}
-                        {config.language === 'pt' && 'O banner será sempre exibido em português.'}
-                        {config.language === 'ja' && 'バナーは常に日本語で表示されます。'}
-                        {config.language === 'zh' && '横幅将始终以中文显示。'}
-                        {config.language === 'ko' && '배너가 항상 한국어로 표시됩니다.'}
-                        {config.language === 'ar' && 'سيتم عرض الشعار دائمًا باللغة العربية.'}
-                        {config.language === 'hi' && 'बैनर हमेशा हिन्दी में प्रदर्शित होगा।'}
+                        {config.language === 'pt' && 'O banner ser\u00e1 sempre exibido em portugu\u00eas.'}
+                        {config.language === 'ja' && '\u30d0\u30ca\u30fc\u306f\u5e38\u306b\u65e5\u672c\u8a9e\u3067\u8868\u793a\u3055\u308c\u307e\u3059\u3002'}
+                        {config.language === 'zh' && '\u6a2a\u5e45\u5c06\u59cb\u7ec8\u4ee5\u4e2d\u6587\u663e\u793a\u3002'}
+                        {config.language === 'ko' && '\ubc30\ub108\uac00 \ud56d\uc0c1 \ud55c\uad6d\uc5b4\ub85c \ud45c\uc2dc\ub429\ub2c8\ub2e4.'}
+                        {config.language === 'ar' && '\u0633\u064a\u062a\u0645 \u0639\u0631\u0636 \u0627\u0644\u0634\u0639\u0627\u0631 \u062f\u0627\u0626\u0645\u064b\u0627 \u0628\u0627\u0644\u0644\u063a\u0629 \u0627\u0644\u0639\u0631\u0628\u064a\u0629.'}
+                        {config.language === 'hi' && '\u092c\u0948\u0928\u0930 \u0939\u092e\u0947\u0936\u093e \u0939\u093f\u0928\u094d\u0926\u0940 \u092e\u0947\u0902 \u092a\u094d\u0930\u0926\u0930\u094d\u0936\u093f\u0924 \u0939\u094b\u0917\u093e\u0964'}
+                        {config.language === 'nl' && 'Het banner wordt altijd in het Nederlands weergegeven.'}
+                        {config.language === 'sv' && 'Bannern visas alltid p\u00e5 svenska.'}
+                        {config.language === 'nb' && 'Banneret vises alltid p\u00e5 norsk.'}
+                        {config.language === 'da' && 'Banneret vises altid p\u00e5 dansk.'}
+                        {config.language === 'it' && 'Il banner verr\u00e0 sempre visualizzato in italiano.'}
+                        {config.language === 'fi' && 'Banneri n\u00e4ytet\u00e4\u00e4n aina suomeksi.'}
                       </p>
                     </div>
 
@@ -2390,7 +2402,13 @@ function BannerBuilderContent() {
                           { code: 'zh', label: '中文', sample: '我们使用Cookie' },
                           { code: 'ko', label: '한국어', sample: '쿠키를 사용합니다' },
                           { code: 'ar', label: 'العربية', sample: 'نستخدم ملفات تعريف الارتباط' },
-                          { code: 'hi', label: 'हिन्दी', sample: 'हम कुकीज़ का उपयोग करते हैं' },
+                          { code: 'hi', label: '\u0939\u093f\u0928\u094d\u0926\u0940', sample: '\u0939\u092e \u0915\u0941\u0915\u0940\u091c\u093c \u0915\u093e \u0909\u092a\u092f\u094b\u0917 \u0915\u0930\u0924\u0947 \u0939\u0948\u0902' },
+                          { code: 'nl', label: 'Nederlands', sample: 'Wij gebruiken cookies' },
+                          { code: 'sv', label: 'Svenska', sample: 'Vi anv\u00e4nder cookies' },
+                          { code: 'nb', label: 'Norsk', sample: 'Vi bruker informasjonskapsler' },
+                          { code: 'da', label: 'Dansk', sample: 'Vi bruger cookies' },
+                          { code: 'it', label: 'Italiano', sample: 'Utilizziamo i cookie' },
+                          { code: 'fi', label: 'Suomi', sample: 'K\u00e4yt\u00e4mme ev\u00e4steit\u00e4' },
                         ].map((lang) => (
                           <div
                             key={lang.code}
@@ -4147,7 +4165,7 @@ function BannerBuilderContent() {
                                       setConfig((prev: BannerConfig) => ({
                                         ...prev,
                                         geoRules: (prev.geoRules || []).map((r: GeoRule) =>
-                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, language: value as 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'auto' } } : r
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, language: value as 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'nl' | 'sv' | 'nb' | 'da' | 'it' | 'fi' | 'auto' } } : r
                                         )
                                       }))
                                     }}
@@ -4165,6 +4183,12 @@ function BannerBuilderContent() {
                                       <SelectItem value="ko">Korean</SelectItem>
                                       <SelectItem value="ar">Arabic</SelectItem>
                                       <SelectItem value="hi">Hindi</SelectItem>
+                                      <SelectItem value="nl">Dutch</SelectItem>
+                                      <SelectItem value="sv">Swedish</SelectItem>
+                                      <SelectItem value="nb">Norwegian</SelectItem>
+                                      <SelectItem value="da">Danish</SelectItem>
+                                      <SelectItem value="it">Italian</SelectItem>
+                                      <SelectItem value="fi">Finnish</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>

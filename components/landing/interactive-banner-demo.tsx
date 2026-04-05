@@ -708,7 +708,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
     } else {
       const translations = applyTranslations(newLanguage)
       setConfig(prev => ({ ...prev, language: newLanguage, text: translations }))
-      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi' }
+      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ja: 'Japanese', zh: 'Chinese', ko: 'Korean', ar: 'Arabic', hi: 'Hindi', nl: 'Dutch', sv: 'Swedish', nb: 'Norwegian', da: 'Danish', it: 'Italian', fi: 'Finnish' }
       toast.success(`Banner text updated to ${langNames[newLanguage]}`)
     }
   }
@@ -1672,10 +1672,16 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                           <SelectItem value="ko">한국어 (Korean)</SelectItem>
                           <SelectItem value="ar">العربية (Arabic)</SelectItem>
                           <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
+                          <SelectItem value="nl">Nederlands (Dutch)</SelectItem>
+                          <SelectItem value="sv">Svenska (Swedish)</SelectItem>
+                          <SelectItem value="nb">Norsk (Norwegian)</SelectItem>
+                          <SelectItem value="da">Dansk (Danish)</SelectItem>
+                          <SelectItem value="it">Italiano (Italian)</SelectItem>
+                          <SelectItem value="fi">Suomi (Finnish)</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 10 languages.'}
+                        {config.language === 'auto' && 'Language will be detected from the visitor\'s browser. Supports 16 languages.'}
                         {config.language === 'en' && 'Banner will always show in English.'}
                         {config.language === 'fr' && 'La bannière sera toujours affichée en français.'}
                         {config.language === 'es' && 'El banner siempre se mostrará en español.'}
@@ -1686,6 +1692,12 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                         {config.language === 'ko' && '배너가 항상 한국어로 표시됩니다.'}
                         {config.language === 'ar' && 'سيتم عرض الشعار دائمًا باللغة العربية.'}
                         {config.language === 'hi' && 'बैनर हमेशा हिन्दी में प्रदर्शित होगा।'}
+                        {config.language === 'nl' && 'Het banner wordt altijd in het Nederlands weergegeven.'}
+                        {config.language === 'sv' && 'Bannern visas alltid p\u00e5 svenska.'}
+                        {config.language === 'nb' && 'Banneret vises alltid p\u00e5 norsk.'}
+                        {config.language === 'da' && 'Banneret vises altid p\u00e5 dansk.'}
+                        {config.language === 'it' && 'Il banner verr\u00e0 sempre visualizzato in italiano.'}
+                        {config.language === 'fi' && 'Banneri n\u00e4ytet\u00e4\u00e4n aina suomeksi.'}
                       </p>
                     </div>
                   </CardContent>
