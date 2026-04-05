@@ -9,7 +9,7 @@ const LANGUAGES = [
   { code: 'fr', name: 'French', native: 'Français', sample: 'Nous utilisons des cookies' },
   { code: 'de', name: 'German', native: 'Deutsch', sample: 'Wir verwenden Cookies' },
   { code: 'pt', name: 'Portuguese', native: 'Português', sample: 'Utilizamos cookies' },
-  { code: 'ja', name: 'Japanese', native: '日本語', sample: 'Cookieを使用しています' },
+  { code: 'ja', name: 'Japanese', native: '日本語', sample: 'Cookieの使用について' },
   { code: 'zh', name: 'Chinese', native: '中文', sample: '我们使用Cookie' },
   { code: 'ko', name: 'Korean', native: '한국어', sample: '쿠키를 사용합니다' },
   { code: 'ar', name: 'Arabic', native: 'العربية', sample: 'نستخدم ملفات تعريف الارتباط', rtl: true },

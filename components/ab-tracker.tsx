@@ -11,8 +11,8 @@ import posthog from 'posthog-js'
  */
 export function ABTracker({ experiment, variant }: { experiment: string; variant: string }) {
   useEffect(() => {
-    // PostHog A/B test tracking
-    if (process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+    // PostHog A/B test tracking (only if user has consented to analytics)
+    if (process.env.NEXT_PUBLIC_POSTHOG_KEY && posthog.has_opted_in_capturing()) {
       posthog.capture('$experiment_started', {
         experiment,
         variant,

@@ -59,6 +59,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         if (existing?.analytics) {
           ph.opt_in_capturing()
           ph.set_config({ persistence: 'localStorage+cookie' })
+          // Capture the first pageview that PostHogPageView would miss
+          // (it fires before init completes, so has_opted_in returns false)
+          ph.capture('$pageview', { $current_url: window.location.href })
         } else {
           ph.opt_out_capturing() // Stay silent until consent
         }
