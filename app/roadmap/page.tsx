@@ -78,6 +78,11 @@ const categoryConfig: Record<string, { label: string; color: string; accent: str
   optimization: { label: 'Optimization', color: 'bg-cyan-50 text-cyan-700 border-cyan-200', accent: 'text-cyan-600' },
 }
 
+interface Voter {
+  name: string
+  image: string | null
+}
+
 interface RoadmapItem {
   id: number
   title: string
@@ -87,6 +92,7 @@ interface RoadmapItem {
   vote_count: number
   userVoted: boolean
   priority: number
+  voters: Voter[]
 }
 
 interface SearchResult {
@@ -143,6 +149,41 @@ function VoteButton({
         {item.vote_count}
       </span>
     </button>
+  )
+}
+
+function VoterAvatars({ voters }: { voters: Voter[] }) {
+  if (voters.length === 0) return null
+  const shown = voters.slice(0, 5)
+  const remaining = voters.length - shown.length
+
+  return (
+    <div className="flex items-center gap-1.5 mt-2">
+      <div className="flex -space-x-1.5">
+        {shown.map((voter, i) => (
+          <div
+            key={i}
+            className="w-5 h-5 rounded-full border-2 border-background flex items-center justify-center bg-muted text-[8px] font-semibold text-muted-foreground overflow-hidden"
+            title={voter.name}
+          >
+            {voter.image ? (
+              <img src={voter.image} alt={voter.name} className="w-full h-full object-cover" />
+            ) : (
+              voter.name.charAt(0).toUpperCase()
+            )}
+          </div>
+        ))}
+        {remaining > 0 && (
+          <div className="w-5 h-5 rounded-full border-2 border-background flex items-center justify-center bg-muted text-[8px] font-semibold text-muted-foreground">
+            +{remaining}
+          </div>
+        )}
+      </div>
+      <span className="text-[10px] text-muted-foreground truncate max-w-[180px]">
+        {shown.map((v) => v.name.split(' ')[0]).join(', ')}
+        {remaining > 0 && ` +${remaining} more`}
+      </span>
+    </div>
   )
 }
 
@@ -374,9 +415,10 @@ function RoadmapCard({
               <ItemIcon className={`w-3.5 h-3.5 ${catInfo.accent}`} />
             </div>
           </div>
-          <p className="text-xs text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-muted-foreground mb-1 line-clamp-2 leading-relaxed">
             {item.description}
           </p>
+          <VoterAvatars voters={item.voters} />
 
           {isBuilding && <BuildingIndicator />}
 
@@ -630,12 +672,16 @@ export default function RoadmapPage() {
 
       if (response.ok) {
         const data = await response.json()
+        const userName = session?.user?.name || 'You'
+        const userImage = session?.user?.image || null
         setItems((prev) =>
-          prev.map((item) =>
-            item.id === itemId
-              ? { ...item, vote_count: data.voteCount, userVoted: data.userVoted }
-              : item
-          )
+          prev.map((item) => {
+            if (item.id !== itemId) return item
+            const voters = data.userVoted
+              ? [...item.voters.filter((v) => v.name !== userName), { name: userName, image: userImage }]
+              : item.voters.filter((v) => v.name !== userName)
+            return { ...item, vote_count: data.voteCount, userVoted: data.userVoted, voters }
+          })
         )
       } else {
         const data = await response.json()

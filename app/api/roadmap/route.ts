@@ -46,23 +46,38 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ items: defaultItems })
       }
 
-      // If user is authenticated, get their votes
-      let userVotedItems = new Set<number>()
-      if (session?.user?.id) {
-        const { data: userVotes, error: votesError } = await supabase
-          .from('RoadmapVote')
-          .select('roadmapItemId')
-          .eq('userId', session.user.id)
+      // Get all votes with voter info (name + image from User table)
+      const { data: allVotes, error: votesError } = await supabase
+        .from('RoadmapVote')
+        .select('roadmapItemId, userId, User:userId(name, image)')
 
-        if (!votesError && userVotes) {
-          userVotedItems = new Set(userVotes.map(vote => vote.roadmapItemId))
+      // Build voter map: roadmapItemId -> array of { name, image }
+      const voterMap = new Map<number, { name: string; image: string | null }[]>()
+      let userVotedItems = new Set<number>()
+
+      if (!votesError && allVotes) {
+        for (const vote of allVotes) {
+          if (session?.user?.id && vote.userId === session.user.id) {
+            userVotedItems.add(vote.roadmapItemId)
+          }
+          const user = vote.User as any
+          if (user?.name) {
+            if (!voterMap.has(vote.roadmapItemId)) {
+              voterMap.set(vote.roadmapItemId, [])
+            }
+            voterMap.get(vote.roadmapItemId)!.push({
+              name: user.name,
+              image: user.image || null,
+            })
+          }
         }
       }
 
-      // Combine roadmap items with user vote status
+      // Combine roadmap items with user vote status and voters
       const itemsWithUserVotes = roadmapItems?.map(item => ({
         ...item,
-        userVoted: userVotedItems.has(item.id)
+        userVoted: userVotedItems.has(item.id),
+        voters: voterMap.get(item.id) || [],
       })) || []
 
       return NextResponse.json({ items: itemsWithUserVotes })
