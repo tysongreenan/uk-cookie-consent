@@ -335,12 +335,20 @@ export async function GET(request: NextRequest) {
       if (extra.isReturning) evt.isReturning = true;
     }
     _cbEventQueue.push(evt);
-    // Debounce: flush after 1s of no new events, or immediately if queue has 5+
-    if (_cbFlushTimer) clearTimeout(_cbFlushTimer);
-    if (_cbEventQueue.length >= 5) {
+    // Decision events (accept/reject/dismiss) flush immediately via sendBeacon
+    // because saveConsent() loads third-party scripts that may trigger page reloads,
+    // and a 1s debounce timer would be killed before firing.
+    // Impressions still debounce since they fire during a stable page state.
+    if (type !== 'impression') {
+      if (_cbFlushTimer) { clearTimeout(_cbFlushTimer); _cbFlushTimer = null; }
       _cbFlushEvents();
     } else {
-      _cbFlushTimer = setTimeout(_cbFlushEvents, 1000);
+      if (_cbFlushTimer) clearTimeout(_cbFlushTimer);
+      if (_cbEventQueue.length >= 5) {
+        _cbFlushEvents();
+      } else {
+        _cbFlushTimer = setTimeout(_cbFlushEvents, 1000);
+      }
     }
   }
 
@@ -351,7 +359,7 @@ export async function GET(request: NextRequest) {
     try {
       var sent = false;
       if (navigator.sendBeacon) {
-        sent = navigator.sendBeacon(_cbTrackUrl, new Blob([payload], { type: 'application/json' }));
+        sent = navigator.sendBeacon(_cbTrackUrl, new Blob([payload], { type: 'text/plain' }));
       }
       if (!sent) {
         var xhr = new XMLHttpRequest();
@@ -368,6 +376,11 @@ export async function GET(request: NextRequest) {
   if (typeof addEventListener !== 'undefined') {
     addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'hidden') _cbFlushEvents();
+    });
+    // pagehide is more reliable than visibilitychange for same-tab navigations
+    // and page reloads, especially on mobile/tablet browsers and webviews
+    addEventListener('pagehide', function() {
+      _cbFlushEvents();
     });
   }
 `
@@ -438,7 +451,7 @@ export async function GET(request: NextRequest) {
       try {
         var sent = false;
         if (navigator.sendBeacon) {
-          sent = navigator.sendBeacon(_cbConsentLogUrl, new Blob([payload], { type: 'application/json' }));
+          sent = navigator.sendBeacon(_cbConsentLogUrl, new Blob([payload], { type: 'text/plain' }));
         }
         if (!sent) {
           var xhr = new XMLHttpRequest();

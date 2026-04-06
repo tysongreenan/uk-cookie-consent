@@ -8,7 +8,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 }
 
-const VALID_EVENT_TYPES = ['impression', 'accept', 'reject', 'dismiss']
+const VALID_EVENT_TYPES = ['impression', 'accept', 'reject', 'dismiss', 'custom']
 const VALID_DEVICES = new Set(['mobile', 'tablet', 'desktop'])
 
 // 30 requests per minute per IP (one page load = ~2 requests max)
@@ -98,6 +98,10 @@ export async function POST(request: NextRequest) {
         continue
       }
 
+      // Normalize 'custom' (preferences modal) to 'accept' for stats —
+      // custom preferences are a form of consent acceptance
+      const eventType = event.type === 'custom' ? 'accept' : event.type
+
       const decisionTime = typeof event.decisionTime === 'number' && event.decisionTime > 0 && event.decisionTime < 300000
         ? Math.round(event.decisionTime)
         : null
@@ -118,12 +122,12 @@ export async function POST(request: NextRequest) {
         supabase.rpc('increment_banner_stat', {
           p_user_id: userId,
           p_date: today,
-          p_event_type: event.type,
+          p_event_type: eventType,
           p_decision_time_ms: decisionTime,
           p_is_returning: Boolean(event.isReturning),
           p_banner_id: safeBannerId,
           p_gpc: safeGpc
-        }).then(r => ({ event: event.type, type: 'stat' as const, error: r.error }))
+        }).then(r => ({ event: eventType, type: 'stat' as const, error: r.error }))
       )
 
       rpcCalls.push(
@@ -131,14 +135,14 @@ export async function POST(request: NextRequest) {
           p_user_id: userId,
           p_banner_id: safeBannerId,
           p_date: today,
-          p_event_type: event.type,
+          p_event_type: eventType,
           p_source: safeSource,
           p_device: safeDevice,
           p_country: safeCountry,
           p_page_path: safePagePath,
           p_decision_time_ms: decisionTime,
           p_gpc: safeGpc
-        }).then(r => ({ event: event.type, type: 'visitor' as const, error: r.error }))
+        }).then(r => ({ event: eventType, type: 'visitor' as const, error: r.error }))
       )
     }
 

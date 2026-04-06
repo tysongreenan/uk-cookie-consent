@@ -2291,9 +2291,11 @@ function init() {
         tcfPurposes = {};
         for (var i = 1; i <= 11; i++) tcfPurposes[i] = true;
       }
+      // Track BEFORE saveConsent — saveConsent loads third-party scripts (GTM, GA4, etc.)
+      // that may trigger page reloads, killing any pending flush timers
+      trackConsentEvent('accept', consent);
       saveConsent(consent, tcfPurposes);
       initGA4(); // Initialize GA4
-      trackConsentEvent('accept', consent); // Track consent event
       banner.style.display = 'none';
       if (GPC_ACTIVE) showGpcAcknowledgment();
     });
@@ -2309,8 +2311,10 @@ function init() {
         tcfPurposes = {};
         for (var i = 1; i <= 11; i++) tcfPurposes[i] = false;
       }
+      // Track BEFORE saveConsent — saveConsent loads third-party scripts
+      // that may trigger page reloads, killing any pending flush timers
+      trackConsentEvent('reject', consent);
       saveConsent(consent, tcfPurposes);
-      trackConsentEvent('reject', consent); // Track consent event (but don't init GA4)
       banner.style.display = 'none';
     });
     rejectBtn.dataset.handlerAttached = 'true';
@@ -2378,8 +2382,8 @@ function init() {
         tcfPurposes = {};
         for (var i = 1; i <= 11; i++) tcfPurposes[i] = true;
       }
-      saveConsent(consent, tcfPurposes);
       trackConsentEvent('accept', consent);
+      saveConsent(consent, tcfPurposes);
 
       // Update modal toggles to show all ON before closing
       loadConsentIntoModal(consent);
@@ -2401,8 +2405,8 @@ function init() {
         tcfPurposes = {};
         for (var i = 1; i <= 11; i++) tcfPurposes[i] = false;
       }
-      saveConsent(consent, tcfPurposes);
       trackConsentEvent('reject', consent);
+      saveConsent(consent, tcfPurposes);
       banner.style.display = 'none';
       modal.style.display = 'none';
     });
@@ -2448,8 +2452,8 @@ function init() {
       }
 
       console.log('User confirmed cookie preferences:', consent);
-      saveConsent(consent, tcfPurposes);
       trackConsentEvent('custom', consent);
+      saveConsent(consent, tcfPurposes);
 
       banner.style.display = 'none';
       modal.style.display = 'none';
