@@ -1771,22 +1771,24 @@ var TRANSLATIONS = {
 
 function detectLanguage() {
   ${config.language === 'auto' ? `
+  var htmlLang = (document.documentElement.lang || '').toLowerCase();
   var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-  if (browserLang.startsWith('fr')) return 'fr';
-  if (browserLang.startsWith('es')) return 'es';
-  if (browserLang.startsWith('de')) return 'de';
-  if (browserLang.startsWith('pt')) return 'pt';
-  if (browserLang.startsWith('ja')) return 'ja';
-  if (browserLang.startsWith('zh')) return 'zh';
-  if (browserLang.startsWith('ko')) return 'ko';
-  if (browserLang.startsWith('ar')) return 'ar';
-  if (browserLang.startsWith('hi')) return 'hi';
-  if (browserLang.startsWith('nl')) return 'nl';
-  if (browserLang.startsWith('sv')) return 'sv';
-  if (browserLang.startsWith('nb') || browserLang.startsWith('no')) return 'nb';
-  if (browserLang.startsWith('da')) return 'da';
-  if (browserLang.startsWith('it')) return 'it';
-  if (browserLang.startsWith('fi')) return 'fi';
+  var lang = htmlLang || browserLang;
+  if (lang.startsWith('fr')) return 'fr';
+  if (lang.startsWith('es')) return 'es';
+  if (lang.startsWith('de')) return 'de';
+  if (lang.startsWith('pt')) return 'pt';
+  if (lang.startsWith('ja')) return 'ja';
+  if (lang.startsWith('zh')) return 'zh';
+  if (lang.startsWith('ko')) return 'ko';
+  if (lang.startsWith('ar')) return 'ar';
+  if (lang.startsWith('hi')) return 'hi';
+  if (lang.startsWith('nl')) return 'nl';
+  if (lang.startsWith('sv')) return 'sv';
+  if (lang.startsWith('nb') || lang.startsWith('no')) return 'nb';
+  if (lang.startsWith('da')) return 'da';
+  if (lang.startsWith('it')) return 'it';
+  if (lang.startsWith('fi')) return 'fi';
   return 'en';
   ` : `
   return ${JSON.stringify(config.language)};
