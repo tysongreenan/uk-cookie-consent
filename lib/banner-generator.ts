@@ -465,7 +465,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     const thumbId = `tcf-purpose-${id}-thumb`
     const isLI = legalBasis === 'legitimate-interest'
     const thumbBg = config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText
-    const inactiveBg = config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'
+    const inactiveBg = config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'
     return `
             <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="flex: 1; min-width: 0; margin-right: 12px;">
@@ -477,7 +477,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="${toggleId}" data-tcf-purpose="${id}" style="opacity: 0; width: 0; height: 0;" />
                   <span id="${sliderId}" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${inactiveBg}; transition: .4s; border-radius: 24px;"></span>
-                  <span id="${thumbId}" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${thumbBg}; transition: .4s; border-radius: 50%;"></span>
+                  <span id="${thumbId}" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${thumbBg}; transition: .4s; border-radius: 50%; pointer-events: none;"></span>
                 </label>
               </div>
             </div>`
@@ -599,8 +599,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-func-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%; pointer-events: none;"></span>
                 </label>
               </div>
             </div>
@@ -617,8 +617,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-performance-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%; pointer-events: none;"></span>
                 </label>
               </div>
             </div>
@@ -635,8 +635,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-targeting-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%; pointer-events: none;"></span>
                 </label>
               </div>
             </div>
@@ -653,8 +653,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
               <div style="flex-shrink: 0; margin-left: 12px;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
-                  <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc'}; transition: .4s; border-radius: 24px;"></span>
-                  <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%;"></span>
+                  <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
+                  <span id="cookie-social-toggle-thumb" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: ${config.colors.background === '#ffffff' || config.colors.background === '#fff' || config.colors.background === 'white' ? '#ffffff' : config.colors.buttonText}; transition: .4s; border-radius: 50%; pointer-events: none;"></span>
                 </label>
               </div>
             </div>
@@ -1875,7 +1875,7 @@ function saveConsent(consent, tcfPurposes) {
 // so showPreferencesModal() can call loadConsentIntoModal()
 function setupToggleSwitches() {
   var buttonColor = ${JSON.stringify(config.colors.button)};
-  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
+  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af')};
 
   var toggles = [
     { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
@@ -1918,7 +1918,7 @@ function setupToggleSwitches() {
 function setupTcfToggleSwitches() {
   if (!TCF_ENABLED) return;
   var buttonColor = ${JSON.stringify(config.colors.button)};
-  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#ccc')};
+  var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af')};
 
   for (var pid = 1; pid <= 11; pid++) {
     (function(id) {
