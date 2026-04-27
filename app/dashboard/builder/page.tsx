@@ -1985,15 +1985,16 @@ function BannerBuilderContent() {
                       <div>
                         <Label htmlFor="font-family" className="text-sm font-medium">Fallback Font</Label>
                         <Select
-                          value={config.fontFamily || ''}
-                          onValueChange={(value) => updateConfig('fontFamily', value)}
+                          value={config.fontFamily || 'inherit'}
+                          onValueChange={(value) => updateConfig('fontFamily', value === 'inherit' ? '' : value)}
                         >
                           <SelectTrigger className="mt-1">
                             <SelectValue placeholder="Inherit from website (recommended)" />
                           </SelectTrigger>
                           <SelectContent>
-                            {FONT_PRESETS.map((font) => (
-                              <SelectItem key={font.value || 'inherit'} value={font.value}>
+                            <SelectItem value="inherit">Inherit from website (recommended)</SelectItem>
+                            {FONT_PRESETS.filter(f => f.value).map((font) => (
+                              <SelectItem key={font.value} value={font.value}>
                                 {font.name}
                               </SelectItem>
                             ))}
