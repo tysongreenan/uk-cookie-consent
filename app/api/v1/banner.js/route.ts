@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('console.error("Cookie Banner: Rate limit exceeded. Please try again later.");', {
         status: 429,
         headers: {
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/javascript; charset=utf-8',
           'X-RateLimit-Limit': '100',
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
         status: 400,
         headers: { 
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/javascript; charset=utf-8',
           ...SECURITY_HEADERS,
         }
       })
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('console.error("Cookie Banner: Invalid banner ID format");', { 
         status: 400,
         headers: { 
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/javascript; charset=utf-8',
           ...SECURITY_HEADERS,
         }
       })
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('console.error("Cookie Banner: Config not found");', { 
         status: 404,
         headers: { 
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/javascript; charset=utf-8',
           ...SECURITY_HEADERS,
         }
       })
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
       
       return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
         headers: { 
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/javascript; charset=utf-8',
           'Cache-Control': 'private, no-cache, must-revalidate',
           'ETag': finalEtag,
           'X-Cache': 'MISS',

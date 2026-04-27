@@ -1909,11 +1909,6 @@ function setupToggleSwitches() {
           }
         });
 
-        slider.addEventListener('click', function() {
-          input.checked = !input.checked;
-          input.dispatchEvent(new Event('change'));
-        });
-
         input.dataset.listenerAttached = 'true';
       }
     }
@@ -1949,10 +1944,6 @@ function setupTcfToggleSwitches() {
             slider.style.backgroundColor = inactiveColor;
             thumb.style.transform = 'translateX(0)';
           }
-        });
-        slider.addEventListener('click', function() {
-          input.checked = !input.checked;
-          input.dispatchEvent(new Event('change'));
         });
         input.dataset.listenerAttached = 'true';
       }
