@@ -84,7 +84,6 @@ export interface BannerConfig {
 
   // Typography
   fontFamily?: string
-  disableGoogleFonts?: boolean
   
   // Language
   language: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'nl' | 'sv' | 'nb' | 'da' | 'it' | 'fi' | 'auto'

@@ -1,31 +1,17 @@
 export interface FontPreset {
   name: string
   value: string
-  category: 'sans-serif' | 'serif' | 'display'
+  category: 'sans-serif' | 'serif' | 'monospace'
 }
 
 export const FONT_PRESETS: FontPreset[] = [
-  { name: 'System Default', value: '', category: 'sans-serif' },
-  { name: 'Inter', value: 'Inter', category: 'sans-serif' },
-  { name: 'Roboto', value: 'Roboto', category: 'sans-serif' },
-  { name: 'Open Sans', value: 'Open Sans', category: 'sans-serif' },
-  { name: 'Lato', value: 'Lato', category: 'sans-serif' },
-  { name: 'Poppins', value: 'Poppins', category: 'sans-serif' },
-  { name: 'Montserrat', value: 'Montserrat', category: 'sans-serif' },
-  { name: 'Nunito', value: 'Nunito', category: 'sans-serif' },
-  { name: 'DM Sans', value: 'DM Sans', category: 'sans-serif' },
-  { name: 'Plus Jakarta Sans', value: 'Plus Jakarta Sans', category: 'sans-serif' },
-  { name: 'Work Sans', value: 'Work Sans', category: 'sans-serif' },
-  { name: 'Outfit', value: 'Outfit', category: 'sans-serif' },
-  { name: 'Manrope', value: 'Manrope', category: 'sans-serif' },
-  { name: 'Raleway', value: 'Raleway', category: 'display' },
-  { name: 'Playfair Display', value: 'Playfair Display', category: 'serif' },
-  { name: 'Merriweather', value: 'Merriweather', category: 'serif' },
-  { name: 'Source Serif 4', value: 'Source Serif 4', category: 'serif' },
+  { name: 'Inherit from website (recommended)', value: '', category: 'sans-serif' },
+  { name: 'System UI', value: 'system-ui', category: 'sans-serif' },
+  { name: 'Arial', value: 'Arial', category: 'sans-serif' },
+  { name: 'Helvetica', value: 'Helvetica Neue', category: 'sans-serif' },
+  { name: 'Verdana', value: 'Verdana', category: 'sans-serif' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS', category: 'sans-serif' },
+  { name: 'Georgia', value: 'Georgia', category: 'serif' },
+  { name: 'Times New Roman', value: 'Times New Roman', category: 'serif' },
+  { name: 'Courier New', value: 'Courier New', category: 'monospace' },
 ]
-
-export function getGoogleFontUrl(fontFamily: string): string {
-  if (!fontFamily) return ''
-  const encoded = fontFamily.replace(/ /g, '+')
-  return `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;500;600;700&display=swap`
-}

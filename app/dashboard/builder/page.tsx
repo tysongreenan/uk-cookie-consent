@@ -33,7 +33,7 @@ import { Slider } from '@/components/ui/slider'
 import { ContrastBadge } from '@/components/ui/contrast-badge'
 import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
 import { COLOR_PRESETS } from '@/lib/color-presets'
-import { FONT_PRESETS, getGoogleFontUrl } from '@/lib/font-presets'
+import { FONT_PRESETS } from '@/lib/font-presets'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -1978,44 +1978,32 @@ function BannerBuilderContent() {
                       <CardTitle>Typography</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                      <div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40 px-4 py-3">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-300">Your banner inherits fonts from your website</p>
+                        <p className="text-xs text-green-800 dark:text-green-400 mt-1">No fonts are loaded from Google or any third-party server — fully GDPR compliant by default.</p>
+                      </div>
                       <div>
-                        <Label htmlFor="font-family" className="text-sm font-medium">Font Family</Label>
+                        <Label htmlFor="font-family" className="text-sm font-medium">Fallback Font</Label>
                         <Select
-                          value={config.fontFamily || 'system-default'}
-                          onValueChange={(value) => updateConfig('fontFamily', value === 'system-default' ? '' : value)}
+                          value={config.fontFamily || ''}
+                          onValueChange={(value) => updateConfig('fontFamily', value)}
                         >
                           <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="System Default" />
+                            <SelectValue placeholder="Inherit from website (recommended)" />
                           </SelectTrigger>
                           <SelectContent>
                             {FONT_PRESETS.map((font) => (
-                              <SelectItem key={font.value || 'system-default'} value={font.value || 'system-default'}>
+                              <SelectItem key={font.value || 'inherit'} value={font.value}>
                                 {font.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {config.fontFamily && !config.disableGoogleFonts
-                            ? `Using "${config.fontFamily}" loaded from Google Fonts`
-                            : config.fontFamily
-                            ? `Using "${config.fontFamily}" (loaded by your site — Google Fonts disabled)`
-                            : 'Using the browser default font'}
+                          {config.fontFamily
+                            ? `Fallback: "${config.fontFamily}" — used only if your site's font fails to load.`
+                            : 'Only change this if your website font fails to load on the banner.'}
                         </p>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40 px-4 py-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Label htmlFor="disable-google-fonts" className="text-sm font-medium">Disable Google Fonts</Label>
-                            <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">New</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">Prevent the banner from loading fonts from Google's servers. Required for strict GDPR compliance. Your site must already load the selected font.</p>
-                        </div>
-                        <Switch
-                          id="disable-google-fonts"
-                          checked={config.disableGoogleFonts ?? false}
-                          onCheckedChange={(checked) => updateConfig('disableGoogleFonts', checked)}
-                        />
                       </div>
                     </CardContent>
                   </Card>

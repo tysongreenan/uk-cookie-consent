@@ -1074,17 +1074,6 @@ var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
 var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
 window.__cbGpcActive = GPC_ACTIVE;
 
-${config.fontFamily && !config.disableGoogleFonts ? `// Load Google Font for banner
-(function loadBannerFont() {
-  var fontFamily = '${escapeHtml(config.fontFamily)}';
-  var encoded = fontFamily.replace(/ /g, '+');
-  if (document.querySelector('link[href*="family=' + encoded + '"]')) return;
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=' + encoded + ':wght@400;500;600;700&display=swap';
-  document.head.appendChild(link);
-})();` : ''}
-
 ${ga4Integration}
 
 initGA4Default();
