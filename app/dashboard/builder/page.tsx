@@ -1996,8 +1996,26 @@ function BannerBuilderContent() {
                           </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {config.fontFamily ? `Using "${config.fontFamily}" from Google Fonts` : 'Using the browser default font'}
+                          {config.fontFamily && !config.disableGoogleFonts
+                            ? `Using "${config.fontFamily}" loaded from Google Fonts`
+                            : config.fontFamily
+                            ? `Using "${config.fontFamily}" (loaded by your site — Google Fonts disabled)`
+                            : 'Using the browser default font'}
                         </p>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/40 px-4 py-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="disable-google-fonts" className="text-sm font-medium">Disable Google Fonts</Label>
+                            <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">New</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">Prevent the banner from loading fonts from Google's servers. Required for strict GDPR compliance. Your site must already load the selected font.</p>
+                        </div>
+                        <Switch
+                          id="disable-google-fonts"
+                          checked={config.disableGoogleFonts ?? false}
+                          onCheckedChange={(checked) => updateConfig('disableGoogleFonts', checked)}
+                        />
                       </div>
                     </CardContent>
                   </Card>

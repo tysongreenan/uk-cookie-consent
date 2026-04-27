@@ -51,8 +51,6 @@ export function CodeGenerator({ config, bannerId, planTier }: CodeGeneratorProps
   }
 
   const generateHeadCode = () => {
-    const materialFontUrl = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off&display=swap'
-
     return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 Cookie Consent Banner - HEAD CODE (cookie-banner.ca)      🍁 -->
 <!-- 🍁 Place this code in your <head> section                    🍁 -->
@@ -61,11 +59,6 @@ export function CodeGenerator({ config, bannerId, planTier }: CodeGeneratorProps
 
 ${generateConsentInitScript()}
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preload" as="style" href="${materialFontUrl}" />
-<link rel="stylesheet" href="${materialFontUrl}" media="print" onload="this.media='all'" />
-<noscript><link rel="stylesheet" href="${materialFontUrl}" /></noscript>
 <style>
 ${generateBannerCSS(config)}
 </style>
@@ -108,7 +101,8 @@ ${generateBannerHTML(config, { showBranding })}
     if (!bannerId) return ''
     const scriptUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}`
 
-    return `<script src="${scriptUrl}" async></script>`
+    return `<script src="${scriptUrl}" async></script>
+<noscript><a href="https://cookie-banner.ca/?ref=banner" rel="noopener" style="font-size:10px;color:rgba(128,128,128,0.5);text-decoration:none;">Cookie consent by cookie-banner.ca</a></noscript>`
   }
 
   const getCode = () => {

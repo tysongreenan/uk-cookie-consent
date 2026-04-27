@@ -728,59 +728,7 @@ export const generateBannerCSS = (config: BannerConfig) => {
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
 
-  return `/* Material Symbols CSS - font file loaded asynchronously via <link> */
-.material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24 !important;
-  font-family: 'Material Symbols Outlined' !important;
-  font-weight: normal !important;
-  font-style: normal !important;
-  display: inline-block !important;
-  line-height: 1 !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  word-wrap: normal !important;
-  white-space: nowrap !important;
-  direction: ltr !important;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'liga';
-  vertical-align: middle !important;
-}
-
-/* Specific styles for cookie floating button icons - Extra strong to override site CSS */
-#cookie-settings-float .material-symbols-outlined {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-  vertical-align: baseline !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  transform: none !important;
-}
-
-/* Extra protection against common CSS resets and frameworks */
-#cookie-settings-float .material-symbols-outlined * {
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* Floating button - hidden by default with strong CSS */
+  return `/* Floating button - hidden by default with strong CSS */
 #cookie-settings-float {
   display: none !important; /* This is critical! */
   align-items: center !important;
@@ -870,11 +818,25 @@ input:checked + span:before {
     font-size: 13px !important;
   }
   
+  #cookie-preferences-modal {
+    padding: 0 !important;
+    align-items: flex-start !important;
+  }
+
   #cookie-preferences-modal > div {
     margin: 0 !important;
     max-height: 100vh !important;
+    max-height: 100dvh !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     border-radius: 0 !important;
   }
+
+  #cookie-preferences-modal > div > div:last-child {
+    max-height: calc(100vh - 80px) !important;
+    max-height: calc(100dvh - 80px) !important;
+  }
+
 }
 
 /* GPC Acknowledgment Bar */
@@ -1112,19 +1074,7 @@ var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
 var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
 window.__cbGpcActive = GPC_ACTIVE;
 
-// Load Material Symbols font for cookie icons (if not already loaded)
-(function loadMaterialSymbolsFont() {
-  if (document.querySelector('link[href*="Material+Symbols+Outlined"]')) {
-    return; // Font already loaded
-  }
-  
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cookie,cookie_off&display=swap';
-  document.head.appendChild(link);
-})();
-
-${config.fontFamily ? `// Load Google Font for banner
+${config.fontFamily && !config.disableGoogleFonts ? `// Load Google Font for banner
 (function loadBannerFont() {
   var fontFamily = '${escapeHtml(config.fontFamily)}';
   var encoded = fontFamily.replace(/ /g, '+');
