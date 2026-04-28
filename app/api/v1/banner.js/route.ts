@@ -147,13 +147,16 @@ export async function GET(request: NextRequest) {
     
     if (error || !banner) {
       console.error('Banner fetch error:', error)
-      return new NextResponse('console.error("Cookie Banner: Config not found");', { 
-        status: 404,
-        headers: { 
-          'Content-Type': 'application/javascript; charset=utf-8',
-          ...SECURITY_HEADERS,
+      return new NextResponse(
+        `console.error("[Cookie Banner] No banner found for id " + ${JSON.stringify(bannerId)} + ". Check that the id= in your <script> tag matches a banner in your dashboard.");`,
+        {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/javascript; charset=utf-8',
+            ...SECURITY_HEADERS,
+          }
         }
-      })
+      )
     }
     
     // Use updatedAt from banner (already fetched above)
@@ -174,8 +177,13 @@ export async function GET(request: NextRequest) {
         })
       }
       
-      return new NextResponse('console.log("Cookie Banner: Banner is inactive");', { 
-        headers: { 
+      const inactiveMessage =
+        `console.warn("[Cookie Banner] " + ${JSON.stringify(banner.name || 'Unnamed banner')} +
+          " (id: " + ${JSON.stringify(bannerId)} + ") is currently disabled. " +
+          "Enable it in your dashboard at https://cookie-banner.ca/dashboard, " +
+          "or update the id= in your <script> tag to a different banner.");`
+      return new NextResponse(inactiveMessage, {
+        headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
           'Cache-Control': 'private, no-cache, must-revalidate',
           'ETag': finalEtag,
