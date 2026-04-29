@@ -5,15 +5,7 @@
  * user profile, audit log, service usage, and payment history.
  */
 
-import { createClient } from '@supabase/supabase-js'
-import { prisma } from '@/lib/prisma'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-  if (!url || !key) throw new Error('Supabase config missing')
-  return createClient(url, key)
-}
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export interface DisputeEvidence {
   generatedAt: string
@@ -56,18 +48,15 @@ export async function generateDisputeEvidence(
   const supabase = getSupabaseAdmin()
 
   // 1. Find user by Stripe customer ID
-  const user = await prisma.user.findFirst({
-    where: { stripeCustomerId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-      planTier: true,
-      upgradedAt: true,
-      stripeCustomerId: true,
-    },
-  })
+  const { data: user, error: userError } = await supabase
+    .from('User')
+    .select('id, name, email, createdAt, planTier, upgradedAt, stripeCustomerId')
+    .eq('stripeCustomerId', stripeCustomerId)
+    .maybeSingle()
+
+  if (userError) {
+    throw new Error(`Failed to load customer for dispute evidence: ${userError.message}`)
+  }
 
   if (!user) return null
 
@@ -86,17 +75,15 @@ export async function generateDisputeEvidence(
     .eq('userId', user.id)
 
   // 4. Pull payments
-  const payments = await prisma.payment.findMany({
-    where: { userId: user.id },
-    select: {
-      amount: true,
-      currency: true,
-      status: true,
-      createdAt: true,
-      stripePaymentIntentId: true,
-    },
-    orderBy: { createdAt: 'asc' },
-  })
+  const { data: payments, error: paymentsError } = await supabase
+    .from('Payment')
+    .select('amount, currency, status, createdAt, stripePaymentIntentId')
+    .eq('userId', user.id)
+    .order('createdAt', { ascending: true })
+
+  if (paymentsError) {
+    throw new Error(`Failed to load payments for dispute evidence: ${paymentsError.message}`)
+  }
 
   // 5. Format access log
   const accessLog = (auditEntries || []).map((e) => ({
@@ -120,13 +107,13 @@ export async function generateDisputeEvidence(
     loginEntries.length > 0
       ? `Total logins: ${loginEntries.length} from ${distinctIps.size} distinct IP(s)`
       : null,
-    firstLogin ? `First login: ${formatDate(new Date(firstLogin))}` : null,
+    firstLogin ? `First login: ${formatDate(firstLogin)}` : null,
     lastLogin && lastLogin !== firstLogin
-      ? `Last login: ${formatDate(new Date(lastLogin))}`
+      ? `Last login: ${formatDate(lastLogin)}`
       : null,
     ...accessLog.map(
       (e) =>
-        `${formatDate(new Date(e.timestamp))} — ${e.action}${e.ip ? ` (IP: ${e.ip})` : ''}`
+        `${formatDate(e.timestamp)} - ${e.action}${e.ip ? ` (IP: ${e.ip})` : ''}`
     ),
   ].filter(Boolean)
 
@@ -165,9 +152,9 @@ export async function generateDisputeEvidence(
     customer: {
       name: user.name,
       email: user.email!,
-      registeredAt: user.createdAt.toISOString(),
+      registeredAt: user.createdAt,
       planTier: user.planTier,
-      upgradedAt: user.upgradedAt?.toISOString() || null,
+      upgradedAt: user.upgradedAt || null,
       stripeCustomerId: user.stripeCustomerId,
     },
     productDescription: PRODUCT_DESCRIPTION,
@@ -180,7 +167,7 @@ export async function generateDisputeEvidence(
       amount: p.amount,
       currency: p.currency,
       status: p.status,
-      createdAt: p.createdAt.toISOString(),
+      createdAt: p.createdAt,
       stripePaymentIntentId: p.stripePaymentIntentId,
     })),
     accessActivityLogText,

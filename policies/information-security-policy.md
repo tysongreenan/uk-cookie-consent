@@ -104,7 +104,18 @@ COOKIE-BANNER.CA does not operate its own servers or data centers. All infrastru
 - Application dependencies are monitored for known vulnerabilities via GitHub Dependabot.
 - Critical security patches are applied within 72 hours of disclosure.
 
-## 8. Incident Response
+## 8. Confidential Reporting Channel
+
+Any person — including the founder, future employees, contractors, or external parties — may report suspected security policy violations, security incidents, or concerns confidentially via:
+
+- **Email:** security@cookie-banner.ca
+- **Web:** https://cookie-banner.ca/security
+
+Reports are treated confidentially. No retaliation will occur against anyone making a good-faith report. All reports are reviewed by the Security Lead within 1 business day and tracked to resolution.
+
+When the team grows, an anonymous reporting mechanism (separate from the reporter's identity) will be established.
+
+## 9. Incident Response
 
 In the event of a suspected security incident:
 
@@ -114,7 +125,7 @@ In the event of a suspected security incident:
 4. **Remediate** -- Fix the root cause and restore normal operations.
 5. **Document** -- Record the incident, timeline, impact, and corrective actions taken.
 
-Security incidents can be reported to security@cookie-banner.ca.
+For detailed procedures, see the Incident Response Plan.
 
 ## 9. Secure Development Practices
 
@@ -147,7 +158,25 @@ COOKIE-BANNER.CA processes personal data in compliance with:
 
 Data subject access requests, deletion requests, and consent withdrawal requests are honored within the timelines required by each applicable regulation.
 
-## 13. Policy Review
+## 14. Related Policies
+
+This policy is supported by the following documents:
+
+| Document | Purpose |
+|----------|---------|
+| Incident Response Plan | Detailed incident handling procedures and breach notification |
+| Change Management Policy | Change control, deployment, and rollback procedures |
+| Data Retention Policy | Data lifecycle, retention periods, and destruction |
+| Vulnerability Management Policy | Vulnerability detection, classification, and remediation SLAs |
+| Risk Register | Identified risks, assessments, and treatment plans |
+| Remote Access & Wireless Policy | Secure remote access and wireless network requirements |
+| Physical Security & Clean Desk Policy | Endpoint and workspace security controls |
+| Acceptable Use Policy | Secure use of systems and online resources |
+| IT Architecture & Secure Design Plan | System architecture and security design principles |
+| Asset Inventory | Catalogue of all systems, services, and devices |
+| Security Metrics & Objectives | Measurable security KPIs and quarterly tracking |
+
+## 15. Policy Review
 
 This policy is reviewed and updated:
 
@@ -162,3 +191,4 @@ All revisions are documented with a version number and effective date.
 | Version | Date | Author | Summary |
 |---------|------|--------|---------|
 | 1.0 | 2026-03-28 | Founder | Initial policy |
+| 1.1 | 2026-04-10 | Founder | Added confidential reporting channel (§8), related policies index (§14), renumbered sections |

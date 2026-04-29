@@ -11,9 +11,11 @@ const supabase = createClient(
 // POST /api/invitations/[token]/accept - Accept invitation
 export async function POST(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
+    const { token } = await params
+
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -33,7 +35,7 @@ export async function POST(
           owner_id
         )
       `)
-      .eq('token', params.token)
+      .eq('token', token)
       .single()
 
     if (invitationError || !invitation) {
@@ -89,11 +91,12 @@ export async function POST(
 
     // Atomically claim the invitation to prevent race conditions
     // Only proceeds if status is still 'pending'
+    const acceptedAt = new Date().toISOString()
     const { data: claimed, error: claimError } = await supabase
       .from('TeamInvitation')
       .update({
         status: 'accepted',
-        updated_at: new Date().toISOString()
+        accepted_at: acceptedAt
       })
       .eq('id', invitation.id)
       .eq('status', 'pending')
@@ -125,7 +128,7 @@ export async function POST(
       // Roll back invitation status if member insert fails
       await supabase
         .from('TeamInvitation')
-        .update({ status: 'pending', updated_at: new Date().toISOString() })
+        .update({ status: 'pending', accepted_at: null })
         .eq('id', invitation.id)
 
       console.error('Error adding user to team:', memberError)

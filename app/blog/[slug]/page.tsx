@@ -30,9 +30,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     return {
@@ -46,7 +47,7 @@ export async function generateMetadata({
     ...(post.keywords && { keywords: post.keywords.join(', ') }),
     authors: [{ name: post.author }],
     alternates: {
-      canonical: post.canonical || `/blog/${params.slug}`,
+      canonical: post.canonical || `/blog/${slug}`,
     },
     openGraph: {
       title: post.title,
@@ -68,9 +69,10 @@ export async function generateMetadata({
 export default async function BlogPostPage({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const post = await getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post || !post.published) {
     notFound()

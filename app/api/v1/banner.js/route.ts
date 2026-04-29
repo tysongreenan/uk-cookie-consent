@@ -592,7 +592,7 @@ export async function GET(request: NextRequest) {
     
     return new NextResponse(combinedScript, {
       headers: {
-        'Content-Type': 'application/javascript',
+        'Content-Type': 'application/javascript; charset=utf-8',
         'Cache-Control': 'private, no-cache, must-revalidate',
         'CDN-Cache-Control': 'no-store', // Prevent CDN caching (Vercel, Cloudflare, Brizy, etc.)
         'Surrogate-Control': 'no-store', // Prevent CDN caching (Fastly, Akamai, etc.)
@@ -609,8 +609,8 @@ export async function GET(request: NextRequest) {
     console.error('Banner.js generation error:', error)
     return new NextResponse('console.error("Cookie Banner: Internal server error");', { 
       status: 500,
-      headers: { 
-        'Content-Type': 'application/javascript',
+      headers: {
+        'Content-Type': 'application/javascript; charset=utf-8',
         ...SECURITY_HEADERS,
       }
     })

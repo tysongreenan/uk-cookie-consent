@@ -11,7 +11,7 @@ const supabase = createClient(
 // GET /api/teams/[teamId]/invitations - Get pending invitations
 export async function GET(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId } = params
+    const { teamId } = await params
 
     // Verify user is a member of this team
     const { data: teamMember, error: memberError } = await supabase
@@ -40,10 +40,10 @@ export async function GET(
         id,
         email,
         role,
+        token,
         status,
         created_at,
-        expires_at,
-        invite_link
+        expires_at
       `)
       .eq('team_id', teamId)
       .in('status', ['pending', 'accepted', 'expired'])
@@ -54,9 +54,18 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch invitations' }, { status: 500 })
     }
 
+    const origin = request.headers.get('origin') ||
+                   process.env.NEXT_PUBLIC_BASE_URL ||
+                   process.env.NEXTAUTH_URL ||
+                   new URL(request.url).origin
+    const invitationsWithLinks = (invitations || []).map(invitation => ({
+      ...invitation,
+      invite_link: `${origin}/invite/${invitation.token}`
+    }))
+
     return NextResponse.json({
       success: true,
-      data: invitations
+      data: invitationsWithLinks
     })
   } catch (error) {
     console.error('Error in GET /api/teams/[teamId]/invitations:', error)

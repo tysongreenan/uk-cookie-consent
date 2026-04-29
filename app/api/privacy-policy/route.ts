@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('privacy_policies')
-      .select('id, name, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
+      .select('id, name, slug, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
 
     if (teamId) {
       // Verify the user is a member of this team
@@ -71,6 +71,7 @@ export async function GET(request: NextRequest) {
     const policies = (data || []).map((p: any) => ({
       id: p.id,
       name: p.name,
+      slug: p.slug,
       status: p.status,
       jurisdictions: p.jurisdictions,
       language: p.language,
@@ -126,7 +127,13 @@ export async function POST(request: NextRequest) {
     // ── Parse body ──────────────────────────────────────────────────
 
     const body = await request.json()
-    const { name, inputs, content_html, content_json, jurisdictions, language } = body
+    const output = body.output
+    const inputs = body.inputs
+    const name = body.name || output?.metadata?.businessName || inputs?.businessName || 'My Privacy Policy'
+    const content_html = body.content_html || output?.contentHtml || ''
+    const content_json = body.content_json || output?.contentJson || { sections: [] }
+    const jurisdictions = body.jurisdictions || output?.metadata?.jurisdictions || inputs?.jurisdictions || []
+    const language = body.language || output?.metadata?.language || inputs?.language || 'en'
 
     if (!name || typeof name !== 'string') {
       return NextResponse.json({ error: 'Policy name is required' }, { status: 400 })
@@ -138,13 +145,17 @@ export async function POST(request: NextRequest) {
 
     // ── Team lookup ─────────────────────────────────────────────────
 
-    const { data: membership } = await supabase
-      .from('TeamMember')
-      .select('teamId')
-      .eq('userId', session.user.id)
-      .single()
+    let teamId: string | null = null
+    if (session.user.currentTeamId) {
+      const { data: membership } = await supabase
+        .from('TeamMember')
+        .select('teamId')
+        .eq('userId', session.user.id)
+        .eq('teamId', session.user.currentTeamId)
+        .single()
 
-    const teamId = membership?.teamId || null
+      teamId = membership?.teamId || null
+    }
 
     // ── Insert policy ───────────────────────────────────────────────
 

@@ -58,7 +58,7 @@ export function HeroSectionV2() {
       transition: {
         duration: 0.6,
         delay: 0.1 + i * 0.15,
-        ease: [0.25, 0.4, 0.25, 1],
+        ease: [0.25, 0.4, 0.25, 1] as const,
       },
     }),
   }

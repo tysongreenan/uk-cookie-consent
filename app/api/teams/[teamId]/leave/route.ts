@@ -11,7 +11,7 @@ const supabase = createClient(
 // POST /api/teams/[teamId]/leave - Leave a workspace
 export async function POST(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,7 +19,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId } = params
+    const { teamId } = await params
 
     // Get user's role in this team
     const { data: teamMember, error: memberError } = await supabase

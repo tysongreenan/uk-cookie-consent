@@ -14,12 +14,12 @@ import { toast } from 'react-hot-toast'
 
 interface SavedPolicy {
   id: string
-  title: string
+  name: string
   businessName: string
   status: 'draft' | 'published' | 'archived'
   slug?: string
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export default function PrivacyPoliciesPage() {
@@ -45,7 +45,7 @@ export default function PrivacyPoliciesPage() {
       const res = await fetch('/api/privacy-policy')
       if (!res.ok) throw new Error('Failed to fetch policies')
       const data = await res.json()
-      setPolicies(data.policies || [])
+      setPolicies(data.data || [])
     } catch (err) {
       console.error('Failed to fetch policies:', err)
       toast.error('Failed to load privacy policies')
@@ -115,7 +115,7 @@ export default function PrivacyPoliciesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-semibold truncate">{policy.title || policy.businessName}</h3>
+                        <h3 className="font-semibold truncate">{policy.name || policy.businessName}</h3>
                         <Badge variant={
                           policy.status === 'published' ? 'default' :
                           policy.status === 'archived' ? 'secondary' : 'outline'
@@ -124,7 +124,7 @@ export default function PrivacyPoliciesPage() {
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {policy.businessName} &middot; Updated {new Date(policy.updatedAt).toLocaleDateString()}
+                        {policy.businessName} &middot; Updated {new Date(policy.updated_at).toLocaleDateString()}
                       </p>
                       {policy.status === 'published' && policy.slug && (
                         <p className="text-sm text-primary mt-1">

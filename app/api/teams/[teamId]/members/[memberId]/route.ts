@@ -11,7 +11,7 @@ const supabase = createClient(
 // PATCH /api/teams/[teamId]/members/[memberId] - Update member role
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { teamId: string; memberId: string } }
+  { params }: { params: Promise<{ teamId: string; memberId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,7 +19,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId, memberId } = params
+    const { teamId, memberId } = await params
     const body = await request.json()
     const { role } = body
 
@@ -87,7 +87,7 @@ export async function PATCH(
 // DELETE /api/teams/[teamId]/members/[memberId] - Remove member
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { teamId: string; memberId: string } }
+  { params }: { params: Promise<{ teamId: string; memberId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -95,7 +95,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId, memberId } = params
+    const { teamId, memberId } = await params
 
     // Verify user is owner or admin of this team
     const { data: currentUserMember, error: memberError } = await supabase

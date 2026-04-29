@@ -26,6 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { InviteMemberModal } from './invite-member-modal'
 import { canAccessFeature } from '@/lib/plan-restrictions'
+import type { PlanTier } from '@/types'
 
 interface HeaderProps {}
 
@@ -35,8 +36,7 @@ export function DashboardHeader({}: HeaderProps) {
   const [notifications] = useState(3) // Mock notification count
   const [showInviteModal, setShowInviteModal] = useState(false)
   
-  // Check if user has Pro plan (temporarily set to 'pro' for testing)
-  const userPlan = 'pro' // TODO: Get actual user plan from database
+  const userPlan = (session?.user?.planTier || 'free') as PlanTier
   const canInvite = canAccessFeature(userPlan, 'hasTeamCollaboration')
 
   const handleSignOut = async () => {

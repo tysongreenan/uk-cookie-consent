@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -25,16 +25,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const supabase = getSupabaseAdmin()
+
     // Get user with Stripe customer ID
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        email: true,
-        stripeCustomerId: true,
-        planTier: true,
-      },
-    })
+    const { data: user, error: userError } = await supabase
+      .from('User')
+      .select('id, email, stripeCustomerId, planTier')
+      .eq('id', session.user.id)
+      .maybeSingle()
+
+    if (userError) {
+      throw userError
+    }
 
     if (!user) {
       return NextResponse.json(

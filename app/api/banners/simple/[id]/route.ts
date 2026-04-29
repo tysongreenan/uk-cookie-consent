@@ -55,9 +55,11 @@ async function getAccessibleUserIds(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -72,7 +74,7 @@ export async function GET(
     const { data: banner, error } = await supabase
       .from('SimpleBanners')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .in('userId', accessibleUserIds)
       .single()
 
@@ -93,9 +95,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -114,7 +118,7 @@ export async function PUT(
       const { data: existingBanner } = await supabase
         .from('SimpleBanners')
         .select('id, isActive, userId')
-        .eq('id', params.id)
+        .eq('id', id)
         .in('userId', accessibleUserIds)
         .single()
 
@@ -127,7 +131,7 @@ export async function PUT(
 
       // Toggle using the banner owner's userId (RPC requires the owner)
       const { data: rpcResult, error: rpcError } = await supabase.rpc('toggle_banner_active', {
-        banner_id: params.id,
+        banner_id: id,
         user_id: existingBanner.userId,
         is_active: bannerData.isActive
       })
@@ -150,7 +154,7 @@ export async function PUT(
 
       return NextResponse.json({
         success: true,
-        bannerId: params.id,
+        bannerId: id,
         isActive: bannerData.isActive,
         message: 'Banner status updated successfully!'
       })
@@ -173,7 +177,7 @@ export async function PUT(
     }
 
     // Generate updated code
-    const code = `<div id="cookie-banner-${params.id}">
+    const code = `<div id="cookie-banner-${id}">
   <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #333; color: white; padding: 20px; z-index: 9999;">
     <h3>Cookie Consent</h3>
     <p>We use cookies to improve your experience. Please accept to continue.</p>
@@ -184,12 +188,12 @@ export async function PUT(
 
 <script>
 function acceptCookies() {
-  document.getElementById('cookie-banner-${params.id}').style.display = 'none';
+  document.getElementById('cookie-banner-${id}').style.display = 'none';
   localStorage.setItem('cookieConsent', 'accepted');
 }
 
 function rejectCookies() {
-  document.getElementById('cookie-banner-${params.id}').style.display = 'none';
+  document.getElementById('cookie-banner-${id}').style.display = 'none';
   localStorage.setItem('cookieConsent', 'rejected');
 }
 </script>`
@@ -198,7 +202,7 @@ function rejectCookies() {
     const { data: bannerToUpdate } = await supabase
       .from('SimpleBanners')
       .select('userId')
-      .eq('id', params.id)
+      .eq('id', id)
       .in('userId', accessibleUserIds)
       .single()
 
@@ -208,7 +212,7 @@ function rejectCookies() {
 
     // Update banner using the banner owner's userId (RPC requires the owner)
     const { data, error } = await supabase.rpc('update_banner_simple', {
-      banner_id: params.id,
+      banner_id: id,
       banner_name: bannerName,
       banner_config: bannerConfig,
       banner_code: code,
@@ -225,15 +229,15 @@ function rejectCookies() {
     const { data: updatedBanner } = await supabase
       .from('SimpleBanners')
       .select('id, name, updatedAt')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
-    console.log('✅ Simple Update: Banner updated:', params.id)
-    logActivity(session.user.id, AuditAction.BANNER_UPDATE, request, { bannerId: params.id, bannerName })
+    console.log('✅ Simple Update: Banner updated:', id)
+    logActivity(session.user.id, AuditAction.BANNER_UPDATE, request, { bannerId: id, bannerName })
 
     return NextResponse.json({
       success: true,
-      bannerId: params.id,
+      bannerId: id,
       banner: updatedBanner ? {
         id: updatedBanner.id,
         name: updatedBanner.name,
@@ -251,9 +255,11 @@ function rejectCookies() {
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -268,7 +274,7 @@ export async function DELETE(
     const { data: bannerToDelete } = await supabase
       .from('SimpleBanners')
       .select('userId')
-      .eq('id', params.id)
+      .eq('id', id)
       .in('userId', accessibleUserIds)
       .single()
 
@@ -278,7 +284,7 @@ export async function DELETE(
 
     // Delete banner using the banner owner's userId (RPC requires the owner)
     const { data, error } = await supabase.rpc('delete_banner_simple', {
-      banner_id: params.id,
+      banner_id: id,
       user_id: bannerToDelete.userId
     })
 
@@ -287,8 +293,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Failed to delete banner' }, { status: 500 })
     }
 
-    console.log('✅ Simple Delete: Banner deleted successfully:', params.id)
-    logActivity(session.user.id, AuditAction.BANNER_DELETE, request, { bannerId: params.id })
+    console.log('✅ Simple Delete: Banner deleted successfully:', id)
+    logActivity(session.user.id, AuditAction.BANNER_DELETE, request, { bannerId: id })
 
     return NextResponse.json({
       success: true,

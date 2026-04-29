@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
 interface HostedPolicyPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 async function getPublishedPolicy(slug: string) {
@@ -32,7 +32,8 @@ async function getPublishedPolicy(slug: string) {
 }
 
 export async function generateMetadata({ params }: HostedPolicyPageProps): Promise<Metadata> {
-  const policy = await getPublishedPolicy(params.slug)
+  const { slug } = await params
+  const policy = await getPublishedPolicy(slug)
 
   if (!policy) {
     return {
@@ -46,14 +47,15 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
     title: `Privacy Policy - ${businessName}`,
     description: `Privacy policy for ${businessName}. Learn how your personal information is collected, used, and protected.`,
     alternates: {
-      canonical: `https://www.cookie-banner.ca/p/${params.slug}`,
+      canonical: `https://www.cookie-banner.ca/p/${slug}`,
     },
     robots: 'index, follow',
   }
 }
 
 export default async function HostedPolicyPage({ params }: HostedPolicyPageProps) {
-  const policy = await getPublishedPolicy(params.slug)
+  const { slug } = await params
+  const policy = await getPublishedPolicy(slug)
 
   if (!policy) {
     notFound()
@@ -86,7 +88,7 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     "@type": "WebPage",
     "name": `Privacy Policy - ${businessName}`,
     "description": `Privacy policy for ${businessName}`,
-    "url": `https://www.cookie-banner.ca/p/${params.slug}`,
+    "url": `https://www.cookie-banner.ca/p/${slug}`,
     "dateModified": policy.updated_at,
     "publisher": {
       "@type": "Organization",
@@ -100,7 +102,7 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.cookie-banner.ca" },
       { "@type": "ListItem", "position": 2, "name": "Privacy Policy Generator", "item": "https://www.cookie-banner.ca/tools/privacy-policy" },
-      { "@type": "ListItem", "position": 3, "name": businessName, "item": `https://www.cookie-banner.ca/p/${params.slug}` },
+      { "@type": "ListItem", "position": 3, "name": businessName, "item": `https://www.cookie-banner.ca/p/${slug}` },
     ],
   }
 

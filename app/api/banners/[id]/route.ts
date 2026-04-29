@@ -13,9 +13,11 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -37,7 +39,7 @@ export async function GET(
         id, name, config, isActive, createdAt, updatedAt,
         Project!inner(teamId)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('Project.teamId', currentTeamId)
       .single()
 
@@ -73,16 +75,18 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return handleBannerUpdate(request, params.id)
+  const { id } = await params
+  return handleBannerUpdate(request, id)
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return handleBannerUpdate(request, params.id)
+  const { id } = await params
+  return handleBannerUpdate(request, id)
 }
 
 async function handleBannerUpdate(
@@ -199,9 +203,11 @@ async function handleBannerUpdate(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -233,7 +239,7 @@ export async function DELETE(
         id,
         Project!inner(teamId)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('Project.teamId', currentTeamId)
       .single()
 
@@ -248,7 +254,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('ConsentBanner')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Database error:', error)

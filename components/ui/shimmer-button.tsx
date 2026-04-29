@@ -28,7 +28,7 @@ function ShimmerButton({ children, className, ...props }: ShimmerButtonProps) {
         '--shimmer-button-x': {
           duration: 3,
           repeat: Infinity,
-          ease: [0.445, 0.05, 0.55, 0.95]
+          ease: [0.445, 0.05, 0.55, 0.95] as const
         }
       }}
       whileTap={{

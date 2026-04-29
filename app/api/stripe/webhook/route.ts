@@ -21,6 +21,10 @@ const SECURITY_HEADERS = {
   'X-XSS-Protection': '1; mode=block',
 }
 
+function optionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null
+}
+
 function ok(data: Record<string, unknown> = { received: true }) {
   return NextResponse.json(data, { headers: SECURITY_HEADERS })
 }
@@ -54,6 +58,7 @@ export async function POST(request: NextRequest) {
       // ── Checkout completed (one-time OR subscription first payment) ──
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+        const paymentIntentId = optionalString(session.payment_intent)
 
         if (session.payment_status !== 'paid') {
           console.error('[WEBHOOK] Payment not completed:', { sessionId: session.id, paymentStatus: session.payment_status })
@@ -94,34 +99,35 @@ export async function POST(request: NextRequest) {
           const subscriptionEndsAt = new Date()
           subscriptionEndsAt.setFullYear(subscriptionEndsAt.getFullYear() + 1)
 
-          await prisma.user.update({
-            where: { id: userId },
-            data: {
-              planTier: 'pro_annual',
-              billingCycle: 'annual',
-              subscriptionStatus: 'active',
-              stripeSubscriptionId: subscriptionId,
-              stripeCustomerId: session.customer as string,
-              upgradedAt: new Date(),
-              subscriptionEndsAt,
-              featureFreezeDate: null, // Annual users have no freeze
-              loyaltyUpgradeEligible: false, // They've upgraded
-            },
-          })
-
-          await prisma.payment.create({
-            data: {
-              userId,
-              amount: session.amount_total || 0,
-              currency: session.currency || 'usd',
-              status: 'succeeded',
-              planTier: 'pro_annual',
-              paymentType: 'subscription',
-              stripeSessionId: session.id,
-              stripePaymentIntentId: (session.payment_intent as string) || '',
-              stripeCustomerId: session.customer as string,
-            },
-          })
+          await prisma.$transaction([
+            prisma.user.update({
+              where: { id: userId },
+              data: {
+                planTier: 'pro_annual',
+                billingCycle: 'annual',
+                subscriptionStatus: 'active',
+                stripeSubscriptionId: subscriptionId,
+                stripeCustomerId: session.customer as string,
+                upgradedAt: new Date(),
+                subscriptionEndsAt,
+                featureFreezeDate: null, // Annual users have no freeze
+                loyaltyUpgradeEligible: false, // They've upgraded
+              },
+            }),
+            prisma.payment.create({
+              data: {
+                userId,
+                amount: session.amount_total || 0,
+                currency: session.currency || 'usd',
+                status: 'succeeded',
+                planTier: 'pro_annual',
+                paymentType: 'subscription',
+                stripeSessionId: session.id,
+                stripePaymentIntentId: paymentIntentId,
+                stripeCustomerId: session.customer as string,
+              },
+            }),
+          ])
 
           logActivity(userId, AuditAction.PLAN_UPGRADE, null, {
             planTier: 'pro_annual',
@@ -183,7 +189,7 @@ export async function POST(request: NextRequest) {
                 planTier: 'pro_lifetime',
                 paymentType: 'one_time',
                 stripeSessionId: session.id,
-                stripePaymentIntentId: session.payment_intent as string,
+                stripePaymentIntentId: paymentIntentId,
                 stripeCustomerId: session.customer as string,
               },
             }),
@@ -205,6 +211,7 @@ export async function POST(request: NextRequest) {
       // ── Subscription renewal (invoice paid after first payment) ──
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice & { subscription?: string; payment_intent?: string }
+        const paymentIntentId = optionalString(invoice.payment_intent)
         const subscriptionId = invoice.subscription as string
         if (!subscriptionId) break // Not a subscription invoice
 
@@ -227,27 +234,28 @@ export async function POST(request: NextRequest) {
         const subscriptionEndsAt = new Date()
         subscriptionEndsAt.setFullYear(subscriptionEndsAt.getFullYear() + 1)
 
-        await prisma.user.update({
-          where: { id: renewalUser.id },
-          data: {
-            subscriptionStatus: 'active',
-            subscriptionEndsAt,
-          },
-        })
-
-        await prisma.payment.create({
-          data: {
-            userId: renewalUser.id,
-            amount: invoice.amount_paid || 0,
-            currency: invoice.currency || 'usd',
-            status: 'succeeded',
-            planTier: 'pro_annual',
-            paymentType: 'subscription_renewal',
-            stripeSessionId: invoice.id,
-            stripePaymentIntentId: (invoice.payment_intent as string) || '',
-            stripeCustomerId: invoice.customer as string,
-          },
-        })
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: renewalUser.id },
+            data: {
+              subscriptionStatus: 'active',
+              subscriptionEndsAt,
+            },
+          }),
+          prisma.payment.create({
+            data: {
+              userId: renewalUser.id,
+              amount: invoice.amount_paid || 0,
+              currency: invoice.currency || 'usd',
+              status: 'succeeded',
+              planTier: 'pro_annual',
+              paymentType: 'subscription_renewal',
+              stripeSessionId: invoice.id,
+              stripePaymentIntentId: paymentIntentId,
+              stripeCustomerId: invoice.customer as string,
+            },
+          }),
+        ])
 
         logActivity(renewalUser.id, AuditAction.PLAN_UPGRADE, null, {
           reason: 'subscription_renewal',
@@ -438,6 +446,7 @@ export async function POST(request: NextRequest) {
     console.error('[WEBHOOK] Processing error:', {
       eventId: event.id,
       eventType: event.type,
+      errorName: error instanceof Error ? error.name : 'UnknownError',
       error: error instanceof Error ? error.message : 'Unknown error',
     })
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500, headers: SECURITY_HEADERS })

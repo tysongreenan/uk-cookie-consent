@@ -6,14 +6,13 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import {
   Shield,
-  Chrome,
+  Globe,
   ArrowRight,
   Eye,
   MousePointerClick,
   LayoutDashboard,
   History,
   BarChart3,
-  Globe,
   Check,
   X,
   Frown,
@@ -43,7 +42,7 @@ function AnimateIn({
       ref={ref}
       initial={{ opacity: 0, y: 32 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
-      transition={{ duration: 0.55, delay, ease: [0.25, 0.4, 0.25, 1] }}
+      transition={{ duration: 0.55, delay, ease: [0.25, 0.4, 0.25, 1] as const }}
       className={className}
     >
       {children}
@@ -126,7 +125,7 @@ export default function PrivacyManagerPage() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#0E768C]/20 bg-[#0E768C]/5 px-4 py-1.5 text-sm font-medium text-[#0E768C]">
-                  <Chrome className="h-4 w-4" />
+                  <Globe className="h-4 w-4" />
                   Chrome Extension
                 </div>
               </motion.div>
@@ -175,7 +174,7 @@ export default function PrivacyManagerPage() {
                     variant="outline"
                     className="h-12 gap-2 border-slate-200 px-7 text-[15px] font-semibold text-slate-700 hover:bg-slate-50"
                   >
-                    <Chrome className="h-4.5 w-4.5" />
+                    <Globe className="h-4.5 w-4.5" />
                     Add to Chrome
                   </Button>
                 </Link>
@@ -300,7 +299,7 @@ export default function PrivacyManagerPage() {
                 title: 'Install the extension',
                 description:
                   'Add Privacy Manager to Chrome in one click. It runs quietly in the background as you browse.',
-                icon: Chrome,
+                icon: Globe,
               },
               {
                 step: '03',
@@ -702,7 +701,7 @@ export default function PrivacyManagerPage() {
                   variant="outline"
                   className="h-13 gap-2 border-slate-200 px-8 text-base font-semibold text-slate-700 hover:bg-slate-50"
                 >
-                  <Chrome className="h-5 w-5" />
+                  <Globe className="h-5 w-5" />
                   Add to Chrome
                 </Button>
               </Link>

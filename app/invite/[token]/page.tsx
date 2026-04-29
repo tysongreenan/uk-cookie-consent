@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -30,7 +30,9 @@ interface InvitationData {
   }
 }
 
-export default function InvitePage({ params }: { params: { token: string } }) {
+export default function InvitePage() {
+  const params = useParams<{ token: string }>()
+  const token = typeof params?.token === 'string' ? params.token : ''
   const { data: session, status: sessionStatus } = useSession()
   const [invitation, setInvitation] = useState<InvitationData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -40,14 +42,14 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
 
-  const callbackUrl = encodeURIComponent(`/invite/${params.token}`)
+  const callbackUrl = encodeURIComponent(`/invite/${token}`)
   const isAuthenticated = sessionStatus === 'authenticated'
   const isAuthLoading = sessionStatus === 'loading'
 
   useEffect(() => {
     const fetchInvitation = async () => {
       try {
-        const response = await fetch(`/api/invitations/${params.token}`)
+        const response = await fetch(`/api/invitations/${token}`)
         const data = await response.json()
 
         if (data.success) {
@@ -63,13 +65,13 @@ export default function InvitePage({ params }: { params: { token: string } }) {
     }
 
     fetchInvitation()
-  }, [params.token])
+  }, [token])
 
   const handleAcceptInvitation = async () => {
     setAccepting(true)
     setEmailMismatch(false)
     try {
-      const response = await fetch(`/api/invitations/${params.token}/accept`, {
+      const response = await fetch(`/api/invitations/${token}/accept`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -92,7 +94,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   }
 
   const handleSignOutAndRetry = async () => {
-    await signOut({ callbackUrl: `/invite/${params.token}` })
+    await signOut({ callbackUrl: `/invite/${token}` })
   }
 
   const maskEmail = (email: string) => {

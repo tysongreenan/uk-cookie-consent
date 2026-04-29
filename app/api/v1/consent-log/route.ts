@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 
     const { data: user, error: userError } = await supabase
       .from('User')
-      .select('planTier, featureFreezeDate, teamId')
+      .select('planTier, featureFreezeDate, current_team_id')
       .eq('id', userId)
       .single()
 
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
 
     const tier = (user?.planTier || 'free') as PlanTier
     const featureFreezeDate = user?.featureFreezeDate || null
-    const teamId = user?.teamId || null
+    const teamId = user?.current_team_id || null
 
     const hasAccess = canAccessFeatureWithFreeze(tier, 'hasConsentLogs', featureFreezeDate)
     if (!hasAccess) {

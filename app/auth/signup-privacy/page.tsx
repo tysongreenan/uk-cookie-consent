@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import { Shield, Mail, Lock, User, ArrowRight, Loader2, Chrome } from 'lucide-react'
+import { Shield, Mail, Lock, User, ArrowRight, Loader2, Globe } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 function PrivacySignUpContent() {
@@ -90,7 +90,7 @@ function PrivacySignUpContent() {
         {/* Features */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {[
-            { icon: Chrome, text: 'Chrome Extension' },
+            { icon: Globe, text: 'Chrome Extension' },
             { icon: Shield, text: 'Auto-manage banners' },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-slate-200">

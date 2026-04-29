@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,69 +12,103 @@ interface BannerConfig {
   }
 }
 
+interface ShowcaseUser {
+  id: string
+  name: string | null
+}
+
+interface ShowcaseProject {
+  id: string
+  userId: string
+  domain: string | null
+}
+
+interface ShowcaseBanner {
+  projectId: string
+  config: BannerConfig | null
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // 1. Fetch ALL users (removed planTier: 'pro' check) with their projects and banners
-    // Limiting to 50 most recent users to check for valid logos
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        projects: {
-          where: {
-            domain: {
-              not: null, // Must have a domain
-            },
-          },
-          select: {
-            domain: true,
-            consentBanners: {
-              where: {
-                isActive: true,
-              },
-              orderBy: {
-                updatedAt: 'desc',
-              },
-              take: 1, // Only need the most recent active banner
-              select: {
-                config: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc', // Show most recent users first
-      },
-      take: 50,
-    })
+    const supabase = getSupabaseAdmin()
 
-    // 2. Process and filter the results
-    const showcaseItems = users
-      .flatMap(user => {
-        return user.projects.flatMap(project => {
-          const banner = project.consentBanners[0]
-          if (!banner || !banner.config) return []
+    // Fetch the most recent users first, then resolve their projects and latest active banners.
+    const { data: users, error: usersError } = await supabase
+      .from('User')
+      .select('id, name')
+      .order('createdAt', { ascending: false })
+      .limit(50)
 
-          const config = banner.config as unknown as BannerConfig
-          const logoUrl = config.branding?.logo?.url
-          const logoEnabled = config.branding?.logo?.enabled
+    if (usersError) {
+      throw usersError
+    }
 
-          // Must have a valid logo URL and be enabled
-          if (!logoUrl || !logoEnabled || !project.domain) return []
+    const userList = (users || []) as ShowcaseUser[]
+    const userIds = userList.map((user) => user.id)
 
-          // Ensure domain has protocol
-          let websiteUrl = project.domain
-          if (!websiteUrl.startsWith('http')) {
-            websiteUrl = `https://${websiteUrl}`
-          }
+    if (userIds.length === 0) {
+      return NextResponse.json({ items: [] })
+    }
 
-          return {
-            companyName: user.name || project.domain,
-            logoUrl,
-            websiteUrl,
-          }
-        })
+    const { data: projects, error: projectsError } = await supabase
+      .from('Project')
+      .select('id, userId, domain')
+      .in('userId', userIds)
+      .not('domain', 'is', null)
+      .limit(5000)
+
+    if (projectsError) {
+      throw projectsError
+    }
+
+    const projectList = (projects || []) as ShowcaseProject[]
+    const projectIds = projectList.map((project) => project.id)
+
+    if (projectIds.length === 0) {
+      return NextResponse.json({ items: [] })
+    }
+
+    const { data: banners, error: bannersError } = await supabase
+      .from('ConsentBanner')
+      .select('projectId, config')
+      .in('projectId', projectIds)
+      .eq('isActive', true)
+      .order('updatedAt', { ascending: false })
+      .limit(5000)
+
+    if (bannersError) {
+      throw bannersError
+    }
+
+    const latestBannerByProject = new Map<string, ShowcaseBanner>()
+    for (const banner of (banners || []) as ShowcaseBanner[]) {
+      if (!latestBannerByProject.has(banner.projectId)) {
+        latestBannerByProject.set(banner.projectId, banner)
+      }
+    }
+
+    const userById = new Map(userList.map((user) => [user.id, user]))
+
+    const showcaseItems = projectList
+      .flatMap((project) => {
+        const banner = latestBannerByProject.get(project.id)
+        if (!banner?.config || !project.domain) return []
+
+        const logoUrl = banner.config.branding?.logo?.url
+        const logoEnabled = banner.config.branding?.logo?.enabled
+
+        if (!logoUrl || !logoEnabled) return []
+
+        let websiteUrl = project.domain
+        if (!websiteUrl.startsWith('http')) {
+          websiteUrl = `https://${websiteUrl}`
+        }
+
+        return {
+          companyName: userById.get(project.userId)?.name || project.domain,
+          logoUrl,
+          websiteUrl,
+        }
       })
       // Remove duplicates (by logo URL or website)
       .filter((item, index, self) => 

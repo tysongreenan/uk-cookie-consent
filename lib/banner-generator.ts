@@ -125,11 +125,11 @@ function generateInlineFooterLinkHTML(footerLink: any, config: any): string {
       html = `<button onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-btn${customClass ? ' ' + customClass : ''}" style="background: ${escapeHtml(config.colors.button)}; color: ${escapeHtml(config.colors.buttonText)}; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">${text}</button>`
       break
     case 'icon-text':
-      const icon = includeIcon ? '🍪 ' : ''
+      const icon = includeIcon ? '&#127850; ' : ''
       html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${escapeHtml(config.colors.link)};">${icon}${text}</a>`
       break
     case 'custom':
-      const customIcon = includeIcon ? '🍪 ' : ''
+      const customIcon = includeIcon ? '&#127850; ' : ''
       const customLogo = includeLogo ? '<img src="YOUR_LOGO_URL" alt="Logo" style="height: 16px; margin-right: 4px;" />' : ''
       html = `<a href="#" onclick="window.showCookiePreferences?.(); return false;" class="cookie-settings-link${customClass ? ' ' + customClass : ''}" style="color: ${escapeHtml(config.colors.link)};">${customLogo}${customIcon}${text}</a>`
       break
@@ -523,7 +523,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       `}
 
       <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: ${config.colors.text}; font-size: 20px; line-height: 1; flex-shrink: 0; opacity: 0.7;" aria-label="Close">
-        ×
+        &times;
       </button>
     </div>
 
@@ -579,7 +579,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             <!-- Strictly Necessary -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px; background-color: ${cardBackgroundColor};">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">&rsaquo;</span>
                 <div style="min-width: 0; flex: 1;">
                   <div id="cat-necessary" style="font-weight: 500; color: ${config.colors.text};">Strictly Necessary Cookies</div>
                   <div id="cat-necessary-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Always active</div>
@@ -590,7 +590,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             <!-- Functionality -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">&rsaquo;</span>
                 <div style="min-width: 0; flex: 1;">
                   <div id="cat-functionality" style="font-weight: 500; color: ${config.colors.text};">Functional Cookies</div>
                   <div id="cat-functionality-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Remember preferences and choices</div>
@@ -608,7 +608,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             <!-- Performance -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">&rsaquo;</span>
                 <div style="min-width: 0; flex: 1;">
                   <div id="cat-analytics" style="font-weight: 500; color: ${config.colors.text};">Performance Cookies</div>
                   <div id="cat-analytics-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Help us improve our website</div>
@@ -626,7 +626,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             <!-- Targeting -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">&rsaquo;</span>
                 <div style="min-width: 0; flex: 1;">
                   <div id="cat-marketing" style="font-weight: 500; color: ${config.colors.text};">Targeting Cookies</div>
                   <div id="cat-marketing-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Personalized ads and content</div>
@@ -644,7 +644,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             <!-- Social Media -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
               <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">&rsaquo;</span>
                 <div style="min-width: 0; flex: 1;">
                   <div id="cat-social" style="font-weight: 500; color: ${config.colors.text};">Social Media Cookies</div>
                   <div id="cat-social-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Social media integration</div>
@@ -1821,15 +1821,23 @@ document.addEventListener('DOMContentLoaded', function() {
 ` : ''}
 
 function getCookie(name) {
-  var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : null;
+  try {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  } catch(e) {
+    return null;
+  }
 }
 
 function setCookie(name, value, days) {
-  var expires = new Date();
-  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-  var secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
+  try {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    var secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
+  } catch(e) {
+    // Cookie access blocked in sandboxed context — silently ignore
+  }
 }
 
 function getConsent() {

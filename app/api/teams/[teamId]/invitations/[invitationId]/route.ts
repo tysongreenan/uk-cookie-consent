@@ -11,7 +11,7 @@ const supabase = createClient(
 // DELETE /api/teams/[teamId]/invitations/[invitationId] - Cancel invitation
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { teamId: string; invitationId: string } }
+  { params }: { params: Promise<{ teamId: string; invitationId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,7 +19,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId, invitationId } = params
+    const { teamId, invitationId } = await params
 
     // Verify user is owner or admin of this team
     const { data: teamMember, error: memberError } = await supabase

@@ -11,7 +11,7 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Development only - return 404 in production
   if (process.env.NODE_ENV === 'production') {
@@ -22,6 +22,8 @@ export async function GET(
   }
 
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
@@ -32,7 +34,7 @@ export async function GET(
     const { data: banner, error } = await supabase
       .from('ConsentBanner')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('userId', session.user.id)
       .single()
 

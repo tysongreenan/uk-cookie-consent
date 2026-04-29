@@ -10,7 +10,7 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Verify authentication
@@ -22,10 +22,10 @@ export async function GET(
       )
     }
 
-    const { userId } = params
+    const { userId } = await params
 
     // Verify user can only access their own config
-    if (params.userId !== session.user.id) {
+    if (userId !== session.user.id) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }

@@ -15,7 +15,7 @@ const supabase = createClient(
 // GET /api/teams/[teamId] - Get team details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -26,7 +26,7 @@ export async function GET(
       )
     }
 
-    const { teamId } = params
+    const { teamId } = await params
 
     // Check if user has permission to view team
     const permissionResult = await requireTeamPermission(
@@ -86,7 +86,7 @@ export async function GET(
 // PATCH /api/teams/[teamId] - Update team
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -97,7 +97,7 @@ export async function PATCH(
       )
     }
 
-    const { teamId } = params
+    const { teamId } = await params
     const body: UpdateTeamForm = await request.json()
 
     // Check if user has permission to edit team (admin or owner)
@@ -166,7 +166,7 @@ export async function PATCH(
 // DELETE /api/teams/[teamId] - Delete team (owner only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -177,7 +177,7 @@ export async function DELETE(
       )
     }
 
-    const { teamId } = params
+    const { teamId } = await params
 
     // Check if user has permission to delete team (owner only)
     const permissionResult = await requireTeamPermission(

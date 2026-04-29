@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Bricolage_Grotesque } from 'next/font/google'
@@ -82,103 +83,43 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* DNS prefetch for external resources */}
+        {/* DNS prefetch for analytics (fonts self-hosted by next/font) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-
-        {/* Preconnect to Google Fonts for faster loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* Google Consent Mode v2 — MUST be first, before any trackers or banner script */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('consent', 'default', {
-                'analytics_storage': 'denied',
-                'ad_storage': 'denied',
-                'ad_user_data': 'denied',
-                'ad_personalization': 'denied',
-                'wait_for_update': 500
-              });
-            `,
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'denied','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied','wait_for_update':500});`,
           }}
         />
 
-        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
-        {/* 🍁 Cookie Consent Banner - HOSTED SCRIPT (cookie-banner.ca)  🍁 */}
-        {/* 🍁 Place this code in your <head> section                    🍁 */}
-        {/* 🍁 IMPORTANT: Place as high as possible to block trackers    🍁 */}
-        {/* 🍁 Updates automatically - no need to change this code!      🍁 */}
-        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
-
+        {/* Cookie Consent Banner — must be high in head to block trackers before they fire */}
         <script async src="https://www.cookie-banner.ca/api/v1/banner.js?id=eb2e7ccc-3c74-4ca4-86ca-2bf2cd1fc6b8"></script>
-
-        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
-        {/* 🍁 End HOSTED SCRIPT - Powered by cookie-banner.ca           🍁 */}
-        {/* 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 */}
-
-        {/* Google Analytics (gtag.js) — loads after consent defaults are set */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              gtag('js', new Date());
-              gtag('config', 'G-QM1L8P6TT5');
-            `,
-          }}
-        />
-
-        {/* Deferred Google Tag Manager - loads after page is interactive */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Suppress GTM/reCAPTCHA errors to prevent "Invalid domain for site key" messages
-              window.addEventListener('error', function(e) {
-                if (e.message && (e.message.includes('site key') || e.message.includes('recaptcha') || e.message.includes('Invalid domain'))) {
-                  e.preventDefault();
-                  return true;
-                }
-              }, true);
-              
-              // Defer GTM until page is fully loaded
-              window.addEventListener('load', function() {
-                setTimeout(function() {
-                  try {
-                    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;
-                    j.onerror = function() { console.warn('GTM failed to load (suppressed)'); };
-                    f.parentNode.insertBefore(j,f);
-                    })(window,document,'script','dataLayer','GTM-5LGTBVXZ');
-                  } catch(e) {
-                    console.warn('GTM initialization error (suppressed):', e.message);
-                  }
-                }, 1000); // 1 second delay after load
-              });
-            `,
-          }}
-        />
-        
-        {/* Google Analytics removed - should be configured per-banner via banner builder */}
-        {/* This prevents "Invalid domain for site key" errors when testing banners */}
       </head>
       <body className={`${GeistSans.variable} ${GeistMono.variable} ${bricolage.variable} font-sans antialiased`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
         <noscript>
-          <iframe 
+          <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-5LGTBVXZ"
-            height="0" 
-            width="0" 
+            height="0"
+            width="0"
             style={{display: 'none', visibility: 'hidden'}}
           />
         </noscript>
-        
+
+        {/* GA & GTM — loaded after hydration to avoid render-blocking */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-QM1L8P6TT5"
+          strategy="afterInteractive"
+        />
+        <Script id="ga-config" strategy="afterInteractive">
+          {`gtag('js', new Date()); gtag('config', 'G-QM1L8P6TT5');`}
+        </Script>
+        <Script id="gtm-loader" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;j.onerror=function(){console.warn('GTM failed to load')};f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5LGTBVXZ');`}
+        </Script>
+
         <AnnouncementProvider>
           <Providers>
             <TooltipProvider>

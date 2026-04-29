@@ -11,7 +11,7 @@ const supabase = createClient(
 // GET /api/teams/[teamId]/members - Get team members
 export async function GET(
   request: NextRequest,
-  { params }: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { teamId } = params
+    const { teamId } = await params
 
     // Verify user is a member of this team
     const { data: teamMember, error: memberError } = await supabase

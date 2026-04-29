@@ -141,9 +141,11 @@ function updateConsent() {
 // GET /api/banners/[id]/code - Get generated code for a banner
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -162,7 +164,7 @@ export async function GET(
         projectId,
         Project!inner(userId)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('Project.userId', userId)
       .single()
 

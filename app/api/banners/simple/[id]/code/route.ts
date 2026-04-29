@@ -10,9 +10,11 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
@@ -21,7 +23,7 @@ export async function GET(
 
     // Get banner code using direct SQL to bypass RLS issues
     const { data, error } = await supabase.rpc('get_banner_code_simple', {
-      banner_id: params.id,
+      banner_id: id,
       user_id: session.user.id
     })
 
@@ -34,7 +36,7 @@ export async function GET(
       return NextResponse.json({ error: 'Banner not found' }, { status: 404 })
     }
 
-    console.log('✅ Simple Code: Banner code fetched successfully:', params.id)
+    console.log('✅ Simple Code: Banner code fetched successfully:', id)
     return NextResponse.json({ 
       code: data[0].code,
       name: data[0].name

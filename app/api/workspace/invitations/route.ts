@@ -70,24 +70,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check workspace member limit (max 5 people)
-    const { count: memberTotal, error: countError } = await supabase
+    const { data: inviterMembership, error: membershipError } = await supabase
       .from('TeamMember')
-      .select('*', { count: 'exact', head: true })
+      .select('role')
       .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .single()
 
-    if (countError) {
-      console.error('Error checking member count:', countError)
+    if (membershipError || !inviterMembership) {
       return NextResponse.json(
-        { error: 'Failed to check workspace capacity' },
-        { status: 500 }
+        { error: 'You are not a member of this workspace.' },
+        { status: 403 }
       )
     }
 
-    if (memberTotal != null && memberTotal >= 5) {
+    if (!['owner', 'admin'].includes(inviterMembership.role)) {
       return NextResponse.json(
-        { error: 'Workspace is at capacity (maximum 5 members). Upgrade to invite more collaborators.' },
-        { status: 400 }
+        { error: 'Only workspace owners and admins can invite collaborators.' },
+        { status: 403 }
       )
     }
 
@@ -134,6 +134,50 @@ export async function POST(request: NextRequest) {
         },
         message: 'A pending invitation already exists for this email. Here is the existing invite link.'
       }, { status: 200 })
+    }
+
+    // Check workspace member limit (max 5 people)
+    const { count: memberTotal, error: countError } = await supabase
+      .from('TeamMember')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', teamId)
+
+    if (countError) {
+      console.error('Error checking member count:', countError)
+      return NextResponse.json(
+        { error: 'Failed to check workspace capacity' },
+        { status: 500 }
+      )
+    }
+
+    if (memberTotal != null && memberTotal >= 5) {
+      return NextResponse.json(
+        { error: 'Workspace is at capacity (maximum 5 members). Upgrade to invite more collaborators.' },
+        { status: 400 }
+      )
+    }
+
+    const { count: pendingInviteTotal, error: pendingInviteCountError } = await supabase
+      .from('TeamInvitation')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', teamId)
+      .eq('status', 'pending')
+      .gt('expires_at', new Date().toISOString())
+
+    if (pendingInviteCountError) {
+      console.error('Error checking pending invitation count:', pendingInviteCountError)
+      return NextResponse.json(
+        { error: 'Failed to check workspace capacity' },
+        { status: 500 }
+      )
+    }
+
+    const reservedSeats = (memberTotal || 0) + (pendingInviteTotal || 0)
+    if (reservedSeats >= 5) {
+      return NextResponse.json(
+        { error: 'Workspace is at capacity (maximum 5 members including pending invitations). Upgrade to invite more collaborators.' },
+        { status: 400 }
+      )
     }
 
     // Create invitation record

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import Stripe from 'stripe'
 
 function getStripe(): Stripe {
@@ -34,10 +34,16 @@ export async function GET() {
       )
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true },
-    })
+    const supabase = getSupabaseAdmin()
+    const { data: user, error: userError } = await supabase
+      .from('User')
+      .select('stripeCustomerId')
+      .eq('id', session.user.id)
+      .maybeSingle()
+
+    if (userError) {
+      throw userError
+    }
 
     if (!user?.stripeCustomerId) {
       return NextResponse.json({ invoices: [] })

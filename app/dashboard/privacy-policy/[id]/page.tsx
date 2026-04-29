@@ -24,16 +24,14 @@ import type { PolicyOutput } from '@/types'
 
 interface PolicyDetail {
   id: string
-  title: string
-  businessName: string
+  name: string
   status: 'draft' | 'published' | 'archived'
   slug?: string
-  contentHtml: string
-  contentJson: PolicyOutput['contentJson']
+  content_html: string
+  content_json: PolicyOutput['contentJson']
   inputs: Record<string, any>
-  metadata: PolicyOutput['metadata']
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export default function PolicyDetailPage() {
@@ -85,7 +83,7 @@ export default function PolicyDetailPage() {
   const handleCopy = useCallback(async () => {
     if (!policy) return
     try {
-      await navigator.clipboard.writeText(policy.contentHtml)
+      await navigator.clipboard.writeText(policy.content_html)
       setHasCopied(true)
       toast.success('Privacy policy HTML copied to clipboard')
       setTimeout(() => setHasCopied(false), 2000)
@@ -96,11 +94,12 @@ export default function PolicyDetailPage() {
 
   const handleDownload = useCallback(() => {
     if (!policy) return
-    const blob = new Blob([policy.contentHtml], { type: 'text/html' })
+    const businessName = policy.inputs?.businessName || policy.name || 'privacy-policy'
+    const blob = new Blob([policy.content_html], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `privacy-policy-${policy.businessName.toLowerCase().replace(/\s+/g, '-')}.html`
+    a.download = `privacy-policy-${businessName.toLowerCase().replace(/\s+/g, '-')}.html`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -158,6 +157,11 @@ export default function PolicyDetailPage() {
 
   if (status === 'unauthenticated' || !policy) return null
 
+  const businessName = policy.inputs?.businessName || policy.name
+  const jurisdictions = Array.isArray(policy.inputs?.jurisdictions)
+    ? policy.inputs.jurisdictions
+    : []
+
   return (
     <DashboardLayout>
       <div className="p-6 max-w-5xl mx-auto">
@@ -165,7 +169,7 @@ export default function PolicyDetailPage() {
           items={[
             { label: 'Dashboard', href: '/dashboard' },
             { label: 'Privacy Policies', href: '/dashboard/privacy-policy' },
-            { label: policy.title || policy.businessName },
+            { label: policy.name || businessName },
           ]}
         />
 
@@ -173,7 +177,7 @@ export default function PolicyDetailPage() {
         <div className="flex items-start justify-between mb-6 mt-4 flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold">{policy.title || `Privacy Policy - ${policy.businessName}`}</h1>
+              <h1 className="text-2xl font-bold">{policy.name || `Privacy Policy - ${businessName}`}</h1>
               <Badge variant={
                 policy.status === 'published' ? 'default' :
                 policy.status === 'archived' ? 'secondary' : 'outline'
@@ -182,9 +186,9 @@ export default function PolicyDetailPage() {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Last updated {new Date(policy.updatedAt).toLocaleDateString()}
-              {policy.metadata?.jurisdictions?.length > 0 && (
-                <> &middot; Covers: {policy.metadata.jurisdictions.join(', ')}</>
+              Last updated {new Date(policy.updated_at).toLocaleDateString()}
+              {jurisdictions.length > 0 && (
+                <> &middot; Covers: {jurisdictions.join(', ')}</>
               )}
             </p>
             {policy.status === 'published' && policy.slug && (
@@ -272,7 +276,7 @@ export default function PolicyDetailPage() {
         {/* Policy Content - rendered from our server-generated policy, not raw user input */}
         <Card className="mb-6">
           <CardContent className="p-6">
-            <PolicyContent html={policy.contentHtml} />
+            <PolicyContent html={policy.content_html} />
           </CardContent>
         </Card>
 

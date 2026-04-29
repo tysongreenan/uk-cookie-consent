@@ -9,7 +9,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeDSAR, getSupabaseAdmin } from '@/lib/dsar-helpers'
-import { prisma } from '@/lib/prisma'
 import type { DSARIdentifierType } from '@/types'
 
 const VALID_TYPES: DSARIdentifierType[] = ['email', 'ip', 'name']
@@ -32,22 +31,56 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin()
 
+    const { data: teamMembers, error: teamMembersError } = await supabase
+      .from('TeamMember')
+      .select('userId')
+      .eq('teamId', auth.teamId)
+
+    if (teamMembersError) {
+      throw teamMembersError
+    }
+
+    const orgUserIds = Array.from(new Set([
+      auth.userId,
+      ...(teamMembers || []).map((member: { userId: string }) => member.userId),
+    ]))
+
     // Get org-scoped banner IDs
-    const { data: banners } = await supabase
+    const { data: banners, error: bannersError } = await supabase
       .from('SimpleBanners')
       .select('id, name')
-      .eq('userId', auth.userId)
+      .in('userId', orgUserIds)
+
+    if (bannersError) {
+      throw bannersError
+    }
+
     const bannerIds = (banners || []).map((b: { id: string }) => b.id)
     const bannerNames = new Map((banners || []).map((b: { id: string; name: string }) => [b.id, b.name]))
 
     // Get org-scoped project IDs
-    const projects = await prisma.project.findMany({
-      where: auth.teamId
-        ? { OR: [{ teamId: auth.teamId }, { userId: auth.userId, teamId: null }] }
-        : { userId: auth.userId },
-      select: { id: true },
-    })
-    const projectIds = projects.map((p) => p.id)
+    const [teamProjectsResult, legacyProjectsResult] = await Promise.all([
+      supabase
+        .from('Project')
+        .select('id')
+        .eq('teamId', auth.teamId),
+      supabase
+        .from('Project')
+        .select('id')
+        .eq('userId', auth.userId)
+        .is('teamId', null),
+    ])
+
+    if (teamProjectsResult.error) {
+      throw teamProjectsResult.error
+    }
+
+    if (legacyProjectsResult.error) {
+      throw legacyProjectsResult.error
+    }
+
+    const projects = [...(teamProjectsResult.data || []), ...(legacyProjectsResult.data || [])]
+    const projectIds = Array.from(new Set(projects.map((p: { id: string }) => p.id)))
 
     // Search banner_visitors
     let visitorResults: { count: number; banners: string[]; dateRange: { first: string; last: string } | null } = {
@@ -56,37 +89,23 @@ export async function GET(request: NextRequest) {
       dateRange: null,
     }
 
-    if (bannerIds.length > 0 && type === 'ip') {
-      const { data: visitors, count } = await supabase
-        .from('banner_visitors')
-        .select('banner_id, date', { count: 'exact' })
-        .in('banner_id', bannerIds)
-        .eq('ip_address', value)
-        .order('date', { ascending: true })
-        .limit(1000)
+    // banner_visitors stores aggregate analytics only in the live schema; it does
+    // not retain raw IP/email/name values. Individual proof lives in consent_records.
 
-      if (visitors && visitors.length > 0) {
-        const uniqueBanners = Array.from(new Set(visitors.map((v: { banner_id: string }) => v.banner_id)))
-        visitorResults = {
-          count: count || visitors.length,
-          banners: uniqueBanners.map((id) => bannerNames.get(id) || id),
-          dateRange: {
-            first: visitors[0].date,
-            last: visitors[visitors.length - 1].date,
-          },
-        }
-      }
-    }
-
-    // Search BannerAnalytics (Prisma) — only works for IP
+    // Search BannerAnalytics — only works for IP
     let analyticsCount = 0
     if (projectIds.length > 0 && type === 'ip') {
-      analyticsCount = await prisma.bannerAnalytics.count({
-        where: {
-          projectId: { in: projectIds },
-          ipAddress: value,
-        },
-      })
+      const { count, error: analyticsError } = await supabase
+        .from('BannerAnalytics')
+        .select('id', { count: 'exact', head: true })
+        .in('projectId', projectIds)
+        .eq('ipAddress', value)
+
+      if (analyticsError && analyticsError.code !== 'PGRST205') {
+        throw analyticsError
+      }
+
+      analyticsCount = count || 0
     }
 
     const totalRecords = visitorResults.count + analyticsCount
@@ -112,7 +131,7 @@ export async function GET(request: NextRequest) {
             ? 'Cookie banners typically collect IP addresses, not emails. Try searching by IP instead.'
             : type === 'name'
               ? 'Cookie banners do not collect names. Try searching by the person\'s IP address.'
-              : 'No records found for this IP across your banners.'
+              : 'No matching legacy analytics records found. Consent proof searches use consent IDs or hashed visitor cookies.'
           : null,
       },
     })

@@ -9,9 +9,11 @@ const supabase = createClient(
 // GET /api/invitations/[token] - Get invitation details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
+    const { token } = await params
+
     const { data: invitation, error } = await supabase
       .from('TeamInvitation')
       .select(`
@@ -27,7 +29,7 @@ export async function GET(
           email
         )
       `)
-      .eq('token', params.token)
+      .eq('token', token)
       .single()
 
     if (error) {

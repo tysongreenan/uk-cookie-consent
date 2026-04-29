@@ -9,8 +9,7 @@
  */
 
 import { createHash } from 'crypto'
-import { createClient } from '@supabase/supabase-js'
-import { prisma } from '@/lib/prisma'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import type {
   DSARIdentifierType,
   DSARReport,
@@ -18,20 +17,13 @@ import type {
   DataAccessRequest,
 } from '@/types'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) throw new Error('Supabase config missing: SUPABASE_SERVICE_ROLE_KEY is required for DSAR operations')
-  return createClient(url, key)
-}
-
 // ── Bilingual labels ──────────────────────────────────────────────────
 
 const LABELS: Record<string, Record<'en' | 'fr', string>> = {
-  consent_records: { en: 'Consent Records', fr: 'Registres de consentement' },
+  consent_records: { en: 'Consent Records (Aggregate)', fr: 'Registres de consentement (agrégés)' },
   consent_records_desc: {
-    en: 'Every interaction with cookie consent banners operated by this organization.',
-    fr: 'Chaque interaction avec les bannières de consentement aux cookies exploitées par cette organisation.',
+    en: 'Aggregate consent interaction records. Individual per-decision proof has moved to the Individual Consent Logs section below.',
+    fr: 'Enregistrements agrégés des interactions de consentement. La preuve individuelle de chaque décision se trouve dans la section Journaux de consentement individuels ci-dessous.',
   },
   analytics_events: { en: 'Analytics Events', fr: 'Événements analytiques' },
   analytics_events_desc: {
@@ -77,25 +69,69 @@ async function getOrgScope(
   userId: string,
   teamId: string | null
 ) {
-  // Get projects: team-owned OR user-owned (before team existed)
-  const projectWhere = teamId
-    ? { OR: [{ teamId }, { userId, teamId: null }] }
-    : { userId }
+  const projectRecords = new Map<string, { id: string }>()
+  let orgUserIds = [userId]
 
-  const projects = await prisma.project.findMany({
-    where: projectWhere,
-    select: { id: true },
-  })
-  const projectIds = projects.map((p) => p.id)
-
-  // Get simple banners: team-owned OR user-owned (before team existed)
-  let bannerQuery = supabase.from('SimpleBanners').select('id')
   if (teamId) {
-    bannerQuery = bannerQuery.or(`teamId.eq.${teamId},and(userId.eq.${userId},teamId.is.null)`)
+    const { data: teamMembers, error: teamMembersError } = await supabase
+      .from('TeamMember')
+      .select('userId')
+      .eq('teamId', teamId)
+
+    if (teamMembersError) {
+      throw teamMembersError
+    }
+
+    orgUserIds = Array.from(new Set([
+      userId,
+      ...(teamMembers || []).map((member: { userId: string }) => member.userId),
+    ]))
+
+    const [teamProjectsResult, legacyProjectsResult] = await Promise.all([
+      supabase
+        .from('Project')
+        .select('id')
+        .eq('teamId', teamId),
+      supabase
+        .from('Project')
+        .select('id')
+        .eq('userId', userId)
+        .is('teamId', null),
+    ])
+
+    if (teamProjectsResult.error) {
+      throw teamProjectsResult.error
+    }
+
+    if (legacyProjectsResult.error) {
+      throw legacyProjectsResult.error
+    }
+
+    for (const project of [...(teamProjectsResult.data || []), ...(legacyProjectsResult.data || [])]) {
+      projectRecords.set((project as { id: string }).id, project as { id: string })
+    }
   } else {
-    bannerQuery = bannerQuery.eq('userId', userId)
+    const { data: projects, error: projectsError } = await supabase
+      .from('Project')
+      .select('id')
+      .eq('userId', userId)
+
+    if (projectsError) {
+      throw projectsError
+    }
+
+    for (const project of projects || []) {
+      projectRecords.set((project as { id: string }).id, project as { id: string })
+    }
   }
-  const { data: banners } = await bannerQuery
+
+  const projectIds = Array.from(projectRecords.keys())
+
+  // SimpleBanners are user-owned; for team scope include all team members.
+  const { data: banners } = await supabase
+    .from('SimpleBanners')
+    .select('id')
+    .in('userId', orgUserIds)
   const bannerIds = (banners || []).map((b: { id: string }) => b.id)
 
   return { projectIds, bannerIds }
@@ -121,37 +157,11 @@ async function generateConsentRecords(
     }
   }
 
-  const filterColumn = identifierType === 'ip' ? 'ip_address' : identifierType === 'email' ? 'email' : 'name'
-
-  const { data: visitors, count } = await supabase
-    .from('banner_visitors')
-    .select('date, banner_id, source, device, country, page_path, impressions, accepts, rejects, dismisses, gpc', { count: 'exact' })
-    .in('banner_id', bannerIds)
-    .ilike(filterColumn, identifierValue)
-    .order('date', { ascending: false })
-    .limit(ROW_LIMIT)
-
   const section: DSARReportSection = {
     name: t('consent_records', lang),
     description: t('consent_records_desc', lang),
-    data: (visitors || []).map((v: Record<string, unknown>) => ({
-      date: v.date,
-      banner_id: v.banner_id,
-      source: v.source,
-      device: v.device,
-      country: v.country,
-      page_path: v.page_path,
-      impressions: v.impressions,
-      accepts: v.accepts,
-      rejects: v.rejects,
-      dismisses: v.dismisses,
-      gpc_signal: v.gpc,
-    })),
+    data: [],
     refused: false,
-  }
-
-  if (count && count > ROW_LIMIT) {
-    section.description += ` ${t('truncated', lang)}`
   }
 
   return section
@@ -220,6 +230,7 @@ async function generateIndividualConsentLogs(
 }
 
 async function generateAnalyticsEvents(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
   identifierType: DSARIdentifierType,
   identifierValue: string,
   projectIds: string[],
@@ -234,10 +245,7 @@ async function generateAnalyticsEvents(
     }
   }
 
-  const where: Record<string, unknown> = { projectId: { in: projectIds } }
-  if (identifierType === 'ip') {
-    where.ipAddress = identifierValue
-  } else {
+  if (identifierType !== 'ip') {
     // BannerAnalytics doesn't store email or name — return empty for non-IP lookups
     return {
       name: t('analytics_events', lang),
@@ -247,28 +255,27 @@ async function generateAnalyticsEvents(
     }
   }
 
-  const events = await prisma.bannerAnalytics.findMany({
-    where,
-    select: {
-      event: true,
-      userAgent: true,
-      ipAddress: true,
-      country: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: 'desc' },
-    take: ROW_LIMIT,
-  })
+  const { data: events, error } = await supabase
+    .from('BannerAnalytics')
+    .select('event, userAgent, ipAddress, country, createdAt')
+    .in('projectId', projectIds)
+    .eq('ipAddress', identifierValue)
+    .order('createdAt', { ascending: false })
+    .limit(ROW_LIMIT)
+
+  if (error && error.code !== 'PGRST205') {
+    throw error
+  }
 
   return {
     name: t('analytics_events', lang),
     description: t('analytics_events_desc', lang),
-    data: events.map((e) => ({
+    data: (events || []).map((e: Record<string, unknown>) => ({
       event: e.event,
       user_agent: e.userAgent,
       ip_address: e.ipAddress,
       country: e.country,
-      timestamp: e.createdAt.toISOString(),
+      timestamp: e.createdAt,
     })),
     refused: false,
   }
@@ -402,7 +409,7 @@ export async function generateDSARReport(
           refused: true,
           refusalReason: request.refusedSections.find((s) => s.section === 'analytics_events')?.reason,
         })
-      : generateAnalyticsEvents(request.subjectIdentifierType, request.subjectIdentifierValue, projectIds, lang),
+      : generateAnalyticsEvents(supabase, request.subjectIdentifierType, request.subjectIdentifierValue, projectIds, lang),
   ])
 
   const processingPurposes = generateProcessingPurposes(lang)
