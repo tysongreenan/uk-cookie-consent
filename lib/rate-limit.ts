@@ -1,30 +1,29 @@
 /**
- * Rate Limiter — Upstash Redis for Vercel serverless
+ * Rate Limiter — Postgres-backed (Supabase) for Vercel serverless
  *
- * Previous version used in-memory Map which reset on every cold start.
- * This version uses Upstash Redis for persistent, distributed rate limiting.
+ * Uses a single atomic RPC (check_rate_limit) per request. No external
+ * service, no quota — just rows in the existing Supabase DB.
  *
- * Falls back to in-memory (permissive) if Upstash is not configured,
- * so the app still works without Redis — just without rate limiting.
+ * Fails open if the DB call errors, so an outage doesn't lock users out.
  *
  * API is unchanged: new RateLimit({ windowMs, maxRequests }) → .check(request)
  */
 
-import { Redis } from '@upstash/redis'
-import { Ratelimit } from '@upstash/ratelimit'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-// Lazy init — only create Redis client if env vars exist
-let redis: Redis | null = null
-function getRedis(): Redis | null {
-  if (redis) return redis
-  const url = process.env.UPSTASH_REDIS_REST_URL?.trim()
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
-  if (!url || !token) return null
+let client: SupabaseClient | null = null
+function getClient(): SupabaseClient | null {
+  if (client) return client
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) return null
   try {
-    redis = new Redis({ url, token })
-    return redis
+    client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+    return client
   } catch (error) {
-    console.error('[RATE-LIMIT] Failed to create Redis client:', error)
+    console.error('[RATE-LIMIT] Failed to create Supabase client:', error)
     return null
   }
 }
@@ -39,7 +38,6 @@ export class RateLimit {
   private windowMs: number
   private maxRequests: number
   private keyGenerator: (req: Request) => string
-  private upstashLimiter: Ratelimit | null = null
 
   constructor(options: RateLimitOptions) {
     this.windowMs = options.windowMs
@@ -54,43 +52,41 @@ export class RateLimit {
     return ip
   }
 
-  private getLimiter(): Ratelimit | null {
-    if (this.upstashLimiter) return this.upstashLimiter
-    const r = getRedis()
-    if (!r) return null
-    // Convert windowMs to seconds for Upstash sliding window
-    const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
-    this.upstashLimiter = new Ratelimit({
-      redis: r,
-      limiter: Ratelimit.slidingWindow(this.maxRequests, `${windowSeconds} s`),
-      analytics: false, // Keep it fast
-    })
-    return this.upstashLimiter
-  }
-
   public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
-    const key = this.keyGenerator(req)
     const fallback = { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
 
-    try {
-      const limiter = this.getLimiter()
-      if (!limiter) return fallback
+    const supabase = getClient()
+    if (!supabase) return fallback
 
-      const result = await limiter.limit(key)
+    const key = `${this.windowMs}:${this.maxRequests}:${this.keyGenerator(req)}`
+    const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
+
+    try {
+      const { data, error } = await supabase.rpc('check_rate_limit', {
+        p_key: key,
+        p_window_seconds: windowSeconds,
+        p_max_requests: this.maxRequests,
+      })
+
+      if (error || !data || !Array.isArray(data) || data.length === 0) {
+        if (error) console.error('[RATE-LIMIT] RPC error, failing open:', error.message)
+        return fallback
+      }
+
+      const row = data[0] as { allowed: boolean; remaining: number; reset_at: string }
       return {
-        allowed: result.success,
-        remaining: result.remaining,
-        resetTime: result.reset,
+        allowed: row.allowed,
+        remaining: row.remaining,
+        resetTime: new Date(row.reset_at).getTime(),
       }
     } catch (error) {
-      // Redis error — fail open (don't block users if Redis is down)
-      console.error('[RATE-LIMIT] Upstash error, failing open:', error)
+      console.error('[RATE-LIMIT] Unexpected error, failing open:', error)
       return fallback
     }
   }
 }
 
-// Pre-configured rate limiters (same config as before)
+// Pre-configured rate limiters (unchanged from previous version)
 export const authRateLimit = new RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 5,
