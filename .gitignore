@@ -133,3 +133,6 @@ COMPARISON.md
 SIMPLIFICATION_SUMMARY.md
 working-header.html
 .env*.local
+
+# Local sandbox pages
+public/sandbox-*.html
