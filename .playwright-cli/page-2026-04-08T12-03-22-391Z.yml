@@ -1,0 +1,13 @@
+- main [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - img "UpGuard" [ref=e7]
+      - heading [level=1]
+      - generic:
+        - paragraph
+    - generic [ref=e11]:
+      - button: Continue
+      - generic [ref=e15]:
+        - generic [ref=e16]: Email address *
+        - textbox "Email address" [ref=e17]
+      - button "Continue" [ref=e19] [cursor=pointer]

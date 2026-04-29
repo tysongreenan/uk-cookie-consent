@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>information-security-policy</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<h1 id="information-security-policy">Information Security Policy</h1>
+<p><strong>COOKIE-BANNER.CA</strong> <strong>Version:</strong> 1.0
+<strong>Effective Date:</strong> March 28, 2026 <strong>Next Review
+Date:</strong> March 28, 2027 <strong>Contact:</strong>
+security@cookie-banner.ca</p>
+<hr />
+<h2 id="purpose">1. Purpose</h2>
+<p>This policy establishes the information security principles,
+standards, and responsibilities for COOKIE-BANNER.CA, a cookie consent
+management platform (CMP). It applies to all systems, data, and services
+operated by the organization.</p>
+<p>COOKIE-BANNER.CA is a solo-founder, fully remote SaaS company with no
+physical office or self-managed data center. Our security posture relies
+on carefully selected infrastructure providers, strong access controls,
+and disciplined operational practices rather than on-premises security
+measures.</p>
+<h2 id="scope">2. Scope</h2>
+<p>This policy covers:</p>
+<ul>
+<li>All production systems and environments (application, database,
+payment processing)</li>
+<li>All customer data, including consent records and account
+information</li>
+<li>All third-party services integrated into the platform</li>
+<li>The founder and any future contractors or employees with access to
+company systems</li>
+</ul>
+<h2 id="roles-and-responsibilities">3. Roles and Responsibilities</h2>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Founder / Security Lead</strong></td>
+<td>Owns this policy. Responsible for all security decisions, access
+management, incident response, and vendor assessments.</td>
+</tr>
+<tr>
+<td><strong>Future Contractors</strong></td>
+<td>Must agree to this policy before accessing any company system.
+Access is granted on a least-privilege basis and revoked upon contract
+end.</td>
+</tr>
+</tbody>
+</table>
+<p>As a solo-founder organization, the founder currently holds all
+security responsibilities. If the team grows, a formal delegation of
+duties will be documented.</p>
+<h2 id="data-classification">4. Data Classification</h2>
+<p>All data handled by COOKIE-BANNER.CA is classified into one of the
+following categories:</p>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 27%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Description</th>
+<th>Examples</th>
+<th>Handling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Confidential</strong></td>
+<td>Data whose exposure would cause significant harm to the business or
+customers.</td>
+<td>API keys, database credentials, Stripe secrets, authentication
+tokens, session secrets</td>
+<td>Stored only in encrypted environment variables managed by Vercel.
+Never committed to source control.</td>
+</tr>
+<tr>
+<td><strong>Restricted</strong></td>
+<td>Personal data or customer data subject to privacy regulations.</td>
+<td>Email addresses, consent records, account details, billing
+metadata</td>
+<td>Encrypted at rest and in transit. Access limited to production
+systems. Processed in accordance with GDPR, PIPEDA, Law 25, and
+PECR.</td>
+</tr>
+<tr>
+<td><strong>Internal</strong></td>
+<td>Business data not intended for public disclosure.</td>
+<td>Application source code, internal documentation, analytics,
+operational logs</td>
+<td>Stored in private repositories and internal tools. Access controlled
+via SSO or strong authentication.</td>
+</tr>
+<tr>
+<td><strong>Public</strong></td>
+<td>Information intentionally made available.</td>
+<td>Marketing website content, published documentation, blog posts</td>
+<td>No access restrictions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="access-control">5. Access Control</h2>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Least Privilege:</strong> Every account and service is
+granted the minimum permissions required to perform its function.</li>
+<li><strong>No Shared Accounts:</strong> Each person and service uses a
+unique identity.</li>
+<li><strong>MFA Required:</strong> Multi-factor authentication is
+enabled on all critical accounts, including Vercel, Supabase, Stripe,
+GitHub, and DNS providers.</li>
+</ul>
+<h3 id="authentication-standards">Authentication Standards</h3>
+<ul>
+<li>All administrative access requires MFA (TOTP or hardware key).</li>
+<li>NextAuth.js manages customer authentication with secure, httpOnly
+session cookies.</li>
+<li>API keys are scoped to the minimum permissions necessary.</li>
+<li>Service-to-service communication uses environment-injected secrets,
+never hardcoded credentials.</li>
+</ul>
+<h3 id="access-reviews">Access Reviews</h3>
+<p>Access to all systems is reviewed quarterly. Unused accounts and
+stale API keys are revoked promptly.</p>
+<h2 id="encryption-standards">6. Encryption Standards</h2>
+<h3 id="data-in-transit">Data in Transit</h3>
+<ul>
+<li>All traffic is encrypted via TLS 1.2 or higher.</li>
+<li>HSTS is enforced on all domains.</li>
+<li>Vercel provides automatic TLS certificate provisioning and
+renewal.</li>
+</ul>
+<h3 id="data-at-rest">Data at Rest</h3>
+<ul>
+<li>Supabase (PostgreSQL) encrypts all data at rest using AES-256.</li>
+<li>Vercel environment variables are encrypted at rest.</li>
+<li>Stripe handles all payment card data; no card numbers are stored or
+processed by COOKIE-BANNER.CA systems.</li>
+</ul>
+<h3 id="secrets-management">Secrets Management</h3>
+<ul>
+<li>Secrets are stored exclusively in Vercel environment variables and
+Supabase vault.</li>
+<li>Secrets are never committed to version control. The
+<code>.gitignore</code> file excludes <code>.env*</code> files.</li>
+<li>Secrets are rotated at least annually, or immediately upon suspected
+compromise.</li>
+</ul>
+<h2 id="infrastructure-and-third-party-risk-management">7.
+Infrastructure and Third-Party Risk Management</h2>
+<p>COOKIE-BANNER.CA does not operate its own servers or data centers.
+All infrastructure is provided by third-party vendors selected for their
+security certifications and practices.</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Function</th>
+<th>Security Certification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vercel</strong></td>
+<td>Application hosting, edge network, CI/CD</td>
+<td>SOC 2 Type II</td>
+</tr>
+<tr>
+<td><strong>Supabase</strong></td>
+<td>PostgreSQL database, authentication services</td>
+<td>SOC 2 Type II</td>
+</tr>
+<tr>
+<td><strong>Stripe</strong></td>
+<td>Payment processing</td>
+<td>PCI DSS Level 1</td>
+</tr>
+<tr>
+<td><strong>GitHub</strong></td>
+<td>Source code management, CI/CD</td>
+<td>SOC 2 Type II</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vendor-assessment">Vendor Assessment</h3>
+<ul>
+<li>Vendor security certifications are verified before adoption and
+reviewed annually.</li>
+<li>Only vendors with established security programs and publicly
+available compliance documentation are selected.</li>
+<li>Data processing agreements (DPAs) are executed with vendors that
+process personal data.</li>
+</ul>
+<h3 id="dependency-management">Dependency Management</h3>
+<ul>
+<li>Application dependencies are monitored for known vulnerabilities via
+GitHub Dependabot.</li>
+<li>Critical security patches are applied within 72 hours of
+disclosure.</li>
+</ul>
+<h2 id="incident-response">8. Incident Response</h2>
+<p>In the event of a suspected security incident:</p>
+<ol type="1">
+<li><strong>Contain</strong> – Immediately revoke compromised
+credentials and isolate affected systems.</li>
+<li><strong>Assess</strong> – Determine the scope and severity of the
+incident.</li>
+<li><strong>Notify</strong> – Inform affected customers and relevant
+supervisory authorities within the timelines required by applicable law
+(72 hours under GDPR, as soon as feasible under PIPEDA/Law 25).</li>
+<li><strong>Remediate</strong> – Fix the root cause and restore normal
+operations.</li>
+<li><strong>Document</strong> – Record the incident, timeline, impact,
+and corrective actions taken.</li>
+</ol>
+<p>Security incidents can be reported to security@cookie-banner.ca.</p>
+<h2 id="secure-development-practices">9. Secure Development
+Practices</h2>
+<ul>
+<li>All code changes go through pull request review before merging to
+production.</li>
+<li>Environment variables are used for all configuration and secrets;
+nothing is hardcoded.</li>
+<li>Input validation is performed on all API endpoints using Zod schema
+validation.</li>
+<li>Dependencies are kept up to date and audited for known
+vulnerabilities.</li>
+<li>Production deployments are managed through Vercel’s CI/CD pipeline
+with automatic preview environments.</li>
+</ul>
+<h2 id="business-continuity">10. Business Continuity</h2>
+<ul>
+<li><strong>Database Backups:</strong> Supabase performs automated daily
+backups with point-in-time recovery.</li>
+<li><strong>Source Code:</strong> All code is stored in a private GitHub
+repository with full version history.</li>
+<li><strong>Service Availability:</strong> Vercel’s edge network
+provides global redundancy and automatic failover.</li>
+<li><strong>Disaster Recovery:</strong> In the event of a provider
+outage, the application can be redeployed to an alternative provider
+using the source code and database backups.</li>
+</ul>
+<h2 id="security-awareness">11. Security Awareness</h2>
+<ul>
+<li>The founder maintains current knowledge of security best practices,
+privacy regulations, and emerging threats relevant to web application
+security and consent management.</li>
+<li>If the team grows, all personnel with access to company systems will
+complete security awareness orientation before gaining access, with
+annual refreshers thereafter.</li>
+</ul>
+<h2 id="regulatory-compliance">12. Regulatory Compliance</h2>
+<p>COOKIE-BANNER.CA processes personal data in compliance with:</p>
+<ul>
+<li><strong>GDPR</strong> (EU General Data Protection Regulation)</li>
+<li><strong>PIPEDA</strong> (Canada’s Personal Information Protection
+and Electronic Documents Act)</li>
+<li><strong>Law 25</strong> (Quebec’s Act respecting the protection of
+personal information in the private sector)</li>
+<li><strong>PECR</strong> (UK Privacy and Electronic Communications
+Regulations)</li>
+</ul>
+<p>Data subject access requests, deletion requests, and consent
+withdrawal requests are honored within the timelines required by each
+applicable regulation.</p>
+<h2 id="policy-review">13. Policy Review</h2>
+<p>This policy is reviewed and updated:</p>
+<ul>
+<li><strong>Annually</strong>, on or before the anniversary of the
+effective date.</li>
+<li><strong>Upon significant change</strong>, such as a new
+infrastructure provider, a material change in data processing, or a
+security incident.</li>
+<li><strong>Upon regulatory change</strong>, when new laws or amendments
+affect the company’s obligations.</li>
+</ul>
+<p>All revisions are documented with a version number and effective
+date.</p>
+<hr />
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-03-28</td>
+<td>Founder</td>
+<td>Initial policy</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

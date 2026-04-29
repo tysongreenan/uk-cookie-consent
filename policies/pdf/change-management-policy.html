@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>change-management-policy</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<h1 id="change-management-policy">Change Management Policy</h1>
+<p><strong>COOKIE-BANNER.CA</strong> <strong>Effective Date:</strong>
+2026-03-28 <strong>Last Reviewed:</strong> 2026-03-28
+<strong>Contact:</strong> security@cookie-banner.ca
+<strong>Classification:</strong> Internal</p>
+<hr />
+<h2 id="purpose-and-scope">1. Purpose and Scope</h2>
+<p>This policy establishes a formal change management process for all
+modifications to the COOKIE-BANNER.CA cookie consent management platform
+(CMP), including application code, infrastructure configuration,
+database schemas, and third-party integrations.</p>
+<p>It applies to all changes affecting the production environment:
+application deployments, database migrations, environment variable
+updates, DNS changes, Stripe configuration changes, and Supabase or
+Vercel settings modifications.</p>
+<hr />
+<h2 id="change-classification">2. Change Classification</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Description</th>
+<th>Examples</th>
+<th>Approval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard</strong></td>
+<td>Low-risk, routine changes following the established PR workflow</td>
+<td>Bug fixes, copy updates, dependency patches, UI tweaks</td>
+<td>Self-approved after PR checklist review</td>
+</tr>
+<tr>
+<td><strong>Significant</strong></td>
+<td>Changes affecting data models, authentication, billing, or
+privacy-related functionality</td>
+<td>Prisma schema migrations, NextAuth config changes, Stripe webhook
+updates, consent logic changes</td>
+<td>Requires documented risk assessment in the PR description before
+merge</td>
+</tr>
+<tr>
+<td><strong>Emergency</strong></td>
+<td>Urgent fixes for production outages, security vulnerabilities, or
+data integrity issues</td>
+<td>Security patches, critical bug hotfixes, incident remediation</td>
+<td>May bypass standard PR review; must be documented retroactively
+within 24 hours</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="change-request-and-approval-process">3. Change Request and
+Approval Process</h2>
+<p>All changes follow a Git-based workflow using GitHub as the system of
+record:</p>
+<ol type="1">
+<li><strong>Branch</strong>: Create a feature or fix branch from
+<code>develop</code>.</li>
+<li><strong>Implement</strong>: Develop the change with atomic,
+descriptive commits.</li>
+<li><strong>Pull Request</strong>: Open a PR against
+<code>develop</code> with:
+<ul>
+<li>Summary of what changed and why.</li>
+<li>Change classification (standard, significant, or emergency).</li>
+<li>Testing steps performed.</li>
+<li>For significant changes: risk assessment and rollback plan.</li>
+</ul></li>
+<li><strong>Review</strong>: PR is reviewed against the checklist before
+merge. For significant changes, a cooling-off period of at least one
+hour is observed before merging.</li>
+<li><strong>Merge</strong>: Squash-merge into <code>develop</code>,
+triggering automated deployment.</li>
+</ol>
+<p>The Founder serves as the sole Change Approver and is responsible for
+all merge decisions.</p>
+<hr />
+<h2 id="testing-requirements">4. Testing Requirements</h2>
+<p>All changes must be verified before reaching production:</p>
+<ul>
+<li><strong>Vercel Preview Deployments</strong>: Every PR generates a
+preview URL. The preview must be manually verified for UI/UX correctness
+and functional behavior.</li>
+<li><strong>Automated Tests</strong>: Any existing test suites must pass
+before merge.</li>
+<li><strong>Database Migrations</strong>: Must be tested against a
+non-production database (Supabase branch or local instance) before
+merging.</li>
+<li><strong>Significant Changes</strong>: Require explicit testing of
+affected user flows (consent collection, banner rendering, dashboard
+functionality, Stripe billing) as documented in the PR.</li>
+</ul>
+<hr />
+<h2 id="deployment-process">5. Deployment Process</h2>
+<p>COOKIE-BANNER.CA uses Vercel for automated, immutable
+deployments:</p>
+<ul>
+<li>Merging a PR to <code>develop</code> triggers an automatic
+production deployment.</li>
+<li>Each deployment is an atomic, immutable snapshot with a unique
+URL.</li>
+<li>Vercel maintains a full deployment history, enabling instant
+rollback to any previous deployment.</li>
+<li>No manual server access or SSH is required; all deployments are
+managed through the Git-to-Vercel pipeline.</li>
+</ul>
+<hr />
+<h2 id="rollback-procedures">6. Rollback Procedures</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Rollback Method</th>
+<th>Recovery Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Application</strong></td>
+<td>Vercel Instant Rollback via the dashboard or CLI to any previous
+deployment</td>
+<td>Minutes</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>Supabase Point-in-Time Recovery (PITR) to restore to any point
+within the retention window</td>
+<td>Minutes to hours depending on data volume</td>
+</tr>
+<tr>
+<td><strong>Environment Variables</strong></td>
+<td>Revert via Vercel dashboard; redeploy if needed</td>
+<td>Minutes</td>
+</tr>
+</tbody>
+</table>
+<p>For any rollback, a post-incident note must be added to the original
+PR or a follow-up issue documenting what was rolled back and why.</p>
+<hr />
+<h2 id="database-changes">7. Database Changes</h2>
+<p>Database schema changes carry elevated risk and require additional
+diligence:</p>
+<ol type="1">
+<li>All schema changes are managed through <strong>Prisma
+migrations</strong> (<code>prisma migrate</code>).</li>
+<li>Migration SQL must be reviewed in the PR diff before merge.</li>
+<li>Migrations must be tested against a non-production database
+first.</li>
+<li>Destructive operations (dropping columns/tables, changing types)
+require a two-phase approach: deprecate first, remove in a subsequent
+release.</li>
+<li>Direct SQL modifications to the production database outside of
+Prisma migrations are prohibited except during emergency incident
+response.</li>
+</ol>
+<hr />
+<h2 id="documentation-requirements">8. Documentation Requirements</h2>
+<ul>
+<li><strong>Commit Messages</strong>: Must be descriptive and reference
+the intent of the change.</li>
+<li><strong>PR Descriptions</strong>: Must include a summary,
+classification, and testing steps.</li>
+<li><strong>Significant Changes</strong>: Must include a risk assessment
+and rollback plan in the PR.</li>
+<li><strong>Emergency Changes</strong>: Must be retroactively documented
+within 24 hours with a post-incident summary.</li>
+<li><strong>Configuration Changes</strong>: Changes to environment
+variables, Stripe settings, Supabase configuration, or DNS must be
+logged in the relevant PR or a dedicated change log issue.</li>
+</ul>
+<hr />
+<h2 id="emergency-change-procedures">9. Emergency Change Procedures</h2>
+<p>When a production incident requires immediate remediation:</p>
+<ol type="1">
+<li><strong>Assess</strong>: Determine severity and whether an emergency
+change is warranted.</li>
+<li><strong>Fix</strong>: Implement the fix on a branch. If time
+permits, open a PR; if not, commit directly to
+<code>develop</code>.</li>
+<li><strong>Deploy</strong>: Merge or push to trigger deployment;
+alternatively, use Vercel Instant Rollback if reverting is
+sufficient.</li>
+<li><strong>Document</strong>: Within 24 hours, create or update a
+PR/issue with:
+<ul>
+<li>Description of the incident and its impact.</li>
+<li>The change that was made.</li>
+<li>Root cause (if known).</li>
+<li>Steps to prevent recurrence.</li>
+</ul></li>
+<li><strong>Review</strong>: Retroactively review the emergency change
+to confirm it meets code quality standards.</li>
+</ol>
+<hr />
+<h2 id="post-deployment-verification">10. Post-Deployment
+Verification</h2>
+<p>After every production deployment:</p>
+<ol type="1">
+<li>Verify the application loads correctly at the production URL.</li>
+<li>Confirm the cookie consent banner renders and functions on a test
+site.</li>
+<li>Check the Vercel deployment logs for errors.</li>
+<li>For significant changes: verify the specific functionality affected
+(dashboard, billing, consent logging, API endpoints).</li>
+<li>Monitor error tracking and application logs for 30 minutes following
+deployment.</li>
+</ol>
+<hr />
+<h2 id="roles-and-responsibilities">11. Roles and Responsibilities</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Person</th>
+<th>Responsibilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Change Approver</strong></td>
+<td>Founder</td>
+<td>Reviews and approves all changes; makes merge decisions; authorizes
+emergency changes</td>
+</tr>
+<tr>
+<td><strong>Change Implementer</strong></td>
+<td>Founder</td>
+<td>Develops, tests, and deploys changes; writes documentation</td>
+</tr>
+<tr>
+<td><strong>Incident Responder</strong></td>
+<td>Founder</td>
+<td>Responds to production incidents; executes emergency changes and
+rollbacks</td>
+</tr>
+</tbody>
+</table>
+<p>As a solo-founder organization, all roles are held by the same
+individual. This policy ensures disciplined process adherence despite
+the absence of a second reviewer by requiring documented checklists, PR
+descriptions, and post-deployment verification.</p>
+<hr />
+<h2 id="compliance-considerations">12. Compliance Considerations</h2>
+<p>Changes affecting consent collection, data processing, or data
+storage must account for obligations under GDPR, PIPEDA, Quebec Law 25,
+and PECR. Any change to how personal data is collected, stored, or
+processed must include a privacy impact note in the PR description.</p>
+<hr />
+<h2 id="review-schedule">13. Review Schedule</h2>
+<p>This policy is reviewed <strong>annually</strong> or whenever a
+material change occurs to the platform architecture, team structure, or
+regulatory requirements. The next scheduled review is
+<strong>2027-03-28</strong>.</p>
+<hr />
+<p><em>Approved by: Founder, COOKIE-BANNER.CA</em> <em>Date:
+2026-03-28</em></p>
+</body>
+</html>

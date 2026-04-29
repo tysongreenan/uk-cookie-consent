@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>data-retention-policy</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<h1 id="data-retention-and-destruction-policy">Data Retention and
+Destruction Policy</h1>
+<p><strong>Organization:</strong> COOKIE-BANNER.CA
+<strong>Contact:</strong> security@cookie-banner.ca <strong>Effective
+Date:</strong> March 28, 2026 <strong>Last Reviewed:</strong> March 28,
+2026 <strong>Next Review:</strong> March 28, 2027</p>
+<hr />
+<h2 id="purpose-and-scope">1. Purpose and Scope</h2>
+<p>This policy defines how COOKIE-BANNER.CA retains, archives, and
+destroys data across its cookie consent management platform. It applies
+to all data processed by the organization and its infrastructure
+providers (Vercel, Supabase, Stripe). COOKIE-BANNER.CA operates as a
+fully virtual organization with no physical offices or on-premises data
+storage.</p>
+<p>This policy supports compliance with GDPR, PIPEDA, Quebec Law 25, and
+PECR.</p>
+<hr />
+<h2 id="data-classification">2. Data Classification</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Examples</th>
+<th>Classification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Consent Records</strong></td>
+<td>Visitor consent preferences, timestamps, consent string, domain</td>
+<td>Business-Critical</td>
+</tr>
+<tr>
+<td><strong>Customer Account Data</strong></td>
+<td>Email address, organization name, team members</td>
+<td>Confidential</td>
+</tr>
+<tr>
+<td><strong>Payment Data</strong></td>
+<td>Subscription status, plan tier (card details held by Stripe)</td>
+<td>Restricted</td>
+</tr>
+<tr>
+<td><strong>Application Configuration</strong></td>
+<td>Banner settings, color schemes, integrations</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td><strong>Application Logs</strong></td>
+<td>Server logs, error traces, request metadata</td>
+<td>Internal</td>
+</tr>
+<tr>
+<td><strong>Backups</strong></td>
+<td>Database snapshots (managed by Supabase)</td>
+<td>Confidential</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="retention-periods">3. Retention Periods</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention Period</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consent records</td>
+<td><strong>3 years</strong> from collection</td>
+<td>Regulatory proof-of-consent requirement (GDPR Art. 7, Law 25
+s.8)</td>
+</tr>
+<tr>
+<td>Customer account data</td>
+<td><strong>Duration of account + 90 days</strong></td>
+<td>Service delivery; 90-day grace period for reactivation</td>
+</tr>
+<tr>
+<td>Payment and billing records</td>
+<td><strong>7 years</strong> from transaction date</td>
+<td>Tax and financial record-keeping obligations</td>
+</tr>
+<tr>
+<td>Application configuration</td>
+<td><strong>Duration of account + 30 days</strong></td>
+<td>Allows brief recovery window post-cancellation</td>
+</tr>
+<tr>
+<td>Application logs (Vercel)</td>
+<td><strong>30 days</strong></td>
+<td>Operational troubleshooting; Vercel auto-purges</td>
+</tr>
+<tr>
+<td>Database backups (Supabase)</td>
+<td><strong>30 days</strong> rolling</td>
+<td>Disaster recovery; managed by Supabase retention policy</td>
+</tr>
+<tr>
+<td>Authentication session data</td>
+<td><strong>30 days</strong> from last activity</td>
+<td>Session management (NextAuth.js)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-destruction-procedures">4. Data Destruction Procedures</h2>
+<h3 id="automated-destruction">4.1 Automated Destruction</h3>
+<ul>
+<li><strong>Consent records</strong> older than 3 years are purged by a
+scheduled database job that runs monthly.</li>
+<li><strong>Expired sessions</strong> are cleared automatically by
+NextAuth.js on a rolling basis.</li>
+<li><strong>Application logs</strong> expire automatically per Vercel’s
+30-day log retention.</li>
+</ul>
+<h3 id="account-deletion">4.2 Account Deletion</h3>
+<p>When a customer deletes their account or requests deletion:</p>
+<ol type="1">
+<li>Account data, banner configurations, and team member records are
+deleted from the production database within <strong>30
+days</strong>.</li>
+<li>Consent records collected on behalf of the customer are deleted
+within <strong>30 days</strong>, unless a legal retention obligation
+applies.</li>
+<li>Stripe customer and subscription objects are cancelled; Stripe
+retains transaction records per its own data retention obligations.</li>
+<li>A confirmation email is sent to the customer upon completion.</li>
+</ol>
+<h3 id="destruction-methods">4.3 Destruction Methods</h3>
+<ul>
+<li><strong>Database records:</strong> Hard deletion via SQL
+<code>DELETE</code> statements against Supabase PostgreSQL. No
+soft-delete retention beyond the stated periods.</li>
+<li><strong>Backups:</strong> Supabase manages automated backup rotation
+on a 30-day rolling cycle. Deleted records naturally age out of the
+backup window.</li>
+<li><strong>Logs:</strong> Vercel logs auto-expire. No manual
+destruction is required.</li>
+</ul>
+<hr />
+<h2 id="cloud-data-lifecycle">5. Cloud Data Lifecycle</h2>
+<p>COOKIE-BANNER.CA does not operate its own servers or data centers.
+All data resides with SOC 2 Type II certified providers:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Data Held</th>
+<th>Retention Control</th>
+<th>Certification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Supabase</strong></td>
+<td>Database, backups, file storage</td>
+<td>Direct SQL control; 30-day backup rotation</td>
+<td>SOC 2 Type II</td>
+</tr>
+<tr>
+<td><strong>Vercel</strong></td>
+<td>Application hosting, server logs</td>
+<td>30-day log auto-expiry</td>
+<td>SOC 2 Type II</td>
+</tr>
+<tr>
+<td><strong>Stripe</strong></td>
+<td>Payment methods, transaction history</td>
+<td>Managed by Stripe per PCI DSS requirements</td>
+<td>PCI DSS Level 1</td>
+</tr>
+</tbody>
+</table>
+<p>Upon termination of any provider relationship, COOKIE-BANNER.CA will
+export or migrate data before the provider’s deletion timeline and
+confirm destruction of residual data in writing.</p>
+<hr />
+<h2 id="customer-data-deletion-requests">6. Customer Data Deletion
+Requests</h2>
+<p>Customers and end users may request data deletion by contacting
+security@cookie-banner.ca. Requests are processed as follows:</p>
+<ul>
+<li><strong>Acknowledgment</strong> within 3 business days.</li>
+<li><strong>Completion</strong> within 30 calendar days.</li>
+<li><strong>Verification</strong> of requester identity before
+processing.</li>
+<li>Applies to all data categories unless a legal retention obligation
+overrides the request (see Section 8).</li>
+</ul>
+<p>For GDPR data subjects, the right to erasure (Art. 17) is honored
+unless an exemption applies. For PIPEDA/Law 25 data subjects, withdrawal
+of consent and deletion requests are handled equivalently.</p>
+<hr />
+<h2 id="third-party-data-handling">7. Third-Party Data Handling</h2>
+<p>COOKIE-BANNER.CA requires that all sub-processors handle data
+destruction in accordance with their contractual obligations:</p>
+<ul>
+<li><strong>Supabase:</strong> Data deleted from production is removed
+from backups within 30 days via rolling retention.</li>
+<li><strong>Stripe:</strong> Retains transaction data as required by PCI
+DSS and applicable tax law. COOKIE-BANNER.CA cannot force deletion of
+Stripe-held payment records but will cancel all associated customer
+objects.</li>
+<li><strong>Vercel:</strong> Logs are purged automatically. No
+persistent customer personal data is stored at the Vercel layer.</li>
+</ul>
+<hr />
+<h2 id="exceptions-and-legal-holds">8. Exceptions and Legal Holds</h2>
+<p>Data may be retained beyond the standard periods when:</p>
+<ul>
+<li>Required by a <strong>legal hold</strong> (e.g., litigation,
+regulatory investigation, audit).</li>
+<li>Needed to comply with <strong>tax or financial reporting</strong>
+obligations.</li>
+<li>Subject to an <strong>active dispute</strong> or chargeback with a
+payment provider.</li>
+<li>Required to demonstrate <strong>proof of consent</strong> under
+GDPR, PIPEDA, Law 25, or PECR.</li>
+</ul>
+<p>Legal holds are authorized by the founder and documented with the
+scope, reason, and expected duration. Held data is destroyed within 30
+days of the hold being lifted.</p>
+<hr />
+<h2 id="review-schedule">9. Review Schedule</h2>
+<p>This policy is reviewed <strong>annually</strong> or sooner if
+triggered by:</p>
+<ul>
+<li>A change in applicable privacy legislation.</li>
+<li>A material change in infrastructure providers.</li>
+<li>A data breach or security incident.</li>
+<li>Significant changes to the types of data processed.</li>
+</ul>
+<hr />
+<p><em>COOKIE-BANNER.CA – security@cookie-banner.ca</em></p>
+</body>
+</html>

@@ -1,0 +1,367 @@
+- generic [active] [ref=e1]:
+  - heading "Incident Response Plan" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Document Classification:"
+    - text: Internal – Confidential
+    - strong [ref=e6]: "Effective Date:"
+    - text: 2026-03-28
+    - strong [ref=e7]: "Last Reviewed:"
+    - text: 2026-03-28
+    - strong [ref=e8]: "Next Review:"
+    - text: 2026-09-28
+    - strong [ref=e9]: "Owner:"
+    - text: Founder / Incident Commander
+    - strong [ref=e10]: "Contact:"
+    - text: security@cookie-banner.ca
+  - separator [ref=e11]
+  - heading "1. Purpose and Scope" [level=2] [ref=e12]
+  - paragraph [ref=e13]: This plan establishes procedures for detecting, responding to, and recovering from security incidents affecting COOKIE-BANNER.CA, a cookie consent management platform (CMP) serving customers under GDPR, PIPEDA, Quebec Law 25, and PECR.
+  - paragraph [ref=e14]:
+    - strong [ref=e15]: "In scope:"
+    - text: "All production systems, customer data, internal accounts, and third-party integrations including:"
+  - list [ref=e16]:
+    - listitem [ref=e17]: Application layer (Next.js on Vercel)
+    - listitem [ref=e18]: Database (Supabase / PostgreSQL)
+    - listitem [ref=e19]: Payment processing (Stripe)
+    - listitem [ref=e20]: Authentication (NextAuth.js)
+    - listitem [ref=e21]: DNS, domain registrar, and email accounts
+    - listitem [ref=e22]: Source code repositories
+  - paragraph [ref=e23]:
+    - strong [ref=e24]: "Out of scope:"
+    - text: Physical security (fully virtual organization, no offices or data centers). Infrastructure-level incidents at Vercel, Supabase, or Stripe are managed by those providers under their own SOC 2 Type II and PCI DSS programs; however, this plan covers COOKIE-BANNER.CA’s response obligations when those incidents affect our customers.
+  - separator [ref=e25]
+  - heading "2. Incident Classification" [level=2] [ref=e26]
+  - table [ref=e27]:
+    - rowgroup [ref=e33]:
+      - row "Severity Description Response Time Examples" [ref=e34]:
+        - columnheader "Severity" [ref=e35]
+        - columnheader "Description" [ref=e36]
+        - columnheader "Response Time" [ref=e37]
+        - columnheader "Examples" [ref=e38]
+    - rowgroup [ref=e39]:
+      - row "SEV-1 – Critical Confirmed data breach, active intrusion, or total service outage Immediate (within 1 hour) Unauthorized database access, leaked customer PII, compromised auth tokens" [ref=e40]:
+        - cell "SEV-1 – Critical" [ref=e41]:
+          - strong [ref=e42]: SEV-1 – Critical
+        - cell "Confirmed data breach, active intrusion, or total service outage" [ref=e43]
+        - cell "Immediate (within 1 hour)" [ref=e44]
+        - cell "Unauthorized database access, leaked customer PII, compromised auth tokens" [ref=e45]
+      - row "SEV-2 – High Potential breach under investigation, partial outage, or degraded security controls Within 4 hours Suspicious login activity, Supabase RLS bypass, payment webhook failures" [ref=e46]:
+        - cell "SEV-2 – High" [ref=e47]:
+          - strong [ref=e48]: SEV-2 – High
+        - cell "Potential breach under investigation, partial outage, or degraded security controls" [ref=e49]
+        - cell "Within 4 hours" [ref=e50]
+        - cell "Suspicious login activity, Supabase RLS bypass, payment webhook failures" [ref=e51]
+      - row "SEV-3 – Medium Contained security event, minor service disruption Within 24 hours Failed brute-force attempt, single-customer data discrepancy, dependency vulnerability" [ref=e52]:
+        - cell "SEV-3 – Medium" [ref=e53]:
+          - strong [ref=e54]: SEV-3 – Medium
+        - cell "Contained security event, minor service disruption" [ref=e55]
+        - cell "Within 24 hours" [ref=e56]
+        - cell "Failed brute-force attempt, single-customer data discrepancy, dependency vulnerability" [ref=e57]
+      - row "SEV-4 – Low Informational, no immediate impact Within 72 hours Routine vulnerability scan findings, phishing attempt (unsuccessful), provider advisory" [ref=e58]:
+        - cell "SEV-4 – Low" [ref=e59]:
+          - strong [ref=e60]: SEV-4 – Low
+        - cell "Informational, no immediate impact" [ref=e61]
+        - cell "Within 72 hours" [ref=e62]
+        - cell "Routine vulnerability scan findings, phishing attempt (unsuccessful), provider advisory" [ref=e63]
+  - separator [ref=e64]
+  - heading "3. Roles and Responsibilities" [level=2] [ref=e65]
+  - paragraph [ref=e66]: "As a solo-founder organization, the Founder serves all incident response roles:"
+  - table [ref=e67]:
+    - rowgroup [ref=e71]:
+      - row "Role Responsibility" [ref=e72]:
+        - columnheader "Role" [ref=e73]
+        - columnheader "Responsibility" [ref=e74]
+    - rowgroup [ref=e75]:
+      - 'row "Incident Commander Owns the incident end-to-end: detection through post-mortem" [ref=e76]':
+        - cell "Incident Commander" [ref=e77]:
+          - strong [ref=e78]: Incident Commander
+        - 'cell "Owns the incident end-to-end: detection through post-mortem" [ref=e79]'
+      - row "Technical Responder Investigates, contains, eradicates, and recovers" [ref=e80]:
+        - cell "Technical Responder" [ref=e81]:
+          - strong [ref=e82]: Technical Responder
+        - cell "Investigates, contains, eradicates, and recovers" [ref=e83]
+      - row "Communications Lead Notifies authorities, affected customers, and providers" [ref=e84]:
+        - cell "Communications Lead" [ref=e85]:
+          - strong [ref=e86]: Communications Lead
+        - cell "Notifies authorities, affected customers, and providers" [ref=e87]
+  - paragraph [ref=e88]:
+    - strong [ref=e89]: Escalation contacts
+    - text: "(external, as needed):"
+  - list [ref=e90]:
+    - listitem [ref=e91]:
+      - strong [ref=e92]: Legal counsel
+      - text: – Privacy/data protection attorney (retain on-call relationship)
+    - listitem [ref=e93]:
+      - strong [ref=e94]: Supabase support
+      - text: – For database-level incidents
+    - listitem [ref=e95]:
+      - strong [ref=e96]: Vercel support
+      - text: – For deployment/infrastructure incidents
+    - listitem [ref=e97]:
+      - strong [ref=e98]: Stripe support
+      - text: – For payment data incidents
+  - separator [ref=e99]
+  - heading "4. Detection and Reporting" [level=2] [ref=e100]
+  - heading "Detection Sources" [level=3] [ref=e101]
+  - list [ref=e102]:
+    - listitem [ref=e103]: Vercel deployment logs and function logs
+    - listitem [ref=e104]: Supabase dashboard alerts (auth anomalies, query patterns)
+    - listitem [ref=e105]: Stripe webhook failure notifications
+    - listitem [ref=e106]: Uptime monitoring (external service)
+    - listitem [ref=e107]: Customer reports to security@cookie-banner.ca
+    - listitem [ref=e108]: GitHub security advisories and Dependabot alerts
+    - listitem [ref=e109]: Manual review of access logs
+  - heading "Reporting" [level=3] [ref=e110]
+  - paragraph [ref=e111]:
+    - text: Anyone (customers, partners, the founder) who suspects an incident should email
+    - strong [ref=e112]: security@cookie-banner.ca
+    - text: "immediately. All incidents are logged in a dedicated incident register with:"
+  - list [ref=e113]:
+    - listitem [ref=e114]: Date/time of detection
+    - listitem [ref=e115]: Description and initial severity classification
+    - listitem [ref=e116]: Systems and data potentially affected
+    - listitem [ref=e117]: Actions taken
+  - separator [ref=e118]
+  - heading "5. Response Procedures" [level=2] [ref=e119]
+  - heading "5.1 Contain" [level=3] [ref=e120]
+  - paragraph [ref=e121]:
+    - strong [ref=e122]: "Goal:"
+    - text: Stop the incident from spreading.
+  - list [ref=e123]:
+    - listitem [ref=e124]: Revoke or rotate compromised credentials (Supabase keys, NextAuth secrets, Stripe API keys, Vercel tokens)
+    - listitem [ref=e125]: If unauthorized database access is suspected, enable Supabase network restrictions or pause the project
+    - listitem [ref=e126]: Revoke active user sessions if auth is compromised
+    - listitem [ref=e127]: If a Vercel deployment is compromised, roll back to the last known-good deployment
+    - listitem [ref=e128]: Enable maintenance mode if necessary to protect customer data
+  - heading "5.2 Eradicate" [level=3] [ref=e129]
+  - paragraph [ref=e130]:
+    - strong [ref=e131]: "Goal:"
+    - text: Remove the root cause.
+  - list [ref=e132]:
+    - listitem [ref=e133]: Identify the attack vector (e.g., compromised dependency, leaked environment variable, social engineering)
+    - listitem [ref=e134]: Remove malicious code, unauthorized accounts, or backdoors
+    - listitem [ref=e135]: Patch the vulnerability or misconfiguration
+    - listitem [ref=e136]: Rotate all credentials that may have been exposed, even if not confirmed compromised
+    - listitem [ref=e137]: Update dependencies if a supply-chain vulnerability is involved
+  - heading "5.3 Recover" [level=3] [ref=e138]
+  - paragraph [ref=e139]:
+    - strong [ref=e140]: "Goal:"
+    - text: Restore normal operations with confidence.
+  - list [ref=e141]:
+    - listitem [ref=e142]: Deploy verified clean code to Vercel
+    - listitem [ref=e143]: Restore database from Supabase point-in-time recovery if data integrity is in question
+    - listitem [ref=e144]: Re-enable services incrementally; monitor closely for recurrence
+    - listitem [ref=e145]: Verify payment processing is functioning correctly via Stripe dashboard
+    - listitem [ref=e146]: Confirm customer-facing banner delivery is operating normally
+    - listitem [ref=e147]: Remove maintenance mode
+  - separator [ref=e148]
+  - heading "6. Evidence Preservation" [level=2] [ref=e149]
+  - paragraph [ref=e150]: "From the moment an incident is suspected:"
+  - list [ref=e151]:
+    - listitem [ref=e152]:
+      - strong [ref=e153]: Do not delete or modify logs.
+      - text: Export and preserve Vercel function logs, Supabase query logs, and Stripe event logs.
+    - listitem [ref=e154]: Take screenshots of dashboards, error messages, and anomalous activity.
+    - listitem [ref=e155]: Record all timestamps in UTC.
+    - listitem [ref=e156]: Document every action taken during the response, including who did what and when.
+    - listitem [ref=e157]: Preserve email headers and full content if phishing or social engineering is involved.
+    - listitem [ref=e158]: Store all evidence in a dedicated, access-controlled folder separate from production systems.
+  - paragraph [ref=e159]:
+    - text: Evidence must be retained for a minimum of
+    - strong [ref=e160]: 5 years
+    - text: to satisfy regulatory requirements.
+  - separator [ref=e161]
+  - heading "7. Breach Notification Requirements" [level=2] [ref=e162]
+  - heading "7.1 GDPR (EU/EEA Data Subjects)" [level=3] [ref=e163]
+  - list [ref=e164]:
+    - listitem [ref=e165]:
+      - text: Notify the relevant
+      - strong [ref=e166]: Supervisory Authority
+      - text: within
+      - strong [ref=e167]: 72 hours
+      - text: of becoming aware of a personal data breach, unless the breach is unlikely to result in a risk to individuals.
+    - listitem [ref=e168]:
+      - text: If the breach poses a
+      - strong [ref=e169]: high risk
+      - text: to individuals, notify affected data subjects
+      - strong [ref=e170]: without undue delay
+      - text: .
+    - listitem [ref=e171]: Document all breaches in the internal breach register regardless of notification obligation.
+  - heading "7.2 PIPEDA (Canada – Federal)" [level=3] [ref=e172]
+  - list [ref=e173]:
+    - listitem [ref=e174]:
+      - text: Report breaches involving personal information that create a
+      - strong [ref=e175]: real risk of significant harm
+      - text: to the
+      - strong [ref=e176]: Office of the Privacy Commissioner of Canada (OPC)
+      - text: as soon as feasible.
+    - listitem [ref=e177]: Notify affected individuals as soon as feasible.
+    - listitem [ref=e178]: Notify any third-party organizations that may be able to reduce risk of harm.
+    - listitem [ref=e179]:
+      - text: Maintain breach records for
+      - strong [ref=e180]: 2 years
+      - text: .
+  - heading "7.3 Quebec Law 25 (Canada – Quebec)" [level=3] [ref=e181]
+  - list [ref=e182]:
+    - listitem [ref=e183]:
+      - text: Notify the
+      - strong [ref=e184]: Commission d’acces a l’information du Quebec (CAI)
+      - text: of any
+      - strong [ref=e185]: confidentiality incident
+      - text: involving personal information that presents a
+      - strong [ref=e186]: risk of serious injury
+      - text: .
+    - listitem [ref=e187]: Notify affected individuals as soon as feasible.
+    - listitem [ref=e188]: Maintain an incident register and provide it to the CAI upon request.
+  - heading "7.4 PECR / UK GDPR (UK Data Subjects)" [level=3] [ref=e189]
+  - list [ref=e190]:
+    - listitem [ref=e191]:
+      - text: Notify the
+      - strong [ref=e192]: Information Commissioner’s Office (ICO)
+      - text: within
+      - strong [ref=e193]: 72 hours
+      - text: of becoming aware of a personal data breach that poses a risk to individuals.
+    - listitem [ref=e194]: Notify affected individuals without undue delay if the breach poses a high risk.
+  - heading "Notification Checklist" [level=3] [ref=e195]
+  - list [ref=e196]:
+    - listitem [ref=e197]:
+      - generic [ref=e198]:
+        - checkbox "Determine which jurisdictions and regulations apply based on affected data subjects" [ref=e199]
+        - text: Determine which jurisdictions and regulations apply based on affected data subjects
+    - listitem [ref=e200]:
+      - generic [ref=e201]:
+        - 'checkbox "Prepare breach description: nature, categories of data, approximate number of records" [ref=e202]'
+        - text: "Prepare breach description: nature, categories of data, approximate number of records"
+    - listitem [ref=e203]:
+      - generic [ref=e204]:
+        - checkbox "Describe likely consequences and measures taken or proposed" [ref=e205]
+        - text: Describe likely consequences and measures taken or proposed
+    - listitem [ref=e206]:
+      - generic [ref=e207]:
+        - checkbox "File with relevant authorities within required timeframes" [ref=e208]
+        - text: File with relevant authorities within required timeframes
+    - listitem [ref=e209]:
+      - generic [ref=e210]:
+        - checkbox "Notify affected customers with clear, plain-language communication" [ref=e211]
+        - text: Notify affected customers with clear, plain-language communication
+    - listitem [ref=e212]:
+      - generic [ref=e213]:
+        - checkbox "Update the internal breach register" [ref=e214]
+        - text: Update the internal breach register
+  - separator [ref=e215]
+  - heading "8. Communication Plan" [level=2] [ref=e216]
+  - heading "Internal" [level=3] [ref=e217]
+  - list [ref=e218]:
+    - listitem [ref=e219]: Log all incident communications with timestamps.
+    - listitem [ref=e220]: Use a dedicated incident channel (separate from day-to-day communications) if external contractors or legal counsel are involved.
+  - heading "Customers" [level=3] [ref=e221]
+  - list [ref=e222]:
+    - listitem [ref=e223]: Email affected customers directly from security@cookie-banner.ca.
+    - listitem [ref=e224]: "Include: what happened, what data was involved, what actions were taken, what customers should do (e.g., rotate API keys), and a contact point for questions."
+    - listitem [ref=e225]: If the incident affects banner delivery, post a status update on the public status page.
+  - heading "Authorities" [level=3] [ref=e226]
+  - list [ref=e227]:
+    - listitem [ref=e228]: Use official submission channels for each regulator (see Section 7).
+    - listitem [ref=e229]: Retain copies of all submissions and correspondence.
+  - heading "Third-Party Providers" [level=3] [ref=e230]
+  - list [ref=e231]:
+    - listitem [ref=e232]: Notify Supabase, Vercel, or Stripe if the incident involves their systems or requires their cooperation.
+  - separator [ref=e233]
+  - heading "9. Post-Incident Review" [level=2] [ref=e234]
+  - paragraph [ref=e235]:
+    - text: Within
+    - strong [ref=e236]: 5 business days
+    - text: "of incident resolution, conduct a post-incident review covering:"
+  - list [ref=e237]:
+    - listitem [ref=e238]:
+      - strong [ref=e239]: Timeline
+      - text: – What happened and when, from detection to resolution.
+    - listitem [ref=e240]:
+      - strong [ref=e241]: Root cause
+      - text: – What allowed the incident to occur.
+    - listitem [ref=e242]:
+      - strong [ref=e243]: Response effectiveness
+      - text: – What went well, what could be improved.
+    - listitem [ref=e244]:
+      - strong [ref=e245]: Action items
+      - text: – Specific, assigned, time-bound improvements (e.g., add monitoring, tighten access controls, update this plan).
+    - listitem [ref=e246]:
+      - strong [ref=e247]: Lessons learned
+      - text: – Document for future reference.
+  - paragraph [ref=e248]: The review is documented in writing and stored alongside the incident record. Action items are tracked to completion.
+  - separator [ref=e249]
+  - heading "10. Testing and Review Schedule" [level=2] [ref=e250]
+  - table [ref=e251]:
+    - rowgroup [ref=e252]:
+      - row "Activity Frequency" [ref=e253]:
+        - columnheader "Activity" [ref=e254]
+        - columnheader "Frequency" [ref=e255]
+    - rowgroup [ref=e256]:
+      - 'row "Review and update this plan Every 6 months (next: 2026-09-28)" [ref=e257]':
+        - cell "Review and update this plan" [ref=e258]
+        - 'cell "Every 6 months (next: 2026-09-28)" [ref=e259]'
+      - row "Credential rotation drill Quarterly" [ref=e260]:
+        - cell "Credential rotation drill" [ref=e261]
+        - cell "Quarterly" [ref=e262]
+      - row "Tabletop walkthrough of a simulated breach scenario Annually" [ref=e263]:
+        - cell "Tabletop walkthrough of a simulated breach scenario" [ref=e264]
+        - cell "Annually" [ref=e265]
+      - row "Review provider incident response capabilities Annually" [ref=e266]:
+        - cell "Review provider incident response capabilities" [ref=e267]
+        - cell "Annually" [ref=e268]
+      - row "Test database point-in-time recovery Every 6 months" [ref=e269]:
+        - cell "Test database point-in-time recovery" [ref=e270]
+        - cell "Every 6 months" [ref=e271]
+      - row "Verify notification contact details for regulators Every 6 months" [ref=e272]:
+        - cell "Verify notification contact details for regulators" [ref=e273]
+        - cell "Every 6 months" [ref=e274]
+  - separator [ref=e275]
+  - heading "11. Contact Information" [level=2] [ref=e276]
+  - table [ref=e277]:
+    - rowgroup [ref=e278]:
+      - row "Contact Details" [ref=e279]:
+        - columnheader "Contact" [ref=e280]
+        - columnheader "Details" [ref=e281]
+    - rowgroup [ref=e282]:
+      - row "Incident Commander (Founder) security@cookie-banner.ca" [ref=e283]:
+        - cell "Incident Commander (Founder)" [ref=e284]:
+          - strong [ref=e285]: Incident Commander (Founder)
+        - cell "security@cookie-banner.ca" [ref=e286]
+      - row "OPC (Canada) https://www.priv.gc.ca – 1-800-282-1376" [ref=e287]:
+        - cell "OPC (Canada)" [ref=e288]:
+          - strong [ref=e289]: OPC (Canada)
+        - cell "https://www.priv.gc.ca – 1-800-282-1376" [ref=e290]
+      - row "CAI (Quebec) https://www.cai.gouv.qc.ca" [ref=e291]:
+        - cell "CAI (Quebec)" [ref=e292]:
+          - strong [ref=e293]: CAI (Quebec)
+        - cell "https://www.cai.gouv.qc.ca" [ref=e294]
+      - row "ICO (UK) https://ico.org.uk – 0303 123 1113" [ref=e295]:
+        - cell "ICO (UK)" [ref=e296]:
+          - strong [ref=e297]: ICO (UK)
+        - cell "https://ico.org.uk – 0303 123 1113" [ref=e298]
+      - row "Supabase Support Via Supabase dashboard" [ref=e299]:
+        - cell "Supabase Support" [ref=e300]:
+          - strong [ref=e301]: Supabase Support
+        - cell "Via Supabase dashboard" [ref=e302]
+      - row "Vercel Support Via Vercel dashboard" [ref=e303]:
+        - cell "Vercel Support" [ref=e304]:
+          - strong [ref=e305]: Vercel Support
+        - cell "Via Vercel dashboard" [ref=e306]
+      - row "Stripe Support Via Stripe dashboard" [ref=e307]:
+        - cell "Stripe Support" [ref=e308]:
+          - strong [ref=e309]: Stripe Support
+        - cell "Via Stripe dashboard" [ref=e310]
+  - separator [ref=e311]
+  - heading "Document History" [level=2] [ref=e312]
+  - table [ref=e313]:
+    - rowgroup [ref=e314]:
+      - row "Version Date Change" [ref=e315]:
+        - columnheader "Version" [ref=e316]
+        - columnheader "Date" [ref=e317]
+        - columnheader "Change" [ref=e318]
+    - rowgroup [ref=e319]:
+      - row "1.0 2026-03-28 Initial version" [ref=e320]:
+        - cell "1.0" [ref=e321]
+        - cell "2026-03-28" [ref=e322]
+        - cell "Initial version" [ref=e323]

@@ -1,0 +1,229 @@
+- generic [active] [ref=e1]:
+  - heading "Vulnerability Management Policy" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: "Organization:"
+    - text: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Contact:"
+    - text: security@cookie-banner.ca
+    - strong [ref=e6]: "Effective Date:"
+    - text: 2026-03-28
+    - strong [ref=e7]: "Last Reviewed:"
+    - text: 2026-03-28
+    - strong [ref=e8]: "Next Review:"
+    - text: 2026-09-28
+    - strong [ref=e9]: "Owner:"
+    - text: Founder / Security Lead
+  - separator [ref=e10]
+  - heading "1. Purpose" [level=2] [ref=e11]
+  - paragraph [ref=e12]: This policy defines how COOKIE-BANNER.CA identifies, evaluates, remediates, and tracks security vulnerabilities across its cookie consent management platform. It ensures a consistent, risk-based approach to vulnerability management appropriate for a small, fully remote SaaS operation.
+  - heading "2. Scope" [level=2] [ref=e13]
+  - paragraph [ref=e14]: "This policy applies to all systems, code, dependencies, and infrastructure that support the COOKIE-BANNER.CA platform, including:"
+  - list [ref=e15]:
+    - listitem [ref=e16]: Application source code (Next.js, React, TypeScript)
+    - listitem [ref=e17]: Third-party dependencies (npm packages)
+    - listitem [ref=e18]: Infrastructure services (Vercel, Supabase, Stripe, GitHub)
+    - listitem [ref=e19]: Authentication systems (NextAuth.js)
+    - listitem [ref=e20]: Database layer (Supabase PostgreSQL)
+  - heading "3. Vulnerability Detection Sources" [level=2] [ref=e21]
+  - paragraph [ref=e22]: "Vulnerabilities are identified through the following channels, monitored on an ongoing basis:"
+  - table [ref=e23]:
+    - rowgroup [ref=e28]:
+      - row "Source Type Frequency" [ref=e29]:
+        - columnheader "Source" [ref=e30]
+        - columnheader "Type" [ref=e31]
+        - columnheader "Frequency" [ref=e32]
+    - rowgroup [ref=e33]:
+      - row "GitHub Dependabot Dependency vulnerabilities Continuous (automated)" [ref=e34]:
+        - cell "GitHub Dependabot" [ref=e35]
+        - cell "Dependency vulnerabilities" [ref=e36]
+        - cell "Continuous (automated)" [ref=e37]
+      - row "GitHub Security Advisories Supply chain and code vulnerabilities Continuous (automated)" [ref=e38]:
+        - cell "GitHub Security Advisories" [ref=e39]
+        - cell "Supply chain and code vulnerabilities" [ref=e40]
+        - cell "Continuous (automated)" [ref=e41]
+      - row "npm audit Dependency vulnerabilities Every build + weekly manual review" [ref=e42]:
+        - cell "npm audit" [ref=e43]:
+          - code [ref=e44]: npm audit
+        - cell "Dependency vulnerabilities" [ref=e45]
+        - cell "Every build + weekly manual review" [ref=e46]
+      - row "Supabase Security Advisories Database and platform advisories As published" [ref=e47]:
+        - cell "Supabase Security Advisories" [ref=e48]
+        - cell "Database and platform advisories" [ref=e49]
+        - cell "As published" [ref=e50]
+      - row "Vercel Security Notifications Hosting and edge platform advisories As published" [ref=e51]:
+        - cell "Vercel Security Notifications" [ref=e52]
+        - cell "Hosting and edge platform advisories" [ref=e53]
+        - cell "As published" [ref=e54]
+      - row "CVE Databases (NVD, MITRE) Industry-wide vulnerability disclosures Weekly review" [ref=e55]:
+        - cell "CVE Databases (NVD, MITRE)" [ref=e56]
+        - cell "Industry-wide vulnerability disclosures" [ref=e57]
+        - cell "Weekly review" [ref=e58]
+      - row "OWASP Top 10 Application security baseline Each development cycle" [ref=e59]:
+        - cell "OWASP Top 10" [ref=e60]
+        - cell "Application security baseline" [ref=e61]
+        - cell "Each development cycle" [ref=e62]
+  - heading "4. Severity Classification and Remediation SLAs" [level=2] [ref=e63]
+  - paragraph [ref=e64]: "Vulnerabilities are classified using CVSS v3.1 scores aligned with the following severity levels:"
+  - table [ref=e65]:
+    - rowgroup [ref=e71]:
+      - row "Severity CVSS Score Remediation SLA Examples" [ref=e72]:
+        - columnheader "Severity" [ref=e73]
+        - columnheader "CVSS Score" [ref=e74]
+        - columnheader "Remediation SLA" [ref=e75]
+        - columnheader "Examples" [ref=e76]
+    - rowgroup [ref=e77]:
+      - row "Critical 9.0 – 10.0 24 hours Remote code execution, authentication bypass, data breach exposure" [ref=e78]:
+        - cell "Critical" [ref=e79]:
+          - strong [ref=e80]: Critical
+        - cell "9.0 – 10.0" [ref=e81]
+        - cell "24 hours" [ref=e82]:
+          - strong [ref=e83]: 24 hours
+        - cell "Remote code execution, authentication bypass, data breach exposure" [ref=e84]
+      - row "High 7.0 – 8.9 7 days SQL injection, XSS with data exfiltration, privilege escalation" [ref=e85]:
+        - cell "High" [ref=e86]:
+          - strong [ref=e87]: High
+        - cell "7.0 – 8.9" [ref=e88]
+        - cell "7 days" [ref=e89]:
+          - strong [ref=e90]: 7 days
+        - cell "SQL injection, XSS with data exfiltration, privilege escalation" [ref=e91]
+      - row "Medium 4.0 – 6.9 30 days CSRF, information disclosure, denial of service" [ref=e92]:
+        - cell "Medium" [ref=e93]:
+          - strong [ref=e94]: Medium
+        - cell "4.0 – 6.9" [ref=e95]
+        - cell "30 days" [ref=e96]:
+          - strong [ref=e97]: 30 days
+        - cell "CSRF, information disclosure, denial of service" [ref=e98]
+      - row "Low 0.1 – 3.9 Next scheduled maintenance Minor information leakage, low-impact misconfigurations" [ref=e99]:
+        - cell "Low" [ref=e100]:
+          - strong [ref=e101]: Low
+        - cell "0.1 – 3.9" [ref=e102]
+        - cell "Next scheduled maintenance" [ref=e103]:
+          - strong [ref=e104]: Next scheduled maintenance
+        - cell "Minor information leakage, low-impact misconfigurations" [ref=e105]
+  - paragraph [ref=e106]: SLA timelines begin from the date of detection or public disclosure, whichever is earlier.
+  - heading "5. Dependency Management" [level=2] [ref=e107]
+  - list [ref=e108]:
+    - listitem [ref=e109]:
+      - strong [ref=e110]: "Automated scanning:"
+      - text: Dependabot is enabled on all repositories and configured to open pull requests for vulnerable dependencies automatically.
+    - listitem [ref=e111]:
+      - strong [ref=e112]: "Regular updates:"
+      - text: Dependencies are reviewed and updated at minimum monthly. Security-critical updates are applied within the SLA for their severity level.
+    - listitem [ref=e113]:
+      - strong [ref=e114]: "Lock files:"
+      - code [ref=e115]: package-lock.json
+      - text: is committed to source control to ensure reproducible builds and prevent supply chain drift.
+    - listitem [ref=e116]:
+      - strong [ref=e117]: "Audit on build:"
+      - code [ref=e118]: npm audit
+      - text: runs as part of the CI pipeline; builds producing critical or high vulnerabilities are flagged for immediate review.
+  - heading "6. Infrastructure Vulnerability Management" [level=2] [ref=e119]
+  - paragraph [ref=e120]: "COOKIE-BANNER.CA operates as a fully cloud-hosted, serverless platform with no physical infrastructure. Infrastructure security is delegated to SOC 2 Type II certified providers:"
+  - list [ref=e121]:
+    - listitem [ref=e122]:
+      - strong [ref=e123]: Vercel
+      - text: – Application hosting, edge network, and SSL/TLS termination
+    - listitem [ref=e124]:
+      - strong [ref=e125]: Supabase
+      - text: – PostgreSQL database, authentication services, and storage
+    - listitem [ref=e126]:
+      - strong [ref=e127]: Stripe
+      - text: – Payment processing (PCI DSS Level 1 compliant)
+    - listitem [ref=e128]:
+      - strong [ref=e129]: GitHub
+      - text: – Source control, CI/CD, and secrets management
+  - paragraph [ref=e130]: Provider security postures are reviewed annually by verifying current SOC 2 reports and compliance certifications. Any provider security advisory affecting COOKIE-BANNER.CA is treated as an internal vulnerability and triaged per the SLAs above.
+  - heading "7. Application Security" [level=2] [ref=e131]
+  - paragraph [ref=e132]: "The development process incorporates the following application security practices:"
+  - list [ref=e133]:
+    - listitem [ref=e134]:
+      - strong [ref=e135]: "OWASP Top 10 awareness:"
+      - text: All code is developed with OWASP Top 10 risks in mind, including injection, broken authentication, sensitive data exposure, and security misconfiguration.
+    - listitem [ref=e136]:
+      - strong [ref=e137]: "Input validation:"
+      - text: All user input and API request bodies are validated using Zod schemas before processing.
+    - listitem [ref=e138]:
+      - strong [ref=e139]: "Output encoding:"
+      - text: Server-rendered content is escaped by default through React’s built-in XSS protections.
+    - listitem [ref=e140]:
+      - strong [ref=e141]: "Authentication and authorization:"
+      - text: NextAuth.js manages session security. API routes enforce authorization checks before data access.
+    - listitem [ref=e142]:
+      - strong [ref=e143]: "Secrets management:"
+      - text: All secrets are stored in environment variables managed through Vercel and GitHub; no secrets are committed to source control.
+    - listitem [ref=e144]:
+      - strong [ref=e145]: "Secure headers:"
+      - text: HTTP security headers (CSP, HSTS, X-Frame-Options) are configured at the application and platform level.
+  - heading "8. Patch Management Process" [level=2] [ref=e146]
+  - list [ref=e147]:
+    - listitem [ref=e148]:
+      - strong [ref=e149]: Detection
+      - text: – Vulnerability identified through any source listed in Section 3.
+    - listitem [ref=e150]:
+      - strong [ref=e151]: Triage
+      - text: – Severity assessed using CVSS score; SLA clock starts.
+    - listitem [ref=e152]:
+      - strong [ref=e153]: Remediation
+      - text: – Patch applied, dependency updated, or mitigation implemented.
+    - listitem [ref=e154]:
+      - strong [ref=e155]: Testing
+      - text: – Fix verified in a preview/staging environment before production deployment.
+    - listitem [ref=e156]:
+      - strong [ref=e157]: Deployment
+      - text: – Pushed to production via the standard CI/CD pipeline (GitHub to Vercel).
+    - listitem [ref=e158]:
+      - strong [ref=e159]: Verification
+      - text: – Post-deployment check confirms the vulnerability is resolved.
+    - listitem [ref=e160]:
+      - strong [ref=e161]: Documentation
+      - text: – Vulnerability and remediation recorded in the internal security log.
+  - heading "9. Exception Handling" [level=2] [ref=e162]
+  - paragraph [ref=e163]: "When a vulnerability cannot be remediated within its SLA, a risk acceptance exception is documented containing:"
+  - list [ref=e164]:
+    - listitem [ref=e165]: Vulnerability description and severity
+    - listitem [ref=e166]: Reason remediation cannot be completed on schedule (e.g., no patch available, breaking dependency change)
+    - listitem [ref=e167]: Compensating controls in place to reduce risk
+    - listitem [ref=e168]: Revised target remediation date
+    - listitem [ref=e169]: Acceptance approved by the Founder / Security Lead
+  - paragraph [ref=e170]: Exceptions are reviewed monthly and closed as soon as a viable remediation path becomes available.
+  - heading "10. Roles and Responsibilities" [level=2] [ref=e171]
+  - table [ref=e172]:
+    - rowgroup [ref=e176]:
+      - row "Role Responsibility" [ref=e177]:
+        - columnheader "Role" [ref=e178]
+        - columnheader "Responsibility" [ref=e179]
+    - rowgroup [ref=e180]:
+      - row "Founder / Security Lead Policy ownership, vulnerability triage, remediation, exception approval, and compliance oversight" [ref=e181]:
+        - cell "Founder / Security Lead" [ref=e182]:
+          - strong [ref=e183]: Founder / Security Lead
+        - cell "Policy ownership, vulnerability triage, remediation, exception approval, and compliance oversight" [ref=e184]
+      - row "Infrastructure Providers Maintaining platform-level security, publishing advisories, and providing SOC 2 attestations" [ref=e185]:
+        - cell "Infrastructure Providers" [ref=e186]:
+          - strong [ref=e187]: Infrastructure Providers
+        - cell "Maintaining platform-level security, publishing advisories, and providing SOC 2 attestations" [ref=e188]
+  - paragraph [ref=e189]: As a solo-founder organization, all operational security responsibilities are held by the founder. If the team grows, this section will be updated to reflect delegated responsibilities.
+  - heading "11. Reporting and Metrics" [level=2] [ref=e190]
+  - paragraph [ref=e191]: "The following metrics are tracked quarterly:"
+  - list [ref=e192]:
+    - listitem [ref=e193]: Total vulnerabilities detected (by severity)
+    - listitem [ref=e194]: Mean time to remediation (by severity)
+    - listitem [ref=e195]: Number of open exceptions and their age
+    - listitem [ref=e196]: Dependency update currency (percentage of dependencies on latest patch version)
+  - paragraph [ref=e197]: A summary is maintained internally and made available upon request for compliance audits (GDPR, PIPEDA, Law 25, PECR).
+  - heading "12. External Vulnerability Reporting" [level=2] [ref=e198]
+  - paragraph [ref=e199]:
+    - text: Security researchers and external parties can report vulnerabilities to
+    - strong [ref=e200]: security@cookie-banner.ca
+    - text: . Reports are acknowledged within 48 hours and triaged using the same severity classification and SLA framework defined in this policy.
+  - heading "13. Review Schedule" [level=2] [ref=e201]
+  - paragraph [ref=e202]:
+    - text: This policy is reviewed and updated
+    - strong [ref=e203]: semi-annually
+    - text: ", or sooner if triggered by:"
+  - list [ref=e204]:
+    - listitem [ref=e205]: A significant security incident
+    - listitem [ref=e206]: A material change in technology stack or infrastructure providers
+    - listitem [ref=e207]: New regulatory requirements affecting GDPR, PIPEDA, Law 25, or PECR compliance
+  - separator [ref=e208]
+  - paragraph [ref=e209]:
+    - emphasis [ref=e210]: COOKIE-BANNER.CA – Vulnerability Management Policy v1.0

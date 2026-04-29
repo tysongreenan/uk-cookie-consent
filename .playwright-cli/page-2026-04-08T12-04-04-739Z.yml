@@ -1,0 +1,22 @@
+- main [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - img "UpGuard" [ref=e7]
+      - heading [level=1]
+      - generic:
+        - paragraph
+    - generic [ref=e9]:
+      - generic [ref=e11]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: support@cookieb-banner.ca
+          - link "Edit email address" [ref=e15] [cursor=pointer]:
+            - /url: /u/login/identifier?state=hKFo2SB5UnpULXpFSkNua1FrdTE2dm9Da3A3TWpsa2lueHdEdqFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEM1d0l2TGw1TF8wQVRZeW5UM21OQ3VtdnhzbUN5TFV3o2NpZNkgcXkwRk5qaFpyUFZpb3dVd1FiMk50R3ZzSjg3Uk9mSUM
+            - text: Edit
+        - generic [ref=e17]:
+          - generic [ref=e18]: Password *
+          - textbox "Password" [active] [ref=e19]
+          - switch "Show password" [ref=e20] [cursor=pointer]
+      - paragraph [ref=e21]:
+        - link "Reset password" [ref=e22] [cursor=pointer]:
+          - /url: /u/login/password-reset-start/Username-Password-Authentication/support%40cookieb-banner.ca?state=hKFo2SB5UnpULXpFSkNua1FrdTE2dm9Da3A3TWpsa2lueHdEdqFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEM1d0l2TGw1TF8wQVRZeW5UM21OQ3VtdnhzbUN5TFV3o2NpZNkgcXkwRk5qaFpyUFZpb3dVd1FiMk50R3ZzSjg3Uk9mSUM
+      - button "Continue" [ref=e24] [cursor=pointer]

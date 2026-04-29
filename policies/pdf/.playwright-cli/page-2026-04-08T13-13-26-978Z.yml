@@ -1,0 +1,236 @@
+- generic [active] [ref=e1]:
+  - heading "Data Retention and Destruction Policy" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: "Organization:"
+    - text: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Contact:"
+    - text: security@cookie-banner.ca
+    - strong [ref=e6]: "Effective Date:"
+    - text: March 28, 2026
+    - strong [ref=e7]: "Last Reviewed:"
+    - text: March 28, 2026
+    - strong [ref=e8]: "Next Review:"
+    - text: March 28, 2027
+  - separator [ref=e9]
+  - heading "1. Purpose and Scope" [level=2] [ref=e10]
+  - paragraph [ref=e11]: This policy defines how COOKIE-BANNER.CA retains, archives, and destroys data across its cookie consent management platform. It applies to all data processed by the organization and its infrastructure providers (Vercel, Supabase, Stripe). COOKIE-BANNER.CA operates as a fully virtual organization with no physical offices or on-premises data storage.
+  - paragraph [ref=e12]: This policy supports compliance with GDPR, PIPEDA, Quebec Law 25, and PECR.
+  - separator [ref=e13]
+  - heading "2. Data Classification" [level=2] [ref=e14]
+  - table [ref=e15]:
+    - rowgroup [ref=e20]:
+      - row "Category Examples Classification" [ref=e21]:
+        - columnheader "Category" [ref=e22]
+        - columnheader "Examples" [ref=e23]
+        - columnheader "Classification" [ref=e24]
+    - rowgroup [ref=e25]:
+      - row "Consent Records Visitor consent preferences, timestamps, consent string, domain Business-Critical" [ref=e26]:
+        - cell "Consent Records" [ref=e27]:
+          - strong [ref=e28]: Consent Records
+        - cell "Visitor consent preferences, timestamps, consent string, domain" [ref=e29]
+        - cell "Business-Critical" [ref=e30]
+      - row "Customer Account Data Email address, organization name, team members Confidential" [ref=e31]:
+        - cell "Customer Account Data" [ref=e32]:
+          - strong [ref=e33]: Customer Account Data
+        - cell "Email address, organization name, team members" [ref=e34]
+        - cell "Confidential" [ref=e35]
+      - row "Payment Data Subscription status, plan tier (card details held by Stripe) Restricted" [ref=e36]:
+        - cell "Payment Data" [ref=e37]:
+          - strong [ref=e38]: Payment Data
+        - cell "Subscription status, plan tier (card details held by Stripe)" [ref=e39]
+        - cell "Restricted" [ref=e40]
+      - row "Application Configuration Banner settings, color schemes, integrations Standard" [ref=e41]:
+        - cell "Application Configuration" [ref=e42]:
+          - strong [ref=e43]: Application Configuration
+        - cell "Banner settings, color schemes, integrations" [ref=e44]
+        - cell "Standard" [ref=e45]
+      - row "Application Logs Server logs, error traces, request metadata Internal" [ref=e46]:
+        - cell "Application Logs" [ref=e47]:
+          - strong [ref=e48]: Application Logs
+        - cell "Server logs, error traces, request metadata" [ref=e49]
+        - cell "Internal" [ref=e50]
+      - row "Backups Database snapshots (managed by Supabase) Confidential" [ref=e51]:
+        - cell "Backups" [ref=e52]:
+          - strong [ref=e53]: Backups
+        - cell "Database snapshots (managed by Supabase)" [ref=e54]
+        - cell "Confidential" [ref=e55]
+  - separator [ref=e56]
+  - heading "3. Retention Periods" [level=2] [ref=e57]
+  - table [ref=e58]:
+    - rowgroup [ref=e63]:
+      - row "Data Type Retention Period Justification" [ref=e64]:
+        - columnheader "Data Type" [ref=e65]
+        - columnheader "Retention Period" [ref=e66]
+        - columnheader "Justification" [ref=e67]
+    - rowgroup [ref=e68]:
+      - row "Consent records 3 years from collection Regulatory proof-of-consent requirement (GDPR Art. 7, Law 25 s.8)" [ref=e69]:
+        - cell "Consent records" [ref=e70]
+        - cell "3 years from collection" [ref=e71]:
+          - strong [ref=e72]: 3 years
+          - text: from collection
+        - cell "Regulatory proof-of-consent requirement (GDPR Art. 7, Law 25 s.8)" [ref=e73]
+      - row "Customer account data Duration of account + 90 days Service delivery; 90-day grace period for reactivation" [ref=e74]:
+        - cell "Customer account data" [ref=e75]
+        - cell "Duration of account + 90 days" [ref=e76]:
+          - strong [ref=e77]: Duration of account + 90 days
+        - cell "Service delivery; 90-day grace period for reactivation" [ref=e78]
+      - row "Payment and billing records 7 years from transaction date Tax and financial record-keeping obligations" [ref=e79]:
+        - cell "Payment and billing records" [ref=e80]
+        - cell "7 years from transaction date" [ref=e81]:
+          - strong [ref=e82]: 7 years
+          - text: from transaction date
+        - cell "Tax and financial record-keeping obligations" [ref=e83]
+      - row "Application configuration Duration of account + 30 days Allows brief recovery window post-cancellation" [ref=e84]:
+        - cell "Application configuration" [ref=e85]
+        - cell "Duration of account + 30 days" [ref=e86]:
+          - strong [ref=e87]: Duration of account + 30 days
+        - cell "Allows brief recovery window post-cancellation" [ref=e88]
+      - row "Application logs (Vercel) 30 days Operational troubleshooting; Vercel auto-purges" [ref=e89]:
+        - cell "Application logs (Vercel)" [ref=e90]
+        - cell "30 days" [ref=e91]:
+          - strong [ref=e92]: 30 days
+        - cell "Operational troubleshooting; Vercel auto-purges" [ref=e93]
+      - row "Database backups (Supabase) 30 days rolling Disaster recovery; managed by Supabase retention policy" [ref=e94]:
+        - cell "Database backups (Supabase)" [ref=e95]
+        - cell "30 days rolling" [ref=e96]:
+          - strong [ref=e97]: 30 days
+          - text: rolling
+        - cell "Disaster recovery; managed by Supabase retention policy" [ref=e98]
+      - row "Authentication session data 30 days from last activity Session management (NextAuth.js)" [ref=e99]:
+        - cell "Authentication session data" [ref=e100]
+        - cell "30 days from last activity" [ref=e101]:
+          - strong [ref=e102]: 30 days
+          - text: from last activity
+        - cell "Session management (NextAuth.js)" [ref=e103]
+  - separator [ref=e104]
+  - heading "4. Data Destruction Procedures" [level=2] [ref=e105]
+  - heading "4.1 Automated Destruction" [level=3] [ref=e106]
+  - list [ref=e107]:
+    - listitem [ref=e108]:
+      - strong [ref=e109]: Consent records
+      - text: older than 3 years are purged by a scheduled database job that runs monthly.
+    - listitem [ref=e110]:
+      - strong [ref=e111]: Expired sessions
+      - text: are cleared automatically by NextAuth.js on a rolling basis.
+    - listitem [ref=e112]:
+      - strong [ref=e113]: Application logs
+      - text: expire automatically per Vercel’s 30-day log retention.
+  - heading "4.2 Account Deletion" [level=3] [ref=e114]
+  - paragraph [ref=e115]: "When a customer deletes their account or requests deletion:"
+  - list [ref=e116]:
+    - listitem [ref=e117]:
+      - text: Account data, banner configurations, and team member records are deleted from the production database within
+      - strong [ref=e118]: 30 days
+      - text: .
+    - listitem [ref=e119]:
+      - text: Consent records collected on behalf of the customer are deleted within
+      - strong [ref=e120]: 30 days
+      - text: ", unless a legal retention obligation applies."
+    - listitem [ref=e121]: Stripe customer and subscription objects are cancelled; Stripe retains transaction records per its own data retention obligations.
+    - listitem [ref=e122]: A confirmation email is sent to the customer upon completion.
+  - heading "4.3 Destruction Methods" [level=3] [ref=e123]
+  - list [ref=e124]:
+    - listitem [ref=e125]:
+      - strong [ref=e126]: "Database records:"
+      - text: Hard deletion via SQL
+      - code [ref=e127]: DELETE
+      - text: statements against Supabase PostgreSQL. No soft-delete retention beyond the stated periods.
+    - listitem [ref=e128]:
+      - strong [ref=e129]: "Backups:"
+      - text: Supabase manages automated backup rotation on a 30-day rolling cycle. Deleted records naturally age out of the backup window.
+    - listitem [ref=e130]:
+      - strong [ref=e131]: "Logs:"
+      - text: Vercel logs auto-expire. No manual destruction is required.
+  - separator [ref=e132]
+  - heading "5. Cloud Data Lifecycle" [level=2] [ref=e133]
+  - paragraph [ref=e134]: "COOKIE-BANNER.CA does not operate its own servers or data centers. All data resides with SOC 2 Type II certified providers:"
+  - table [ref=e135]:
+    - rowgroup [ref=e141]:
+      - row "Provider Data Held Retention Control Certification" [ref=e142]:
+        - columnheader "Provider" [ref=e143]
+        - columnheader "Data Held" [ref=e144]
+        - columnheader "Retention Control" [ref=e145]
+        - columnheader "Certification" [ref=e146]
+    - rowgroup [ref=e147]:
+      - row "Supabase Database, backups, file storage Direct SQL control; 30-day backup rotation SOC 2 Type II" [ref=e148]:
+        - cell "Supabase" [ref=e149]:
+          - strong [ref=e150]: Supabase
+        - cell "Database, backups, file storage" [ref=e151]
+        - cell "Direct SQL control; 30-day backup rotation" [ref=e152]
+        - cell "SOC 2 Type II" [ref=e153]
+      - row "Vercel Application hosting, server logs 30-day log auto-expiry SOC 2 Type II" [ref=e154]:
+        - cell "Vercel" [ref=e155]:
+          - strong [ref=e156]: Vercel
+        - cell "Application hosting, server logs" [ref=e157]
+        - cell "30-day log auto-expiry" [ref=e158]
+        - cell "SOC 2 Type II" [ref=e159]
+      - row "Stripe Payment methods, transaction history Managed by Stripe per PCI DSS requirements PCI DSS Level 1" [ref=e160]:
+        - cell "Stripe" [ref=e161]:
+          - strong [ref=e162]: Stripe
+        - cell "Payment methods, transaction history" [ref=e163]
+        - cell "Managed by Stripe per PCI DSS requirements" [ref=e164]
+        - cell "PCI DSS Level 1" [ref=e165]
+  - paragraph [ref=e166]: Upon termination of any provider relationship, COOKIE-BANNER.CA will export or migrate data before the provider’s deletion timeline and confirm destruction of residual data in writing.
+  - separator [ref=e167]
+  - heading "6. Customer Data Deletion Requests" [level=2] [ref=e168]
+  - paragraph [ref=e169]: "Customers and end users may request data deletion by contacting security@cookie-banner.ca. Requests are processed as follows:"
+  - list [ref=e170]:
+    - listitem [ref=e171]:
+      - strong [ref=e172]: Acknowledgment
+      - text: within 3 business days.
+    - listitem [ref=e173]:
+      - strong [ref=e174]: Completion
+      - text: within 30 calendar days.
+    - listitem [ref=e175]:
+      - strong [ref=e176]: Verification
+      - text: of requester identity before processing.
+    - listitem [ref=e177]: Applies to all data categories unless a legal retention obligation overrides the request (see Section 8).
+  - paragraph [ref=e178]: For GDPR data subjects, the right to erasure (Art. 17) is honored unless an exemption applies. For PIPEDA/Law 25 data subjects, withdrawal of consent and deletion requests are handled equivalently.
+  - separator [ref=e179]
+  - heading "7. Third-Party Data Handling" [level=2] [ref=e180]
+  - paragraph [ref=e181]: "COOKIE-BANNER.CA requires that all sub-processors handle data destruction in accordance with their contractual obligations:"
+  - list [ref=e182]:
+    - listitem [ref=e183]:
+      - strong [ref=e184]: "Supabase:"
+      - text: Data deleted from production is removed from backups within 30 days via rolling retention.
+    - listitem [ref=e185]:
+      - strong [ref=e186]: "Stripe:"
+      - text: Retains transaction data as required by PCI DSS and applicable tax law. COOKIE-BANNER.CA cannot force deletion of Stripe-held payment records but will cancel all associated customer objects.
+    - listitem [ref=e187]:
+      - strong [ref=e188]: "Vercel:"
+      - text: Logs are purged automatically. No persistent customer personal data is stored at the Vercel layer.
+  - separator [ref=e189]
+  - heading "8. Exceptions and Legal Holds" [level=2] [ref=e190]
+  - paragraph [ref=e191]: "Data may be retained beyond the standard periods when:"
+  - list [ref=e192]:
+    - listitem [ref=e193]:
+      - text: Required by a
+      - strong [ref=e194]: legal hold
+      - text: (e.g., litigation, regulatory investigation, audit).
+    - listitem [ref=e195]:
+      - text: Needed to comply with
+      - strong [ref=e196]: tax or financial reporting
+      - text: obligations.
+    - listitem [ref=e197]:
+      - text: Subject to an
+      - strong [ref=e198]: active dispute
+      - text: or chargeback with a payment provider.
+    - listitem [ref=e199]:
+      - text: Required to demonstrate
+      - strong [ref=e200]: proof of consent
+      - text: under GDPR, PIPEDA, Law 25, or PECR.
+  - paragraph [ref=e201]: Legal holds are authorized by the founder and documented with the scope, reason, and expected duration. Held data is destroyed within 30 days of the hold being lifted.
+  - separator [ref=e202]
+  - heading "9. Review Schedule" [level=2] [ref=e203]
+  - paragraph [ref=e204]:
+    - text: This policy is reviewed
+    - strong [ref=e205]: annually
+    - text: "or sooner if triggered by:"
+  - list [ref=e206]:
+    - listitem [ref=e207]: A change in applicable privacy legislation.
+    - listitem [ref=e208]: A material change in infrastructure providers.
+    - listitem [ref=e209]: A data breach or security incident.
+    - listitem [ref=e210]: Significant changes to the types of data processed.
+  - separator [ref=e211]
+  - paragraph [ref=e212]:
+    - emphasis [ref=e213]: COOKIE-BANNER.CA – security@cookie-banner.ca

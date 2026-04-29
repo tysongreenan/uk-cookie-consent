@@ -1,0 +1,234 @@
+- generic [active] [ref=e1]:
+  - heading "Change Management Policy" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Effective Date:"
+    - text: 2026-03-28
+    - strong [ref=e6]: "Last Reviewed:"
+    - text: 2026-03-28
+    - strong [ref=e7]: "Contact:"
+    - text: security@cookie-banner.ca
+    - strong [ref=e8]: "Classification:"
+    - text: Internal
+  - separator [ref=e9]
+  - heading "1. Purpose and Scope" [level=2] [ref=e10]
+  - paragraph [ref=e11]: This policy establishes a formal change management process for all modifications to the COOKIE-BANNER.CA cookie consent management platform (CMP), including application code, infrastructure configuration, database schemas, and third-party integrations.
+  - paragraph [ref=e12]: "It applies to all changes affecting the production environment: application deployments, database migrations, environment variable updates, DNS changes, Stripe configuration changes, and Supabase or Vercel settings modifications."
+  - separator [ref=e13]
+  - heading "2. Change Classification" [level=2] [ref=e14]
+  - table [ref=e15]:
+    - rowgroup [ref=e21]:
+      - row "Classification Description Examples Approval" [ref=e22]:
+        - columnheader "Classification" [ref=e23]
+        - columnheader "Description" [ref=e24]
+        - columnheader "Examples" [ref=e25]
+        - columnheader "Approval" [ref=e26]
+    - rowgroup [ref=e27]:
+      - row "Standard Low-risk, routine changes following the established PR workflow Bug fixes, copy updates, dependency patches, UI tweaks Self-approved after PR checklist review" [ref=e28]:
+        - cell "Standard" [ref=e29]:
+          - strong [ref=e30]: Standard
+        - cell "Low-risk, routine changes following the established PR workflow" [ref=e31]
+        - cell "Bug fixes, copy updates, dependency patches, UI tweaks" [ref=e32]
+        - cell "Self-approved after PR checklist review" [ref=e33]
+      - row "Significant Changes affecting data models, authentication, billing, or privacy-related functionality Prisma schema migrations, NextAuth config changes, Stripe webhook updates, consent logic changes Requires documented risk assessment in the PR description before merge" [ref=e34]:
+        - cell "Significant" [ref=e35]:
+          - strong [ref=e36]: Significant
+        - cell "Changes affecting data models, authentication, billing, or privacy-related functionality" [ref=e37]
+        - cell "Prisma schema migrations, NextAuth config changes, Stripe webhook updates, consent logic changes" [ref=e38]
+        - cell "Requires documented risk assessment in the PR description before merge" [ref=e39]
+      - row "Emergency Urgent fixes for production outages, security vulnerabilities, or data integrity issues Security patches, critical bug hotfixes, incident remediation May bypass standard PR review; must be documented retroactively within 24 hours" [ref=e40]:
+        - cell "Emergency" [ref=e41]:
+          - strong [ref=e42]: Emergency
+        - cell "Urgent fixes for production outages, security vulnerabilities, or data integrity issues" [ref=e43]
+        - cell "Security patches, critical bug hotfixes, incident remediation" [ref=e44]
+        - cell "May bypass standard PR review; must be documented retroactively within 24 hours" [ref=e45]
+  - separator [ref=e46]
+  - heading "3. Change Request and Approval Process" [level=2] [ref=e47]
+  - paragraph [ref=e48]: "All changes follow a Git-based workflow using GitHub as the system of record:"
+  - list [ref=e49]:
+    - listitem [ref=e50]:
+      - strong [ref=e51]: Branch
+      - text: ": Create a feature or fix branch from"
+      - code [ref=e52]: develop
+      - text: .
+    - listitem [ref=e53]:
+      - strong [ref=e54]: Implement
+      - text: ": Develop the change with atomic, descriptive commits."
+    - listitem [ref=e55]:
+      - strong [ref=e56]: Pull Request
+      - text: ": Open a PR against"
+      - code [ref=e57]: develop
+      - text: "with:"
+      - list [ref=e58]:
+        - listitem [ref=e59]: Summary of what changed and why.
+        - listitem [ref=e60]: Change classification (standard, significant, or emergency).
+        - listitem [ref=e61]: Testing steps performed.
+        - listitem [ref=e62]: "For significant changes: risk assessment and rollback plan."
+    - listitem [ref=e63]:
+      - strong [ref=e64]: Review
+      - text: ": PR is reviewed against the checklist before merge. For significant changes, a cooling-off period of at least one hour is observed before merging."
+    - listitem [ref=e65]:
+      - strong [ref=e66]: Merge
+      - text: ": Squash-merge into"
+      - code [ref=e67]: develop
+      - text: ", triggering automated deployment."
+  - paragraph [ref=e68]: The Founder serves as the sole Change Approver and is responsible for all merge decisions.
+  - separator [ref=e69]
+  - heading "4. Testing Requirements" [level=2] [ref=e70]
+  - paragraph [ref=e71]: "All changes must be verified before reaching production:"
+  - list [ref=e72]:
+    - listitem [ref=e73]:
+      - strong [ref=e74]: Vercel Preview Deployments
+      - text: ": Every PR generates a preview URL. The preview must be manually verified for UI/UX correctness and functional behavior."
+    - listitem [ref=e75]:
+      - strong [ref=e76]: Automated Tests
+      - text: ": Any existing test suites must pass before merge."
+    - listitem [ref=e77]:
+      - strong [ref=e78]: Database Migrations
+      - text: ": Must be tested against a non-production database (Supabase branch or local instance) before merging."
+    - listitem [ref=e79]:
+      - strong [ref=e80]: Significant Changes
+      - text: ": Require explicit testing of affected user flows (consent collection, banner rendering, dashboard functionality, Stripe billing) as documented in the PR."
+  - separator [ref=e81]
+  - heading "5. Deployment Process" [level=2] [ref=e82]
+  - paragraph [ref=e83]: "COOKIE-BANNER.CA uses Vercel for automated, immutable deployments:"
+  - list [ref=e84]:
+    - listitem [ref=e85]:
+      - text: Merging a PR to
+      - code [ref=e86]: develop
+      - text: triggers an automatic production deployment.
+    - listitem [ref=e87]: Each deployment is an atomic, immutable snapshot with a unique URL.
+    - listitem [ref=e88]: Vercel maintains a full deployment history, enabling instant rollback to any previous deployment.
+    - listitem [ref=e89]: No manual server access or SSH is required; all deployments are managed through the Git-to-Vercel pipeline.
+  - separator [ref=e90]
+  - heading "6. Rollback Procedures" [level=2] [ref=e91]
+  - table [ref=e92]:
+    - rowgroup [ref=e97]:
+      - row "Component Rollback Method Recovery Time" [ref=e98]:
+        - columnheader "Component" [ref=e99]
+        - columnheader "Rollback Method" [ref=e100]
+        - columnheader "Recovery Time" [ref=e101]
+    - rowgroup [ref=e102]:
+      - row "Application Vercel Instant Rollback via the dashboard or CLI to any previous deployment Minutes" [ref=e103]:
+        - cell "Application" [ref=e104]:
+          - strong [ref=e105]: Application
+        - cell "Vercel Instant Rollback via the dashboard or CLI to any previous deployment" [ref=e106]
+        - cell "Minutes" [ref=e107]
+      - row "Database Supabase Point-in-Time Recovery (PITR) to restore to any point within the retention window Minutes to hours depending on data volume" [ref=e108]:
+        - cell "Database" [ref=e109]:
+          - strong [ref=e110]: Database
+        - cell "Supabase Point-in-Time Recovery (PITR) to restore to any point within the retention window" [ref=e111]
+        - cell "Minutes to hours depending on data volume" [ref=e112]
+      - row "Environment Variables Revert via Vercel dashboard; redeploy if needed Minutes" [ref=e113]:
+        - cell "Environment Variables" [ref=e114]:
+          - strong [ref=e115]: Environment Variables
+        - cell "Revert via Vercel dashboard; redeploy if needed" [ref=e116]
+        - cell "Minutes" [ref=e117]
+  - paragraph [ref=e118]: For any rollback, a post-incident note must be added to the original PR or a follow-up issue documenting what was rolled back and why.
+  - separator [ref=e119]
+  - heading "7. Database Changes" [level=2] [ref=e120]
+  - paragraph [ref=e121]: "Database schema changes carry elevated risk and require additional diligence:"
+  - list [ref=e122]:
+    - listitem [ref=e123]:
+      - text: All schema changes are managed through
+      - strong [ref=e124]: Prisma migrations
+      - text: (
+      - code [ref=e125]: prisma migrate
+      - text: ).
+    - listitem [ref=e126]: Migration SQL must be reviewed in the PR diff before merge.
+    - listitem [ref=e127]: Migrations must be tested against a non-production database first.
+    - listitem [ref=e128]: "Destructive operations (dropping columns/tables, changing types) require a two-phase approach: deprecate first, remove in a subsequent release."
+    - listitem [ref=e129]: Direct SQL modifications to the production database outside of Prisma migrations are prohibited except during emergency incident response.
+  - separator [ref=e130]
+  - heading "8. Documentation Requirements" [level=2] [ref=e131]
+  - list [ref=e132]:
+    - listitem [ref=e133]:
+      - strong [ref=e134]: Commit Messages
+      - text: ": Must be descriptive and reference the intent of the change."
+    - listitem [ref=e135]:
+      - strong [ref=e136]: PR Descriptions
+      - text: ": Must include a summary, classification, and testing steps."
+    - listitem [ref=e137]:
+      - strong [ref=e138]: Significant Changes
+      - text: ": Must include a risk assessment and rollback plan in the PR."
+    - listitem [ref=e139]:
+      - strong [ref=e140]: Emergency Changes
+      - text: ": Must be retroactively documented within 24 hours with a post-incident summary."
+    - listitem [ref=e141]:
+      - strong [ref=e142]: Configuration Changes
+      - text: ": Changes to environment variables, Stripe settings, Supabase configuration, or DNS must be logged in the relevant PR or a dedicated change log issue."
+  - separator [ref=e143]
+  - heading "9. Emergency Change Procedures" [level=2] [ref=e144]
+  - paragraph [ref=e145]: "When a production incident requires immediate remediation:"
+  - list [ref=e146]:
+    - listitem [ref=e147]:
+      - strong [ref=e148]: Assess
+      - text: ": Determine severity and whether an emergency change is warranted."
+    - listitem [ref=e149]:
+      - strong [ref=e150]: Fix
+      - text: ": Implement the fix on a branch. If time permits, open a PR; if not, commit directly to"
+      - code [ref=e151]: develop
+      - text: .
+    - listitem [ref=e152]:
+      - strong [ref=e153]: Deploy
+      - text: ": Merge or push to trigger deployment; alternatively, use Vercel Instant Rollback if reverting is sufficient."
+    - listitem [ref=e154]:
+      - strong [ref=e155]: Document
+      - text: ": Within 24 hours, create or update a PR/issue with:"
+      - list [ref=e156]:
+        - listitem [ref=e157]: Description of the incident and its impact.
+        - listitem [ref=e158]: The change that was made.
+        - listitem [ref=e159]: Root cause (if known).
+        - listitem [ref=e160]: Steps to prevent recurrence.
+    - listitem [ref=e161]:
+      - strong [ref=e162]: Review
+      - text: ": Retroactively review the emergency change to confirm it meets code quality standards."
+  - separator [ref=e163]
+  - heading "10. Post-Deployment Verification" [level=2] [ref=e164]
+  - paragraph [ref=e165]: "After every production deployment:"
+  - list [ref=e166]:
+    - listitem [ref=e167]: Verify the application loads correctly at the production URL.
+    - listitem [ref=e168]: Confirm the cookie consent banner renders and functions on a test site.
+    - listitem [ref=e169]: Check the Vercel deployment logs for errors.
+    - listitem [ref=e170]: "For significant changes: verify the specific functionality affected (dashboard, billing, consent logging, API endpoints)."
+    - listitem [ref=e171]: Monitor error tracking and application logs for 30 minutes following deployment.
+  - separator [ref=e172]
+  - heading "11. Roles and Responsibilities" [level=2] [ref=e173]
+  - table [ref=e174]:
+    - rowgroup [ref=e179]:
+      - row "Role Person Responsibilities" [ref=e180]:
+        - columnheader "Role" [ref=e181]
+        - columnheader "Person" [ref=e182]
+        - columnheader "Responsibilities" [ref=e183]
+    - rowgroup [ref=e184]:
+      - row "Change Approver Founder Reviews and approves all changes; makes merge decisions; authorizes emergency changes" [ref=e185]:
+        - cell "Change Approver" [ref=e186]:
+          - strong [ref=e187]: Change Approver
+        - cell "Founder" [ref=e188]
+        - cell "Reviews and approves all changes; makes merge decisions; authorizes emergency changes" [ref=e189]
+      - row "Change Implementer Founder Develops, tests, and deploys changes; writes documentation" [ref=e190]:
+        - cell "Change Implementer" [ref=e191]:
+          - strong [ref=e192]: Change Implementer
+        - cell "Founder" [ref=e193]
+        - cell "Develops, tests, and deploys changes; writes documentation" [ref=e194]
+      - row "Incident Responder Founder Responds to production incidents; executes emergency changes and rollbacks" [ref=e195]:
+        - cell "Incident Responder" [ref=e196]:
+          - strong [ref=e197]: Incident Responder
+        - cell "Founder" [ref=e198]
+        - cell "Responds to production incidents; executes emergency changes and rollbacks" [ref=e199]
+  - paragraph [ref=e200]: As a solo-founder organization, all roles are held by the same individual. This policy ensures disciplined process adherence despite the absence of a second reviewer by requiring documented checklists, PR descriptions, and post-deployment verification.
+  - separator [ref=e201]
+  - heading "12. Compliance Considerations" [level=2] [ref=e202]
+  - paragraph [ref=e203]: Changes affecting consent collection, data processing, or data storage must account for obligations under GDPR, PIPEDA, Quebec Law 25, and PECR. Any change to how personal data is collected, stored, or processed must include a privacy impact note in the PR description.
+  - separator [ref=e204]
+  - heading "13. Review Schedule" [level=2] [ref=e205]
+  - paragraph [ref=e206]:
+    - text: This policy is reviewed
+    - strong [ref=e207]: annually
+    - text: or whenever a material change occurs to the platform architecture, team structure, or regulatory requirements. The next scheduled review is
+    - strong [ref=e208]: 2027-03-28
+    - text: .
+  - separator [ref=e209]
+  - paragraph [ref=e210]:
+    - emphasis [ref=e211]: "Approved by: Founder, COOKIE-BANNER.CA"
+    - emphasis [ref=e212]: "Date: 2026-03-28"

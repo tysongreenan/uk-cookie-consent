@@ -1,0 +1,239 @@
+- generic [active] [ref=e1]:
+  - heading "Information Security Policy" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Version:"
+    - text: "1.0"
+    - strong [ref=e6]: "Effective Date:"
+    - text: March 28, 2026
+    - strong [ref=e7]: "Next Review Date:"
+    - text: March 28, 2027
+    - strong [ref=e8]: "Contact:"
+    - text: security@cookie-banner.ca
+  - separator [ref=e9]
+  - heading "1. Purpose" [level=2] [ref=e10]
+  - paragraph [ref=e11]: This policy establishes the information security principles, standards, and responsibilities for COOKIE-BANNER.CA, a cookie consent management platform (CMP). It applies to all systems, data, and services operated by the organization.
+  - paragraph [ref=e12]: COOKIE-BANNER.CA is a solo-founder, fully remote SaaS company with no physical office or self-managed data center. Our security posture relies on carefully selected infrastructure providers, strong access controls, and disciplined operational practices rather than on-premises security measures.
+  - heading "2. Scope" [level=2] [ref=e13]
+  - paragraph [ref=e14]: "This policy covers:"
+  - list [ref=e15]:
+    - listitem [ref=e16]: All production systems and environments (application, database, payment processing)
+    - listitem [ref=e17]: All customer data, including consent records and account information
+    - listitem [ref=e18]: All third-party services integrated into the platform
+    - listitem [ref=e19]: The founder and any future contractors or employees with access to company systems
+  - heading "3. Roles and Responsibilities" [level=2] [ref=e20]
+  - table [ref=e21]:
+    - rowgroup [ref=e25]:
+      - row "Role Responsibility" [ref=e26]:
+        - columnheader "Role" [ref=e27]
+        - columnheader "Responsibility" [ref=e28]
+    - rowgroup [ref=e29]:
+      - row "Founder / Security Lead Owns this policy. Responsible for all security decisions, access management, incident response, and vendor assessments." [ref=e30]:
+        - cell "Founder / Security Lead" [ref=e31]:
+          - strong [ref=e32]: Founder / Security Lead
+        - cell "Owns this policy. Responsible for all security decisions, access management, incident response, and vendor assessments." [ref=e33]
+      - row "Future Contractors Must agree to this policy before accessing any company system. Access is granted on a least-privilege basis and revoked upon contract end." [ref=e34]:
+        - cell "Future Contractors" [ref=e35]:
+          - strong [ref=e36]: Future Contractors
+        - cell "Must agree to this policy before accessing any company system. Access is granted on a least-privilege basis and revoked upon contract end." [ref=e37]
+  - paragraph [ref=e38]: As a solo-founder organization, the founder currently holds all security responsibilities. If the team grows, a formal delegation of duties will be documented.
+  - heading "4. Data Classification" [level=2] [ref=e39]
+  - paragraph [ref=e40]: "All data handled by COOKIE-BANNER.CA is classified into one of the following categories:"
+  - table [ref=e41]:
+    - rowgroup [ref=e47]:
+      - row "Classification Description Examples Handling" [ref=e48]:
+        - columnheader "Classification" [ref=e49]
+        - columnheader "Description" [ref=e50]
+        - columnheader "Examples" [ref=e51]
+        - columnheader "Handling" [ref=e52]
+    - rowgroup [ref=e53]:
+      - row "Confidential Data whose exposure would cause significant harm to the business or customers. API keys, database credentials, Stripe secrets, authentication tokens, session secrets Stored only in encrypted environment variables managed by Vercel. Never committed to source control." [ref=e54]:
+        - cell "Confidential" [ref=e55]:
+          - strong [ref=e56]: Confidential
+        - cell "Data whose exposure would cause significant harm to the business or customers." [ref=e57]
+        - cell "API keys, database credentials, Stripe secrets, authentication tokens, session secrets" [ref=e58]
+        - cell "Stored only in encrypted environment variables managed by Vercel. Never committed to source control." [ref=e59]
+      - row "Restricted Personal data or customer data subject to privacy regulations. Email addresses, consent records, account details, billing metadata Encrypted at rest and in transit. Access limited to production systems. Processed in accordance with GDPR, PIPEDA, Law 25, and PECR." [ref=e60]:
+        - cell "Restricted" [ref=e61]:
+          - strong [ref=e62]: Restricted
+        - cell "Personal data or customer data subject to privacy regulations." [ref=e63]
+        - cell "Email addresses, consent records, account details, billing metadata" [ref=e64]
+        - cell "Encrypted at rest and in transit. Access limited to production systems. Processed in accordance with GDPR, PIPEDA, Law 25, and PECR." [ref=e65]
+      - row "Internal Business data not intended for public disclosure. Application source code, internal documentation, analytics, operational logs Stored in private repositories and internal tools. Access controlled via SSO or strong authentication." [ref=e66]:
+        - cell "Internal" [ref=e67]:
+          - strong [ref=e68]: Internal
+        - cell "Business data not intended for public disclosure." [ref=e69]
+        - cell "Application source code, internal documentation, analytics, operational logs" [ref=e70]
+        - cell "Stored in private repositories and internal tools. Access controlled via SSO or strong authentication." [ref=e71]
+      - row "Public Information intentionally made available. Marketing website content, published documentation, blog posts No access restrictions." [ref=e72]:
+        - cell "Public" [ref=e73]:
+          - strong [ref=e74]: Public
+        - cell "Information intentionally made available." [ref=e75]
+        - cell "Marketing website content, published documentation, blog posts" [ref=e76]
+        - cell "No access restrictions." [ref=e77]
+  - heading "5. Access Control" [level=2] [ref=e78]
+  - heading "Principles" [level=3] [ref=e79]
+  - list [ref=e80]:
+    - listitem [ref=e81]:
+      - strong [ref=e82]: "Least Privilege:"
+      - text: Every account and service is granted the minimum permissions required to perform its function.
+    - listitem [ref=e83]:
+      - strong [ref=e84]: "No Shared Accounts:"
+      - text: Each person and service uses a unique identity.
+    - listitem [ref=e85]:
+      - strong [ref=e86]: "MFA Required:"
+      - text: Multi-factor authentication is enabled on all critical accounts, including Vercel, Supabase, Stripe, GitHub, and DNS providers.
+  - heading "Authentication Standards" [level=3] [ref=e87]
+  - list [ref=e88]:
+    - listitem [ref=e89]: All administrative access requires MFA (TOTP or hardware key).
+    - listitem [ref=e90]: NextAuth.js manages customer authentication with secure, httpOnly session cookies.
+    - listitem [ref=e91]: API keys are scoped to the minimum permissions necessary.
+    - listitem [ref=e92]: Service-to-service communication uses environment-injected secrets, never hardcoded credentials.
+  - heading "Access Reviews" [level=3] [ref=e93]
+  - paragraph [ref=e94]: Access to all systems is reviewed quarterly. Unused accounts and stale API keys are revoked promptly.
+  - heading "6. Encryption Standards" [level=2] [ref=e95]
+  - heading "Data in Transit" [level=3] [ref=e96]
+  - list [ref=e97]:
+    - listitem [ref=e98]: All traffic is encrypted via TLS 1.2 or higher.
+    - listitem [ref=e99]: HSTS is enforced on all domains.
+    - listitem [ref=e100]: Vercel provides automatic TLS certificate provisioning and renewal.
+  - heading "Data at Rest" [level=3] [ref=e101]
+  - list [ref=e102]:
+    - listitem [ref=e103]: Supabase (PostgreSQL) encrypts all data at rest using AES-256.
+    - listitem [ref=e104]: Vercel environment variables are encrypted at rest.
+    - listitem [ref=e105]: Stripe handles all payment card data; no card numbers are stored or processed by COOKIE-BANNER.CA systems.
+  - heading "Secrets Management" [level=3] [ref=e106]
+  - list [ref=e107]:
+    - listitem [ref=e108]: Secrets are stored exclusively in Vercel environment variables and Supabase vault.
+    - listitem [ref=e109]:
+      - text: Secrets are never committed to version control. The
+      - code [ref=e110]: .gitignore
+      - text: file excludes
+      - code [ref=e111]: .env*
+      - text: files.
+    - listitem [ref=e112]: Secrets are rotated at least annually, or immediately upon suspected compromise.
+  - heading "7. Infrastructure and Third-Party Risk Management" [level=2] [ref=e113]
+  - paragraph [ref=e114]: COOKIE-BANNER.CA does not operate its own servers or data centers. All infrastructure is provided by third-party vendors selected for their security certifications and practices.
+  - table [ref=e115]:
+    - rowgroup [ref=e120]:
+      - row "Provider Function Security Certification" [ref=e121]:
+        - columnheader "Provider" [ref=e122]
+        - columnheader "Function" [ref=e123]
+        - columnheader "Security Certification" [ref=e124]
+    - rowgroup [ref=e125]:
+      - row "Vercel Application hosting, edge network, CI/CD SOC 2 Type II" [ref=e126]:
+        - cell "Vercel" [ref=e127]:
+          - strong [ref=e128]: Vercel
+        - cell "Application hosting, edge network, CI/CD" [ref=e129]
+        - cell "SOC 2 Type II" [ref=e130]
+      - row "Supabase PostgreSQL database, authentication services SOC 2 Type II" [ref=e131]:
+        - cell "Supabase" [ref=e132]:
+          - strong [ref=e133]: Supabase
+        - cell "PostgreSQL database, authentication services" [ref=e134]
+        - cell "SOC 2 Type II" [ref=e135]
+      - row "Stripe Payment processing PCI DSS Level 1" [ref=e136]:
+        - cell "Stripe" [ref=e137]:
+          - strong [ref=e138]: Stripe
+        - cell "Payment processing" [ref=e139]
+        - cell "PCI DSS Level 1" [ref=e140]
+      - row "GitHub Source code management, CI/CD SOC 2 Type II" [ref=e141]:
+        - cell "GitHub" [ref=e142]:
+          - strong [ref=e143]: GitHub
+        - cell "Source code management, CI/CD" [ref=e144]
+        - cell "SOC 2 Type II" [ref=e145]
+  - heading "Vendor Assessment" [level=3] [ref=e146]
+  - list [ref=e147]:
+    - listitem [ref=e148]: Vendor security certifications are verified before adoption and reviewed annually.
+    - listitem [ref=e149]: Only vendors with established security programs and publicly available compliance documentation are selected.
+    - listitem [ref=e150]: Data processing agreements (DPAs) are executed with vendors that process personal data.
+  - heading "Dependency Management" [level=3] [ref=e151]
+  - list [ref=e152]:
+    - listitem [ref=e153]: Application dependencies are monitored for known vulnerabilities via GitHub Dependabot.
+    - listitem [ref=e154]: Critical security patches are applied within 72 hours of disclosure.
+  - heading "8. Incident Response" [level=2] [ref=e155]
+  - paragraph [ref=e156]: "In the event of a suspected security incident:"
+  - list [ref=e157]:
+    - listitem [ref=e158]:
+      - strong [ref=e159]: Contain
+      - text: – Immediately revoke compromised credentials and isolate affected systems.
+    - listitem [ref=e160]:
+      - strong [ref=e161]: Assess
+      - text: – Determine the scope and severity of the incident.
+    - listitem [ref=e162]:
+      - strong [ref=e163]: Notify
+      - text: – Inform affected customers and relevant supervisory authorities within the timelines required by applicable law (72 hours under GDPR, as soon as feasible under PIPEDA/Law 25).
+    - listitem [ref=e164]:
+      - strong [ref=e165]: Remediate
+      - text: – Fix the root cause and restore normal operations.
+    - listitem [ref=e166]:
+      - strong [ref=e167]: Document
+      - text: – Record the incident, timeline, impact, and corrective actions taken.
+  - paragraph [ref=e168]: Security incidents can be reported to security@cookie-banner.ca.
+  - heading "9. Secure Development Practices" [level=2] [ref=e169]
+  - list [ref=e170]:
+    - listitem [ref=e171]: All code changes go through pull request review before merging to production.
+    - listitem [ref=e172]: Environment variables are used for all configuration and secrets; nothing is hardcoded.
+    - listitem [ref=e173]: Input validation is performed on all API endpoints using Zod schema validation.
+    - listitem [ref=e174]: Dependencies are kept up to date and audited for known vulnerabilities.
+    - listitem [ref=e175]: Production deployments are managed through Vercel’s CI/CD pipeline with automatic preview environments.
+  - heading "10. Business Continuity" [level=2] [ref=e176]
+  - list [ref=e177]:
+    - listitem [ref=e178]:
+      - strong [ref=e179]: "Database Backups:"
+      - text: Supabase performs automated daily backups with point-in-time recovery.
+    - listitem [ref=e180]:
+      - strong [ref=e181]: "Source Code:"
+      - text: All code is stored in a private GitHub repository with full version history.
+    - listitem [ref=e182]:
+      - strong [ref=e183]: "Service Availability:"
+      - text: Vercel’s edge network provides global redundancy and automatic failover.
+    - listitem [ref=e184]:
+      - strong [ref=e185]: "Disaster Recovery:"
+      - text: In the event of a provider outage, the application can be redeployed to an alternative provider using the source code and database backups.
+  - heading "11. Security Awareness" [level=2] [ref=e186]
+  - list [ref=e187]:
+    - listitem [ref=e188]: The founder maintains current knowledge of security best practices, privacy regulations, and emerging threats relevant to web application security and consent management.
+    - listitem [ref=e189]: If the team grows, all personnel with access to company systems will complete security awareness orientation before gaining access, with annual refreshers thereafter.
+  - heading "12. Regulatory Compliance" [level=2] [ref=e190]
+  - paragraph [ref=e191]: "COOKIE-BANNER.CA processes personal data in compliance with:"
+  - list [ref=e192]:
+    - listitem [ref=e193]:
+      - strong [ref=e194]: GDPR
+      - text: (EU General Data Protection Regulation)
+    - listitem [ref=e195]:
+      - strong [ref=e196]: PIPEDA
+      - text: (Canada’s Personal Information Protection and Electronic Documents Act)
+    - listitem [ref=e197]:
+      - strong [ref=e198]: Law 25
+      - text: (Quebec’s Act respecting the protection of personal information in the private sector)
+    - listitem [ref=e199]:
+      - strong [ref=e200]: PECR
+      - text: (UK Privacy and Electronic Communications Regulations)
+  - paragraph [ref=e201]: Data subject access requests, deletion requests, and consent withdrawal requests are honored within the timelines required by each applicable regulation.
+  - heading "13. Policy Review" [level=2] [ref=e202]
+  - paragraph [ref=e203]: "This policy is reviewed and updated:"
+  - list [ref=e204]:
+    - listitem [ref=e205]:
+      - strong [ref=e206]: Annually
+      - text: ", on or before the anniversary of the effective date."
+    - listitem [ref=e207]:
+      - strong [ref=e208]: Upon significant change
+      - text: ", such as a new infrastructure provider, a material change in data processing, or a security incident."
+    - listitem [ref=e209]:
+      - strong [ref=e210]: Upon regulatory change
+      - text: ", when new laws or amendments affect the company’s obligations."
+  - paragraph [ref=e211]: All revisions are documented with a version number and effective date.
+  - separator [ref=e212]
+  - table [ref=e213]:
+    - rowgroup [ref=e214]:
+      - row "Version Date Author Summary" [ref=e215]:
+        - columnheader "Version" [ref=e216]
+        - columnheader "Date" [ref=e217]
+        - columnheader "Author" [ref=e218]
+        - columnheader "Summary" [ref=e219]
+    - rowgroup [ref=e220]:
+      - row "1.0 2026-03-28 Founder Initial policy" [ref=e221]:
+        - cell "1.0" [ref=e222]
+        - cell "2026-03-28" [ref=e223]
+        - cell "Founder" [ref=e224]
+        - cell "Initial policy" [ref=e225]

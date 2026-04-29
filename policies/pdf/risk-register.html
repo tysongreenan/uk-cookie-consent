@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>risk-register</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<h1 id="risk-register">Risk Register</h1>
+<p><strong>Organization:</strong> COOKIE-BANNER.CA
+<strong>Contact:</strong> security@cookie-banner.ca <strong>Document
+Owner:</strong> Founder (sole operator) <strong>Effective Date:</strong>
+2026-03-28 <strong>Next Review Date:</strong> 2026-06-28
+<strong>Classification:</strong> Internal – Confidential</p>
+<hr />
+<h2 id="purpose">1. Purpose</h2>
+<p>This Risk Register identifies, assesses, and tracks information
+security and operational risks facing COOKIE-BANNER.CA, a cloud-native
+cookie consent management platform (CMP). It serves as the central
+record for risk management decisions and supports compliance obligations
+under GDPR, PIPEDA, Quebec Law 25, and PECR.</p>
+<p>As a solo-founder, fully virtual organization with no physical
+infrastructure, the risk profile is shaped primarily by dependency on
+third-party cloud providers, the sensitivity of consent and customer
+data processed, and the concentration of operational knowledge in a
+single individual.</p>
+<h2 id="methodology">2. Methodology</h2>
+<p>Risks are assessed using a qualitative likelihood-times-impact
+methodology:</p>
+<p><strong>Risk Score = Likelihood x Impact</strong></p>
+<h3 id="likelihood-scale">Likelihood Scale</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 28%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Score</th>
+<th>Rating</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Rare</td>
+<td>May occur only in exceptional circumstances (less than once per 5
+years)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Unlikely</td>
+<td>Could occur but not expected (once per 2-5 years)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Possible</td>
+<td>Might occur at some point (once per 1-2 years)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Likely</td>
+<td>Will probably occur in most circumstances (once or more per
+year)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Almost Certain</td>
+<td>Expected to occur frequently (multiple times per year)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="impact-scale">Impact Scale</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 28%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Score</th>
+<th>Rating</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Negligible</td>
+<td>No measurable effect on operations or data; resolved within normal
+workflow</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Minor</td>
+<td>Minor inconvenience; limited data affected; resolved within
+hours</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Moderate</td>
+<td>Noticeable service degradation; partial data exposure; regulatory
+notification may be required</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Major</td>
+<td>Significant service outage; confirmed data breach; regulatory
+investigation likely</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Severe</td>
+<td>Complete service loss; large-scale data breach; material
+legal/financial consequences</td>
+</tr>
+</tbody>
+</table>
+<h3 id="risk-rating-thresholds">Risk Rating Thresholds</h3>
+<table>
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 25%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Score Range</th>
+<th>Rating</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 – 5</td>
+<td><strong>Low</strong></td>
+<td>Accept and monitor; review at next scheduled assessment</td>
+</tr>
+<tr>
+<td>6 – 12</td>
+<td><strong>Medium</strong></td>
+<td>Mitigate with defined controls; track actively</td>
+</tr>
+<tr>
+<td>13 – 19</td>
+<td><strong>High</strong></td>
+<td>Prioritize for treatment; escalate to founder review</td>
+</tr>
+<tr>
+<td>20 – 25</td>
+<td><strong>Critical</strong></td>
+<td>Immediate action required; implement controls before proceeding</td>
+</tr>
+</tbody>
+</table>
+<h3 id="review-schedule">Review Schedule</h3>
+<p>This register is reviewed <strong>quarterly</strong> by the founder.
+Ad-hoc reviews are triggered by material changes to infrastructure, a
+security incident, or a significant regulatory development.</p>
+<hr />
+<h2 id="risk-register-1">3. Risk Register</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 3%" />
+<col style="width: 15%" />
+<col style="width: 9%" />
+<col style="width: 11%" />
+<col style="width: 7%" />
+<col style="width: 6%" />
+<col style="width: 19%" />
+<col style="width: 13%" />
+<col style="width: 6%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risk Description</th>
+<th>Category</th>
+<th style="text-align: center;">Likelihood</th>
+<th style="text-align: center;">Impact</th>
+<th style="text-align: center;">Score</th>
+<th>Current Mitigations</th>
+<th style="text-align: center;">Residual Risk</th>
+<th>Owner</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R-001</td>
+<td><strong>Unauthorized access to consent data</strong> – An attacker
+gains access to the Supabase PostgreSQL database containing consent
+records, exposing user consent preferences and associated metadata.</td>
+<td>Data Security</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;"><strong>8 (Medium)</strong></td>
+<td>Supabase row-level security (RLS) policies enforced on all tables;
+database credentials stored as encrypted Vercel environment variables;
+API routes require authenticated sessions via NextAuth.js; no direct
+database exposure to the public internet; Supabase enforces TLS in
+transit and encryption at rest.</td>
+<td style="text-align: center;">Medium – RLS misconfiguration or leaked
+credentials remain possible vectors. No independent penetration testing
+performed to date.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-002</td>
+<td><strong>Supabase outage or data loss</strong> – Supabase experiences
+a regional outage or data corruption event, rendering the platform
+unable to read/write consent records or serve the dashboard.</td>
+<td>Infrastructure</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;"><strong>12 (Medium)</strong></td>
+<td>Supabase provides automated daily backups with point-in-time
+recovery (PITR); backup restoration procedures documented in
+<code>policies/backup-restore-test-log.md</code>; ETag/304 caching
+strategy reduces read dependency during short outages; banner widget
+serves cached configuration from CDN edge.</td>
+<td style="text-align: center;">Medium – Recovery time depends entirely
+on Supabase; no self-hosted replica or multi-region failover. RPO
+limited to Supabase backup frequency.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-003</td>
+<td><strong>Vercel outage or service disruption</strong> – Vercel
+experiences a platform-wide or regional outage, taking the dashboard,
+API routes, and banner delivery offline.</td>
+<td>Infrastructure</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>9 (Medium)</strong></td>
+<td>Vercel Edge Network provides multi-region redundancy; static assets
+and banner scripts served from CDN with aggressive caching; serverless
+functions auto-scale; Vercel status page monitored.</td>
+<td style="text-align: center;">Medium – Full Vercel outage would render
+the dashboard and API inaccessible. Banner widget may continue to
+function from CDN cache for existing visitors.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-004</td>
+<td><strong>Stripe integration failure</strong> – Stripe API outage or
+webhook delivery failure prevents subscription management, payment
+processing, or plan enforcement.</td>
+<td>Financial</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>6 (Medium)</strong></td>
+<td>Stripe webhook endpoint includes retry logic and idempotency keys;
+subscription status cached in local database to avoid real-time Stripe
+dependency for access control; Stripe’s own SLA and redundancy; payment
+failure notifications configured.</td>
+<td style="text-align: center;">Low – Temporary Stripe outage would not
+lock out existing subscribers. New signups and plan changes would be
+delayed but not lost due to Stripe’s retry mechanism.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-005</td>
+<td><strong>Supply chain attack via compromised npm dependency</strong>
+– A malicious package update is introduced through a direct or
+transitive npm dependency, potentially exfiltrating data or injecting
+code into the banner widget served to end users.</td>
+<td>Supply Chain</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><strong>15 (High)</strong></td>
+<td>Dependabot alerts enabled on GitHub repository;
+<code>package-lock.json</code> pinned and committed; dependencies
+reviewed before major upgrades; Next.js and core packages sourced from
+well-maintained, widely-audited projects; banner widget output is a
+controlled, minimal JavaScript payload.</td>
+<td style="text-align: center;">High – No automated Software Composition
+Analysis (SCA) tool in CI pipeline; no Subresource Integrity (SRI)
+hashes on delivered scripts; transitive dependency tree is large and not
+fully auditable by a solo operator.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-006</td>
+<td><strong>Key person risk (solo founder)</strong> – The sole operator
+becomes unavailable due to illness, injury, or other personal
+circumstances, leaving the platform without anyone to respond to
+incidents, process support requests, or maintain infrastructure.</td>
+<td>Operational</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><strong>15 (High)</strong></td>
+<td>Incident response plan documented in
+<code>policies/incident-response-plan.md</code>; all credentials stored
+in a password manager with emergency access procedure; infrastructure is
+fully managed (Vercel, Supabase, Stripe) requiring minimal active
+intervention; platform can operate unattended for extended periods.</td>
+<td style="text-align: center;">High – No backup operator, on-call
+rotation, or succession plan. Extended unavailability would leave the
+business unable to respond to security incidents or regulatory requests
+within required timeframes.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-007</td>
+<td><strong>DDoS attack on banner widget endpoint</strong> – A
+distributed denial-of-service attack targets the banner configuration
+API or widget script endpoint, degrading service for all customers’
+websites.</td>
+<td>Security</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>9 (Medium)</strong></td>
+<td>Vercel Edge Network provides built-in DDoS protection and automatic
+scaling; banner configuration served from CDN cache with appropriate
+TTLs; API rate limiting applied to authenticated endpoints; widget is a
+lightweight static asset with minimal server-side computation per
+request.</td>
+<td style="text-align: center;">Medium – Sustained volumetric attack
+could exhaust Vercel’s included limits or incur unexpected costs. No
+dedicated WAF or advanced DDoS mitigation service in place.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-008</td>
+<td><strong>Regulatory non-compliance due to evolving privacy
+laws</strong> – Changes to GDPR, PIPEDA, Quebec Law 25, PECR, or the
+introduction of new privacy regulations (e.g., US state laws, ePrivacy
+Regulation) render the platform non-compliant or require features not
+yet implemented.</td>
+<td>Compliance</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;"><strong>16 (High)</strong></td>
+<td>Active monitoring of regulatory developments in target
+jurisdictions; platform architecture designed for configurable consent
+categories; consent logging feature supports DSAR proof-of-consent
+requirements; privacy policies and data processing documentation
+maintained.</td>
+<td style="text-align: center;">High – Solo operator has limited
+bandwidth to track all jurisdictions simultaneously. Implementing
+compliance changes for new regulations requires development time with no
+dedicated legal counsel on retainer.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-009</td>
+<td><strong>Loss of access to cloud accounts</strong> – Founder loses
+access to critical accounts (Vercel, Supabase, Stripe, GitHub, domain
+registrar, DNS provider) due to compromised credentials, lost MFA
+device, or account lockout.</td>
+<td>Operational</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><strong>10 (Medium)</strong></td>
+<td>MFA enabled on all critical accounts; credentials stored in a
+password manager; MFA recovery codes stored separately in secure offline
+backup; account recovery email is a domain-controlled address.</td>
+<td style="text-align: center;">Medium – Single person holds all account
+access. Loss of the password manager master credential or MFA device
+would require provider-level account recovery, which may take days.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-010</td>
+<td><strong>Third-party provider security incident</strong> – A security
+breach at Supabase, Vercel, Stripe, or GitHub exposes COOKIE-BANNER.CA
+customer data, source code, or API keys.</td>
+<td>Third Party</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;"><strong>8 (Medium)</strong></td>
+<td>All providers selected are SOC 2 Type II compliant; minimal data
+shared with each provider (principle of least privilege); Stripe handles
+all payment card data (PCI DSS compliant) so no card data touches
+COOKIE-BANNER.CA infrastructure; API keys rotatable; GitHub branch
+protection and audit logging enabled.</td>
+<td style="text-align: center;">Medium – No contractual right to audit
+providers; limited visibility into their internal security posture. A
+provider breach could require emergency credential rotation and customer
+notification.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-011</td>
+<td><strong>Insider threat from future employees or contractors</strong>
+– A future employee, contractor, or collaborator with access to source
+code, databases, or cloud accounts intentionally or accidentally causes
+data loss, exfiltration, or service disruption.</td>
+<td>Personnel</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;"><strong>4 (Low)</strong></td>
+<td>Currently a solo operation with no employees or contractors; no
+shared access to production systems; GitHub repository is private; all
+environment variables managed through Vercel’s encrypted secrets (not
+committed to source).</td>
+<td style="text-align: center;">Low – Risk is theoretical at present. No
+access controls, onboarding/offboarding procedures, or least-privilege
+access policies have been formalized for future hires. This risk will
+require re-assessment before onboarding any personnel.</td>
+<td>Founder</td>
+<td>Monitor</td>
+</tr>
+<tr>
+<td>R-012</td>
+<td><strong>Client-side script injection via banner widget</strong> – An
+attacker exploits a vulnerability in the banner widget JavaScript to
+inject malicious code that executes on customer websites, potentially
+stealing end-user data or defacing sites.</td>
+<td>Application Security</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><strong>10 (Medium)</strong></td>
+<td>Banner widget is a controlled, minimal JavaScript payload generated
+server-side; output is sanitized and does not include user-supplied
+content in executable contexts; Content Security Policy headers
+recommended to customers; no dynamic code execution or unsafe
+string-to-code patterns used in widget code.</td>
+<td style="text-align: center;">Medium – Widget runs on third-party
+domains with broad DOM access by necessity. A successful injection would
+have severe blast radius across all customer sites. No formal code audit
+or bug bounty program exists.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+<tr>
+<td>R-013</td>
+<td><strong>Domain or DNS compromise</strong> – An attacker gains
+control of the cookie-banner.ca domain through registrar account
+compromise, DNS hijacking, or expired domain, redirecting traffic or
+intercepting API requests.</td>
+<td>Infrastructure</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;"><strong>5 (Low)</strong></td>
+<td>Domain registrar account protected with MFA; domain locked (transfer
+lock enabled); DNSSEC enabled where supported by registrar; auto-renewal
+configured with valid payment method; DNS managed through a reputable
+provider.</td>
+<td style="text-align: center;">Low – Domain compromise would be
+catastrophic but probability is low with current controls. No domain
+monitoring or certificate transparency log alerting in place.</td>
+<td>Founder</td>
+<td>Monitor</td>
+</tr>
+<tr>
+<td>R-014</td>
+<td><strong>Stale dependencies with known vulnerabilities</strong> – npm
+packages in the project accumulate known CVEs over time due to
+infrequent updates, creating exploitable attack surface in the
+application or banner widget.</td>
+<td>Supply Chain</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>12 (Medium)</strong></td>
+<td>Dependabot alerts enabled on GitHub; <code>npm audit</code> run
+periodically; Next.js framework updated regularly as part of feature
+development; Vercel build process surfaces dependency warnings.</td>
+<td style="text-align: center;">Medium – No automated CI gate that
+blocks deployment on critical CVEs. Updates are manual and may be
+deferred during feature development sprints. Transitive vulnerabilities
+may go unnoticed.</td>
+<td>Founder</td>
+<td>Active</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risk-heat-map-summary">4. Risk Heat Map Summary</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th><strong>Negligible (1)</strong></th>
+<th><strong>Minor (2)</strong></th>
+<th><strong>Moderate (3)</strong></th>
+<th><strong>Major (4)</strong></th>
+<th><strong>Severe (5)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Almost Certain (5)</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Likely (4)</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R-008</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Possible (3)</strong></td>
+<td></td>
+<td></td>
+<td>R-003, R-007</td>
+<td>R-002</td>
+<td>R-005, R-006</td>
+</tr>
+<tr>
+<td><strong>Unlikely (2)</strong></td>
+<td></td>
+<td></td>
+<td>R-004</td>
+<td>R-001, R-010</td>
+<td>R-009, R-012</td>
+</tr>
+<tr>
+<td><strong>Rare (1)</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R-011</td>
+<td>R-013</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risk-acceptance-statement">5. Risk Acceptance Statement</h2>
+<p>I, as the sole founder and operator of COOKIE-BANNER.CA, have
+reviewed all risks identified in this register. I understand the
+residual risk levels and accept them given the current stage of the
+business, available resources, and mitigations in place.</p>
+<p>I commit to:</p>
+<ul>
+<li>Reviewing this register quarterly (next review:
+<strong>2026-06-28</strong>)</li>
+<li>Re-assessing risks whenever material changes occur to
+infrastructure, staffing, or regulatory requirements</li>
+<li>Prioritizing treatment of any risk that escalates to
+<strong>High</strong> or <strong>Critical</strong> rating</li>
+<li>Maintaining documentation of risk treatment decisions</li>
+</ul>
+<p>Risks rated <strong>High</strong> (R-005, R-006, R-008) are accepted
+with the acknowledgment that additional mitigations should be evaluated
+as the business scales, including: engaging a part-time security
+consultant, implementing automated SCA tooling in CI, formalizing a
+succession plan, and retaining privacy legal counsel.</p>
+<p><strong>Accepted by:</strong></p>
+<p>Name: ___________________________________________</p>
+<p>Role: Founder, COOKIE-BANNER.CA</p>
+<p>Signature: ___________________________________________</p>
+<p>Date: ___________________________________________</p>
+<hr />
+<h2 id="document-control">6. Document Control</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-03-28</td>
+<td>Founder</td>
+<td>Initial risk register created</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This document is reviewed quarterly. For questions or to report a
+new risk, contact security@cookie-banner.ca.</em></p>
+</body>
+</html>

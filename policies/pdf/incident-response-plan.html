@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>incident-response-plan</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<h1 id="incident-response-plan">Incident Response Plan</h1>
+<p><strong>COOKIE-BANNER.CA</strong> <strong>Document
+Classification:</strong> Internal – Confidential <strong>Effective
+Date:</strong> 2026-03-28 <strong>Last Reviewed:</strong> 2026-03-28
+<strong>Next Review:</strong> 2026-09-28 <strong>Owner:</strong> Founder
+/ Incident Commander <strong>Contact:</strong>
+security@cookie-banner.ca</p>
+<hr />
+<h2 id="purpose-and-scope">1. Purpose and Scope</h2>
+<p>This plan establishes procedures for detecting, responding to, and
+recovering from security incidents affecting COOKIE-BANNER.CA, a cookie
+consent management platform (CMP) serving customers under GDPR, PIPEDA,
+Quebec Law 25, and PECR.</p>
+<p><strong>In scope:</strong> All production systems, customer data,
+internal accounts, and third-party integrations including:</p>
+<ul>
+<li>Application layer (Next.js on Vercel)</li>
+<li>Database (Supabase / PostgreSQL)</li>
+<li>Payment processing (Stripe)</li>
+<li>Authentication (NextAuth.js)</li>
+<li>DNS, domain registrar, and email accounts</li>
+<li>Source code repositories</li>
+</ul>
+<p><strong>Out of scope:</strong> Physical security (fully virtual
+organization, no offices or data centers). Infrastructure-level
+incidents at Vercel, Supabase, or Stripe are managed by those providers
+under their own SOC 2 Type II and PCI DSS programs; however, this plan
+covers COOKIE-BANNER.CA’s response obligations when those incidents
+affect our customers.</p>
+<hr />
+<h2 id="incident-classification">2. Incident Classification</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Description</th>
+<th>Response Time</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SEV-1 – Critical</strong></td>
+<td>Confirmed data breach, active intrusion, or total service
+outage</td>
+<td>Immediate (within 1 hour)</td>
+<td>Unauthorized database access, leaked customer PII, compromised auth
+tokens</td>
+</tr>
+<tr>
+<td><strong>SEV-2 – High</strong></td>
+<td>Potential breach under investigation, partial outage, or degraded
+security controls</td>
+<td>Within 4 hours</td>
+<td>Suspicious login activity, Supabase RLS bypass, payment webhook
+failures</td>
+</tr>
+<tr>
+<td><strong>SEV-3 – Medium</strong></td>
+<td>Contained security event, minor service disruption</td>
+<td>Within 24 hours</td>
+<td>Failed brute-force attempt, single-customer data discrepancy,
+dependency vulnerability</td>
+</tr>
+<tr>
+<td><strong>SEV-4 – Low</strong></td>
+<td>Informational, no immediate impact</td>
+<td>Within 72 hours</td>
+<td>Routine vulnerability scan findings, phishing attempt
+(unsuccessful), provider advisory</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="roles-and-responsibilities">3. Roles and Responsibilities</h2>
+<p>As a solo-founder organization, the Founder serves all incident
+response roles:</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Incident Commander</strong></td>
+<td>Owns the incident end-to-end: detection through post-mortem</td>
+</tr>
+<tr>
+<td><strong>Technical Responder</strong></td>
+<td>Investigates, contains, eradicates, and recovers</td>
+</tr>
+<tr>
+<td><strong>Communications Lead</strong></td>
+<td>Notifies authorities, affected customers, and providers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Escalation contacts</strong> (external, as needed):</p>
+<ul>
+<li><strong>Legal counsel</strong> – Privacy/data protection attorney
+(retain on-call relationship)</li>
+<li><strong>Supabase support</strong> – For database-level
+incidents</li>
+<li><strong>Vercel support</strong> – For deployment/infrastructure
+incidents</li>
+<li><strong>Stripe support</strong> – For payment data incidents</li>
+</ul>
+<hr />
+<h2 id="detection-and-reporting">4. Detection and Reporting</h2>
+<h3 id="detection-sources">Detection Sources</h3>
+<ul>
+<li>Vercel deployment logs and function logs</li>
+<li>Supabase dashboard alerts (auth anomalies, query patterns)</li>
+<li>Stripe webhook failure notifications</li>
+<li>Uptime monitoring (external service)</li>
+<li>Customer reports to security@cookie-banner.ca</li>
+<li>GitHub security advisories and Dependabot alerts</li>
+<li>Manual review of access logs</li>
+</ul>
+<h3 id="reporting">Reporting</h3>
+<p>Anyone (customers, partners, the founder) who suspects an incident
+should email <strong>security@cookie-banner.ca</strong> immediately. All
+incidents are logged in a dedicated incident register with:</p>
+<ul>
+<li>Date/time of detection</li>
+<li>Description and initial severity classification</li>
+<li>Systems and data potentially affected</li>
+<li>Actions taken</li>
+</ul>
+<hr />
+<h2 id="response-procedures">5. Response Procedures</h2>
+<h3 id="contain">5.1 Contain</h3>
+<p><strong>Goal:</strong> Stop the incident from spreading.</p>
+<ul>
+<li>Revoke or rotate compromised credentials (Supabase keys, NextAuth
+secrets, Stripe API keys, Vercel tokens)</li>
+<li>If unauthorized database access is suspected, enable Supabase
+network restrictions or pause the project</li>
+<li>Revoke active user sessions if auth is compromised</li>
+<li>If a Vercel deployment is compromised, roll back to the last
+known-good deployment</li>
+<li>Enable maintenance mode if necessary to protect customer data</li>
+</ul>
+<h3 id="eradicate">5.2 Eradicate</h3>
+<p><strong>Goal:</strong> Remove the root cause.</p>
+<ul>
+<li>Identify the attack vector (e.g., compromised dependency, leaked
+environment variable, social engineering)</li>
+<li>Remove malicious code, unauthorized accounts, or backdoors</li>
+<li>Patch the vulnerability or misconfiguration</li>
+<li>Rotate all credentials that may have been exposed, even if not
+confirmed compromised</li>
+<li>Update dependencies if a supply-chain vulnerability is involved</li>
+</ul>
+<h3 id="recover">5.3 Recover</h3>
+<p><strong>Goal:</strong> Restore normal operations with confidence.</p>
+<ul>
+<li>Deploy verified clean code to Vercel</li>
+<li>Restore database from Supabase point-in-time recovery if data
+integrity is in question</li>
+<li>Re-enable services incrementally; monitor closely for
+recurrence</li>
+<li>Verify payment processing is functioning correctly via Stripe
+dashboard</li>
+<li>Confirm customer-facing banner delivery is operating normally</li>
+<li>Remove maintenance mode</li>
+</ul>
+<hr />
+<h2 id="evidence-preservation">6. Evidence Preservation</h2>
+<p>From the moment an incident is suspected:</p>
+<ul>
+<li><strong>Do not delete or modify logs.</strong> Export and preserve
+Vercel function logs, Supabase query logs, and Stripe event logs.</li>
+<li>Take screenshots of dashboards, error messages, and anomalous
+activity.</li>
+<li>Record all timestamps in UTC.</li>
+<li>Document every action taken during the response, including who did
+what and when.</li>
+<li>Preserve email headers and full content if phishing or social
+engineering is involved.</li>
+<li>Store all evidence in a dedicated, access-controlled folder separate
+from production systems.</li>
+</ul>
+<p>Evidence must be retained for a minimum of <strong>5 years</strong>
+to satisfy regulatory requirements.</p>
+<hr />
+<h2 id="breach-notification-requirements">7. Breach Notification
+Requirements</h2>
+<h3 id="gdpr-eueea-data-subjects">7.1 GDPR (EU/EEA Data Subjects)</h3>
+<ul>
+<li>Notify the relevant <strong>Supervisory Authority</strong> within
+<strong>72 hours</strong> of becoming aware of a personal data breach,
+unless the breach is unlikely to result in a risk to individuals.</li>
+<li>If the breach poses a <strong>high risk</strong> to individuals,
+notify affected data subjects <strong>without undue delay</strong>.</li>
+<li>Document all breaches in the internal breach register regardless of
+notification obligation.</li>
+</ul>
+<h3 id="pipeda-canada-federal">7.2 PIPEDA (Canada – Federal)</h3>
+<ul>
+<li>Report breaches involving personal information that create a
+<strong>real risk of significant harm</strong> to the <strong>Office of
+the Privacy Commissioner of Canada (OPC)</strong> as soon as
+feasible.</li>
+<li>Notify affected individuals as soon as feasible.</li>
+<li>Notify any third-party organizations that may be able to reduce risk
+of harm.</li>
+<li>Maintain breach records for <strong>2 years</strong>.</li>
+</ul>
+<h3 id="quebec-law-25-canada-quebec">7.3 Quebec Law 25 (Canada –
+Quebec)</h3>
+<ul>
+<li>Notify the <strong>Commission d’acces a l’information du Quebec
+(CAI)</strong> of any <strong>confidentiality incident</strong>
+involving personal information that presents a <strong>risk of serious
+injury</strong>.</li>
+<li>Notify affected individuals as soon as feasible.</li>
+<li>Maintain an incident register and provide it to the CAI upon
+request.</li>
+</ul>
+<h3 id="pecr-uk-gdpr-uk-data-subjects">7.4 PECR / UK GDPR (UK Data
+Subjects)</h3>
+<ul>
+<li>Notify the <strong>Information Commissioner’s Office (ICO)</strong>
+within <strong>72 hours</strong> of becoming aware of a personal data
+breach that poses a risk to individuals.</li>
+<li>Notify affected individuals without undue delay if the breach poses
+a high risk.</li>
+</ul>
+<h3 id="notification-checklist">Notification Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Determine which jurisdictions and
+regulations apply based on affected data subjects</label></li>
+<li><label><input type="checkbox" />Prepare breach description: nature,
+categories of data, approximate number of records</label></li>
+<li><label><input type="checkbox" />Describe likely consequences and
+measures taken or proposed</label></li>
+<li><label><input type="checkbox" />File with relevant authorities
+within required timeframes</label></li>
+<li><label><input type="checkbox" />Notify affected customers with
+clear, plain-language communication</label></li>
+<li><label><input type="checkbox" />Update the internal breach
+register</label></li>
+</ul>
+<hr />
+<h2 id="communication-plan">8. Communication Plan</h2>
+<h3 id="internal">Internal</h3>
+<ul>
+<li>Log all incident communications with timestamps.</li>
+<li>Use a dedicated incident channel (separate from day-to-day
+communications) if external contractors or legal counsel are
+involved.</li>
+</ul>
+<h3 id="customers">Customers</h3>
+<ul>
+<li>Email affected customers directly from
+security@cookie-banner.ca.</li>
+<li>Include: what happened, what data was involved, what actions were
+taken, what customers should do (e.g., rotate API keys), and a contact
+point for questions.</li>
+<li>If the incident affects banner delivery, post a status update on the
+public status page.</li>
+</ul>
+<h3 id="authorities">Authorities</h3>
+<ul>
+<li>Use official submission channels for each regulator (see Section
+7).</li>
+<li>Retain copies of all submissions and correspondence.</li>
+</ul>
+<h3 id="third-party-providers">Third-Party Providers</h3>
+<ul>
+<li>Notify Supabase, Vercel, or Stripe if the incident involves their
+systems or requires their cooperation.</li>
+</ul>
+<hr />
+<h2 id="post-incident-review">9. Post-Incident Review</h2>
+<p>Within <strong>5 business days</strong> of incident resolution,
+conduct a post-incident review covering:</p>
+<ol type="1">
+<li><strong>Timeline</strong> – What happened and when, from detection
+to resolution.</li>
+<li><strong>Root cause</strong> – What allowed the incident to
+occur.</li>
+<li><strong>Response effectiveness</strong> – What went well, what could
+be improved.</li>
+<li><strong>Action items</strong> – Specific, assigned, time-bound
+improvements (e.g., add monitoring, tighten access controls, update this
+plan).</li>
+<li><strong>Lessons learned</strong> – Document for future
+reference.</li>
+</ol>
+<p>The review is documented in writing and stored alongside the incident
+record. Action items are tracked to completion.</p>
+<hr />
+<h2 id="testing-and-review-schedule">10. Testing and Review
+Schedule</h2>
+<table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Review and update this plan</td>
+<td>Every 6 months (next: 2026-09-28)</td>
+</tr>
+<tr>
+<td>Credential rotation drill</td>
+<td>Quarterly</td>
+</tr>
+<tr>
+<td>Tabletop walkthrough of a simulated breach scenario</td>
+<td>Annually</td>
+</tr>
+<tr>
+<td>Review provider incident response capabilities</td>
+<td>Annually</td>
+</tr>
+<tr>
+<td>Test database point-in-time recovery</td>
+<td>Every 6 months</td>
+</tr>
+<tr>
+<td>Verify notification contact details for regulators</td>
+<td>Every 6 months</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="contact-information">11. Contact Information</h2>
+<table>
+<thead>
+<tr>
+<th>Contact</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Incident Commander (Founder)</strong></td>
+<td>security@cookie-banner.ca</td>
+</tr>
+<tr>
+<td><strong>OPC (Canada)</strong></td>
+<td>https://www.priv.gc.ca – 1-800-282-1376</td>
+</tr>
+<tr>
+<td><strong>CAI (Quebec)</strong></td>
+<td>https://www.cai.gouv.qc.ca</td>
+</tr>
+<tr>
+<td><strong>ICO (UK)</strong></td>
+<td>https://ico.org.uk – 0303 123 1113</td>
+</tr>
+<tr>
+<td><strong>Supabase Support</strong></td>
+<td>Via Supabase dashboard</td>
+</tr>
+<tr>
+<td><strong>Vercel Support</strong></td>
+<td>Via Vercel dashboard</td>
+</tr>
+<tr>
+<td><strong>Stripe Support</strong></td>
+<td>Via Stripe dashboard</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="document-history">Document History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-03-28</td>
+<td>Initial version</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

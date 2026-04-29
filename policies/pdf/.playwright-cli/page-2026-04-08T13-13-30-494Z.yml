@@ -1,0 +1,438 @@
+- generic [active] [ref=e1]:
+  - heading "Risk Register" [level=1] [ref=e2]
+  - paragraph [ref=e3]:
+    - strong [ref=e4]: "Organization:"
+    - text: COOKIE-BANNER.CA
+    - strong [ref=e5]: "Contact:"
+    - text: security@cookie-banner.ca
+    - strong [ref=e6]: "Document Owner:"
+    - text: Founder (sole operator)
+    - strong [ref=e7]: "Effective Date:"
+    - text: 2026-03-28
+    - strong [ref=e8]: "Next Review Date:"
+    - text: 2026-06-28
+    - strong [ref=e9]: "Classification:"
+    - text: Internal – Confidential
+  - separator [ref=e10]
+  - heading "1. Purpose" [level=2] [ref=e11]
+  - paragraph [ref=e12]: This Risk Register identifies, assesses, and tracks information security and operational risks facing COOKIE-BANNER.CA, a cloud-native cookie consent management platform (CMP). It serves as the central record for risk management decisions and supports compliance obligations under GDPR, PIPEDA, Quebec Law 25, and PECR.
+  - paragraph [ref=e13]: As a solo-founder, fully virtual organization with no physical infrastructure, the risk profile is shaped primarily by dependency on third-party cloud providers, the sensitivity of consent and customer data processed, and the concentration of operational knowledge in a single individual.
+  - heading "2. Methodology" [level=2] [ref=e14]
+  - paragraph [ref=e15]: "Risks are assessed using a qualitative likelihood-times-impact methodology:"
+  - paragraph [ref=e16]:
+    - strong [ref=e17]: Risk Score = Likelihood x Impact
+  - heading "Likelihood Scale" [level=3] [ref=e18]
+  - table [ref=e19]:
+    - rowgroup [ref=e24]:
+      - row "Score Rating Description" [ref=e25]:
+        - columnheader "Score" [ref=e26]
+        - columnheader "Rating" [ref=e27]
+        - columnheader "Description" [ref=e28]
+    - rowgroup [ref=e29]:
+      - row "1 Rare May occur only in exceptional circumstances (less than once per 5 years)" [ref=e30]:
+        - cell "1" [ref=e31]
+        - cell "Rare" [ref=e32]
+        - cell "May occur only in exceptional circumstances (less than once per 5 years)" [ref=e33]
+      - row "2 Unlikely Could occur but not expected (once per 2-5 years)" [ref=e34]:
+        - cell "2" [ref=e35]
+        - cell "Unlikely" [ref=e36]
+        - cell "Could occur but not expected (once per 2-5 years)" [ref=e37]
+      - row "3 Possible Might occur at some point (once per 1-2 years)" [ref=e38]:
+        - cell "3" [ref=e39]
+        - cell "Possible" [ref=e40]
+        - cell "Might occur at some point (once per 1-2 years)" [ref=e41]
+      - row "4 Likely Will probably occur in most circumstances (once or more per year)" [ref=e42]:
+        - cell "4" [ref=e43]
+        - cell "Likely" [ref=e44]
+        - cell "Will probably occur in most circumstances (once or more per year)" [ref=e45]
+      - row "5 Almost Certain Expected to occur frequently (multiple times per year)" [ref=e46]:
+        - cell "5" [ref=e47]
+        - cell "Almost Certain" [ref=e48]
+        - cell "Expected to occur frequently (multiple times per year)" [ref=e49]
+  - heading "Impact Scale" [level=3] [ref=e50]
+  - table [ref=e51]:
+    - rowgroup [ref=e56]:
+      - row "Score Rating Description" [ref=e57]:
+        - columnheader "Score" [ref=e58]
+        - columnheader "Rating" [ref=e59]
+        - columnheader "Description" [ref=e60]
+    - rowgroup [ref=e61]:
+      - row "1 Negligible No measurable effect on operations or data; resolved within normal workflow" [ref=e62]:
+        - cell "1" [ref=e63]
+        - cell "Negligible" [ref=e64]
+        - cell "No measurable effect on operations or data; resolved within normal workflow" [ref=e65]
+      - row "2 Minor Minor inconvenience; limited data affected; resolved within hours" [ref=e66]:
+        - cell "2" [ref=e67]
+        - cell "Minor" [ref=e68]
+        - cell "Minor inconvenience; limited data affected; resolved within hours" [ref=e69]
+      - row "3 Moderate Noticeable service degradation; partial data exposure; regulatory notification may be required" [ref=e70]:
+        - cell "3" [ref=e71]
+        - cell "Moderate" [ref=e72]
+        - cell "Noticeable service degradation; partial data exposure; regulatory notification may be required" [ref=e73]
+      - row "4 Major Significant service outage; confirmed data breach; regulatory investigation likely" [ref=e74]:
+        - cell "4" [ref=e75]
+        - cell "Major" [ref=e76]
+        - cell "Significant service outage; confirmed data breach; regulatory investigation likely" [ref=e77]
+      - row "5 Severe Complete service loss; large-scale data breach; material legal/financial consequences" [ref=e78]:
+        - cell "5" [ref=e79]
+        - cell "Severe" [ref=e80]
+        - cell "Complete service loss; large-scale data breach; material legal/financial consequences" [ref=e81]
+  - heading "Risk Rating Thresholds" [level=3] [ref=e82]
+  - table [ref=e83]:
+    - rowgroup [ref=e88]:
+      - row "Score Range Rating Response" [ref=e89]:
+        - columnheader "Score Range" [ref=e90]
+        - columnheader "Rating" [ref=e91]
+        - columnheader "Response" [ref=e92]
+    - rowgroup [ref=e93]:
+      - row "1 – 5 Low Accept and monitor; review at next scheduled assessment" [ref=e94]:
+        - cell "1 – 5" [ref=e95]
+        - cell "Low" [ref=e96]:
+          - strong [ref=e97]: Low
+        - cell "Accept and monitor; review at next scheduled assessment" [ref=e98]
+      - row "6 – 12 Medium Mitigate with defined controls; track actively" [ref=e99]:
+        - cell "6 – 12" [ref=e100]
+        - cell "Medium" [ref=e101]:
+          - strong [ref=e102]: Medium
+        - cell "Mitigate with defined controls; track actively" [ref=e103]
+      - row "13 – 19 High Prioritize for treatment; escalate to founder review" [ref=e104]:
+        - cell "13 – 19" [ref=e105]
+        - cell "High" [ref=e106]:
+          - strong [ref=e107]: High
+        - cell "Prioritize for treatment; escalate to founder review" [ref=e108]
+      - row "20 – 25 Critical Immediate action required; implement controls before proceeding" [ref=e109]:
+        - cell "20 – 25" [ref=e110]
+        - cell "Critical" [ref=e111]:
+          - strong [ref=e112]: Critical
+        - cell "Immediate action required; implement controls before proceeding" [ref=e113]
+  - heading "Review Schedule" [level=3] [ref=e114]
+  - paragraph [ref=e115]:
+    - text: This register is reviewed
+    - strong [ref=e116]: quarterly
+    - text: by the founder. Ad-hoc reviews are triggered by material changes to infrastructure, a security incident, or a significant regulatory development.
+  - separator [ref=e117]
+  - heading "3. Risk Register" [level=2] [ref=e118]
+  - table [ref=e119]:
+    - rowgroup [ref=e131]:
+      - row "ID Risk Description Category Likelihood Impact Score Current Mitigations Residual Risk Owner Status" [ref=e132]:
+        - columnheader "ID" [ref=e133]
+        - columnheader "Risk Description" [ref=e134]
+        - columnheader "Category" [ref=e135]
+        - columnheader "Likelihood" [ref=e136]
+        - columnheader "Impact" [ref=e137]
+        - columnheader "Score" [ref=e138]
+        - columnheader "Current Mitigations" [ref=e139]
+        - columnheader "Residual Risk" [ref=e140]
+        - columnheader "Owner" [ref=e141]
+        - columnheader "Status" [ref=e142]
+    - rowgroup [ref=e143]:
+      - row "R-001 Unauthorized access to consent data – An attacker gains access to the Supabase PostgreSQL database containing consent records, exposing user consent preferences and associated metadata. Data Security 2 4 8 (Medium) Supabase row-level security (RLS) policies enforced on all tables; database credentials stored as encrypted Vercel environment variables; API routes require authenticated sessions via NextAuth.js; no direct database exposure to the public internet; Supabase enforces TLS in transit and encryption at rest. Medium – RLS misconfiguration or leaked credentials remain possible vectors. No independent penetration testing performed to date. Founder Active" [ref=e144]:
+        - cell "R-001" [ref=e145]
+        - cell "Unauthorized access to consent data – An attacker gains access to the Supabase PostgreSQL database containing consent records, exposing user consent preferences and associated metadata." [ref=e146]:
+          - strong [ref=e147]: Unauthorized access to consent data
+          - text: – An attacker gains access to the Supabase PostgreSQL database containing consent records, exposing user consent preferences and associated metadata.
+        - cell "Data Security" [ref=e148]
+        - cell "2" [ref=e149]
+        - cell "4" [ref=e150]
+        - cell "8 (Medium)" [ref=e151]:
+          - strong [ref=e152]: 8 (Medium)
+        - cell "Supabase row-level security (RLS) policies enforced on all tables; database credentials stored as encrypted Vercel environment variables; API routes require authenticated sessions via NextAuth.js; no direct database exposure to the public internet; Supabase enforces TLS in transit and encryption at rest." [ref=e153]
+        - cell "Medium – RLS misconfiguration or leaked credentials remain possible vectors. No independent penetration testing performed to date." [ref=e154]
+        - cell "Founder" [ref=e155]
+        - cell "Active" [ref=e156]
+      - row "R-002 Supabase outage or data loss – Supabase experiences a regional outage or data corruption event, rendering the platform unable to read/write consent records or serve the dashboard. Infrastructure 3 4 12 (Medium) Supabase provides automated daily backups with point-in-time recovery (PITR); backup restoration procedures documented in policies/backup-restore-test-log.md; ETag/304 caching strategy reduces read dependency during short outages; banner widget serves cached configuration from CDN edge. Medium – Recovery time depends entirely on Supabase; no self-hosted replica or multi-region failover. RPO limited to Supabase backup frequency. Founder Active" [ref=e157]:
+        - cell "R-002" [ref=e158]
+        - cell "Supabase outage or data loss – Supabase experiences a regional outage or data corruption event, rendering the platform unable to read/write consent records or serve the dashboard." [ref=e159]:
+          - strong [ref=e160]: Supabase outage or data loss
+          - text: – Supabase experiences a regional outage or data corruption event, rendering the platform unable to read/write consent records or serve the dashboard.
+        - cell "Infrastructure" [ref=e161]
+        - cell "3" [ref=e162]
+        - cell "4" [ref=e163]
+        - cell "12 (Medium)" [ref=e164]:
+          - strong [ref=e165]: 12 (Medium)
+        - cell "Supabase provides automated daily backups with point-in-time recovery (PITR); backup restoration procedures documented in policies/backup-restore-test-log.md; ETag/304 caching strategy reduces read dependency during short outages; banner widget serves cached configuration from CDN edge." [ref=e166]:
+          - text: Supabase provides automated daily backups with point-in-time recovery (PITR); backup restoration procedures documented in
+          - code [ref=e167]: policies/backup-restore-test-log.md
+          - text: ; ETag/304 caching strategy reduces read dependency during short outages; banner widget serves cached configuration from CDN edge.
+        - cell "Medium – Recovery time depends entirely on Supabase; no self-hosted replica or multi-region failover. RPO limited to Supabase backup frequency." [ref=e168]
+        - cell "Founder" [ref=e169]
+        - cell "Active" [ref=e170]
+      - row "R-003 Vercel outage or service disruption – Vercel experiences a platform-wide or regional outage, taking the dashboard, API routes, and banner delivery offline. Infrastructure 3 3 9 (Medium) Vercel Edge Network provides multi-region redundancy; static assets and banner scripts served from CDN with aggressive caching; serverless functions auto-scale; Vercel status page monitored. Medium – Full Vercel outage would render the dashboard and API inaccessible. Banner widget may continue to function from CDN cache for existing visitors. Founder Active" [ref=e171]:
+        - cell "R-003" [ref=e172]
+        - cell "Vercel outage or service disruption – Vercel experiences a platform-wide or regional outage, taking the dashboard, API routes, and banner delivery offline." [ref=e173]:
+          - strong [ref=e174]: Vercel outage or service disruption
+          - text: – Vercel experiences a platform-wide or regional outage, taking the dashboard, API routes, and banner delivery offline.
+        - cell "Infrastructure" [ref=e175]
+        - cell "3" [ref=e176]
+        - cell "3" [ref=e177]
+        - cell "9 (Medium)" [ref=e178]:
+          - strong [ref=e179]: 9 (Medium)
+        - cell "Vercel Edge Network provides multi-region redundancy; static assets and banner scripts served from CDN with aggressive caching; serverless functions auto-scale; Vercel status page monitored." [ref=e180]
+        - cell "Medium – Full Vercel outage would render the dashboard and API inaccessible. Banner widget may continue to function from CDN cache for existing visitors." [ref=e181]
+        - cell "Founder" [ref=e182]
+        - cell "Active" [ref=e183]
+      - row "R-004 Stripe integration failure – Stripe API outage or webhook delivery failure prevents subscription management, payment processing, or plan enforcement. Financial 2 3 6 (Medium) Stripe webhook endpoint includes retry logic and idempotency keys; subscription status cached in local database to avoid real-time Stripe dependency for access control; Stripe’s own SLA and redundancy; payment failure notifications configured. Low – Temporary Stripe outage would not lock out existing subscribers. New signups and plan changes would be delayed but not lost due to Stripe’s retry mechanism. Founder Active" [ref=e184]:
+        - cell "R-004" [ref=e185]
+        - cell "Stripe integration failure – Stripe API outage or webhook delivery failure prevents subscription management, payment processing, or plan enforcement." [ref=e186]:
+          - strong [ref=e187]: Stripe integration failure
+          - text: – Stripe API outage or webhook delivery failure prevents subscription management, payment processing, or plan enforcement.
+        - cell "Financial" [ref=e188]
+        - cell "2" [ref=e189]
+        - cell "3" [ref=e190]
+        - cell "6 (Medium)" [ref=e191]:
+          - strong [ref=e192]: 6 (Medium)
+        - cell "Stripe webhook endpoint includes retry logic and idempotency keys; subscription status cached in local database to avoid real-time Stripe dependency for access control; Stripe’s own SLA and redundancy; payment failure notifications configured." [ref=e193]
+        - cell "Low – Temporary Stripe outage would not lock out existing subscribers. New signups and plan changes would be delayed but not lost due to Stripe’s retry mechanism." [ref=e194]
+        - cell "Founder" [ref=e195]
+        - cell "Active" [ref=e196]
+      - row "R-005 Supply chain attack via compromised npm dependency – A malicious package update is introduced through a direct or transitive npm dependency, potentially exfiltrating data or injecting code into the banner widget served to end users. Supply Chain 3 5 15 (High) Dependabot alerts enabled on GitHub repository; package-lock.json pinned and committed; dependencies reviewed before major upgrades; Next.js and core packages sourced from well-maintained, widely-audited projects; banner widget output is a controlled, minimal JavaScript payload. High – No automated Software Composition Analysis (SCA) tool in CI pipeline; no Subresource Integrity (SRI) hashes on delivered scripts; transitive dependency tree is large and not fully auditable by a solo operator. Founder Active" [ref=e197]:
+        - cell "R-005" [ref=e198]
+        - cell "Supply chain attack via compromised npm dependency – A malicious package update is introduced through a direct or transitive npm dependency, potentially exfiltrating data or injecting code into the banner widget served to end users." [ref=e199]:
+          - strong [ref=e200]: Supply chain attack via compromised npm dependency
+          - text: – A malicious package update is introduced through a direct or transitive npm dependency, potentially exfiltrating data or injecting code into the banner widget served to end users.
+        - cell "Supply Chain" [ref=e201]
+        - cell "3" [ref=e202]
+        - cell "5" [ref=e203]
+        - cell "15 (High)" [ref=e204]:
+          - strong [ref=e205]: 15 (High)
+        - cell "Dependabot alerts enabled on GitHub repository; package-lock.json pinned and committed; dependencies reviewed before major upgrades; Next.js and core packages sourced from well-maintained, widely-audited projects; banner widget output is a controlled, minimal JavaScript payload." [ref=e206]:
+          - text: Dependabot alerts enabled on GitHub repository;
+          - code [ref=e207]: package-lock.json
+          - text: pinned and committed; dependencies reviewed before major upgrades; Next.js and core packages sourced from well-maintained, widely-audited projects; banner widget output is a controlled, minimal JavaScript payload.
+        - cell "High – No automated Software Composition Analysis (SCA) tool in CI pipeline; no Subresource Integrity (SRI) hashes on delivered scripts; transitive dependency tree is large and not fully auditable by a solo operator." [ref=e208]
+        - cell "Founder" [ref=e209]
+        - cell "Active" [ref=e210]
+      - row "R-006 Key person risk (solo founder) – The sole operator becomes unavailable due to illness, injury, or other personal circumstances, leaving the platform without anyone to respond to incidents, process support requests, or maintain infrastructure. Operational 3 5 15 (High) Incident response plan documented in policies/incident-response-plan.md; all credentials stored in a password manager with emergency access procedure; infrastructure is fully managed (Vercel, Supabase, Stripe) requiring minimal active intervention; platform can operate unattended for extended periods. High – No backup operator, on-call rotation, or succession plan. Extended unavailability would leave the business unable to respond to security incidents or regulatory requests within required timeframes. Founder Active" [ref=e211]:
+        - cell "R-006" [ref=e212]
+        - cell "Key person risk (solo founder) – The sole operator becomes unavailable due to illness, injury, or other personal circumstances, leaving the platform without anyone to respond to incidents, process support requests, or maintain infrastructure." [ref=e213]:
+          - strong [ref=e214]: Key person risk (solo founder)
+          - text: – The sole operator becomes unavailable due to illness, injury, or other personal circumstances, leaving the platform without anyone to respond to incidents, process support requests, or maintain infrastructure.
+        - cell "Operational" [ref=e215]
+        - cell "3" [ref=e216]
+        - cell "5" [ref=e217]
+        - cell "15 (High)" [ref=e218]:
+          - strong [ref=e219]: 15 (High)
+        - cell "Incident response plan documented in policies/incident-response-plan.md; all credentials stored in a password manager with emergency access procedure; infrastructure is fully managed (Vercel, Supabase, Stripe) requiring minimal active intervention; platform can operate unattended for extended periods." [ref=e220]:
+          - text: Incident response plan documented in
+          - code [ref=e221]: policies/incident-response-plan.md
+          - text: ; all credentials stored in a password manager with emergency access procedure; infrastructure is fully managed (Vercel, Supabase, Stripe) requiring minimal active intervention; platform can operate unattended for extended periods.
+        - cell "High – No backup operator, on-call rotation, or succession plan. Extended unavailability would leave the business unable to respond to security incidents or regulatory requests within required timeframes." [ref=e222]
+        - cell "Founder" [ref=e223]
+        - cell "Active" [ref=e224]
+      - row "R-007 DDoS attack on banner widget endpoint – A distributed denial-of-service attack targets the banner configuration API or widget script endpoint, degrading service for all customers’ websites. Security 3 3 9 (Medium) Vercel Edge Network provides built-in DDoS protection and automatic scaling; banner configuration served from CDN cache with appropriate TTLs; API rate limiting applied to authenticated endpoints; widget is a lightweight static asset with minimal server-side computation per request. Medium – Sustained volumetric attack could exhaust Vercel’s included limits or incur unexpected costs. No dedicated WAF or advanced DDoS mitigation service in place. Founder Active" [ref=e225]:
+        - cell "R-007" [ref=e226]
+        - cell "DDoS attack on banner widget endpoint – A distributed denial-of-service attack targets the banner configuration API or widget script endpoint, degrading service for all customers’ websites." [ref=e227]:
+          - strong [ref=e228]: DDoS attack on banner widget endpoint
+          - text: – A distributed denial-of-service attack targets the banner configuration API or widget script endpoint, degrading service for all customers’ websites.
+        - cell "Security" [ref=e229]
+        - cell "3" [ref=e230]
+        - cell "3" [ref=e231]
+        - cell "9 (Medium)" [ref=e232]:
+          - strong [ref=e233]: 9 (Medium)
+        - cell "Vercel Edge Network provides built-in DDoS protection and automatic scaling; banner configuration served from CDN cache with appropriate TTLs; API rate limiting applied to authenticated endpoints; widget is a lightweight static asset with minimal server-side computation per request." [ref=e234]
+        - cell "Medium – Sustained volumetric attack could exhaust Vercel’s included limits or incur unexpected costs. No dedicated WAF or advanced DDoS mitigation service in place." [ref=e235]
+        - cell "Founder" [ref=e236]
+        - cell "Active" [ref=e237]
+      - row "R-008 Regulatory non-compliance due to evolving privacy laws – Changes to GDPR, PIPEDA, Quebec Law 25, PECR, or the introduction of new privacy regulations (e.g., US state laws, ePrivacy Regulation) render the platform non-compliant or require features not yet implemented. Compliance 4 4 16 (High) Active monitoring of regulatory developments in target jurisdictions; platform architecture designed for configurable consent categories; consent logging feature supports DSAR proof-of-consent requirements; privacy policies and data processing documentation maintained. High – Solo operator has limited bandwidth to track all jurisdictions simultaneously. Implementing compliance changes for new regulations requires development time with no dedicated legal counsel on retainer. Founder Active" [ref=e238]:
+        - cell "R-008" [ref=e239]
+        - cell "Regulatory non-compliance due to evolving privacy laws – Changes to GDPR, PIPEDA, Quebec Law 25, PECR, or the introduction of new privacy regulations (e.g., US state laws, ePrivacy Regulation) render the platform non-compliant or require features not yet implemented." [ref=e240]:
+          - strong [ref=e241]: Regulatory non-compliance due to evolving privacy laws
+          - text: – Changes to GDPR, PIPEDA, Quebec Law 25, PECR, or the introduction of new privacy regulations (e.g., US state laws, ePrivacy Regulation) render the platform non-compliant or require features not yet implemented.
+        - cell "Compliance" [ref=e242]
+        - cell "4" [ref=e243]
+        - cell "4" [ref=e244]
+        - cell "16 (High)" [ref=e245]:
+          - strong [ref=e246]: 16 (High)
+        - cell "Active monitoring of regulatory developments in target jurisdictions; platform architecture designed for configurable consent categories; consent logging feature supports DSAR proof-of-consent requirements; privacy policies and data processing documentation maintained." [ref=e247]
+        - cell "High – Solo operator has limited bandwidth to track all jurisdictions simultaneously. Implementing compliance changes for new regulations requires development time with no dedicated legal counsel on retainer." [ref=e248]
+        - cell "Founder" [ref=e249]
+        - cell "Active" [ref=e250]
+      - row "R-009 Loss of access to cloud accounts – Founder loses access to critical accounts (Vercel, Supabase, Stripe, GitHub, domain registrar, DNS provider) due to compromised credentials, lost MFA device, or account lockout. Operational 2 5 10 (Medium) MFA enabled on all critical accounts; credentials stored in a password manager; MFA recovery codes stored separately in secure offline backup; account recovery email is a domain-controlled address. Medium – Single person holds all account access. Loss of the password manager master credential or MFA device would require provider-level account recovery, which may take days. Founder Active" [ref=e251]:
+        - cell "R-009" [ref=e252]
+        - cell "Loss of access to cloud accounts – Founder loses access to critical accounts (Vercel, Supabase, Stripe, GitHub, domain registrar, DNS provider) due to compromised credentials, lost MFA device, or account lockout." [ref=e253]:
+          - strong [ref=e254]: Loss of access to cloud accounts
+          - text: – Founder loses access to critical accounts (Vercel, Supabase, Stripe, GitHub, domain registrar, DNS provider) due to compromised credentials, lost MFA device, or account lockout.
+        - cell "Operational" [ref=e255]
+        - cell "2" [ref=e256]
+        - cell "5" [ref=e257]
+        - cell "10 (Medium)" [ref=e258]:
+          - strong [ref=e259]: 10 (Medium)
+        - cell "MFA enabled on all critical accounts; credentials stored in a password manager; MFA recovery codes stored separately in secure offline backup; account recovery email is a domain-controlled address." [ref=e260]
+        - cell "Medium – Single person holds all account access. Loss of the password manager master credential or MFA device would require provider-level account recovery, which may take days." [ref=e261]
+        - cell "Founder" [ref=e262]
+        - cell "Active" [ref=e263]
+      - row "R-010 Third-party provider security incident – A security breach at Supabase, Vercel, Stripe, or GitHub exposes COOKIE-BANNER.CA customer data, source code, or API keys. Third Party 2 4 8 (Medium) All providers selected are SOC 2 Type II compliant; minimal data shared with each provider (principle of least privilege); Stripe handles all payment card data (PCI DSS compliant) so no card data touches COOKIE-BANNER.CA infrastructure; API keys rotatable; GitHub branch protection and audit logging enabled. Medium – No contractual right to audit providers; limited visibility into their internal security posture. A provider breach could require emergency credential rotation and customer notification. Founder Active" [ref=e264]:
+        - cell "R-010" [ref=e265]
+        - cell "Third-party provider security incident – A security breach at Supabase, Vercel, Stripe, or GitHub exposes COOKIE-BANNER.CA customer data, source code, or API keys." [ref=e266]:
+          - strong [ref=e267]: Third-party provider security incident
+          - text: – A security breach at Supabase, Vercel, Stripe, or GitHub exposes COOKIE-BANNER.CA customer data, source code, or API keys.
+        - cell "Third Party" [ref=e268]
+        - cell "2" [ref=e269]
+        - cell "4" [ref=e270]
+        - cell "8 (Medium)" [ref=e271]:
+          - strong [ref=e272]: 8 (Medium)
+        - cell "All providers selected are SOC 2 Type II compliant; minimal data shared with each provider (principle of least privilege); Stripe handles all payment card data (PCI DSS compliant) so no card data touches COOKIE-BANNER.CA infrastructure; API keys rotatable; GitHub branch protection and audit logging enabled." [ref=e273]
+        - cell "Medium – No contractual right to audit providers; limited visibility into their internal security posture. A provider breach could require emergency credential rotation and customer notification." [ref=e274]
+        - cell "Founder" [ref=e275]
+        - cell "Active" [ref=e276]
+      - row "R-011 Insider threat from future employees or contractors – A future employee, contractor, or collaborator with access to source code, databases, or cloud accounts intentionally or accidentally causes data loss, exfiltration, or service disruption. Personnel 1 4 4 (Low) Currently a solo operation with no employees or contractors; no shared access to production systems; GitHub repository is private; all environment variables managed through Vercel’s encrypted secrets (not committed to source). Low – Risk is theoretical at present. No access controls, onboarding/offboarding procedures, or least-privilege access policies have been formalized for future hires. This risk will require re-assessment before onboarding any personnel. Founder Monitor" [ref=e277]:
+        - cell "R-011" [ref=e278]
+        - cell "Insider threat from future employees or contractors – A future employee, contractor, or collaborator with access to source code, databases, or cloud accounts intentionally or accidentally causes data loss, exfiltration, or service disruption." [ref=e279]:
+          - strong [ref=e280]: Insider threat from future employees or contractors
+          - text: – A future employee, contractor, or collaborator with access to source code, databases, or cloud accounts intentionally or accidentally causes data loss, exfiltration, or service disruption.
+        - cell "Personnel" [ref=e281]
+        - cell "1" [ref=e282]
+        - cell "4" [ref=e283]
+        - cell "4 (Low)" [ref=e284]:
+          - strong [ref=e285]: 4 (Low)
+        - cell "Currently a solo operation with no employees or contractors; no shared access to production systems; GitHub repository is private; all environment variables managed through Vercel’s encrypted secrets (not committed to source)." [ref=e286]
+        - cell "Low – Risk is theoretical at present. No access controls, onboarding/offboarding procedures, or least-privilege access policies have been formalized for future hires. This risk will require re-assessment before onboarding any personnel." [ref=e287]
+        - cell "Founder" [ref=e288]
+        - cell "Monitor" [ref=e289]
+      - row "R-012 Client-side script injection via banner widget – An attacker exploits a vulnerability in the banner widget JavaScript to inject malicious code that executes on customer websites, potentially stealing end-user data or defacing sites. Application Security 2 5 10 (Medium) Banner widget is a controlled, minimal JavaScript payload generated server-side; output is sanitized and does not include user-supplied content in executable contexts; Content Security Policy headers recommended to customers; no dynamic code execution or unsafe string-to-code patterns used in widget code. Medium – Widget runs on third-party domains with broad DOM access by necessity. A successful injection would have severe blast radius across all customer sites. No formal code audit or bug bounty program exists. Founder Active" [ref=e290]:
+        - cell "R-012" [ref=e291]
+        - cell "Client-side script injection via banner widget – An attacker exploits a vulnerability in the banner widget JavaScript to inject malicious code that executes on customer websites, potentially stealing end-user data or defacing sites." [ref=e292]:
+          - strong [ref=e293]: Client-side script injection via banner widget
+          - text: – An attacker exploits a vulnerability in the banner widget JavaScript to inject malicious code that executes on customer websites, potentially stealing end-user data or defacing sites.
+        - cell "Application Security" [ref=e294]
+        - cell "2" [ref=e295]
+        - cell "5" [ref=e296]
+        - cell "10 (Medium)" [ref=e297]:
+          - strong [ref=e298]: 10 (Medium)
+        - cell "Banner widget is a controlled, minimal JavaScript payload generated server-side; output is sanitized and does not include user-supplied content in executable contexts; Content Security Policy headers recommended to customers; no dynamic code execution or unsafe string-to-code patterns used in widget code." [ref=e299]
+        - cell "Medium – Widget runs on third-party domains with broad DOM access by necessity. A successful injection would have severe blast radius across all customer sites. No formal code audit or bug bounty program exists." [ref=e300]
+        - cell "Founder" [ref=e301]
+        - cell "Active" [ref=e302]
+      - row "R-013 Domain or DNS compromise – An attacker gains control of the cookie-banner.ca domain through registrar account compromise, DNS hijacking, or expired domain, redirecting traffic or intercepting API requests. Infrastructure 1 5 5 (Low) Domain registrar account protected with MFA; domain locked (transfer lock enabled); DNSSEC enabled where supported by registrar; auto-renewal configured with valid payment method; DNS managed through a reputable provider. Low – Domain compromise would be catastrophic but probability is low with current controls. No domain monitoring or certificate transparency log alerting in place. Founder Monitor" [ref=e303]:
+        - cell "R-013" [ref=e304]
+        - cell "Domain or DNS compromise – An attacker gains control of the cookie-banner.ca domain through registrar account compromise, DNS hijacking, or expired domain, redirecting traffic or intercepting API requests." [ref=e305]:
+          - strong [ref=e306]: Domain or DNS compromise
+          - text: – An attacker gains control of the cookie-banner.ca domain through registrar account compromise, DNS hijacking, or expired domain, redirecting traffic or intercepting API requests.
+        - cell "Infrastructure" [ref=e307]
+        - cell "1" [ref=e308]
+        - cell "5" [ref=e309]
+        - cell "5 (Low)" [ref=e310]:
+          - strong [ref=e311]: 5 (Low)
+        - cell "Domain registrar account protected with MFA; domain locked (transfer lock enabled); DNSSEC enabled where supported by registrar; auto-renewal configured with valid payment method; DNS managed through a reputable provider." [ref=e312]
+        - cell "Low – Domain compromise would be catastrophic but probability is low with current controls. No domain monitoring or certificate transparency log alerting in place." [ref=e313]
+        - cell "Founder" [ref=e314]
+        - cell "Monitor" [ref=e315]
+      - row "R-014 Stale dependencies with known vulnerabilities – npm packages in the project accumulate known CVEs over time due to infrequent updates, creating exploitable attack surface in the application or banner widget. Supply Chain 4 3 12 (Medium) Dependabot alerts enabled on GitHub; npm audit run periodically; Next.js framework updated regularly as part of feature development; Vercel build process surfaces dependency warnings. Medium – No automated CI gate that blocks deployment on critical CVEs. Updates are manual and may be deferred during feature development sprints. Transitive vulnerabilities may go unnoticed. Founder Active" [ref=e316]:
+        - cell "R-014" [ref=e317]
+        - cell "Stale dependencies with known vulnerabilities – npm packages in the project accumulate known CVEs over time due to infrequent updates, creating exploitable attack surface in the application or banner widget." [ref=e318]:
+          - strong [ref=e319]: Stale dependencies with known vulnerabilities
+          - text: – npm packages in the project accumulate known CVEs over time due to infrequent updates, creating exploitable attack surface in the application or banner widget.
+        - cell "Supply Chain" [ref=e320]
+        - cell "4" [ref=e321]
+        - cell "3" [ref=e322]
+        - cell "12 (Medium)" [ref=e323]:
+          - strong [ref=e324]: 12 (Medium)
+        - cell "Dependabot alerts enabled on GitHub; npm audit run periodically; Next.js framework updated regularly as part of feature development; Vercel build process surfaces dependency warnings." [ref=e325]:
+          - text: Dependabot alerts enabled on GitHub;
+          - code [ref=e326]: npm audit
+          - text: run periodically; Next.js framework updated regularly as part of feature development; Vercel build process surfaces dependency warnings.
+        - cell "Medium – No automated CI gate that blocks deployment on critical CVEs. Updates are manual and may be deferred during feature development sprints. Transitive vulnerabilities may go unnoticed." [ref=e327]
+        - cell "Founder" [ref=e328]
+        - cell "Active" [ref=e329]
+  - separator [ref=e330]
+  - heading "4. Risk Heat Map Summary" [level=2] [ref=e331]
+  - table [ref=e332]:
+    - rowgroup [ref=e340]:
+      - row "Negligible (1) Minor (2) Moderate (3) Major (4) Severe (5)" [ref=e341]:
+        - columnheader [ref=e342]
+        - columnheader "Negligible (1)" [ref=e343]:
+          - strong [ref=e344]: Negligible (1)
+        - columnheader "Minor (2)" [ref=e345]:
+          - strong [ref=e346]: Minor (2)
+        - columnheader "Moderate (3)" [ref=e347]:
+          - strong [ref=e348]: Moderate (3)
+        - columnheader "Major (4)" [ref=e349]:
+          - strong [ref=e350]: Major (4)
+        - columnheader "Severe (5)" [ref=e351]:
+          - strong [ref=e352]: Severe (5)
+    - rowgroup [ref=e353]:
+      - row "Almost Certain (5)" [ref=e354]:
+        - cell "Almost Certain (5)" [ref=e355]:
+          - strong [ref=e356]: Almost Certain (5)
+        - cell [ref=e357]
+        - cell [ref=e358]
+        - cell [ref=e359]
+        - cell [ref=e360]
+        - cell [ref=e361]
+      - row "Likely (4) R-008" [ref=e362]:
+        - cell "Likely (4)" [ref=e363]:
+          - strong [ref=e364]: Likely (4)
+        - cell [ref=e365]
+        - cell [ref=e366]
+        - cell [ref=e367]
+        - cell "R-008" [ref=e368]
+        - cell [ref=e369]
+      - row "Possible (3) R-003, R-007 R-002 R-005, R-006" [ref=e370]:
+        - cell "Possible (3)" [ref=e371]:
+          - strong [ref=e372]: Possible (3)
+        - cell [ref=e373]
+        - cell [ref=e374]
+        - cell "R-003, R-007" [ref=e375]
+        - cell "R-002" [ref=e376]
+        - cell "R-005, R-006" [ref=e377]
+      - row "Unlikely (2) R-004 R-001, R-010 R-009, R-012" [ref=e378]:
+        - cell "Unlikely (2)" [ref=e379]:
+          - strong [ref=e380]: Unlikely (2)
+        - cell [ref=e381]
+        - cell [ref=e382]
+        - cell "R-004" [ref=e383]
+        - cell "R-001, R-010" [ref=e384]
+        - cell "R-009, R-012" [ref=e385]
+      - row "Rare (1) R-011 R-013" [ref=e386]:
+        - cell "Rare (1)" [ref=e387]:
+          - strong [ref=e388]: Rare (1)
+        - cell [ref=e389]
+        - cell [ref=e390]
+        - cell [ref=e391]
+        - cell "R-011" [ref=e392]
+        - cell "R-013" [ref=e393]
+  - separator [ref=e394]
+  - heading "5. Risk Acceptance Statement" [level=2] [ref=e395]
+  - paragraph [ref=e396]: I, as the sole founder and operator of COOKIE-BANNER.CA, have reviewed all risks identified in this register. I understand the residual risk levels and accept them given the current stage of the business, available resources, and mitigations in place.
+  - paragraph [ref=e397]: "I commit to:"
+  - list [ref=e398]:
+    - listitem [ref=e399]:
+      - text: "Reviewing this register quarterly (next review:"
+      - strong [ref=e400]: 2026-06-28
+      - text: )
+    - listitem [ref=e401]: Re-assessing risks whenever material changes occur to infrastructure, staffing, or regulatory requirements
+    - listitem [ref=e402]:
+      - text: Prioritizing treatment of any risk that escalates to
+      - strong [ref=e403]: High
+      - text: or
+      - strong [ref=e404]: Critical
+      - text: rating
+    - listitem [ref=e405]: Maintaining documentation of risk treatment decisions
+  - paragraph [ref=e406]:
+    - text: Risks rated
+    - strong [ref=e407]: High
+    - text: "(R-005, R-006, R-008) are accepted with the acknowledgment that additional mitigations should be evaluated as the business scales, including: engaging a part-time security consultant, implementing automated SCA tooling in CI, formalizing a succession plan, and retaining privacy legal counsel."
+  - paragraph [ref=e408]:
+    - strong [ref=e409]: "Accepted by:"
+  - paragraph [ref=e410]: "Name: ___________________________________________"
+  - paragraph [ref=e411]: "Role: Founder, COOKIE-BANNER.CA"
+  - paragraph [ref=e412]: "Signature: ___________________________________________"
+  - paragraph [ref=e413]: "Date: ___________________________________________"
+  - separator [ref=e414]
+  - heading "6. Document Control" [level=2] [ref=e415]
+  - table [ref=e416]:
+    - rowgroup [ref=e417]:
+      - row "Version Date Author Changes" [ref=e418]:
+        - columnheader "Version" [ref=e419]
+        - columnheader "Date" [ref=e420]
+        - columnheader "Author" [ref=e421]
+        - columnheader "Changes" [ref=e422]
+    - rowgroup [ref=e423]:
+      - row "1.0 2026-03-28 Founder Initial risk register created" [ref=e424]:
+        - cell "1.0" [ref=e425]
+        - cell "2026-03-28" [ref=e426]
+        - cell "Founder" [ref=e427]
+        - cell "Initial risk register created" [ref=e428]
+  - separator [ref=e429]
+  - paragraph [ref=e430]:
+    - emphasis [ref=e431]: This document is reviewed quarterly. For questions or to report a new risk, contact security@cookie-banner.ca.
