@@ -1,19 +1,18 @@
-// Stripe webhook handler — one-time payments + annual subscriptions
+// Stripe webhook handler — one-time payments + annual subscriptions.
+// Uses Supabase client directly (not Prisma) to avoid PgBouncer transaction-mode issues.
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { validatePaymentAmount } from '@/lib/security-validation'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { generateDisputeEvidence } from '@/lib/dispute-evidence'
 import Stripe from 'stripe'
+import { randomUUID } from 'crypto'
 
-const getStripe = () => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('Stripe secret key not configured')
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-09-30.clover',
-  })
-}
+const getStripe = () =>
+  new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-09-30.clover' })
+
+const getSupabase = (): SupabaseClient =>
+  createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -28,6 +27,14 @@ function fail(error: string, status = 400) {
   return NextResponse.json({ error }, { status, headers: SECURITY_HEADERS })
 }
 
+const yearFromNowIso = () => {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() + 1)
+  return d.toISOString()
+}
+
+const newId = () => 'pay_' + randomUUID().replace(/-/g, '').slice(0, 24)
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -39,14 +46,14 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event
   try {
-    const stripe = getStripe()
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch (err) {
     console.error('[WEBHOOK] Signature verification failed:', err)
     return fail('Invalid signature')
   }
 
   console.log(`[WEBHOOK] Received event: ${event.type} (${event.id})`)
+  const supabase = getSupabase()
 
   try {
     switch (event.type) {
@@ -57,22 +64,24 @@ export async function POST(request: NextRequest) {
 
         if (session.payment_status !== 'paid') {
           console.error('[WEBHOOK] Payment not completed:', { sessionId: session.id, paymentStatus: session.payment_status })
-          return ok() // Acknowledge to stop Stripe retries — payment isn't complete yet
+          return ok()
         }
 
         const userId = session.metadata?.userId
         if (!userId) {
           console.error('[WEBHOOK] Missing userId in metadata:', { sessionId: session.id })
-          return ok() // Acknowledge — can't process without userId, don't retry
+          return ok()
         }
 
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { id: true, email: true, planTier: true },
-        })
-        if (!user) {
-          console.error('[WEBHOOK] User not found:', { sessionId: session.id, userId })
-          return ok() // User may have been deleted — don't retry
+        const { data: user, error: userErr } = await supabase
+          .from('User')
+          .select('id, email, "planTier"')
+          .eq('id', userId)
+          .single()
+
+        if (userErr || !user) {
+          console.error('[WEBHOOK] User not found:', { sessionId: session.id, userId, error: userErr?.message })
+          return ok()
         }
 
         const billingCycle = session.metadata?.billingCycle || 'one_time'
@@ -81,36 +90,43 @@ export async function POST(request: NextRequest) {
           // ── Annual subscription ──
           const subscriptionId = session.subscription as string
 
-          // Prevent duplicate subscription processing
-          const existingSub = await prisma.user.findFirst({
-            where: { id: userId, stripeSubscriptionId: subscriptionId },
-          })
+          // Idempotency: don't reprocess same subscription
+          const { data: existingSub } = await supabase
+            .from('User')
+            .select('id')
+            .eq('id', userId)
+            .eq('stripeSubscriptionId', subscriptionId)
+            .maybeSingle()
+
           if (existingSub) {
             console.log('[WEBHOOK] Subscription already processed:', { sessionId: session.id, userId })
             return ok({ received: true, message: 'Already processed' })
           }
 
-          // Calculate subscription end date (1 year from now)
-          const subscriptionEndsAt = new Date()
-          subscriptionEndsAt.setFullYear(subscriptionEndsAt.getFullYear() + 1)
-
-          await prisma.user.update({
-            where: { id: userId },
-            data: {
+          const { error: updateErr } = await supabase
+            .from('User')
+            .update({
               planTier: 'pro_annual',
               billingCycle: 'annual',
               subscriptionStatus: 'active',
               stripeSubscriptionId: subscriptionId,
               stripeCustomerId: session.customer as string,
-              upgradedAt: new Date(),
-              subscriptionEndsAt,
-              featureFreezeDate: null, // Annual users have no freeze
-              loyaltyUpgradeEligible: false, // They've upgraded
-            },
-          })
+              upgradedAt: new Date().toISOString(),
+              subscriptionEndsAt: yearFromNowIso(),
+              featureFreezeDate: null,
+              loyaltyUpgradeEligible: false,
+            })
+            .eq('id', userId)
 
-          await prisma.payment.create({
-            data: {
+          if (updateErr) {
+            console.error('[WEBHOOK] User update failed (annual):', { userId, error: updateErr.message })
+            return NextResponse.json({ error: 'User update failed' }, { status: 500, headers: SECURITY_HEADERS })
+          }
+
+          const { error: payErr } = await supabase
+            .from('Payment')
+            .insert({
+              id: newId(),
               userId,
               amount: session.amount_total || 0,
               currency: session.currency || 'usd',
@@ -118,10 +134,14 @@ export async function POST(request: NextRequest) {
               planTier: 'pro_annual',
               paymentType: 'subscription',
               stripeSessionId: session.id,
-              stripePaymentIntentId: (session.payment_intent as string) || '',
+              stripePaymentIntentId: (session.payment_intent as string) || null,
               stripeCustomerId: session.customer as string,
-            },
-          })
+            })
+
+          if (payErr) {
+            // Non-fatal: user is upgraded, just log Payment row failure (likely duplicate retry).
+            console.warn('[WEBHOOK] Payment row insert failed (annual):', { userId, error: payErr.message })
+          }
 
           logActivity(userId, AuditAction.PLAN_UPGRADE, null, {
             planTier: 'pro_annual',
@@ -141,16 +161,19 @@ export async function POST(request: NextRequest) {
             return fail('Invalid payment amount')
           }
 
-          // Idempotency check
-          const existingPayment = await prisma.user.findFirst({
-            where: { id: userId, stripePaymentIntentId: session.payment_intent as string },
-          })
+          // Idempotency: same paymentIntent already attached to this user
+          const { data: existingPayment } = await supabase
+            .from('User')
+            .select('id')
+            .eq('id', userId)
+            .eq('stripePaymentIntentId', session.payment_intent as string)
+            .maybeSingle()
+
           if (existingPayment) {
             console.log('[WEBHOOK] Payment already processed:', { sessionId: session.id, userId })
             return ok({ received: true, message: 'Already processed' })
           }
 
-          // Don't downgrade an annual subscriber to lifetime
           if (user.planTier === 'pro_annual') {
             console.warn('[WEBHOOK] User already on annual, skipping one-time:', { userId })
             return ok({ received: true, message: 'User already on annual' })
@@ -161,33 +184,42 @@ export async function POST(request: NextRequest) {
             return ok({ received: true, message: 'User already upgraded' })
           }
 
-          await prisma.$transaction([
-            prisma.user.update({
-              where: { id: userId },
-              data: {
-                planTier: 'pro_lifetime',
-                billingCycle: 'one_time',
-                upgradedAt: new Date(),
-                stripeCustomerId: session.customer as string,
-                stripePaymentIntentId: session.payment_intent as string,
-                featureFreezeDate: new Date(),
-                loyaltyUpgradeEligible: true,
-              },
-            }),
-            prisma.payment.create({
-              data: {
-                userId,
-                amount,
-                currency: session.currency || 'usd',
-                status: 'succeeded',
-                planTier: 'pro_lifetime',
-                paymentType: 'one_time',
-                stripeSessionId: session.id,
-                stripePaymentIntentId: session.payment_intent as string,
-                stripeCustomerId: session.customer as string,
-              },
-            }),
-          ])
+          const { error: updateErr } = await supabase
+            .from('User')
+            .update({
+              planTier: 'pro_lifetime',
+              billingCycle: 'one_time',
+              upgradedAt: new Date().toISOString(),
+              stripeCustomerId: session.customer as string,
+              stripePaymentIntentId: session.payment_intent as string,
+              featureFreezeDate: new Date().toISOString(),
+              loyaltyUpgradeEligible: true,
+            })
+            .eq('id', userId)
+
+          if (updateErr) {
+            console.error('[WEBHOOK] User update failed (one-time):', { userId, error: updateErr.message })
+            return NextResponse.json({ error: 'User update failed' }, { status: 500, headers: SECURITY_HEADERS })
+          }
+
+          const { error: payErr } = await supabase
+            .from('Payment')
+            .insert({
+              id: newId(),
+              userId,
+              amount,
+              currency: session.currency || 'usd',
+              status: 'succeeded',
+              planTier: 'pro_lifetime',
+              paymentType: 'one_time',
+              stripeSessionId: session.id,
+              stripePaymentIntentId: session.payment_intent as string,
+              stripeCustomerId: session.customer as string,
+            })
+
+          if (payErr) {
+            console.warn('[WEBHOOK] Payment row insert failed (one-time):', { userId, error: payErr.message })
+          }
 
           logActivity(userId, AuditAction.PLAN_UPGRADE, null, {
             planTier: 'pro_lifetime',
@@ -206,37 +238,36 @@ export async function POST(request: NextRequest) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice & { subscription?: string; payment_intent?: string }
         const subscriptionId = invoice.subscription as string
-        if (!subscriptionId) break // Not a subscription invoice
+        if (!subscriptionId) break
 
-        // Skip the first invoice (handled by checkout.session.completed)
         if (invoice.billing_reason === 'subscription_create') {
           console.log('[WEBHOOK] Skipping initial subscription invoice:', { invoiceId: invoice.id })
           break
         }
 
-        const renewalUser = await prisma.user.findFirst({
-          where: { stripeSubscriptionId: subscriptionId },
-          select: { id: true, email: true },
-        })
+        const { data: renewalUser } = await supabase
+          .from('User')
+          .select('id, email')
+          .eq('stripeSubscriptionId', subscriptionId)
+          .maybeSingle()
 
         if (!renewalUser) {
           console.error('[WEBHOOK] No user for subscription renewal:', { subscriptionId })
           break
         }
 
-        const subscriptionEndsAt = new Date()
-        subscriptionEndsAt.setFullYear(subscriptionEndsAt.getFullYear() + 1)
-
-        await prisma.user.update({
-          where: { id: renewalUser.id },
-          data: {
+        await supabase
+          .from('User')
+          .update({
             subscriptionStatus: 'active',
-            subscriptionEndsAt,
-          },
-        })
+            subscriptionEndsAt: yearFromNowIso(),
+          })
+          .eq('id', renewalUser.id)
 
-        await prisma.payment.create({
-          data: {
+        await supabase
+          .from('Payment')
+          .insert({
+            id: newId(),
             userId: renewalUser.id,
             amount: invoice.amount_paid || 0,
             currency: invoice.currency || 'usd',
@@ -244,10 +275,9 @@ export async function POST(request: NextRequest) {
             planTier: 'pro_annual',
             paymentType: 'subscription_renewal',
             stripeSessionId: invoice.id,
-            stripePaymentIntentId: (invoice.payment_intent as string) || '',
+            stripePaymentIntentId: (invoice.payment_intent as string) || null,
             stripeCustomerId: invoice.customer as string,
-          },
-        })
+          })
 
         logActivity(renewalUser.id, AuditAction.PLAN_UPGRADE, null, {
           reason: 'subscription_renewal',
@@ -262,10 +292,11 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
 
-        const subUser = await prisma.user.findFirst({
-          where: { stripeSubscriptionId: subscription.id },
-          select: { id: true, email: true },
-        })
+        const { data: subUser } = await supabase
+          .from('User')
+          .select('id, email')
+          .eq('stripeSubscriptionId', subscription.id)
+          .maybeSingle()
 
         if (!subUser) {
           console.error('[WEBHOOK] No user for subscription update:', { subscriptionId: subscription.id })
@@ -278,13 +309,12 @@ export async function POST(request: NextRequest) {
           : null
 
         if (newStatus) {
-          await prisma.user.update({
-            where: { id: subUser.id },
-            data: { subscriptionStatus: newStatus },
-          })
+          await supabase
+            .from('User')
+            .update({ subscriptionStatus: newStatus })
+            .eq('id', subUser.id)
           console.log('[WEBHOOK] Subscription status updated:', { userId: subUser.id, status: newStatus })
         }
-
         break
       }
 
@@ -292,27 +322,27 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.deleted': {
         const deletedSub = event.data.object as Stripe.Subscription
 
-        const deletedSubUser = await prisma.user.findFirst({
-          where: { stripeSubscriptionId: deletedSub.id },
-          select: { id: true, email: true, planTier: true },
-        })
+        const { data: deletedSubUser } = await supabase
+          .from('User')
+          .select('id, email, "planTier"')
+          .eq('stripeSubscriptionId', deletedSub.id)
+          .maybeSingle()
 
         if (!deletedSubUser) {
           console.error('[WEBHOOK] No user for deleted subscription:', { subscriptionId: deletedSub.id })
           break
         }
 
-        // Downgrade to pro_lifetime (not free) — they keep features frozen at cancellation
-        await prisma.user.update({
-          where: { id: deletedSubUser.id },
-          data: {
+        await supabase
+          .from('User')
+          .update({
             planTier: 'pro_lifetime',
             billingCycle: 'one_time',
             subscriptionStatus: 'canceled',
-            featureFreezeDate: new Date(),
-            loyaltyUpgradeEligible: true, // They can re-subscribe later
-          },
-        })
+            featureFreezeDate: new Date().toISOString(),
+            loyaltyUpgradeEligible: true,
+          })
+          .eq('id', deletedSubUser.id)
 
         logActivity(deletedSubUser.id, AuditAction.PLAN_DOWNGRADE, null, {
           reason: 'subscription_canceled',
@@ -324,7 +354,6 @@ export async function POST(request: NextRequest) {
           userId: deletedSubUser.id,
           email: deletedSubUser.email,
         })
-
         break
       }
 
@@ -349,26 +378,28 @@ export async function POST(request: NextRequest) {
           break
         }
 
-        const refundUser = await prisma.user.findFirst({
-          where: { stripeCustomerId: refundCustomerId },
-          select: { id: true, email: true, planTier: true },
-        })
+        const { data: refundUser } = await supabase
+          .from('User')
+          .select('id, email, "planTier"')
+          .eq('stripeCustomerId', refundCustomerId)
+          .maybeSingle()
 
         if (!refundUser) {
           console.error('[WEBHOOK] No user found for refund customer:', refundCustomerId)
           break
         }
 
-        await prisma.$transaction([
-          prisma.user.update({
-            where: { id: refundUser.id },
-            data: { planTier: 'free', billingCycle: null, subscriptionStatus: null },
-          }),
-          prisma.payment.updateMany({
-            where: { userId: refundUser.id, stripeCustomerId: refundCustomerId, status: 'succeeded' },
-            data: { status: 'refunded' },
-          }),
-        ])
+        await supabase
+          .from('User')
+          .update({ planTier: 'free', billingCycle: null, subscriptionStatus: null })
+          .eq('id', refundUser.id)
+
+        await supabase
+          .from('Payment')
+          .update({ status: 'refunded' })
+          .eq('userId', refundUser.id)
+          .eq('stripeCustomerId', refundCustomerId)
+          .eq('status', 'succeeded')
 
         logActivity(refundUser.id, AuditAction.PLAN_DOWNGRADE, null, {
           reason: 'refund',
@@ -389,26 +420,28 @@ export async function POST(request: NextRequest) {
           break
         }
 
-        const disputeUser = await prisma.user.findFirst({
-          where: { stripeCustomerId: disputeCustomerId },
-          select: { id: true, email: true, planTier: true },
-        })
+        const { data: disputeUser } = await supabase
+          .from('User')
+          .select('id, email, "planTier"')
+          .eq('stripeCustomerId', disputeCustomerId)
+          .maybeSingle()
 
         if (!disputeUser) {
           console.error('[WEBHOOK] No user found for dispute customer:', disputeCustomerId)
           break
         }
 
-        await prisma.$transaction([
-          prisma.user.update({
-            where: { id: disputeUser.id },
-            data: { planTier: 'free', billingCycle: null, subscriptionStatus: null },
-          }),
-          prisma.payment.updateMany({
-            where: { userId: disputeUser.id, stripeCustomerId: disputeCustomerId, status: 'succeeded' },
-            data: { status: 'disputed' },
-          }),
-        ])
+        await supabase
+          .from('User')
+          .update({ planTier: 'free', billingCycle: null, subscriptionStatus: null })
+          .eq('id', disputeUser.id)
+
+        await supabase
+          .from('Payment')
+          .update({ status: 'disputed' })
+          .eq('userId', disputeUser.id)
+          .eq('stripeCustomerId', disputeCustomerId)
+          .eq('status', 'succeeded')
 
         logActivity(disputeUser.id, AuditAction.PLAN_DOWNGRADE, null, {
           reason: 'dispute',
