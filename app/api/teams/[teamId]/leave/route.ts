@@ -43,29 +43,37 @@ export async function POST(
     // Check if this is the user's current workspace
     if (session.user.currentTeamId === teamId) {
       // Find another workspace to switch to (preferably their personal workspace)
-      const { data: otherTeams, error: otherTeamsError } = await supabase
+      const { data: otherMemberships, error: otherTeamsError } = await supabase
         .from('TeamMember')
-        .select(`
-          team_id,
-          role,
-          Team!inner(
-            id,
-            name,
-            owner_id
-          )
-        `)
+        .select('team_id, role')
         .eq('user_id', session.user.id)
         .neq('team_id', teamId)
 
-      if (otherTeamsError || !otherTeams || otherTeams.length === 0) {
+      if (otherTeamsError || !otherMemberships || otherMemberships.length === 0) {
         return NextResponse.json({ 
           error: 'You cannot leave your only workspace. Create a personal workspace first.' 
         }, { status: 400 })
       }
 
+      const otherTeamIds = otherMemberships.map(member => member.team_id).filter(Boolean)
+      const { data: teams, error: teamsError } = await supabase
+        .from('Team')
+        .select('id, name, owner_id')
+        .in('id', otherTeamIds)
+
+      if (teamsError || !teams || teams.length === 0) {
+        console.error('Error fetching fallback workspaces:', teamsError)
+        return NextResponse.json({ error: 'Failed to find another workspace' }, { status: 500 })
+      }
+
+      const teamsById = new Map(teams.map(team => [team.id, team]))
+
       // Switch to another workspace (preferably personal workspace)
-      const personalWorkspace = otherTeams.find(t => t.Team[0]?.owner_id === session.user.id)
-      const targetWorkspace = personalWorkspace || otherTeams[0]
+      const personalWorkspace = otherMemberships.find(member => {
+        const team = teamsById.get(member.team_id)
+        return team?.owner_id === session.user.id
+      })
+      const targetWorkspace = personalWorkspace || otherMemberships[0]
 
       // Update user's currentTeamId
       const { error: updateError } = await supabase

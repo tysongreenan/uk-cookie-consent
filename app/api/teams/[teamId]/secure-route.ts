@@ -1,3 +1,4 @@
+// Deprecated helper module. Do not use for active team routes.
 // Secure team API route with comprehensive security validation
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'

@@ -42,21 +42,10 @@ export async function GET(
       )
     }
 
-    // Get team details
     const { data: team, error } = await supabase
       .from('Team')
-      .select(`
-        id,
-        name,
-        owner_id,
-        created_at,
-        updated_at,
-        TeamMember!inner(
-          role
-        )
-      `)
+      .select('id, name, owner_id, created_at, updated_at')
       .eq('id', teamId)
-      .eq('TeamMember.user_id', session.user.id)
       .single()
 
     if (error || !team) {
@@ -66,11 +55,40 @@ export async function GET(
       )
     }
 
+    const { data: membership, error: membershipError } = await supabase
+      .from('TeamMember')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      console.error('Error fetching team membership:', membershipError)
+      return NextResponse.json(
+        { error: 'Team membership not found' },
+        { status: 404 }
+      )
+    }
+
+    const { count: memberCount, error: countError } = await supabase
+      .from('TeamMember')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', teamId)
+
+    if (countError) {
+      console.error('Error fetching team member count:', countError)
+      return NextResponse.json(
+        { error: 'Failed to fetch team member count' },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         ...team,
-        userRole: team.TeamMember[0]?.role
+        userRole: membership.role,
+        memberCount: memberCount || 0
       }
     })
 

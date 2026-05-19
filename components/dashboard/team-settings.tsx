@@ -92,6 +92,9 @@ export function TeamSettings() {
       
       if (teamResponse.ok && teamData.success) {
         setTeamInfo(teamData.data)
+      } else {
+        console.error('Failed to fetch workspace details:', teamData)
+        toast.error('Failed to load workspace details')
       }
 
       // Fetch team members
@@ -100,6 +103,9 @@ export function TeamSettings() {
       
       if (membersResponse.ok && membersData.success) {
         setMembers(membersData.data)
+      } else {
+        console.error('Failed to fetch workspace members:', membersData)
+        toast.error('Failed to load workspace members')
       }
 
       // Fetch pending invitations
@@ -108,6 +114,9 @@ export function TeamSettings() {
       
       if (invitationsResponse.ok && invitationsData.success) {
         setPendingInvitations(invitationsData.data)
+      } else {
+        console.error('Failed to fetch workspace invitations:', invitationsData)
+        toast.error('Failed to load workspace invitations')
       }
     } catch (error) {
       console.error('Error fetching team data:', error)
@@ -320,8 +329,14 @@ export function TeamSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {members.map((member) => (
+          {members.length === 0 ? (
+            <div className="text-center py-6 text-gray-500">
+              <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm">No members loaded</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {members.map((member) => (
               <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -374,8 +389,9 @@ export function TeamSettings() {
                   )}
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

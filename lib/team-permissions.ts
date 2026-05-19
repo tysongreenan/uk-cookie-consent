@@ -108,19 +108,9 @@ export async function getUserTeamRole(
  */
 export async function getUserTeams(userId: string) {
   try {
-    const { data, error } = await supabase
+    const { data: memberships, error } = await supabase
       .from('TeamMember')
-      .select(`
-        role,
-        joined_at,
-        Team!inner(
-          id,
-          name,
-          owner_id,
-          created_at,
-          updated_at
-        )
-      `)
+      .select('team_id, role, joined_at')
       .eq('user_id', userId)
       .order('joined_at', { ascending: false })
 
@@ -129,11 +119,33 @@ export async function getUserTeams(userId: string) {
       return []
     }
 
-    return data?.map(member => ({
-      ...member.Team,
-      userRole: member.role,
-      joinedAt: member.joined_at
-    })) || []
+    const teamIds = (memberships || []).map(member => member.team_id).filter(Boolean)
+    if (teamIds.length === 0) return []
+
+    const { data: teams, error: teamsError } = await supabase
+      .from('Team')
+      .select('id, name, owner_id, created_at, updated_at')
+      .in('id', teamIds)
+
+    if (teamsError) {
+      console.error('Error getting team details:', teamsError)
+      return []
+    }
+
+    const teamsById = new Map((teams || []).map(team => [team.id, team]))
+
+    return (memberships || [])
+      .map(member => {
+        const team = teamsById.get(member.team_id)
+        if (!team) return null
+
+        return {
+          ...team,
+          userRole: member.role,
+          joinedAt: member.joined_at
+        }
+      })
+      .filter(Boolean)
   } catch (error) {
     console.error('Error getting user teams:', error)
     return []
@@ -145,20 +157,9 @@ export async function getUserTeams(userId: string) {
  */
 export async function getTeamMembers(teamId: string) {
   try {
-    const { data, error } = await supabase
+    const { data: members, error } = await supabase
       .from('TeamMember')
-      .select(`
-        id,
-        role,
-        joined_at,
-        created_at,
-        User(
-          id,
-          name,
-          email,
-          image
-        )
-      `)
+      .select('id, user_id, role, joined_at, created_at')
       .eq('team_id', teamId)
       .order('joined_at', { ascending: false })
 
@@ -167,13 +168,28 @@ export async function getTeamMembers(teamId: string) {
       return []
     }
 
-    return data?.map(member => ({
+    const userIds = (members || []).map(member => member.user_id).filter(Boolean)
+    const { data: users, error: usersError } = userIds.length > 0
+      ? await supabase
+        .from('User')
+        .select('id, name, email, image')
+        .in('id', userIds)
+      : { data: [], error: null }
+
+    if (usersError) {
+      console.error('Error getting team member users:', usersError)
+      return []
+    }
+
+    const usersById = new Map((users || []).map(user => [user.id, user]))
+
+    return (members || []).map(member => ({
       id: member.id,
       role: member.role,
       joinedAt: member.joined_at,
       createdAt: member.created_at,
-      user: member.User
-    })) || []
+      user: usersById.get(member.user_id) || null
+    }))
   } catch (error) {
     console.error('Error getting team members:', error)
     return []
@@ -185,22 +201,9 @@ export async function getTeamMembers(teamId: string) {
  */
 export async function getTeamInvitations(teamId: string) {
   try {
-    const { data, error } = await supabase
+    const { data: invitations, error } = await supabase
       .from('TeamInvitation')
-      .select(`
-        id,
-        email,
-        role,
-        token,
-        status,
-        expires_at,
-        created_at,
-        User(
-          id,
-          name,
-          email
-        )
-      `)
+      .select('id, email, role, token, status, expires_at, created_at, invited_by')
       .eq('team_id', teamId)
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
@@ -210,7 +213,22 @@ export async function getTeamInvitations(teamId: string) {
       return []
     }
 
-    return data?.map(invitation => ({
+    const inviterIds = (invitations || []).map(invitation => invitation.invited_by).filter(Boolean)
+    const { data: inviters, error: invitersError } = inviterIds.length > 0
+      ? await supabase
+        .from('User')
+        .select('id, name, email')
+        .in('id', inviterIds)
+      : { data: [], error: null }
+
+    if (invitersError) {
+      console.error('Error getting invitation inviters:', invitersError)
+      return []
+    }
+
+    const invitersById = new Map((inviters || []).map(inviter => [inviter.id, inviter]))
+
+    return (invitations || []).map(invitation => ({
       id: invitation.id,
       email: invitation.email,
       role: invitation.role,
@@ -218,8 +236,8 @@ export async function getTeamInvitations(teamId: string) {
       status: invitation.status,
       expiresAt: invitation.expires_at,
       createdAt: invitation.created_at,
-      inviter: invitation.User
-    })) || []
+      inviter: invitersById.get(invitation.invited_by) || null
+    }))
   } catch (error) {
     console.error('Error getting team invitations:', error)
     return []

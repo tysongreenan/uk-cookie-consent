@@ -91,14 +91,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if the invitee is already a member of this workspace (by email)
+    // Check if the invitee is already a member of this workspace.
+    // Do this in two explicit queries because TeamMember has two User
+    // relationships, which makes embedded User joins ambiguous in PostgREST.
     const normalizedEmail = email.trim().toLowerCase()
-    const { data: existingMember } = await supabase
-      .from('TeamMember')
-      .select('id, User!inner(email)')
-      .eq('team_id', teamId)
-      .eq('User.email', normalizedEmail)
-      .single()
+    const { data: invitee, error: inviteeError } = await supabase
+      .from('User')
+      .select('id, email')
+      .eq('email', normalizedEmail)
+      .maybeSingle()
+
+    if (inviteeError) {
+      console.error('Error checking invitee user:', inviteeError)
+      return NextResponse.json(
+        { error: 'Failed to check existing workspace membership' },
+        { status: 500 }
+      )
+    }
+
+    let existingMember = null
+    if (invitee?.id) {
+      const { data: member, error: memberLookupError } = await supabase
+        .from('TeamMember')
+        .select('id')
+        .eq('team_id', teamId)
+        .eq('user_id', invitee.id)
+        .maybeSingle()
+
+      if (memberLookupError) {
+        console.error('Error checking existing workspace member:', memberLookupError)
+        return NextResponse.json(
+          { error: 'Failed to check existing workspace membership' },
+          { status: 500 }
+        )
+      }
+
+      existingMember = member
+    }
 
     if (existingMember) {
       return NextResponse.json(

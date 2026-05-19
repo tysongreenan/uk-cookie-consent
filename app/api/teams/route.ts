@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const userPlan = (session.user.planTier || 'free') as PlanTier
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
-        { 
+        {
           error: 'Team collaboration requires a Pro plan. Please upgrade to create teams.',
           upgradeRequired: true,
           feature: 'Team Collaboration'
@@ -130,19 +130,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { data: teams, error } = await supabase
+    const { data: memberships, error } = await supabase
       .from('TeamMember')
-      .select(`
-        role,
-        joined_at,
-        Team!inner(
-          id,
-          name,
-          owner_id,
-          created_at,
-          updated_at
-        )
-      `)
+      .select('team_id, role, joined_at')
       .eq('user_id', session.user.id)
       .order('joined_at', { ascending: false })
 
@@ -156,7 +146,7 @@ export async function GET(request: NextRequest) {
         userId: session.user.id
       })
       return NextResponse.json(
-        { 
+        {
           error: 'Failed to fetch teams',
           details: process.env.NODE_ENV === 'development' ? error.message : undefined
         },
@@ -164,11 +154,47 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const formattedTeams = teams?.map(member => ({
-      ...member.Team,
-      userRole: member.role,
-      joinedAt: member.joined_at
-    })) || []
+    const teamIds = (memberships || [])
+      .map(member => member.team_id)
+      .filter(Boolean)
+
+    if (teamIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: []
+      })
+    }
+
+    const { data: teams, error: teamsError } = await supabase
+      .from('Team')
+      .select('id, name, owner_id, created_at, updated_at')
+      .in('id', teamIds)
+
+    if (teamsError) {
+      console.error('Error fetching team details:', teamsError)
+      return NextResponse.json(
+        {
+          error: 'Failed to fetch teams',
+          details: process.env.NODE_ENV === 'development' ? teamsError.message : undefined
+        },
+        { status: 500 }
+      )
+    }
+
+    const teamsById = new Map((teams || []).map(team => [team.id, team]))
+
+    const formattedTeams = (memberships || [])
+      .map(member => {
+        const team = teamsById.get(member.team_id)
+        if (!team) return null
+
+        return {
+          ...team,
+          userRole: member.role,
+          joinedAt: member.joined_at
+        }
+      })
+      .filter(Boolean)
 
     return NextResponse.json({
       success: true,
