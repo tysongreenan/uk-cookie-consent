@@ -252,6 +252,70 @@ export async function canPerformTeamAction(
   return result.hasPermission
 }
 
+async function getPlanForUser(userId: string): Promise<{ planTier: string; featureFreezeDate: string | null }> {
+  const { data: user, error } = await supabase
+    .from('User')
+    .select('planTier')
+    .eq('id', userId)
+    .single()
+
+  if (error) {
+    console.error('[PLAN] Failed to resolve plan tier:', error)
+    return { planTier: 'free', featureFreezeDate: null }
+  }
+
+  let featureFreezeDate: string | null = null
+
+  try {
+    const { data: freezeData, error: freezeError } = await supabase
+      .from('User')
+      .select('featureFreezeDate')
+      .eq('id', userId)
+      .single()
+
+    if (!freezeError) {
+      featureFreezeDate = freezeData?.featureFreezeDate || null
+    }
+  } catch {
+    featureFreezeDate = null
+  }
+
+  return {
+    planTier: user?.planTier || 'free',
+    featureFreezeDate,
+  }
+}
+
+/**
+ * Resolve the effective plan tier and freeze date for a user in a team workspace.
+ * When the user is in someone else's workspace, returns the team owner's plan.
+ */
+export async function resolveEffectivePlan(
+  userId: string,
+  currentTeamId: string | null | undefined
+): Promise<{ planTier: string; featureFreezeDate: string | null }> {
+  if (!currentTeamId) {
+    return getPlanForUser(userId)
+  }
+
+  try {
+    const { data: team } = await supabase
+      .from('Team')
+      .select('owner_id')
+      .eq('id', currentTeamId)
+      .single()
+
+    const lookupUserId = team?.owner_id && team.owner_id !== userId
+      ? team.owner_id
+      : userId
+
+    return getPlanForUser(lookupUserId)
+  } catch (error) {
+    console.error('[PLAN] Failed to resolve team owner plan:', error)
+    return { planTier: 'free', featureFreezeDate: null }
+  }
+}
+
 /**
  * Middleware helper for API routes
  */

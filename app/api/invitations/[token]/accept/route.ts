@@ -81,10 +81,32 @@ export async function POST(
       .single()
 
     if (existingMember) {
-      return NextResponse.json(
-        { error: 'You are already a member of this workspace' },
-        { status: 400 }
-      )
+      await supabase
+        .from('TeamInvitation')
+        .update({
+          status: 'accepted',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', invitation.id)
+
+      const { error: switchError } = await supabase
+        .from('User')
+        .update({ currentTeamId: invitation.team_id })
+        .eq('id', session.user.id)
+
+      if (switchError) {
+        console.error('Error switching existing member to invited workspace:', switchError)
+        return NextResponse.json(
+          { error: 'Failed to switch workspace' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'You are already a member of this workspace. We switched you to it.',
+        team: invitation.Team
+      })
     }
 
     // Atomically claim the invitation to prevent race conditions
@@ -137,10 +159,18 @@ export async function POST(
 
     // Auto-switch to the invited workspace so the user immediately
     // sees the team owner's plan and Pro features
-    await supabase
+    const { error: switchError } = await supabase
       .from('User')
       .update({ currentTeamId: invitation.team_id })
       .eq('id', session.user.id)
+
+    if (switchError) {
+      console.error('Error switching user to invited workspace:', switchError)
+      return NextResponse.json(
+        { error: 'Joined workspace, but failed to switch to it. Please use the workspace switcher.' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

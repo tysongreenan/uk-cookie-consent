@@ -421,7 +421,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // Main banner HTML
   const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
   <div style="position: relative;">
-    <button id="cookie-close-btn" style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: ${config.colors.text}; font-size: 24px; cursor: pointer; padding: 4px 8px; line-height: 1; opacity: 0.7;" aria-label="Close">&times;</button>
+    <button id="cookie-close-btn" style="position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
     
     <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
@@ -813,6 +813,24 @@ input:checked + span:before {
     bottom: 0 !important;
     width: auto !important;
     margin: 0 !important;` : ''}
+  }
+
+  #cookie-consent-banner #cookie-close-btn {
+    top: 10px !important;
+    right: 10px !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    font-size: 28px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2 !important;
+  }
+
+  #cookie-title {
+    padding-right: 48px !important;
   }
   
   #cookie-consent-banner h3 {
@@ -1859,8 +1877,21 @@ function getConsent() {
   return null;
 }
 
+function dispatchConsentUpdate(consent) {
+  try {
+    window.dispatchEvent(new CustomEvent('cookie-consent-update', {
+      detail: {
+        analytics: !!consent.analytics,
+        marketing: !!consent.marketing,
+        functionality: !!consent.functionality
+      }
+    }));
+  } catch(e) {}
+}
+
 function saveConsent(consent, tcfPurposes) {
   setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
+  dispatchConsentUpdate(consent);
   loadScripts(consent);
   showFloatingButton();
   updateFloatingButtonIcon(consent);
@@ -1879,17 +1910,6 @@ function saveConsent(consent, tcfPurposes) {
       try { cb(consent); } catch(e) {}
     });
   }
-
-  // Dispatch CustomEvent for framework integrations (React, Vue, etc.)
-  try {
-    window.dispatchEvent(new CustomEvent('cookie-consent-update', {
-      detail: {
-        analytics: !!consent.analytics,
-        marketing: !!consent.marketing,
-        functionality: !!consent.functionality
-      }
-    }));
-  } catch(e) {}
 }
 
 // Toggle switches and consent loading - must be in outer scope
@@ -2497,15 +2517,7 @@ function init() {
     updateFloatingButtonIcon(existingConsent);
 
     // Dispatch initial consent state for framework integrations (React, Vue, etc.)
-    try {
-      window.dispatchEvent(new CustomEvent('cookie-consent-update', {
-        detail: {
-          analytics: !!existingConsent.analytics,
-          marketing: !!existingConsent.marketing,
-          functionality: !!existingConsent.functionality
-        }
-      }));
-    } catch(e) {}
+    dispatchConsentUpdate(existingConsent);
 
     // Show GPC acknowledgment bar only on the first visit where GPC is newly detected
     if (GPC_ACTIVE && gpcChanged) {

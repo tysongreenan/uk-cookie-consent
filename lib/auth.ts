@@ -188,7 +188,7 @@ export const authOptions: NextAuthOptions = {
         // Check if user already exists
         const { data: existingUser } = await supabase
           .from('User')
-          .select('id, name, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
+          .select('id, name, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool, currentTeamId')
           .eq('email', email)
           .single()
 
@@ -203,14 +203,26 @@ export const authOptions: NextAuthOptions = {
             .update(updates)
             .eq('id', existingUser.id)
 
-          // Look up their workspace
-          const { data: teamMember } = await supabase
-            .from('TeamMember')
-            .select('role, team_id')
-            .eq('user_id', existingUser.id)
-            .order('joined_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
+          // Look up their workspace, preferring the persisted currentTeamId
+          let { data: teamMember } = existingUser.currentTeamId
+            ? await supabase
+                .from('TeamMember')
+                .select('role, team_id')
+                .eq('user_id', existingUser.id)
+                .eq('team_id', existingUser.currentTeamId)
+                .maybeSingle()
+            : { data: null }
+
+          if (!teamMember) {
+            const { data: fallbackMember } = await supabase
+              .from('TeamMember')
+              .select('role, team_id')
+              .eq('user_id', existingUser.id)
+              .order('joined_at', { ascending: false })
+              .limit(1)
+              .maybeSingle()
+            teamMember = fallbackMember
+          }
 
           // If user has no workspace (e.g., created via credentials but workspace creation failed), create one
           if (!teamMember) {
@@ -346,6 +358,20 @@ export const authOptions: NextAuthOptions = {
         token.hasConsentBanner = (user as any).hasConsentBanner ?? true
         token.hasPrivacyConsumer = (user as any).hasPrivacyConsumer ?? false
         token.hasCommentTool = (user as any).hasCommentTool ?? false
+
+        // Resolve the team owner's plan immediately on login so invited
+        // workspace members see Pro features without waiting for token refresh.
+        if (token.id) {
+          try {
+            const effective = await resolveEffectivePlan(
+              token.id as string,
+              token.currentTeamId as string | null | undefined
+            )
+            token.planTier = effective.planTier
+          } catch (err) {
+            console.error('[AUTH] Failed to resolve effective plan on login:', err)
+          }
+        }
       } else if (token.id) {
         // Refresh plan data and team role from database on token rotation
         // so upgrades and team switches take effect without re-login
@@ -389,7 +415,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    session: ({ session, token }) => {
+    session: async ({ session, token }) => {
       // Check if session is expired based on remember me setting
       const now = Math.floor(Date.now() / 1000);
       const tokenAge = now - (token.iat as number);
@@ -402,6 +428,20 @@ export const authOptions: NextAuthOptions = {
           expires: new Date().toISOString(),
         };
       }
+
+      let planTier = (token.planTier || 'free') as string
+
+      if (token.id && token.currentTeamId) {
+        try {
+          const effective = await resolveEffectivePlan(
+            token.id as string,
+            token.currentTeamId as string
+          )
+          planTier = effective.planTier || planTier
+        } catch (err) {
+          console.error('[AUTH] Failed to resolve effective plan in session:', err)
+        }
+      }
       
       return {
         ...session,
@@ -410,7 +450,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           currentTeamId: token.currentTeamId,
           userRole: token.userRole,
-          planTier: token.planTier || 'free',
+          planTier,
           userType: token.userType || 'business',
           consumerTier: token.consumerTier || 'free',
           hasConsentBanner: token.hasConsentBanner ?? true,

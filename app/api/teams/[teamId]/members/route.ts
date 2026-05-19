@@ -33,20 +33,11 @@ export async function GET(
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    // Get all team members with user details
+    // Get all team members first. Avoid a joined Supabase relation query here:
+    // if PostgREST cannot infer the User relation, the dashboard gets a 500.
     const { data: members, error } = await supabase
       .from('TeamMember')
-      .select(`
-        id,
-        user_id,
-        role,
-        joined_at,
-        User!inner(
-          name,
-          email,
-          image
-        )
-      `)
+      .select('id, user_id, role, joined_at')
       .eq('team_id', teamId)
       .order('joined_at', { ascending: true })
 
@@ -55,18 +46,37 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch team members' }, { status: 500 })
     }
 
+    const userIds = (members || []).map(member => member.user_id).filter(Boolean)
+    const { data: users, error: usersError } = userIds.length > 0
+      ? await supabase
+          .from('User')
+          .select('id, name, email, image')
+          .in('id', userIds)
+      : { data: [], error: null }
+
+    if (usersError) {
+      console.error('Error fetching team member users:', usersError)
+      return NextResponse.json({ error: 'Failed to fetch team member users' }, { status: 500 })
+    }
+
+    const usersById = new Map((users || []).map(user => [user.id, user]))
+
     // Transform the data to match our interface
-    const transformedMembers = members.map(member => ({
-      id: member.id,
-      user_id: member.user_id,
-      role: member.role,
-      joined_at: member.joined_at,
-      user: {
-        name: member.User?.[0]?.name || null,
-        email: member.User?.[0]?.email || '',
-        image: member.User?.[0]?.image || null
+    const transformedMembers = (members || []).map(member => {
+      const user = usersById.get(member.user_id)
+
+      return {
+        id: member.id,
+        user_id: member.user_id,
+        role: member.role,
+        joined_at: member.joined_at,
+        user: {
+          name: user?.name || null,
+          email: user?.email || '',
+          image: user?.image || null
+        }
       }
-    }))
+    })
 
     return NextResponse.json({
       success: true,
