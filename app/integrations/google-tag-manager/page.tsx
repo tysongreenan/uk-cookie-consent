@@ -434,7 +434,7 @@ window.dataLayer.push({
                       <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto mb-4">
                         <pre>{`<!-- GTM Custom HTML Tag -->
 <script
-  src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
   async
 ></script>`}</pre>
                       </div>
@@ -477,7 +477,7 @@ window.dataLayer.push({
                         <pre>{`<head>
   <!-- Step 1: Cookie Consent Banner (BEFORE GTM) -->
   <script
-    src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+    src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
     async
   ></script>
 
@@ -526,7 +526,7 @@ export default function RootLayout({
       <head>
         {/* Step 1: Cookie Consent - loads before GTM */}
         <Script
-          src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+          src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
           strategy="beforeInteractive"
         />
 

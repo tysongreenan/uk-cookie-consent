@@ -17,6 +17,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 import { logActivity, AuditAction } from '@/lib/audit-log'
+import { resolveEffectivePlan } from '@/lib/team-permissions'
 import { sanitizeEmail } from '@/lib/sanitize'
 
 // Lazy initialization to avoid build-time errors
@@ -76,7 +77,7 @@ export const authOptions: NextAuthOptions = {
           // Basic user query (only existing fields)
           const { data: user, error } = await supabase
             .from('User')
-            .select('id, email, name, password, emailVerified, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool')
+            .select('id, email, name, password, emailVerified, planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool, currentTeamId')
             .eq('email', email)
             .single()
 
@@ -106,38 +107,32 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Get user's current team and role
+          // Prefer the workspace stored in currentTeamId so team switches persist across logins
           console.log('🔍 Auth: Looking up team for user:', user.id)
-          let { data: teamMember } = await supabase
-            .from('TeamMember')
-            .select('role, team_id')
-            .eq('user_id', user.id)
-            .order('joined_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
+          let { data: teamMember } = user.currentTeamId
+            ? await supabase
+                .from('TeamMember')
+                .select('role, team_id')
+                .eq('user_id', user.id)
+                .eq('team_id', user.currentTeamId)
+                .maybeSingle()
+            : { data: null }
+
+          if (!teamMember) {
+            const { data: fallbackMember } = await supabase
+              .from('TeamMember')
+              .select('role, team_id')
+              .eq('user_id', user.id)
+              .order('joined_at', { ascending: true })
+              .limit(1)
+              .maybeSingle()
+            teamMember = fallbackMember
+          }
           
           console.log('🔍 Auth: TeamMember query result:', teamMember)
 
-          // If user has no team, this should not happen for registered users
           if (!teamMember) {
-            console.warn('❌ Auth: User has no workspace - this should not happen for registered users:', user.id)
-            
-            // As a fallback, check if workspace exists but query failed
-            const { data: fallbackCheck } = await supabase
-              .from('TeamMember')
-              .select('team_id, role')
-              .eq('user_id', user.id)
-              .limit(1)
-              .maybeSingle()
-            
-            if (fallbackCheck) {
-              console.log('✅ Auth: Found workspace via fallback check:', fallbackCheck.team_id)
-              teamMember = {
-                role: fallbackCheck.role,
-                team_id: fallbackCheck.team_id
-              }
-            } else {
-              console.error('❌ Auth: No workspace found for user - they need to contact support')
-            }
+            console.error('❌ Auth: No workspace found for user:', user.id)
           }
 
           // Update last login time (only update existing fields)
@@ -318,7 +313,7 @@ export const authOptions: NextAuthOptions = {
           // Set current team
           await supabase
             .from('User')
-            .update({ current_team_id: teamId })
+            .update({ currentTeamId: teamId })
             .eq('id', userId)
         } else {
           console.error('Google OAuth: Failed to create workspace:', teamError)
@@ -358,13 +353,20 @@ export const authOptions: NextAuthOptions = {
           const supabase = getSupabaseClient()
           const { data } = await supabase
             .from('User')
-            .select('planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool, current_team_id')
+            .select('planTier, userType, consumerTier, hasConsentBanner, hasPrivacyConsumer, hasCommentTool, currentTeamId')
             .eq('id', token.id)
             .single()
           if (data?.planTier) token.planTier = data.planTier
           if (data?.userType) token.userType = data.userType
           if (data?.consumerTier) token.consumerTier = data.consumerTier
-          if (data?.current_team_id) token.currentTeamId = data.current_team_id
+          if (data?.currentTeamId) token.currentTeamId = data.currentTeamId
+
+          // Resolve team owner's plan when user is in someone else's workspace
+          const effectiveTeamId = data?.currentTeamId || (token.currentTeamId as string)
+          if (effectiveTeamId) {
+            const effective = await resolveEffectivePlan(token.id as string, effectiveTeamId)
+            token.planTier = effective.planTier
+          }
           if (data) {
             token.hasConsentBanner = data.hasConsentBanner ?? true
             token.hasPrivacyConsumer = data.hasPrivacyConsumer ?? false
@@ -372,12 +374,12 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Re-fetch user's role for their current team so it stays in sync after team switches
-          if (data?.current_team_id) {
+          if (data?.currentTeamId) {
             const { data: member } = await supabase
               .from('TeamMember')
               .select('role')
               .eq('user_id', token.id)
-              .eq('team_id', data.current_team_id)
+              .eq('team_id', data.currentTeamId)
               .single()
             if (member?.role) token.userRole = member.role
           }

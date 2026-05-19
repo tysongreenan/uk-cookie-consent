@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Update user's current team
     const { error } = await supabase
       .from('User')
-      .update({ current_team_id: teamId })
+      .update({ currentTeamId: teamId })
       .eq('id', session.user.id)
 
     if (error) {

@@ -135,8 +135,12 @@ export async function POST(
       )
     }
 
-    // Don't auto-switch user's current workspace
-    // User can switch to the invited workspace via the workspace switcher
+    // Auto-switch to the invited workspace so the user immediately
+    // sees the team owner's plan and Pro features
+    await supabase
+      .from('User')
+      .update({ currentTeamId: invitation.team_id })
+      .eq('id', session.user.id)
 
     return NextResponse.json({
       success: true,

@@ -727,6 +727,7 @@ export const generateBannerCSS = (config: BannerConfig) => {
   if (!config.branding) config.branding = {} as any
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
+  const isBottomBar = config.position === 'bottom'
 
   return `/* Floating button - hidden by default with strong CSS */
 #cookie-settings-float {
@@ -750,6 +751,10 @@ export const generateBannerCSS = (config: BannerConfig) => {
 #cookie-settings-float:hover {
   opacity: 1 !important;
   transform: translateY(-2px);
+}
+
+#cookie-consent-banner {
+  position: fixed !important;
 }
 
 #cookie-consent-banner * {
@@ -803,6 +808,11 @@ input:checked + span:before {
     left: 0 !important;
     right: 0 !important;
     max-width: none !important;
+    ${isBottomBar ? `
+    top: auto !important;
+    bottom: 0 !important;
+    width: auto !important;
+    margin: 0 !important;` : ''}
   }
   
   #cookie-consent-banner h3 {
@@ -1869,6 +1879,17 @@ function saveConsent(consent, tcfPurposes) {
       try { cb(consent); } catch(e) {}
     });
   }
+
+  // Dispatch CustomEvent for framework integrations (React, Vue, etc.)
+  try {
+    window.dispatchEvent(new CustomEvent('cookie-consent-update', {
+      detail: {
+        analytics: !!consent.analytics,
+        marketing: !!consent.marketing,
+        functionality: !!consent.functionality
+      }
+    }));
+  } catch(e) {}
 }
 
 // Toggle switches and consent loading - must be in outer scope
@@ -2200,6 +2221,48 @@ function init() {
   
   if (!banner) return;
 
+  ${config.position === 'bottom' ? `
+  var syncBottomBannerToViewport = function() {
+    if (!banner || banner.style.display === 'none') return;
+
+    banner.style.setProperty('position', 'fixed', 'important');
+    banner.style.setProperty('top', 'auto', 'important');
+    banner.style.setProperty('bottom', '0', 'important');
+    banner.style.setProperty('left', '0', 'important');
+    banner.style.setProperty('right', '0', 'important');
+
+    if (!window.visualViewport || window.innerWidth > 768) {
+      banner.style.removeProperty('--cookie-banner-viewport-y');
+      banner.style.removeProperty('transform');
+      return;
+    }
+
+    banner.style.setProperty('transform', 'translateY(0px)', 'important');
+    var rect = banner.getBoundingClientRect();
+    var correction = Math.round(window.visualViewport.height - rect.bottom);
+    if (Math.abs(correction) < 1) correction = 0;
+    banner.style.setProperty('transform', 'translateY(' + correction + 'px)', 'important');
+  };
+
+  var scheduleBottomBannerSync = function() {
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(syncBottomBannerToViewport);
+    } else {
+      setTimeout(syncBottomBannerToViewport, 0);
+    }
+  };
+
+  if (!banner.dataset.viewportPinAttached) {
+    window.addEventListener('scroll', scheduleBottomBannerSync, { passive: true });
+    window.addEventListener('resize', scheduleBottomBannerSync);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('scroll', scheduleBottomBannerSync, { passive: true });
+      window.visualViewport.addEventListener('resize', scheduleBottomBannerSync);
+    }
+    banner.dataset.viewportPinAttached = 'true';
+  }
+  ` : ''}
+
   // Geo-targeting: strict opt-in enforcement
   // When a geo rule requires opt-in, hide the close button so visitors must explicitly choose
   if (GEO_REQUIRES_OPT_IN && closeBtn) {
@@ -2433,6 +2496,17 @@ function init() {
     showFloatingButton();
     updateFloatingButtonIcon(existingConsent);
 
+    // Dispatch initial consent state for framework integrations (React, Vue, etc.)
+    try {
+      window.dispatchEvent(new CustomEvent('cookie-consent-update', {
+        detail: {
+          analytics: !!existingConsent.analytics,
+          marketing: !!existingConsent.marketing,
+          functionality: !!existingConsent.functionality
+        }
+      }));
+    } catch(e) {}
+
     // Show GPC acknowledgment bar only on the first visit where GPC is newly detected
     if (GPC_ACTIVE && gpcChanged) {
       showGpcAcknowledgment();
@@ -2448,6 +2522,7 @@ function init() {
 
   ${config.behavior.autoShow ? `
   banner.style.display = 'block';
+  ${config.position === 'bottom' ? 'scheduleBottomBannerSync();' : ''}
   trackConsentEvent('impression'); // Track banner impression
   // TCF: update display status and notify listeners
   if (TCF_ENABLED) {
@@ -2533,4 +2608,3 @@ export const generateConsentInitScript = (config?: BannerConfig) => {
 })();
 </script>`
 }
-

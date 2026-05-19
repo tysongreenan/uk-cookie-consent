@@ -185,10 +185,10 @@ export async function POST(request: NextRequest) {
           console.error('❌ Registration: Error adding user to workspace:', memberError)
         } else {
           console.log('✅ Registration: TeamMember created successfully')
-          // Set current_team_id for the user
+          // Set currentTeamId for the user
           await supabase
             .from('User')
-            .update({ current_team_id: teamId })
+            .update({ currentTeamId: teamId })
             .eq('id', user.id)
           
           console.log('✅ Registration: Personal workspace created for user:', user.id, 'teamId:', teamId)

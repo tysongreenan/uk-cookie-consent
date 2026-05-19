@@ -22,7 +22,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const currentTeamId = session.user.currentTeamId || (session.user as any).current_team_id
+    const currentTeamId = session.user.currentTeamId
     if (!currentTeamId) {
       return NextResponse.json(
         { error: 'No team selected' },

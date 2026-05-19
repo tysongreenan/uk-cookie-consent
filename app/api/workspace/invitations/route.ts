@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     expiresAt.setDate(expiresAt.getDate() + 7) // 7 days from now
 
     // Get or create user's team/workspace
-    let teamId = session.user.currentTeamId || (session.user as any)?.current_team_id
+    let teamId = session.user.currentTeamId
     
     if (!teamId) {
       // User should already have a workspace from registration

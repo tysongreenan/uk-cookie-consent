@@ -67,14 +67,14 @@ export async function POST(
       const personalWorkspace = otherTeams.find(t => t.Team[0]?.owner_id === session.user.id)
       const targetWorkspace = personalWorkspace || otherTeams[0]
 
-      // Update user's current_team_id
+      // Update user's currentTeamId
       const { error: updateError } = await supabase
         .from('User')
-        .update({ current_team_id: targetWorkspace.team_id })
+        .update({ currentTeamId: targetWorkspace.team_id })
         .eq('id', session.user.id)
 
       if (updateError) {
-        console.error('Error updating user current_team_id:', updateError)
+        console.error('Error updating user currentTeamId:', updateError)
         return NextResponse.json({ error: 'Failed to switch workspace' }, { status: 500 })
       }
     }

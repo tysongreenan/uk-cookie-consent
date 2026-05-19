@@ -366,7 +366,7 @@ export default function ReactIntegrationPage() {
                         The dashboard gives you a script tag like this:
                       </p>
                       <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto">
-                        <pre>{`<script src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js" async></script>`}</pre>
+                        <pre>{`<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}</pre>
                       </div>
                       <div className="bg-muted border border-border rounded-lg p-4 mt-4">
                         <p className="text-sm text-muted-foreground">
@@ -458,7 +458,7 @@ export default function RootLayout({
       <head>
         {/* Cookie Consent Banner - loads before tracking scripts */}
         <Script
-          src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+          src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
           strategy="beforeInteractive"
         />
       </head>
@@ -502,7 +502,7 @@ export default function Document() {
       <Head>
         {/* Cookie Consent Banner */}
         <script
-          src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+          src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
           async
         />
       </Head>
@@ -545,7 +545,7 @@ export default function Document() {
 
     <!-- Cookie Consent Banner - MUST be before analytics scripts -->
     <script
-      src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+      src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
       async
     ></script>
 
@@ -602,7 +602,7 @@ export default function App() {
         <Links />
         {/* Cookie Consent Banner */}
         <script
-          src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+          src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
           async
         />
       </head>
@@ -673,7 +673,7 @@ export default function RootLayout({
       <head>
         {/* Step 1: Cookie Consent - MUST load first */}
         <Script
-          src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+          src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
           strategy="beforeInteractive"
         />
 
@@ -726,11 +726,11 @@ export function useCookieConsent() {
   const [consent, setConsent] = useState<{
     analytics: boolean
     marketing: boolean
-    preferences: boolean
+    functionality: boolean
   }>({
     analytics: false,
     marketing: false,
-    preferences: false,
+    functionality: false,
   })
 
   useEffect(() => {
@@ -790,7 +790,7 @@ export default function PublicLayout({
     <>
       {/* Only loads cookie banner on public routes */}
       <Script
-        src="https://www.cookie-banner.ca/api/scripts/YOUR_BANNER_ID.js"
+        src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
         strategy="beforeInteractive"
       />
       {children}
