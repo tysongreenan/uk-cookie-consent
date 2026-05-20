@@ -21,9 +21,14 @@ import {
   Edit,
   Eye,
   Loader2,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+
+const NEW_WORKSPACE_NOTICE_KEY = 'cookie-banner:new-workspace-joined'
+const WORKSPACE_NOTICE_DISMISSED_PREFIX = 'cookie-banner:workspace-notice-dismissed:'
+const WORKSPACE_NOTICE_MAX_AGE = 7 * 24 * 60 * 60 * 1000
 
 interface Workspace {
   id: string
@@ -38,6 +43,11 @@ export function WorkspaceSwitcher() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [loading, setLoading] = useState(true)
   const [switching, setSwitching] = useState(false)
+  const [workspaceNotice, setWorkspaceNotice] = useState<{
+    teamId: string
+    teamName: string
+    joinedFromInvite: boolean
+  } | null>(null)
   const userPlan = (session?.user?.planTier || 'free') as string
   const isPro = userPlan !== 'free'
 
@@ -176,6 +186,62 @@ export function WorkspaceSwitcher() {
   // Other workspaces are all workspaces except the current one
   const otherWorkspaces = workspaces.filter(w => w.id !== currentWorkspace?.id)
 
+  useEffect(() => {
+    if (!currentWorkspace || loading) return
+
+    try {
+      const dismissedKey = `${WORKSPACE_NOTICE_DISMISSED_PREFIX}${currentWorkspace.id}`
+      const rawNotice = localStorage.getItem(NEW_WORKSPACE_NOTICE_KEY)
+      let nextNotice: typeof workspaceNotice = null
+
+      if (rawNotice) {
+        const parsed = JSON.parse(rawNotice) as {
+          teamId?: string
+          teamName?: string
+          createdAt?: number
+        }
+        const isFresh = typeof parsed.createdAt === 'number' &&
+          Date.now() - parsed.createdAt < WORKSPACE_NOTICE_MAX_AGE
+
+        if (!isFresh) {
+          localStorage.removeItem(NEW_WORKSPACE_NOTICE_KEY)
+        } else if (parsed.teamId === currentWorkspace.id) {
+          nextNotice = {
+            teamId: currentWorkspace.id,
+            teamName: parsed.teamName || currentWorkspace.name,
+            joinedFromInvite: true
+          }
+        }
+      }
+
+      if (!nextNotice && currentWorkspace.userRole !== 'owner' && !localStorage.getItem(dismissedKey)) {
+        nextNotice = {
+          teamId: currentWorkspace.id,
+          teamName: currentWorkspace.name,
+          joinedFromInvite: false
+        }
+      }
+
+      setWorkspaceNotice(nextNotice)
+    } catch (error) {
+      console.error('Error loading workspace notice:', error)
+      setWorkspaceNotice(null)
+    }
+  }, [currentWorkspace?.id, currentWorkspace?.name, currentWorkspace?.userRole, loading])
+
+  const dismissWorkspaceNotice = () => {
+    if (!workspaceNotice) return
+
+    try {
+      localStorage.removeItem(NEW_WORKSPACE_NOTICE_KEY)
+      localStorage.setItem(`${WORKSPACE_NOTICE_DISMISSED_PREFIX}${workspaceNotice.teamId}`, 'true')
+    } catch (error) {
+      console.error('Error dismissing workspace notice:', error)
+    }
+
+    setWorkspaceNotice(null)
+  }
+
   if (loading) {
     return (
       <Button variant="outline" disabled>
@@ -195,84 +261,121 @@ export function WorkspaceSwitcher() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-between overflow-hidden">
-          <div className="flex items-center min-w-0">
-            <Building2 className="h-4 w-4 mr-2 shrink-0" />
-            <span className="truncate">{currentWorkspace?.name || 'Select Workspace'}</span>
-            {isPro && <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 border-0 font-semibold tracking-wide shrink-0" aria-label="Pro plan workspace">PRO</Badge>}
-          </div>
-          <ChevronDown className="h-4 w-4 ml-1 shrink-0" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64">
-        <DropdownMenuLabel>Switch Workspace</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
-        {/* Current Workspace */}
-        {currentWorkspace && (
-          <DropdownMenuItem 
-            className="cursor-default"
-            disabled
-          >
-            <div className="flex items-center w-full">
-              <Check className="h-4 w-4 mr-2 text-green-600" />
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">{currentWorkspace.name}</div>
-                <div className="text-xs text-muted-foreground">Current workspace</div>
+    <div className="space-y-2">
+      {workspaceNotice && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow-sm">
+          <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="font-semibold leading-snug">
+                {workspaceNotice.joinedFromInvite ? `Joined ${workspaceNotice.teamName}` : `Viewing ${workspaceNotice.teamName}`}
               </div>
-              <Badge className={getRoleBadgeColor(currentWorkspace.userRole)}>
-                {currentWorkspace.userRole}
-              </Badge>
-            </div>
-          </DropdownMenuItem>
-        )}
-
-        {otherWorkspaces.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Other Workspaces</DropdownMenuLabel>
-          </>
-        )}
-
-        {/* Other Workspaces */}
-        {otherWorkspaces.map((workspace) => (
-          <DropdownMenuItem
-            key={workspace.id}
-            onClick={() => switchWorkspace(workspace.id)}
-            disabled={switching}
-            className="cursor-pointer"
-          >
-            <div className="flex items-center w-full">
-              {getRoleIcon(workspace.userRole)}
-              <div className="flex-1 min-w-0 ml-2">
-                <div className="font-medium truncate">{workspace.name}</div>
-                <div className="text-xs text-muted-foreground">
-                  Joined {new Date(workspace.joinedAt).toLocaleDateString()}
-                </div>
+              <div className="mt-0.5 leading-snug text-amber-800">
+                This is the workspace connected to the team plan.
               </div>
-              <Badge className={getRoleBadgeColor(workspace.userRole)}>
-                {workspace.userRole}
-              </Badge>
             </div>
-          </DropdownMenuItem>
-        ))}
-
-        {/* Leave Workspace Option - only show if not owner of current workspace */}
-        {currentWorkspace && currentWorkspace.userRole !== 'owner' && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => leaveWorkspace(currentWorkspace.id)}
-              className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+            <button
+              type="button"
+              onClick={dismissWorkspaceNotice}
+              className="rounded p-0.5 text-amber-700 hover:bg-amber-100 hover:text-amber-900"
+              aria-label="Dismiss workspace notice"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Leave this workspace
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full justify-between overflow-hidden">
+            <div className="flex items-center min-w-0">
+              <Building2 className="h-4 w-4 mr-2 shrink-0" />
+              <span className="truncate">{currentWorkspace?.name || 'Select Workspace'}</span>
+              {workspaceNotice?.joinedFromInvite && (
+                <Badge className="ml-1.5 bg-emerald-600 text-white text-[10px] px-1.5 py-0 border-0 font-semibold tracking-wide shrink-0">
+                  NEW
+                </Badge>
+              )}
+              {isPro && <Badge className="ml-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0 border-0 font-semibold tracking-wide shrink-0" aria-label="Pro plan workspace">PRO</Badge>}
+            </div>
+            <ChevronDown className="h-4 w-4 ml-1 shrink-0" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-64">
+          <DropdownMenuLabel>Switch Workspace</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          {/* Current Workspace */}
+          {currentWorkspace && (
+            <DropdownMenuItem
+              className="cursor-default"
+              disabled
+            >
+              <div className="flex items-center w-full">
+                <Check className="h-4 w-4 mr-2 text-green-600" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-medium truncate">{currentWorkspace.name}</span>
+                    {workspaceNotice?.joinedFromInvite && (
+                      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] px-1.5 py-0">
+                        NEW
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Current workspace</div>
+                </div>
+                <Badge className={getRoleBadgeColor(currentWorkspace.userRole)}>
+                  {currentWorkspace.userRole}
+                </Badge>
+              </div>
             </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          )}
+
+          {otherWorkspaces.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Other Workspaces</DropdownMenuLabel>
+            </>
+          )}
+
+          {/* Other Workspaces */}
+          {otherWorkspaces.map((workspace) => (
+            <DropdownMenuItem
+              key={workspace.id}
+              onClick={() => switchWorkspace(workspace.id)}
+              disabled={switching}
+              className="cursor-pointer"
+            >
+              <div className="flex items-center w-full">
+                {getRoleIcon(workspace.userRole)}
+                <div className="flex-1 min-w-0 ml-2">
+                  <div className="font-medium truncate">{workspace.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Joined {new Date(workspace.joinedAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <Badge className={getRoleBadgeColor(workspace.userRole)}>
+                  {workspace.userRole}
+                </Badge>
+              </div>
+            </DropdownMenuItem>
+          ))}
+
+          {/* Leave Workspace Option - only show if not owner of current workspace */}
+          {currentWorkspace && currentWorkspace.userRole !== 'owner' && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => leaveWorkspace(currentWorkspace.id)}
+                className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Leave this workspace
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }

@@ -38,6 +38,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   const [error, setError] = useState<string | null>(null)
   const [emailMismatch, setEmailMismatch] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [acceptedWorkspaceName, setAcceptedWorkspaceName] = useState<string | null>(null)
   const router = useRouter()
 
   const callbackUrl = encodeURIComponent(`/invite/${params.token}`)
@@ -75,6 +76,20 @@ export default function InvitePage({ params }: { params: { token: string } }) {
       const data = await response.json()
 
       if (data.success) {
+        const acceptedTeam = data.team || invitation?.Team
+        const teamId = acceptedTeam?.id || invitation?.team_id
+        const teamName = acceptedTeam?.name || invitation?.Team?.name || 'your new workspace'
+
+        setAcceptedWorkspaceName(teamName)
+
+        if (teamId && typeof window !== 'undefined') {
+          localStorage.setItem('cookie-banner:new-workspace-joined', JSON.stringify({
+            teamId,
+            teamName,
+            createdAt: Date.now()
+          }))
+        }
+
         setSuccess(true)
         setTimeout(() => {
           router.push('/dashboard')
@@ -150,7 +165,8 @@ export default function InvitePage({ params }: { params: { token: string } }) {
             <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
             <CardTitle className="text-xl">Welcome to the Team!</CardTitle>
             <CardDescription>
-              You&apos;ve successfully joined the workspace. You can switch to this workspace using the workspace switcher in the dashboard header.
+              You&apos;re now viewing {acceptedWorkspaceName || 'your new workspace'}.
+              We&apos;ll highlight it in the dashboard workspace menu.
             </CardDescription>
           </CardHeader>
           <CardContent>
