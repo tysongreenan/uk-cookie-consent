@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { scanWebsite } from '@/lib/scripts/scan-website'
 import { RateLimit } from '@/lib/rate-limit'
 
+// Headless Chromium needs the Node.js runtime, not Edge.
+export const runtime = 'nodejs'
+// 60 s lets a slow site finish (navigation up to 25 s + Chromium cold start
+// up to ~8 s + scoring + slack). Vercel.json also sets this limit.
+export const maxDuration = 60
+
 // Public marketing tool — tighter rate limit than the in-builder scanner
 // because this endpoint is unauthenticated and reachable from the landing
 // page.
