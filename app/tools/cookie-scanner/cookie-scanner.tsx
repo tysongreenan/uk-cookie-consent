@@ -56,6 +56,7 @@ interface ScanResult {
   privacyPolicyUrl?: string | null
   scriptsDetected?: { name: string; category: string }[]
   note?: string
+  scanMethod?: 'headless' | 'static-html'
 }
 
 type ScanStep = {
@@ -172,6 +173,7 @@ async function performScan(targetUrl: string): Promise<ScanResult> {
     privacyPolicyUrl: data.privacyPolicyUrl,
     scriptsDetected: data.scriptsDetected ?? [],
     note: data.note,
+    scanMethod: data.scanMethod,
   }
 }
 

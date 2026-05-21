@@ -1,8 +1,16 @@
+// Orchestrator: tries a headless browser scan first (real cookies, real
+// network requests, post-JS DOM). Falls back to the cheerio HTML scan when
+// the headless launch fails (e.g., cold-start binary download error) or
+// times out, so the public tool never returns a hard failure for a normal
+// site.
+
 import { discoverScripts } from '@/lib/scripts/discover'
 import { SCRIPT_COOKIE_MAP, resolveCookieDomain, type InferredCookie } from '@/lib/scripts/known-cookies'
+import { scanWithBrowser, type HeadlessScanResult } from '@/lib/scripts/scan-website-headless'
+import { classifyCookies, type ClassifiedCookie } from '@/lib/scripts/cookie-classifier'
 
 export interface ScannedCookie extends InferredCookie {
-  source: string // Which detected script the cookie was inferred from.
+  source: string
 }
 
 export interface RegulationResult {
@@ -29,6 +37,7 @@ export interface WebsiteScanResult {
   recommendations: { text: string; regulation: string }[]
   warnings: string[]
   note: string
+  scanMethod: 'headless' | 'static-html'
 }
 
 function getGrade(score: number): string {
@@ -43,34 +52,29 @@ function clamp(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)))
 }
 
-export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult> {
-  const discovery = await discoverScripts(targetUrl)
-  const hostname = new URL(targetUrl).hostname
+interface ScoringInput {
+  cookies: ScannedCookie[]
+  scriptsDetected: { name: string; category: string }[]
+  consentBanner: { detected: boolean; vendor: string | null }
+  privacyPolicyUrl: string | null
+}
 
-  const scriptsDetected = discovery.scripts.map(s => ({ name: s.name, category: s.category }))
-  const consentBanner = discovery.consentBanner ?? { detected: false, vendor: null }
-  const privacyPolicyUrl = discovery.privacyPolicyUrl ?? null
+interface ScoringOutput {
+  overallScore: number
+  overallGrade: string
+  compliance: WebsiteScanResult['compliance']
+  recommendations: WebsiteScanResult['recommendations']
+}
 
-  // Infer cookies from each detected script using the well-known cookie map.
-  const cookies: ScannedCookie[] = []
-  for (const script of discovery.scripts) {
-    const mapped = SCRIPT_COOKIE_MAP[script.name]
-    if (!mapped) continue
-    for (const c of mapped) {
-      cookies.push({
-        ...c,
-        domain: resolveCookieDomain(c.domain, hostname),
-        source: script.name,
-      })
-    }
-  }
-
-  // Bucket counts drive every score and recommendation below.
+function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl }: ScoringInput): ScoringOutput {
   const marketingCount = cookies.filter(c => c.category === 'marketing').length
   const analyticsCount = cookies.filter(c => c.category === 'analytics').length
   const thirdPartyCount = cookies.filter(c => c.thirdParty).length
   const hasBanner = consentBanner.detected
   const hasPolicy = !!privacyPolicyUrl
+  const hasTrackingScripts = scriptsDetected.some(
+    s => s.category === 'tracking-performance' || s.category === 'targeting-advertising',
+  )
 
   // GDPR — strict opt-in regime. Heavy penalty for tracking without a CMP.
   const gdprIssues: string[] = []
@@ -86,7 +90,8 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
   if (marketingCount > 0) {
     gdpr -= Math.min(25, marketingCount * 6)
     if (!hasBanner) {
-      gdprIssues.push(`${marketingCount} marketing/advertising cookie${marketingCount > 1 ? 's' : ''} typically set without explicit consent (e.g., ${cookies.filter(c => c.category === 'marketing').slice(0, 3).map(c => c.name).join(', ')}).`)
+      const examples = cookies.filter(c => c.category === 'marketing').slice(0, 3).map(c => c.name).join(', ')
+      gdprIssues.push(`${marketingCount} marketing/advertising cookie${marketingCount > 1 ? 's' : ''} set without explicit consent${examples ? ` (e.g., ${examples})` : ''}.`)
     }
   }
   if (analyticsCount > 0 && !hasBanner) {
@@ -97,8 +102,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
     gdprIssues.push(`${thirdPartyCount} third-party cookie${thirdPartyCount > 1 ? 's' : ''} from external domains require granular opt-in.`)
   }
 
-  // PIPEDA — Canadian federal law, less strict than GDPR but still expects
-  // meaningful consent and transparency.
+  // PIPEDA — Canadian federal law, meaningful consent + transparency.
   const pipedaIssues: string[] = []
   let pipeda = 100
   if (!hasBanner) {
@@ -120,8 +124,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
     }
   }
 
-  // CCPA — California. Focused on the "sale" of personal information, which
-  // most ad-tech cookies qualify as.
+  // CCPA — focused on the "sale" of personal information.
   const ccpaIssues: string[] = []
   let ccpa = 100
   if (marketingCount > 0) {
@@ -138,9 +141,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
     ccpaIssues.push('Privacy policy must disclose categories of personal information collected.')
   }
 
-  // Quebec Law 25 — strict consent + French language requirement. We can't
-  // verify French-language consent from a one-page HTML scan, so we flag it
-  // as a known unknown.
+  // Quebec Law 25 — strict consent + French language requirement.
   const law25Issues: string[] = []
   let law25 = 100
   if (!hasBanner) {
@@ -162,7 +163,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
   law25 = clamp(law25)
   const overallScore = clamp((gdpr + pipeda + ccpa + law25) / 4)
 
-  const recommendations: { text: string; regulation: string }[] = []
+  const recommendations: WebsiteScanResult['recommendations'] = []
   if (!hasBanner) {
     recommendations.push({
       text: 'Add a cookie consent banner that blocks non-essential cookies until users opt in. Equal-prominence Accept and Reject buttons are required.',
@@ -192,7 +193,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
       regulation: 'GDPR, CCPA',
     })
   }
-  if (marketingCount > 0 || analyticsCount > 0) {
+  if (marketingCount > 0 || analyticsCount > 0 || hasTrackingScripts) {
     recommendations.push({
       text: 'Provide your privacy policy and cookie notice in French for Quebec visitors.',
       regulation: 'Law 25',
@@ -204,12 +205,6 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
   })
 
   return {
-    url: targetUrl,
-    fetchedAt: discovery.fetchedAt,
-    scriptsDetected,
-    consentBanner,
-    privacyPolicyUrl,
-    cookies,
     overallScore,
     overallGrade: getGrade(overallScore),
     compliance: {
@@ -219,7 +214,95 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
       law25: { score: law25, grade: getGrade(law25), issues: law25Issues },
     },
     recommendations,
+  }
+}
+
+function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, hostname: string): WebsiteScanResult {
+  const classified = classifyCookies(headless.cookies, hostname)
+  const cookies: ScannedCookie[] = classified.map((c: ClassifiedCookie) => ({
+    name: c.name,
+    domain: c.domain,
+    purpose: c.purpose,
+    category: c.category,
+    expires: c.expires,
+    secure: c.secure,
+    httpOnly: c.httpOnly,
+    sameSite: c.sameSite,
+    thirdParty: c.thirdParty,
+    source: c.source,
+  }))
+
+  const scriptsDetected = headless.loadedScripts.map(s => ({ name: s.name, category: s.category }))
+  const scored = scoreCompliance({
+    cookies,
+    scriptsDetected,
+    consentBanner: headless.consentBanner,
+    privacyPolicyUrl: headless.privacyPolicyUrl,
+  })
+
+  return {
+    url: targetUrl,
+    fetchedAt: new Date().toISOString(),
+    scriptsDetected,
+    consentBanner: headless.consentBanner,
+    privacyPolicyUrl: headless.privacyPolicyUrl,
+    cookies,
+    ...scored,
+    warnings: [],
+    note: `Cookies and scripts observed directly via a headless browser scan of ${headless.finalUrl}. Sites that block headless browsers or that only load trackers after user interaction may show fewer results.`,
+    scanMethod: 'headless',
+  }
+}
+
+async function buildFromCheerio(targetUrl: string, hostname: string): Promise<WebsiteScanResult> {
+  const discovery = await discoverScripts(targetUrl)
+  const scriptsDetected = discovery.scripts.map(s => ({ name: s.name, category: s.category }))
+  const consentBanner = discovery.consentBanner ?? { detected: false, vendor: null }
+  const privacyPolicyUrl = discovery.privacyPolicyUrl ?? null
+
+  const cookies: ScannedCookie[] = []
+  for (const script of discovery.scripts) {
+    const mapped = SCRIPT_COOKIE_MAP[script.name]
+    if (!mapped) continue
+    for (const c of mapped) {
+      cookies.push({
+        ...c,
+        domain: resolveCookieDomain(c.domain, hostname),
+        source: script.name,
+      })
+    }
+  }
+
+  const scored = scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl })
+
+  return {
+    url: targetUrl,
+    fetchedAt: discovery.fetchedAt,
+    scriptsDetected,
+    consentBanner,
+    privacyPolicyUrl,
+    cookies,
+    ...scored,
     warnings: discovery.warnings,
-    note: 'Cookie list inferred from tracking scripts found in the page HTML. A static scan cannot observe cookies set at runtime by single-page apps or after consent; results reflect well-known defaults of each detected vendor.',
+    note: 'Cookie list inferred from tracking scripts found in the page HTML. A static scan cannot observe cookies set at runtime by single-page apps; this is the fallback when a full browser scan is unavailable.',
+    scanMethod: 'static-html',
+  }
+}
+
+export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult> {
+  const hostname = new URL(targetUrl).hostname
+
+  // Try the headless browser scan first — it sees the post-JS world.
+  try {
+    const headless = await scanWithBrowser(targetUrl)
+    return buildFromHeadless(targetUrl, headless, hostname)
+  } catch (err) {
+    console.warn('Headless scan failed, falling back to static HTML scan:', err instanceof Error ? err.message : err)
+    const fallback = await buildFromCheerio(targetUrl, hostname)
+    fallback.warnings = [
+      ...fallback.warnings,
+      'Full-browser scan was unavailable; results are based on static HTML only and may miss scripts loaded dynamically.',
+    ]
+    return fallback
   }
 }
