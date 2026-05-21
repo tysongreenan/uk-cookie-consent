@@ -429,9 +429,9 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       <div style="flex: 1; min-width: 250px;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.title)}</h3>
-        
-        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        <h3 id="cookie-title" style="margin: 0 0 8px 0; padding-right: 56px; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.title)}</h3>
+
+        <p id="cookie-message" style="margin: 0 0 16px 0; padding-right: 56px; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
         
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.acceptButton)}</button>
@@ -829,8 +829,9 @@ input:checked + span:before {
     z-index: 2 !important;
   }
 
-  #cookie-title {
-    padding-right: 48px !important;
+  #cookie-title,
+  #cookie-message {
+    padding-right: 56px !important;
   }
   
   #cookie-consent-banner h3 {
