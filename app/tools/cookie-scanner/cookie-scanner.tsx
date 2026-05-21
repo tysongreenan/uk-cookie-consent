@@ -52,6 +52,10 @@ interface ScanResult {
   }
   recommendations: { text: string; regulation: string }[]
   timestamp: string
+  consentBanner?: { detected: boolean; vendor: string | null }
+  privacyPolicyUrl?: string | null
+  scriptsDetected?: { name: string; category: string }[]
+  note?: string
 }
 
 type ScanStep = {
@@ -126,86 +130,48 @@ function validateUrl(inputUrl: string): boolean {
   return true
 }
 
-// Mock scan — will be replaced with real API call
+// Calls the real backend scanner. The endpoint fetches the page server-side
+// with cheerio, detects tracking scripts and any CMP, infers cookies from
+// the known-vendor map, and returns per-regulation compliance scores.
 async function performScan(targetUrl: string): Promise<ScanResult> {
-  await new Promise(resolve => setTimeout(resolve, 8000))
-
   const domain = new URL(targetUrl).hostname
-  const cookies: CookieData[] = [
-    { name: '_ga', domain: `.${domain}`, purpose: 'Google Analytics — tracks unique visitors', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_gid', domain: `.${domain}`, purpose: 'Google Analytics — distinguishes users for 24h', category: 'analytics', expires: '24 hours', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_ga_QM1L8P6TT5', domain: `.${domain}`, purpose: 'Google Analytics 4 — stores session state', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_fbp', domain: '.facebook.com', purpose: 'Facebook Pixel — tracks visits for ad targeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'None', thirdParty: true },
-    { name: '_gcl_au', domain: `.${domain}`, purpose: 'Google Ads — stores conversion data', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: 'fr', domain: '.facebook.com', purpose: 'Facebook — ad delivery and retargeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
-    { name: 'sessionid', domain: `.${domain}`, purpose: 'Session management — keeps users logged in', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Lax', thirdParty: false },
-    { name: 'csrftoken', domain: `.${domain}`, purpose: 'CSRF protection — prevents cross-site attacks', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
-    { name: '__stripe_mid', domain: `.${domain}`, purpose: 'Stripe — fraud detection for payments', category: 'necessary', expires: '1 year', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
-    { name: 'preferences', domain: `.${domain}`, purpose: 'User preferences — language, theme, layout', category: 'functional', expires: '1 year', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_hjSessionUser', domain: `.${domain}`, purpose: 'Hotjar — identifies returning visitors', category: 'analytics', expires: '1 year', secure: true, httpOnly: false, sameSite: 'None', thirdParty: false },
-    { name: 'NID', domain: '.google.com', purpose: 'Google — stores preferences and ad personalization', category: 'marketing', expires: '6 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
-  ]
 
-  const gdprScore = 58
-  const pipedaScore = 72
-  const ccpaScore = 52
-  const law25Score = 65
-  const overallScore = Math.round((gdprScore + pipedaScore + ccpaScore + law25Score) / 4)
+  const response = await fetch('/api/tools/cookie-scanner', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: domain }),
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data?.error || 'Scan failed')
+  }
+
+  const cookies: CookieData[] = (data.cookies ?? []).map((c: any) => ({
+    name: c.name,
+    domain: c.domain,
+    purpose: c.purpose,
+    category: c.category,
+    expires: c.expires,
+    secure: c.secure,
+    httpOnly: c.httpOnly,
+    sameSite: c.sameSite,
+    thirdParty: c.thirdParty,
+  }))
 
   return {
     url: targetUrl,
     cookies,
-    overallGrade: getGrade(overallScore),
-    overallScore,
-    compliance: {
-      gdpr: {
-        score: gdprScore,
-        grade: getGrade(gdprScore),
-        issues: [
-          'Analytics cookies set before obtaining explicit consent',
-          'Marketing cookies from third-party domains require granular opt-in',
-          'No consent withdrawal mechanism detected',
-          'Cookie policy does not list all cookies by category',
-        ],
-      },
-      pipeda: {
-        score: pipedaScore,
-        grade: getGrade(pipedaScore),
-        issues: [
-          'Marketing cookies require explicit opt-in consent',
-          'Cookie notice should be more prominent on first visit',
-          'Third-party data sharing not disclosed in privacy policy',
-        ],
-      },
-      ccpa: {
-        score: ccpaScore,
-        grade: getGrade(ccpaScore),
-        issues: [
-          'Third-party marketing cookies constitute "sale" of personal information',
-          '"Do Not Sell or Share My Personal Information" link not found',
-          'Opt-out mechanism required for all advertising cookies',
-          'Privacy policy must disclose categories of data collected',
-        ],
-      },
-      law25: {
-        score: law25Score,
-        grade: getGrade(law25Score),
-        issues: [
-          'Consent must be obtained in French for Quebec visitors',
-          'Privacy policy must be available in French',
-          'Biometric and location data processing requires explicit consent',
-        ],
-      },
-    },
-    recommendations: [
-      { text: 'Add a cookie consent banner that blocks non-essential cookies until users opt in.', regulation: 'GDPR, CCPA, PIPEDA, Law 25' },
-      { text: 'Add a "Do Not Sell or Share My Personal Information" link in your footer.', regulation: 'CCPA' },
-      { text: 'Create a detailed cookie policy listing every cookie by name, purpose, and duration.', regulation: 'GDPR, PIPEDA' },
-      { text: 'Implement Google Consent Mode v2 so Analytics and Ads respect user choices automatically.', regulation: 'GDPR, CCPA' },
-      { text: 'Provide your privacy policy and cookie notice in French for Quebec visitors.', regulation: 'Law 25' },
-      { text: 'Review third-party scripts quarterly — plugins and widgets often add cookies without notice.', regulation: 'All' },
-    ],
-    timestamp: new Date().toISOString(),
+    overallGrade: data.overallGrade,
+    overallScore: data.overallScore,
+    compliance: data.compliance,
+    recommendations: data.recommendations ?? [],
+    timestamp: data.fetchedAt ?? new Date().toISOString(),
+    consentBanner: data.consentBanner,
+    privacyPolicyUrl: data.privacyPolicyUrl,
+    scriptsDetected: data.scriptsDetected ?? [],
+    note: data.note,
   }
 }
 
@@ -332,22 +298,26 @@ export function CookieScanner() {
     setExpandedCookie(null)
     setExpandedRegulation(null)
 
-    // Step progression
-    const stepTimers = [2000, 3000, 3000]
+    const targetUrl = `https://${domain}`
+    const scanPromise = performScan(targetUrl)
+
+    // Step animation runs in parallel with the real scan so total time
+    // tracks whichever is slower (usually the network fetch + parse).
+    const stepTimers = [1500, 2000, 2000]
     for (let i = 0; i < stepTimers.length; i++) {
       await new Promise(r => setTimeout(r, stepTimers[i]))
       setCurrentStep(i + 1)
     }
 
     try {
-      const targetUrl = `https://${domain}`
-      const scanResult = await performScan(targetUrl)
+      const scanResult = await scanPromise
       setResult(scanResult)
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 200)
-    } catch {
-      setError('Failed to scan website. Please try again.')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to scan website. Please try again.'
+      setError(message)
     } finally {
       setIsScanning(false)
       setCurrentStep(-1)
@@ -532,6 +502,55 @@ export function CookieScanner() {
               </div>
             </div>
           </motion.div>
+
+          {/* What we detected on the page */}
+          <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 md:grid-cols-3 gap-3 py-6 border-b border-border">
+            <div className={`flex items-start gap-3 p-3 rounded-lg border ${result.consentBanner?.detected ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'}`}>
+              {result.consentBanner?.detected ? (
+                <Check className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-red-700 shrink-0 mt-0.5" />
+              )}
+              <div>
+                <p className="text-sm font-semibold text-foreground">Consent banner</p>
+                <p className={`text-xs ${result.consentBanner?.detected ? 'text-emerald-700' : 'text-red-700'}`}>
+                  {result.consentBanner?.detected
+                    ? `${result.consentBanner.vendor ?? 'CMP'} detected`
+                    : 'Not detected on this page'}
+                </p>
+              </div>
+            </div>
+            <div className={`flex items-start gap-3 p-3 rounded-lg border ${result.privacyPolicyUrl ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+              {result.privacyPolicyUrl ? (
+                <Check className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">Privacy policy link</p>
+                <p className={`text-xs truncate ${result.privacyPolicyUrl ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  {result.privacyPolicyUrl ? 'Found in page footer' : 'Not found on this page'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/40">
+              <Activity className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Tracking scripts</p>
+                <p className="text-xs text-muted-foreground">
+                  {result.scriptsDetected && result.scriptsDetected.length > 0
+                    ? `${result.scriptsDetected.length} detected: ${result.scriptsDetected.slice(0, 3).map(s => s.name).join(', ')}${result.scriptsDetected.length > 3 ? '…' : ''}`
+                    : 'None matched our pattern library'}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {result.note && (
+            <motion.p variants={fadeUp} custom={1} className="text-xs text-muted-foreground italic py-3 border-b border-border">
+              {result.note}
+            </motion.p>
+          )}
 
           {/* Cookie Category Breakdown */}
           <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-b border-border">
