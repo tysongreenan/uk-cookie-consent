@@ -7,7 +7,25 @@ export interface ScriptDiscoveryResult {
   scripts: TrackingScript[]
   warnings: string[]
   fetchedAt: string
+  consentBanner?: { detected: boolean; vendor: string | null }
+  privacyPolicyUrl?: string | null
 }
+
+// Common Consent Management Platforms — matched against script src/content/id.
+const cmpPatterns: { name: string; patterns: RegExp[] }[] = [
+  { name: 'Cookiebot', patterns: [/consent\.cookiebot\.com/, /cookiebot\.com\/uc\.js/, /id=["']Cookiebot["']/] },
+  { name: 'OneTrust', patterns: [/cdn\.cookielaw\.org/, /cdn-ukwest\.onetrust\.com/, /OneTrust\.NoticeApi/, /optanon-/] },
+  { name: 'Termly', patterns: [/app\.termly\.io\/embed/, /termly\.io\/resource-blocker/] },
+  { name: 'CookieYes', patterns: [/cookie-cdn\.cookieyes\.com/, /cookieyes\.com\/client_data/] },
+  { name: 'Iubenda', patterns: [/iubenda\.com\/cs\/iubenda_cs/, /cs\.iubenda\.com/] },
+  { name: 'Osano', patterns: [/cmp\.osano\.com/] },
+  { name: 'Quantcast Choice', patterns: [/quantcast\.mgr\.consensu\.org/, /cmp\.quantcast\.com/] },
+  { name: 'TrustArc', patterns: [/consent\.trustarc\.com/, /cdn\.trustarc\.com/] },
+  { name: 'Usercentrics', patterns: [/app\.usercentrics\.eu/, /privacy-proxy\.usercentrics\.eu/] },
+  { name: 'Didomi', patterns: [/sdk\.privacy-center\.org/, /didomi\.io/] },
+  { name: 'UK Cookie Consent', patterns: [/ukcookieconsent/, /uk-cookie-consent/] },
+  { name: 'Civic Cookie Control', patterns: [/cc\.cdn\.civiccomputing\.com/, /CookieControl/] },
+]
 
 interface ScriptPattern {
   name: string
@@ -19,6 +37,30 @@ interface ScriptPattern {
     className?: RegExp[]
   }
   extractScript?: (element: any, $: CheerioAPI, baseUrl: URL) => { scriptCode: string; bodyCode?: string }
+}
+
+function getScriptSource(scriptCode: string): string {
+  return scriptCode.match(/src=["']([^"']+)["']/i)?.[1] || ''
+}
+
+function hasExtractedTrackingId(scriptCode: string): boolean {
+  return [
+    /\bGTM-[A-Z0-9]+\b/i,
+    /\bG-[A-Z0-9]+\b/i,
+    /\bUA-\d+-\d+\b/i,
+    /\bAW-\d+\b/i,
+    /fbq\(['"]init['"],\s*['"]\d+['"]\)/i,
+    /ttq\.load\(['"][^'"]+['"]\)/i,
+    /clarity\(['"]init['"],\s*['"][^'"]+['"]\)/i,
+    /hjid\s*[:=]\s*['"]?\d+/i,
+    /_linkedin_partner_id\s*=\s*['"]?\d+/i,
+  ].some(pattern => pattern.test(scriptCode))
+}
+
+function getDetectionConfidence(scriptCode: string, src: string): TrackingScript['confidence'] {
+  if (hasExtractedTrackingId(scriptCode)) return 'high'
+  if (src || getScriptSource(scriptCode)) return 'medium'
+  return 'low'
 }
 
 const scriptPatterns: ScriptPattern[] = [
@@ -333,6 +375,8 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
   const warnings: string[] = []
   const discoveredScripts: TrackingScript[] = []
   const foundPatterns = new Set<string>()
+  let consentBanner: { detected: boolean; vendor: string | null } = { detected: false, vendor: null }
+  let privacyPolicyUrl: string | null = null
 
   try {
     const sanitizedUrl = normalizeUrl(targetUrl)
@@ -397,6 +441,10 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
               scriptCode: extracted.scriptCode,
               bodyCode: extracted.bodyCode,
               enabled: true,
+              source: 'scanner',
+              sourceUrl: src || getScriptSource(extracted.scriptCode) || undefined,
+              detectedVendor: pattern.name,
+              confidence: getDetectionConfidence(extracted.scriptCode, src),
             })
           } catch (error) {
             warnings.push(`Failed to extract ${pattern.name}: ${(error as Error).message}`)
@@ -420,6 +468,32 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
       }
     }
 
+    // Consent Management Platform detection — scan the whole HTML once.
+    for (const cmp of cmpPatterns) {
+      if (cmp.patterns.some(rx => rx.test(html))) {
+        consentBanner = { detected: true, vendor: cmp.name }
+        break
+      }
+    }
+
+    // Privacy policy link detection — find the first anchor whose text or
+    // href looks like a privacy / cookie policy page.
+    const policyAnchor = $('a').toArray().find(a => {
+      const text = $(a).text().trim().toLowerCase()
+      const href = ($(a).attr('href') || '').toLowerCase()
+      const looksLikePolicy = /privacy|cookie policy|cookie-policy/.test(text)
+        || /\/privacy|privacy-policy|cookie-policy|cookies/.test(href)
+      return looksLikePolicy && !!href
+    })
+    if (policyAnchor) {
+      try {
+        const href = $(policyAnchor).attr('href') || ''
+        privacyPolicyUrl = new URL(href, url).toString()
+      } catch {
+        // Ignore malformed hrefs.
+      }
+    }
+
     if (discoveredScripts.length === 0) {
       warnings.push('No common tracking scripts detected. You may need to add them manually.')
     }
@@ -431,6 +505,8 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
     scripts: discoveredScripts,
     warnings,
     fetchedAt: new Date().toISOString(),
+    consentBanner,
+    privacyPolicyUrl,
   }
 }
 

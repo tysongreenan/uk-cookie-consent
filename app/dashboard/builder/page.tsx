@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Search, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -34,6 +34,8 @@ import { ContrastBadge } from '@/components/ui/contrast-badge'
 import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
+import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
+import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -504,9 +506,7 @@ function BannerBuilderContent() {
   const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
   const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
   const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
-  const [scriptScanUrl, setScriptScanUrl] = useState('')
-  const [isScanningScripts, setIsScanningScripts] = useState(false)
-  const [scriptScanError, setScriptScanError] = useState<string | null>(null)
+  const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
 
@@ -685,83 +685,58 @@ function BannerBuilderContent() {
     toast.success('Brand logo applied')
   }
 
-  const handleScriptDiscovery = async () => {
-    if (!scriptScanUrl.trim()) {
-      setScriptScanError('Enter a website URL to scan for scripts.')
+  const handleScannerImport = (
+    scripts: TrackingScript[],
+    summary: { imported: number; skipped: number; warnings: string[] }
+  ) => {
+    if (scripts.length === 0) {
+      toast('No scripts selected for import.', { icon: 'ℹ️' })
       return
     }
 
-    setIsScanningScripts(true)
-    setScriptScanError(null)
+    setConfig(prev => {
+      const nextScripts = {
+        strictlyNecessary: [...prev.scripts.strictlyNecessary],
+        functionality: [...prev.scripts.functionality],
+        trackingPerformance: [...prev.scripts.trackingPerformance],
+        targetingAdvertising: [...prev.scripts.targetingAdvertising],
+      }
 
-    try {
-      const response = await fetch('/api/scripts/discover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: scriptScanUrl.trim() })
+      scripts.forEach(script => {
+        const key = categoryToConfigKey(script.category)
+        nextScripts[key] = [...nextScripts[key], script]
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          const retryAfter = response.headers.get('Retry-After')
-          const message = retryAfter 
-            ? `Too many requests. Please wait ${Math.ceil(parseInt(retryAfter) / 60)} minutes.`
-            : 'Too many requests. Please wait before trying again.'
-          setScriptScanError(message)
-          toast.error(message)
-        } else {
-          setScriptScanError(data.error || 'Unable to discover scripts.')
-          toast.error(data.error || 'Unable to discover scripts.')
-        }
-        return
+      return {
+        ...prev,
+        scripts: nextScripts,
       }
+    })
+    setIsDirty(true)
+    toast.success(`Imported ${summary.imported} script${summary.imported === 1 ? '' : 's'} into your banner.`)
 
-      if (data.scripts && data.scripts.length > 0) {
-        // Add discovered scripts to their respective categories
-        const newScripts = { ...config.scripts }
-        
-        data.scripts.forEach((script: TrackingScript) => {
-          const category = script.category
-          if (category === 'strictly-necessary') {
-            newScripts.strictlyNecessary = [...newScripts.strictlyNecessary, script]
-          } else if (category === 'functionality') {
-            newScripts.functionality = [...newScripts.functionality, script]
-          } else if (category === 'tracking-performance') {
-            newScripts.trackingPerformance = [...newScripts.trackingPerformance, script]
-          } else if (category === 'targeting-advertising') {
-            newScripts.targetingAdvertising = [...newScripts.targetingAdvertising, script]
-          }
-        })
+    summary.warnings.slice(0, 3).forEach(warning => {
+      toast(warning, { icon: '!', duration: 6000 })
+    })
+  }
 
-        setConfig(prev => ({
-          ...prev,
-          scripts: newScripts
-        }))
+  const handleUseDetectedPrivacyPolicy = (url: string) => {
+    setConfig(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        privacyPolicy: {
+          ...prev.branding.privacyPolicy,
+          url,
+        },
+      },
+    }))
+    setIsDirty(true)
+    toast.success('Detected privacy policy applied')
+  }
 
-        toast.success(`Found ${data.scripts.length} script${data.scripts.length > 1 ? 's' : ''}! Added to your banner.`)
-        
-        if (data.warnings && data.warnings.length > 0) {
-          data.warnings.forEach((warning: string) => {
-            toast(warning, { icon: 'ℹ️', duration: 5000 })
-          })
-        }
-      } else {
-        toast('No tracking scripts detected. You may need to add them manually.', { icon: 'ℹ️', duration: 5000 })
-        if (data.warnings && data.warnings.length > 0) {
-          data.warnings.forEach((warning: string) => {
-            toast(warning, { icon: 'ℹ️', duration: 5000 })
-          })
-        }
-      }
-    } catch (error) {
-      const errorMessage = (error as Error).message
-      setScriptScanError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsScanningScripts(false)
-    }
+  const handleBuilderScanComplete = (result: BuilderScannerResult) => {
+    setDetectedCmpVendor(result.consentBanner.detected ? result.consentBanner.vendor : null)
   }
 
   const handleBrandImport = async () => {
@@ -903,10 +878,14 @@ function BannerBuilderContent() {
         setIsDirty(false)
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
-          // For new banners, redirect to dashboard after saving
-          setTimeout(() => {
-            router.push('/dashboard')
-          }, 1500)
+          // For new banners, stay in the builder so users can copy the hosted
+          // replacement script and finish switching from their old CMP.
+          if (data.bannerId) {
+            setBannerId(data.bannerId)
+            setIsEditing(true)
+            setActiveTab('code')
+            router.replace(`/dashboard/builder?id=${data.bannerId}`)
+          }
         } else {
           // For updated banners, stay on the page but show success
           console.log('Banner updated successfully:', data.banner)
@@ -3023,57 +3002,13 @@ function BannerBuilderContent() {
 
           {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
-                {/* Script Discovery */}
-                <Card className="border-primary/20 bg-primary/5 border-l-4 border-l-violet-500">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Search className="h-5 w-5 text-primary" />
-                      Auto-Discover Scripts
-                    </CardTitle>
-                    <CardDescription>
-                      Scan your website to automatically find and add tracking scripts. This saves hours of manual work!
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="https://example.com"
-                        value={scriptScanUrl}
-                        onChange={(e) => setScriptScanUrl(e.target.value)}
-                        className="flex-1"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !isScanningScripts) {
-                            handleScriptDiscovery()
-                          }
-                        }}
-                      />
-                      <Button 
-                        onClick={handleScriptDiscovery} 
-                        disabled={isScanningScripts}
-                      >
-                        {isScanningScripts ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Scanning...
-                          </>
-                        ) : (
-                          <>
-                            <Search className="mr-2 h-4 w-4" />
-                            Scan Website
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    {scriptScanError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{scriptScanError}</AlertDescription>
-                      </Alert>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Detects: Google Analytics, Facebook Pixel, Google Tag Manager, Hotjar, Microsoft Clarity, LinkedIn Insight Tag, TikTok Pixel, Google Ads, Intercom, Zendesk, and more.
-                    </p>
-                  </CardContent>
-                </Card>
+                <ScriptScannerImport
+                  currentScripts={config.scripts}
+                  privacyPolicyUrl={config.branding?.privacyPolicy?.url}
+                  onImport={handleScannerImport}
+                  onUsePrivacyPolicy={handleUseDetectedPrivacyPolicy}
+                  onScanComplete={handleBuilderScanComplete}
+                />
 
                 <Card>
                   <CardHeader>
@@ -4806,6 +4741,7 @@ function BannerBuilderContent() {
                       config={config}
                       bannerId={bannerId || undefined}
                       planTier={session?.user?.planTier || 'free'}
+                      detectedCmpVendor={detectedCmpVendor || undefined}
                     />
                   </CardContent>
                 </Card>

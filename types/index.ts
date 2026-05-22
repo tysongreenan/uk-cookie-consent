@@ -216,6 +216,11 @@ export interface TrackingScript {
   scriptCode: string
   bodyCode?: string // Optional body code (e.g., for GTM noscript)
   enabled: boolean
+  source?: 'manual' | 'scanner' | 'template'
+  sourceUrl?: string
+  detectedVendor?: string
+  confidence?: 'high' | 'medium' | 'low'
+  importWarning?: string
 }
 
 export interface Project {
