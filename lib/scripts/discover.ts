@@ -39,6 +39,30 @@ interface ScriptPattern {
   extractScript?: (element: any, $: CheerioAPI, baseUrl: URL) => { scriptCode: string; bodyCode?: string }
 }
 
+function getScriptSource(scriptCode: string): string {
+  return scriptCode.match(/src=["']([^"']+)["']/i)?.[1] || ''
+}
+
+function hasExtractedTrackingId(scriptCode: string): boolean {
+  return [
+    /\bGTM-[A-Z0-9]+\b/i,
+    /\bG-[A-Z0-9]+\b/i,
+    /\bUA-\d+-\d+\b/i,
+    /\bAW-\d+\b/i,
+    /fbq\(['"]init['"],\s*['"]\d+['"]\)/i,
+    /ttq\.load\(['"][^'"]+['"]\)/i,
+    /clarity\(['"]init['"],\s*['"][^'"]+['"]\)/i,
+    /hjid\s*[:=]\s*['"]?\d+/i,
+    /_linkedin_partner_id\s*=\s*['"]?\d+/i,
+  ].some(pattern => pattern.test(scriptCode))
+}
+
+function getDetectionConfidence(scriptCode: string, src: string): TrackingScript['confidence'] {
+  if (hasExtractedTrackingId(scriptCode)) return 'high'
+  if (src || getScriptSource(scriptCode)) return 'medium'
+  return 'low'
+}
+
 const scriptPatterns: ScriptPattern[] = [
   // Google Analytics 4
   {
@@ -417,6 +441,10 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
               scriptCode: extracted.scriptCode,
               bodyCode: extracted.bodyCode,
               enabled: true,
+              source: 'scanner',
+              sourceUrl: src || getScriptSource(extracted.scriptCode) || undefined,
+              detectedVendor: pattern.name,
+              confidence: getDetectionConfidence(extracted.scriptCode, src),
             })
           } catch (error) {
             warnings.push(`Failed to extract ${pattern.name}: ${(error as Error).message}`)
