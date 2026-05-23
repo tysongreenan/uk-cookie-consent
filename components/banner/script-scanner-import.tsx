@@ -74,25 +74,29 @@ export function ScriptScannerImport({
 
   // Split candidates into two groups:
   //   importable — actually-detected scripts the user should consider importing
+  //                (including the tag manager itself! — that's what gates everything)
   //   managed    — scripts that already run via a tag manager the site has
-  //                installed (GTM container introspection). Importing these
-  //                would double-load unless the user is replacing GTM.
+  //                installed (only set for entries sourced from GTM container
+  //                introspection). Importing these would double-load unless
+  //                the user is fully replacing the tag manager.
+  //
+  // Critically, this keys off `managedByTagManager`, NOT `importNoteType`.
+  // The note type is just visual (blue vs amber icon); the grouping is a
+  // distinct concept. Conflating them previously caused GTM itself — which
+  // has an info-style noscript note — to disappear into the managed group,
+  // leaving users with nothing to import.
   const importableCandidates = useMemo(
-    () => candidates.filter(c => c.importNoteType !== 'info'),
+    () => candidates.filter(c => !c.managedByTagManager),
     [candidates],
   )
   const managedCandidates = useMemo(
-    () => candidates.filter(c => c.importNoteType === 'info'),
+    () => candidates.filter(c => !!c.managedByTagManager),
     [candidates],
   )
 
-  // Pull the tag-manager name out of a managed candidate's note ("Loaded by
-  // GTM-XXX (ID Y). ..."). Used to print a single grouping header instead
-  // of repeating the same context on every line.
   const managedByLabel = useMemo(() => {
     if (managedCandidates.length === 0) return null
-    const match = managedCandidates[0].detectedVendor?.match(/^Configured in (\S+)$/)
-    return match ? match[1] : null
+    return managedCandidates[0].managedByTagManager ?? null
   }, [managedCandidates])
 
   const groupedCandidates = useMemo(() => {
@@ -142,20 +146,21 @@ export function ScriptScannerImport({
       setSelectedIds(new Set(
         deduped
           // Pre-check high-confidence, non-duplicate candidates that the
-          // user would normally want to bring over. Skip 'info'-tagged
-          // entries (GTM-container introspection) because the recommended
-          // action there is NOT to import unless the user is replacing GTM.
+          // user would normally want to bring over. Skip entries sourced
+          // from a tag-manager container (GTM introspection) — the
+          // recommended action there is NOT to import unless the user is
+          // fully replacing the tag manager.
           .filter(candidate =>
             candidate.confidence === 'high'
             && !candidate.duplicate
             && candidate.scriptCode.trim()
-            && candidate.importNoteType !== 'info'
+            && !candidate.managedByTagManager
           )
           .map(candidate => candidate.id),
       ))
       onScanComplete?.(scanResult)
       setShowDetails(true)
-      const importableCount = deduped.filter(c => c.importNoteType !== 'info').length
+      const importableCount = deduped.filter(c => !c.managedByTagManager).length
       const managedCount = deduped.length - importableCount
       const parts = [`${importableCount} script${importableCount === 1 ? '' : 's'} to review`]
       if (managedCount > 0) {

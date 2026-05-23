@@ -17,6 +17,12 @@ export interface ScannerImportCandidate {
    *  an issue), 'warning' = orange triangle (needs attention). Defaults
    *  to 'warning' for backwards compatibility. */
   importNoteType?: 'info' | 'warning'
+  /** Set when this candidate is sourced from a tag-manager container
+   *  introspection (e.g., GTM-PZHQ5C2). The string is the container ID.
+   *  Used to group "already managed by your tag manager" entries in the
+   *  import UI. They remain importable for users who are replacing the
+   *  tag manager — the grouping is informational, not a filter. */
+  managedByTagManager?: string
   duplicate?: boolean
   duplicateReason?: string
 }
@@ -374,6 +380,7 @@ export async function toImportCandidates(
           ? `Loaded by ${gtmId} (ID ${tag.vendorId}). Only import if replacing GTM.`
           : `Loaded by ${gtmId}. Only import if replacing GTM.`,
         importNoteType: 'info',
+        managedByTagManager: gtmId,
       })
     }
   }

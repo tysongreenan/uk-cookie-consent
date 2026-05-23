@@ -231,6 +231,32 @@ describe('toImportCandidates', () => {
     // And must NOT use the old "we can't do it" framing:
     expect(gtm?.importWarning).not.toMatch(/cannot be fully migrated/i)
   })
+
+  // Regression: the previous grouping logic keyed off importNoteType,
+  // so GTM (which has an info-style noscript note) got swept into the
+  // "already managed by your tag manager" group — leaving the user
+  // with nothing to import.
+  it('does NOT mark GTM itself as managed-by-tag-manager (it IS the tag manager)', async () => {
+    const gtmCode =
+      "<script>(function(w,d,s,l,i){})(window,document,'script','dataLayer','GTM-PZHQ5C2');</script>"
+    const candidates = await toImportCandidates(emptyScan(), [
+      {
+        id: 'gtm-1',
+        name: 'Google Tag Manager',
+        category: 'tracking-performance',
+        scriptCode: gtmCode,
+        bodyCode: '<noscript><iframe src="..."></iframe></noscript>',
+        enabled: true,
+      },
+    ])
+    const gtm = candidates.find(c => c.name === 'Google Tag Manager')
+
+    expect(gtm).toBeDefined()
+    expect(gtm?.managedByTagManager).toBeUndefined()
+    // GTM should still be info-styled (the noscript note IS info), but
+    // that's a separate concept from the grouping.
+    expect(gtm?.importNoteType).toBe('info')
+  })
 })
 
 describe('toImportCandidates — GTM container introspection', () => {
@@ -273,10 +299,13 @@ describe('toImportCandidates — GTM container introspection', () => {
     const ga4Managed = candidates.find(c => c.name === 'Google Analytics 4')
 
     expect(ga4Managed).toBeDefined()
-    // This is the visual treatment differentiator: 'info' (blue ℹ️) vs
-    // 'warning' (orange triangle). Default-uncheck logic in the UI keys
-    // off this same field.
+    // importNoteType controls the visual treatment of the per-row note
+    // (blue ℹ️ vs amber triangle).
     expect(ga4Managed?.importNoteType).toBe('info')
+    // managedByTagManager is the grouping discriminator — entries with
+    // this set are surfaced in the "already managed by your tag manager"
+    // callout and NOT pre-checked by default.
+    expect(ga4Managed?.managedByTagManager).toBe('GTM-ABC123')
     expect(ga4Managed?.detectedVendor).toBe('Configured in GTM-ABC123')
     expect(ga4Managed?.importWarning).toMatch(/Only import if replacing GTM/i)
   })
