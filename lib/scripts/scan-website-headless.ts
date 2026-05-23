@@ -5,17 +5,18 @@
 // after JavaScript runs — which is most of the modern web (SPAs, GTM-loaded
 // tags, post-DOM-ready trackers).
 //
-// On Vercel we use playwright-core (no bundled browsers, ~5 MB) plus
-// @sparticuz/chromium-min, which downloads a Lambda-stripped Chromium binary
-// from a GitHub release on cold start and caches it in /tmp.
+// On Vercel we use playwright-core (no bundled browsers, ~5 MB) plus the
+// FULL @sparticuz/chromium package, which bundles a Lambda-stripped
+// Chromium binary AND its required shared libraries (libnss3.so, etc.)
+// in node_modules/@sparticuz/chromium/bin. The full package side-steps
+// the libnss3 loading errors we hit with @sparticuz/chromium-min, at the
+// cost of ~95 MB of function bundle size (well within Vercel Pro's
+// 250 MB limit).
 //
 // Locally we use the full `playwright` package (devDependency, ships a
 // regular Chromium via `npx playwright install`).
 
 import { validatePublicUrl } from '@/lib/url-validation'
-
-const CHROMIUM_PACK_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
 
 // Wait past initial load so consent banners and trackers that fire on
 // setTimeout (Hotjar, some pixels) get captured.
@@ -209,18 +210,16 @@ export async function launchBrowser(): Promise<any> {
 
   if (isServerless) {
     const playwrightCore: any = await import('playwright-core')
-    const sparticuz: any = await import('@sparticuz/chromium-min')
+    const sparticuz: any = await import('@sparticuz/chromium')
     const chromium = sparticuz.default ?? sparticuz
 
-    // @sparticuz/chromium-min downloads the chromium binary AND its shared
-    // libraries (libnss3.so, libnssutil3.so, etc.) into /tmp. Playwright
-    // spawns chromium as a child process; the new process needs
-    // LD_LIBRARY_PATH=/tmp to find those .so files. Without this we hit:
-    //   /tmp/chromium: error while loading shared libraries:
-    //   libnss3.so: cannot open shared object file
-    // (This is the workaround documented in the Sparticuz/chromium README
-    // for Playwright integration.)
-    const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL)
+    // The full @sparticuz/chromium package ships the chromium binary AND
+    // its required shared libraries (libnss3.so, libnssutil3.so, libnspr4,
+    // freetype, etc.) bundled in node_modules/@sparticuz/chromium/bin.
+    // executablePath() extracts them to /tmp on first call and returns
+    // the binary path. We still set LD_LIBRARY_PATH defensively so the
+    // chromium child process can find the libs alongside the binary.
+    const executablePath = await chromium.executablePath()
     const tmpDir = executablePath.substring(0, executablePath.lastIndexOf('/'))
     process.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH
       ? `${tmpDir}:${process.env.LD_LIBRARY_PATH}`

@@ -37,7 +37,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-pdf/renderer": "^4.3.2",
     "@sentry/nextjs": "^10.47.0",
-    "@sparticuz/chromium-min": "^131.0.1",
+    "@sparticuz/chromium": "^131.0.1",
     "@studio-freight/lenis": "^1.0.42",
     "@supabase/supabase-js": "^2.39.0",
     "@types/bcryptjs": "^2.4.6",
