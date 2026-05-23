@@ -1100,11 +1100,14 @@ function BannerBuilderContent() {
     }
   }
 
-  // Only show the loading spinner on the genuine initial load (no session
-  // yet AND status hasn't resolved). Once we've had a session, hold on to
-  // the rendered builder even if next-auth briefly re-fetches — otherwise
-  // an in-progress refetch unmounts the form and wipes unsaved state.
-  if (!session && status !== 'authenticated') {
+  // Show the loading spinner until next-auth resolves us as authenticated.
+  // Once status is 'authenticated', hold on to the rendered builder even
+  // if next-auth briefly re-fetches the session — otherwise an in-progress
+  // refetch unmounts the form and wipes unsaved state. (Just checking
+  // status here, since next-auth's UseSessionResult is a discriminated
+  // union — `!session` already implies `status !== 'authenticated'`, and
+  // combining both checks errors as "no overlap" under production tsc.)
+  if (status !== 'authenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
