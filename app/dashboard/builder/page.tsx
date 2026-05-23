@@ -720,7 +720,6 @@ function BannerBuilderContent() {
 
       if (data.fetchError) {
         setScriptScanError(data.fetchError)
-        toast.error(data.fetchError, { duration: 7000 })
         return
       }
 
@@ -762,7 +761,6 @@ function BannerBuilderContent() {
           ? `${data.cmpDetected} is installed on this site. Tracking scripts are likely managed in ${data.cmpDetected}'s dashboard — add them manually below.`
           : 'No tracking scripts found in the HTML. Many sites inject tracking via JavaScript after load — you may need to add them manually.'
         setScriptScanError(primary)
-        toast(primary, { icon: 'ℹ️', duration: 7000 })
       }
     } catch (error) {
       const errorMessage = (error as Error).message

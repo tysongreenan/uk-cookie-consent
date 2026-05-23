@@ -4,6 +4,10 @@ const DEFAULT_TIMEOUT = 10000 // 10 seconds
 const DEFAULT_MAX_CONTENT_LENGTH = 2 * 1024 * 1024 // 2 MB
 const MAX_REDIRECTS = 5
 
+// Bump periodically — some anti-bot vendors score UA recency.
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
+
 const allowedProtocols = new Set(['http:', 'https:'])
 
 export interface FetchSafeOptions extends RequestInit {
@@ -32,8 +36,7 @@ export async function fetchSafe(input: string | URL, init: FetchSafeOptions = {}
       const response = await fetch(url.toString(), {
         ...init,
         headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'User-Agent': BROWSER_UA,
           'Accept':
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.9',
