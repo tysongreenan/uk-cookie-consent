@@ -718,10 +718,15 @@ function BannerBuilderContent() {
         return
       }
 
+      if (data.fetchError) {
+        setScriptScanError(data.fetchError)
+        return
+      }
+
       if (data.scripts && data.scripts.length > 0) {
         // Add discovered scripts to their respective categories
         const newScripts = { ...config.scripts }
-        
+
         data.scripts.forEach((script: TrackingScript) => {
           const category = script.category
           if (category === 'strictly-necessary') {
@@ -741,19 +746,21 @@ function BannerBuilderContent() {
         }))
 
         toast.success(`Found ${data.scripts.length} script${data.scripts.length > 1 ? 's' : ''}! Added to your banner.`)
-        
+
+        if (data.cmpDetected) {
+          toast(`${data.cmpDetected} detected on this site.`, { icon: 'ℹ️', duration: 6000 })
+        }
+
         if (data.warnings && data.warnings.length > 0) {
           data.warnings.forEach((warning: string) => {
-            toast(warning, { icon: 'ℹ️', duration: 5000 })
+            toast(warning, { icon: 'ℹ️', duration: 6000 })
           })
         }
       } else {
-        toast('No tracking scripts detected. You may need to add them manually.', { icon: 'ℹ️', duration: 5000 })
-        if (data.warnings && data.warnings.length > 0) {
-          data.warnings.forEach((warning: string) => {
-            toast(warning, { icon: 'ℹ️', duration: 5000 })
-          })
-        }
+        const primary = data.cmpDetected
+          ? `${data.cmpDetected} is installed on this site. Tracking scripts are likely managed in ${data.cmpDetected}'s dashboard — add them manually below.`
+          : 'No tracking scripts found in the HTML. Many sites inject tracking via JavaScript after load — you may need to add them manually.'
+        setScriptScanError(primary)
       }
     } catch (error) {
       const errorMessage = (error as Error).message

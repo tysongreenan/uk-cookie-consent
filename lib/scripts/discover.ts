@@ -7,7 +7,54 @@ export interface ScriptDiscoveryResult {
   scripts: TrackingScript[]
   warnings: string[]
   fetchedAt: string
+  cmpDetected?: string
+  fetchError?: string
 }
+
+interface CmpSignature {
+  name: string
+  // Patterns that must appear inside a <script> tag (src, attributes, or
+  // inline content). Use this for plain domain names — otherwise an outbound
+  // <a href> link to the vendor's privacy policy would trigger detection.
+  scriptContext?: RegExp[]
+  // Patterns specific enough to match anywhere in the document (vendor-
+  // prefixed CSS classes, distinctive global identifiers, etc.).
+  anywhere?: RegExp[]
+}
+
+const cmpSignatures: CmpSignature[] = [
+  {
+    name: 'OneTrust',
+    scriptContext: [/cdn\.cookielaw\.org/i, /otSDKStub\.js/i],
+    anywhere: [/optanon-category-/i, /\bonetrust[-_]/i],
+  },
+  {
+    name: 'Cookiebot',
+    scriptContext: [/consent\.cookiebot\.com/i, /id=["']Cookiebot["']/i],
+    anywhere: [/data-cookieconsent=/i],
+  },
+  {
+    name: 'CookieYes',
+    scriptContext: [/cookieyes\.com/i],
+    anywhere: [/class=["']cky-/i],
+  },
+  {
+    name: 'Termly',
+    scriptContext: [/app\.termly\.io/i, /termly\.io\/embed/i],
+  },
+  {
+    name: 'Iubenda',
+    scriptContext: [/iubenda\.com/i],
+  },
+  {
+    name: 'Quantcast Choice',
+    scriptContext: [/quantcast\.mgr\.consensu\.org/i],
+  },
+  {
+    name: 'TrustArc',
+    scriptContext: [/trustarc\.com/i, /truste\.com\/notice/i],
+  },
+]
 
 interface ScriptPattern {
   name: string
@@ -329,17 +376,106 @@ function generateScriptId(): string {
   return `script-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
+const SCAN_TIMEOUT_MS = 15000
+
+function describeFetchError(err: Error, urlStr: string): string {
+  const msg = err.message || ''
+  const cause = (err as Error & { cause?: unknown }).cause
+  const causeMsg = cause instanceof Error ? cause.message : ''
+  const combined = `${msg} ${causeMsg}`.trim()
+
+  const httpMatch = combined.match(/HTTP\s+(\d{3})/i)
+  if (httpMatch) {
+    const status = httpMatch[1]
+    if (status === '403' || status === '401' || status === '429') {
+      return `The site returned HTTP ${status} — it's blocking automated scans. Try scanning a different page on the site, or add your tracking scripts manually below.`
+    }
+    if (status === '404') {
+      return `The site returned HTTP 404 — that URL doesn't exist. Double-check the address and try again.`
+    }
+    if (status.startsWith('5')) {
+      return `The site returned HTTP ${status} — it's currently unavailable. Try again in a few minutes.`
+    }
+    return `The site returned HTTP ${status}.`
+  }
+
+  // Node's fetch AbortController surfaces the abort reason on err.cause and
+  // sets err.name === 'AbortError' with a generic message like
+  // "This operation was aborted". Treat the timeout case separately so we
+  // don't claim "timed out" for unrelated aborts.
+  const isAbort = err.name === 'AbortError' || /aborted/i.test(combined)
+  const timeoutSeconds = Math.round(SCAN_TIMEOUT_MS / 1000)
+  if (/timed out|ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT/i.test(combined)) {
+    return `The scan timed out after ${timeoutSeconds} seconds. The site may be slow or blocking scans — try a different page or add scripts manually.`
+  }
+  if (isAbort) {
+    return `The scan was cancelled before it finished.`
+  }
+
+  if (/ECONNREFUSED/i.test(combined)) {
+    return `The site refused the connection. It may be down — try again later or scan a different page.`
+  }
+  if (/ECONNRESET|EPIPE/i.test(combined)) {
+    return `The connection was reset before we finished reading the page. Try again, or scan a different page.`
+  }
+  if (/EHOSTUNREACH|ENETUNREACH/i.test(combined)) {
+    return `Couldn't reach ${urlStr}. The site may be offline.`
+  }
+  if (/ENOTFOUND|getaddrinfo|DNS/i.test(combined)) {
+    return `Couldn't resolve ${urlStr}. Check the URL is correct.`
+  }
+  if (/private|loopback|allowlist/i.test(combined)) {
+    return `That URL points to a private or non-public address and can't be scanned.`
+  }
+  return `Couldn't fetch ${urlStr}: ${msg}`
+}
+
+function detectCmp($: CheerioAPI, html: string): string | undefined {
+  // Build a single haystack from every <script> tag — src + class + id +
+  // data-* attrs + inline content. Matching script-context patterns against
+  // this avoids false positives from outbound <a href> links to vendor
+  // privacy policies.
+  const scriptHaystack = $('script')
+    .toArray()
+    .map(el => {
+      const $el = $(el)
+      const src = $el.attr('src') ?? ''
+      const className = $el.attr('class') ?? ''
+      const id = $el.attr('id') ?? ''
+      const dataAttrs = Object.entries(el.attribs || {})
+        .filter(([k]) => k.startsWith('data-'))
+        .map(([k, v]) => `${k}=${v}`)
+        .join(' ')
+      const content = $el.html() ?? ''
+      return `${src} ${className} ${id} ${dataAttrs} ${content}`
+    })
+    .join('\n')
+
+  for (const cmp of cmpSignatures) {
+    if (cmp.scriptContext?.some(re => re.test(scriptHaystack))) return cmp.name
+    if (cmp.anywhere?.some(re => re.test(html))) return cmp.name
+  }
+  return undefined
+}
+
 export async function discoverScripts(targetUrl: string): Promise<ScriptDiscoveryResult> {
   const warnings: string[] = []
   const discoveredScripts: TrackingScript[] = []
   const foundPatterns = new Set<string>()
+  let cmpDetected: string | undefined
+  let fetchError: string | undefined
+
+  let urlForErrors = targetUrl
 
   try {
     const sanitizedUrl = normalizeUrl(targetUrl)
+    urlForErrors = sanitizedUrl
     const url = new URL(sanitizedUrl)
 
-    const { text: html } = await fetchSafeText(url, { timeoutMs: 15000 })
+    const { text: html } = await fetchSafeText(url, { timeoutMs: SCAN_TIMEOUT_MS })
     const $ = load(html)
+
+    cmpDetected = detectCmp($, html)
 
     // Find all script tags
     const scriptTags = $('script').toArray()
@@ -405,6 +541,74 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
       }
     }
 
+    // Drupal/Magento/Wagtail/etc. aggregate JS into first-party bundles, so
+    // tracking init code (GTM-XXX, GA4 IDs, fbq init) never appears in the
+    // raw HTML — only in /sites/.../files/js/js_<hash>.js. After the inline
+    // pass, fetch a few same-origin <script src> bundles and re-run the same
+    // content patterns against their text.
+    const remainingPatterns = scriptPatterns.filter(p => !foundPatterns.has(p.name))
+    if (remainingPatterns.length > 0) {
+      const sameOriginScriptUrls: string[] = []
+      const seenBundleUrls = new Set<string>()
+      for (const el of scriptTags) {
+        const src = $(el).attr('src')
+        if (!src) continue
+        try {
+          const abs = new URL(src, url)
+          if (abs.origin !== url.origin) continue
+          const absStr = abs.toString()
+          if (seenBundleUrls.has(absStr)) continue
+          seenBundleUrls.add(absStr)
+          sameOriginScriptUrls.push(absStr)
+          if (sameOriginScriptUrls.length >= 5) break
+        } catch {
+          // Ignore malformed src URLs
+        }
+      }
+
+      for (const bundleUrl of sameOriginScriptUrls) {
+        let bundleText: string
+        try {
+          const result = await fetchSafeText(bundleUrl, {
+            timeoutMs: 8000,
+            maxContentLength: 512 * 1024,
+          })
+          bundleText = result.text
+        } catch {
+          continue // Skip bundles we can't read
+        }
+
+        // Neutralize any literal `</script>` in the bundle so cheerio's HTML
+        // parser doesn't close the wrapper element early.
+        const safeBundleText = bundleText.replace(/<\/script/gi, '<\\/script')
+        const $bundle = load(`<script>${safeBundleText}</script>`)
+        const bundleEl = $bundle('script').get(0)
+        if (!bundleEl) continue
+
+        for (const pattern of remainingPatterns) {
+          if (foundPatterns.has(pattern.name)) continue
+          const matched = pattern.patterns.content?.some(re => re.test(bundleText)) ?? false
+          if (!matched) continue
+          foundPatterns.add(pattern.name)
+          try {
+            const extracted = pattern.extractScript
+              ? pattern.extractScript(bundleEl, $bundle, url)
+              : { scriptCode: `<script src="${bundleUrl}"></script>` }
+            discoveredScripts.push({
+              id: generateScriptId(),
+              name: pattern.name,
+              category: pattern.category,
+              scriptCode: extracted.scriptCode,
+              bodyCode: extracted.bodyCode,
+              enabled: true,
+            })
+          } catch (error) {
+            warnings.push(`Failed to extract ${pattern.name} from bundle: ${(error as Error).message}`)
+          }
+        }
+      }
+    }
+
     // Also check for inline scripts in noscript tags (e.g., GTM)
     const noscriptTags = $('noscript').toArray()
     for (const noscriptTag of noscriptTags) {
@@ -420,17 +624,20 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
       }
     }
 
-    if (discoveredScripts.length === 0) {
-      warnings.push('No common tracking scripts detected. You may need to add them manually.')
-    }
+    // cmpDetected and the empty-scripts case are surfaced by the caller via
+    // structured fields (cmpDetected, scripts.length). Don't duplicate them
+    // here as warnings — only true per-script extraction errors belong in
+    // `warnings`.
   } catch (error) {
-    warnings.push(`Failed to fetch website: ${(error as Error).message}`)
+    fetchError = describeFetchError(error as Error, urlForErrors)
   }
 
   return {
     scripts: discoveredScripts,
     warnings,
     fetchedAt: new Date().toISOString(),
+    cmpDetected,
+    fetchError,
   }
 }
 
