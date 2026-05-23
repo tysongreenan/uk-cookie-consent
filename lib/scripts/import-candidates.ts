@@ -64,7 +64,7 @@ export function categoryToConfigKey(category: TrackingScript['category']): keyof
   }
 }
 
-function extractSrc(scriptCode: string): string {
+export function extractSrc(scriptCode: string): string {
   const raw = scriptCode.match(/src=["']([^"']+)["']/i)?.[1] || ''
   if (!raw) return ''
   // Reject obvious junk pulled out of JS string literals inside bundles.
