@@ -224,7 +224,11 @@ describe('toImportCandidates', () => {
 
     expect(gtm).toBeDefined()
     expect(gtm?.importNoteType).toBe('info')
-    expect(gtm?.importWarning).toMatch(/optional/i)
+    // The note must accurately tell users what's migrated where:
+    expect(gtm?.importWarning).toMatch(/noscript iframe is preserved/i)
+    expect(gtm?.importWarning).toMatch(/Body Code snippet/i)
+    expect(gtm?.importWarning).toMatch(/Hosted Script/i)
+    // And must NOT use the old "we can't do it" framing:
     expect(gtm?.importWarning).not.toMatch(/cannot be fully migrated/i)
   })
 })

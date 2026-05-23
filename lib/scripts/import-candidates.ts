@@ -109,12 +109,12 @@ function isCmpScript(script: TrackingScript): boolean {
 }
 
 function inferWarning(script: TrackingScript): string | undefined {
-  // GTM's noscript <iframe> fallback is for visitors with JavaScript
-  // disabled (~1% of traffic). The main JS loader is migrated normally,
-  // so this is informational only — see inferNoteType below for the
-  // matching visual treatment (info, not warning).
+  // GTM ships two install pieces: the JS loader (head) and a <noscript>
+  // <iframe> fallback (body) for visitors with JS disabled. We preserve
+  // both — but whether the noscript piece reaches the site depends on
+  // which install mode the user picks in the Code tab. Explain plainly.
   if (script.name.toLowerCase().includes('google tag manager') && script.bodyCode) {
-    return 'Optional: GTM also has a noscript iframe for users with JavaScript disabled. The main loader will work for everyone with JS — if you also want to support the no-JS fallback, paste the iframe snippet from your generated code into your site\'s <body> tag.'
+    return 'GTM noscript iframe is preserved — it appears in the Body Code snippet of your generated install. If you use the one-line Hosted Script instead, only the JS loader is migrated (visitors with JavaScript disabled won\'t be tracked).'
   }
 
   if (!script.scriptCode.trim()) {
