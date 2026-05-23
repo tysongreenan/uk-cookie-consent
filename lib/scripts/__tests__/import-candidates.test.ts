@@ -200,6 +200,33 @@ describe('toImportCandidates', () => {
     expect(ga4Entries[0].id).toBe('ga4-discovered')
     expect(ga4Entries[0].scriptCode).toContain('G-XYZ123ABC')
   })
+
+  // Regression: the GTM noscript heads-up was rendered with the same
+  // amber-triangle "warning" treatment as real issues, so users thought
+  // they had to take action when they didn't. It should be info-style.
+  it('marks the GTM noscript-iframe heads-up as info, not warning', async () => {
+    const gtmCode =
+      "<script>(function(w,d,s,l,i){})(window,document,'script','dataLayer','GTM-PZHQ5C2');</script>"
+    const noscriptCode =
+      '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PZHQ5C2"></iframe></noscript>'
+
+    const candidates = await toImportCandidates(emptyScan(), [
+      {
+        id: 'gtm-1',
+        name: 'Google Tag Manager',
+        category: 'tracking-performance',
+        scriptCode: gtmCode,
+        bodyCode: noscriptCode,
+        enabled: true,
+      },
+    ])
+    const gtm = candidates.find(c => c.name === 'Google Tag Manager')
+
+    expect(gtm).toBeDefined()
+    expect(gtm?.importNoteType).toBe('info')
+    expect(gtm?.importWarning).toMatch(/optional/i)
+    expect(gtm?.importWarning).not.toMatch(/cannot be fully migrated/i)
+  })
 })
 
 describe('toImportCandidates — GTM container introspection', () => {

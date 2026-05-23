@@ -109,8 +109,12 @@ function isCmpScript(script: TrackingScript): boolean {
 }
 
 function inferWarning(script: TrackingScript): string | undefined {
+  // GTM's noscript <iframe> fallback is for visitors with JavaScript
+  // disabled (~1% of traffic). The main JS loader is migrated normally,
+  // so this is informational only — see inferNoteType below for the
+  // matching visual treatment (info, not warning).
   if (script.name.toLowerCase().includes('google tag manager') && script.bodyCode) {
-    return 'GTM noscript body code cannot be fully migrated through the hosted script. The JavaScript GTM loader will be gated by consent; the noscript iframe requires manual placement if needed.'
+    return 'Optional: GTM also has a noscript iframe for users with JavaScript disabled. The main loader will work for everyone with JS — if you also want to support the no-JS fallback, paste the iframe snippet from your generated code into your site\'s <body> tag.'
   }
 
   if (!script.scriptCode.trim()) {
@@ -122,6 +126,18 @@ function inferWarning(script: TrackingScript): string | undefined {
   }
 
   return script.importWarning
+}
+
+/**
+ * Returns 'info' for purely informational notes (rendered with the blue
+ * ℹ️ icon) and undefined for everything else (defaults to the amber
+ * triangle treatment, which signals "needs attention").
+ */
+function inferNoteType(script: TrackingScript): 'info' | 'warning' | undefined {
+  if (script.name.toLowerCase().includes('google tag manager') && script.bodyCode) {
+    return 'info'
+  }
+  return undefined
 }
 
 function makeFallbackScriptCode(name: string, sourceUrl?: string, existingCode = ''): string {
@@ -256,6 +272,7 @@ export async function toImportCandidates(
       const scriptCode = makeFallbackScriptCode(script.name, sourceUrl, script.scriptCode) || script.scriptCode
       const confidenceWithCode = extractKnownId(scriptCode) ? 'high' : confidence
 
+      const ctx = { ...script, scriptCode, confidence: confidenceWithCode }
       return {
         id: script.id,
         name: script.name,
@@ -266,7 +283,8 @@ export async function toImportCandidates(
         sourceUrl,
         detectedVendor: script.detectedVendor || script.name,
         confidence: confidenceWithCode,
-        importWarning: inferWarning({ ...script, scriptCode, confidence: confidenceWithCode }),
+        importWarning: inferWarning(ctx),
+        importNoteType: inferNoteType(ctx),
       }
     })
 
