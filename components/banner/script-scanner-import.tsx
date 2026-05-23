@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Check, ChevronDown, Info, Loader2, RefreshCw, Search, Shield, X } from 'lucide-react'
+import { AlertTriangle, Check, ChevronDown, Info, Loader2, RefreshCw, Search, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -239,10 +239,6 @@ export function ScriptScannerImport({
     setSelectedIds(new Set())
   }
 
-  const hasStrictOptInRecommendation = !!result && (
-    result.compliance.gdpr.issues.length > 0 || result.compliance.law25.issues.length > 0
-  )
-
   return (
     <Card className="border-primary/20 bg-primary/5 border-l-4 border-l-violet-500">
       <CardHeader>
@@ -342,12 +338,6 @@ export function ScriptScannerImport({
                 </div>
               )}
 
-              {hasStrictOptInRecommendation && (
-                <div className="mt-3 flex gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                  <Shield className="mt-0.5 h-4 w-4 shrink-0" />
-                  GDPR or Law 25 issues were found. Consider enabling explicit consent, a visible Reject button, and granular preferences before publishing.
-                </div>
-              )}
             </div>
 
             {importSummary && (
