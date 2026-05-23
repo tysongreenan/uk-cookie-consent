@@ -212,9 +212,23 @@ async function launchBrowser(): Promise<any> {
     const sparticuz: any = await import('@sparticuz/chromium-min')
     const chromium = sparticuz.default ?? sparticuz
 
+    // @sparticuz/chromium-min downloads the chromium binary AND its shared
+    // libraries (libnss3.so, libnssutil3.so, etc.) into /tmp. Playwright
+    // spawns chromium as a child process; the new process needs
+    // LD_LIBRARY_PATH=/tmp to find those .so files. Without this we hit:
+    //   /tmp/chromium: error while loading shared libraries:
+    //   libnss3.so: cannot open shared object file
+    // (This is the workaround documented in the Sparticuz/chromium README
+    // for Playwright integration.)
+    const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL)
+    const tmpDir = executablePath.substring(0, executablePath.lastIndexOf('/'))
+    process.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH
+      ? `${tmpDir}:${process.env.LD_LIBRARY_PATH}`
+      : tmpDir
+
     return playwrightCore.chromium.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
+      executablePath,
       headless: true,
     })
   }
