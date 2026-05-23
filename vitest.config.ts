@@ -11,7 +11,8 @@ export default defineConfig({
     environment: 'node',
     globals: false,
     include: ['lib/**/*.test.ts', 'app/**/*.test.ts'],
-    // Skip integration files that need a real browser / network.
-    exclude: ['node_modules/**', '.next/**', 'dist/**'],
+    // Smoke tests need a real chromium and take seconds, not millis.
+    // Run them on demand with `npm run test:smoke`.
+    exclude: ['node_modules/**', '.next/**', 'dist/**', '**/*.smoke.test.ts'],
   },
 })

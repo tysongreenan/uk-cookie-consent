@@ -201,7 +201,7 @@ export interface HeadlessScanResult {
   ourBannerId: string | null
 }
 
-async function launchBrowser(): Promise<any> {
+export async function launchBrowser(): Promise<any> {
   // Detect Vercel/Lambda environment. In dev, fall back to the full
   // `playwright` package which bundles its own browsers via
   // `npx playwright install`.
@@ -269,7 +269,7 @@ function normalizeSameSite(value: string | undefined): 'Strict' | 'Lax' | 'None'
  * actually accepted. The caller waits POST_CONSENT_SETTLE_MS after which
  * any downstream tags should have fired.
  */
-async function tryAcceptConsent(page: any): Promise<{ vendor: string | null; attempted: boolean }> {
+export async function tryAcceptConsent(page: any): Promise<{ vendor: string | null; attempted: boolean }> {
   for (const cmp of CONSENT_ACCEPT_SELECTORS) {
     for (const selector of cmp.selectors) {
       try {
