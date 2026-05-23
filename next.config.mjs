@@ -12,6 +12,27 @@ const nextConfig = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build',
   },
+  // Playwright + @sparticuz/chromium-min are dynamically imported by the
+  // headless scanner and must not be bundled by webpack — they reference
+  // optional native deps (chromium-bidi, etc.) that fail to resolve at
+  // build time. Mark them external so they're require()'d at runtime.
+  experimental: {
+    serverComponentsExternalPackages: ['playwright-core', 'playwright', '@sparticuz/chromium-min'],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      if (!Array.isArray(config.externals)) {
+        config.externals = config.externals ? [config.externals] : []
+      }
+      config.externals.push(({ request }, callback) => {
+        if (/^(playwright-core|playwright|@sparticuz\/chromium-min)/.test(request)) {
+          return callback(null, 'commonjs ' + request)
+        }
+        callback()
+      })
+    }
+    return config
+  },
   // Production optimizations
   compress: true,
   poweredByHeader: false,
