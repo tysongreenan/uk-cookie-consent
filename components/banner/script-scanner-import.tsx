@@ -70,9 +70,33 @@ export function ScriptScannerImport({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [importSummary, setImportSummary] = useState<{ imported: number; skipped: number; warnings: string[] } | null>(null)
   const [showDetails, setShowDetails] = useState(true)
+  const [showManagedDetails, setShowManagedDetails] = useState(false)
+
+  // Split candidates into two groups:
+  //   importable — actually-detected scripts the user should consider importing
+  //   managed    — scripts that already run via a tag manager the site has
+  //                installed (GTM container introspection). Importing these
+  //                would double-load unless the user is replacing GTM.
+  const importableCandidates = useMemo(
+    () => candidates.filter(c => c.importNoteType !== 'info'),
+    [candidates],
+  )
+  const managedCandidates = useMemo(
+    () => candidates.filter(c => c.importNoteType === 'info'),
+    [candidates],
+  )
+
+  // Pull the tag-manager name out of a managed candidate's note ("Loaded by
+  // GTM-XXX (ID Y). ..."). Used to print a single grouping header instead
+  // of repeating the same context on every line.
+  const managedByLabel = useMemo(() => {
+    if (managedCandidates.length === 0) return null
+    const match = managedCandidates[0].detectedVendor?.match(/^Configured in (\S+)$/)
+    return match ? match[1] : null
+  }, [managedCandidates])
 
   const groupedCandidates = useMemo(() => {
-    return candidates.reduce<Record<TrackingScript['category'], ScannerImportCandidate[]>>((groups, candidate) => {
+    return importableCandidates.reduce<Record<TrackingScript['category'], ScannerImportCandidate[]>>((groups, candidate) => {
       groups[candidate.category].push(candidate)
       return groups
     }, {
@@ -81,7 +105,7 @@ export function ScriptScannerImport({
       'tracking-performance': [],
       'targeting-advertising': [],
     })
-  }, [candidates])
+  }, [importableCandidates])
 
   const scanWebsite = async () => {
     if (!url.trim()) {
@@ -131,7 +155,13 @@ export function ScriptScannerImport({
       ))
       onScanComplete?.(scanResult)
       setShowDetails(true)
-      toast.success(`Scan complete: ${deduped.length} importable script${deduped.length === 1 ? '' : 's'} found.`)
+      const importableCount = deduped.filter(c => c.importNoteType !== 'info').length
+      const managedCount = deduped.length - importableCount
+      const parts = [`${importableCount} script${importableCount === 1 ? '' : 's'} to review`]
+      if (managedCount > 0) {
+        parts.push(`${managedCount} already managed by your tag manager`)
+      }
+      toast.success(`Scan complete: ${parts.join(', ')}.`)
     } catch (scanError) {
       const message = scanError instanceof Error ? scanError.message : 'Unable to scan this website.'
       setError(message)
@@ -316,9 +346,85 @@ export function ScriptScannerImport({
 
               {showDetails && (
                 <div className="space-y-5 border-t p-4">
-                  {candidates.length === 0 ? (
+                  {/* Top-of-list summary for tags that a detected tag-manager
+                      container (typically GTM) is already responsible for
+                      loading. The user shouldn't need to import these unless
+                      they're replacing the tag manager itself — call that out
+                      ONCE here instead of repeating it on every row. */}
+                  {managedCandidates.length > 0 && (
+                    <div className="rounded-md border border-blue-200 bg-blue-50/70 p-4">
+                      <div className="flex gap-3">
+                        <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                        <div className="flex-1 space-y-2">
+                          <p className="text-sm font-semibold text-blue-900">
+                            {managedCandidates.length} script{managedCandidates.length === 1 ? '' : 's'} {managedCandidates.length === 1 ? 'is' : 'are'} already managed by your existing tag manager
+                            {managedByLabel ? ` (${managedByLabel})` : ''}
+                          </p>
+                          <p className="text-sm text-blue-900/90">
+                            Your tag manager already loads these on your site. <strong>You don&apos;t need to import them</strong> — once your cookie-banner.ca banner gates the tag manager script, consent will flow through to every tag it manages.
+                          </p>
+                          <p className="text-xs text-blue-900/70">
+                            Only import these individually if you&apos;re fully replacing your tag manager and want cookie-banner.ca to load each tag directly.
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2 pt-1">
+                            {managedCandidates.slice(0, showManagedDetails ? managedCandidates.length : 6).map(c => (
+                              <Badge key={c.id} variant="secondary" className="bg-white text-blue-900 border border-blue-200">
+                                {c.name}
+                              </Badge>
+                            ))}
+                            {!showManagedDetails && managedCandidates.length > 6 && (
+                              <span className="text-xs text-blue-900/70">+ {managedCandidates.length - 6} more</span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowManagedDetails(!showManagedDetails)}
+                            className="text-xs font-medium text-blue-700 underline-offset-2 hover:underline"
+                          >
+                            {showManagedDetails ? 'Hide individual scripts' : 'Show each managed script (advanced — only if replacing your tag manager)'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Per-script checkboxes — only shown when the user
+                          explicitly expands. Default state keeps the panel
+                          quiet so the importable section gets focus. */}
+                      {showManagedDetails && (
+                        <div className="mt-4 space-y-2 border-t border-blue-200 pt-4">
+                          {managedCandidates.map(script => {
+                            const disabled = !!script.duplicate || !script.scriptCode.trim()
+                            return (
+                              <div key={script.id} className="rounded-md border border-blue-200 bg-white p-3">
+                                <div className="flex items-start gap-3">
+                                  <Checkbox
+                                    checked={selectedIds.has(script.id)}
+                                    disabled={disabled}
+                                    onCheckedChange={(checked) => toggleSelected(script.id, checked === true)}
+                                    aria-label={`Import ${script.name} (already managed by ${managedByLabel ?? 'tag manager'})`}
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="text-sm font-medium">{script.name}</p>
+                                      <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[script.category]}</Badge>
+                                    </div>
+                                    <p className="mt-0.5 text-xs text-muted-foreground">{script.importWarning}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {importableCandidates.length === 0 && managedCandidates.length === 0 ? (
                     <div className="rounded-md bg-muted/50 p-4 text-sm text-muted-foreground">
                       No importable tracking scripts were detected. You can still add scripts manually below.
+                    </div>
+                  ) : importableCandidates.length === 0 ? (
+                    <div className="rounded-md bg-muted/50 p-4 text-sm text-muted-foreground">
+                      Nothing else to import — every tracker we found is already handled by your tag manager above.
                     </div>
                   ) : (
                     (Object.keys(groupedCandidates) as TrackingScript['category'][]).map(category => {
