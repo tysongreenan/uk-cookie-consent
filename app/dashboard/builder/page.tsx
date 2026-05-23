@@ -514,9 +514,6 @@ function BannerBuilderContent() {
   const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
   const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
   const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
-  const [scriptScanUrl, setScriptScanUrl] = useState('')
-  const [isScanningScripts, setIsScanningScripts] = useState(false)
-  const [scriptScanError, setScriptScanError] = useState<string | null>(null)
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
@@ -695,92 +692,6 @@ function BannerBuilderContent() {
       }
     }))
     toast.success('Brand logo applied')
-  }
-
-  const handleScriptDiscovery = async () => {
-    if (!scriptScanUrl.trim()) {
-      setScriptScanError('Enter a website URL to scan for scripts.')
-      return
-    }
-
-    setIsScanningScripts(true)
-    setScriptScanError(null)
-
-    try {
-      const response = await fetch('/api/scripts/discover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: scriptScanUrl.trim() })
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          const retryAfter = response.headers.get('Retry-After')
-          const message = retryAfter 
-            ? `Too many requests. Please wait ${Math.ceil(parseInt(retryAfter) / 60)} minutes.`
-            : 'Too many requests. Please wait before trying again.'
-          setScriptScanError(message)
-          toast.error(message)
-        } else {
-          setScriptScanError(data.error || 'Unable to discover scripts.')
-          toast.error(data.error || 'Unable to discover scripts.')
-        }
-        return
-      }
-
-      if (data.fetchError) {
-        setScriptScanError(data.fetchError)
-        return
-      }
-
-      if (data.scripts && data.scripts.length > 0) {
-        // Add discovered scripts to their respective categories
-        const newScripts = { ...config.scripts }
-
-        data.scripts.forEach((script: TrackingScript) => {
-          const category = script.category
-          if (category === 'strictly-necessary') {
-            newScripts.strictlyNecessary = [...newScripts.strictlyNecessary, script]
-          } else if (category === 'functionality') {
-            newScripts.functionality = [...newScripts.functionality, script]
-          } else if (category === 'tracking-performance') {
-            newScripts.trackingPerformance = [...newScripts.trackingPerformance, script]
-          } else if (category === 'targeting-advertising') {
-            newScripts.targetingAdvertising = [...newScripts.targetingAdvertising, script]
-          }
-        })
-
-        setConfig(prev => ({
-          ...prev,
-          scripts: newScripts
-        }))
-
-        toast.success(`Found ${data.scripts.length} script${data.scripts.length > 1 ? 's' : ''}! Added to your banner.`)
-
-        if (data.cmpDetected) {
-          toast(`${data.cmpDetected} detected on this site.`, { icon: 'ℹ️', duration: 6000 })
-        }
-
-        if (data.warnings && data.warnings.length > 0) {
-          data.warnings.forEach((warning: string) => {
-            toast(warning, { icon: 'ℹ️', duration: 6000 })
-          })
-        }
-      } else {
-        const primary = data.cmpDetected
-          ? `${data.cmpDetected} is installed on this site. Tracking scripts are likely managed in ${data.cmpDetected}'s dashboard — add them manually below.`
-          : 'No tracking scripts found in the HTML. Many sites inject tracking via JavaScript after load — you may need to add them manually.'
-        setScriptScanError(primary)
-      }
-    } catch (error) {
-      const errorMessage = (error as Error).message
-      setScriptScanError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsScanningScripts(false)
-    }
   }
 
   const handleScannerImport = (
@@ -3107,58 +3018,6 @@ function BannerBuilderContent() {
                   onUsePrivacyPolicy={handleUseDetectedPrivacyPolicy}
                   onScanComplete={handleBuilderScanComplete}
                 />
-
-                {/* Script Discovery */}
-                <Card className="border-primary/20 bg-primary/5 border-l-4 border-l-violet-500">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Search className="h-5 w-5 text-primary" />
-                      Auto-Discover Scripts
-                    </CardTitle>
-                    <CardDescription>
-                      Scan your website to automatically find and add tracking scripts. This saves hours of manual work!
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="https://example.com"
-                        value={scriptScanUrl}
-                        onChange={(e) => setScriptScanUrl(e.target.value)}
-                        className="flex-1"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !isScanningScripts) {
-                            handleScriptDiscovery()
-                          }
-                        }}
-                      />
-                      <Button 
-                        onClick={handleScriptDiscovery} 
-                        disabled={isScanningScripts}
-                      >
-                        {isScanningScripts ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Scanning...
-                          </>
-                        ) : (
-                          <>
-                            <Search className="mr-2 h-4 w-4" />
-                            Scan Website
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    {scriptScanError && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{scriptScanError}</AlertDescription>
-                      </Alert>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Detects: Google Analytics, Facebook Pixel, Google Tag Manager, Hotjar, Microsoft Clarity, LinkedIn Insight Tag, TikTok Pixel, Google Ads, Intercom, Zendesk, and more.
-                    </p>
-                  </CardContent>
-                </Card>
 
                 <Card>
                   <CardHeader>
