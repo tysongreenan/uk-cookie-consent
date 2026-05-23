@@ -13,6 +13,10 @@ export interface ScannerImportCandidate {
   detectedVendor?: string
   confidence: 'high' | 'medium' | 'low'
   importWarning?: string
+  /** How importWarning should be rendered. 'info' = blue ℹ️ (context, not
+   *  an issue), 'warning' = orange triangle (needs attention). Defaults
+   *  to 'warning' for backwards compatibility. */
+  importNoteType?: 'info' | 'warning'
   duplicate?: boolean
   duplicateReason?: string
 }
@@ -215,9 +219,12 @@ export async function toImportCandidates(
         bodyCode: tag.bodyCode,
         enabled: true,
         sourceUrl: undefined,
-        detectedVendor: `${tag.name} (configured in ${gtmId})`,
+        detectedVendor: `Configured in ${gtmId}`,
         confidence: tag.confidence,
-        importWarning: `${tag.reason} If you're keeping ${gtmId} active, you don't need to add this separately — GTM will continue to load it. Only import this entry if you're replacing GTM.`,
+        importWarning: tag.vendorId
+          ? `Loaded by ${gtmId} (ID ${tag.vendorId}). Only import if replacing GTM.`
+          : `Loaded by ${gtmId}. Only import if replacing GTM.`,
+        importNoteType: 'info',
       })
     }
   }

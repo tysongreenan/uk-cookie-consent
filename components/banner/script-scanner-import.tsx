@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Check, ChevronDown, Loader2, RefreshCw, Search, Shield, X } from 'lucide-react'
+import { AlertTriangle, Check, ChevronDown, Info, Loader2, RefreshCw, Search, Shield, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -117,7 +117,16 @@ export function ScriptScannerImport({
       setCandidates(deduped)
       setSelectedIds(new Set(
         deduped
-          .filter(candidate => candidate.confidence === 'high' && !candidate.duplicate && candidate.scriptCode.trim())
+          // Pre-check high-confidence, non-duplicate candidates that the
+          // user would normally want to bring over. Skip 'info'-tagged
+          // entries (GTM-container introspection) because the recommended
+          // action there is NOT to import unless the user is replacing GTM.
+          .filter(candidate =>
+            candidate.confidence === 'high'
+            && !candidate.duplicate
+            && candidate.scriptCode.trim()
+            && candidate.importNoteType !== 'info'
+          )
           .map(candidate => candidate.id),
       ))
       onScanComplete?.(scanResult)
@@ -338,12 +347,21 @@ export function ScriptScannerImport({
                                         {script.duplicate && <Badge variant="secondary">Already in banner</Badge>}
                                       </div>
                                       <p className="mt-1 break-all text-xs text-muted-foreground">{getSnippet(script) || 'No script preview available'}</p>
-                                      {(script.importWarning || script.duplicateReason) && (
-                                        <p className="mt-2 flex gap-1 text-xs text-amber-700">
-                                          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                                          {script.duplicateReason || script.importWarning}
-                                        </p>
-                                      )}
+                                      {(script.importWarning || script.duplicateReason) && (() => {
+                                        // Duplicates and explicit warnings get the amber treatment.
+                                        // 'info'-tagged notes (e.g. "Loaded by GTM-XXX, only import if
+                                        // replacing GTM") get a softer blue style so they don't read
+                                        // like errors.
+                                        const isInfo = !script.duplicateReason && script.importNoteType === 'info'
+                                        const colorClass = isInfo ? 'text-blue-700' : 'text-amber-700'
+                                        const Icon = isInfo ? Info : AlertTriangle
+                                        return (
+                                          <p className={`mt-2 flex gap-1 text-xs ${colorClass}`}>
+                                            <Icon className="h-3.5 w-3.5 shrink-0" />
+                                            <span>{script.duplicateReason || script.importWarning}</span>
+                                          </p>
+                                        )
+                                      })()}
                                     </div>
                                   </div>
                                   <div className="w-full md:w-56">
