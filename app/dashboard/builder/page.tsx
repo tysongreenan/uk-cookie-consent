@@ -32,6 +32,8 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import { Slider } from '@/components/ui/slider'
 import { ContrastBadge } from '@/components/ui/contrast-badge'
 import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
+import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
+import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
 
@@ -507,6 +509,7 @@ function BannerBuilderContent() {
   const [scriptScanUrl, setScriptScanUrl] = useState('')
   const [isScanningScripts, setIsScanningScripts] = useState(false)
   const [scriptScanError, setScriptScanError] = useState<string | null>(null)
+  const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
 
@@ -769,6 +772,57 @@ function BannerBuilderContent() {
     } finally {
       setIsScanningScripts(false)
     }
+  }
+
+  const handleScannerImport = (
+    scripts: TrackingScript[],
+    summary: { imported: number; skipped: number; warnings: string[] }
+  ) => {
+    if (scripts.length === 0) {
+      toast('No scripts selected for import.', { icon: 'ℹ️' })
+      return
+    }
+
+    setConfig(prev => {
+      const nextScripts = {
+        strictlyNecessary: [...prev.scripts.strictlyNecessary],
+        functionality: [...prev.scripts.functionality],
+        trackingPerformance: [...prev.scripts.trackingPerformance],
+        targetingAdvertising: [...prev.scripts.targetingAdvertising],
+      }
+
+      scripts.forEach(script => {
+        const key = categoryToConfigKey(script.category)
+        nextScripts[key] = [...nextScripts[key], script]
+      })
+
+      return { ...prev, scripts: nextScripts }
+    })
+    setIsDirty(true)
+    toast.success(`Imported ${summary.imported} script${summary.imported === 1 ? '' : 's'} into your banner.`)
+
+    summary.warnings.slice(0, 3).forEach(warning => {
+      toast(warning, { icon: '!', duration: 6000 })
+    })
+  }
+
+  const handleUseDetectedPrivacyPolicy = (url: string) => {
+    setConfig(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        privacyPolicy: {
+          ...prev.branding.privacyPolicy,
+          url,
+        },
+      },
+    }))
+    setIsDirty(true)
+    toast.success('Detected privacy policy applied')
+  }
+
+  const handleBuilderScanComplete = (result: BuilderScannerResult) => {
+    setDetectedCmpVendor(result.consentBanner.detected ? result.consentBanner.vendor : null)
   }
 
   const handleBrandImport = async () => {
@@ -3030,6 +3084,14 @@ function BannerBuilderContent() {
 
           {/* Scripts Tab */}
               <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
+                <ScriptScannerImport
+                  currentScripts={config.scripts}
+                  privacyPolicyUrl={config.branding?.privacyPolicy?.url}
+                  onImport={handleScannerImport}
+                  onUsePrivacyPolicy={handleUseDetectedPrivacyPolicy}
+                  onScanComplete={handleBuilderScanComplete}
+                />
+
                 {/* Script Discovery */}
                 <Card className="border-primary/20 bg-primary/5 border-l-4 border-l-violet-500">
                   <CardHeader>

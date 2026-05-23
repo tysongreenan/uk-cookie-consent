@@ -32,6 +32,8 @@ export interface RateLimitOptions {
   windowMs: number
   maxRequests: number
   keyGenerator?: (req: Request) => string
+  /** Optional human-readable label for logs/metrics. */
+  name?: string
 }
 
 export class RateLimit {
