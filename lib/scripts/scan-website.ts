@@ -35,7 +35,11 @@ export interface ProductAdvice {
 export interface WebsiteScanResult {
   url: string
   fetchedAt: string
-  scriptsDetected: { name: string; category: string }[]
+  // `url` is the live URL the headless scanner saw the tracker load from
+  // (e.g. https://static.hotjar.com/c/hotjar-1778278.js?sv=7). Carried
+  // through so the import-candidates layer can extract vendor IDs and
+  // build canonical snippets even when the script wasn't in the raw HTML.
+  scriptsDetected: { name: string; category: string; url?: string }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
   cookies: ScannedCookie[]
@@ -69,7 +73,7 @@ function clamp(score: number): number {
 
 interface ScoringInput {
   cookies: ScannedCookie[]
-  scriptsDetected: { name: string; category: string }[]
+  scriptsDetected: { name: string; category: string; url?: string }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
   frenchLanguage?: FrenchLanguageCheck
@@ -447,7 +451,7 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
     source: c.source,
   }))
 
-  const scriptsDetected = headless.loadedScripts.map(s => ({ name: s.name, category: s.category }))
+  const scriptsDetected = headless.loadedScripts.map(s => ({ name: s.name, category: s.category, url: s.url }))
   const scored = scoreCompliance({
     cookies,
     scriptsDetected,

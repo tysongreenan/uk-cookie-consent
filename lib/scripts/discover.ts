@@ -92,7 +92,9 @@ const scriptPatterns: ScriptPattern[] = [
     category: 'tracking-performance',
     patterns: {
       src: [/google-analytics\.com\/analytics\.js/, /google-analytics\.com\/ga\.js/],
-      content: [/ga\(/, /_gaq\.push/],
+      // Tightened from /ga\(/ — that matched any minified function named
+      // `ga`. Require the UA-XXXXXX-X tracking ID or the legacy _gaq queue.
+      content: [/UA-\d{4,}-\d+/, /_gaq\.push/, /google-analytics\.com\/analytics\.js/],
     },
     extractScript: (element, $, baseUrl) => {
       const src = $(element).attr('src')
@@ -193,7 +195,10 @@ fbq('track', 'PageView');
     category: 'tracking-performance',
     patterns: {
       src: [/static\.hotjar\.com/],
-      content: [/hj\(/, /hotjar\.com/],
+      // Tightened from /hj\(/ — that was matching minified GTM internal
+      // functions like `hj(w.location, "host")`, producing false-positive
+      // Hotjar detections on any site running GTM.
+      content: [/hjid\s*[:=]/, /static\.hotjar\.com/, /hotjar-\d+\.js/],
     },
     extractScript: (element, $, baseUrl) => {
       const content = $(element).html() || ''

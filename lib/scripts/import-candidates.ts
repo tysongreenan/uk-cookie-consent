@@ -65,7 +65,19 @@ export function categoryToConfigKey(category: TrackingScript['category']): keyof
 }
 
 function extractSrc(scriptCode: string): string {
-  return scriptCode.match(/src=["']([^"']+)["']/i)?.[1] || ''
+  const raw = scriptCode.match(/src=["']([^"']+)["']/i)?.[1] || ''
+  if (!raw) return ''
+  // Reject obvious junk pulled out of JS string literals inside bundles.
+  // A real script src is one of:
+  //   - absolute (http:// or https://)
+  //   - protocol-relative (//cdn...)
+  //   - root-relative (/path/to/file.js)
+  // Anything else (template fragments like "+x+", concatenation pieces,
+  // single tokens) is noise from regex-matching inside JS source code.
+  if (/^https?:\/\//i.test(raw)) return raw
+  if (raw.startsWith('//')) return raw
+  if (raw.startsWith('/') && raw.length > 2) return raw
+  return ''
 }
 
 function extractKnownId(scriptCode: string): string {
@@ -133,6 +145,100 @@ function makeFallbackScriptCode(name: string, sourceUrl?: string, existingCode =
     }
   }
 
+  // Hotjar URL pattern: https://static.hotjar.com/c/hotjar-1778278.js?sv=7
+  if (name === 'Hotjar') {
+    const id = sourceUrl?.match(/hotjar-(\d+)\.js/i)?.[1] || existingCode.match(/hjid['"]?\s*[:=]\s*['"]?(\d+)/)?.[1] || ''
+    if (id) {
+      return `<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:${id},hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>`
+    }
+  }
+
+  // Microsoft Clarity URL pattern: https://www.clarity.ms/tag/abcdefgh
+  if (name === 'Microsoft Clarity') {
+    const id = sourceUrl?.match(/clarity\.ms\/tag\/([a-z0-9]+)/i)?.[1] || existingCode.match(/clarity\(['"]init['"],\s*['"]([^'"]+)['"]/)?.[1] || ''
+    if (id) {
+      return `<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "${id}");
+</script>`
+    }
+  }
+
+  // Facebook Pixel URL pattern: https://connect.facebook.net/en_US/fbevents.js
+  // (the pixel ID isn't in the URL — try existingCode for fbq('init', '...')).
+  if (name === 'Facebook Pixel') {
+    const id = existingCode.match(/fbq\(['"]init['"],\s*['"](\d{10,})['"]\)/)?.[1] || ''
+    if (id) {
+      return `<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${id}');
+fbq('track', 'PageView');
+</script>`
+    }
+    if (sourceUrl) {
+      // No pixel ID extractable, but we know FB Pixel is on the site — give
+      // the user the loader URL plus a placeholder so they can fill in the ID.
+      return `<script async src="${sourceUrl}"></script>
+<!-- Replace YOUR_PIXEL_ID with your Meta pixel ID (find it in Events Manager). -->
+<script>fbq('init', 'YOUR_PIXEL_ID'); fbq('track', 'PageView');</script>`
+    }
+  }
+
+  // LinkedIn Insight Tag URL pattern: https://snap.licdn.com/li.lms-analytics/insight.min.js
+  // (partner ID isn't in the URL — try existingCode for _linkedin_partner_id).
+  if (name === 'LinkedIn Insight Tag') {
+    const id = existingCode.match(/_linkedin_partner_id\s*=\s*['"]?(\d+)/)?.[1] || ''
+    if (id) {
+      return `<script type="text/javascript">
+_linkedin_partner_id = "${id}";
+window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+</script><script type="text/javascript">
+(function(l) {
+if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+window.lintrk.q=[]}
+var s = document.getElementsByTagName("script")[0];
+var b = document.createElement("script");
+b.type = "text/javascript";b.async = true;
+b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+s.parentNode.insertBefore(b, s);})(window.lintrk);
+</script>`
+    }
+  }
+
+  // TikTok Pixel URL pattern: https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=ABCDEF
+  if (name === 'TikTok Pixel') {
+    const id = sourceUrl?.match(/[?&]sdkid=([^&]+)/)?.[1] || existingCode.match(/ttq\.load\(['"]([^'"]+)['"]\)/)?.[1] || ''
+    if (id) {
+      return `<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+  ttq.load('${id}');
+  ttq.page();
+}(window, document, 'ttq');
+</script>`
+    }
+  }
+
   if (!sourceUrl) return ''
 
   return `<script src="${sourceUrl}"></script>`
@@ -168,17 +274,42 @@ export async function toImportCandidates(
   const fallbackCandidates = scanResult.scriptsDetected
     .filter(script => !discoveredNames.has(script.name))
     .filter(script => !CMP_NAMES.some(name => script.name.toLowerCase().includes(name.toLowerCase())))
-    .map(script => ({
-      id: `headless-${script.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
-      name: script.name,
-      category: script.category as TrackingScript['category'],
-      scriptCode: '',
-      enabled: true,
-      sourceUrl: undefined as string | undefined,
-      detectedVendor: script.name,
-      confidence: 'low' as const,
-      importWarning: 'Detected in the browser scan, but no importable script code was extracted from the page HTML. Add this manually if you still need it.',
-    }))
+    .map(script => {
+      // Use the live URL the headless scanner captured. If it embeds a
+      // vendor ID (Hotjar site ID, Clarity tag, TikTok sdkid, GA4 id, etc.)
+      // we can rebuild a canonical loader snippet from it instead of giving
+      // the user an empty preview.
+      const sourceUrl = script.url
+      const builtCode = makeFallbackScriptCode(script.name, sourceUrl)
+      // makeFallbackScriptCode returns either a multi-line canonical loader
+      // (when it could extract an ID) or just `<script src="${url}"></script>`
+      // (when it couldn't). Treat the multi-line case as high-confidence —
+      // unless the snippet is a partial template with a YOUR_X placeholder
+      // (e.g., FB Pixel when we have the loader URL but not the pixel ID).
+      const hasPlaceholder = /YOUR_[A-Z_]+/.test(builtCode)
+      const isCanonical =
+        builtCode.length > 0
+        && !/^<script[^>]*src=[^>]*><\/script>$/.test(builtCode)
+        && !hasPlaceholder
+      const scriptCode = builtCode || ''
+      return {
+        id: `headless-${script.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        name: script.name,
+        category: script.category as TrackingScript['category'],
+        scriptCode,
+        enabled: true,
+        sourceUrl,
+        detectedVendor: script.name,
+        confidence: (isCanonical ? 'high' : sourceUrl ? 'medium' : 'low') as 'high' | 'medium' | 'low',
+        importWarning: isCanonical
+          ? undefined
+          : hasPlaceholder
+            ? `We detected ${script.name} but couldn't auto-extract the account ID from the page. The snippet below has a placeholder — fill in your ID before saving.`
+            : sourceUrl
+              ? 'We saw this tag load on your site but couldn\'t auto-extract its account ID. Paste the vendor\'s install snippet to complete the import.'
+              : 'Detected in the browser scan, but no importable script code was extracted. Add this manually if you still need it.',
+      }
+    })
 
   const base = [...candidates, ...fallbackCandidates]
 
