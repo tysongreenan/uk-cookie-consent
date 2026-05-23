@@ -39,9 +39,27 @@ const SCAN_STEPS = [
 ]
 
 function getCmpLabel(result: BuilderScannerResult | null): string {
-  if (!result?.consentBanner.detected) return 'No banner detected'
-  if (result.consentBanner.vendor === 'UK Cookie Consent') return 'cookie-banner.ca detected'
-  return `${result.consentBanner.vendor || 'Custom / Unknown'} detected`
+  if (!result) return ''
+  if (result.consentBanner.detected) {
+    if (result.consentBanner.vendor === 'UK Cookie Consent') return 'cookie-banner.ca detected'
+    return `${result.consentBanner.vendor || 'Custom / Unknown'} detected`
+  }
+  // A static HTML scan can't see banners that JavaScript injects after
+  // the page loads — which is most of them. Be explicit about that
+  // rather than telling the user "No banner detected" when their site
+  // clearly has one.
+  if (result.scanMethod === 'static-html') {
+    return 'Banner check skipped — static-HTML scan only'
+  }
+  return 'No banner detected'
+}
+
+function getCmpSubLabel(result: BuilderScannerResult | null): string | null {
+  if (!result) return null
+  if (result.scanMethod === 'static-html' && !result.consentBanner.detected) {
+    return 'Most cookie banners are added by JavaScript, so a static scan can\'t see them. Click Rescan to retry the full browser scan.'
+  }
+  return null
 }
 
 function getConfidenceVariant(confidence: ScannerImportCandidate['confidence']): 'default' | 'secondary' | 'destructive' {
@@ -296,6 +314,9 @@ export function ScriptScannerImport({
                   <p className="text-xs text-muted-foreground">
                     {result.cookies.length} cookies found · {result.scanMethod === 'headless' ? 'Browser scan' : 'Static HTML scan'}
                   </p>
+                  {getCmpSubLabel(result) && (
+                    <p className="mt-2 text-xs text-blue-700">{getCmpSubLabel(result)}</p>
+                  )}
                 </div>
                 {result.consentBanner.vendor === 'UK Cookie Consent' ? (
                   <Badge variant="secondary">Audit existing banner</Badge>

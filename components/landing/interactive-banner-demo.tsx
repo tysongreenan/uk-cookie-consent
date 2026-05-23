@@ -2521,9 +2521,9 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                                         : 'Body Code (placed after <body> tag) - Optional'}
                                     </Label>
                                     {(script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')) && (
-                                      <p className="text-xs text-amber-600 mb-2 flex items-center">
+                                      <p className="text-xs text-blue-700 mb-2 flex items-center">
                                         <Info className="h-3 w-3 mr-1" />
-                                        Google Tag Manager requires both Head and Body codes to work properly
+                                        Google Tag Manager needs both Head and Body codes — paste each into the matching tab on your site
                                       </p>
                                     )}
                                     <textarea
@@ -2575,9 +2575,9 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                                     <Label className="text-xs text-muted-foreground mb-1 block">
                                       Body Code (Step 2: Paste after &lt;body&gt; tag - Required for GTM)
                                     </Label>
-                                    <p className="text-xs text-amber-600 mb-2 flex items-center">
+                                    <p className="text-xs text-blue-700 mb-2 flex items-center">
                                       <Info className="h-3 w-3 mr-1" />
-                                      Google Tag Manager requires both Head and Body codes to work properly
+                                      Google Tag Manager needs both Head and Body codes — paste each into the matching tab on your site
                                     </p>
                                     <textarea
                                       value={script.bodyCode || ''}
@@ -2942,9 +2942,9 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                                       : 'Body Code (placed after <body> tag) - Optional'}
                                   </Label>
                                   {(script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')) && (
-                                    <p className="text-xs text-amber-600 mb-2 flex items-center">
+                                    <p className="text-xs text-blue-700 mb-2 flex items-center">
                                       <Info className="h-3 w-3 mr-1" />
-                                      Google Tag Manager requires both Head and Body codes to work properly
+                                      Google Tag Manager needs both Head and Body codes — paste each into the matching tab on your site
                                     </p>
                                   )}
                                   <textarea
