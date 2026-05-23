@@ -13,52 +13,46 @@ export interface ScriptDiscoveryResult {
 
 interface CmpSignature {
   name: string
-  patterns: RegExp[]
+  // Patterns that must appear inside a <script> tag (src, attributes, or
+  // inline content). Use this for plain domain names — otherwise an outbound
+  // <a href> link to the vendor's privacy policy would trigger detection.
+  scriptContext?: RegExp[]
+  // Patterns specific enough to match anywhere in the document (vendor-
+  // prefixed CSS classes, distinctive global identifiers, etc.).
+  anywhere?: RegExp[]
 }
 
 const cmpSignatures: CmpSignature[] = [
   {
     name: 'OneTrust',
-    patterns: [
-      /cdn\.cookielaw\.org/i,
-      /optanon-category-/i,
-      /\bOneTrust\b/,
-      /otSDKStub\.js/i,
-    ],
+    scriptContext: [/cdn\.cookielaw\.org/i, /otSDKStub\.js/i],
+    anywhere: [/optanon-category-/i, /\bonetrust[-_]/i],
   },
   {
     name: 'Cookiebot',
-    patterns: [
-      /consent\.cookiebot\.com/i,
-      /id=["']Cookiebot["']/i,
-      /data-cookieconsent=/i,
-    ],
+    scriptContext: [/consent\.cookiebot\.com/i, /id=["']Cookiebot["']/i],
+    anywhere: [/data-cookieconsent=/i],
   },
   {
     name: 'CookieYes',
-    patterns: [
-      /cookieyes\.com/i,
-      /class=["']cky-/i,
-    ],
+    scriptContext: [/cookieyes\.com/i],
+    anywhere: [/class=["']cky-/i],
   },
   {
     name: 'Termly',
-    patterns: [
-      /app\.termly\.io/i,
-      /termly\.io\/embed/i,
-    ],
+    scriptContext: [/app\.termly\.io/i, /termly\.io\/embed/i],
   },
   {
     name: 'Iubenda',
-    patterns: [/iubenda\.com/i],
+    scriptContext: [/iubenda\.com/i],
   },
   {
     name: 'Quantcast Choice',
-    patterns: [/quantcast\.mgr\.consensu\.org/i],
+    scriptContext: [/quantcast\.mgr\.consensu\.org/i],
   },
   {
     name: 'TrustArc',
-    patterns: [/trustarc\.com/i, /truste\.com\/notice/i],
+    scriptContext: [/trustarc\.com/i, /truste\.com\/notice/i],
   },
 ]
 
@@ -382,6 +376,8 @@ function generateScriptId(): string {
   return `script-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
+const SCAN_TIMEOUT_MS = 15000
+
 function describeFetchError(err: Error, urlStr: string): string {
   const msg = err.message || ''
   const cause = (err as Error & { cause?: unknown }).cause
@@ -406,15 +402,25 @@ function describeFetchError(err: Error, urlStr: string): string {
   // Node's fetch AbortController surfaces the abort reason on err.cause and
   // sets err.name === 'AbortError' with a generic message like
   // "This operation was aborted". Treat the timeout case separately so we
-  // don't claim "timed out after 15s" for unrelated aborts.
+  // don't claim "timed out" for unrelated aborts.
   const isAbort = err.name === 'AbortError' || /aborted/i.test(combined)
-  if (/timed out/i.test(combined)) {
-    return `The scan timed out after 15 seconds. The site may be slow or blocking scans — try a different page or add scripts manually.`
+  const timeoutSeconds = Math.round(SCAN_TIMEOUT_MS / 1000)
+  if (/timed out|ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT/i.test(combined)) {
+    return `The scan timed out after ${timeoutSeconds} seconds. The site may be slow or blocking scans — try a different page or add scripts manually.`
   }
   if (isAbort) {
     return `The scan was cancelled before it finished.`
   }
 
+  if (/ECONNREFUSED/i.test(combined)) {
+    return `The site refused the connection. It may be down — try again later or scan a different page.`
+  }
+  if (/ECONNRESET|EPIPE/i.test(combined)) {
+    return `The connection was reset before we finished reading the page. Try again, or scan a different page.`
+  }
+  if (/EHOSTUNREACH|ENETUNREACH/i.test(combined)) {
+    return `Couldn't reach ${urlStr}. The site may be offline.`
+  }
   if (/ENOTFOUND|getaddrinfo|DNS/i.test(combined)) {
     return `Couldn't resolve ${urlStr}. Check the URL is correct.`
   }
@@ -424,11 +430,30 @@ function describeFetchError(err: Error, urlStr: string): string {
   return `Couldn't fetch ${urlStr}: ${msg}`
 }
 
-function detectCmp(html: string): string | undefined {
+function detectCmp($: CheerioAPI, html: string): string | undefined {
+  // Build a single haystack from every <script> tag — src + class + id +
+  // data-* attrs + inline content. Matching script-context patterns against
+  // this avoids false positives from outbound <a href> links to vendor
+  // privacy policies.
+  const scriptHaystack = $('script')
+    .toArray()
+    .map(el => {
+      const $el = $(el)
+      const src = $el.attr('src') ?? ''
+      const className = $el.attr('class') ?? ''
+      const id = $el.attr('id') ?? ''
+      const dataAttrs = Object.entries(el.attribs || {})
+        .filter(([k]) => k.startsWith('data-'))
+        .map(([k, v]) => `${k}=${v}`)
+        .join(' ')
+      const content = $el.html() ?? ''
+      return `${src} ${className} ${id} ${dataAttrs} ${content}`
+    })
+    .join('\n')
+
   for (const cmp of cmpSignatures) {
-    if (cmp.patterns.some(re => re.test(html))) {
-      return cmp.name
-    }
+    if (cmp.scriptContext?.some(re => re.test(scriptHaystack))) return cmp.name
+    if (cmp.anywhere?.some(re => re.test(html))) return cmp.name
   }
   return undefined
 }
@@ -447,10 +472,10 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
     urlForErrors = sanitizedUrl
     const url = new URL(sanitizedUrl)
 
-    const { text: html } = await fetchSafeText(url, { timeoutMs: 15000 })
+    const { text: html } = await fetchSafeText(url, { timeoutMs: SCAN_TIMEOUT_MS })
     const $ = load(html)
 
-    cmpDetected = detectCmp(html)
+    cmpDetected = detectCmp($, html)
 
     // Find all script tags
     const scriptTags = $('script').toArray()
