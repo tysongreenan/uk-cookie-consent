@@ -7,7 +7,60 @@ export interface ScriptDiscoveryResult {
   scripts: TrackingScript[]
   warnings: string[]
   fetchedAt: string
+  cmpDetected?: string
+  fetchError?: string
 }
+
+interface CmpSignature {
+  name: string
+  patterns: RegExp[]
+}
+
+const cmpSignatures: CmpSignature[] = [
+  {
+    name: 'OneTrust',
+    patterns: [
+      /cdn\.cookielaw\.org/i,
+      /optanon-category-/i,
+      /\bOneTrust\b/,
+      /otSDKStub\.js/i,
+    ],
+  },
+  {
+    name: 'Cookiebot',
+    patterns: [
+      /consent\.cookiebot\.com/i,
+      /id=["']Cookiebot["']/i,
+      /data-cookieconsent=/i,
+    ],
+  },
+  {
+    name: 'CookieYes',
+    patterns: [
+      /cookieyes\.com/i,
+      /class=["']cky-/i,
+    ],
+  },
+  {
+    name: 'Termly',
+    patterns: [
+      /app\.termly\.io/i,
+      /termly\.io\/embed/i,
+    ],
+  },
+  {
+    name: 'Iubenda',
+    patterns: [/iubenda\.com/i],
+  },
+  {
+    name: 'Quantcast Choice',
+    patterns: [/quantcast\.mgr\.consensu\.org/i, /__cmp\(/],
+  },
+  {
+    name: 'TrustArc',
+    patterns: [/trustarc\.com/i, /truste\.com\/notice/i],
+  },
+]
 
 interface ScriptPattern {
   name: string
@@ -329,17 +382,61 @@ function generateScriptId(): string {
   return `script-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
+function describeFetchError(err: Error, urlStr: string): string {
+  const msg = err.message || ''
+  const httpMatch = msg.match(/HTTP\s+(\d{3})/i)
+  if (httpMatch) {
+    const status = httpMatch[1]
+    if (status === '403' || status === '401' || status === '429') {
+      return `The site returned HTTP ${status} — it's blocking automated scans. Try scanning a different page on the site, or add your tracking scripts manually below.`
+    }
+    if (status === '404') {
+      return `The site returned HTTP 404 — that URL doesn't exist. Double-check the address and try again.`
+    }
+    if (status.startsWith('5')) {
+      return `The site returned HTTP ${status} — it's currently unavailable. Try again in a few minutes.`
+    }
+    return `The site returned HTTP ${status}.`
+  }
+  if (/timed out/i.test(msg) || /aborted/i.test(msg)) {
+    return `The scan timed out after 15 seconds. The site may be slow or blocking scans — try a different page or add scripts manually.`
+  }
+  if (/ENOTFOUND|getaddrinfo|DNS/i.test(msg)) {
+    return `Couldn't resolve ${urlStr}. Check the URL is correct.`
+  }
+  if (/private|loopback|allowlist/i.test(msg)) {
+    return `That URL points to a private or non-public address and can't be scanned.`
+  }
+  return `Couldn't fetch ${urlStr}: ${msg}`
+}
+
+function detectCmp($: CheerioAPI, html: string): string | undefined {
+  for (const cmp of cmpSignatures) {
+    if (cmp.patterns.some(re => re.test(html))) {
+      return cmp.name
+    }
+  }
+  return undefined
+}
+
 export async function discoverScripts(targetUrl: string): Promise<ScriptDiscoveryResult> {
   const warnings: string[] = []
   const discoveredScripts: TrackingScript[] = []
   const foundPatterns = new Set<string>()
+  let cmpDetected: string | undefined
+  let fetchError: string | undefined
+
+  let urlForErrors = targetUrl
 
   try {
     const sanitizedUrl = normalizeUrl(targetUrl)
+    urlForErrors = sanitizedUrl
     const url = new URL(sanitizedUrl)
 
     const { text: html } = await fetchSafeText(url, { timeoutMs: 15000 })
     const $ = load(html)
+
+    cmpDetected = detectCmp($, html)
 
     // Find all script tags
     const scriptTags = $('script').toArray()
@@ -420,17 +517,31 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
       }
     }
 
-    if (discoveredScripts.length === 0) {
-      warnings.push('No common tracking scripts detected. You may need to add them manually.')
+    if (cmpDetected) {
+      if (discoveredScripts.length === 0) {
+        warnings.push(
+          `${cmpDetected} is installed on this site. Tracking scripts are likely configured through ${cmpDetected}'s dashboard rather than embedded in the HTML, so we couldn't auto-detect them. Add them manually below.`
+        )
+      } else {
+        warnings.push(
+          `${cmpDetected} is installed on this site — we extracted the scripts it was gating. Review them before saving.`
+        )
+      }
+    } else if (discoveredScripts.length === 0) {
+      warnings.push(
+        'No common tracking scripts detected in the HTML. Many sites inject tracking via JavaScript after load — you may need to add them manually.'
+      )
     }
   } catch (error) {
-    warnings.push(`Failed to fetch website: ${(error as Error).message}`)
+    fetchError = describeFetchError(error as Error, urlForErrors)
   }
 
   return {
     scripts: discoveredScripts,
     warnings,
     fetchedAt: new Date().toISOString(),
+    cmpDetected,
+    fetchError,
   }
 }
 
