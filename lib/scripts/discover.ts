@@ -541,6 +541,74 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
       }
     }
 
+    // Drupal/Magento/Wagtail/etc. aggregate JS into first-party bundles, so
+    // tracking init code (GTM-XXX, GA4 IDs, fbq init) never appears in the
+    // raw HTML — only in /sites/.../files/js/js_<hash>.js. After the inline
+    // pass, fetch a few same-origin <script src> bundles and re-run the same
+    // content patterns against their text.
+    const remainingPatterns = scriptPatterns.filter(p => !foundPatterns.has(p.name))
+    if (remainingPatterns.length > 0) {
+      const sameOriginScriptUrls: string[] = []
+      const seenBundleUrls = new Set<string>()
+      for (const el of scriptTags) {
+        const src = $(el).attr('src')
+        if (!src) continue
+        try {
+          const abs = new URL(src, url)
+          if (abs.origin !== url.origin) continue
+          const absStr = abs.toString()
+          if (seenBundleUrls.has(absStr)) continue
+          seenBundleUrls.add(absStr)
+          sameOriginScriptUrls.push(absStr)
+          if (sameOriginScriptUrls.length >= 5) break
+        } catch {
+          // Ignore malformed src URLs
+        }
+      }
+
+      for (const bundleUrl of sameOriginScriptUrls) {
+        let bundleText: string
+        try {
+          const result = await fetchSafeText(bundleUrl, {
+            timeoutMs: 8000,
+            maxContentLength: 512 * 1024,
+          })
+          bundleText = result.text
+        } catch {
+          continue // Skip bundles we can't read
+        }
+
+        // Neutralize any literal `</script>` in the bundle so cheerio's HTML
+        // parser doesn't close the wrapper element early.
+        const safeBundleText = bundleText.replace(/<\/script/gi, '<\\/script')
+        const $bundle = load(`<script>${safeBundleText}</script>`)
+        const bundleEl = $bundle('script').get(0)
+        if (!bundleEl) continue
+
+        for (const pattern of remainingPatterns) {
+          if (foundPatterns.has(pattern.name)) continue
+          const matched = pattern.patterns.content?.some(re => re.test(bundleText)) ?? false
+          if (!matched) continue
+          foundPatterns.add(pattern.name)
+          try {
+            const extracted = pattern.extractScript
+              ? pattern.extractScript(bundleEl, $bundle, url)
+              : { scriptCode: `<script src="${bundleUrl}"></script>` }
+            discoveredScripts.push({
+              id: generateScriptId(),
+              name: pattern.name,
+              category: pattern.category,
+              scriptCode: extracted.scriptCode,
+              bodyCode: extracted.bodyCode,
+              enabled: true,
+            })
+          } catch (error) {
+            warnings.push(`Failed to extract ${pattern.name} from bundle: ${(error as Error).message}`)
+          }
+        }
+      }
+    }
+
     // Also check for inline scripts in noscript tags (e.g., GTM)
     const noscriptTags = $('noscript').toArray()
     for (const noscriptTag of noscriptTags) {
