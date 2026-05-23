@@ -491,7 +491,15 @@ const SmartScriptInput = ({
 }
 
 function BannerBuilderContent() {
-  const { data: session } = useSession()
+  // `status` is 'loading' whenever next-auth refetches the session (window
+  // focus, polling, manual update). Treating `!session` as "logged out" was
+  // bouncing users to /auth/signin every time a refetch happened — most
+  // visibly after importing scripts, where the success toast's focus shift
+  // triggered a refetch mid-render. The signin page then bounces an
+  // already-authenticated user to /dashboard, which silently destroyed the
+  // builder's in-memory state. Use the explicit 'unauthenticated' status
+  // to make the redirect deterministic.
+  const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [config, setConfig] = useState<BannerConfig>(defaultConfig)
@@ -514,13 +522,14 @@ function BannerBuilderContent() {
   const [isDirty, setIsDirty] = useState(false)
 
   useEffect(() => {
-    if (!session) {
+    if (status === 'unauthenticated') {
       router.push('/auth/signin')
-    } else {
+    } else if (status === 'authenticated' && session) {
       const planTier = (session.user?.planTier || 'free') as PlanTier
       setUserPlan(planTier)
     }
-  }, [session, router])
+    // status === 'loading' → do nothing; keep current state intact.
+  }, [status, session, router])
 
   useEffect(() => {
     const editId = searchParams.get('id') || searchParams.get('edit')
@@ -1091,7 +1100,11 @@ function BannerBuilderContent() {
     }
   }
 
-  if (!session) {
+  // Only show the loading spinner on the genuine initial load (no session
+  // yet AND status hasn't resolved). Once we've had a session, hold on to
+  // the rendered builder even if next-auth briefly re-fetches — otherwise
+  // an in-progress refetch unmounts the form and wipes unsaved state.
+  if (!session && status !== 'authenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
