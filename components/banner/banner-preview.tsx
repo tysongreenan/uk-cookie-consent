@@ -506,16 +506,32 @@ export function BannerPreview({ config }: BannerPreviewProps) {
             ...getLayoutStyles(),
           }}
         >
-          <div className="relative">
-            {(safeConfig.position.includes('floating') || safeConfig.position.includes('modal')) && (
-              <button
-                onClick={handleClose}
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-                style={{ color: safeConfig.colors.text }}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+          <div className="relative" style={{ paddingRight: 56 }}>
+            {/* Mirror the production banner: a 44x44 close button is rendered
+                regardless of position so builders can see where it lands
+                against their copy before publishing. */}
+            <button
+              onClick={handleClose}
+              aria-label="Close"
+              className="absolute flex items-start justify-center"
+              style={{
+                top: 0,
+                right: 0,
+                width: 44,
+                height: 44,
+                paddingTop: 2,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: safeConfig.colors.text,
+                fontSize: 24,
+                lineHeight: 1,
+                opacity: 0.7,
+                zIndex: 2,
+              }}
+            >
+              ×
+            </button>
 
             <div className={`flex items-start ${
               safeConfig.branding.logo.position === 'center' ? 'flex-col' : 'flex-row'
