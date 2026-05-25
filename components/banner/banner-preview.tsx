@@ -73,8 +73,14 @@ interface BannerConfig {
   }
 }
 
+type PreviewView = 'banner' | 'preferences' | 'floating'
+
 interface BannerPreviewProps {
   config: BannerConfig
+  /** Forces a specific preview view. When provided, overrides internal banner/preferences toggle state. */
+  view?: PreviewView
+  /** Called when the user interacts with the preview in a way that should switch the parent's view chip (e.g., clicking the floating button to open preferences). */
+  onViewChange?: (view: PreviewView) => void
 }
 
 // Helper function to generate floating button preview styles
@@ -150,63 +156,53 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   const showText = floatingStyle.showText !== false
   const text = safeConfig.branding?.footerLink?.text || 'Cookie Settings'
   const hasLogo = safeConfig.branding?.logo?.enabled && safeConfig.branding?.logo?.url
-  
-  // Cookie icons (matching the code generator)
+  // iconStyle: 'cookie' (always cookie icon), 'logo' (always logo, falls back to cookie when no logo), 'auto' (logo if available else cookie)
+  const iconStyle: 'cookie' | 'logo' | 'auto' = floatingStyle.iconStyle || 'auto'
+
   const cookieAcceptedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>
-      cookie
-    </span>
+    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>cookie</span>
   )
-  
   const cookieRejectedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>
-      cookie_off
-    </span>
+    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>cookie_off</span>
   )
-  
-  // Check consent state for icon
-  const consentState = typeof window !== 'undefined' 
+
+  const consentState = typeof window !== 'undefined'
     ? localStorage.getItem('cookie-consent-preview-state') || 'accepted'
     : 'accepted'
-  
-  const hasAcceptedNonEssential = consentState === 'accepted'
-  const cookieIcon = hasAcceptedNonEssential ? cookieAcceptedIcon : cookieRejectedIcon
-  
-  if (shape === 'circle') {
-    // Circle always shows only cookie icon (not logo) for dynamic state changes
-    return <span>{cookieIcon}</span>
-  } else {
-    // Pill and square respect the showText setting
-    if (showText && hasLogo) {
-      // Show logo + text when both are enabled
-      return (
-        <>
-          <img 
-            src={safeConfig.branding.logo.url} 
-            alt="Logo" 
-            style={{ width: '16px', height: '16px', objectFit: 'contain', marginRight: '4px' }} 
-          />
-          <span>{text}</span>
-        </>
-      )
-    } else if (showText && !hasLogo) {
-      // Show icon + text when text is enabled but no logo
-      return (
-        <>
-          <span>{cookieIcon}</span>
-          <span style={{ marginLeft: '4px' }}>{text}</span>
-        </>
-      )
-    } else {
-      // Show only icon when text is disabled (regardless of logo setting)
-      return <span>{cookieIcon}</span>
-    }
+  const cookieIcon = consentState === 'accepted' ? cookieAcceptedIcon : cookieRejectedIcon
+
+  const logoNode = hasLogo ? (
+    <img
+      src={safeConfig.branding.logo.url}
+      alt="Logo"
+      style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+    />
+  ) : null
+
+  // Decide which icon node to render based on iconStyle preference
+  const preferLogo = iconStyle === 'logo' || (iconStyle === 'auto' && hasLogo)
+  const iconNode = preferLogo && logoNode ? logoNode : cookieIcon
+
+  if (shape === 'circle' || !showText) {
+    return <span style={{ display: 'inline-flex', alignItems: 'center' }}>{iconNode}</span>
   }
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      {iconNode}
+      <span>{text}</span>
+    </span>
+  )
 }
 
-export function BannerPreview({ config }: BannerPreviewProps) {
-  const [isVisible, setIsVisible] = useState(true)
-  const [showPreferences, setShowPreferences] = useState(false)
+export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps) {
+  const [internalIsVisible, setInternalIsVisible] = useState(true)
+  const [internalShowPreferences, setInternalShowPreferences] = useState(false)
+
+  // When a view prop is supplied, derive state from it; otherwise let user interactions drive it.
+  const isVisible = view === 'floating' ? false : view === 'preferences' ? true : internalIsVisible
+  const showPreferences = view === 'preferences' ? true : view === 'floating' ? false : internalShowPreferences
+  const setIsVisible = setInternalIsVisible
+  const setShowPreferences = setInternalShowPreferences
 
   // Load Material Symbols CSS
   useEffect(() => {
@@ -380,18 +376,65 @@ export function BannerPreview({ config }: BannerPreviewProps) {
   }
 
   if (!isVisible) {
+    // When forced to floating view, show the floating button centered in the preview frame.
+    if (view === 'floating') {
+      const footerEnabled = safeConfig.branding.footerLink.enabled
+      const floatingActive = (safeConfig as any).branding.footerLink.style === 'floating' || (safeConfig as any).branding.footerLink.style === 'both'
+      return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+          {footerEnabled && floatingActive ? (
+            <>
+              <div
+                className="cursor-pointer shadow-lg transition-transform hover:scale-105 flex items-center justify-center"
+                style={generateFloatingButtonPreviewStyles(safeConfig)}
+                onClick={() => {
+                  // Switch the parent preview chip to 'preferences' so the user lands on the modal view
+                  if (onViewChange) onViewChange('preferences')
+                  else setShowPreferences(true)
+                }}
+                title="Click to reopen cookie preferences"
+              >
+                {generateFloatingButtonPreviewContent(safeConfig)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">Click to reopen preferences</p>
+            </>
+          ) : (
+            <div className="text-sm text-muted-foreground max-w-xs">
+              <p className="font-medium text-foreground mb-1">Floating button is disabled</p>
+              <p>Enable a Display Style on the Cookie Settings tab to preview the button here.</p>
+            </div>
+          )}
+        </div>
+      )
+    }
     return (
       <div className="text-center py-8 text-muted-foreground">
         <p>Banner is hidden</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setIsVisible(true)}
           className="mt-2"
         >
           Show Preview
         </Button>
       </div>
+    )
+  }
+
+  // When forced into preferences view, render the modal full-frame with no banner backdrop
+  // or summary controls — gives the user a clean, scrollable view of the entire modal.
+  if (view === 'preferences') {
+    return (
+      <PreferencesModal
+        config={config}
+        isVisible
+        onClose={() => { /* no-op in forced view */ }}
+        onAcceptAll={handleAcceptAll}
+        onConfirmChoices={handleConfirmChoices}
+        domain="cookie-banner.ca"
+        previewMode
+      />
     )
   }
 
@@ -644,20 +687,33 @@ export function BannerPreview({ config }: BannerPreviewProps) {
 
       {/* Enhanced Floating Cookie Settings Button (Preview) */}
       {safeConfig.branding.footerLink.enabled && ((safeConfig as any).branding.footerLink.style === 'floating' || (safeConfig as any).branding.footerLink.style === 'both') && !isVisible && (
-        <div
-          className="fixed z-40 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center"
-          style={{
-            ...generateFloatingButtonPreviewStyles(safeConfig),
-            [safeConfig.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
-            bottom: '20px',
-          }}
-          onClick={() => setIsVisible(true)}
-        >
-          {generateFloatingButtonPreviewContent(safeConfig)}
-        </div>
+        view === 'floating' ? (
+          // Forced view: render centered inside the preview frame so it's visible
+          <div className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none">
+            <div
+              className="cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
+              style={generateFloatingButtonPreviewStyles(safeConfig)}
+              onClick={() => setIsVisible(true)}
+            >
+              {generateFloatingButtonPreviewContent(safeConfig)}
+            </div>
+          </div>
+        ) : (
+          <div
+            className="fixed z-40 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center"
+            style={{
+              ...generateFloatingButtonPreviewStyles(safeConfig),
+              [safeConfig.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
+              bottom: '20px',
+            }}
+            onClick={() => setIsVisible(true)}
+          >
+            {generateFloatingButtonPreviewContent(safeConfig)}
+          </div>
+        )
       )}
 
-      {/* Preferences Modal */}
+      {/* Preferences Modal — previewMode anchors it inside the builder's preview frame instead of the viewport */}
       <PreferencesModal
         config={config}
         isVisible={showPreferences}
@@ -665,6 +721,7 @@ export function BannerPreview({ config }: BannerPreviewProps) {
         onAcceptAll={handleAcceptAll}
         onConfirmChoices={handleConfirmChoices}
         domain="cookie-banner.ca"
+        previewMode
       />
 
       {/* Preview Controls */}

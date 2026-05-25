@@ -25,6 +25,7 @@ import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
+import { getComplianceRequirements } from '@/lib/compliance-frameworks'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -497,6 +498,10 @@ function BannerBuilderContent() {
   const [config, setConfig] = useState<BannerConfig>(defaultConfig)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('compliance')
+  // null = use auto-derived view from activeTab; otherwise user has clicked a preview tab and wants to lock it
+  const [previewView, setPreviewView] = useState<'banner' | 'preferences' | 'floating' | null>(null)
+  // Reset preview override whenever the user navigates to a different builder tab so auto-derivation kicks back in
+  useEffect(() => { setPreviewView(null) }, [activeTab])
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
@@ -775,17 +780,17 @@ function BannerBuilderContent() {
   }
 
   const handleComplianceFrameworkChange = (framework: ComplianceFramework) => {
-    const template = getBannerTemplate(framework)
-    
+    const compliance = getComplianceRequirements(framework)
+
     // Only update compliance settings and required behavior changes
     // Preserve user's colors, text, and other customizations
     setConfig(prev => ({
       ...prev,
-      compliance: template.compliance,
+      compliance,
       behavior: {
         ...prev.behavior,
-        showPreferences: template.compliance.requiresGranularConsent,
-        cookieExpiry: template.compliance.consentExpiry
+        showPreferences: compliance.requiresGranularConsent,
+        cookieExpiry: compliance.consentExpiry
       }
     }))
     
@@ -1093,43 +1098,27 @@ function BannerBuilderContent() {
               <div className="sticky top-6">
                 {/* Progress */}
                 <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {activeTab === 'compliance' ? 'Step 1 of 9' :
-                       activeTab === 'brand' ? 'Step 2 of 9' :
-                       activeTab === 'design' ? 'Step 3 of 9' :
-                       activeTab === 'content' ? 'Step 4 of 9' :
-                       activeTab === 'scripts' ? 'Step 5 of 9' :
-                       activeTab === 'cookie-settings' ? 'Step 6 of 9' :
-                       activeTab === 'behavior' ? 'Step 7 of 9' :
-                       activeTab === 'analytics' ? 'Step 8 of 9' : 'Step 9 of 9'}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {Math.round((activeTab === 'compliance' ? 11 :
-                                   activeTab === 'brand' ? 22 :
-                                   activeTab === 'design' ? 33 :
-                                   activeTab === 'content' ? 44 :
-                                   activeTab === 'scripts' ? 56 :
-                                   activeTab === 'cookie-settings' ? 60 :
-                                   activeTab === 'behavior' ? 70 :
-                                   activeTab === 'geo-targeting' ? 80 :
-                                   activeTab === 'analytics' ? 90 : 100))}%
-                    </span>
-                  </div>
+                  {(() => {
+                    const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','behavior','geo-targeting','analytics','code']
+                    const idx = Math.max(0, stepOrder.indexOf(activeTab))
+                    const total = stepOrder.length
+                    const pct = Math.round(((idx + 1) / total) * 100)
+                    return (
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">Step {idx + 1} of {total}</span>
+                        <span className="text-xs text-muted-foreground">{pct}%</span>
+                      </div>
+                    )
+                  })()}
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${activeTab === 'compliance' ? 9 :
-                                 activeTab === 'brand' ? 18 :
-                                 activeTab === 'design' ? 27 :
-                                 activeTab === 'content' ? 36 :
-                                 activeTab === 'language' ? 45 :
-                                 activeTab === 'scripts' ? 54 :
-                                 activeTab === 'cookie-settings' ? 63 :
-                                 activeTab === 'behavior' ? 72 :
-                                 activeTab === 'geo-targeting' ? 81 :
-                                 activeTab === 'analytics' ? 90 : 100}%`
+                        width: `${(() => {
+                          const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','behavior','geo-targeting','analytics','code']
+                          const idx = Math.max(0, stepOrder.indexOf(activeTab))
+                          return Math.round(((idx + 1) / stepOrder.length) * 100)
+                        })()}%`
                       }}
                     ></div>
                   </div>
@@ -1301,7 +1290,7 @@ function BannerBuilderContent() {
                    activeTab === 'geo-targeting' ? 'Geo-Targeting Rules' :
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1 max-w-prose">
                   {activeTab === 'compliance' ? 'Select the privacy law that applies to your website. This will configure your banner\'s requirements and legal text.' :
                    activeTab === 'brand' ? 'Import your brand, choose colors, fonts, and logo for your cookie consent banner.' :
                    activeTab === 'design' ? 'Configure position, layout, spacing, and animation settings.' :
@@ -1318,31 +1307,25 @@ function BannerBuilderContent() {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               {/* Compliance Tab */}
-              <TabsContent value="compliance" className="space-y-6" id="compliance-panel" role="tabpanel" aria-labelledby="compliance-tab">
+              <TabsContent value="compliance" className="space-y-12" id="compliance-panel" role="tabpanel" aria-labelledby="compliance-tab">
                 <ComplianceSelector
                   selectedFramework={config.compliance.framework}
                   onFrameworkChange={handleComplianceFrameworkChange}
                 />
-                
-                {/* Button Layout Section */}
-                <Card className="border-l-4 border-l-green-500">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
-                      Button Layout
-                    </CardTitle>
-                    <CardDescription>
-                      Choose which buttons appear on your banner. Some layouts may not meet all compliance requirements.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {/* Button Layout — flattened section, no card chrome */}
+                <section className="space-y-5">
+                  <div>
+                    <h3 className="text-base font-semibold tracking-tight">Button Layout</h3>
+                    <p className="text-sm text-muted-foreground mt-1 max-w-prose">Choose which buttons appear on your banner.</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {/* Standard Layout */}
                       <div
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`p-5 rounded-lg border cursor-pointer transition-all ${
                           (config.behavior.buttonLayout || 'standard') === 'standard'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-muted-foreground/50'
+                            ? 'border-primary ring-1 ring-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/40'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1365,10 +1348,10 @@ function BannerBuilderContent() {
                       
                       {/* Soft Consent Layout */}
                       <div
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`p-5 rounded-lg border cursor-pointer transition-all ${
                           config.behavior.buttonLayout === 'soft-consent'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-muted-foreground/50'
+                            ? 'border-primary ring-1 ring-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/40'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1386,15 +1369,15 @@ function BannerBuilderContent() {
                           <Badge variant="default" className="text-xs">Accept</Badge>
                           <Badge variant="secondary" className="text-xs">Customize</Badge>
                         </div>
-                        <div className="mt-2 text-xs text-amber-600">⚠ Higher acceptance rates</div>
+                        <div className="mt-2 text-xs text-amber-600">⚠ No reject button — may fail GDPR</div>
                       </div>
                       
                       {/* Accept Only Layout */}
                       <div
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`p-5 rounded-lg border cursor-pointer transition-all ${
                           config.behavior.buttonLayout === 'accept-only'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-muted-foreground/50'
+                            ? 'border-primary ring-1 ring-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/40'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1415,80 +1398,67 @@ function BannerBuilderContent() {
                       </div>
                     </div>
                     
-                    {/* Compliance Warning */}
-                    {config.compliance.framework === 'gdpr' && config.behavior.buttonLayout !== 'standard' && (
-                      <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertDescription>
-                          GDPR requires an easy way to reject cookies. Consider using "Standard" layout for full compliance.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                    
-                    {/* Manual Toggle Override */}
-                    <div className="pt-4 border-t space-y-3">
-                      <div className="text-sm font-medium text-muted-foreground">Manual Controls</div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="show-reject">Show Reject Button</Label>
-                          <p className="text-xs text-muted-foreground">Display a dedicated reject button</p>
-                        </div>
-                        <Switch
-                          id="show-reject"
-                          checked={config.behavior.showRejectButton !== false}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            behavior: {
-                              ...prev.behavior,
-                              showRejectButton: checked,
-                              buttonLayout: checked ? 'standard' : (prev.behavior.showPreferences ? 'soft-consent' : 'accept-only')
-                            }
-                          }))}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="show-preferences">Show Customize Button</Label>
-                          <p className="text-xs text-muted-foreground">Allow users to customize cookie preferences</p>
-                        </div>
-                        <Switch
-                          id="show-preferences"
-                          checked={config.behavior.showPreferences}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            behavior: {
-                              ...prev.behavior,
-                              showPreferences: checked,
-                              buttonLayout: prev.behavior.showRejectButton !== false 
-                                ? 'standard' 
-                                : (checked ? 'soft-consent' : 'accept-only')
-                            }
-                          }))}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  {/* Compliance Warning */}
+                  {config.compliance.framework === 'gdpr' && config.behavior.buttonLayout !== 'standard' && (
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        GDPR requires an easy way to reject cookies. Consider using "Standard" layout for full compliance.
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
-                {/* Browser Privacy Signals (GPC) */}
-                <Card className="border-l-4 border-l-blue-500">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      Browser Privacy Signals
-                    </CardTitle>
-                    <CardDescription>
-                      Respect Global Privacy Control (GPC) — a browser signal that tells websites not to sell or share personal data.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Manual Toggle Override */}
+                  <div className="pt-5 border-t space-y-4">
+                    <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Manual Controls</div>
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        id="show-reject"
+                        checked={config.behavior.showRejectButton !== false}
+                        onCheckedChange={(checked) => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            showRejectButton: checked,
+                            buttonLayout: checked ? 'standard' : (prev.behavior.showPreferences ? 'soft-consent' : 'accept-only')
+                          }
+                        }))}
+                      />
+                      <Label htmlFor="show-reject" className="cursor-pointer">Show Reject Button</Label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        id="show-preferences"
+                        checked={config.behavior.showPreferences}
+                        onCheckedChange={(checked) => setConfig(prev => ({
+                          ...prev,
+                          behavior: {
+                            ...prev.behavior,
+                            showPreferences: checked,
+                            buttonLayout: prev.behavior.showRejectButton !== false
+                              ? 'standard'
+                              : (checked ? 'soft-consent' : 'accept-only')
+                          }
+                        }))}
+                      />
+                      <Label htmlFor="show-preferences" className="cursor-pointer">Show Customize Button</Label>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Browser Privacy Signals (GPC) — flattened */}
+                <section className="space-y-5">
+                  <div>
+                    <h3 className="text-base font-semibold tracking-tight">Browser Privacy Signals</h3>
+                    <p className="text-sm text-muted-foreground mt-1 max-w-prose">Respect Global Privacy Control (GPC) — a browser signal asking sites not to sell or share personal data.</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {/* Auto-detect (free, default) */}
                       <div
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`p-5 rounded-lg border cursor-pointer transition-all ${
                           (config.behavior.gpc?.mode || 'auto') === 'auto'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-muted-foreground/50'
+                            ? 'border-primary ring-1 ring-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/40'
                         }`}
                         onClick={() => setConfig(prev => ({
                           ...prev,
@@ -1508,10 +1478,10 @@ function BannerBuilderContent() {
 
                       {/* Disabled (Pro only) */}
                       <div
-                        className={`p-4 rounded-lg border-2 transition-all ${
+                        className={`p-5 rounded-lg border transition-all ${
                           (config.behavior.gpc?.mode || 'auto') === 'off'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-muted-foreground/50'
+                            ? 'border-primary ring-1 ring-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/40'
                         } ${session?.user?.planTier === 'free' ? 'opacity-60' : 'cursor-pointer'}`}
                         onClick={() => {
                           if (session?.user?.planTier === 'free') return
@@ -1537,92 +1507,72 @@ function BannerBuilderContent() {
                       </div>
                     </div>
 
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription className="text-sm">
-                        When GPC is detected, visitors see a slim acknowledgment bar confirming their privacy signal is respected. Marketing/targeting cookie toggles are locked off in the preferences modal. Visitors can still manually override if they choose.
-                      </AlertDescription>
-                    </Alert>
-                  </CardContent>
-                </Card>
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription className="text-sm">
+                      When GPC is detected, visitors see a slim acknowledgment bar confirming their privacy signal is respected. Marketing/targeting cookie toggles are locked off in the preferences modal. Visitors can still manually override if they choose.
+                    </AlertDescription>
+                  </Alert>
+                </section>
 
-                {/* Framework Comparison */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Framework Comparison</CardTitle>
-                    <CardDescription>
-                      Quick comparison of key differences between compliance frameworks
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-2">Requirement</th>
-                            <th className="text-center py-2">PIPEDA</th>
-                            <th className="text-center py-2">GDPR</th>
-                            <th className="text-center py-2">CCPA</th>
-                            <th className="text-center py-2">Custom</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b">
-                            <td className="py-2">Consent Type</td>
-                            <td className="text-center py-2">
-                              <Badge variant="outline" className="text-xs">Opt-out</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="outline" className="text-xs">Opt-in</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="outline" className="text-xs">Opt-out</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="outline" className="text-xs">Opt-in</Badge>
-                            </td>
-                          </tr>
-                          <tr className="border-b">
-                            <td className="py-2">Granular Controls</td>
-                            <td className="text-center py-2">
-                              <Badge variant="secondary" className="text-xs">Optional</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="default" className="text-xs">Required</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="default" className="text-xs">Required</Badge>
-                            </td>
-                            <td className="text-center py-2">
-                              <Badge variant="default" className="text-xs">Required</Badge>
-                            </td>
-                          </tr>
-                          <tr className="border-b">
-                            <td className="py-2">Max Penalty</td>
-                            <td className="text-center py-2 text-xs">Reputation</td>
-                            <td className="text-center py-2 text-xs">€20M</td>
-                            <td className="text-center py-2 text-xs">$7,500</td>
-                            <td className="text-center py-2 text-xs">Varies</td>
-                          </tr>
-                          <tr>
-                            <td className="py-2">Consent Expiry</td>
-                            <td className="text-center py-2 text-xs">24 months</td>
-                            <td className="text-center py-2 text-xs">12 months</td>
-                            <td className="text-center py-2 text-xs">12 months</td>
-                            <td className="text-center py-2 text-xs">12 months</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Framework Comparison — collapsed by default; reference only */}
+                <details className="group rounded-lg border bg-muted/30">
+                  <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between text-sm font-medium select-none">
+                    <span>Compare frameworks</span>
+                    <span className="text-xs text-muted-foreground group-open:hidden">Show table</span>
+                    <span className="text-xs text-muted-foreground hidden group-open:inline">Hide</span>
+                  </summary>
+                  <div className="px-5 pb-5 overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 font-medium">Requirement</th>
+                          <th className="text-center py-2 font-medium">PIPEDA</th>
+                          <th className="text-center py-2 font-medium">GDPR</th>
+                          <th className="text-center py-2 font-medium">CCPA</th>
+                          <th className="text-center py-2 font-medium">Custom</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="py-3">Consent Type</td>
+                          <td className="text-center py-3"><Badge variant="outline" className="text-xs">Opt-out</Badge></td>
+                          <td className="text-center py-3"><Badge variant="outline" className="text-xs">Opt-in</Badge></td>
+                          <td className="text-center py-3"><Badge variant="outline" className="text-xs">Opt-out</Badge></td>
+                          <td className="text-center py-3"><Badge variant="outline" className="text-xs">Opt-in</Badge></td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-3">Granular Controls</td>
+                          <td className="text-center py-3"><Badge variant="secondary" className="text-xs">Optional</Badge></td>
+                          <td className="text-center py-3"><Badge variant="default" className="text-xs">Required</Badge></td>
+                          <td className="text-center py-3"><Badge variant="default" className="text-xs">Required</Badge></td>
+                          <td className="text-center py-3"><Badge variant="default" className="text-xs">Required</Badge></td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-3">Max Penalty</td>
+                          <td className="text-center py-3 text-xs">Reputation</td>
+                          <td className="text-center py-3 text-xs">€20M</td>
+                          <td className="text-center py-3 text-xs">$7,500</td>
+                          <td className="text-center py-3 text-xs">Varies</td>
+                        </tr>
+                        <tr>
+                          <td className="py-3">Consent Expiry</td>
+                          <td className="text-center py-3 text-xs">24 months</td>
+                          <td className="text-center py-3 text-xs">12 months</td>
+                          <td className="text-center py-3 text-xs">12 months</td>
+                          <td className="text-center py-3 text-xs">12 months</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
               </TabsContent>
 
               {/* Brand Tab */}
-              <TabsContent value="brand" className="space-y-6" id="brand-panel" role="tabpanel" aria-labelledby="brand-tab">
+              <TabsContent value="brand" className="space-y-10" id="brand-panel" role="tabpanel" aria-labelledby="brand-tab">
 
                   {/* Brand Import */}
-                  <Card className="border-l-4 border-l-amber-500">
+                  <Card>
                     <CardHeader>
                       <CardTitle>Brand Import</CardTitle>
                     </CardHeader>
@@ -2140,10 +2090,10 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Design/Layout Tab */}
-              <TabsContent value="design" className="space-y-6" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
+              <TabsContent value="design" className="space-y-10" id="design-panel" role="tabpanel" aria-labelledby="design-tab">
 
                 {/* Layout Settings */}
-                  <Card className="border-l-4 border-l-blue-500">
+                  <Card>
                     <CardHeader>
                       <CardTitle>Layout & Spacing</CardTitle>
                     </CardHeader>
@@ -2315,8 +2265,8 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Language Tab */}
-              <TabsContent value="language" className="space-y-6" id="language-panel" role="tabpanel" aria-labelledby="language-tab">
-                <Card className="border-l-4 border-l-purple-500">
+              <TabsContent value="language" className="space-y-10" id="language-panel" role="tabpanel" aria-labelledby="language-tab">
+                <Card>
                   <CardHeader>
                     <CardTitle>Banner Language</CardTitle>
                     <CardDescription>
@@ -2415,7 +2365,7 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Content Tab */}
-              <TabsContent value="content" className="space-y-6" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
+              <TabsContent value="content" className="space-y-10" id="content-panel" role="tabpanel" aria-labelledby="content-tab">
 
                 <Card>
                   <CardHeader>
@@ -2501,19 +2451,22 @@ function BannerBuilderContent() {
                       />
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <div>
-                        <Label htmlFor="remove-branding">Remove &quot;Powered by&quot; branding</Label>
-                        <p className="text-xs text-muted-foreground">Hide the cookie-banner.ca attribution</p>
-                      </div>
+                    <div className="pt-2 border-t">
                       {canAccessFeature(userPlan, 'hasBrandingRemoval') ? (
-                        <Switch
-                          id="remove-branding"
-                          checked={config.branding.showPoweredBy === false}
-                          onCheckedChange={(checked) => updateConfig('branding', {
-                            showPoweredBy: !checked
-                          })}
-                        />
+                        <div className="flex items-start gap-3">
+                          <Switch
+                            id="remove-branding"
+                            checked={config.branding.showPoweredBy === false}
+                            onCheckedChange={(checked) => updateConfig('branding', {
+                              showPoweredBy: !checked
+                            })}
+                            className="mt-0.5"
+                          />
+                          <div>
+                            <Label htmlFor="remove-branding" className="cursor-pointer">Remove &quot;Powered by&quot; branding</Label>
+                            <p className="text-xs text-muted-foreground">Hide the cookie-banner.ca attribution</p>
+                          </div>
+                        </div>
                       ) : (
                         <UpgradePrompt
                           feature="Remove Branding"
@@ -2528,80 +2481,45 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Cookie Settings Tab */}
-        <TabsContent value="cookie-settings" className="space-y-6" id="cookie-settings-panel" role="tabpanel" aria-labelledby="cookie-settings-tab">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Configuration Panel */}
-            <div className="space-y-6">
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader>
-                  <CardTitle>Cookie Settings Management</CardTitle>
-                  <CardDescription>
-                    Configure how users can manage their cookie preferences after initial consent. Choose between a floating button or inline footer link.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Cookie Settings Management is mandatory */}
-                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">Cookie Settings Management</p>
-                      </div>
-                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                        Required for compliance. Users must be able to manage their cookie preferences after initial consent.
-                      </p>
-                    </div>
+        <TabsContent value="cookie-settings" className="space-y-10" id="cookie-settings-panel" role="tabpanel" aria-labelledby="cookie-settings-tab">
+          {/* Display Style selector */}
+          <div className="space-y-2 max-w-md">
+            <Label htmlFor="cookie-settings-style">Display Style</Label>
+            <Select
+              value={config.branding?.footerLink?.style || 'floating'}
+              onValueChange={(value: any) => updateConfig('branding', {
+                footerLink: {
+                  ...(config.branding?.footerLink || {}),
+                  style: value,
+                  ...(value === 'floating' && !config.branding?.footerLink?.floatingStyle ? {
+                    floatingStyle: { shape: 'pill', size: 'small', showText: true, useCustomColors: false }
+                  } : {}),
+                  ...(value === 'inline' && !config.branding?.footerLink?.inlineStyle ? {
+                    inlineStyle: { linkType: 'plain', includeIcon: false, includeLogo: false }
+                  } : {})
+                }
+              })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="floating">Floating Button (Recommended)</SelectItem>
+                <SelectItem value="inline">Inline Footer Link</SelectItem>
+                <SelectItem value="both">Both Options</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-                    {(
-                      <div className="space-y-6">
-                        {/* Style Selection */}
-                        <div>
-                          <Label htmlFor="cookie-settings-style">Display Style</Label>
-                          <Select 
-                            value={config.branding?.footerLink?.style || 'floating'} 
-                            onValueChange={(value: any) => updateConfig('branding', { 
-                              footerLink: { 
-                                ...(config.branding?.footerLink || {}), 
-                                style: value,
-                                // Initialize new properties if switching to floating
-                                ...(value === 'floating' && !config.branding?.footerLink?.floatingStyle ? {
-                                  floatingStyle: {
-                                    shape: 'pill',
-                                    size: 'small',
-                                    showText: true,
-                                    useCustomColors: false
-                                  }
-                                } : {}),
-                                // Initialize new properties if switching to inline
-                                ...(value === 'inline' && !config.branding?.footerLink?.inlineStyle ? {
-                                  inlineStyle: {
-                                    linkType: 'plain',
-                                    includeIcon: false,
-                                    includeLogo: false
-                                  }
-                                } : {})
-                              }
-                            })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="floating">Floating Button (Recommended)</SelectItem>
-                              <SelectItem value="inline">Inline Footer Link</SelectItem>
-                              <SelectItem value="both">Both Options</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+          {/* Floating Button Section — settings + preview inline */}
+          {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
+            <section className="space-y-6 pt-8 border-t">
+              <div>
+                <h3 className="text-base font-semibold tracking-tight">Floating Button</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-prose">A persistent button that lets visitors reopen their cookie choices.</p>
+              </div>
 
-                        {/* Floating Button Configuration */}
-                        {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
-                          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                            <h4 className="font-medium flex items-center">
-                              <Settings className="h-4 w-4 mr-2" />
-                              Floating Button Settings
-                            </h4>
-                            
-                            <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="floating-text">Button Text</Label>
                                 <Input
@@ -2633,375 +2551,261 @@ function BannerBuilderContent() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="floating-shape">Shape</Label>
-                                <Select 
-                                  value={config.branding?.footerLink?.floatingStyle?.shape || 'pill'} 
-                                  onValueChange={(value: any) => updateConfig('branding', { 
-                                    footerLink: { 
-                                      ...(config.branding?.footerLink || {}), 
-                                      floatingStyle: { 
-                                        ...(config.branding?.footerLink?.floatingStyle || {}), 
-                                        shape: value 
-                                      }
-                                    }
-                                  })}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="circle">Circle (Icon Only)</SelectItem>
-                                    <SelectItem value="pill">Pill (Icon + Text)</SelectItem>
-                                    <SelectItem value="square">Square (Icon + Text)</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              
-                              <div>
-                                <Label htmlFor="floating-size">Size</Label>
-                                <Select 
-                                  value={config.branding?.footerLink?.floatingStyle?.size || 'small'} 
-                                  onValueChange={(value: any) => updateConfig('branding', { 
-                                    footerLink: { 
-                                      ...(config.branding?.footerLink || {}), 
-                                      floatingStyle: { 
-                                        ...(config.branding?.footerLink?.floatingStyle || {}), 
-                                        size: value 
-                                      }
-                                    }
-                                  })}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="small">Small (40px)</SelectItem>
-                                    <SelectItem value="medium">Medium (48px)</SelectItem>
-                                    <SelectItem value="large">Large (56px)</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                              <Switch
-                                id="floating-show-text"
-                                checked={config.branding?.footerLink?.floatingStyle?.showText ?? true}
-                                onCheckedChange={(checked) => updateConfig('branding', { 
-                                  footerLink: { 
-                                    ...(config.branding?.footerLink || {}), 
-                                    floatingStyle: { 
-                                      ...(config.branding?.footerLink?.floatingStyle || {}), 
-                                      showText: checked 
-                                    }
-                                  }
-                                })}
-                              />
-                              <Label htmlFor="floating-show-text">Show text with icon</Label>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                              <Switch
-                                id="floating-custom-colors"
-                                checked={config.branding?.footerLink?.floatingStyle?.useCustomColors ?? false}
-                                onCheckedChange={(checked) => updateConfig('branding', { 
-                                  footerLink: { 
-                                    ...(config.branding?.footerLink || {}), 
-                                    floatingStyle: { 
-                                      ...(config.branding?.footerLink?.floatingStyle || {}), 
-                                      useCustomColors: checked 
-                                    }
-                                  }
-                                })}
-                              />
-                              <Label htmlFor="floating-custom-colors">Use custom colors (otherwise matches banner button)</Label>
-                            </div>
-
-                            {config.branding?.footerLink?.floatingStyle?.useCustomColors && (
-                              <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                  <Label className="text-xs">Background</Label>
-                                  <ColorPicker
-                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.background || '#6b7280'}
-                                    onChange={(color) => updateConfig('branding', {
-                                      footerLink: {
-                                        ...(config.branding?.footerLink || {}),
-                                        floatingStyle: {
-                                          ...(config.branding?.footerLink?.floatingStyle || {}),
-                                          customColors: {
-                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            background: color
-                                          }
-                                        }
-                                      }
-                                    })}
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-xs">Text</Label>
-                                  <ColorPicker
-                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.text || '#ffffff'}
-                                    onChange={(color) => updateConfig('branding', {
-                                      footerLink: {
-                                        ...(config.branding?.footerLink || {}),
-                                        floatingStyle: {
-                                          ...(config.branding?.footerLink?.floatingStyle || {}),
-                                          customColors: {
-                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            text: color
-                                          }
-                                        }
-                                      }
-                                    })}
-                                  />
-                                </div>
-                                <div>
-                                  <Label className="text-xs">Border</Label>
-                                  <ColorPicker
-                                    value={config.branding?.footerLink?.floatingStyle?.customColors?.border || '#6b7280'}
-                                    onChange={(color) => updateConfig('branding', {
-                                      footerLink: {
-                                        ...(config.branding?.footerLink || {}),
-                                        floatingStyle: {
-                                          ...(config.branding?.footerLink?.floatingStyle || {}),
-                                          customColors: {
-                                            ...(config.branding?.footerLink?.floatingStyle?.customColors || {}),
-                                            border: color
-                                          }
-                                        }
-                                      }
-                                    })}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Inline Footer Link Configuration */}
-                        {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
-                          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                            <h4 className="font-medium flex items-center">
-                              <Type className="h-4 w-4 mr-2" />
-                              Inline Footer Link Settings
-                            </h4>
-                            
-                            <div className="space-y-4">
-                              <div>
-                                <Label htmlFor="inline-link-type">Link Style</Label>
-                                <Select 
-                                  value={config.branding?.footerLink?.inlineStyle?.linkType || 'plain'} 
-                                  onValueChange={(value: any) => updateConfig('branding', { 
-                                    footerLink: { 
-                                      ...(config.branding?.footerLink || {}), 
-                                      inlineStyle: { 
-                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
-                                        linkType: value 
-                                      }
-                                    }
-                                  })}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="plain">Plain Text Link</SelectItem>
-                                    <SelectItem value="button">Button Style</SelectItem>
-                                    <SelectItem value="icon-text">Icon + Text</SelectItem>
-                                    <SelectItem value="custom">Custom Styled</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-
-                              <div className="flex items-center space-x-2">
-                                <Switch
-                                  id="inline-include-icon"
-                                  checked={config.branding?.footerLink?.inlineStyle?.includeIcon ?? false}
-                                  onCheckedChange={(checked) => updateConfig('branding', { 
-                                    footerLink: { 
-                                      ...(config.branding?.footerLink || {}), 
-                                      inlineStyle: { 
-                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
-                                        includeIcon: checked 
-                                      }
-                                    }
-                                  })}
-                                />
-                                <Label htmlFor="inline-include-icon">Include cookie icon</Label>
-                              </div>
-
-                              <div className="flex items-center space-x-2">
-                                <Switch
-                                  id="inline-include-logo"
-                                  checked={config.branding?.footerLink?.inlineStyle?.includeLogo ?? false}
-                                  onCheckedChange={(checked) => updateConfig('branding', { 
-                                    footerLink: { 
-                                      ...(config.branding?.footerLink || {}), 
-                                      inlineStyle: { 
-                                        ...(config.branding?.footerLink?.inlineStyle || {}), 
-                                        includeLogo: checked 
-                                      }
-                                    }
-                                  })}
-                                />
-                                <Label htmlFor="inline-include-logo">Include your logo (if uploaded)</Label>
-                              </div>
-
-                              {config.branding?.footerLink?.inlineStyle?.linkType === 'custom' && (
-                                <div>
-                                  <Label htmlFor="inline-custom-class">Custom CSS Class</Label>
-                                  <Input
-                                    id="inline-custom-class"
-                                    value={config.branding?.footerLink?.inlineStyle?.customClass || ''}
-                                    onChange={(e) => updateConfig('branding', { 
-                                      footerLink: { 
-                                        ...(config.branding?.footerLink || {}), 
-                                        inlineStyle: { 
-                                          ...(config.branding?.footerLink?.inlineStyle || {}), 
-                                          customClass: e.target.value 
-                                        }
-                                      }
-                                    })}
-                                    placeholder="my-custom-cookie-link"
-                                  />
-                                </div>
-                              )}
-
-                              {/* Generated HTML Preview */}
-                              <div className="mt-4 p-4 bg-muted rounded-lg">
-                                <p className="text-sm font-medium mb-2">Generated HTML for your footer:</p>
-                                <code className="block p-3 bg-background rounded text-xs overflow-x-auto">
-                                  {generateInlineFooterLinkHTML(config.branding?.footerLink || {})}
-                                </code>
-                                <p className="text-xs text-muted-foreground mt-2">
-                                  Copy this code and paste it into your website footer where you want the link to appear.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="floating-shape">Shape</Label>
+                  <Select
+                    value={config.branding?.footerLink?.floatingStyle?.shape || 'pill'}
+                    onValueChange={(value: any) => updateConfig('branding', {
+                      footerLink: {
+                        ...(config.branding?.footerLink || {}),
+                        floatingStyle: { ...(config.branding?.footerLink?.floatingStyle || {}), shape: value }
+                      }
+                    })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="circle">Circle (Icon Only)</SelectItem>
+                      <SelectItem value="pill">Pill (Icon + Text)</SelectItem>
+                      <SelectItem value="square">Square (Icon + Text)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="floating-size">Size</Label>
+                  <Select
+                    value={config.branding?.footerLink?.floatingStyle?.size || 'small'}
+                    onValueChange={(value: any) => updateConfig('branding', {
+                      footerLink: {
+                        ...(config.branding?.footerLink || {}),
+                        floatingStyle: { ...(config.branding?.footerLink?.floatingStyle || {}), size: value }
+                      }
+                    })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small (40px)</SelectItem>
+                      <SelectItem value="medium">Medium (48px)</SelectItem>
+                      <SelectItem value="large">Large (56px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {/* Live Preview Panel */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Live Preview</CardTitle>
-                    <CardDescription>
-                      See how your cookie settings will look on your website
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {/* Floating Button Preview */}
-                      {(config.branding?.footerLink?.style === 'floating' || config.branding?.footerLink?.style === 'both') && (
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium">Floating Button Preview</h4>
-                          <div className="relative border-2 border-dashed border-border rounded-lg p-8 bg-muted/50 min-h-[200px]">
-                            <div className="text-center text-sm text-muted-foreground mb-4">
-                              Your website content would appear here
-                            </div>
-                            
-                            {/* Floating Button Preview */}
-                            <div 
-                              className="inline-block cursor-pointer transition-all duration-200 hover:scale-105"
-                              style={{
-                                ...generateFloatingButtonPreviewStyles(config),
-                                position: 'relative',
-                                top: 'auto',
-                                left: 'auto',
-                                right: 'auto',
-                                bottom: 'auto',
-                                transform: 'none',
-                                margin: '0 auto'
-                              }}
-                              onClick={() => {
-                                // Toggle consent state for preview
-                                const currentState = localStorage.getItem('cookie-consent-preview-state') || 'accepted';
-                                const newState = currentState === 'accepted' ? 'rejected' : 'accepted';
-                                localStorage.setItem('cookie-consent-preview-state', newState);
-                                // Force re-render by updating a dummy state
-                                setConfig({...config});
-                              }}
-                            >
-                              {generateFloatingButtonPreviewContent(config)}
-                            </div>
-                            
-                            <div className="text-center mt-4">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  const currentState = localStorage.getItem('cookie-consent-preview-state') || 'accepted';
-                                  const newState = currentState === 'accepted' ? 'rejected' : 'accepted';
-                                  localStorage.setItem('cookie-consent-preview-state', newState);
-                                  setConfig({...config});
-                                }}
-                              >
-                                Toggle Consent State
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Inline Footer Link Preview */}
-                      {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium">Inline Footer Link Preview</h4>
-                          <div className="border border-border rounded-lg p-4 bg-muted/50">
-                            <div className="text-xs text-muted-foreground mb-2">Footer area:</div>
-                            <div 
-                              className="inline-block"
-                              dangerouslySetInnerHTML={{ 
-                                __html: generateInlineFooterLinkHTML(config.branding?.footerLink) 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* HTML Snippet Preview */}
-                      {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium">Generated HTML Snippet</h4>
-                          <div className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs font-mono overflow-x-auto">
-                            <pre>{generateInlineFooterLinkHTML(config.branding?.footerLink)}</pre>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              navigator.clipboard.writeText(generateInlineFooterLinkHTML(config.branding?.footerLink));
-                              toast.success('Copied to clipboard!')
-                            }}
-                          >
-                            Copy HTML Snippet
-                          </Button>
-                        </div>
-                      )}
-
-                      {!config.branding?.footerLink?.style && (
-                        <div className="text-center text-muted-foreground py-8">
-                          <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          <p>Select a display style to see preview</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="floating-show-text"
+                  checked={config.branding?.footerLink?.floatingStyle?.showText ?? true}
+                  onCheckedChange={(checked) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      floatingStyle: { ...(config.branding?.footerLink?.floatingStyle || {}), showText: checked }
+                    }
+                  })}
+                />
+                <Label htmlFor="floating-show-text" className="cursor-pointer">Show text with icon</Label>
               </div>
+
+              <div>
+                <Label htmlFor="floating-icon-style">Icon</Label>
+                <Select
+                  value={config.branding?.footerLink?.floatingStyle?.iconStyle || 'auto'}
+                  onValueChange={(value: any) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      floatingStyle: { ...(config.branding?.footerLink?.floatingStyle || {}), iconStyle: value }
+                    }
+                  })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cookie">Cookie icon (default)</SelectItem>
+                    <SelectItem value="logo">Your logo</SelectItem>
+                    <SelectItem value="auto">Auto — logo if uploaded, otherwise cookie</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Choose what shows inside the floating button.</p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Switch
+                  id="floating-custom-colors"
+                  checked={config.branding?.footerLink?.floatingStyle?.useCustomColors ?? false}
+                  onCheckedChange={(checked) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      floatingStyle: { ...(config.branding?.footerLink?.floatingStyle || {}), useCustomColors: checked }
+                    }
+                  })}
+                  className="mt-0.5"
+                />
+                <div>
+                  <Label htmlFor="floating-custom-colors" className="cursor-pointer">Use custom colors</Label>
+                  <p className="text-xs text-muted-foreground">Otherwise matches your banner button.</p>
+                </div>
+              </div>
+
+              {config.branding?.footerLink?.floatingStyle?.useCustomColors && (
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs">Background</Label>
+                    <ColorPicker
+                      value={config.branding?.footerLink?.floatingStyle?.customColors?.background || '#6b7280'}
+                      onChange={(color) => updateConfig('branding', {
+                        footerLink: {
+                          ...(config.branding?.footerLink || {}),
+                          floatingStyle: {
+                            ...(config.branding?.footerLink?.floatingStyle || {}),
+                            customColors: { ...(config.branding?.footerLink?.floatingStyle?.customColors || {}), background: color }
+                          }
+                        }
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Text</Label>
+                    <ColorPicker
+                      value={config.branding?.footerLink?.floatingStyle?.customColors?.text || '#ffffff'}
+                      onChange={(color) => updateConfig('branding', {
+                        footerLink: {
+                          ...(config.branding?.footerLink || {}),
+                          floatingStyle: {
+                            ...(config.branding?.footerLink?.floatingStyle || {}),
+                            customColors: { ...(config.branding?.footerLink?.floatingStyle?.customColors || {}), text: color }
+                          }
+                        }
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Border</Label>
+                    <ColorPicker
+                      value={config.branding?.footerLink?.floatingStyle?.customColors?.border || '#6b7280'}
+                      onChange={(color) => updateConfig('branding', {
+                        footerLink: {
+                          ...(config.branding?.footerLink || {}),
+                          floatingStyle: {
+                            ...(config.branding?.footerLink?.floatingStyle || {}),
+                            customColors: { ...(config.branding?.footerLink?.floatingStyle?.customColors || {}), border: color }
+                          }
+                        }
+                      })}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <p className="text-xs text-muted-foreground pt-2">
+                See the floating button in the Live Preview pane on the right.
+              </p>
+            </section>
+          )}
+
+          {/* Inline Footer Link Section */}
+          {(config.branding?.footerLink?.style === 'inline' || config.branding?.footerLink?.style === 'both') && (
+            <section className="space-y-6 pt-8 border-t">
+              <div>
+                <h3 className="text-base font-semibold tracking-tight">Inline Footer Link</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-prose">An HTML snippet you paste into your site footer.</p>
+              </div>
+
+              <div className="max-w-md">
+                <Label htmlFor="inline-link-type">Link Style</Label>
+                <Select
+                  value={config.branding?.footerLink?.inlineStyle?.linkType || 'plain'}
+                  onValueChange={(value: any) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      inlineStyle: { ...(config.branding?.footerLink?.inlineStyle || {}), linkType: value }
+                    }
+                  })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="plain">Plain Text Link</SelectItem>
+                    <SelectItem value="button">Button Style</SelectItem>
+                    <SelectItem value="icon-text">Icon + Text</SelectItem>
+                    <SelectItem value="custom">Custom Styled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="inline-include-icon"
+                  checked={config.branding?.footerLink?.inlineStyle?.includeIcon ?? false}
+                  onCheckedChange={(checked) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      inlineStyle: { ...(config.branding?.footerLink?.inlineStyle || {}), includeIcon: checked }
+                    }
+                  })}
+                />
+                <Label htmlFor="inline-include-icon" className="cursor-pointer">Include cookie icon</Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="inline-include-logo"
+                  checked={config.branding?.footerLink?.inlineStyle?.includeLogo ?? false}
+                  onCheckedChange={(checked) => updateConfig('branding', {
+                    footerLink: {
+                      ...(config.branding?.footerLink || {}),
+                      inlineStyle: { ...(config.branding?.footerLink?.inlineStyle || {}), includeLogo: checked }
+                    }
+                  })}
+                />
+                <Label htmlFor="inline-include-logo" className="cursor-pointer">Include your logo (if uploaded)</Label>
+              </div>
+
+              {config.branding?.footerLink?.inlineStyle?.linkType === 'custom' && (
+                <div className="max-w-md">
+                  <Label htmlFor="inline-custom-class">Custom CSS Class</Label>
+                  <Input
+                    id="inline-custom-class"
+                    value={config.branding?.footerLink?.inlineStyle?.customClass || ''}
+                    onChange={(e) => updateConfig('branding', {
+                      footerLink: {
+                        ...(config.branding?.footerLink || {}),
+                        inlineStyle: { ...(config.branding?.footerLink?.inlineStyle || {}), customClass: e.target.value }
+                      }
+                    })}
+                    placeholder="my-custom-cookie-link"
+                  />
+                </div>
+              )}
+
+              {/* Generated HTML snippet (the real footer link renders on your live site) */}
+              <div className="pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Generated HTML</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(generateInlineFooterLinkHTML(config.branding?.footerLink))
+                      toast.success('Copied to clipboard!')
+                    }}
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs font-mono overflow-x-auto">{generateInlineFooterLinkHTML(config.branding?.footerLink)}</pre>
+                <p className="text-xs text-muted-foreground mt-2">Paste this into your site footer where you want the link to appear.</p>
+              </div>
+            </section>
+          )}
+
+          {!config.branding?.footerLink?.style && (
+            <div className="text-center text-muted-foreground py-12">
+              <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>Select a display style to see preview</p>
             </div>
+          )}
           </TabsContent>
 
           {/* Scripts Tab */}
-              <TabsContent value="scripts" className="space-y-6" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
+              <TabsContent value="scripts" className="space-y-10" id="scripts-panel" role="tabpanel" aria-labelledby="scripts-tab">
                 <ScriptScannerImport
                   currentScripts={config.scripts}
                   privacyPolicyUrl={config.branding?.privacyPolicy?.url}
@@ -3764,13 +3568,12 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Behavior Tab */}
-              <TabsContent value="behavior" className="space-y-6" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
-                <Card className="relative border-l-4 border-l-cyan-500">
+              <TabsContent value="behavior" className="space-y-10" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
+                <Card className="relative">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Banner Behavior</CardTitle>
                     </div>
-                    <CardDescription>Configure how the banner behaves and interacts with users</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -3825,12 +3628,12 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Geo-Targeting Tab */}
-              <TabsContent value="geo-targeting" className="space-y-6" id="geo-targeting-panel" role="tabpanel" aria-labelledby="geo-targeting-tab">
+              <TabsContent value="geo-targeting" className="space-y-10" id="geo-targeting-panel" role="tabpanel" aria-labelledby="geo-targeting-tab">
                 {!canAccessFeature(userPlan, 'hasGeoTargeting') ? (
                   <UpgradePrompt feature="Geo-Targeting" description="Show different consent behavior based on visitor location. Perfect for Quebec Law 25 compliance." />
                 ) : (
                   <>
-                    <Card className="relative border-l-4 border-l-emerald-500">
+                    <Card className="relative">
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <CardTitle className="flex items-center gap-2">
@@ -4043,11 +3846,7 @@ function BannerBuilderContent() {
                               <div className="space-y-3 pt-2 border-t">
                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">Overrides for this region</Label>
 
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <Label className="text-sm">Require strict opt-in</Label>
-                                    <p className="text-xs text-muted-foreground">Hides close button, forces explicit accept/reject</p>
-                                  </div>
+                                <div className="flex items-start gap-3">
                                   <Switch
                                     checked={rule.overrides.requiresOptIn}
                                     onCheckedChange={(checked) => {
@@ -4058,14 +3857,15 @@ function BannerBuilderContent() {
                                         )
                                       }))
                                     }}
+                                    className="mt-0.5"
                                   />
+                                  <div>
+                                    <Label className="text-sm">Require strict opt-in</Label>
+                                    <p className="text-xs text-muted-foreground">Hides close button, forces explicit accept/reject</p>
+                                  </div>
                                 </div>
 
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <Label className="text-sm">Show reject button</Label>
-                                    <p className="text-xs text-muted-foreground">Always show reject option for this region</p>
-                                  </div>
+                                <div className="flex items-start gap-3">
                                   <Switch
                                     checked={rule.overrides.showRejectButton}
                                     disabled={rule.overrides.requiresOptIn}
@@ -4077,14 +3877,15 @@ function BannerBuilderContent() {
                                         )
                                       }))
                                     }}
+                                    className="mt-0.5"
                                   />
+                                  <div>
+                                    <Label className="text-sm">Show reject button</Label>
+                                    <p className="text-xs text-muted-foreground">Always show reject option for this region</p>
+                                  </div>
                                 </div>
 
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <Label className="text-sm">Allow dismiss on scroll</Label>
-                                    <p className="text-xs text-muted-foreground">Let visitors dismiss banner by scrolling</p>
-                                  </div>
+                                <div className="flex items-start gap-3">
                                   <Switch
                                     checked={rule.overrides.dismissOnScroll}
                                     disabled={rule.overrides.requiresOptIn}
@@ -4096,7 +3897,12 @@ function BannerBuilderContent() {
                                         )
                                       }))
                                     }}
+                                    className="mt-0.5"
                                   />
+                                  <div>
+                                    <Label className="text-sm">Allow dismiss on scroll</Label>
+                                    <p className="text-xs text-muted-foreground">Let visitors dismiss banner by scrolling</p>
+                                  </div>
                                 </div>
 
                                 <div>
@@ -4153,97 +3959,82 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Performance Tab */}
-              <TabsContent value="performance" className="space-y-6">
+              <TabsContent value="performance" className="space-y-10">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <BarChart3 className="mr-2 h-5 w-5" />
                       Performance Optimization
                     </CardTitle>
-                    <CardDescription>
-                      Optimize your banner's impact on page speed and Core Web Vitals
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="defer-scripts" className="text-sm font-medium">
-                            Defer Non-Critical Scripts
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            Load analytics and marketing scripts after page load
-                          </p>
-                        </div>
+                      <div className="flex items-start gap-3">
                         <Switch
                           id="defer-scripts"
                           checked={config.advanced.performance?.deferNonCriticalScripts ?? true}
-                          onCheckedChange={(checked) => 
-                            updateConfig('advanced', { 
+                          onCheckedChange={(checked) =>
+                            updateConfig('advanced', {
                               performance: { ...(config.advanced.performance || {}), deferNonCriticalScripts: checked }
                             })
                           }
+                          className="mt-0.5"
                         />
+                        <div>
+                          <Label htmlFor="defer-scripts" className="text-sm font-medium cursor-pointer">Defer Non-Critical Scripts</Label>
+                          <p className="text-xs text-muted-foreground">Load analytics and marketing scripts after page load</p>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="idle-callback" className="text-sm font-medium">
-                            Use RequestIdleCallback
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            Load scripts during browser idle time for better performance
-                          </p>
-                        </div>
+                      <div className="flex items-start gap-3">
                         <Switch
                           id="idle-callback"
                           checked={config.advanced.performance?.useRequestIdleCallback ?? true}
-                          onCheckedChange={(checked) => 
-                            updateConfig('advanced', { 
+                          onCheckedChange={(checked) =>
+                            updateConfig('advanced', {
                               performance: { ...(config.advanced.performance || {}), useRequestIdleCallback: checked }
                             })
                           }
+                          className="mt-0.5"
                         />
+                        <div>
+                          <Label htmlFor="idle-callback" className="text-sm font-medium cursor-pointer">Use RequestIdleCallback</Label>
+                          <p className="text-xs text-muted-foreground">Load scripts during browser idle time for better performance</p>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="lazy-analytics" className="text-sm font-medium">
-                            Lazy Load Analytics
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            Delay analytics scripts until user interaction
-                          </p>
-                        </div>
+                      <div className="flex items-start gap-3">
                         <Switch
                           id="lazy-analytics"
                           checked={config.advanced.performance?.lazyLoadAnalytics ?? true}
-                          onCheckedChange={(checked) => 
-                            updateConfig('advanced', { 
+                          onCheckedChange={(checked) =>
+                            updateConfig('advanced', {
                               performance: { ...(config.advanced.performance || {}), lazyLoadAnalytics: checked }
                             })
                           }
+                          className="mt-0.5"
                         />
+                        <div>
+                          <Label htmlFor="lazy-analytics" className="text-sm font-medium cursor-pointer">Lazy Load Analytics</Label>
+                          <p className="text-xs text-muted-foreground">Delay analytics scripts until user interaction</p>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="inline-css" className="text-sm font-medium">
-                            Inline Critical CSS
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            Prevent render-blocking by inlining banner styles
-                          </p>
-                        </div>
+                      <div className="flex items-start gap-3">
                         <Switch
                           id="inline-css"
                           checked={config.advanced.performance?.inlineCriticalCSS ?? true}
-                          onCheckedChange={(checked) => 
-                            updateConfig('advanced', { 
+                          onCheckedChange={(checked) =>
+                            updateConfig('advanced', {
                               performance: { ...(config.advanced.performance || {}), inlineCriticalCSS: checked }
                             })
                           }
+                          className="mt-0.5"
                         />
+                        <div>
+                          <Label htmlFor="inline-css" className="text-sm font-medium cursor-pointer">Inline Critical CSS</Label>
+                          <p className="text-xs text-muted-foreground">Prevent render-blocking by inlining banner styles</p>
+                        </div>
                       </div>
                     </div>
 
@@ -4261,11 +4052,10 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Advanced Tab */}
-              <TabsContent value="advanced" className="space-y-6">
+              <TabsContent value="advanced" className="space-y-10">
                 <Card>
                   <CardHeader>
                     <CardTitle>Advanced Settings</CardTitle>
-                    <CardDescription>Advanced configuration options</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -4461,9 +4251,9 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Analytics Tab */}
-              <TabsContent value="analytics" className="space-y-6" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
+              <TabsContent value="analytics" className="space-y-10" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab">
                 {/* GA4 Events Reference */}
-                <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 border-l-4 border-l-rose-500">
+                <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center text-base">
                       <Info className="mr-2 h-4 w-4 text-blue-600" />
@@ -4725,7 +4515,7 @@ function BannerBuilderContent() {
               </TabsContent>
 
               {/* Code Tab */}
-              <TabsContent value="code" className="space-y-6" id="code-panel" role="tabpanel" aria-labelledby="code-tab">
+              <TabsContent value="code" className="space-y-10" id="code-panel" role="tabpanel" aria-labelledby="code-tab">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
@@ -4753,18 +4543,36 @@ function BannerBuilderContent() {
             <div className="lg:col-span-4">
               <div className="sticky top-6">
                 <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center">
-                        <Eye className="mr-2 h-5 w-5" />
-                        Live Preview
-                      </CardTitle>
-                    </div>
-                    {config.behavior.showPreferences && (
-                      <CardDescription className="text-purple-600 dark:text-purple-400">
-                        ✨ Try clicking the "Preferences" button to see the new modal!
-                      </CardDescription>
-                    )}
+                  <CardHeader className="space-y-3">
+                    <CardTitle className="flex items-center">
+                      <Eye className="mr-2 h-5 w-5" />
+                      Live Preview
+                    </CardTitle>
+                    {(() => {
+                      // Auto-derive default view from active tab; user can override with the buttons below
+                      const autoView: 'banner' | 'preferences' | 'floating' =
+                        activeTab === 'cookie-settings' ? 'floating' :
+                        activeTab === 'content' && config.behavior.showPreferences ? 'preferences' :
+                        'banner'
+                      const effective = previewView ?? autoView
+                      return (
+                        <div className="inline-flex rounded-md border bg-muted/40 p-0.5 text-xs">
+                          {(['banner', 'preferences', 'floating'] as const).map((v) => (
+                            <button
+                              key={v}
+                              onClick={() => setPreviewView(v)}
+                              className={`px-3 py-1.5 rounded transition-colors ${
+                                effective === v
+                                  ? 'bg-background shadow-sm font-medium'
+                                  : 'text-muted-foreground hover:text-foreground'
+                              }`}
+                            >
+                              {v === 'banner' ? 'Banner' : v === 'preferences' ? 'Preferences' : 'Floating Button'}
+                            </button>
+                          ))}
+                        </div>
+                      )
+                    })()}
                   </CardHeader>
                   <CardContent>
                     {/* Browser Chrome Frame */}
@@ -4779,8 +4587,17 @@ function BannerBuilderContent() {
                           yoursite.com
                         </div>
                       </div>
-                      <div className="bg-white rounded-b-lg min-h-[300px] relative overflow-hidden">
-                        <BannerPreview config={config} />
+                      {/* transform-gpu anchors fixed-positioned descendants; overscroll-contain stops mouse-wheel from bubbling to the page when you scroll inside the preview */}
+                      <div className="bg-white rounded-b-lg h-[640px] relative overflow-hidden overscroll-contain transform-gpu">
+                        <BannerPreview
+                          config={config}
+                          view={previewView ?? (
+                            activeTab === 'cookie-settings' ? 'floating' :
+                            activeTab === 'content' && config.behavior.showPreferences ? 'preferences' :
+                            'banner'
+                          )}
+                          onViewChange={setPreviewView}
+                        />
                       </div>
                     </div>
                   </CardContent>

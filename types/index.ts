@@ -135,6 +135,7 @@ export interface BannerConfig {
         size: 'small' | 'medium' | 'large'
         showText: boolean
         useCustomColors: boolean
+        iconStyle?: 'cookie' | 'logo' | 'auto'
         customColors?: {
           background?: string
           text?: string
