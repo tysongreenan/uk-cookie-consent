@@ -107,9 +107,13 @@ export async function GET(request: NextRequest) {
     // Geo data is included because the same banner serves different JS to different regions
     const earlyGeoCountry = request.headers.get('x-vercel-ip-country') || 'unknown'
     const earlyGeoRegion = request.headers.get('x-vercel-ip-country-region') || ''
+    // Include the deploy SHA so a new Vercel deploy invalidates every browser's
+    // cached banner.js — generator-code fixes reach all customer sites on the
+    // next page load without anyone needing to re-publish their banner.
+    const deployVersion = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || 'dev'
     const etag = updatedAt
-      ? `"${bannerId}-${updatedAt}-${earlyGeoCountry}-${earlyGeoRegion}"`
-      : `"${bannerId}-${Date.now()}-${earlyGeoCountry}-${earlyGeoRegion}"`
+      ? `"${bannerId}-${updatedAt}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
+      : `"${bannerId}-${Date.now()}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
     const ifNoneMatch = request.headers.get('if-none-match')
 
     // If client has matching ETag (same updatedAt + same geo), return 304 Not Modified
