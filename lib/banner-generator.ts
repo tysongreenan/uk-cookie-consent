@@ -821,10 +821,11 @@ input:checked + span:before {
     width: 44px !important;
     height: 44px !important;
     padding: 0 !important;
-    font-size: 28px !important;
+    padding-top: 2px !important;
+    font-size: 24px !important;
     line-height: 1 !important;
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     justify-content: center !important;
     z-index: 2 !important;
   }
