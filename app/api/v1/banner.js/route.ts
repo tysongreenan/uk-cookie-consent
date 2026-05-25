@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
     // Use updatedAt from banner (already fetched above)
     // Reuse earlyGeoCountry/earlyGeoRegion from above for consistent ETag format
     const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
-    const finalEtag = `"${bannerId}-${bannerUpdatedAt}-${earlyGeoCountry}-${earlyGeoRegion}"`
+    const finalEtag = `"${bannerId}-${bannerUpdatedAt}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
     
     if (banner.isActive === false) {
       // Check if client has cached version (304 Not Modified)
