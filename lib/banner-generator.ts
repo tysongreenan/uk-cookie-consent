@@ -420,8 +420,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   // Main banner HTML
   const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
-  <div style="position: relative;">
-    <button id="cookie-close-btn" style="position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
+  <div style="position: relative; padding-right: 40px;">
+    <button id="cookie-close-btn" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
     
     <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
