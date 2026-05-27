@@ -12,11 +12,49 @@ const nextConfig = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build',
   },
+  experimental: {
+    serverComponentsExternalPackages: ['playwright-core', 'playwright', '@sparticuz/chromium-min'],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      if (!Array.isArray(config.externals)) {
+        config.externals = config.externals ? [config.externals] : []
+      }
+      config.externals.push(({ request }, callback) => {
+        if (/^(playwright-core|playwright|@sparticuz\/chromium-min)/.test(request)) {
+          return callback(null, 'commonjs ' + request)
+        }
+        callback()
+      })
+    }
+    return config
+  },
   // Production optimizations
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
   
+  // 301 redirects for renamed content (preserve SEO equity)
+  async redirects() {
+    return [
+      {
+        source: '/blog/cookie-consent-canada-guide-2025',
+        destination: '/blog/cookie-consent-canada-guide-2026',
+        permanent: true,
+      },
+      {
+        source: '/blog/gtm-setup',
+        destination: '/blog/google-tag-manager-cookie-consent-guide',
+        permanent: true,
+      },
+      {
+        source: '/blog/cpra-cookie-requirements-guide',
+        destination: '/blog/ccpa-cpra-cookie-compliance-guide',
+        permanent: true,
+      },
+    ]
+  },
+
   // Security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production'

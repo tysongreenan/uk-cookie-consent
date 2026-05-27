@@ -2,10 +2,20 @@
 title: "Do I Need Consent for Google Analytics and Facebook Pixel Under PIPEDA?"
 description: "Yes. PIPEDA requires explicit consent for Google Analytics, Facebook Pixel, and other tracking tools because they collect personal information. You must block these scripts until users give permission."
 date: "2025-01-15"
-updatedDate: "2025-05-01"
+updatedDate: "2026-05-26"
 author: "cookie-banner-team"
 tags: ["PIPEDA", "Analytics", "Google Analytics", "Facebook Pixel", "Canada", "Privacy Compliance"]
 published: true
+canonical: "/blog/pipeda-analytics-advertising-pixels"
+keywords:
+  - "pipeda google analytics"
+  - "pipeda facebook pixel"
+  - "do I need consent for google analytics"
+  - "pipeda analytics consent"
+  - "pipeda tracking consent"
+  - "google analytics consent canada"
+  - "facebook pixel consent canada"
+  - "pipeda cookie consent analytics"
 schema:
   "@context": "https://schema.org"
   "@type": "FAQPage"

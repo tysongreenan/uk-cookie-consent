@@ -6,6 +6,7 @@ author: "cookie-banner-team"
 tags: ["Google Tag Manager", "Cookie Consent", "Consent Mode v2", "GTM", "GDPR", "Google Analytics", "Tutorial"]
 published: true
 canonical: "/blog/google-tag-manager-cookie-consent-guide"
+updatedDate: "2026-05-26"
 keywords:
   - "google tag manager cookie consent"
   - "gtm cookie consent"
@@ -18,6 +19,14 @@ keywords:
   - "gtm set cookie"
   - "consent manager google tag manager"
   - "gtm cookies"
+  - "consent mode v2 gtm template"
+  - "gtm consent mode v2 setup"
+  - "cookie banner generator gtm"
+  - "google consent mode v2 template"
+  - "gtm cookie consent template"
+  - "gtm consent default denied"
+  - "ads data redaction gtm"
+  - "gtm cookie consent setup"
 schema:
   "@context": "https://schema.org"
   "@type": "FAQPage"
@@ -52,6 +61,16 @@ schema:
       acceptedAnswer:
         "@type": "Answer"
         text: "Yes. Since March 2024, Google requires Consent Mode v2 signals (specifically ad_user_data and ad_personalization) for remarketing, audience building, and conversion measurement for users in the EEA and UK. Without these signals, your Google Ads campaigns lose access to remarketing lists and modelled conversions for European users."
+    - "@type": "Question"
+      name: "Can I use this without Google Tag Manager?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "You do not need the GTM template if you are not using Google Tag Manager. The Cookie Banner Generator script already sends gtag('consent', 'update', ...) signals directly. The GTM template is specifically for sites that manage their Google tags through Tag Manager and need default consent states set before any tags fire."
+    - "@type": "Question"
+      name: "Does this work with Google Analytics 4?"
+      acceptedAnswer:
+        "@type": "Answer"
+        text: "Yes. Google Analytics 4 fully supports Consent Mode v2. When analytics_storage is denied, GA4 sends cookieless pings instead of setting cookies, and uses conversion modelling to fill data gaps. When consent is granted, GA4 operates normally with full cookie-based tracking."
 ---
 
 # Google Tag Manager Cookie Consent: How to Set It Up the Right Way
@@ -143,7 +162,7 @@ Tags send **cookieless pings** even when consent is denied. No cookies are set, 
 - Recommended by Google for better analytics accuracy
 - Still respects user consent -- no cookies are set without permission
 
-**Which should you choose?** For most websites, Advanced Consent Mode is the better option. It preserves data quality without compromising user privacy. The cookieless pings do not contain personal data and do not set cookies on the user's device. Cookie Banner Generator's [GTM template](/blog/gtm-setup) uses Advanced Consent Mode by default.
+**Which should you choose?** For most websites, Advanced Consent Mode is the better option. It preserves data quality without compromising user privacy. The cookieless pings do not contain personal data and do not set cookies on the user's device. Cookie Banner Generator's GTM template uses Advanced Consent Mode by default.
 
 ---
 
@@ -167,7 +186,7 @@ Now create a tag using this template:
 7. Click **New** and name the tag **"Cookie Banner Generator -- Consent Mode"**
 8. Click **Tag Configuration** and select the Cookie Banner Generator template
 
-For a detailed walkthrough of the template configuration, see our dedicated [GTM setup guide](/blog/gtm-setup).
+The template configuration is covered in detail in the steps below.
 
 ### Step 2: Configure Default Consent States
 
@@ -436,7 +455,7 @@ Setting up Google Tag Manager cookie consent correctly requires three components
 
 1. [Create a free Cookie Banner Generator account](https://cookie-banner.ca/signup)
 2. Build your banner using the [cookie banner builder](/builder)
-3. Install the GTM Community Template following our [step-by-step GTM setup guide](/blog/gtm-setup)
+3. Install the GTM Community Template following the [steps above](#how-to-set-up-cookie-consent-in-google-tag-manager-step-by-step)
 4. Test in Preview Mode and publish
 
 The entire setup takes under 10 minutes and ensures your GTM tags fire compliantly -- no developer required.
@@ -468,6 +487,18 @@ The entire setup takes under 10 minutes and ensures your GTM tags fire compliant
 ### Do I need Consent Mode v2 for Google Ads?
 
 **Answer:** Yes. Since March 2024, Google requires Consent Mode v2 signals (specifically `ad_user_data` and `ad_personalization`) for remarketing, audience building, and conversion measurement for users in the EEA and UK. Without these signals, your Google Ads campaigns lose access to remarketing lists and modelled conversions for European users.
+
+### Can I use Cookie Banner Generator without Google Tag Manager?
+
+**Answer:** You do not need the GTM template if you are not using Google Tag Manager. The Cookie Banner Generator script already sends `gtag('consent', 'update', ...)` signals directly. The GTM template is specifically for sites that manage their Google tags through Tag Manager and need default consent states set before any tags fire.
+
+### Does this work with Google Analytics 4?
+
+**Answer:** Yes. Google Analytics 4 fully supports Consent Mode v2. When `analytics_storage` is denied, GA4 sends cookieless pings instead of setting cookies, and uses conversion modelling to fill data gaps. When consent is granted, GA4 operates normally with full cookie-based tracking.
+
+### What is ads data redaction?
+
+**Answer:** When ads data redaction is enabled, Google removes all ad-click identifiers from requests when `ad_storage` consent is denied. This provides an extra layer of privacy by stripping tracking parameters like `gclid` from network requests, reducing the data sent to Google when a user has not consented to advertising cookies.
 
 ---
 
