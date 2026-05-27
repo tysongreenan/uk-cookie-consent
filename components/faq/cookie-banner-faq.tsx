@@ -65,6 +65,14 @@ const faqData = [
     answer: "Yes. Our cookie banner includes full bilingual support (English/French) with automatic language detection. This satisfies Quebec's Law 25 requirements and ensures compliance for Canadian businesses operating in Quebec."
   },
   {
+    question: "If someone is in Quebec, will the banner always show in French?",
+    answer: "No. Location and language are separate settings. Quebec detection can apply Quebec consent rules, while the banner language can still follow the site language. A visitor in Quebec can see English on your English site and French on your French site, unless you specifically configure a Quebec rule to force French."
+  },
+  {
+    question: "How do English and French versions of a site work?",
+    answer: "You can set the English site to English and the French site to French, or use auto-detect when each page has the correct HTML language set. In auto-detect mode, the banner checks the site's page language first, then the visitor's browser language. Geo-targeting can override the language only if you configure that rule."
+  },
+  {
     question: "How long does it take to set up?",
     answer: "Setup takes approximately 5 minutes. The process is: pick a template, customize your banner (colors, fonts, text), copy the generated code, and paste it into your website. No coding knowledge required."
   }
@@ -246,6 +254,28 @@ export function CookieBannerFAQ() {
           <AccordionContent className="text-base text-muted-foreground">
             <p className="leading-relaxed">
               Yes. Our cookie banner includes full bilingual support (English/French) with automatic language detection. This satisfies Quebec&apos;s Law 25 requirements and ensures compliance for Canadian businesses operating in Quebec.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="quebec-language" className="rounded-lg border bg-background px-6">
+          <AccordionTrigger className="text-left hover:no-underline">
+            <span className="text-lg font-semibold">If someone is in Quebec, will the banner always show in French?</span>
+          </AccordionTrigger>
+          <AccordionContent className="text-base text-muted-foreground">
+            <p className="leading-relaxed">
+              No. Location and language are separate settings. Quebec detection can apply Quebec consent rules, while the banner language can still follow the site language. A visitor in Quebec can see English on your English site and French on your French site, unless you specifically configure a Quebec rule to force French.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="english-french-sites" className="rounded-lg border bg-background px-6">
+          <AccordionTrigger className="text-left hover:no-underline">
+            <span className="text-lg font-semibold">How do English and French versions of a site work?</span>
+          </AccordionTrigger>
+          <AccordionContent className="text-base text-muted-foreground">
+            <p className="leading-relaxed">
+              You can set the English site to English and the French site to French, or use auto-detect when each page has the correct HTML language set. In auto-detect mode, the banner checks the site&apos;s page language first, then the visitor&apos;s browser language. Geo-targeting can override the language only if you configure that rule.
             </p>
           </AccordionContent>
         </AccordionItem>

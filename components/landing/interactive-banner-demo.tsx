@@ -864,16 +864,6 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
   return (
     <section className="relative bg-muted/30 w-full py-12 sm:py-16 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6">
-        {/* Title Section */}
-        <div className="text-center mb-10 sm:mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Build Your First Cookie Banner
-          </h2>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Customize your cookie banner and get the code. No technical skills needed.
-          </p>
-        </div>
-
         {/* Configuration Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Sidebar Navigation */}

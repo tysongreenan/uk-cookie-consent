@@ -216,6 +216,12 @@ export default function GDPRCompliancePage() {
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
                   The GDPR requires explicit opt-in consent before any non-essential cookies load. Here is exactly what you need to do, and how our banner handles it automatically.
                 </p>
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto mt-3">
+                  Looking for a detailed guide? Read our{' '}
+                  <Link href="/blog/gdpr-cookie-consent-requirements" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                    Complete GDPR Cookie Consent Requirements Guide
+                  </Link>
+                </p>
               </motion.div>
 
               <motion.div
@@ -305,7 +311,7 @@ export default function GDPRCompliancePage() {
                     Short answer: almost certainly yes.
                   </h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    If your website uses any cookies beyond what is strictly necessary for the site to function, you need a GDPR-compliant cookie consent banner. This includes analytics cookies (Google Analytics, Plausible with cookies enabled), marketing pixels (Meta Pixel, Google Ads), social media embeds, and most third-party scripts.
+                    If your website uses any cookies beyond what is strictly necessary for the site to function, you need a GDPR-compliant cookie consent banner. This includes analytics cookies (Google Analytics, Plausible with cookies enabled), marketing pixels (Meta Pixel, Google Ads), social media embeds, and most third-party scripts. Not sure what cookies your site sets? <Link href="/tools/cookie-scanner" className="text-primary underline hover:no-underline">Run a free cookie scan</Link> to find out in 30 seconds.
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
                     The only cookies exempt from consent are those that are strictly necessary for the website to work, such as session cookies for shopping carts, login authentication tokens, and security cookies. Even these must be disclosed in your cookie policy.

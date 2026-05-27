@@ -110,10 +110,10 @@ export default function CookiebotAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "Cookiebot Alternatives 2026: Pricing, Cookiebot vs CookieYes & Complianz",
+          title: "Best Cookiebot Alternatives 2026: Free + Pricing Compared",
           description: "Compare Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Full pricing breakdown, feature matrix, and migration guide.",
           datePublished: "2025-01-01",
-          dateModified: "2026-03-16",
+          dateModified: "2026-05-20",
         }}
       />
       <StructuredData type="faq" data={faqData} />
@@ -165,7 +165,7 @@ export default function CookiebotAlternativePage() {
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Free Options, Pricing & Migration Guide
+                    Free + Pricing Compared
                   </span>
                 </h1>
 
@@ -194,6 +194,86 @@ export default function CookiebotAlternativePage() {
                   </Link>
                 </Button>
               </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Quick Pricing & Feature Overview — 4-Way Comparison */}
+        <section className="py-16 sm:py-20 border-t border-border bg-muted/30">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
+                Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                A side-by-side look at pricing, compliance, and platform support for the top Cookiebot alternatives in 2026
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="max-w-6xl mx-auto overflow-x-auto mb-8"
+            >
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-border">
+                    <th className="text-left py-4 px-4 font-heading font-semibold text-foreground min-w-[180px]">Feature</th>
+                    <th className="text-center py-4 px-4 font-heading font-semibold text-primary min-w-[160px]">Cookie-Banner.ca</th>
+                    <th className="text-center py-4 px-4 font-heading font-semibold text-foreground min-w-[140px]">Cookiebot</th>
+                    <th className="text-center py-4 px-4 font-heading font-semibold text-foreground min-w-[140px]">CookieYes</th>
+                    <th className="text-center py-4 px-4 font-heading font-semibold text-foreground min-w-[140px]">Complianz</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "Monthly cost", ours: "Free / $99 one-time", cookiebot: "$9–$199/mo", cookieyes: "$10–$49/mo", complianz: "$49/yr (WP only)" },
+                    { feature: "Annual cost", ours: "$0 or $99 total", cookiebot: "$108–$2,388/yr", cookieyes: "$120–$588/yr", complianz: "$49/yr" },
+                    { feature: "Free plan pages", ours: "Unlimited", cookiebot: "100 subpages", cookieyes: "100 pages", complianz: "N/A" },
+                    { feature: "GDPR compliant", ours: true, cookiebot: true, cookieyes: true, complianz: true },
+                    { feature: "CCPA compliant", ours: true, cookiebot: true, cookieyes: true, complianz: true },
+                    { feature: "PIPEDA / Law 25", ours: true, cookiebot: "Limited", cookieyes: false, complianz: false },
+                    { feature: "Google Consent Mode v2", ours: true, cookiebot: true, cookieyes: true, complianz: "Partial" },
+                    { feature: "Script size", ours: "Under 10KB", cookiebot: "~50KB+", cookieyes: "~40KB+", complianz: "Plugin-based" },
+                    { feature: "Platform", ours: "Any website", cookiebot: "Any website", cookieyes: "Any website", complianz: "WordPress only" },
+                  ].map((row, i) => (
+                    <tr key={i} className={`border-b border-border ${i % 2 === 1 ? 'bg-muted/30' : ''}`}>
+                      <td className="py-3 px-4 font-medium text-foreground">{row.feature}</td>
+                      {[row.ours, row.cookiebot, row.cookieyes, row.complianz].map((val, j) => (
+                        <td key={j} className={`py-3 px-4 text-center ${j === 0 ? 'bg-primary/[0.03]' : ''}`}>
+                          {val === true ? (
+                            <CheckCircle className={`h-5 w-5 mx-auto ${j === 0 ? 'text-primary' : 'text-primary/60'}`} />
+                          ) : val === false ? (
+                            <XCircle className="h-5 w-5 text-muted-foreground/40 mx-auto" />
+                          ) : (
+                            <span className={`text-sm font-medium ${j === 0 ? 'text-primary' : 'text-muted-foreground'}`}>{val}</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </motion.div>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-6">
+                Pricing data as of May 2026. Complianz is a WordPress-only plugin and cannot be used on Shopify, React, or other platforms. See detailed breakdowns below.
+              </p>
+              <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
+                <Link href="/builder">
+                  Try Cookie-Banner.ca Free
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -281,10 +361,10 @@ export default function CookiebotAlternativePage() {
               className="text-center mb-12"
             >
               <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                Cookiebot Pricing Plans in 2026: How Much Does It Cost?
+                Cookiebot Pricing 2026: Full Tier Breakdown and What Each Plan Includes
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                A transparent look at Cookiebot pricing plans vs Cookie-Banner.ca
+                Cookiebot (Usercentrics) updated its pricing in 2026. Here is exactly what each tier costs and what you get.
               </p>
             </motion.div>
 
@@ -374,6 +454,118 @@ export default function CookiebotAlternativePage() {
                   </motion.div>
                 ))}
               </div>
+
+              {/* Detailed Cookiebot 2026 Tier Breakdown */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-8"
+              >
+                <h3 className="font-heading text-xl font-semibold text-foreground mb-6 text-center">What Each Cookiebot Plan Includes in 2026</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    {
+                      plan: 'Cookiebot Free',
+                      price: '$0/mo',
+                      details: [
+                        '1 domain only',
+                        'Up to 100 subpages',
+                        'Basic cookie scanning',
+                        'Cookiebot branding on banner',
+                        'No consent analytics',
+                        'No Google Consent Mode v2',
+                      ],
+                      limitation: 'Most websites exceed 100 subpages, making this tier impractical for production use.',
+                    },
+                    {
+                      plan: 'Cookiebot Essential',
+                      price: '$9/mo ($108/yr)',
+                      details: [
+                        '1 domain',
+                        'Up to 500 subpages',
+                        'Automatic cookie scanning',
+                        'Google Consent Mode v2',
+                        'Basic customization',
+                        'Email support',
+                      ],
+                      limitation: 'Adequate for small single-domain sites. Exceeding 500 pages requires upgrading.',
+                    },
+                    {
+                      plan: 'Cookiebot Premium',
+                      price: '$49/mo ($588/yr)',
+                      details: [
+                        'Up to 3 domains',
+                        'Up to 5,000 subpages',
+                        'Full customization',
+                        'Geolocation targeting',
+                        'Consent analytics',
+                        'Priority support',
+                      ],
+                      limitation: 'Popular tier for agencies, but the per-domain limit means costs scale quickly.',
+                    },
+                    {
+                      plan: 'Cookiebot Enterprise',
+                      price: '$199/mo ($2,388/yr)',
+                      details: [
+                        'Unlimited domains',
+                        'Unlimited subpages',
+                        'Full customization + white-label',
+                        'Advanced analytics',
+                        'Dedicated account manager',
+                        'SLA support',
+                      ],
+                      limitation: 'Enterprise-grade pricing. Over 3 years this plan costs $7,164.',
+                    },
+                  ].map((tier, i) => (
+                    <motion.div
+                      key={tier.plan}
+                      custom={i}
+                      variants={cardVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, margin: '-50px' }}
+                    >
+                      <div className="rounded-xl border border-border bg-background p-6 h-full">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-heading font-semibold text-foreground">{tier.plan}</h4>
+                          <span className="text-sm font-medium text-muted-foreground">{tier.price}</span>
+                        </div>
+                        <ul className="space-y-2 mb-4">
+                          {tier.details.map((detail) => (
+                            <li key={detail} className="flex items-start gap-2 text-sm text-muted-foreground">
+                              <Circle className="h-1.5 w-1.5 fill-muted-foreground/60 mt-2 flex-shrink-0" />
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-xs text-muted-foreground/80 italic border-t border-border pt-3">
+                          {tier.limitation}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="rounded-xl border-2 border-primary bg-primary/5 p-6 mb-8"
+              >
+                <div className="flex items-start gap-4">
+                  <DollarSign className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-heading font-semibold text-foreground text-lg mb-2">Cookiebot Pricing 2026: The Bottom Line</h3>
+                    <p className="text-muted-foreground">
+                      Even Cookiebot&apos;s cheapest paid plan ($9/month) costs more per year than Cookie-Banner.ca&apos;s one-time Pro plan ($99). For agencies or multi-site businesses, Cookiebot&apos;s per-domain pricing adds up fast -- $588/year for 3 domains, $2,388/year for unlimited. Cookie-Banner.ca charges the same $99 whether you run 1 site or 100.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
 
               <p className="text-sm text-muted-foreground text-center">
                 The free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.

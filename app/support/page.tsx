@@ -134,6 +134,24 @@ export default function SupportPage() {
 
                 <div className="border-b border-border pb-6">
                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                    If someone is in Quebec, will the banner always show in French?
+                  </h3>
+                  <p className="text-muted-foreground">
+                    No. Think of location and language as two separate settings. Quebec detection can apply Quebec consent rules, while the banner language can still follow the site language. If someone in Quebec visits your English site, they can see the English banner. If they visit your French site, they can see the French banner.
+                  </p>
+                </div>
+
+                <div className="border-b border-border pb-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    How do English and French versions of a site work?
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Set the English site to English and the French site to French, or use auto-detect if each page has the correct language set in its HTML. The banner checks the site language first, then the visitor&apos;s browser language. A Quebec geo-targeting rule can also force French, but only if you configure that override.
+                  </p>
+                </div>
+
+                <div className="border-b border-border pb-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     What if I need help with my specific website?
                   </h3>
                   <p className="text-muted-foreground">

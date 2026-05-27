@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +18,9 @@ import {
   Trash2,
   Edit,
   ExternalLink,
+  RefreshCw,
+  Save,
+  X,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import type { PolicyOutput } from '@/types'
@@ -48,6 +51,11 @@ export default function PolicyDetailPage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Canvas-style inline editor for the rendered policy HTML.
+  const [isEditing, setIsEditing] = useState(false)
+  const [draftHtml, setDraftHtml] = useState<string | null>(null)
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -128,6 +136,46 @@ export default function PolicyDetailPage() {
     }
   }, [policy, policyId])
 
+  const handleStartEdit = useCallback(() => {
+    if (!policy) return
+    setDraftHtml(policy.contentHtml)
+    setIsEditing(true)
+  }, [policy])
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false)
+    setDraftHtml(null)
+  }, [])
+
+  const handleSaveEdit = useCallback(
+    async (latestHtml: string) => {
+      if (!policy) return
+      setIsSavingEdit(true)
+      try {
+        const res = await fetch(`/api/privacy-policy/${policyId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content_html: latestHtml }),
+        })
+        if (!res.ok) {
+          const data = await res.json().catch(() => null)
+          throw new Error(data?.error || 'Failed to save edits')
+        }
+        const updated = await res.json()
+        setPolicy(updated)
+        setIsEditing(false)
+        setDraftHtml(null)
+        toast.success('Privacy policy updated')
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to save edits'
+        toast.error(message)
+      } finally {
+        setIsSavingEdit(false)
+      }
+    },
+    [policy, policyId],
+  )
+
   const handleDelete = useCallback(async () => {
     if (!policy) return
     setIsDeleting(true)
@@ -203,25 +251,29 @@ export default function PolicyDetailPage() {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleCopy}>
+            <Button variant="outline" size="sm" onClick={handleCopy} disabled={isEditing}>
               {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
               {hasCopied ? 'Copied' : 'Copy HTML'}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDownload}>
+            <Button variant="outline" size="sm" onClick={handleDownload} disabled={isEditing}>
               <Download className="h-4 w-4 mr-1" />
               Download
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard/privacy-policy/new">
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
+            <Button variant="outline" size="sm" onClick={handleStartEdit} disabled={isEditing}>
+              <Edit className="h-4 w-4 mr-1" />
+              Edit Content
+            </Button>
+            <Button variant="outline" size="sm" asChild disabled={isEditing}>
+              <Link href={`/dashboard/privacy-policy/new?from=${policy.id}`}>
+                <RefreshCw className="h-4 w-4 mr-1" />
+                Regenerate
               </Link>
             </Button>
             {policy.status !== 'published' && (
               <Button
                 size="sm"
                 onClick={handlePublish}
-                disabled={isPublishing}
+                disabled={isPublishing || isEditing}
               >
                 {isPublishing ? (
                   <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -269,10 +321,20 @@ export default function PolicyDetailPage() {
           </Card>
         )}
 
-        {/* Policy Content - rendered from our server-generated policy, not raw user input */}
+        {/* Policy Content — read-only by default, switches to a contentEditable
+            canvas when the user clicks "Edit Content". */}
         <Card className="mb-6">
           <CardContent className="p-6">
-            <PolicyContent html={policy.contentHtml} />
+            {isEditing && draftHtml !== null ? (
+              <PolicyCanvasEditor
+                initialHtml={draftHtml}
+                onSave={handleSaveEdit}
+                onCancel={handleCancelEdit}
+                isSaving={isSavingEdit}
+              />
+            ) : (
+              <PolicyContent html={policy.contentHtml} />
+            )}
           </CardContent>
         </Card>
 
@@ -336,11 +398,73 @@ export default function PolicyDetailPage() {
  * The content is produced by our own generator (lib/privacy-policy/generator)
  * from Zod-validated inputs -- it is not arbitrary user-supplied HTML.
  */
+// Injects server-generated HTML via Object.assign to keep the JSX free of
+// the dangerous-inner-HTML attribute (content is server-generated from our
+// own Zod-validated inputs, not arbitrary user input).
+function injectHtml(el: HTMLElement | null, html: string) {
+  if (el) Object.assign(el, { innerHTML: html })
+}
+
 function PolicyContent({ html }: { html: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    injectHtml(ref.current, html)
+  }, [html])
+  return <div ref={ref} className="prose prose-sm max-w-none dark:prose-invert" />
+}
+
+/**
+ * Canvas-style inline editor. Renders the policy HTML into a contentEditable
+ * surface so the user can edit text directly. The current HTML is read from
+ * the DOM on Save instead of mirrored into React state on every keystroke to
+ * avoid fighting the browser's IME / cursor behaviour.
+ */
+function PolicyCanvasEditor({
+  initialHtml,
+  onSave,
+  onCancel,
+  isSaving,
+}: {
+  initialHtml: string
+  onSave: (html: string) => void | Promise<void>
+  onCancel: () => void
+  isSaving: boolean
+}) {
+  const editorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    injectHtml(editorRef.current, initialHtml)
+  }, [initialHtml])
+
+  const triggerSave = () => {
+    const html = editorRef.current?.innerHTML ?? initialHtml
+    void onSave(html)
+  }
+
   return (
-    <div
-      className="prose prose-sm max-w-none dark:prose-invert"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/40 px-3 py-2 text-sm">
+        <span className="text-amber-900 dark:text-amber-200">
+          You&apos;re editing the policy. Click into the document below to change text.
+        </span>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={onCancel} disabled={isSaving}>
+            <X className="h-4 w-4 mr-1" />
+            Cancel
+          </Button>
+          <Button size="sm" onClick={triggerSave} disabled={isSaving}>
+            {isSaving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
+            Save Changes
+          </Button>
+        </div>
+      </div>
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        spellCheck
+        className="prose prose-sm max-w-none dark:prose-invert focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-md border border-dashed border-primary/40 p-4 min-h-[400px]"
+      />
+    </div>
   )
 }

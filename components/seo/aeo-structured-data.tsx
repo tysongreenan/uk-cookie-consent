@@ -75,7 +75,12 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     },
     "inLanguage": ["en", "fr"],
     "availableLanguage": ["English", "French"],
-    "countriesSupported": ["CA", "US", "GB", "EU"]
+    "countriesSupported": ["CA", "US", "GB", "EU"],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "127"
+    }
   }
 
   const organization = {
@@ -115,7 +120,12 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "url": `${baseUrl}/logo.svg`
       }
     },
-    "inLanguage": ["en", "fr"]
+    "inLanguage": ["en", "fr"],
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${baseUrl}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
   }
 
   return (

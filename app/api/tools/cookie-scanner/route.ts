@@ -13,8 +13,9 @@ export const maxDuration = 60
 // because this endpoint is unauthenticated and reachable from the landing
 // page.
 const publicScanRateLimit = new RateLimit({
+  name: 'public-cookie-scanner',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3, // 3 scans per hour per IP
+  maxRequests: 10, // 10 scans per hour per IP
 })
 
 function normalizeUrl(input: string): string {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
         {
           status: 429,
           headers: {
-            'X-RateLimit-Limit': '3',
+            'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
             'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, {
       headers: {
-        'X-RateLimit-Limit': '3',
+        'X-RateLimit-Limit': '10',
         'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
         'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
       },

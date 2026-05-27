@@ -6,7 +6,8 @@
  *
  * Fails open if the DB call errors, so an outage doesn't lock users out.
  *
- * API is unchanged: new RateLimit({ windowMs, maxRequests }) → .check(request)
+ * API: new RateLimit({ name, windowMs, maxRequests }) → .check(request)
+ * `name` disambiguates limiters that share (windowMs, maxRequests).
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
@@ -29,17 +30,20 @@ function getClient(): SupabaseClient | null {
 }
 
 export interface RateLimitOptions {
+  name: string
   windowMs: number
   maxRequests: number
   keyGenerator?: (req: Request) => string
 }
 
 export class RateLimit {
+  private name: string
   private windowMs: number
   private maxRequests: number
   private keyGenerator: (req: Request) => string
 
   constructor(options: RateLimitOptions) {
+    this.name = options.name
     this.windowMs = options.windowMs
     this.maxRequests = options.maxRequests
     this.keyGenerator = options.keyGenerator || this.defaultKeyGenerator
@@ -58,7 +62,7 @@ export class RateLimit {
     const supabase = getClient()
     if (!supabase) return fallback
 
-    const key = `${this.windowMs}:${this.maxRequests}:${this.keyGenerator(req)}`
+    const key = `${this.name}:${this.windowMs}:${this.maxRequests}:${this.keyGenerator(req)}`
     const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
 
     try {
@@ -86,43 +90,52 @@ export class RateLimit {
   }
 }
 
-// Pre-configured rate limiters (unchanged from previous version)
+// Pre-configured rate limiters. `name` disambiguates limiters that share
+// (windowMs, maxRequests) so they don't collide on the same Postgres bucket.
 export const authRateLimit = new RateLimit({
+  name: 'auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 5,
 })
 
 export const strictAuthRateLimit = new RateLimit({
+  name: 'auth-strict',
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 10,
 })
 
 export const apiRateLimit = new RateLimit({
+  name: 'api',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 60,
 })
 
 export const bannerRateLimit = new RateLimit({
+  name: 'banner',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 10,
 })
 
 export const registrationRateLimit = new RateLimit({
+  name: 'registration',
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 3,
 })
 
 export const passwordResetRateLimit = new RateLimit({
+  name: 'password-reset',
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 3,
 })
 
 export const enterpriseRateLimit = new RateLimit({
+  name: 'enterprise',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100,
 })
 
 export const freeTierRateLimit = new RateLimit({
+  name: 'free-tier',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 30,
 })

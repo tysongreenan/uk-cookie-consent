@@ -6,8 +6,9 @@
 
 import { discoverScripts } from '@/lib/scripts/discover'
 import { SCRIPT_COOKIE_MAP, resolveCookieDomain, type InferredCookie } from '@/lib/scripts/known-cookies'
-import { scanWithBrowser, type HeadlessScanResult } from '@/lib/scripts/scan-website-headless'
+import { scanWithBrowser, type HeadlessScanResult, type FrenchLanguageCheck } from '@/lib/scripts/scan-website-headless'
 import { classifyCookies, type ClassifiedCookie } from '@/lib/scripts/cookie-classifier'
+import type { BannerConfig } from '@/types'
 
 export interface ScannedCookie extends InferredCookie {
   source: string
@@ -17,6 +18,18 @@ export interface RegulationResult {
   score: number
   grade: string
   issues: string[]
+}
+
+export interface ProductRecommendation {
+  title: string
+  description: string
+  settingPath?: string
+}
+
+export interface ProductAdvice {
+  isOurBanner: boolean
+  bannerId?: string
+  recommendations: ProductRecommendation[]
 }
 
 export interface WebsiteScanResult {
@@ -38,6 +51,8 @@ export interface WebsiteScanResult {
   warnings: string[]
   note: string
   scanMethod: 'headless' | 'static-html'
+  frenchLanguage?: FrenchLanguageCheck
+  productAdvice?: ProductAdvice
 }
 
 function getGrade(score: number): string {
@@ -57,6 +72,7 @@ interface ScoringInput {
   scriptsDetected: { name: string; category: string }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  frenchLanguage?: FrenchLanguageCheck
 }
 
 interface ScoringOutput {
@@ -66,7 +82,7 @@ interface ScoringOutput {
   recommendations: WebsiteScanResult['recommendations']
 }
 
-function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl }: ScoringInput): ScoringOutput {
+function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl, frenchLanguage }: ScoringInput): ScoringOutput {
   const marketingCount = cookies.filter(c => c.category === 'marketing').length
   const analyticsCount = cookies.filter(c => c.category === 'analytics').length
   const thirdPartyCount = cookies.filter(c => c.thirdParty).length
@@ -77,6 +93,10 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
   )
 
   // GDPR — strict opt-in regime. Heavy penalty for tracking without a CMP.
+  // Note: the scanner loads the page without clicking the consent banner, so
+  // cookies present here were set *before* consent — a real compliance signal.
+  // If a CMP is present, cookies that leak through are a lighter issue (the
+  // site has a mechanism, it just may not be blocking everything properly).
   const gdprIssues: string[] = []
   let gdpr = 100
   if (!hasBanner) {
@@ -88,10 +108,13 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
     gdprIssues.push('No privacy or cookie policy link found in the page footer.')
   }
   if (marketingCount > 0) {
-    gdpr -= Math.min(25, marketingCount * 6)
+    const examples = cookies.filter(c => c.category === 'marketing').slice(0, 3).map(c => c.name).join(', ')
     if (!hasBanner) {
-      const examples = cookies.filter(c => c.category === 'marketing').slice(0, 3).map(c => c.name).join(', ')
+      gdpr -= Math.min(25, marketingCount * 6)
       gdprIssues.push(`${marketingCount} marketing/advertising cookie${marketingCount > 1 ? 's' : ''} set without explicit consent${examples ? ` (e.g., ${examples})` : ''}.`)
+    } else {
+      gdpr -= Math.min(10, marketingCount * 3)
+      gdprIssues.push(`${marketingCount} marketing/advertising cookie${marketingCount > 1 ? 's' : ''} detected before consent was given${examples ? ` (e.g., ${examples})` : ''}. Verify your CMP is configured to block these scripts until the user opts in.`)
     }
   }
   if (analyticsCount > 0 && !hasBanner) {
@@ -117,24 +140,30 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
     pipeda -= Math.min(15, marketingCount * 4)
     pipedaIssues.push('Marketing cookies should be opt-in and disclosed in the privacy policy.')
   }
-  if (thirdPartyCount > 0) {
+  if (thirdPartyCount > 0 && !hasPolicy) {
     pipeda -= Math.min(10, thirdPartyCount * 2)
-    if (!hasPolicy) {
-      pipedaIssues.push('Third-party data sharing must be disclosed to users.')
-    }
+    pipedaIssues.push('Third-party data sharing must be disclosed to users.')
   }
 
-  // CCPA — focused on the "sale" of personal information.
+  // CCPA — opt-out regime focused on the "sale" of personal information.
+  // Unlike GDPR, having marketing cookies isn't inherently wrong — what
+  // matters is whether users can opt out. A consent banner counts as an
+  // opt-out mechanism.
   const ccpaIssues: string[] = []
   let ccpa = 100
   if (marketingCount > 0) {
-    ccpa -= Math.min(40, marketingCount * 10)
-    ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} likely constitute a "sale" or "sharing" of personal information under CCPA.`)
-    ccpaIssues.push('A "Do Not Sell or Share My Personal Information" link is required when ad-tech cookies are present.')
+    if (!hasBanner) {
+      ccpa -= Math.min(40, marketingCount * 10)
+      ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} likely constitute a "sale" or "sharing" of personal information under CCPA.`)
+      ccpaIssues.push('A "Do Not Sell or Share My Personal Information" link or opt-out mechanism is required when ad-tech cookies are present.')
+    } else {
+      ccpa -= Math.min(10, marketingCount * 3)
+      ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} detected — verify your consent banner includes a clear opt-out for the sale/sharing of personal information.`)
+    }
   }
   if (!hasBanner && (marketingCount > 0 || analyticsCount > 0)) {
     ccpa -= 15
-    ccpaIssues.push('Opt-out mechanism not detected for tracking cookies.')
+    ccpaIssues.push('No opt-out mechanism detected for tracking cookies.')
   }
   if (!hasPolicy) {
     ccpa -= 15
@@ -149,8 +178,15 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
     law25Issues.push('No consent mechanism detected — Law 25 requires express consent before non-essential cookies.')
   }
   if (marketingCount > 0 || analyticsCount > 0) {
-    law25Issues.push('Consent and privacy notices must be available in French for Quebec visitors (cannot be verified from a single-page scan).')
-    law25 -= 10
+    if (frenchLanguage && frenchLanguage.available) {
+      // French support detected — no penalty, but note it for the report
+    } else if (frenchLanguage && !frenchLanguage.available) {
+      law25 -= 10
+      law25Issues.push('No French language version detected — Law 25 requires consent and privacy notices to be available in French for Quebec visitors.')
+    } else {
+      law25 -= 10
+      law25Issues.push('Consent and privacy notices must be available in French for Quebec visitors (could not be verified from a static scan).')
+    }
   }
   if (!hasPolicy) {
     law25 -= 15
@@ -193,7 +229,7 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
       regulation: 'GDPR, CCPA',
     })
   }
-  if (marketingCount > 0 || analyticsCount > 0 || hasTrackingScripts) {
+  if ((marketingCount > 0 || analyticsCount > 0 || hasTrackingScripts) && (!frenchLanguage || !frenchLanguage.available)) {
     recommendations.push({
       text: 'Provide your privacy policy and cookie notice in French for Quebec visitors.',
       regulation: 'Law 25',
@@ -217,7 +253,186 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
   }
 }
 
-function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, hostname: string): WebsiteScanResult {
+async function fetchBannerConfig(bannerId: string): Promise<BannerConfig | null> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+    if (!supabaseUrl || !supabaseKey) return null
+
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    const { data } = await supabase
+      .from('consent_banners')
+      .select('config')
+      .eq('id', bannerId)
+      .single()
+
+    return data?.config as BannerConfig | null
+  } catch {
+    return null
+  }
+}
+
+function generateOurBannerAdvice(
+  config: BannerConfig,
+  cookies: ScannedCookie[],
+  frenchLanguage?: FrenchLanguageCheck,
+): ProductRecommendation[] {
+  const recs: ProductRecommendation[] = []
+  const marketingCookies = cookies.filter(c => c.category === 'marketing')
+  const analyticsCookies = cookies.filter(c => c.category === 'analytics')
+
+  if (marketingCookies.length > 0) {
+    const names = marketingCookies.slice(0, 3).map(c => c.source || c.name).join(', ')
+    const hasAdScriptsConfigured = config.scripts?.targetingAdvertising?.length > 0
+    if (!hasAdScriptsConfigured) {
+      recs.push({
+        title: 'Add advertising scripts to Script Manager',
+        description: `We detected ${marketingCookies.length} marketing cookie${marketingCookies.length > 1 ? 's' : ''} (${names}) loading before consent. Add these scripts to the "Targeting & Advertising" category in your Script Manager so they're blocked until the user opts in.`,
+        settingPath: 'Scripts → Targeting & Advertising',
+      })
+    } else {
+      recs.push({
+        title: 'Check script categorization',
+        description: `${marketingCookies.length} marketing cookie${marketingCookies.length > 1 ? 's' : ''} (${names}) loaded before consent was given. Verify these scripts are in the "Targeting & Advertising" category and not in "Strictly Necessary."`,
+        settingPath: 'Scripts → Targeting & Advertising',
+      })
+    }
+  }
+
+  if (analyticsCookies.length > 0 && !config.advanced?.googleConsentMode) {
+    recs.push({
+      title: 'Enable Google Consent Mode v2',
+      description: 'Analytics cookies were detected before consent. Turn on Google Consent Mode v2 so Google Analytics and Ads respect user choices automatically.',
+      settingPath: 'Advanced → Google Consent Mode',
+    })
+  }
+
+  if (!config.behavior?.gpc?.enabled) {
+    recs.push({
+      title: 'Enable Global Privacy Control (GPC)',
+      description: 'GPC lets your banner automatically respect browser-level opt-out signals required by CCPA and some US state laws.',
+      settingPath: 'Behavior → GPC',
+    })
+  }
+
+  if (!config.behavior?.showRejectButton && config.behavior?.buttonLayout !== 'standard') {
+    recs.push({
+      title: 'Show the Reject button',
+      description: 'GDPR and Law 25 require an equally prominent Reject button. Switch your button layout to "Standard" or enable the Reject button.',
+      settingPath: 'Behavior → Button Layout',
+    })
+  }
+
+  if (config.language !== 'auto' && config.language !== 'fr') {
+    const hasQuebecGeoRule = config.geoRules?.some(
+      r => r.enabled && r.country === 'CA' && r.region === 'QC' && r.overrides?.language === 'fr'
+    )
+    if (!hasQuebecGeoRule && (!frenchLanguage || !frenchLanguage.available)) {
+      recs.push({
+        title: 'Add French language support for Law 25',
+        description: 'Quebec\'s Law 25 requires consent notices in French. Set your banner language to "Auto-detect" or add a Quebec geo-rule with French override.',
+        settingPath: 'Language → Auto-detect / Geo Rules → Quebec',
+      })
+    }
+  }
+
+  if (!config.branding?.privacyPolicy?.url) {
+    recs.push({
+      title: 'Link your privacy policy',
+      description: 'Add your privacy policy URL in the Branding settings so the banner links to it. Every major privacy law requires this.',
+      settingPath: 'Branding → Privacy Policy',
+    })
+  }
+
+  if (!config.integrations?.tcf?.enabled) {
+    recs.push({
+      title: 'Consider enabling IAB TCF v2.2',
+      description: 'If you run programmatic ads in the EU, enabling TCF ensures your ad partners receive standardized consent signals.',
+      settingPath: 'Integrations → TCF',
+    })
+  }
+
+  if (!config.branding?.footerLink?.enabled) {
+    recs.push({
+      title: 'Enable the floating cookie settings button',
+      description: 'Let returning visitors change their cookie preferences anytime with a persistent settings button — required by some interpretations of GDPR.',
+      settingPath: 'Branding → Footer Link',
+    })
+  }
+
+  if (recs.length === 0) {
+    recs.push({
+      title: 'Your banner is well configured',
+      description: 'No issues detected with your Cookie Banner setup. Keep reviewing your script categories quarterly as you add new integrations.',
+    })
+  }
+
+  return recs
+}
+
+function generateCompetitorAdvice(
+  cookies: ScannedCookie[],
+  consentBanner: { detected: boolean; vendor: string | null },
+  privacyPolicyUrl: string | null,
+  frenchLanguage?: FrenchLanguageCheck,
+): ProductRecommendation[] {
+  const recs: ProductRecommendation[] = []
+  const marketingCount = cookies.filter(c => c.category === 'marketing').length
+  const analyticsCount = cookies.filter(c => c.category === 'analytics').length
+  const hasBanner = consentBanner.detected
+
+  if (!hasBanner) {
+    recs.push({
+      title: 'Add a consent banner with automatic script blocking',
+      description: 'Cookie Banner blocks all non-essential scripts until the user consents — just paste your tracking codes into the Script Manager and the banner handles the rest. Free plan available.',
+    })
+  } else {
+    if (marketingCount > 0) {
+      recs.push({
+        title: 'Block marketing scripts before consent',
+        description: `${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} loaded before consent was given. Cookie Banner's Script Manager blocks these automatically until the user opts in — no code changes needed.`,
+      })
+    }
+  }
+
+  if (analyticsCount > 0) {
+    recs.push({
+      title: 'Built-in Google Consent Mode v2',
+      description: 'Cookie Banner includes native Google Consent Mode v2 integration — Google Analytics and Ads automatically respect user choices without extra configuration.',
+    })
+  }
+
+  if (!frenchLanguage || !frenchLanguage.available) {
+    recs.push({
+      title: 'Automatic French translations for Law 25',
+      description: 'Cookie Banner auto-detects Quebec visitors and displays the consent notice in French — built in, no translation work required. Supports 17 languages total.',
+    })
+  }
+
+  if (marketingCount > 0) {
+    recs.push({
+      title: 'GPC & CCPA opt-out built in',
+      description: 'Cookie Banner supports Global Privacy Control (GPC) signals and provides automatic opt-out for CCPA — no "Do Not Sell" link configuration needed.',
+    })
+  }
+
+  recs.push({
+    title: 'Geo-targeting for multi-region compliance',
+    description: 'Set different consent rules per country and region — strict opt-in for the EU, opt-out for California, French language for Quebec — all from one banner.',
+  })
+
+  if (!hasBanner || consentBanner.vendor === 'Custom / Unknown') {
+    recs.push({
+      title: 'IAB TCF v2.2 for programmatic advertising',
+      description: 'Cookie Banner supports IAB Transparency and Consent Framework v2.2 for standardized consent signals to ad partners.',
+    })
+  }
+
+  return recs
+}
+
+function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, hostname: string, productAdvice?: ProductAdvice): WebsiteScanResult {
   const classified = classifyCookies(headless.cookies, hostname)
   const cookies: ScannedCookie[] = classified.map((c: ClassifiedCookie) => ({
     name: c.name,
@@ -238,6 +453,7 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
     scriptsDetected,
     consentBanner: headless.consentBanner,
     privacyPolicyUrl: headless.privacyPolicyUrl,
+    frenchLanguage: headless.frenchLanguage,
   })
 
   return {
@@ -246,11 +462,13 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
     scriptsDetected,
     consentBanner: headless.consentBanner,
     privacyPolicyUrl: headless.privacyPolicyUrl,
+    frenchLanguage: headless.frenchLanguage,
     cookies,
     ...scored,
     warnings: [],
     note: `Cookies and scripts observed directly via a headless browser scan of ${headless.finalUrl}. Sites that block headless browsers or that only load trackers after user interaction may show fewer results.`,
     scanMethod: 'headless',
+    productAdvice,
   }
 }
 
@@ -295,7 +513,43 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
   // Try the headless browser scan first — it sees the post-JS world.
   try {
     const headless = await scanWithBrowser(targetUrl)
-    return buildFromHeadless(targetUrl, headless, hostname)
+
+    let productAdvice: ProductAdvice | undefined
+    const isOurBanner = headless.consentBanner.vendor === 'UK Cookie Consent'
+
+    if (isOurBanner && headless.ourBannerId) {
+      const config = await fetchBannerConfig(headless.ourBannerId)
+      const result = buildFromHeadless(targetUrl, headless, hostname)
+      if (config) {
+        productAdvice = {
+          isOurBanner: true,
+          bannerId: headless.ourBannerId,
+          recommendations: generateOurBannerAdvice(config, result.cookies, headless.frenchLanguage),
+        }
+      } else {
+        productAdvice = {
+          isOurBanner: true,
+          bannerId: headless.ourBannerId,
+          recommendations: [{
+            title: 'Banner configuration not found',
+            description: 'We detected your Cookie Banner script but couldn\'t load its configuration. Verify the banner ID in your script tag matches an active banner in your dashboard.',
+          }],
+        }
+      }
+      return { ...result, productAdvice }
+    }
+
+    const result = buildFromHeadless(targetUrl, headless, hostname)
+    productAdvice = {
+      isOurBanner: false,
+      recommendations: generateCompetitorAdvice(
+        result.cookies,
+        headless.consentBanner,
+        headless.privacyPolicyUrl,
+        headless.frenchLanguage,
+      ),
+    }
+    return { ...result, productAdvice }
   } catch (err) {
     console.warn('Headless scan failed, falling back to static HTML scan:', err instanceof Error ? err.message : err)
     const fallback = await buildFromCheerio(targetUrl, hostname)
@@ -303,6 +557,14 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
       ...fallback.warnings,
       'Full-browser scan was unavailable; results are based on static HTML only and may miss scripts loaded dynamically.',
     ]
+    fallback.productAdvice = {
+      isOurBanner: false,
+      recommendations: generateCompetitorAdvice(
+        fallback.cookies,
+        fallback.consentBanner,
+        fallback.privacyPolicyUrl,
+      ),
+    }
     return fallback
   }
 }

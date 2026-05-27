@@ -335,4 +335,4 @@ The average organization receives its first Law 25 data access request without w
 
 **cookie-banner.ca Pro** gives you the complete DSAR workflow: deadline tracking, identity verification, automated report generation, secure delivery, and a full audit trail. It's the only [cookie consent platform](/features/what-you-get) built specifically for Canadian privacy law compliance, including Law 25.
 
-[Get started with Pro &rarr;](/upgrade) | [See all features &rarr;](/features/what-you-get) | [Read the Canada compliance guide &rarr;](/blog/cookie-consent-canada-guide-2025)
+[Get started with Pro &rarr;](/upgrade) | [See all features &rarr;](/features/what-you-get) | [Read the Canada compliance guide &rarr;](/blog/cookie-consent-canada-guide-2026)

@@ -599,3 +599,83 @@ select:-webkit-autofill:focus {
     color: hsl(var(--muted-foreground));
   }
 }
+
+/* Homepage v2 — bento card animations */
+@keyframes cbSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes cbSpinReverse {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+@keyframes cbCorePulse {
+  0%, 100% { box-shadow: 0 4px 18px rgba(14, 118, 140, 0.18), inset 0 0 0 4px rgba(14, 118, 140, 0.06); }
+  50%      { box-shadow: 0 4px 28px rgba(14, 118, 140, 0.32), inset 0 0 0 4px rgba(14, 118, 140, 0.10); }
+}
+@keyframes cbBob {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50%      { filter: drop-shadow(0 0 6px rgba(14, 118, 140, 0.35)); }
+}
+@keyframes cbAttackTL {
+  0%   { transform: translate(0, 0) rotate(-8deg); opacity: 0; }
+  10%  { opacity: 1; }
+  55%  { transform: translate(110px, 90px) rotate(-8deg); opacity: 1; }
+  65%  { transform: translate(95px, 80px) rotate(-8deg) scale(1.4); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes cbAttackTR {
+  0%   { transform: translate(0, 0) rotate(6deg); opacity: 0; }
+  10%  { opacity: 1; }
+  55%  { transform: translate(-115px, 95px) rotate(6deg); opacity: 1; }
+  65%  { transform: translate(-100px, 82px) rotate(6deg) scale(1.4); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes cbAttackBL {
+  0%   { transform: translate(0, 0) rotate(4deg); opacity: 0; }
+  10%  { opacity: 1; }
+  55%  { transform: translate(120px, -90px) rotate(4deg); opacity: 1; }
+  65%  { transform: translate(105px, -78px) rotate(4deg) scale(1.4); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes cbAttackBR {
+  0%   { transform: translate(0, 0) rotate(-5deg); opacity: 0; }
+  10%  { opacity: 1; }
+  55%  { transform: translate(-110px, -95px) rotate(-5deg); opacity: 1; }
+  65%  { transform: translate(-96px, -82px) rotate(-5deg) scale(1.4); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Apply via stable classnames so Tailwind doesn't mangle names with underscores */
+.cb-orbit-r1 {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 180px; height: 180px;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(14, 118, 140, 0.30);
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: cbSpin 22s linear infinite;
+}
+.cb-orbit-r2 {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 240px; height: 240px;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(14, 118, 140, 0.30);
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: .55;
+  animation: cbSpinReverse 32s linear infinite;
+}
+.cb-core { animation: cbCorePulse 3.2s ease-in-out infinite; }
+.cb-shield { animation: cbBob 4s ease-in-out infinite; }
+.cb-attack-tl { animation: cbAttackTL 5.5s ease-in 0s infinite; }
+.cb-attack-tr { animation: cbAttackTR 5.5s ease-in 1.4s infinite; }
+.cb-attack-bl { animation: cbAttackBL 5.5s ease-in 2.8s infinite; }
+.cb-attack-br { animation: cbAttackBR 5.5s ease-in 4.2s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-orbit-r1, .cb-orbit-r2, .cb-core, .cb-shield,
+  .cb-attack-tl, .cb-attack-tr, .cb-attack-bl, .cb-attack-br { animation: none; }
+}

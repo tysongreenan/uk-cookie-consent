@@ -98,10 +98,10 @@ export default function CookieYesAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "CookieYes Alternative 2026: Save $120/Year with Free Unlimited Pages",
-          description: "Compare CookieYes vs Cookie-Banner.ca. CookieYes costs $120/year. Switch to a free alternative with unlimited pages.",
+          title: "Best CookieYes Alternatives 2026 vs Cookiebot (Free Options)",
+          description: "Compare CookieYes alternatives: CookieYes vs Cookiebot pricing, features, and free options. Cookie-Banner.ca is free or $99 one-time.",
           datePublished: "2025-01-01",
-          dateModified: "2026-04-03",
+          dateModified: "2026-05-20",
         }}
       />
       <StructuredData type="faq" data={faqData} />
@@ -149,11 +149,11 @@ export default function CookieYesAlternativePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Best CookieYes Alternative in 2026
+                    Best CookieYes Alternatives in 2026
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Save $120/Year with Free Unlimited Pages
+                    vs Cookiebot + Free Options
                   </span>
                 </h1>
 

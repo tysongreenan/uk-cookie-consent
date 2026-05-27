@@ -17,11 +17,11 @@ import { validatePublicUrl } from '@/lib/url-validation'
 const CHROMIUM_PACK_URL =
   'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
 
-// Wait briefly past `networkidle` so trackers that fire on a setTimeout
-// (Hotjar, some pixels) still get captured.
-const POST_LOAD_SETTLE_MS = 1500
-const NAVIGATION_TIMEOUT_MS = 25000
-const TOTAL_TIMEOUT_MS = 35000
+// Wait past initial load so consent banners and trackers that fire on
+// setTimeout (Hotjar, some pixels) get captured.
+const POST_LOAD_SETTLE_MS = 3000
+const NAVIGATION_TIMEOUT_MS = 30000
+const TOTAL_TIMEOUT_MS = 45000
 
 // Common selectors used by major CMPs. Used as a DOM-level fallback to the
 // script-tag detection so we still flag CMPs that inject their banner via
@@ -73,13 +73,20 @@ export interface BrowserCookie {
   sameSite: 'Strict' | 'Lax' | 'None'
 }
 
+export interface FrenchLanguageCheck {
+  available: boolean
+  signals: string[]
+}
+
 export interface HeadlessScanResult {
   cookies: BrowserCookie[]
   loadedScripts: { name: string; category: 'tracking-performance' | 'targeting-advertising' | 'functionality'; url: string }[]
   thirdPartyRequests: { domain: string; count: number }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  frenchLanguage: FrenchLanguageCheck
   finalUrl: string
+  ourBannerId: string | null
 }
 
 async function launchBrowser(): Promise<any> {
@@ -137,7 +144,7 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
 
   try {
     const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Linux; CookieBannerBot/1.0; +https://uk-cookie-consent.com/bot)',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
       viewport: { width: 1280, height: 800 },
     })
 
@@ -164,7 +171,7 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
 
     try {
       const response = await page.goto(targetUrl, {
-        waitUntil: 'networkidle',
+        waitUntil: 'load',
         timeout: NAVIGATION_TIMEOUT_MS,
       })
 
@@ -199,9 +206,10 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       }
     }
 
-    // DOM-level CMP detection. More reliable than script-tag matching because
-    // it catches CMPs whose script is dynamically injected by GTM or a tag manager.
+    // --- Consent banner detection (layered: DOM selectors → CMP APIs → network scripts → iframe → generic heuristic) ---
     let consentBanner: HeadlessScanResult['consentBanner'] = { detected: false, vendor: null }
+
+    // Layer 1: Known CMP DOM selectors
     for (const sig of CMP_DOM_SIGNATURES) {
       const found = await page.evaluate(
         (selectors: string[]) => selectors.some(sel => !!document.querySelector(sel)),
@@ -210,6 +218,138 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       if (found) {
         consentBanner = { detected: true, vendor: sig.vendor }
         break
+      }
+    }
+
+    // Layer 2: IAB TCF / CMP JavaScript APIs (works even when the banner is
+    // inside an iframe or shadow DOM — the API is always on the top window)
+    if (!consentBanner.detected) {
+      const cmpApi = await page.evaluate(() => {
+        const w = window as any
+        if (typeof w.__tcfapi === 'function') return 'IAB TCF v2'
+        if (typeof w.__cmp === 'function') return 'IAB CMP v1'
+        if (typeof w.__uspapi === 'function') return 'USP API (CCPA)'
+        if (typeof w.__gpp === 'function') return 'IAB GPP'
+        return null
+      })
+      if (cmpApi) {
+        consentBanner = { detected: true, vendor: cmpApi }
+      }
+    }
+
+    // Layer 3: Known CMP script URLs in network requests
+    if (!consentBanner.detected) {
+      const CMP_NETWORK_PATTERNS: { vendor: string; pattern: RegExp }[] = [
+        { vendor: 'Sourcepoint', pattern: /sourcepoint.*?\.js|cdn\.privacy-mgmt\.com/i },
+        { vendor: 'Cookiebot', pattern: /consent\.cookiebot\.com/i },
+        { vendor: 'OneTrust', pattern: /cdn\.cookielaw\.org|optanon/i },
+        { vendor: 'TrustArc', pattern: /consent\.trustarc\.com|consent-pref\.trustarc\.com/i },
+        { vendor: 'Didomi', pattern: /sdk\.privacy-center\.org|cdn\.didomi\.io/i },
+        { vendor: 'Quantcast Choice', pattern: /quantcast\.mgr\.consensu\.org|cmp\.quantcast\.com/i },
+        { vendor: 'CookieYes', pattern: /cdn-cookieyes\.com/i },
+        { vendor: 'Iubenda', pattern: /cdn\.iubenda\.com\/cs/i },
+        { vendor: 'Osano', pattern: /cmp\.osano\.com/i },
+        { vendor: 'Usercentrics', pattern: /app\.usercentrics\.eu/i },
+        { vendor: 'Termly', pattern: /app\.termly\.io\/resource-blocker/i },
+        { vendor: 'Complianz', pattern: /complianz/i },
+        { vendor: 'UK Cookie Consent', pattern: /cookie-banner\.ca|cookie-consent.*?banner/i },
+      ]
+      for (const reqUrl of Array.from(requestUrls)) {
+        for (const cmp of CMP_NETWORK_PATTERNS) {
+          if (cmp.pattern.test(reqUrl)) {
+            consentBanner = { detected: true, vendor: cmp.vendor }
+            break
+          }
+        }
+        if (consentBanner.detected) break
+      }
+    }
+
+    // Extract our banner ID if UK Cookie Consent was detected via network
+    let ourBannerId: string | null = null
+    const uuidRegex = /[?&]id=([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/i
+    const allRequestUrls = Array.from(requestUrls)
+    for (let ri = 0; ri < allRequestUrls.length; ri++) {
+      const reqUrlStr = allRequestUrls[ri]
+      if (/cookie-banner\.ca|cookie-consent.*?banner/i.test(reqUrlStr)) {
+        const uuidMatch = reqUrlStr.match(uuidRegex)
+        if (uuidMatch) {
+          ourBannerId = uuidMatch[1]
+          break
+        }
+      }
+    }
+
+    // Layer 4: CMP iframes (Sourcepoint, OneTrust, etc. often render inside an iframe)
+    if (!consentBanner.detected) {
+      const iframeCmp = await page.evaluate(() => {
+        const iframes = document.querySelectorAll('iframe')
+        const cmpPatterns = [
+          { vendor: 'Sourcepoint', pattern: /privacy-mgmt\.com|sp_message/i },
+          { vendor: 'OneTrust', pattern: /cookielaw\.org|onetrust/i },
+          { vendor: 'TrustArc', pattern: /trustarc\.com/i },
+          { vendor: 'Didomi', pattern: /didomi\.io/i },
+        ]
+        for (const iframe of Array.from(iframes)) {
+          const src = iframe.getAttribute('src') || ''
+          const id = iframe.getAttribute('id') || ''
+          const title = iframe.getAttribute('title') || ''
+          const combined = `${src} ${id} ${title}`
+          for (const cmp of cmpPatterns) {
+            if (cmp.pattern.test(combined)) return cmp.vendor
+          }
+          if (/consent|cookie|privacy|gdpr/i.test(combined)) return 'Custom / Unknown'
+        }
+        return null
+      })
+      if (iframeCmp) {
+        consentBanner = { detected: true, vendor: iframeCmp }
+      }
+    }
+
+    // Generic heuristic: if no known CMP matched, look for any element that
+    // looks like a consent/cookie banner based on text content, id/class
+    // patterns, and ARIA roles. This catches custom/first-party banners.
+    if (!consentBanner.detected) {
+      const genericDetected = await page.evaluate(() => {
+        const keywords = /\b(cookie|consent|gdpr|privacy|accept all|reject all|manage cookies|cookie preferences|we use cookies|this site uses cookies)\b/i
+        const idClassPattern = /cookie|consent|gdpr|privacy-banner|cc-banner|cc_banner|notice-banner/i
+
+        // Check elements with suggestive IDs or classes that are visible
+        const allEls = document.querySelectorAll('[id], [class], [role="dialog"], [role="banner"], [role="alertdialog"]')
+        for (const el of Array.from(allEls)) {
+          const id = el.getAttribute('id') || ''
+          const cls = el.getAttribute('class') || ''
+          const role = el.getAttribute('role') || ''
+          const hasConsentAttr = idClassPattern.test(id) || idClassPattern.test(cls)
+          const hasDialogRole = role === 'dialog' || role === 'alertdialog'
+
+          if (!hasConsentAttr && !hasDialogRole) continue
+
+          const rect = el.getBoundingClientRect()
+          const isVisible = rect.width > 0 && rect.height > 0
+          if (!isVisible) continue
+
+          const text = (el.textContent || '').slice(0, 500)
+          if (keywords.test(text)) return true
+        }
+
+        // Last resort: look for any fixed/sticky positioned element with cookie-related text
+        const positioned = document.querySelectorAll('*')
+        for (const el of Array.from(positioned)) {
+          const style = window.getComputedStyle(el)
+          if (style.position !== 'fixed' && style.position !== 'sticky') continue
+          const rect = el.getBoundingClientRect()
+          if (rect.width < 200 || rect.height < 40) continue
+          const text = (el.textContent || '').slice(0, 500)
+          if (keywords.test(text)) return true
+        }
+
+        return false
+      })
+
+      if (genericDetected) {
+        consentBanner = { detected: true, vendor: 'Custom / Unknown' }
       }
     }
 
@@ -225,6 +365,114 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       return match ? match.href : null
     })
 
+    // French language availability check (Law 25 requirement for Quebec).
+    // We check the current page for signals, then optionally follow a French
+    // hreflang or language-switcher link to verify it actually works.
+    const frenchLanguage: FrenchLanguageCheck = await page.evaluate(() => {
+      const signals: string[] = []
+
+      // 1. Page itself is in French
+      const htmlLang = (document.documentElement.getAttribute('lang') || '').toLowerCase()
+      if (htmlLang === 'fr' || htmlLang.startsWith('fr-')) {
+        signals.push(`Page language is French (lang="${htmlLang}")`)
+      }
+
+      // 2. hreflang alternate pointing to a French version
+      const hreflangs = document.querySelectorAll('link[rel="alternate"][hreflang]')
+      for (const link of Array.from(hreflangs)) {
+        const hl = (link.getAttribute('hreflang') || '').toLowerCase()
+        if (hl === 'fr' || hl.startsWith('fr-') || hl === 'fr-ca') {
+          signals.push(`French hreflang alternate found: ${link.getAttribute('href')}`)
+        }
+      }
+
+      // 3. Language switcher link (common patterns: /fr, ?lang=fr, text "Français")
+      const allLinks = Array.from(document.querySelectorAll('a[href]')) as HTMLAnchorElement[]
+      const frLink = allLinks.find(a => {
+        const text = (a.textContent || '').trim().toLowerCase()
+        const href = (a.getAttribute('href') || '').toLowerCase()
+        return (
+          text === 'français' || text === 'french' || text === 'fr' ||
+          /[?&]lang=fr/i.test(href) ||
+          /\/(fr)\/?$/i.test(href) ||
+          /\/(fr-ca)\/?$/i.test(href)
+        )
+      })
+      if (frLink) {
+        signals.push(`French language switcher found: "${frLink.textContent?.trim()}" → ${frLink.href}`)
+      }
+
+      // 4. Content-Language meta tag
+      const contentLang = document.querySelector('meta[http-equiv="content-language"]')
+      if (contentLang) {
+        const val = (contentLang.getAttribute('content') || '').toLowerCase()
+        if (val.includes('fr')) {
+          signals.push(`Content-Language meta includes French: ${val}`)
+        }
+      }
+
+      // 5. Check if the consent banner itself has French translations
+      // (e.g., UK Cookie Consent auto-detects browser language and includes
+      // built-in French translations for the consent notice)
+      const scripts = document.querySelectorAll('script[src]')
+      for (const script of Array.from(scripts)) {
+        const src = (script.getAttribute('src') || '').toLowerCase()
+        if (/cookie-banner\.ca|cookie-consent.*banner/i.test(src)) {
+          signals.push('Cookie consent banner (UK Cookie Consent) includes built-in French translations with browser language auto-detection')
+          break
+        }
+      }
+      // Also check inline scripts for French consent translations
+      if (!signals.some(s => s.includes('consent banner'))) {
+        const inlineScripts = document.querySelectorAll('script:not([src])')
+        for (const script of Array.from(inlineScripts)) {
+          const content = (script.textContent || '').slice(0, 5000)
+          if (/TRANSLATIONS.*["']fr["']\s*:/.test(content) || /detectLanguage.*startsWith\(["']fr["']\)/.test(content)) {
+            signals.push('Consent banner includes French language translations with auto-detection')
+            break
+          }
+        }
+      }
+
+      return { available: signals.length > 0, signals }
+    })
+
+    // If we found a French hreflang or language switcher but the page itself
+    // isn't French, navigate to the French version and verify it loads.
+    if (frenchLanguage.available && frenchLanguage.signals.some(s => s.includes('hreflang') || s.includes('switcher'))) {
+      const frUrl = await page.evaluate(() => {
+        // Prefer hreflang link
+        const hreflang = document.querySelector('link[rel="alternate"][hreflang^="fr"]') as HTMLLinkElement | null
+        if (hreflang?.href) return hreflang.href
+
+        // Fall back to language switcher
+        const allLinks = Array.from(document.querySelectorAll('a[href]')) as HTMLAnchorElement[]
+        const frLink = allLinks.find(a => {
+          const text = (a.textContent || '').trim().toLowerCase()
+          return text === 'français' || text === 'french' || text === 'fr'
+        })
+        return frLink?.href || null
+      })
+
+      if (frUrl) {
+        try {
+          const frResponse = await page.goto(frUrl, { waitUntil: 'load', timeout: 15000 })
+          if (frResponse && frResponse.ok()) {
+            const frPageLang = await page.evaluate(() =>
+              (document.documentElement.getAttribute('lang') || '').toLowerCase()
+            )
+            if (frPageLang === 'fr' || frPageLang.startsWith('fr-')) {
+              frenchLanguage.signals.push(`Verified: French page loaded successfully (lang="${frPageLang}")`)
+            } else {
+              frenchLanguage.signals.push(`French URL loaded but page lang="${frPageLang}" — may not be fully translated`)
+            }
+          }
+        } catch {
+          frenchLanguage.signals.push('French URL found but failed to load — may be broken')
+        }
+      }
+    }
+
     const thirdPartyRequests = Array.from(thirdPartyDomainCounts.entries())
       .map(([domain, count]) => ({ domain, count }))
       .sort((a, b) => b.count - a.count)
@@ -236,7 +484,9 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       thirdPartyRequests,
       consentBanner,
       privacyPolicyUrl,
+      frenchLanguage,
       finalUrl: page.url(),
+      ourBannerId,
     }
   } finally {
     await browser.close().catch(() => {})

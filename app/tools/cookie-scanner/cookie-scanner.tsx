@@ -39,6 +39,18 @@ interface ComplianceResult {
   issues: string[]
 }
 
+interface ProductRecommendation {
+  title: string
+  description: string
+  settingPath?: string
+}
+
+interface ProductAdvice {
+  isOurBanner: boolean
+  bannerId?: string
+  recommendations: ProductRecommendation[]
+}
+
 interface ScanResult {
   url: string
   cookies: CookieData[]
@@ -57,6 +69,7 @@ interface ScanResult {
   scriptsDetected?: { name: string; category: string }[]
   note?: string
   scanMethod?: 'headless' | 'static-html'
+  productAdvice?: ProductAdvice
 }
 
 type ScanStep = {
@@ -174,6 +187,7 @@ async function performScan(targetUrl: string): Promise<ScanResult> {
     scriptsDetected: data.scriptsDetected ?? [],
     note: data.note,
     scanMethod: data.scanMethod,
+    productAdvice: data.productAdvice,
   }
 }
 
@@ -764,24 +778,81 @@ export function CookieScanner() {
                   <div>
                     <p className="text-sm text-foreground">{rec.text}</p>
                     <p className="text-xs text-muted-foreground mt-1">Applies to: {rec.regulation}</p>
-                    {i === 0 && (
-                      <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
-                        <p className="text-sm text-foreground">
-                          Cookie Banner can fix this automatically — starting free, or $99 one-time for Pro.{' '}
-                          <Link href="/free-cookie-banner-generator" className="text-primary font-medium hover:underline">
-                            Build your banner now
-                          </Link>
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
 
+          {/* Product Advice */}
+          {result.productAdvice && result.productAdvice.recommendations.length > 0 && (
+            <motion.div variants={fadeUp} custom={5} className="py-8 border-b border-border">
+              {result.productAdvice.isOurBanner ? (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                      <Shield className="h-4 w-4 text-emerald-700" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-heading font-semibold">Cookie Banner Settings Advice</h3>
+                      <p className="text-xs text-muted-foreground">Based on your banner configuration</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {result.productAdvice.recommendations.map((rec, i) => (
+                      <div key={i} className="p-4 rounded-lg border border-border bg-card">
+                        <div className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{rec.title}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                            {rec.settingPath && (
+                              <p className="text-xs font-mono text-primary mt-2">
+                                Dashboard → {rec.settingPath}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Zap className="h-4 w-4 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-heading font-semibold">How Cookie Banner Fixes This</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Based on your scan results, here&apos;s how Cookie Banner would solve the issues we found.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {result.productAdvice.recommendations.map((rec, i) => (
+                      <div key={i} className="p-4 rounded-lg border border-border bg-card hover:border-primary/30 transition-colors">
+                        <p className="text-sm font-semibold text-foreground">{rec.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1.5">{rec.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6">
+                    <Link href="/free-cookie-banner-generator">
+                      <Button className="px-6 py-2.5 h-auto rounded-lg font-semibold">
+                        Build Your Free Banner
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          )}
+
           {/* CTA Block */}
-          <motion.div variants={fadeUp} custom={5} className="py-8">
+          <motion.div variants={fadeUp} custom={6} className="py-8">
             <div className="bg-foreground text-background rounded-2xl p-8 md:p-12">
               <h3 className="text-2xl md:text-3xl font-heading font-bold">
                 Fix your compliance issues in 5 minutes

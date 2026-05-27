@@ -21,11 +21,11 @@ import {
 
 export const metadata: Metadata = {
   title: 'Free Webflow Cookie Consent Banner (2026)',
-  description: 'Add a free GDPR-compliant cookie banner to Webflow in 2 minutes. No code required — just copy and paste. Works with Webflow Designer and custom domains.',
-  keywords: 'webflow cookie consent, webflow cookie banner, cookie consent webflow, webflow gdpr, free cookie consent webflow, webflow cookie consent free, cookie banner webflow, webflow cookies, webflow cookie consent banner, webflow gdpr compliance, cookie consent webflow free, webflow cookie consent banner gdpr',
+  description: 'Add a free cookie banner to Webflow in 2 minutes — paste one snippet in Project Settings. GDPR & CCPA compliant. No plugins, no monthly fees.',
+  keywords: 'webflow cookie consent, webflow cookie banner, free cookie consent webflow, cookie consent webflow free, cookie banner webflow, webflow gdpr, webflow cookies, webflow cookie consent banner, webflow gdpr compliance, cookie consent webflow free, webflow cookie consent banner gdpr, webflow ccpa',
   openGraph: {
     title: 'Free Webflow Cookie Consent Banner (2026)',
-    description: 'Add a free GDPR-compliant cookie banner to Webflow in 2 minutes. No code, no plugins. Copy-paste setup.',
+    description: 'Add a free cookie banner to Webflow in 2 minutes — paste one snippet, no plugins. GDPR & CCPA compliant.',
     type: 'website',
   },
   alternates: {

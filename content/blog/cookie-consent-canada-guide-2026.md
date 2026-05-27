@@ -1,12 +1,12 @@
 ---
-title: "Cookie Consent in Canada 2026: PIPEDA, CASL & Quebec Law 25 Guide"
-description: "What cookie consent do Canadian websites need? Complete guide to PIPEDA, CASL, and Quebec Law 25. Avoid $25M fines with our step-by-step compliance checklist."
+title: "Cookie Consent Canada 2026: Free Law 25 & PIPEDA Checklist"
+description: "Is cookie consent required in Canada? Yes — fines reach $25M. Free 2026 checklist for PIPEDA, CASL, and Quebec Law 25 with a ready-to-use cookie banner."
 date: "2025-01-15"
-updatedDate: "2026-02-21"
+updatedDate: "2026-05-20"
 author: "cookie-banner-team"
 tags: ["PIPEDA", "CASL", "Canada", "Privacy Law", "Cookie Consent", "Law 25", "Quebec"]
 published: true
-canonical: "/blog/cookie-consent-canada-guide-2025"
+canonical: "/blog/cookie-consent-canada-guide-2026"
 keywords:
   - "cookie consent canada"
   - "pipeda cookie requirements"

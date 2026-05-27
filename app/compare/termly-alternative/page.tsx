@@ -98,10 +98,10 @@ export default function TermlyAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "Termly Alternative 2026: Focused Cookie Consent at $99 (Not $10-35/Month)",
+          title: "Best Termly Alternatives 2026: Cookie Consent for $99",
           description: "Compare Termly vs Cookie-Banner.ca. Termly bundles legal docs with cookie consent for $10-35/month. Cookie-Banner.ca focuses on cookie consent at $99 one-time.",
           datePublished: "2025-01-01",
-          dateModified: "2026-04-03",
+          dateModified: "2026-05-20",
         }}
       />
       <StructuredData type="faq" data={faqData} />
@@ -149,11 +149,11 @@ export default function TermlyAlternativePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Best Termly Alternative in 2026
+                    Best Termly Alternatives 2026
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Focused Cookie Consent at $99, Not $10-35/Month
+                    Cookie Consent for $99
                   </span>
                 </h1>
 

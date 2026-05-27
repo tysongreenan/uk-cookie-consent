@@ -1,32 +1,36 @@
 import { Metadata } from 'next'
-import { FeaturesBento } from '@/components/landing/features-bento'
 import { InteractiveBannerDemo } from '@/components/landing/interactive-banner-demo'
-import { RoadmapPreview } from '@/components/landing/roadmap-preview'
-import { FinalCTA } from '@/components/landing/final-cta'
-import { CookieBannerFAQ } from '@/components/faq/cookie-banner-faq'
 import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
-import { HeroSection } from '@/components/blocks/hero-section'
-import { LogoMarquee } from '@/components/landing/logo-marquee'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
-import { ProductDescription } from '@/components/landing/product-description'
-import { LanguageSection } from '@/components/landing/language-section'
 import { ABTracker } from '@/components/ab-tracker'
 
+import { HeroV2 } from '@/components/landing/v2/hero-v2'
+import { PlatformStrip } from '@/components/landing/v2/platform-strip'
+import { BuilderHeader } from '@/components/landing/v2/builder-wrap'
+import { FeaturesBentoV2 } from '@/components/landing/v2/features-bento-v2'
+import { LanguageSectionV2 } from '@/components/landing/v2/language-section-v2'
+import { ComparisonSection } from '@/components/landing/v2/comparison-section'
+import { PricingSection } from '@/components/landing/v2/pricing-section'
+import { FaqV2 } from '@/components/landing/v2/faq-v2'
+import { FinalCtaV2 } from '@/components/landing/v2/final-cta-v2'
+
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
+  title: 'Free Cookie Banner Generator — No Code, Live in 5 Min (2026)',
+  description: 'Build a free cookie banner in 5 minutes. No code needed. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify, Webflow & any site.',
   keywords: [
+    'cookie banner',
+    'cookie banners',
     'cookie banner generator',
-    'cookie banner Canada',
-    'PIPEDA cookie banner',
-    'law 25 cookie banner',
     'free cookie banner generator',
     'cookie banner generator free',
     'cookie consent banner',
     'cookie consent banner generator',
     'cookie banner for website',
+    'cookie banner Canada',
+    'PIPEDA cookie banner',
+    'law 25 cookie banner',
     'GDPR cookie banner',
     'CCPA cookie banner',
     'cookie banner WordPress',
@@ -34,62 +38,47 @@ export const metadata: Metadata = {
     'cookie banner Webflow',
     'free cookie consent banner',
     'free cookie banner',
-    'cookie banners',
     'cookie consent',
     'custom cookie banner',
+    'no code cookie banner',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-    description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site. No code needed.',
+    title: 'Free Cookie Banner Generator — No Code, Live in 5 Min (2026)',
+    description: 'Build a free cookie banner in 5 minutes. No code needed. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site.',
     type: 'website',
+    locale: 'en_CA',
+    alternateLocale: 'fr_CA',
   },
   alternates: {
     canonical: 'https://www.cookie-banner.ca',
+    languages: {
+      'en-ca': 'https://www.cookie-banner.ca',
+      'fr-ca': 'https://www.cookie-banner.ca/fr',
+      'x-default': 'https://www.cookie-banner.ca',
+    },
   },
 }
 
 export default function HomePage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
-  
+
   return (
     <div className="min-h-screen bg-background">
-      {/* AEO Structured Data - Optimized for AI Assistants */}
       <AEOStructuredData baseUrl={baseUrl} />
-      
-      <ABTracker experiment="homepage" variant="v1" />
+      <ABTracker experiment="homepage" variant="v2" />
       <LiveCookieBanner />
       <Header />
       <main>
-        {/* Hero Section - LCP element */}
-        <HeroSection
-          badge={{
-            text: "Used by 1,000+ websites",
-          }}
-          title="Free Cookie Banner Generator"
-          title2="PIPEDA, Law 25 & GDPR Compliant"
-          description="Generate cookie consent banners in 5 minutes. Match your brand. Works on any platform. Free plan available — upgrade to Pro for $99 one-time."
-          emailCapture={true}
-          useGeometricBackground={true}
-          // Video temporarily hidden - uncomment when ready:
-          // video={{
-          //   src: "https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb",
-          //   thumbnail: {
-          //     light: "https://startup-template-sage.vercel.app/hero-light.png",
-          //     dark: "https://startup-template-sage.vercel.app/hero-dark.png",
-          //     alt: "Cookie Banner Generator Demo Video",
-          //   },
-          // }}
-        />
-
-        <LogoMarquee />
-      
+        <HeroV2 />
+        <PlatformStrip />
+        <BuilderHeader />
         <InteractiveBannerDemo />
-        <FeaturesBento />
-        <ProductDescription />
-        <LanguageSection />
-        <RoadmapPreview />
-        <FinalCTA />
-        <CookieBannerFAQ />
+        <FeaturesBentoV2 />
+        <LanguageSectionV2 />
+        <ComparisonSection />
+        <PricingSection />
+        <FaqV2 />
+        <FinalCtaV2 />
       </main>
       <Footer />
     </div>

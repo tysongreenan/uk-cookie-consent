@@ -11,6 +11,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import { resolveEffectivePlan } from '@/lib/team-permissions'
 import type { PlanTier } from '@/types'
 
 const VALID_DECISIONS = ['accept', 'reject', 'custom']
@@ -43,19 +44,9 @@ export async function GET(request: NextRequest) {
 
     // ── Plan check ───────────────────────────────────────────────────
 
-    const { data: user, error: userError } = await supabase
-      .from('User')
-      .select('planTier, featureFreezeDate')
-      .eq('id', session.user.id)
-      .single()
-
-    if (userError) {
-      console.error('[CONSENT-LOGS] User lookup failed:', { userId: session.user.id, error: userError.message })
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    const tier = (user?.planTier || 'free') as PlanTier
-    const featureFreezeDate = user?.featureFreezeDate || null
+    const effective = await resolveEffectivePlan(session.user.id, session.user.currentTeamId)
+    const tier = (effective.planTier || 'free') as PlanTier
+    const featureFreezeDate = effective.featureFreezeDate
 
     const hasAccess = canAccessFeatureWithFreeze(tier, 'hasConsentLogs', featureFreezeDate)
     if (!hasAccess) {

@@ -5,6 +5,7 @@ import { RateLimit } from '@/lib/rate-limit'
 
 // Rate limiter: 5 requests per 10 minutes per IP (same as brand discovery)
 const scriptDiscoveryRateLimit = new RateLimit({
+  name: 'script-discover',
   windowMs: 10 * 60 * 1000, // 10 minutes
   maxRequests: 5, // 5 requests per window
 })

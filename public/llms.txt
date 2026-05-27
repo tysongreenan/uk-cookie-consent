@@ -5,7 +5,7 @@
 ## Key Pages
 - [Homepage](https://www.cookie-banner.ca): Free cookie banner generator with brand-matching customization
 - [Cookie Scanner](https://www.cookie-banner.ca/tools/cookie-scanner): Scan any website to detect cookies and tracking scripts
-- [Cookie Consent Canada Guide](https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2025): Complete guide to cookie consent requirements in Canada
+- [Cookie Consent Canada Guide](https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026): Complete guide to cookie consent requirements in Canada
 - [PIPEDA Compliance](https://www.cookie-banner.ca/compliance/pipeda): PIPEDA cookie consent requirements
 - [GDPR Compliance](https://www.cookie-banner.ca/compliance/gdpr): GDPR cookie banner requirements
 - [CCPA Compliance](https://www.cookie-banner.ca/compliance/ccpa): CCPA cookie opt-out requirements

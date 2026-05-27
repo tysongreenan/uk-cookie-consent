@@ -1,5 +1,26 @@
 import { PrivacyPolicyInputs, PolicySection } from '@/types'
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const COOKIE_CATEGORY_LABELS: Record<string, string> = {
+  necessary: 'Strictly necessary',
+  functional: 'Functional',
+  analytics: 'Analytics',
+  marketing: 'Marketing',
+  social_media: 'Social media',
+}
+
+function formatCategory(value: string): string {
+  return COOKIE_CATEGORY_LABELS[value] || value
+}
+
 /** Format a list of items into readable prose or a bullet list */
 function formatList(items: string[]): string {
   if (items.length === 0) return 'none'
@@ -118,9 +139,31 @@ ${inputs.dataCollected.map((d) => `<li><strong>${labelData(d)}</strong></li>`).j
 ${inputs.collectionMethods.map((m) => `<li>${METHOD_LABELS[m] || m}</li>`).join('\n')}
 </ul>
 ${
-  inputs.cookieCategories.length > 0
+  inputs.cookieCategories.length > 0 || (inputs.cookies && inputs.cookies.length > 0)
     ? `<h3>Cookies and Tracking Technologies</h3>
-<p>We use cookies and similar tracking technologies to collect and track information about your activity on our services. The categories of cookies we use include: ${formatList(inputs.cookieCategories)}. You can manage your cookie preferences through our cookie consent banner or your browser settings. For more information, please see our Cookie Policy.</p>`
+<p>We use cookies and similar tracking technologies to collect and track information about your activity on our services.${
+        inputs.cookieCategories.length > 0
+          ? ` The categories of cookies we use include: ${formatList(inputs.cookieCategories)}.`
+          : ''
+      } You can manage your cookie preferences through our cookie consent banner or your browser settings.</p>${
+        inputs.cookies && inputs.cookies.length > 0
+          ? `
+<p>The specific cookies set on our website are listed below:</p>
+<table class="cookie-table" style="width:100%;border-collapse:collapse;margin:1em 0;">
+<thead>
+<tr><th style="text-align:left;border-bottom:1px solid #ccc;padding:6px;">Name</th><th style="text-align:left;border-bottom:1px solid #ccc;padding:6px;">Provider</th><th style="text-align:left;border-bottom:1px solid #ccc;padding:6px;">Category</th><th style="text-align:left;border-bottom:1px solid #ccc;padding:6px;">Duration</th><th style="text-align:left;border-bottom:1px solid #ccc;padding:6px;">Purpose</th></tr>
+</thead>
+<tbody>
+${inputs.cookies
+  .map(
+    (c) =>
+      `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><code>${escapeHtml(c.name)}</code></td><td style="padding:6px;border-bottom:1px solid #eee;">${escapeHtml(c.provider || '—')}</td><td style="padding:6px;border-bottom:1px solid #eee;">${escapeHtml(formatCategory(c.category))}</td><td style="padding:6px;border-bottom:1px solid #eee;">${escapeHtml(c.duration || '—')}</td><td style="padding:6px;border-bottom:1px solid #eee;">${escapeHtml(c.purpose || '—')}</td></tr>`,
+  )
+  .join('\n')}
+</tbody>
+</table>`
+          : ''
+      }`
     : ''
 }`,
       applicableJurisdictions: ['all'],

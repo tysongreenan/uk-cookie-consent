@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +12,23 @@ import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import type { PrivacyPolicyInputs, PolicyOutput } from '@/types'
 import { ArrowLeft, ArrowRight, Loader2, Check } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { toast } from 'react-hot-toast'
+
+function detectJurisdictions(country: string, province?: string): string[] {
+  const jurisdictions: string[] = []
+  const euCountries = ['DE', 'FR', 'NL', 'IE', 'SE', 'NO', 'DK', 'FI', 'ES', 'IT', 'PT', 'BE', 'AT', 'CH']
+  if (euCountries.includes(country) || country === 'GB') jurisdictions.push('gdpr')
+  if (country === 'CA') {
+    jurisdictions.push('pipeda')
+    if (province === 'QC') jurisdictions.push('law25')
+  }
+  if (country === 'US') jurisdictions.push('ccpa')
+  if (['AU', 'NZ', 'SG', 'JP', 'IN', 'BR', 'MX', 'ZA'].includes(country)) jurisdictions.push('gdpr')
+  if (jurisdictions.length === 0) jurisdictions.push('gdpr')
+  return jurisdictions
+}
 
 const STEPS = [
   { id: 'business', label: 'Business Info' },
@@ -48,10 +64,50 @@ const DEFAULT_INPUTS: PrivacyPolicyInputs = {
 export default function NewPrivacyPolicyPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const fromPolicyId = searchParams?.get('from') ?? null
   const [currentStep, setCurrentStep] = useState(0)
   const [inputs, setInputs] = useState<PrivacyPolicyInputs>(DEFAULT_INPUTS)
+  const [name, setName] = useState('')
+  const [nameTouched, setNameTouched] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isPreloading, setIsPreloading] = useState(!!fromPolicyId)
+
+  // Default the policy name from the business name unless the user edits it.
+  useEffect(() => {
+    if (nameTouched) return
+    const trimmed = inputs.businessName.trim()
+    setName(trimmed ? `${trimmed} Privacy Policy` : '')
+  }, [inputs.businessName, nameTouched])
+
+  // Preload from an existing policy when regenerating.
+  useEffect(() => {
+    if (!fromPolicyId || status !== 'authenticated') return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/privacy-policy/${fromPolicyId}`)
+        if (!res.ok) throw new Error('Could not load policy to regenerate')
+        const policy = await res.json()
+        if (cancelled) return
+        const loaded = policy.inputs as Partial<PrivacyPolicyInputs>
+        setInputs({ ...DEFAULT_INPUTS, ...loaded })
+        if (policy.title) {
+          setName(policy.title)
+          setNameTouched(true)
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load policy'
+        toast.error(message)
+      } finally {
+        if (!cancelled) setIsPreloading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [fromPolicyId, status])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -74,14 +130,22 @@ export default function NewPrivacyPolicyPage() {
   }, [currentStep, inputs])
 
   const handleSave = useCallback(async () => {
+    const policyName = name.trim()
+    if (!policyName) {
+      setError('Policy name is required.')
+      toast.error('Policy name is required.')
+      return
+    }
     setIsSaving(true)
     setError(null)
     try {
-      // First, generate the policy
+      const jurisdictions = detectJurisdictions(inputs.country, inputs.province)
+      const generationPayload = { ...inputs, jurisdictions }
+
       const genRes = await fetch('/api/privacy-policy/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inputs),
+        body: JSON.stringify(generationPayload),
       })
       if (!genRes.ok) {
         const data = await genRes.json().catch(() => null)
@@ -89,29 +153,39 @@ export default function NewPrivacyPolicyPage() {
       }
       const policyOutput: PolicyOutput = await genRes.json()
 
-      // Then, save to dashboard
-      const saveRes = await fetch('/api/privacy-policy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inputs,
-          output: policyOutput,
-        }),
-      })
+      // Regenerating an existing policy → PUT (creates a new version);
+      // otherwise POST a brand-new policy.
+      const isRegenerating = !!fromPolicyId
+      const saveRes = await fetch(
+        isRegenerating ? `/api/privacy-policy/${fromPolicyId}` : '/api/privacy-policy',
+        {
+          method: isRegenerating ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: policyName,
+            inputs: generationPayload,
+            content_html: policyOutput.contentHtml,
+            content_json: policyOutput.contentJson,
+            jurisdictions: policyOutput.metadata.jurisdictions,
+            language: policyOutput.metadata.language,
+          }),
+        },
+      )
       if (!saveRes.ok) {
         const data = await saveRes.json().catch(() => null)
         throw new Error(data?.error || `Save failed (${saveRes.status})`)
       }
       const saved = await saveRes.json()
-      toast.success('Privacy policy created successfully')
+      toast.success(isRegenerating ? 'Privacy policy regenerated' : 'Privacy policy created')
       router.push(`/dashboard/privacy-policy/${saved.id}`)
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.')
-      toast.error(err.message || 'Failed to save privacy policy')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setError(message)
+      toast.error(message)
     } finally {
       setIsSaving(false)
     }
-  }, [inputs, router])
+  }, [inputs, name, router, fromPolicyId])
 
   if (status === 'loading') {
     return (
@@ -137,11 +211,38 @@ export default function NewPrivacyPolicyPage() {
         />
 
         <div className="mb-8 mt-4">
-          <h1 className="text-2xl font-bold">Create New Privacy Policy</h1>
+          <h1 className="text-2xl font-bold">
+            {fromPolicyId ? 'Regenerate Privacy Policy' : 'Create New Privacy Policy'}
+          </h1>
           <p className="text-muted-foreground mt-1">
-            Fill in your business details to generate and save a privacy policy.
+            {fromPolicyId
+              ? 'Review and update your details. Regenerating creates a new version of this policy.'
+              : 'Fill in your business details to generate and save a privacy policy.'}
           </p>
         </div>
+
+        {/* Policy name — required by the dashboard save endpoint. */}
+        <Card className="mb-4">
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <Label htmlFor="policyName">
+                Policy Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="policyName"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setNameTouched(true)
+                }}
+                placeholder="e.g. Acme Inc. Privacy Policy"
+              />
+              <p className="text-xs text-muted-foreground">
+                A short label so you can find this policy in your dashboard. Auto-filled from your business name.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
@@ -222,11 +323,11 @@ export default function NewPrivacyPolicyPage() {
                   {isSaving ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                      Generating & Saving...
+                      {fromPolicyId ? 'Regenerating…' : 'Generating & Saving…'}
                     </>
                   ) : (
                     <>
-                      Generate & Save Policy
+                      {fromPolicyId ? 'Regenerate Policy' : 'Generate & Save Policy'}
                       <ArrowRight className="h-4 w-4 ml-1" />
                     </>
                   )}

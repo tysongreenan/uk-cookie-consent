@@ -23,14 +23,15 @@ import {
 import { StructuredData } from '@/components/seo/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Law 25 Cookie Banner — Free Quebec Privacy Compliance',
-  description: 'Free Law 25 compliant cookie banner for Quebec businesses. Bilingual French/English support. Meets all Quebec privacy law requirements. Set up in 5 minutes. No coding needed.',
+  title: 'Quebec Law 25 Cookie Banner: Free Bilingual Compliance (2026)',
+  description: 'Need a Law 25 cookie banner? Get compliant in 5 minutes with free bilingual French/English consent. Blocks cookies until opt-in. Avoid $25M fines — no coding required.',
   keywords: [
     'law 25 cookie banner',
     'quebec cookie banner',
     'loi 25 banniere cookie',
     'quebec privacy law cookie consent',
     'law 25 compliance',
+    'quebec law 25 cookie consent website',
     'quebec law 25 cookie consent',
     'bilingual cookie banner',
     'law 25 cookie consent',
@@ -38,9 +39,10 @@ export const metadata: Metadata = {
     'loi 25 quebec',
   ],
   openGraph: {
-    title: 'Law 25 Cookie Banner — Free Quebec Privacy Compliance',
-    description: 'Free Law 25 compliant cookie banner with bilingual French/English support. Meets all Quebec privacy requirements. Set up in 5 minutes.',
+    title: 'Quebec Law 25 Cookie Banner: Free Bilingual Compliance (2026)',
+    description: 'Need a Law 25 cookie banner? Get compliant in 5 minutes with free bilingual French/English consent. Blocks cookies until opt-in. No coding required.',
     type: 'website',
+    url: 'https://www.cookie-banner.ca/law-25-cookie-banner',
   },
   alternates: {
     canonical: 'https://www.cookie-banner.ca/law-25-cookie-banner',

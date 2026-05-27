@@ -22,6 +22,7 @@ const VALID_DECISIONS = ['accept', 'reject', 'custom'] as const
 
 // 60 requests per minute per IP (one consent action per page load)
 const consentLogRateLimit = new RateLimit({
+  name: 'v1-consent-log',
   windowMs: 60 * 1000,
   maxRequests: 60,
 })

@@ -33,6 +33,7 @@ function getSupabaseClient() {
 
 // Rate limiter: 100 requests per minute per IP (generous for legitimate use)
 const bannerScriptRateLimit = new RateLimit({
+  name: 'banner-script',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100, // 100 requests per minute
 })
