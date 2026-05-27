@@ -1,5 +1,5 @@
 import { streamText, convertToModelMessages, type UIMessage } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
+import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { RateLimit } from '@/lib/rate-limit'
 import fs from 'fs'
 import path from 'path'
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   )
 
   const result = streamText({
-    model: anthropic('claude-haiku-4-5-20251001'),
+    model: createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY })('anthropic/claude-haiku-4-5-20251001'),
     system: `You are a knowledgeable compliance assistant embedded in a blog article about Canadian cookie consent laws. Help readers understand the requirements covered in this article.
 
 Rules:
