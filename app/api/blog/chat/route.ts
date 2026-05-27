@@ -31,8 +31,8 @@ export async function POST(req: Request) {
 
   const { messages, slug } = body
 
-  if (!slug || typeof slug !== 'string') {
-    return new Response('Missing slug', { status: 400 })
+  if (!slug || typeof slug !== 'string' || !/^[a-z0-9-]+$/.test(slug)) {
+    return new Response('Invalid slug', { status: 400 })
   }
 
   if (!Array.isArray(messages) || messages.length === 0) {
@@ -91,8 +91,11 @@ ${blogContent}`,
 
 function getBlogMarkdown(slug: string): string | null {
   try {
-    const filePath = path.join(process.cwd(), 'content/blog', `${slug}.md`)
-    const fileContents = fs.readFileSync(filePath, 'utf8')
+    const blogDir = fs.realpathSync(path.join(process.cwd(), 'content/blog'))
+    const filePath = path.join(blogDir, `${slug}.md`)
+    const resolved = fs.realpathSync(filePath)
+    if (!resolved.startsWith(blogDir + path.sep)) return null
+    const fileContents = fs.readFileSync(resolved, 'utf8')
     const { content } = matter(fileContents)
     return content
   } catch {
