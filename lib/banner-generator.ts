@@ -452,10 +452,9 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 </div>`
 
   // Preferences modal HTML
-  // Generate modal when preferences button is shown OR when the floating cookie settings button is enabled
-  // (the floating button always opens the preferences modal)
-  const hasFloatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both')
-  const needsPreferencesModal = config.behavior.showPreferences || hasFloatingButton
+  // Generate modal whenever something can open it: the in-banner preferences button,
+  // or any enabled footer link (inline link, floating button, or both — all call window.showCookiePreferences()).
+  const needsPreferencesModal = config.behavior.showPreferences || config.branding.footerLink.enabled
   const tcfEnabled = config.integrations?.tcf?.enabled === true
 
   // TCF purpose toggle HTML helper
