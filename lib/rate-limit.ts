@@ -114,9 +114,20 @@ export const registrationRateLimit = new RateLimit({
   maxRequests: 3,
 })
 
+// Limits how often a reset EMAIL can be requested (forgot-password).
 export const passwordResetRateLimit = new RateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3,
+  maxRequests: 5,
+})
+
+// Separate, looser limit for SUBMITTING a new password (reset-password).
+// Kept apart from the email-request limiter so requesting links never blocks
+// the actual reset. The 32-byte token already prevents brute force; this just
+// caps abuse of the token-verification endpoint.
+export const passwordResetSubmitRateLimit = new RateLimit({
+  name: 'password-reset-submit',
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 10,
 })
 
 export const enterpriseRateLimit = new RateLimit({
