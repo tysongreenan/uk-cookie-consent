@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
-import { passwordResetRateLimit } from '@/lib/rate-limit'
+import { passwordResetSubmitRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail, validatePassword } from '@/lib/sanitize'
 
 function getSupabase() {
@@ -14,14 +14,6 @@ function getSupabase() {
 
 export async function POST(request: NextRequest) {
   try {
-    const rateLimitResult = await passwordResetRateLimit.check(request)
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
-      )
-    }
-
     const { token, email, password } = await request.json()
 
     if (!token || typeof token !== 'string' || token.length > 128) {
@@ -36,6 +28,17 @@ export async function POST(request: NextRequest) {
     const passwordCheck = validatePassword(password)
     if (!passwordCheck.valid) {
       return NextResponse.json({ error: passwordCheck.errors[0] }, { status: 400 })
+    }
+
+    // Rate-limit AFTER input validation so a user's own password typo (400)
+    // doesn't consume an attempt. Uses a dedicated bucket so requesting reset
+    // emails never blocks the actual submit.
+    const rateLimitResult = await passwordResetSubmitRateLimit.check(request)
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
     }
 
     const supabase = getSupabase()
