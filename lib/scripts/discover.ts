@@ -23,7 +23,16 @@ const cmpPatterns: { name: string; patterns: RegExp[] }[] = [
   { name: 'TrustArc', patterns: [/consent\.trustarc\.com/, /cdn\.trustarc\.com/] },
   { name: 'Usercentrics', patterns: [/app\.usercentrics\.eu/, /privacy-proxy\.usercentrics\.eu/] },
   { name: 'Didomi', patterns: [/sdk\.privacy-center\.org/, /didomi\.io/] },
-  { name: 'UK Cookie Consent', patterns: [/ukcookieconsent/, /uk-cookie-consent/] },
+  {
+    name: 'Cookie Banner',
+    patterns: [
+      /ukcookieconsent/,
+      /uk-cookie-consent/,
+      /cookie-banner\.ca\/api\/v1\/banner\.js/i,
+      /cookie-banner\.ca/i,
+      /cookie-consent.*?banner\.js/i,
+    ],
+  },
   { name: 'Civic Cookie Control', patterns: [/cc\.cdn\.civiccomputing\.com/, /CookieControl/] },
 ]
 
@@ -481,4 +490,3 @@ export async function discoverScripts(targetUrl: string): Promise<ScriptDiscover
     privacyPolicyUrl,
   }
 }
-
