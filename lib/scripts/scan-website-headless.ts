@@ -191,7 +191,7 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
     // Network-based script detection — finds anything that actually loaded.
     const seen = new Set<string>()
     const loadedScripts: HeadlessScanResult['loadedScripts'] = []
-    for (const reqUrl of requestUrls) {
+    for (const reqUrl of Array.from(requestUrls)) {
       const match = detectScriptFromUrl(reqUrl)
       if (match && !seen.has(match.name)) {
         seen.add(match.name)
