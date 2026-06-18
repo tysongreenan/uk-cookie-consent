@@ -126,86 +126,45 @@ function validateUrl(inputUrl: string): boolean {
   return true
 }
 
-// Mock scan — will be replaced with real API call
+// Calls the real backend scanner. The endpoint loads the page in a headless
+// browser, observes the cookies and tracking scripts that actually fire, and
+// returns per-regulation compliance scores. Falls back to a static HTML scan
+// server-side when a full browser scan is unavailable.
 async function performScan(targetUrl: string): Promise<ScanResult> {
-  await new Promise(resolve => setTimeout(resolve, 8000))
-
   const domain = new URL(targetUrl).hostname
-  const cookies: CookieData[] = [
-    { name: '_ga', domain: `.${domain}`, purpose: 'Google Analytics — tracks unique visitors', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_gid', domain: `.${domain}`, purpose: 'Google Analytics — distinguishes users for 24h', category: 'analytics', expires: '24 hours', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_ga_QM1L8P6TT5', domain: `.${domain}`, purpose: 'Google Analytics 4 — stores session state', category: 'analytics', expires: '2 years', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_fbp', domain: '.facebook.com', purpose: 'Facebook Pixel — tracks visits for ad targeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'None', thirdParty: true },
-    { name: '_gcl_au', domain: `.${domain}`, purpose: 'Google Ads — stores conversion data', category: 'marketing', expires: '3 months', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: 'fr', domain: '.facebook.com', purpose: 'Facebook — ad delivery and retargeting', category: 'marketing', expires: '3 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
-    { name: 'sessionid', domain: `.${domain}`, purpose: 'Session management — keeps users logged in', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Lax', thirdParty: false },
-    { name: 'csrftoken', domain: `.${domain}`, purpose: 'CSRF protection — prevents cross-site attacks', category: 'necessary', expires: 'Session', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
-    { name: '__stripe_mid', domain: `.${domain}`, purpose: 'Stripe — fraud detection for payments', category: 'necessary', expires: '1 year', secure: true, httpOnly: true, sameSite: 'Strict', thirdParty: false },
-    { name: 'preferences', domain: `.${domain}`, purpose: 'User preferences — language, theme, layout', category: 'functional', expires: '1 year', secure: true, httpOnly: false, sameSite: 'Lax', thirdParty: false },
-    { name: '_hjSessionUser', domain: `.${domain}`, purpose: 'Hotjar — identifies returning visitors', category: 'analytics', expires: '1 year', secure: true, httpOnly: false, sameSite: 'None', thirdParty: false },
-    { name: 'NID', domain: '.google.com', purpose: 'Google — stores preferences and ad personalization', category: 'marketing', expires: '6 months', secure: true, httpOnly: true, sameSite: 'None', thirdParty: true },
-  ]
 
-  const gdprScore = 58
-  const pipedaScore = 72
-  const ccpaScore = 52
-  const law25Score = 65
-  const overallScore = Math.round((gdprScore + pipedaScore + ccpaScore + law25Score) / 4)
+  const response = await fetch('/api/tools/cookie-scanner', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: domain }),
+  })
+
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(data?.error || 'Scan failed. Please try again.')
+  }
+
+  const cookies: CookieData[] = (data.cookies ?? []).map((c: any) => ({
+    name: c.name,
+    domain: c.domain,
+    purpose: c.purpose,
+    category: c.category,
+    expires: c.expires,
+    secure: c.secure,
+    httpOnly: c.httpOnly,
+    sameSite: c.sameSite,
+    thirdParty: c.thirdParty,
+  }))
 
   return {
     url: targetUrl,
     cookies,
-    overallGrade: getGrade(overallScore),
-    overallScore,
-    compliance: {
-      gdpr: {
-        score: gdprScore,
-        grade: getGrade(gdprScore),
-        issues: [
-          'Analytics cookies set before obtaining explicit consent',
-          'Marketing cookies from third-party domains require granular opt-in',
-          'No consent withdrawal mechanism detected',
-          'Cookie policy does not list all cookies by category',
-        ],
-      },
-      pipeda: {
-        score: pipedaScore,
-        grade: getGrade(pipedaScore),
-        issues: [
-          'Marketing cookies require explicit opt-in consent',
-          'Cookie notice should be more prominent on first visit',
-          'Third-party data sharing not disclosed in privacy policy',
-        ],
-      },
-      ccpa: {
-        score: ccpaScore,
-        grade: getGrade(ccpaScore),
-        issues: [
-          'Third-party marketing cookies constitute "sale" of personal information',
-          '"Do Not Sell or Share My Personal Information" link not found',
-          'Opt-out mechanism required for all advertising cookies',
-          'Privacy policy must disclose categories of data collected',
-        ],
-      },
-      law25: {
-        score: law25Score,
-        grade: getGrade(law25Score),
-        issues: [
-          'Consent must be obtained in French for Quebec visitors',
-          'Privacy policy must be available in French',
-          'Biometric and location data processing requires explicit consent',
-        ],
-      },
-    },
-    recommendations: [
-      { text: 'Add a cookie consent banner that blocks non-essential cookies until users opt in.', regulation: 'GDPR, CCPA, PIPEDA, Law 25' },
-      { text: 'Add a "Do Not Sell or Share My Personal Information" link in your footer.', regulation: 'CCPA' },
-      { text: 'Create a detailed cookie policy listing every cookie by name, purpose, and duration.', regulation: 'GDPR, PIPEDA' },
-      { text: 'Implement Google Consent Mode v2 so Analytics and Ads respect user choices automatically.', regulation: 'GDPR, CCPA' },
-      { text: 'Provide your privacy policy and cookie notice in French for Quebec visitors.', regulation: 'Law 25' },
-      { text: 'Review third-party scripts quarterly — plugins and widgets often add cookies without notice.', regulation: 'All' },
-    ],
-    timestamp: new Date().toISOString(),
+    overallGrade: data.overallGrade,
+    overallScore: data.overallScore,
+    compliance: data.compliance,
+    recommendations: data.recommendations ?? [],
+    timestamp: data.fetchedAt ?? new Date().toISOString(),
   }
 }
 
