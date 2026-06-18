@@ -515,6 +515,10 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
     }, 100)
   }
 
+  const signupCallbackUrl = brandImportUrl.trim()
+    ? `/builder?url=${encodeURIComponent(brandImportUrl.trim())}`
+    : '/builder'
+
 
   const updateConfig = (section: keyof BannerConfig, updates: any) => {
     setConfig(prev => {
@@ -3685,7 +3689,7 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-8 text-center">
-                      <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(`/builder?url=${encodeURIComponent(brandImportUrl)}`)}`}>
+                      <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(signupCallbackUrl)}`}>
                         <Button size="lg" className="w-full sm:w-auto">
                           Create Free Account
                           <ArrowRight className="ml-2 h-4 w-4" />

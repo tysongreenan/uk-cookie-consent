@@ -37,7 +37,7 @@ schema:
       name: "Do I need to code a cookie banner myself?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "No. Coding a compliant banner from scratch means writing consent logic, blocking scripts before consent, building a preferences modal, and storing a consent log. A consent management platform (CMP) or free banner generator does all of this for you and gives you a single snippet to paste into your site."
+        text: "No. Coding a compliant banner from scratch means writing consent logic, blocking scripts before consent, building a preferences modal, and storing a consent log. A consent management platform (CMP) lets you build the banner visually, then create an account to save it and get the install snippet."
     - "@type": "Question"
       name: "What is a Consent Management Platform (CMP)?"
       acceptedAnswer:
@@ -67,20 +67,20 @@ schema:
       name: "Is a free cookie banner GDPR compliant?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "It can be, as long as it does the four things the law requires: blocks non-essential cookies until consent, makes rejecting as easy as accepting, lets visitors withdraw consent later, and keeps a record of consent. Many free banner generators meet this standard. Avoid free banners that only display a notice but still load trackers automatically, as those are not compliant."
+        text: "It can be, as long as it does the four things the law requires: blocks non-essential cookies until consent, makes rejecting as easy as accepting, lets visitors withdraw consent later, and keeps a record of consent. Avoid free banners that only display a notice but still load trackers automatically, as those are not compliant."
     - "@type": "Question"
       name: "How long does it take to add a cookie banner?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "With a consent management platform or free banner generator, most websites can add a fully working cookie banner in about 5 minutes: build the banner, copy the snippet, and paste it into your site header. Auto-scanning and categorising your cookies adds a few more minutes but is handled by the tool."
+        text: "With a consent management platform, most websites can add a fully working cookie banner in about 5 minutes: build the banner, create a free account to get the snippet, and paste it into your site header. Auto-scanning and categorising your cookies adds a few more minutes but is handled by the tool."
 ---
 
 # How to Add a Cookie Banner to Your Website (2026): Free 5-Minute Guide
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> You do not need to code a cookie banner from scratch. The fastest, most reliable way is to use a consent management platform (CMP) or free banner generator: it scans your site for cookies, blocks trackers until the visitor consents, and logs every choice. You build the banner, copy one snippet, paste it into your site's header, and you're done in about 5 minutes.
+<strong>Direct Answer:</strong> You do not need to code a cookie banner from scratch. The fastest, most reliable path is to use a consent management platform (CMP): build the banner visually, choose your cookie categories, preview how it works, then create a free account to get the install snippet. Paste that snippet into your site's header and the banner can start blocking non-essential cookies until visitors consent.
 
-[Build your free cookie banner →](/free-cookie-banner)
+[Build your free cookie banner →](/builder)
 </div>
 
 ---
@@ -133,12 +133,12 @@ Instead of building this yourself, you configure it once and paste a single snip
 
 The simplest path is our own **free cookie banner generator**. It's GDPR, PECR, CCPA, and Law 25 ready, requires no credit card, and installs with a single copy-and-paste. Here's the whole process:
 
-1. **Build your banner.** Open the [free banner generator](/free-cookie-banner), pick your colours and text, and choose which cookie categories to offer (necessary, analytics, marketing).
-2. **Copy the snippet.** When you're happy, the tool gives you one short `<script>` snippet.
+1. **Build your banner.** Open the [visual banner builder](/builder), pick your colours and text, and choose which cookie categories to offer (necessary, analytics, marketing).
+2. **Create your free account to get the snippet.** When you're happy with the preview, sign up to save the banner and unlock the short `<script>` install code.
 3. **Paste it into your site's header.** Add the snippet to the `<head>` section of your site (platform-specific steps are below). The banner appears immediately and starts blocking non-essential cookies until visitors consent.
 4. **Scan and confirm.** Run a cookie scan so every tracker is categorised correctly, then publish.
 
-> **Ready to get compliant?** Build yours in under 2 minutes and install it with a single copy-and-paste — free, no credit card required. [Start Building Your Banner →](/free-cookie-banner)
+> **Ready to get compliant?** Build the banner first, then create a free account when you're ready to get the install code — no credit card required. [Start Building Your Banner →](/builder)
 
 ---
 
@@ -200,17 +200,17 @@ A good CMP integrates with Consent Mode v2 automatically: when a visitor accepts
 Adding a cookie banner is no longer a coding project — it's a paste-one-snippet task.
 
 **Key Takeaways:**
-- You don't need to build a banner from scratch; a CMP or free generator handles scanning, blocking, asking, and logging.
+- You don't need to build a banner from scratch; a CMP handles scanning, blocking, asking, and logging.
 - A compliant banner must block non-essential cookies until consent, make rejecting easy, allow withdrawal, and keep a consent log.
-- Installation is the same everywhere: build the banner, copy the snippet, paste it into your `<head>`.
+- Installation is the same everywhere: build the banner, create your free account to get the snippet, then paste it into your `<head>`.
 - If you use Google Analytics or Ads, enable Consent Mode v2.
 
 **Next Steps:**
 1. [Scan your site](/tools/cookie-scanner) to see which cookies you're actually using.
-2. [Build your free cookie banner](/free-cookie-banner) and copy the snippet.
-3. Paste it into your platform's header and publish.
+2. [Build your free cookie banner](/builder), then create your account to get the snippet.
+3. Paste the snippet into your platform's header and publish.
 
-**Ready to add your banner?** [Create your free cookie banner →](/free-cookie-banner) — GDPR ready, no credit card required.
+**Ready to add your banner?** [Create your free cookie banner →](/builder) — GDPR ready, no credit card required.
 
 ---
 
@@ -222,7 +222,7 @@ Adding a cookie banner is no longer a coding project — it's a paste-one-snippe
 
 ### Do I need to code a cookie banner myself?
 
-**Answer:** No. Coding a compliant banner from scratch means writing consent logic, blocking scripts before consent, building a preferences modal, and storing a consent log. A consent management platform (CMP) or free banner generator does all of this for you and gives you a single snippet to paste into your site.
+**Answer:** No. Coding a compliant banner from scratch means writing consent logic, blocking scripts before consent, building a preferences modal, and storing a consent log. A consent management platform (CMP) lets you build the banner visually, then create an account to save it and get the install snippet.
 
 ### What is a Consent Management Platform (CMP)?
 
@@ -246,12 +246,12 @@ Adding a cookie banner is no longer a coding project — it's a paste-one-snippe
 
 ### Is a free cookie banner GDPR compliant?
 
-**Answer:** It can be, as long as it does the four things the law requires: blocks non-essential cookies until consent, makes rejecting as easy as accepting, lets visitors withdraw consent later, and keeps a record of consent. Many free banner generators meet this standard. Avoid free banners that only display a notice but still load trackers automatically, as those are not compliant.
+**Answer:** It can be, as long as it does the four things the law requires: blocks non-essential cookies until consent, makes rejecting as easy as accepting, lets visitors withdraw consent later, and keeps a record of consent. Avoid free banners that only display a notice but still load trackers automatically, as those are not compliant.
 
 ### How long does it take to add a cookie banner?
 
-**Answer:** With a consent management platform or free banner generator, most websites can add a fully working cookie banner in about 5 minutes: build the banner, copy the snippet, and paste it into your site header. Auto-scanning and categorising your cookies adds a few more minutes but is handled by the tool.
+**Answer:** With a consent management platform, most websites can add a fully working cookie banner in about 5 minutes: build the banner, create a free account to get the snippet, and paste it into your site header. Auto-scanning and categorising your cookies adds a few more minutes but is handled by the tool.
 
 ---
 
-**Ready to add your banner?** [Create your free cookie banner →](/free-cookie-banner) — GDPR ready, no credit card required.
+**Ready to add your banner?** [Create your free cookie banner →](/builder) — GDPR ready, no credit card required.
