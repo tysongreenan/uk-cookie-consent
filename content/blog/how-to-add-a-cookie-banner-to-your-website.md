@@ -100,7 +100,7 @@ schema:
 
 ## Do You Need to Code a Cookie Banner?
 
-No — and you probably shouldn't try. A cookie banner looks like a small bar at the bottom of the screen, but a *compliant* one is doing a lot of work behind the scenes. To meet laws like the GDPR and the UK's PECR, your banner has to:
+Not usually. A cookie banner looks like a small bar at the bottom of the screen, but a *compliant* one is doing a lot of work behind the scenes. For most websites, a consent management platform is faster to launch and easier to maintain than custom code. To meet laws like the GDPR and the UK's PECR, your banner has to:
 
 - **Notify** visitors that your site uses cookies, in plain language.
 - **Block non-essential trackers** (analytics, marketing, advertising) *until* the visitor gives consent — not after.
