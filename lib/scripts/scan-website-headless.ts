@@ -209,40 +209,22 @@ export async function launchBrowser(): Promise<any> {
   const isServerless = !!process.env.VERCEL_ENV || !!process.env.AWS_LAMBDA_FUNCTION_NAME
 
   if (isServerless) {
+    // @sparticuz/chromium ships the chromium binary AND its shared libraries
+    // (libnss3.so, etc.) as brotli archives in its bin/ dir. But it only
+    // *extracts* the lib archives and points LD_LIBRARY_PATH at them when it
+    // detects an AWS Lambda runtime — via AWS_EXECUTION_ENV / AWS_LAMBDA_JS_RUNTIME.
+    // Vercel runs on Lambda under the hood but sets neither, so the libs are
+    // never extracted and chromium dies with "libnss3.so: cannot open shared
+    // object file". Advertise the Node-20 Lambda runtime BEFORE importing the
+    // package so its load-time setup and executablePath() extract the al2023
+    // libs and configure LD_LIBRARY_PATH=/tmp/al2023/lib for us.
+    process.env.AWS_LAMBDA_JS_RUNTIME ??= 'nodejs20.x'
+
     const playwrightCore: any = await import('playwright-core')
     const sparticuz: any = await import('@sparticuz/chromium')
     const chromium = sparticuz.default ?? sparticuz
 
-    // The full @sparticuz/chromium package ships the chromium binary AND
-    // its required shared libraries (libnss3.so, libnssutil3.so, libnspr4,
-    // freetype, etc.) bundled in node_modules/@sparticuz/chromium/bin.
-    // executablePath() extracts them to /tmp on first call and returns
-    // the binary path. We still set LD_LIBRARY_PATH defensively so the
-    // chromium child process can find the libs alongside the binary.
     const executablePath = await chromium.executablePath()
-    const tmpDir = executablePath.substring(0, executablePath.lastIndexOf('/'))
-    process.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH
-      ? `${tmpDir}:${process.env.LD_LIBRARY_PATH}`
-      : tmpDir
-
-    // One-shot diagnostic for the libnss3.so launch failure — tells us
-    // deterministically whether the lib archive shipped, whether it
-    // extracted, and where, so we pick the fix in a single deploy.
-    try {
-      const fs = await import('fs')
-      const path = await import('path')
-      const pkgDir = path.dirname(require.resolve('@sparticuz/chromium/package.json'))
-      const binDir = path.join(pkgDir, 'bin')
-      const binFiles = fs.existsSync(binDir) ? fs.readdirSync(binDir) : ['<no bin/ dir>']
-      const tmpFiles = fs.existsSync('/tmp') ? fs.readdirSync('/tmp') : []
-      const libNss = tmpFiles.filter((f: string) => /libnss|\.so/.test(f))
-      console.log('[scanner-diag] bin/:', JSON.stringify(binFiles))
-      console.log('[scanner-diag] executablePath:', executablePath)
-      console.log('[scanner-diag] /tmp libs:', JSON.stringify(libNss))
-      console.log('[scanner-diag] LD_LIBRARY_PATH:', process.env.LD_LIBRARY_PATH)
-    } catch (diagErr) {
-      console.log('[scanner-diag] failed:', diagErr instanceof Error ? diagErr.message : diagErr)
-    }
 
     return playwrightCore.chromium.launch({
       args: chromium.args,
