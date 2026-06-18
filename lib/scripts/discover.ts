@@ -24,6 +24,12 @@ interface CmpSignature {
 
 const cmpSignatures: CmpSignature[] = [
   {
+    // Our own product. Loaded via <script src="https://cookie-banner.ca/api/v1/banner.js?id=...">
+    // so detect it in script context to avoid matching outbound footer links.
+    name: 'Cookie Banner',
+    scriptContext: [/cookie-banner\.ca/i, /cookie-consent.*?banner\.js/i],
+  },
+  {
     name: 'OneTrust',
     scriptContext: [/cdn\.cookielaw\.org/i, /otSDKStub\.js/i],
     anywhere: [/optanon-category-/i, /\bonetrust[-_]/i],

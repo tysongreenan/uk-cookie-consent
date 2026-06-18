@@ -19,6 +19,15 @@ const nextConfig = {
   // external so they're require()'d at runtime from node_modules.
   experimental: {
     serverComponentsExternalPackages: ['playwright-core', 'playwright', '@sparticuz/chromium'],
+    // Marking @sparticuz/chromium external stops webpack bundling it, but it
+    // also stops Vercel's file tracer from copying the package's bin/ assets
+    // (the brotli-compressed chromium binary AND its shared libraries —
+    // libnss3.so, etc.) into the serverless function. Without the libs the
+    // browser launches and immediately dies with "error while loading shared
+    // libraries: libnss3.so". Force the whole package into the route bundle.
+    outputFileTracingIncludes: {
+      '/api/tools/cookie-scanner': ['./node_modules/@sparticuz/chromium/**'],
+    },
   },
   webpack: (config, { isServer }) => {
     if (isServer) {

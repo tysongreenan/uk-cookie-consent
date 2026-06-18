@@ -225,6 +225,25 @@ export async function launchBrowser(): Promise<any> {
       ? `${tmpDir}:${process.env.LD_LIBRARY_PATH}`
       : tmpDir
 
+    // One-shot diagnostic for the libnss3.so launch failure — tells us
+    // deterministically whether the lib archive shipped, whether it
+    // extracted, and where, so we pick the fix in a single deploy.
+    try {
+      const fs = await import('fs')
+      const path = await import('path')
+      const pkgDir = path.dirname(require.resolve('@sparticuz/chromium/package.json'))
+      const binDir = path.join(pkgDir, 'bin')
+      const binFiles = fs.existsSync(binDir) ? fs.readdirSync(binDir) : ['<no bin/ dir>']
+      const tmpFiles = fs.existsSync('/tmp') ? fs.readdirSync('/tmp') : []
+      const libNss = tmpFiles.filter((f: string) => /libnss|\.so/.test(f))
+      console.log('[scanner-diag] bin/:', JSON.stringify(binFiles))
+      console.log('[scanner-diag] executablePath:', executablePath)
+      console.log('[scanner-diag] /tmp libs:', JSON.stringify(libNss))
+      console.log('[scanner-diag] LD_LIBRARY_PATH:', process.env.LD_LIBRARY_PATH)
+    } catch (diagErr) {
+      console.log('[scanner-diag] failed:', diagErr instanceof Error ? diagErr.message : diagErr)
+    }
+
     return playwrightCore.chromium.launch({
       args: chromium.args,
       executablePath,
