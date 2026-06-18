@@ -52,7 +52,7 @@ export function middleware(request: NextRequest) {
 
   // ── Dashboard auth gate ──
   // Redirect unauthenticated users to sign-in
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/builder')) {
+  if (pathname.startsWith('/dashboard')) {
     const sessionToken =
       request.cookies.get('next-auth.session-token') ||
       request.cookies.get('__Secure-next-auth.session-token')
@@ -97,7 +97,6 @@ export const config = {
   matcher: [
     '/',
     '/dashboard/:path*',
-    '/builder/:path*',
     '/locations/:path*',
     '/api/banners/:path*',
     '/api/projects/:path*',
