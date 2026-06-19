@@ -24,7 +24,9 @@ function SignInContent() {
   
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
+  const signupUrl = `/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`
 
   useEffect(() => {
     // Check if user is already signed in
@@ -137,7 +139,7 @@ function SignInContent() {
 
         {/* Footer */}
         <div className="relative z-10 flex justify-between items-center text-zinc-400 text-sm">
-          <p className="text-zinc-400">© 2024 Cookie Banner. All rights reserved.</p>
+          <p className="text-zinc-400">© 2026 Cookie Banner. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="text-zinc-400 hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="text-zinc-400 hover:text-white transition-colors">Terms</Link>
@@ -286,7 +288,7 @@ function SignInContent() {
 
             <p className="text-center text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href={signupUrl} className="font-medium text-blue-600 hover:text-blue-500">
                 Sign up for free
               </Link>
             </p>

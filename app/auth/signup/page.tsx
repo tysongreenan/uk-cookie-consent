@@ -231,7 +231,7 @@ function SignUpContent() {
 
         {/* Footer */}
         <div className="relative z-10 flex justify-between items-center text-zinc-400 text-sm">
-          <p className="text-zinc-400">© 2024 Cookie Banner. All rights reserved.</p>
+          <p className="text-zinc-400">© 2026 Cookie Banner. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="text-zinc-400 hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="text-zinc-400 hover:text-white transition-colors">Terms</Link>
@@ -240,20 +240,20 @@ function SignUpContent() {
       </div>
 
       {/* Right Side - Sign Up Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto">
-        <div className="w-full max-w-md space-y-8 py-8">
+      <div className="flex-1 flex items-center justify-center p-5 sm:p-8 bg-white overflow-y-auto">
+        <div className="w-full max-w-md space-y-5 py-4 sm:space-y-8 sm:py-8">
           <div className="text-center lg:text-left">
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create an account</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Create an account</h1>
             <p className="mt-2 text-gray-600">
               Get started with your free account
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Google Sign Up */}
             <Button
               variant="outline"
-              className="w-full h-14 text-base font-semibold border-gray-200 hover:bg-gray-50 hover:text-gray-900 relative shadow-sm"
+              className="w-full h-12 sm:h-14 text-base font-semibold border-gray-200 hover:bg-gray-50 hover:text-gray-900 relative shadow-sm"
               onClick={handleGoogleSignUp}
               disabled={isLoading || isGoogleLoading}
             >
@@ -299,7 +299,7 @@ function SignUpContent() {
               </Alert>
             )}
 
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <div className="relative">

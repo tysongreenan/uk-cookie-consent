@@ -153,9 +153,9 @@ export default async function BlogPostPage({
         <div className="space-y-4 border-b border-border relative z-10">
           <div className="max-w-7xl mx-auto flex flex-col gap-6 p-6">
             <div className="flex flex-wrap items-center gap-3 gap-y-5 text-sm text-muted-foreground">
-              <Button variant="outline" asChild className="h-6 w-6">
+              <Button variant="outline" size="icon" asChild className="h-6 w-6 shrink-0 p-0">
                 <Link href="/blog">
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="h-4 w-4 text-foreground" aria-hidden="true" />
                   <span className="sr-only">Back to all articles</span>
                 </Link>
               </Button>
