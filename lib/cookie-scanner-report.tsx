@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import { Document, Page, Path, Svg, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
 
 export interface CookieScannerReportCookie {
   name: string
@@ -173,6 +173,10 @@ export function buildScannerReportEmailHtml(result: CookieScannerReportResult): 
 const pdfStyles = StyleSheet.create({
   page: { padding: 36, fontSize: 9, fontFamily: 'Helvetica', color: '#111827' },
   header: { borderBottomWidth: 2, borderBottomColor: '#0E768C', paddingBottom: 14, marginBottom: 18 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  brandMark: { width: 30, height: 22, marginRight: 8 },
+  brandName: { fontSize: 14, fontFamily: 'Helvetica-Bold', color: '#111827' },
+  brandDomain: { fontSize: 8, color: '#6b7280', marginTop: 1 },
   title: { fontSize: 22, fontFamily: 'Helvetica-Bold', color: '#0E768C', marginBottom: 5 },
   subtitle: { fontSize: 10, color: '#4b5563' },
   summaryGrid: { flexDirection: 'row', gap: 10, marginBottom: 18 },
@@ -189,11 +193,29 @@ const pdfStyles = StyleSheet.create({
   footerText: { fontSize: 7, color: '#9ca3af' },
 })
 
+function PdfLogo() {
+  return (
+    <View style={pdfStyles.brandRow}>
+      <Svg viewBox="0 0 126 76" style={pdfStyles.brandMark}>
+        <Path d="M58.5377 76L0 48.3855V29.2971L58.5377 0V14.1395L7.76261 42.4045L4.4186 38.8837L7.76261 35.2781L58.5377 60.093V76Z" fill="#0E768C" />
+        <Path d="M88.6582 29.1628L101.628 14.1395H114H126.658V29.1628L88.6582 29.1628Z" fill="#0E768C" />
+        <Path d="M85.0493 0H62.0726V76H85.0493V0Z" fill="#0E768C" />
+        <Path d="M86.6046 59.2093L99.5743 44.1861H111.946H124.605V59.2093L86.6046 59.2093Z" fill="#0E768C" />
+      </Svg>
+      <View>
+        <Text style={pdfStyles.brandName}>Cookie Banner</Text>
+        <Text style={pdfStyles.brandDomain}>cookie-banner.ca</Text>
+      </View>
+    </View>
+  )
+}
+
 function ScannerPDFDocument({ result }: { result: CookieScannerReportResult }) {
   return (
     <Document>
       <Page size="A4" style={pdfStyles.page}>
         <View style={pdfStyles.header}>
+          <PdfLogo />
           <Text style={pdfStyles.title}>Cookie Scan Report</Text>
           <Text style={pdfStyles.subtitle}>{result.url}</Text>
           <Text style={pdfStyles.subtitle}>Generated {new Date(result.timestamp).toLocaleString('en-CA')}</Text>

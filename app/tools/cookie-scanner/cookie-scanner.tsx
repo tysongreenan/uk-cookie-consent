@@ -793,10 +793,10 @@ export function CookieScanner() {
           {/* CTA Block */}
           <motion.div variants={fadeUp} custom={6} className="py-8">
             <div className="bg-foreground text-background rounded-2xl p-8 md:p-12 text-center">
-              <h3 className="text-2xl md:text-3xl font-heading font-bold max-w-2xl mx-auto">
+              <h3 className="text-2xl md:text-3xl font-heading font-bold max-w-2xl mx-auto text-white">
                 Fix your compliance issues in 5 minutes
               </h3>
-              <p className="text-base text-background/70 mt-2 max-w-2xl mx-auto">
+              <p className="text-base text-white/70 mt-2 max-w-2xl mx-auto">
                 Our cookie banner generator creates a fully compliant consent banner based on your scan results. Free plan available — no credit card needed.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
