@@ -12,6 +12,8 @@ import {
   Activity,
   AlertTriangle,
   Download,
+  FileText,
+  Mail,
   ChevronDown,
   ChevronUp,
   Lock,
@@ -266,6 +268,10 @@ export function CookieScanner() {
   const [activeFilter, setActiveFilter] = useState<string>('all')
   const [expandedCookie, setExpandedCookie] = useState<number | null>(null)
   const [expandedRegulation, setExpandedRegulation] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [emailMessage, setEmailMessage] = useState('')
+  const [isEmailing, setIsEmailing] = useState(false)
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
 
   const handleScan = async (inputUrl?: string) => {
@@ -290,6 +296,7 @@ export function CookieScanner() {
     setActiveFilter('all')
     setExpandedCookie(null)
     setExpandedRegulation(null)
+    setEmailMessage('')
 
     // Step progression
     const stepTimers = [2000, 3000, 3000]
@@ -317,6 +324,71 @@ export function CookieScanner() {
     () => result?.cookies.filter(c => activeFilter === 'all' || c.category === activeFilter) ?? [],
     [result, activeFilter]
   )
+
+  const downloadPdfReport = async () => {
+    if (!result) return
+    setIsDownloadingPdf(true)
+    setEmailMessage('')
+
+    try {
+      const response = await fetch('/api/tools/cookie-scanner/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/pdf' },
+        body: JSON.stringify({ result }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data?.error || 'Could not generate the PDF report.')
+      }
+
+      const blob = await response.blob()
+      if (blob.type && blob.type !== 'application/pdf') {
+        throw new Error('The report service returned an invalid file type.')
+      }
+
+      const disposition = response.headers.get('content-disposition') || ''
+      const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i)
+      const filename = filenameMatch?.[1] || `cookie-scan-${new Date().toISOString().slice(0, 10)}.pdf`
+      const downloadUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = downloadUrl
+      a.download = filename.endsWith('.pdf') ? filename : `${filename}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(downloadUrl)
+    } catch (err) {
+      setEmailMessage(err instanceof Error ? err.message : 'Could not generate the PDF report.')
+    } finally {
+      setIsDownloadingPdf(false)
+    }
+  }
+
+  const sendReportEmail = async () => {
+    if (!result) return
+    setIsEmailing(true)
+    setEmailMessage('')
+
+    try {
+      const response = await fetch('/api/tools/cookie-scanner/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, result }),
+      })
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Could not send the report email.')
+      }
+
+      setEmailMessage('Report sent. Check your inbox.')
+    } catch (err) {
+      setEmailMessage(err instanceof Error ? err.message : 'Could not send the report email.')
+    } finally {
+      setIsEmailing(false)
+    }
+  }
 
   return (
     <div className="w-full">
@@ -456,7 +528,7 @@ export function CookieScanner() {
           ref={resultsRef}
           initial="hidden"
           animate="visible"
-          className="mt-2"
+          className="mt-2 text-left"
         >
           {/* Overall Grade */}
           <motion.div variants={fadeUp} custom={0} className="flex flex-col sm:flex-row items-start sm:items-center gap-6 py-8 border-b border-border">
@@ -692,7 +764,7 @@ export function CookieScanner() {
 
           {/* Recommendations */}
           <motion.div variants={fadeUp} custom={4} className="py-8 border-b border-border">
-            <h3 className="text-xl font-heading font-semibold mb-6">How to Fix These Issues</h3>
+            <h3 className="text-xl font-heading font-semibold text-center mb-6">How to Fix These Issues</h3>
             <div className="space-y-0">
               {result.recommendations.map((rec, i) => (
                 <div key={i} className="flex gap-4 py-4 border-b border-border/50 last:border-0">
@@ -701,7 +773,7 @@ export function CookieScanner() {
                   </div>
                   <div>
                     <p className="text-sm text-foreground">{rec.text}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Applies to: {rec.regulation}</p>
+                    <p className="text-xs text-muted-foreground mt-1 text-center sm:text-left">Applies to: {rec.regulation}</p>
                     {i === 0 && (
                       <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
                         <p className="text-sm text-foreground">
@@ -719,40 +791,66 @@ export function CookieScanner() {
           </motion.div>
 
           {/* CTA Block */}
-          <motion.div variants={fadeUp} custom={5} className="py-8">
-            <div className="bg-foreground text-background rounded-2xl p-8 md:p-12">
-              <h3 className="text-2xl md:text-3xl font-heading font-bold">
+          <motion.div variants={fadeUp} custom={6} className="py-8">
+            <div className="bg-foreground text-background rounded-2xl p-8 md:p-12 text-center">
+              <h3 className="text-2xl md:text-3xl font-heading font-bold max-w-2xl mx-auto">
                 Fix your compliance issues in 5 minutes
               </h3>
-              <p className="text-base text-background/70 mt-2 max-w-xl">
+              <p className="text-base text-background/70 mt-2 max-w-2xl mx-auto">
                 Our cookie banner generator creates a fully compliant consent banner based on your scan results. Free plan available — no credit card needed.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <Link href="/free-cookie-banner-generator">
-                  <Button className="bg-background text-foreground hover:bg-background/90 px-6 py-3 h-auto rounded-lg font-semibold">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+                <Link href="/free-cookie-banner-generator" className="w-full sm:w-auto">
+                  <Button className="w-full bg-background text-foreground hover:bg-background/90 px-6 py-3 h-auto rounded-lg font-semibold">
                     Build Your Cookie Banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Button
-                  variant="outline"
-                  className="border-background/30 text-background hover:bg-background/10 px-6 py-3 h-auto rounded-lg font-medium"
-                  onClick={() => {
-                    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
-                    const downloadUrl = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = downloadUrl
-                    a.download = `cookie-scan-${new Date().toISOString().slice(0, 10)}.json`
-                    document.body.appendChild(a)
-                    a.click()
-                    document.body.removeChild(a)
-                    URL.revokeObjectURL(downloadUrl)
-                  }}
+                  className="w-full sm:w-auto border border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background px-6 py-3 h-auto rounded-lg font-semibold shadow-none"
+                  onClick={downloadPdfReport}
+                  disabled={isDownloadingPdf}
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Report
+                  {isDownloadingPdf ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                  )}
+                  Download PDF
                 </Button>
               </div>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 max-w-xl mx-auto text-left">
+                <label className="sr-only" htmlFor="cookie-scan-report-email">Email address</label>
+                <div className="flex items-center gap-2 rounded-lg border border-background/20 bg-background/10 px-3">
+                  <Mail className="h-4 w-4 text-background/70 shrink-0" />
+                  <input
+                    id="cookie-scan-report-email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value)
+                      setEmailMessage('')
+                    }}
+                    placeholder="you@example.com"
+                    className="h-12 min-w-0 flex-1 bg-transparent text-sm text-background placeholder:text-background/50 outline-none"
+                  />
+                </div>
+                <Button
+                  className="bg-background text-foreground hover:bg-background/90 px-5 py-3 h-auto rounded-lg font-semibold"
+                  onClick={sendReportEmail}
+                  disabled={isEmailing || !email.trim()}
+                >
+                  {isEmailing ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="mr-2 h-4 w-4" />
+                  )}
+                  Send Results
+                </Button>
+              </div>
+              {emailMessage && (
+                <p className="mt-3 text-sm text-background/75">{emailMessage}</p>
+              )}
             </div>
           </motion.div>
 
@@ -762,6 +860,7 @@ export function CookieScanner() {
               onClick={() => {
                 setResult(null)
                 setUrl('')
+                setEmailMessage('')
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
               className="text-sm text-primary hover:underline"
