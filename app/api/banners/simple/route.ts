@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
-import { getAccessibleUserIds } from '@/lib/banner-access'
+import { getBannerAccessScope } from '@/lib/banner-access'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -117,15 +117,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const memberIds = await getAccessibleUserIds(
+    const { userIds: memberIds, isTeamWorkspace } = await getBannerAccessScope(
       supabase,
       session.user.id,
       session.user.currentTeamId
     )
 
-    // Team workspace: memberIds includes all teammates when still a member
-    if (session.user.currentTeamId && memberIds.length > 1) {
-      // Fetch banners for all team members
+    if (isTeamWorkspace) {
       const { data, error } = await supabase
         .from('SimpleBanners')
         .select('*')

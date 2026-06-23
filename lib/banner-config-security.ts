@@ -58,7 +58,7 @@ export function sanitizeCssColor(
 }
 
 /**
- * Allow only absolute http(s) URLs for user-controlled links and images.
+ * Allow only absolute http(s) URLs for user-controlled links.
  */
 export function sanitizeHttpUrl(value: string | undefined | null): string {
   if (!value || typeof value !== 'string') return ''
@@ -73,6 +73,34 @@ export function sanitizeHttpUrl(value: string | undefined | null): string {
   }
 
   return ''
+}
+
+const SAFE_DATA_IMAGE_RE =
+  /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);/i
+
+/**
+ * Allow https URLs and safe inline image data URIs (no scripts).
+ */
+export function sanitizeImageUrl(value: string | undefined | null): string {
+  if (!value || typeof value !== 'string') return ''
+
+  const trimmed = value.trim()
+  const httpUrl = sanitizeHttpUrl(trimmed)
+  if (httpUrl) return httpUrl
+
+  if (!SAFE_DATA_IMAGE_RE.test(trimmed)) return ''
+
+  const lower = trimmed.toLowerCase()
+  if (
+    lower.includes('<script') ||
+    lower.includes('javascript:') ||
+    lower.includes('onerror=') ||
+    lower.includes('onload=')
+  ) {
+    return ''
+  }
+
+  return trimmed
 }
 
 function hardenColorObject(
@@ -107,7 +135,7 @@ export function hardenBannerConfig(config: BannerConfig): void {
 
   if (config.branding?.logo) {
     const logo = config.branding.logo
-    const safeUrl = sanitizeHttpUrl(logo.url)
+    const safeUrl = sanitizeImageUrl(logo.url)
     if (!safeUrl) {
       logo.enabled = false
       logo.url = ''
@@ -142,11 +170,11 @@ export function hardenBannerConfig(config: BannerConfig): void {
   if (footerLink?.icons) {
     if (footerLink.icons.accepted) {
       footerLink.icons.accepted =
-        sanitizeHttpUrl(footerLink.icons.accepted) || ''
+        sanitizeImageUrl(footerLink.icons.accepted) || ''
     }
     if (footerLink.icons.rejected) {
       footerLink.icons.rejected =
-        sanitizeHttpUrl(footerLink.icons.rejected) || ''
+        sanitizeImageUrl(footerLink.icons.rejected) || ''
     }
   }
 }

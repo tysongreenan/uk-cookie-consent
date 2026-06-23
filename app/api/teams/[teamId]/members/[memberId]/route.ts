@@ -159,7 +159,20 @@ export async function DELETE(
         .select('team_id')
         .eq('user_id', targetMember.user_id)
 
-      const fallbackTeamId = otherMemberships?.[0]?.team_id ?? null
+      const otherTeamIds = otherMemberships?.map((m) => m.team_id).filter(Boolean) ?? []
+      let fallbackTeamId: string | null = null
+
+      if (otherTeamIds.length > 0) {
+        const { data: teams } = await supabase
+          .from('Team')
+          .select('id, owner_id')
+          .in('id', otherTeamIds)
+
+        const personalWorkspace = teams?.find(
+          (t) => t.owner_id === targetMember.user_id
+        )
+        fallbackTeamId = personalWorkspace?.id ?? otherTeamIds[0]
+      }
 
       const { error: switchError } = await supabase
         .from('User')
