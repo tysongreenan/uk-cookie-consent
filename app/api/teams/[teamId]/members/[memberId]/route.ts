@@ -146,6 +146,31 @@ export async function DELETE(
       return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
     }
 
+    // If this workspace was their active context, move them back to a workspace they still belong to
+    const { data: removedUser } = await supabase
+      .from('User')
+      .select('currentTeamId')
+      .eq('id', targetMember.user_id)
+      .single()
+
+    if (removedUser?.currentTeamId === teamId) {
+      const { data: otherMemberships } = await supabase
+        .from('TeamMember')
+        .select('team_id')
+        .eq('user_id', targetMember.user_id)
+
+      const fallbackTeamId = otherMemberships?.[0]?.team_id ?? null
+
+      const { error: switchError } = await supabase
+        .from('User')
+        .update({ currentTeamId: fallbackTeamId })
+        .eq('id', targetMember.user_id)
+
+      if (switchError) {
+        console.error('Error resetting removed member currentTeamId:', switchError)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Member removed successfully'

@@ -8,6 +8,7 @@ const scriptDiscoveryRateLimit = new RateLimit({
   name: 'script-discover',
   windowMs: 10 * 60 * 1000, // 10 minutes
   maxRequests: 5, // 5 requests per window
+  failClosed: true,
 })
 
 export async function POST(request: NextRequest) {

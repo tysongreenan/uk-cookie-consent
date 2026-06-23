@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
+import { getAccessibleUserIds } from '@/lib/banner-access'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -116,23 +117,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const currentTeamId = session.user.currentTeamId
+    const memberIds = await getAccessibleUserIds(
+      supabase,
+      session.user.id,
+      session.user.currentTeamId
+    )
 
-    // If user is in a team workspace, fetch banners for all team members
-    if (currentTeamId) {
-      const { data: teamMembers, error: teamError } = await supabase
-        .from('TeamMember')
-        .select('user_id')
-        .eq('team_id', currentTeamId)
-
-      if (teamError) {
-        console.error('❌ Simple Get: Error fetching team members:', teamError)
-        return NextResponse.json({ error: 'Failed to fetch team banners' }, { status: 500 })
-      }
-
-      const memberIds = teamMembers?.map(m => m.user_id) || []
-      if (memberIds.length === 0) memberIds.push(session.user.id)
-
+    // Team workspace: memberIds includes all teammates when still a member
+    if (session.user.currentTeamId && memberIds.length > 1) {
       // Fetch banners for all team members
       const { data, error } = await supabase
         .from('SimpleBanners')

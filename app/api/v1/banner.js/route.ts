@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
+import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
@@ -201,6 +202,8 @@ export async function GET(request: NextRequest) {
     if (config.config && typeof config.config === 'object') {
       config = { ...config.config, ...config, config: undefined }
     }
+
+    hardenBannerConfig(config)
 
     // Look up banner owner's plan tier and analytics setting
     let ownerPlanTier = 'free'

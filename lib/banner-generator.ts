@@ -1,4 +1,5 @@
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
+import { hardenBannerConfig } from '@/lib/banner-config-security'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {
@@ -255,6 +256,8 @@ const generateScriptLoaders = (
 }
 
 export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
+  hardenBannerConfig(config)
+
   // Defensive defaults for optional nested objects (older banners may lack these)
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
@@ -516,7 +519,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     <!-- Header -->
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid ${borderColor};">
       ${config.branding.logo.enabled && config.branding.logo.url ? `
-      <img src="${config.branding.logo.url}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
+      <img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
       ` : `
       <span id="prefs-header-title" style="font-weight: 600; color: ${config.colors.text};">Cookie Settings</span>
       `}
@@ -723,6 +726,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
 }
 
 export const generateBannerCSS = (config: BannerConfig) => {
+  hardenBannerConfig(config)
+
   if (!config.branding) config.branding = {} as any
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
@@ -925,6 +930,8 @@ ${config.advanced.customCSS}`
 }
 
 export const generateBannerJS = (config: BannerConfigWithGeoOverrides) => {
+  hardenBannerConfig(config)
+
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
   if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true, required: false }

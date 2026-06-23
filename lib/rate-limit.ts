@@ -34,6 +34,8 @@ export interface RateLimitOptions {
   windowMs: number
   maxRequests: number
   keyGenerator?: (req: Request) => string
+  /** When true, deny requests if the rate-limit backend is unavailable. */
+  failClosed?: boolean
 }
 
 export class RateLimit {
@@ -41,12 +43,14 @@ export class RateLimit {
   private windowMs: number
   private maxRequests: number
   private keyGenerator: (req: Request) => string
+  private failClosed: boolean
 
   constructor(options: RateLimitOptions) {
     this.name = options.name
     this.windowMs = options.windowMs
     this.maxRequests = options.maxRequests
     this.keyGenerator = options.keyGenerator || this.defaultKeyGenerator
+    this.failClosed = options.failClosed ?? false
   }
 
   private defaultKeyGenerator(req: Request): string {
@@ -57,7 +61,14 @@ export class RateLimit {
   }
 
   public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
-    const fallback = { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
+    const deny = {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + this.windowMs,
+    }
+    const fallback = this.failClosed
+      ? deny
+      : { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
 
     const supabase = getClient()
     if (!supabase) return fallback
@@ -96,6 +107,7 @@ export const authRateLimit = new RateLimit({
   name: 'auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 5,
+  failClosed: true,
 })
 
 export const strictAuthRateLimit = new RateLimit({

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
+import { requireTeamPermission } from '@/lib/team-permissions'
 import { PlanTier } from '@/types'
 
 const supabase = createClient(
@@ -40,6 +41,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const teamIdForPermission = session.user.currentTeamId
+    if (!teamIdForPermission) {
+      return NextResponse.json(
+        { error: 'No workspace found. Please refresh your session or contact support.' },
+        { status: 400 }
+      )
+    }
+
+    const permissionResult = await requireTeamPermission(
+      session.user.id,
+      teamIdForPermission,
+      'admin'
+    )
+    if (!permissionResult.success) {
+      return NextResponse.json(
+        { error: 'Only workspace owners and admins can send invitations.' },
+        { status: 403 }
+      )
+    }
+
+    if (role === 'admin' && permissionResult.userRole !== 'owner') {
+      return NextResponse.json(
+        { error: 'Only the workspace owner can invite admins.' },
+        { status: 403 }
+      )
+    }
+
     // Check if user has Pro plan
     const userPlan = (session.user.planTier || 'free') as PlanTier
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
@@ -58,17 +86,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7) // 7 days from now
 
-    // Get or create user's team/workspace
-    let teamId = session.user.currentTeamId
-    
-    if (!teamId) {
-      // User should already have a workspace from registration
-      // If not, they need to create one first or contact support
-      return NextResponse.json(
-        { error: 'No workspace found. Please refresh your session or contact support.' },
-        { status: 400 }
-      )
-    }
+    const teamId = teamIdForPermission
 
     // Check workspace member limit (max 5 people)
     const { count: memberTotal, error: countError } = await supabase
