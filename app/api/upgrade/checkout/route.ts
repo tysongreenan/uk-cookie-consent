@@ -91,6 +91,12 @@ export async function POST(request: NextRequest) {
         discounts.push({ coupon: LOYALTY_COUPON })
       }
 
+      // Stripe rejects allow_promotion_codes combined with discounts —
+      // when the loyalty coupon applies, it replaces the promo-code field.
+      if (discounts.length > 0) {
+        delete commonParams.allow_promotion_codes
+      }
+
       checkoutSession = await stripe.checkout.sessions.create({
         ...commonParams,
         payment_method_types: ['card'],
