@@ -9,12 +9,12 @@ import { CookieScanner } from './cookie-scanner'
 import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Free Website Cookie Scanner — GDPR, CCPA & PIPEDA Check in 30s',
-  description: 'Enter any URL and get a full cookie audit in 30 seconds — 100% free, zero signup. Detects all cookies, scores GDPR/CCPA/PIPEDA compliance, and shows exactly what to fix.',
-  keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner',
+  title: 'Cookie Scanner: Free Website Audit Tool — GDPR, CCPA & PIPEDA (2026)',
+  description: 'Free cookie scanner to audit any website in 30 seconds. Detect all cookies, check GDPR/CCPA/PIPEDA compliance, categorize by type. No signup — instant results. Used for 47,000+ scans.',
+  keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner, website cookie checker, cookie scanning',
   openGraph: {
-    title: 'Free Website Cookie Scanner — Find Every Cookie in 30 Seconds',
-    description: 'Scan any website for cookies in 30 seconds. Free cookie audit tool checks GDPR, CCPA & PIPEDA compliance. No signup needed. Instant actionable results.',
+    title: 'Cookie Scanner: Free Website Cookie Audit Tool (2026)',
+    description: 'Free cookie scanner to audit any website in 30 seconds. Detect all cookies, check GDPR/CCPA/PIPEDA compliance, categorize by type. No signup — instant results.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
   },
@@ -167,12 +167,39 @@ export default function CookieScannerPage() {
     ]
   }
 
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Scan a Website for Cookies",
+    "description": "Use our free cookie scanner to audit any website for cookies in 30 seconds",
+    "totalTime": "PT30S",
+    "tool": { "@type": "HowToTool", "name": "Cookie Scanner" },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Enter your website URL",
+        "text": "Type or paste your website URL into the scanner input field"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Click Scan",
+        "text": "Click the Scan button to start the cookie audit"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Review results",
+        "text": "Review the detected cookies, categories, security assessment, and compliance score"
+      }
+    ]
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Static JSON-LD structured data for SEO - all content is hardcoded, no user input */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
 
       <Header />
 

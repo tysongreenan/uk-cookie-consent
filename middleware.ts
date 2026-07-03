@@ -51,7 +51,8 @@ export function middleware(request: NextRequest) {
   }
 
   // ── Dashboard auth gate ──
-  // Redirect unauthenticated users to sign-in
+  // Redirect unauthenticated users to sign-in. The public /builder route must
+  // stay open so acquisition CTAs can land visitors in the banner builder.
   if (pathname.startsWith('/dashboard')) {
     const sessionToken =
       request.cookies.get('next-auth.session-token') ||

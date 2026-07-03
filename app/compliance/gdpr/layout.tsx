@@ -1,15 +1,15 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'GDPR Cookie Consent: Complete 2026 Guide',
+  title: 'GDPR Cookie Banner — Free Compliance Tool (2026)',
   description:
-    'Everything you need for GDPR cookie compliance: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights. Free checklist & banner setup.',
+    'Build a GDPR-compliant cookie banner in minutes. Pre-consent script blocking, granular category controls, consent logging, and no dark patterns — free forever.',
   keywords:
-    'gdpr cookie consent, gdpr cookie compliance, gdpr cookie consent requirements, gdpr cookies, gdpr cookie banner, gdpr cookie requirements, cookie consent gdpr, gdpr cookie policy, gdpr compliant cookie banner, eu cookie compliance, gdpr and cookies',
+    'gdpr cookie banner, gdpr compliant cookie banner, gdpr cookie consent tool, gdpr cookie consent solution, free gdpr cookie banner, gdpr cookie banner generator, gdpr cookie compliance tool, eu cookie banner, gdpr cookie widget',
   openGraph: {
-    title: 'GDPR Cookie Consent: Complete 2026 Guide',
+    title: 'GDPR Cookie Banner — Free Compliance Tool (2026)',
     description:
-      'Everything you need for GDPR cookie compliance: explicit opt-in, pre-consent blocking, granular controls, and withdrawal rights.',
+      'Build a GDPR-compliant cookie banner in minutes. Pre-consent blocking, granular controls, consent logging, and no dark patterns.',
     type: 'article',
   },
   alternates: {

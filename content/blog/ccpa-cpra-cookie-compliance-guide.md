@@ -6,6 +6,7 @@ author: "cookie-banner-team"
 tags: ["CCPA", "CPRA", "California", "Privacy Law", "Cookie Consent", "Cookie Banner", "Do Not Sell"]
 published: true
 canonical: "/blog/ccpa-cpra-cookie-compliance-guide"
+updatedDate: "2026-05-26"
 keywords:
   - "ccpa cookie compliance"
   - "ccpa cookies"
@@ -18,6 +19,12 @@ keywords:
   - "california cookie law"
   - "ccpa cookie banner requirements"
   - "ccpa vs cpra"
+  - "cpra cookie compliance"
+  - "cpra cookie banner"
+  - "cpra cookie consent solution"
+  - "cpra fines"
+  - "cpra consent"
+  - "california privacy rights act cookies"
 schema:
   "@context": "https://schema.org"
   "@type": "FAQPage"
@@ -283,7 +290,7 @@ If your website serves both California and European users, you need to understan
 
 **Practical implications:** If you serve both GDPR and CCPA audiences, the simplest approach is to default to GDPR's stricter opt-in standard for EU users and implement the CCPA's opt-out mechanism for California users. A geolocation-aware consent management platform can serve the appropriate banner based on the visitor's location.
 
-For a comparison with Canadian cookie law, see our [cookie consent guide for Canada](/blog/cookie-consent-canada-guide-2025).
+For a comparison with Canadian cookie law, see our [cookie consent guide for Canada](/blog/cookie-consent-canada-guide-2026).
 
 ---
 
@@ -483,4 +490,4 @@ Yes. Under the CPRA's implementing regulations, businesses must treat Global Pri
 
 ---
 
-**Related reading**: [GDPR Cookie Consent Requirements](/blog/gdpr-cookie-consent-requirements) | [Cookie Consent Canada Guide](/blog/cookie-consent-canada-guide-2025) | [PIPEDA Compliance Checklist](/blog/pipeda-compliance-checklist)
+**Related reading**: [GDPR Cookie Consent Requirements](/blog/gdpr-cookie-consent-requirements) | [Cookie Consent Canada Guide](/blog/cookie-consent-canada-guide-2026) | [PIPEDA Compliance Checklist](/blog/pipeda-compliance-checklist)

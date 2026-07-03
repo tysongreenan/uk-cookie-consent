@@ -13,6 +13,7 @@ const VALID_DEVICES = new Set(['mobile', 'tablet', 'desktop'])
 
 // 30 requests per minute per IP (one page load = ~2 requests max)
 const trackRateLimit = new RateLimit({
+  name: 'v1-track',
   windowMs: 60 * 1000,
   maxRequests: 30,
 })

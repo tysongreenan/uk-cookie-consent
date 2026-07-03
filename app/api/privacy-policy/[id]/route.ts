@@ -25,6 +25,34 @@ function isValidUuid(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
 }
 
+/**
+ * Map a raw Supabase row (snake_case) into the camelCase shape the dashboard
+ * components expect. Keeps API consumers decoupled from the database schema.
+ */
+function serializePolicy(row: any) {
+  const inputs = row.inputs || {}
+  const jurisdictions: string[] = row.jurisdictions || []
+  return {
+    id: row.id,
+    title: row.name,
+    businessName: inputs.businessName || row.name || 'Untitled',
+    status: row.status,
+    slug: row.slug || undefined,
+    contentHtml: row.content_html || '',
+    contentJson: row.content_json || { sections: [] },
+    inputs,
+    metadata: {
+      generatedAt: row.updated_at || row.created_at,
+      jurisdictions,
+      language: row.language || 'en',
+      businessName: inputs.businessName || row.name || '',
+    },
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    version: row.version,
+  }
+}
+
 /** Verify the current user owns the policy (directly or via team membership). */
 async function verifyOwnership(
   supabase: ReturnType<typeof getSupabase>,
@@ -81,7 +109,7 @@ export async function GET(
       return NextResponse.json({ error }, { status })
     }
 
-    return NextResponse.json(policy)
+    return NextResponse.json(serializePolicy(policy))
   } catch (error) {
     console.error('[PRIVACY-POLICY] GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -184,7 +212,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update policy' }, { status: 500 })
     }
 
-    return NextResponse.json(updated)
+    return NextResponse.json(serializePolicy(updated))
   } catch (error) {
     console.error('[PRIVACY-POLICY] PUT error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

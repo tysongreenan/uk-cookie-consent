@@ -1,15 +1,15 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'CCPA Cookie Compliance: Complete Requirements Guide (2026)',
+  title: 'California CCPA Cookie Compliance & Do Not Sell Guide (2026)',
   description:
-    'Complete guide to CCPA cookie compliance. Learn California cookie consent requirements, Do Not Sell opt-out rules, GPC signals, CPRA amendments, enforcement fines, and step-by-step implementation. CCPA vs GDPR vs PIPEDA compared.',
+    'CCPA cookie compliance guide: Do Not Sell link, GPC signals, CPRA opt-out rules, and fines up to $7,500. Free banner with one-snippet setup.',
   keywords:
-    'ccpa cookie compliance, ccpa cookies, ccpa cookie consent, ccpa cookie requirements, ccpa cookie banner, california cookie law, ccpa vs gdpr, ccpa cookie banner requirements, ccpa vs cpra, do i need a cookie banner for ccpa, ccpa opt out cookies, ccpa cookie policy, global privacy control ccpa',
+    'ccpa cookie compliance, ccpa cookies, ccpa cookie consent, ccpa cookie requirements, ccpa cookie banner, california cookie law, ccpa vs gdpr, ccpa cookie banner requirements, ccpa vs cpra, do i need a cookie banner for ccpa, ccpa opt out cookies, ccpa cookie policy, global privacy control ccpa, california cookie compliance, do not sell ccpa, ccpa do not sell link',
   openGraph: {
-    title: 'CCPA Cookie Compliance: Complete Requirements Guide (2026)',
+    title: 'California CCPA Cookie Compliance & Do Not Sell Guide (2026)',
     description:
-      'Complete guide to CCPA cookie compliance: opt-out requirements, GPC signals, CPRA amendments, enforcement examples, and step-by-step implementation.',
+      'CCPA cookie compliance guide: Do Not Sell link, GPC signals, CPRA opt-out rules, enforcement fines, and step-by-step implementation.',
     type: 'article',
   },
   alternates: {

@@ -79,8 +79,16 @@ export async function POST(request: NextRequest) {
           .eq('id', userId)
           .single()
 
-        if (userErr || !user) {
-          console.error('[WEBHOOK] User not found:', { sessionId: session.id, userId, error: userErr?.message })
+        if (userErr) {
+          // Transient DB read failure (network/PgBouncer/timeout) on a paid checkout.
+          // Return 500 so Stripe retries with backoff — never silently drop the upgrade.
+          console.error('[WEBHOOK] User lookup failed:', { sessionId: session.id, userId, error: userErr.message })
+          return fail('User lookup failed', 500)
+        }
+
+        if (!user) {
+          // No error, genuinely no row. Retrying won't help — return 200 to stop retries.
+          console.error('[WEBHOOK] User not found:', { sessionId: session.id, userId })
           return ok()
         }
 
@@ -101,6 +109,17 @@ export async function POST(request: NextRequest) {
           if (existingSub) {
             console.log('[WEBHOOK] Subscription already processed:', { sessionId: session.id, userId })
             return ok({ received: true, message: 'Already processed' })
+          }
+
+          const annualAmount = session.amount_total || 0
+          const annualAmountValidation = validatePaymentAmount(annualAmount)
+          if (!annualAmountValidation.valid) {
+            console.error('[WEBHOOK] Invalid annual payment amount:', {
+              sessionId: session.id,
+              amount: annualAmount,
+              error: annualAmountValidation.error,
+            })
+            return fail('Invalid payment amount')
           }
 
           const { error: updateErr } = await supabase
@@ -236,8 +255,18 @@ export async function POST(request: NextRequest) {
 
       // ── Subscription renewal (invoice paid after first payment) ──
       case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice & { subscription?: string; payment_intent?: string }
-        const subscriptionId = invoice.subscription as string
+        // Stripe API 2025-04-30.basil (and later) restructured the Invoice object:
+        //  - `invoice.subscription` was REMOVED; the subscription now lives at
+        //    `invoice.parent.subscription_details.subscription` (string ID or expanded object).
+        //  - `invoice.payment_intent` was REMOVED with no direct 1:1 replacement.
+        // We can't see the Dashboard endpoint's API version from code, so read version-agnostically:
+        // prefer the new location, fall back to the old one (works for both payload shapes).
+        const invoice = event.data.object as Stripe.Invoice & {
+          subscription?: string | Stripe.Subscription
+        }
+
+        const rawSub = invoice.subscription ?? invoice.parent?.subscription_details?.subscription
+        const subscriptionId = typeof rawSub === 'string' ? rawSub : rawSub?.id
         if (!subscriptionId) break
 
         if (invoice.billing_reason === 'subscription_create') {
@@ -275,7 +304,11 @@ export async function POST(request: NextRequest) {
             planTier: 'pro_annual',
             paymentType: 'subscription_renewal',
             stripeSessionId: invoice.id,
-            stripePaymentIntentId: (invoice.payment_intent as string) || null,
+            // `invoice.payment_intent` no longer reliably exists on basil+ payloads (see comment above).
+            // Best-effort read; this only populates a nullable column, so null is acceptable.
+            stripePaymentIntentId: typeof (invoice as any).payment_intent === 'string'
+              ? (invoice as any).payment_intent
+              : null,
             stripeCustomerId: invoice.customer as string,
           })
 
@@ -375,6 +408,17 @@ export async function POST(request: NextRequest) {
 
         if (!refundCustomerId) {
           console.error('[WEBHOOK] No customer ID on refunded charge:', charge.id)
+          break
+        }
+
+        const fullyRefunded = charge.refunded === true || charge.amount_refunded >= charge.amount
+
+        if (!fullyRefunded) {
+          console.log('[WEBHOOK] Partial refund — no downgrade:', {
+            chargeId: charge.id,
+            amountRefunded: charge.amount_refunded,
+            amount: charge.amount,
+          })
           break
         }
 

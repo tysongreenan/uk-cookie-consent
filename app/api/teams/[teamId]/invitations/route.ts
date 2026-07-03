@@ -33,6 +33,13 @@ export async function GET(
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
+    if (!['owner', 'admin'].includes(teamMember.role)) {
+      return NextResponse.json(
+        { error: 'Only workspace owners and admins can view invitations.' },
+        { status: 403 }
+      )
+    }
+
     // Get pending invitations for this team
     const { data: invitations, error } = await supabase
       .from('TeamInvitation')

@@ -135,6 +135,7 @@ export interface BannerConfig {
         size: 'small' | 'medium' | 'large'
         showText: boolean
         useCustomColors: boolean
+        iconStyle?: 'cookie' | 'logo' | 'auto'
         customColors?: {
           background?: string
           text?: string
@@ -636,6 +637,14 @@ export interface DSARReport {
 
 // ── Privacy Policy Generator Types ───────────────────────────────────
 
+export interface CookieDetail {
+  name: string
+  provider?: string
+  category: 'necessary' | 'analytics' | 'marketing' | 'functional' | 'social_media'
+  duration?: string
+  purpose?: string
+}
+
 export interface PrivacyPolicyInputs {
   businessName: string
   businessType: 'website' | 'saas' | 'ecommerce' | 'mobile_app' | 'other'
@@ -643,9 +652,11 @@ export interface PrivacyPolicyInputs {
   contactEmail: string
   country: string
   province?: string
+  logoUrl?: string
   dataCollected: string[]
   collectionMethods: string[]
   cookieCategories: string[]
+  cookies?: CookieDetail[]
   thirdPartyServices: string[]
   dataPurposes: string[]
   sharesDataWithThirdParties: boolean

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface StepProps {
   inputs: PrivacyPolicyInputs
   onChange: (updates: Partial<PrivacyPolicyInputs>) => void
+  errors?: Partial<Record<keyof PrivacyPolicyInputs, string>>
 }
 
 const COUNTRIES = [
@@ -62,7 +63,34 @@ const BUSINESS_TYPES: { value: PrivacyPolicyInputs['businessType']; label: strin
   { value: 'other', label: 'Other' },
 ]
 
-export function StepBusinessInfo({ inputs, onChange }: StepProps) {
+async function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return <p className="text-xs text-destructive mt-1">{message}</p>
+}
+
+export function StepBusinessInfo({ inputs, onChange, errors }: StepProps) {
+  const handleLogoChange = async (file: File | null) => {
+    if (!file) {
+      onChange({ logoUrl: undefined })
+      return
+    }
+    if (file.size > 400_000) {
+      alert('Logo must be under 400 KB. Try a smaller PNG or SVG.')
+      return
+    }
+    const dataUrl = await fileToDataUrl(file)
+    onChange({ logoUrl: dataUrl })
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -72,15 +100,58 @@ export function StepBusinessInfo({ inputs, onChange }: StepProps) {
         </p>
       </div>
 
+      {/* Logo upload */}
+      <div className="space-y-2">
+        <Label htmlFor="logo">Business Logo <span className="text-muted-foreground font-normal">(optional)</span></Label>
+        <div className="flex items-center gap-4">
+          {inputs.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={inputs.logoUrl}
+              alt="Business logo preview"
+              className="h-16 w-16 rounded-md border border-border object-contain bg-white p-1"
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-md border border-dashed border-border bg-muted/30 flex items-center justify-center text-xs text-muted-foreground">
+              Logo
+            </div>
+          )}
+          <div className="space-y-1.5">
+            <Input
+              id="logo"
+              type="file"
+              accept="image/png,image/jpeg,image/svg+xml,image/webp"
+              onChange={(e) => handleLogoChange(e.target.files?.[0] ?? null)}
+              className="cursor-pointer"
+            />
+            {inputs.logoUrl && (
+              <button
+                type="button"
+                onClick={() => onChange({ logoUrl: undefined })}
+                className="text-xs text-muted-foreground hover:text-foreground underline"
+              >
+                Remove logo
+              </button>
+            )}
+            <p className="text-xs text-muted-foreground">PNG, JPG, SVG or WebP, under 400 KB.</p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="businessName">Business Name</Label>
+          <Label htmlFor="businessName">
+            Business Name <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="businessName"
             value={inputs.businessName}
             onChange={(e) => onChange({ businessName: e.target.value })}
             placeholder="Acme Inc."
+            aria-invalid={!!errors?.businessName}
+            className={errors?.businessName ? 'border-destructive' : undefined}
           />
+          <FieldError message={errors?.businessName} />
         </div>
 
         <div className="space-y-2">
@@ -105,36 +176,52 @@ export function StepBusinessInfo({ inputs, onChange }: StepProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="websiteUrl">Website URL</Label>
+          <Label htmlFor="websiteUrl">
+            Website URL <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="websiteUrl"
             type="url"
             value={inputs.websiteUrl}
             onChange={(e) => onChange({ websiteUrl: e.target.value })}
             placeholder="https://example.com"
+            aria-invalid={!!errors?.websiteUrl}
+            className={errors?.websiteUrl ? 'border-destructive' : undefined}
           />
+          <FieldError message={errors?.websiteUrl} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contactEmail">Contact Email</Label>
+          <Label htmlFor="contactEmail">
+            Contact Email <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="contactEmail"
             type="email"
             value={inputs.contactEmail}
             onChange={(e) => onChange({ contactEmail: e.target.value })}
             placeholder="privacy@example.com"
+            aria-invalid={!!errors?.contactEmail}
+            className={errors?.contactEmail ? 'border-destructive' : undefined}
           />
+          <FieldError message={errors?.contactEmail} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="country">Country</Label>
+          <Label htmlFor="country">
+            Country <span className="text-destructive">*</span>
+          </Label>
           <Select
             value={inputs.country}
             onValueChange={(value) => {
               onChange({ country: value, province: undefined })
             }}
           >
-            <SelectTrigger id="country">
+            <SelectTrigger
+              id="country"
+              aria-invalid={!!errors?.country}
+              className={errors?.country ? 'border-destructive' : undefined}
+            >
               <SelectValue placeholder="Select country" />
             </SelectTrigger>
             <SelectContent>
@@ -145,6 +232,7 @@ export function StepBusinessInfo({ inputs, onChange }: StepProps) {
               ))}
             </SelectContent>
           </Select>
+          <FieldError message={errors?.country} />
         </div>
 
         {inputs.country === 'CA' && (

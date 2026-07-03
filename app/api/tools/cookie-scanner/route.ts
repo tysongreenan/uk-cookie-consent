@@ -16,6 +16,7 @@ const publicScanRateLimit = new RateLimit({
   name: 'public-cookie-scanner',
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 10, // 10 scans per hour per IP
+  failClosed: true,
 })
 
 function normalizeUrl(input: string): string {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,9 +8,44 @@ import { StepBusinessInfo } from '@/components/privacy-policy/wizard-steps/step-
 import { StepDataCollection } from '@/components/privacy-policy/wizard-steps/step-data-collection'
 import { StepCookies } from '@/components/privacy-policy/wizard-steps/step-cookies'
 import type { PrivacyPolicyInputs, PolicyOutput } from '@/types'
-import { ArrowLeft, ArrowRight, Loader2, Copy, Check, Download, Crown } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader2, Copy, Check, Download, Save } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+
+const DRAFT_STORAGE_KEY = 'privacy-policy-draft-v1'
+
+// Field-level validation that runs before we even hit the server.
+function validateStep(step: number, inputs: PrivacyPolicyInputs): Record<string, string> {
+  const errors: Record<string, string> = {}
+  if (step === 0) {
+    if (!inputs.businessName.trim()) errors.businessName = 'Business name is required.'
+    const url = inputs.websiteUrl.trim()
+    if (!url) {
+      errors.websiteUrl = 'Website URL is required.'
+    } else {
+      const withScheme = /^https?:\/\//i.test(url) ? url : `https://${url}`
+      try {
+        new URL(withScheme)
+      } catch {
+        errors.websiteUrl = 'Enter a valid URL (e.g. https://example.com).'
+      }
+    }
+    const email = inputs.contactEmail.trim()
+    if (!email) {
+      errors.contactEmail = 'Contact email is required.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.contactEmail = 'Enter a valid email address.'
+    }
+    if (!inputs.country) errors.country = 'Select your country.'
+  }
+  if (step === 1) {
+    if (inputs.dataCollected.length === 0)
+      errors.dataCollected = 'Select at least one type of data you collect.'
+    if (inputs.collectionMethods.length === 0)
+      errors.collectionMethods = 'Select at least one collection method.'
+  }
+  return errors
+}
 
 const STEPS = [
   { id: 'business', label: 'Business Info' },
@@ -48,11 +83,11 @@ export function PrivacyPolicyGenerator() {
   const [currentStep, setCurrentStep] = useState(0)
   const [inputs, setInputs] = useState<PrivacyPolicyInputs>(DEFAULT_INPUTS)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null)
+  const draftLoaded = useRef(false)
 
-  // Restore saved policy after signup/signin redirect
-  const [restoredOnMount, setRestoredOnMount] = useState(false)
   const [output, setOutput] = useState<PolicyOutput | null>(() => {
-    // Try to restore from sessionStorage on mount (after signup redirect)
     if (typeof window === 'undefined') return null
     try {
       const saved = sessionStorage.getItem('privacy-policy-output')
@@ -66,6 +101,45 @@ export function PrivacyPolicyGenerator() {
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Restore draft on mount.
+  useEffect(() => {
+    if (draftLoaded.current || typeof window === 'undefined') return
+    draftLoaded.current = true
+    try {
+      const raw = localStorage.getItem(DRAFT_STORAGE_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw)
+      if (parsed?.inputs && typeof parsed.inputs === 'object') {
+        setInputs({ ...DEFAULT_INPUTS, ...parsed.inputs })
+        if (typeof parsed.currentStep === 'number') {
+          setCurrentStep(Math.min(Math.max(0, parsed.currentStep), 2))
+        }
+        if (parsed.savedAt) setDraftSavedAt(new Date(parsed.savedAt))
+        toast.success('Draft restored', { duration: 2000 })
+      }
+    } catch {
+      // Ignore corrupt drafts.
+    }
+  }, [])
+
+  // Auto-save draft (debounced) whenever inputs or step change.
+  useEffect(() => {
+    if (!draftLoaded.current) return
+    const handle = window.setTimeout(() => {
+      try {
+        const now = new Date()
+        localStorage.setItem(
+          DRAFT_STORAGE_KEY,
+          JSON.stringify({ inputs, currentStep, savedAt: now.toISOString() }),
+        )
+        setDraftSavedAt(now)
+      } catch {
+        // Quota exceeded; ignore.
+      }
+    }, 500)
+    return () => window.clearTimeout(handle)
+  }, [inputs, currentStep])
+
   // Save policy to sessionStorage before navigating to signup
   const saveAndNavigate = useCallback((href: string) => {
     if (output) {
@@ -78,19 +152,48 @@ export function PrivacyPolicyGenerator() {
 
   const handleChange = useCallback((updates: Partial<PrivacyPolicyInputs>) => {
     setInputs((prev) => ({ ...prev, ...updates }))
+    // Clear errors for fields the user just edited.
+    setFieldErrors((prev) => {
+      if (Object.keys(prev).length === 0) return prev
+      const next = { ...prev }
+      let changed = false
+      for (const key of Object.keys(updates)) {
+        if (next[key]) {
+          delete next[key]
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
   }, [])
 
-  const canProceed = useCallback(() => {
-    if (currentStep === 0) {
-      return inputs.businessName.trim() !== '' && inputs.websiteUrl.trim() !== '' && inputs.contactEmail.trim() !== '' && inputs.country !== ''
+  const handleNext = useCallback(() => {
+    const errors = validateStep(currentStep, inputs)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      const firstMessage = Object.values(errors)[0]
+      if (firstMessage) toast.error(firstMessage)
+      return
     }
-    if (currentStep === 1) {
-      return inputs.dataCollected.length > 0 && inputs.collectionMethods.length > 0
-    }
-    return true
+    setFieldErrors({})
+    setCurrentStep((prev) => prev + 1)
   }, [currentStep, inputs])
 
   const handleGenerate = useCallback(async () => {
+    // Re-run validation across every step before submitting so the user
+    // doesn't get a generic server "Validation failed".
+    for (let step = 0; step <= 2; step++) {
+      const errors = validateStep(step, inputs)
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors)
+        setCurrentStep(step)
+        const firstMessage = Object.values(errors)[0]
+        toast.error(firstMessage || 'Please complete the required fields.')
+        return
+      }
+    }
+    setFieldErrors({})
+
     setIsGenerating(true)
     setError(null)
     try {
@@ -103,11 +206,9 @@ export function PrivacyPolicyGenerator() {
         if (inputs.province === 'QC') jurisdictions.push('law25')
       }
       if (inputs.country === 'US') jurisdictions.push('ccpa')
-      // Global sites should cover all
       if (['AU', 'NZ', 'SG', 'JP', 'IN', 'BR', 'MX', 'ZA'].includes(inputs.country)) {
-        jurisdictions.push('gdpr') // GDPR-style best practice
+        jurisdictions.push('gdpr')
       }
-      // Always include at least one framework
       if (jurisdictions.length === 0) jurisdictions.push('gdpr')
 
       const payload = { ...inputs, jurisdictions }
@@ -119,13 +220,34 @@ export function PrivacyPolicyGenerator() {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => null)
+        // Server-side validation: surface field errors and jump back.
+        if (res.status === 400 && data?.details) {
+          const serverErrors: Record<string, string> = {}
+          for (const [field, msgs] of Object.entries(data.details)) {
+            if (Array.isArray(msgs) && msgs[0]) serverErrors[field] = msgs[0] as string
+          }
+          setFieldErrors(serverErrors)
+          // Jump to the step that owns the failing field.
+          const businessFields = new Set(['businessName', 'websiteUrl', 'contactEmail', 'country', 'province', 'logoUrl'])
+          const dataFields = new Set(['dataCollected', 'collectionMethods', 'dataPurposes'])
+          const offending = data.field || Object.keys(serverErrors)[0]
+          if (offending && businessFields.has(offending)) setCurrentStep(0)
+          else if (offending && dataFields.has(offending)) setCurrentStep(1)
+          else setCurrentStep(2)
+          throw new Error(data.error || 'Please review the highlighted fields.')
+        }
         throw new Error(data?.error || `Generation failed (${res.status})`)
       }
       const data: PolicyOutput = await res.json()
       setOutput(data)
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.')
-      toast.error(err.message || 'Failed to generate privacy policy')
+      // Clear the saved draft on success — it's been generated.
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY)
+      } catch {}
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setError(message)
+      toast.error(message)
     } finally {
       setIsGenerating(false)
     }
@@ -161,6 +283,11 @@ export function PrivacyPolicyGenerator() {
     setCurrentStep(0)
     setInputs(DEFAULT_INPUTS)
     setError(null)
+    setFieldErrors({})
+    setDraftSavedAt(null)
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY)
+    } catch {}
   }, [])
 
   // If we have output, show the result
@@ -303,7 +430,7 @@ export function PrivacyPolicyGenerator() {
       <CardContent>
         <div className="min-h-[320px]">
           {currentStep === 0 && (
-            <StepBusinessInfo inputs={inputs} onChange={handleChange} />
+            <StepBusinessInfo inputs={inputs} onChange={handleChange} errors={fieldErrors} />
           )}
           {currentStep === 1 && (
             <StepDataCollection inputs={inputs} onChange={handleChange} />
@@ -331,18 +458,12 @@ export function PrivacyPolicyGenerator() {
           </Button>
 
           {currentStep < STEPS.length - 1 ? (
-            <Button
-              onClick={() => setCurrentStep((prev) => prev + 1)}
-              disabled={!canProceed()}
-            >
+            <Button onClick={handleNext}>
               Next
               <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating || !canProceed()}
-            >
+            <Button onClick={handleGenerate} disabled={isGenerating}>
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -357,6 +478,14 @@ export function PrivacyPolicyGenerator() {
             </Button>
           )}
         </div>
+
+        {/* Draft saved indicator */}
+        {draftSavedAt && (
+          <div className="mt-3 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
+            <Save className="h-3 w-3" />
+            <span>Draft saved {draftSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

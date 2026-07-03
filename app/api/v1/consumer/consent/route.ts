@@ -5,6 +5,7 @@ import { RateLimit } from '@/lib/rate-limit'
 import { CONSUMER_PLAN_FEATURES } from '@/types'
 
 const consentRateLimit = new RateLimit({
+  name: 'consumer-consent',
   windowMs: 60 * 1000,
   maxRequests: 60,
 })

@@ -1,13 +1,22 @@
 ---
-
 title: "What to Put in Your Privacy Policy, Right Now"
 description: "No-nonsense checklist and copy-paste prompt to build a privacy and cookie policy for Canadian websites, covering PIPEDA, Québec Law 25, cookies and consent."
 date: "2025-11-25"
-updatedDate: "2025-11-25"
+updatedDate: "2026-05-26"
 author: "cookie-banner-team"
 tags: ["Privacy", "PIPEDA", "Law 25", "Cookie Consent", "Compliance"]
 published: true
----------------
+canonical: "/blog/privacy-policy"
+keywords:
+  - "privacy policy checklist"
+  - "what to put in privacy policy"
+  - "privacy policy canada"
+  - "pipeda privacy policy"
+  - "privacy policy template canada"
+  - "cookie policy template"
+  - "law 25 privacy policy"
+  - "website privacy policy requirements"
+---
 
 # What to Put in Your Privacy Policy, Right Now
 

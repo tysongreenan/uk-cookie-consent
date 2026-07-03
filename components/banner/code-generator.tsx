@@ -19,15 +19,17 @@ interface CodeGeneratorProps {
   config: BannerConfig
   bannerId?: string
   planTier?: string
+  detectedCmpVendor?: string
 }
 
-export function CodeGenerator({ config, bannerId, planTier }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor }: CodeGeneratorProps) {
   const showBranding = !planTier || planTier === 'free'
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>(bannerId ? 'hosted' : 'head')
   const [isGenerating, setIsGenerating] = useState(false)
   const [showUpdateNotice, setShowUpdateNotice] = useState(false)
   const [copied, setCopied] = useState(false)
   const [showManualCode, setShowManualCode] = useState(false)
+  const [showSwitchChecklist, setShowSwitchChecklist] = useState(true)
   const [manualTab, setManualTab] = useState<'head' | 'body'>('head')
 
   useEffect(() => {
@@ -36,6 +38,12 @@ export function CodeGenerator({ config, bannerId, planTier }: CodeGeneratorProps
       setShowUpdateNotice(true)
     }
   }, [])
+
+  useEffect(() => {
+    if (bannerId) {
+      setActiveTab('hosted')
+    }
+  }, [bannerId])
 
   const dismissUpdateNotice = () => {
     localStorage.setItem('banner_update_dismissed_version', String(GENERATOR_VERSION))
@@ -204,6 +212,39 @@ ${generateBannerHTML(config, { showBranding })}
             <li className="flex items-start gap-2"><span>Visit your site to verify the banner appears</span></li>
             <li className="flex items-start gap-2"><span>Come back here anytime to customize — changes go live automatically</span></li>
           </ol>
+        </div>
+
+        <div className="border rounded-lg bg-background">
+          <button
+            type="button"
+            onClick={() => setShowSwitchChecklist(!showSwitchChecklist)}
+            className="flex w-full items-center gap-2 p-4 text-left text-sm font-semibold"
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform ${showSwitchChecklist ? 'rotate-180' : ''}`} />
+            Switch from your old banner
+          </button>
+          {showSwitchChecklist && (
+            <div className="space-y-3 border-t p-4">
+              {detectedCmpVendor && detectedCmpVendor !== 'UK Cookie Consent' && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                  We detected {detectedCmpVendor}. Disable that script or plugin before publishing this one.
+                </div>
+              )}
+              {detectedCmpVendor === 'UK Cookie Consent' && (
+                <div className="rounded-md border bg-muted/50 p-3 text-sm text-muted-foreground">
+                  This site already appears to use cookie-banner.ca. Use this code if you are replacing the installed banner ID.
+                </div>
+              )}
+              <ol className="space-y-2 text-sm text-muted-foreground list-decimal ml-4">
+                <li>Remove or disable the old CMP script/plugin.</li>
+                <li>Remove duplicate manual tracker snippets from your site if those scripts were imported into this banner.</li>
+                <li>Paste the cookie-banner.ca hosted script in your <code className="bg-muted px-1 rounded">&lt;head&gt;</code>.</li>
+                <li>Clear your site, CDN, and page-builder cache.</li>
+                <li>Open a private browser window and verify the banner appears.</li>
+                <li>Run the cookie scanner again to confirm only cookie-banner.ca is detected.</li>
+              </ol>
+            </div>
+          )}
         </div>
 
         {/* Explanation */}

@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Wix Cookie Banner: Free GDPR Consent (2026)',
-  description: 'Add a GDPR-compliant cookie banner to Wix in minutes. No App Market fees, under 10KB, works via HTML embed or Velo. Free plan available. Step-by-step guide.',
-  keywords: 'wix cookie banner, wix cookie consent, wix cookie consent apps, cookie banner wix, wix gdpr compliance, how to add cookie consent to wix, wix velo cookie banner, wix cookie consent banner, free wix cookie banner',
+  title: 'Free Wix Cookie Banner — No App Market Fees (2026)',
+  description: 'Add a free cookie banner to Wix in 5 minutes. No App Market install needed — paste one snippet via HTML embed or Velo. GDPR & CCPA compliant, under 10KB.',
+  keywords: 'wix cookie banner, wix cookie consent, wix cookie consent apps, cookie banner wix, wix gdpr compliance, how to add cookie consent to wix, wix velo cookie banner, wix cookie consent banner, free wix cookie banner, wix ccpa compliance',
   openGraph: {
-    title: 'Wix Cookie Banner: Free GDPR Consent (2026)',
-    description: 'Add a GDPR-compliant cookie banner to Wix in minutes. No App Market fees, under 10KB. Free plan available.',
+    title: 'Free Wix Cookie Banner — No App Market Fees (2026)',
+    description: 'Add a free cookie banner to Wix in 5 minutes. No App Market install, under 10KB. GDPR & CCPA compliant.',
     type: 'article',
   },
   alternates: {

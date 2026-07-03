@@ -98,10 +98,10 @@ export default function OneTrustAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "OneTrust Alternative 2026: Enterprise Cookie Consent for $99 (Not $10K+)",
+          title: "OneTrust Alternative 2026: Same Compliance, 99% Less Cost",
           description: "Compare OneTrust vs Cookie-Banner.ca. Enterprise-grade cookie consent without enterprise pricing. Full feature comparison, migration guide, and FAQ.",
           datePublished: "2025-06-01",
-          dateModified: "2026-04-03",
+          dateModified: "2026-05-20",
         }}
       />
       <StructuredData type="faq" data={faqData} />
@@ -149,11 +149,11 @@ export default function OneTrustAlternativePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Best OneTrust Alternative in 2026
+                    OneTrust Alternative 2026
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Enterprise Compliance for $99, Not $10K+
+                    Same Compliance, 99% Less Cost
                   </span>
                 </h1>
 

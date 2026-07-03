@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Free WordPress Cookie Banner (No Plugin Needed)',
+  title: 'Free WordPress Cookie Banner — No Plugin, 2-Min Setup (2026)',
   description:
-    'Add a GDPR-compliant cookie banner to WordPress without a plugin. One script tag, under 10KB, works with every theme. Free plan available. Set up in 2 minutes.',
+    'Add a free cookie banner to WordPress without a plugin. One script tag in your header, under 10KB, works with every theme. GDPR & CCPA compliant. No monthly fees.',
   keywords: [
-    'cookie banner wordpress',
     'wordpress cookie banner',
+    'cookie banner wordpress',
     'wordpress cookie consent',
     'wordpress cookie banner plugin',
     'wordpress cookie banner free',
@@ -16,19 +16,20 @@ export const metadata: Metadata = {
     'wordpress gdpr cookie banner',
     'cookie banner integration with wordpress',
     'cookiebot alternative wordpress',
+    'wordpress cookie banner no plugin',
   ],
   openGraph: {
-    title: 'Free WordPress Cookie Banner (No Plugin Needed)',
+    title: 'Free WordPress Cookie Banner — No Plugin, 2-Min Setup (2026)',
     description:
-      'Add a GDPR-compliant cookie banner to WordPress without a plugin. One script tag, under 10KB, works with every theme.',
+      'Add a free cookie banner to WordPress without a plugin. One script tag, under 10KB, works with every theme. GDPR & CCPA compliant.',
     type: 'article',
     url: 'https://www.cookie-banner.ca/integrations/wordpress',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'WordPress Cookie Banner Without a Plugin',
+    title: 'Free WordPress Cookie Banner — No Plugin Needed (2026)',
     description:
-      'Add a GDPR-compliant cookie banner to WordPress without installing a plugin. One script tag, under 10 KB.',
+      'Add a free cookie banner to WordPress without a plugin. One script tag, under 10KB, works with every theme.',
   },
   alternates: {
     canonical: '/integrations/wordpress',

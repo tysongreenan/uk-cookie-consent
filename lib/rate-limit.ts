@@ -6,7 +6,8 @@
  *
  * Fails open if the DB call errors, so an outage doesn't lock users out.
  *
- * API is unchanged: new RateLimit({ windowMs, maxRequests }) → .check(request)
+ * API: new RateLimit({ name, windowMs, maxRequests }) → .check(request)
+ * `name` disambiguates limiters that share (windowMs, maxRequests).
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
@@ -29,11 +30,12 @@ function getClient(): SupabaseClient | null {
 }
 
 export interface RateLimitOptions {
+  name: string
   windowMs: number
   maxRequests: number
   keyGenerator?: (req: Request) => string
-  /** Optional human-readable label for logs/metrics. */
-  name?: string
+  /** When true, deny requests if the rate-limit backend is unavailable. */
+  failClosed?: boolean
 }
 
 export class RateLimit {
@@ -41,12 +43,14 @@ export class RateLimit {
   private windowMs: number
   private maxRequests: number
   private keyGenerator: (req: Request) => string
+  private failClosed: boolean
 
   constructor(options: RateLimitOptions) {
-    this.name = options.name ?? 'rl'
+    this.name = options.name
     this.windowMs = options.windowMs
     this.maxRequests = options.maxRequests
     this.keyGenerator = options.keyGenerator || this.defaultKeyGenerator
+    this.failClosed = options.failClosed ?? false
   }
 
   private defaultKeyGenerator(req: Request): string {
@@ -57,14 +61,18 @@ export class RateLimit {
   }
 
   public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
-    const fallback = { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
+    const deny = {
+      allowed: false,
+      remaining: 0,
+      resetTime: Date.now() + this.windowMs,
+    }
+    const fallback = this.failClosed
+      ? deny
+      : { allowed: true, remaining: this.maxRequests, resetTime: Date.now() + this.windowMs }
 
     const supabase = getClient()
     if (!supabase) return fallback
 
-    // Name is part of the key so limiters that share (windowMs, maxRequests)
-    // get separate buckets instead of colliding (e.g. registration vs
-    // password-reset, both 1h/3 previously shared one bucket per IP).
     const key = `${this.name}:${this.windowMs}:${this.maxRequests}:${this.keyGenerator(req)}`
     const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
 
@@ -93,12 +101,13 @@ export class RateLimit {
   }
 }
 
-// Pre-configured rate limiters. Each has a distinct `name` so limiters that
-// share the same (windowMs, maxRequests) don't collide on the same bucket.
+// Pre-configured rate limiters. `name` disambiguates limiters that share
+// (windowMs, maxRequests) so they don't collide on the same Postgres bucket.
 export const authRateLimit = new RateLimit({
   name: 'auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 5,
+  failClosed: true,
 })
 
 export const strictAuthRateLimit = new RateLimit({

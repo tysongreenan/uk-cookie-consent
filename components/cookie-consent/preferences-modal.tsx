@@ -44,15 +44,18 @@ interface PreferencesModalProps {
     socialMedia: boolean
   }) => void
   domain?: string
+  /** When true, the modal sizes itself to its containing block instead of the viewport — for use inside a constrained preview frame. */
+  previewMode?: boolean
 }
 
-export function PreferencesModal({ 
-  config, 
-  isVisible, 
-  onClose, 
-  onAcceptAll, 
+export function PreferencesModal({
+  config,
+  isVisible,
+  onClose,
+  onAcceptAll,
   onConfirmChoices,
-  domain = 'cookie-banner.ca'
+  domain = 'cookie-banner.ca',
+  previewMode = false
 }: PreferencesModalProps) {
   const [cookiePreferences, setCookiePreferences] = useState({
     strictlyNecessary: true, // Always enabled
@@ -72,9 +75,19 @@ export function PreferencesModal({
 
   if (!isVisible) return null
 
+  // In preview mode we render the modal contents directly inside the preview frame:
+  // no fixed-position overlay, no backdrop dimmer, no centered card — just a clean column
+  // that fills the available space so the user can see every section without scroll conflict.
+  const wrapperClass = previewMode
+    ? 'absolute inset-0 bg-white flex flex-col overflow-hidden'
+    : 'fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4'
+  const cardClass = previewMode
+    ? 'w-full h-full flex flex-col'
+    : 'bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl flex flex-col'
+
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl">
+    <div className={wrapperClass}>
+      <div className={cardClass}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200">
           {config.branding.logo.enabled && config.branding.logo.url ? (
@@ -91,7 +104,10 @@ export function PreferencesModal({
               }}
             />
           ) : (
-            <span className="font-semibold text-gray-900">Cookie Settings</span>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-gray-700" style={{ fontSize: '24px' }}>cookie</span>
+              <span className="font-semibold text-gray-900">Cookie Settings</span>
+            </div>
           )}
           
           <button
@@ -103,8 +119,8 @@ export function PreferencesModal({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col h-full max-h-[calc(90vh-80px)]">
-          <div className="p-6 pt-4 flex-1 overflow-y-auto">
+        <div className={`flex flex-col flex-1 min-h-0 ${previewMode ? '' : 'max-h-[calc(90vh-80px)]'}`}>
+          <div className="p-6 pt-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             {/* Title */}
             <h2 className="text-xl font-bold text-gray-900 mb-3">
               Privacy Center

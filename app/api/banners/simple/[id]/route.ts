@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
+import { getAccessibleUserIds } from '@/lib/banner-access'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -27,31 +28,6 @@ function getSupabaseClient() {
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-
-/**
- * Get the user IDs that the current user is allowed to access banners for.
- * If in a team workspace, returns all team member IDs. Otherwise just the user's own ID.
- */
-async function getAccessibleUserIds(
-  supabase: ReturnType<typeof getSupabaseClient>,
-  userId: string,
-  currentTeamId: string | null | undefined
-): Promise<string[]> {
-  if (!currentTeamId) return [userId]
-
-  const { data: members, error } = await supabase
-    .from('TeamMember')
-    .select('user_id')
-    .eq('team_id', currentTeamId)
-
-  if (error) {
-    console.error('Error fetching team members for banner access:', error)
-    return [userId]
-  }
-
-  const ids = members?.map(m => m.user_id) || []
-  return ids.length > 0 ? ids : [userId]
-}
 
 export async function GET(
   request: NextRequest,

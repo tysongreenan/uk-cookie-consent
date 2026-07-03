@@ -4,7 +4,7 @@ description: "What are CPRA cookie requirements? Complete guide to California Pr
 date: "2026-03-16"
 author: "cookie-banner-team"
 tags: ["CPRA", "CCPA", "California", "Privacy Law", "Cookie Consent", "Cookie Banner", "Compliance"]
-published: true
+published: false
 canonical: "/blog/cpra-cookie-requirements-guide"
 keywords:
   - "cpra cookie requirements"

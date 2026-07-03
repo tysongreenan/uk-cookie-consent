@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
+import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import { resolveEffectivePlan } from '@/lib/team-permissions'
 import { PlanTier } from '@/types'
 // NOTE: In-memory banner cache removed intentionally.
 // On Vercel serverless, each instance has its own memory — invalidating cache
@@ -33,6 +35,7 @@ function getSupabaseClient() {
 
 // Rate limiter: 100 requests per minute per IP (generous for legitimate use)
 const bannerScriptRateLimit = new RateLimit({
+  name: 'banner-script',
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100, // 100 requests per minute
 })
@@ -205,22 +208,26 @@ export async function GET(request: NextRequest) {
       config = { ...config.config, ...config, config: undefined }
     }
 
-    // Look up banner owner's plan tier and analytics setting
+    hardenBannerConfig(config)
+
+    // Look up banner owner's effective plan tier (team-aware) and freeze date.
+    // A banner owned by a member of a paid workspace inherits the workspace
+    // owner's plan. This mirrors the session resolution in lib/auth.ts so the
+    // dashboard (which gates the "remove branding" toggle behind the resolved
+    // plan) and the publicly served banner always agree on the owner's tier.
+    // Note: resolution keys off the owner's currentTeamId — same signal as auth.
     let ownerPlanTier = 'free'
     let ownerFeatureFreezeDate: string | null = null
     const bannerUserId = banner.userId || null
     if (bannerUserId) {
       const { data: bannerOwner } = await supabase
         .from('User')
-        .select('planTier, featureFreezeDate')
+        .select('currentTeamId')
         .eq('id', bannerUserId)
         .single()
-      if (bannerOwner?.planTier) {
-        ownerPlanTier = bannerOwner.planTier
-      }
-      if (bannerOwner?.featureFreezeDate) {
-        ownerFeatureFreezeDate = bannerOwner.featureFreezeDate
-      }
+      const effective = await resolveEffectivePlan(bannerUserId, bannerOwner?.currentTeamId)
+      ownerPlanTier = effective.planTier || 'free'
+      ownerFeatureFreezeDate = effective.featureFreezeDate
     }
 
     const showBranding = ownerPlanTier === 'free' || config.branding?.showPoweredBy !== false

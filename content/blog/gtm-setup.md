@@ -1,15 +1,16 @@
 ---
-title: "How to Set Up Cookie Banner Generator with Google Tag Manager (Consent Mode v2)"
-description: "Step-by-step guide to installing Cookie Banner Generator's GTM Community Template for Google Consent Mode v2. Configure default consent states, regional overrides, ads data redaction, and URL passthrough in minutes."
+title: "GTM Cookie Consent Setup — Consent Mode v2 Guide (2026)"
+description: "Set up GTM cookie consent in 10 minutes with our free Consent Mode v2 template. Default denied states, regional overrides, ads data redaction & URL passthrough — step by step."
 date: "2026-03-16"
 author: "cookie-banner-team"
 tags: ["Google Tag Manager", "Consent Mode v2", "GTM Template", "Cookie Consent", "GDPR", "Setup Guide", "Google Analytics"]
-published: true
+published: false
 canonical: "/blog/gtm-setup"
 keywords:
+  - "google tag manager cookie consent"
+  - "gtm cookie consent"
   - "cookie banner gtm setup"
   - "consent mode v2 gtm template"
-  - "google tag manager cookie consent"
   - "gtm consent mode v2 setup"
   - "cookie banner generator gtm"
   - "google consent mode v2 template"
@@ -19,6 +20,7 @@ keywords:
   - "gtm consent default denied"
   - "cookie consent google tag manager"
   - "ads data redaction gtm"
+  - "gtm cookie consent setup"
 schema:
   "@context": "https://schema.org"
   "@type": "FAQPage"

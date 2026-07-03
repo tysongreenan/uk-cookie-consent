@@ -1,4 +1,5 @@
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
+import { hardenBannerConfig } from '@/lib/banner-config-security'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {
@@ -255,6 +256,8 @@ const generateScriptLoaders = (
 }
 
 export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
+  hardenBannerConfig(config)
+
   // Defensive defaults for optional nested objects (older banners may lack these)
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
@@ -420,7 +423,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   // Main banner HTML
   const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
-  <div style="position: relative; padding-right: 56px;">
+  <div style="position: relative; padding-right: 40px;">
     <button id="cookie-close-btn" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
     
     <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
@@ -516,7 +519,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     <!-- Header -->
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid ${borderColor};">
       ${config.branding.logo.enabled && config.branding.logo.url ? `
-      <img src="${config.branding.logo.url}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
+      <img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
       ` : `
       <span id="prefs-header-title" style="font-weight: 600; color: ${config.colors.text};">Cookie Settings</span>
       `}
@@ -723,6 +726,8 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
 }
 
 export const generateBannerCSS = (config: BannerConfig) => {
+  hardenBannerConfig(config)
+
   if (!config.branding) config.branding = {} as any
   if (!config.branding.footerLink) config.branding.footerLink = { enabled: false, text: 'Cookie Settings', style: 'floating', floatingPosition: 'bottom-right' } as any
   if (!config.behavior) config.behavior = {} as any
@@ -815,18 +820,21 @@ input:checked + span:before {
   }
 
   #cookie-consent-banner #cookie-close-btn {
-    top: 0 !important;
-    right: 0 !important;
+    top: 10px !important;
+    right: 10px !important;
     width: 44px !important;
     height: 44px !important;
     padding: 0 !important;
-    padding-top: 2px !important;
-    font-size: 24px !important;
+    font-size: 28px !important;
     line-height: 1 !important;
     display: flex !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     justify-content: center !important;
     z-index: 2 !important;
+  }
+
+  #cookie-title {
+    padding-right: 48px !important;
   }
   
   #cookie-consent-banner h3 {
@@ -922,6 +930,8 @@ ${config.advanced.customCSS}`
 }
 
 export const generateBannerJS = (config: BannerConfigWithGeoOverrides) => {
+  hardenBannerConfig(config)
+
   if (!config.branding) config.branding = {} as any
   if (!config.branding.logo) config.branding.logo = { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }
   if (!config.branding.privacyPolicy) config.branding.privacyPolicy = { url: '', text: 'Privacy Policy', openInNewTab: true, required: false }

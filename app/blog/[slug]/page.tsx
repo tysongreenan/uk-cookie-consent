@@ -15,6 +15,7 @@ import { FlickeringGrid } from '@/components/magicui/flickering-grid'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { StructuredData } from '@/components/seo/structured-data'
+import { BlogAssistant } from '@/components/blog/blog-assistant'
 import { getAuthor } from '@/lib/authors'
 import { formatDate } from '@/lib/utils'
 
@@ -41,7 +42,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${post.title} | Cookie-Banner.ca`,
+    title: post.title,
     description: post.description,
     ...(post.keywords && { keywords: post.keywords.join(', ') }),
     authors: [{ name: post.author }],
@@ -53,14 +54,15 @@ export async function generateMetadata({
       description: post.description,
       type: 'article',
       publishedTime: post.date,
+      modifiedTime: post.updatedDate || post.date,
       authors: [post.author],
-      images: post.image ? [post.image] : [],
+      images: [post.image ? (post.image.startsWith('http') ? post.image : `https://www.cookie-banner.ca${post.image}`) : 'https://www.cookie-banner.ca/og-image.png'],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: post.image ? [post.image] : [],
+      images: [post.image ? (post.image.startsWith('http') ? post.image : `https://www.cookie-banner.ca${post.image}`) : 'https://www.cookie-banner.ca/og-image.png'],
     },
   }
 }
@@ -151,9 +153,9 @@ export default async function BlogPostPage({
         <div className="space-y-4 border-b border-border relative z-10">
           <div className="max-w-7xl mx-auto flex flex-col gap-6 p-6">
             <div className="flex flex-wrap items-center gap-3 gap-y-5 text-sm text-muted-foreground">
-              <Button variant="outline" asChild className="h-6 w-6">
+              <Button variant="outline" size="icon" asChild className="h-6 w-6 shrink-0 p-0">
                 <Link href="/blog">
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="h-4 w-4 text-foreground" aria-hidden="true" />
                   <span className="sr-only">Back to all articles</span>
                 </Link>
               </Button>
@@ -204,7 +206,11 @@ export default async function BlogPostPage({
               </div>
             )}
             <div className="p-6 lg:p-10">
+              <div className="mb-8">
+                <BlogAssistant slug={post.slug} />
+              </div>
               <div className="prose dark:prose-invert max-w-none prose-headings:scroll-mt-8 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-balance prose-p:tracking-tight prose-p:text-balance prose-lg">
+                {/* Blog content rendered from markdown — trusted source, not user input */}
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
               </div>
             </div>

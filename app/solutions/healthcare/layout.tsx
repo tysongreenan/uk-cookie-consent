@@ -1,18 +1,18 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Cookie Consent for Healthcare — HIPAA Compliant',
+  title: 'Free HIPAA Cookie Consent for Healthcare Sites (2026)',
   description:
-    'HIPAA-compliant cookie consent for healthcare websites. Manage patient portal, telemedicine, and medical site cookies alongside GDPR and CCPA. Free plan available.',
+    'Is your healthcare site tracking patients without consent? Get a free HIPAA-compliant cookie banner for clinics, telehealth & patient portals. Set up in 5 minutes.',
   keywords:
-    'cookie consent healthcare, hipaa cookie consent, healthcare website compliance, medical privacy cookies, telemedicine gdpr, patient portal consent, hipaa cookie banner, cookie consent management platforms for healthcare websites hipaa compliance',
+    'cookie consent healthcare, hipaa cookie consent, healthcare website compliance, medical privacy cookies, telemedicine gdpr, patient portal consent, hipaa cookie banner, healthcare cookie banner, free hipaa cookie consent, telehealth cookie compliance',
   alternates: {
     canonical: '/solutions/healthcare',
   },
   openGraph: {
-    title: 'Cookie Consent for Healthcare — HIPAA Compliant',
+    title: 'Free HIPAA Cookie Consent for Healthcare Sites (2026)',
     description:
-      'HIPAA-compliant cookie consent for healthcare websites. Manage compliance across GDPR, PIPEDA, and CCPA.',
+      'Free HIPAA-compliant cookie banner for clinics, telehealth & patient portals. Set up in 5 minutes, no code needed.',
     type: 'article',
   },
 }
