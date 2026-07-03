@@ -38,3 +38,12 @@ CREATE TRIGGER update_banner_visitors_updated_at
     BEFORE UPDATE ON public.banner_visitors
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_snake_column();
+
+-- storage.objects (snake_case updated_at) has the same broken trigger wiring —
+-- any UPDATE to a stored object's row (file overwrite, metadata change) throws
+-- the same `record "new" has no field "updatedAt"`. Repoint it too.
+DROP TRIGGER IF EXISTS update_objects_updated_at ON storage.objects;
+CREATE TRIGGER update_objects_updated_at
+    BEFORE UPDATE ON storage.objects
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_snake_column();
