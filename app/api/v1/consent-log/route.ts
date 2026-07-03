@@ -143,10 +143,10 @@ export async function POST(request: NextRequest) {
         .eq('id', userId)
         .single(),
       supabase
-        .from('ConsentBanner')
-        .select('id, Project!inner(userId)')
+        .from('SimpleBanners')
+        .select('id, userId')
         .eq('id', bannerId)
-        .eq('Project.userId', userId)
+        .eq('userId', userId)
         .single(),
     ])
 
