@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { RateLimit } from '@/lib/rate-limit'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import { resolveEffectivePlan } from '@/lib/team-permissions'
 import type { PlanTier } from '@/types'
 
 const CORS_HEADERS = {
@@ -114,12 +115,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!country || typeof country !== 'string' || !isValidCountryCode(country)) {
-      return NextResponse.json(
-        { error: 'Invalid country (must be 2-char ISO code)' },
-        { status: 400, headers: CORS_HEADERS }
-      )
-    }
+    // Country: normalize instead of reject. banner.js sends 'unknown' when the
+    // x-vercel-ip-country header is absent; the DB column also defaults to
+    // 'unknown'. A consent record with an unknown country is far better than a
+    // dropped Law 25 proof-of-consent record.
+    const safeCountry = (typeof country === 'string' && isValidCountryCode(country))
+      ? country
+      : 'unknown'
 
     const safePagePath = (typeof pagePath === 'string')
       ? pagePath.replace(/[<>"']/g, '').slice(0, 200)
@@ -129,11 +131,24 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabase()
 
-    const { data: user, error: userError } = await supabase
-      .from('User')
-      .select('planTier, featureFreezeDate, teamId')
-      .eq('id', userId)
-      .single()
+    // User plan lookup and banner ownership check are independent queries —
+    // run them in parallel to keep this hot path at one round-trip of latency.
+    const [
+      { data: user, error: userError },
+      { data: ownedBanner, error: bannerError },
+    ] = await Promise.all([
+      supabase
+        .from('User')
+        .select('planTier, featureFreezeDate, currentTeamId')
+        .eq('id', userId)
+        .single(),
+      supabase
+        .from('ConsentBanner')
+        .select('id, Project!inner(userId)')
+        .eq('id', bannerId)
+        .eq('Project.userId', userId)
+        .single(),
+    ])
 
     if (userError) {
       console.error('[CONSENT-LOG] User lookup failed:', { userId, error: userError.message })
@@ -143,15 +158,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const tier = (user?.planTier || 'free') as PlanTier
-    const featureFreezeDate = user?.featureFreezeDate || null
-    const teamId = user?.teamId || null
+    const teamId = user?.currentTeamId || null
+
+    // This runs on every visitor consent event, so the common case (no team)
+    // uses the fields already selected above — zero extra queries. Only when
+    // the user works in a team workspace do we resolve the effective plan
+    // (team owner's plan), so a Pro-team member's records aren't rejected
+    // after their banner already loaded the logging JS.
+    let tier = (user?.planTier || 'free') as PlanTier
+    let featureFreezeDate: string | null = user?.featureFreezeDate || null
+
+    if (teamId) {
+      const effective = await resolveEffectivePlan(userId, teamId)
+      tier = (effective.planTier || 'free') as PlanTier
+      featureFreezeDate = effective.featureFreezeDate
+    }
 
     const hasAccess = canAccessFeatureWithFreeze(tier, 'hasConsentLogs', featureFreezeDate)
     if (!hasAccess) {
       console.log('[CONSENT-LOG] Plan does not include consent logs:', { userId, tier })
       return NextResponse.json(
         { success: false, reason: 'plan_required' },
+        { status: 200, headers: CORS_HEADERS }
+      )
+    }
+
+    // ── Banner ownership check ───────────────────────────────────────
+    // bannerId and userId are both public in banner.js, so without this join
+    // anyone could forge consent records against another user's account.
+    if (bannerError || !ownedBanner) {
+      console.log('[CONSENT-LOG] Banner does not belong to user:', { userId, bannerId })
+      return NextResponse.json(
+        { success: false, reason: 'banner_mismatch' },
         { status: 200, headers: CORS_HEADERS }
       )
     }
@@ -169,7 +207,7 @@ export async function POST(request: NextRequest) {
         recorded_at: new Date().toISOString(),
         decision,
         categories,
-        country,
+        country: safeCountry,
         page_path: safePagePath,
       })
 

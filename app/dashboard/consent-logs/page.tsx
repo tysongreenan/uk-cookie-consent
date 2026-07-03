@@ -56,7 +56,8 @@ export default function ConsentLogsPage() {
 
   // Data state
   const [logs, setLogs] = useState<ConsentLog[]>([])
-  const [total, setTotal] = useState(0)
+  // null = count unavailable (count RPC failed server-side); still paginate
+  const [total, setTotal] = useState<number | null>(0)
   const [loading, setLoading] = useState(true)
   const [banners, setBanners] = useState<Banner[]>([])
 
@@ -125,7 +126,7 @@ export default function ConsentLogsPage() {
       if (res.ok) {
         const json = await res.json()
         setLogs(json.data || [])
-        setTotal(json.total || 0)
+        setTotal(typeof json.total === 'number' ? json.total : null)
       } else if (res.status === 403) {
         // Plan access denied by server
         setLogs([])
@@ -159,9 +160,15 @@ export default function ConsentLogsPage() {
 
   // ── Pagination helpers ─────────────────────────────────────────────
 
-  const totalPages = Math.ceil(total / limit)
+  // totalPages is null when the count is unavailable — we can still page
+  // forward as long as the current page is full (there may be a next page).
+  const totalPages = total === null ? null : Math.ceil(total / limit)
+  const showPager = totalPages === null
+    ? page > 1 || logs.length === limit
+    : totalPages > 1
 
   function getPageNumbers(): (number | 'ellipsis')[] {
+    if (totalPages === null) return []
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1)
     const pages: (number | 'ellipsis')[] = [1]
     if (page > 3) pages.push('ellipsis')
@@ -422,10 +429,12 @@ export default function ConsentLogsPage() {
         </Card>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {showPager && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total.toLocaleString()} records
+              {total === null
+                ? `Showing ${logs.length} records`
+                : `Showing ${(page - 1) * limit + 1}–${Math.min(page * limit, total)} of ${total.toLocaleString()} records`}
             </p>
             <div className="flex items-center gap-1">
               <button
@@ -454,8 +463,8 @@ export default function ConsentLogsPage() {
                 )
               )}
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                onClick={() => setPage((p) => (totalPages === null ? p + 1 : Math.min(totalPages, p + 1)))}
+                disabled={totalPages === null ? logs.length < limit : page === totalPages}
                 className="p-2 rounded-lg hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
                 aria-label="Next page"
               >

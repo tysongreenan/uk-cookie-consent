@@ -53,12 +53,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Consent logs require an active Pro Annual subscription' }, { status: 403 })
     }
 
-    // ── Team lookup ──────────────────────────────────────────────────
+    // ── Team scope ───────────────────────────────────────────────────
+    // May be null (the common case): the RPCs fall back to user scope.
 
-    const teamId = session.user.currentTeamId
-    if (!teamId) {
-      return NextResponse.json({ error: 'No team selected' }, { status: 400 })
-    }
+    const teamId = session.user.currentTeamId || null
 
     // ── Parse query params ───────────────────────────────────────────
 
@@ -91,12 +89,17 @@ export async function GET(request: NextRequest) {
 
     // ── Build RPC params ─────────────────────────────────────────────
 
+    // dateTo is a YYYY-MM-DD string; treated as midnight it would exclude that
+    // day's records. Extend to end-of-day so the filter is inclusive.
+    const dateToInclusive = dateTo ? `${dateTo}T23:59:59.999Z` : null
+
     const rpcParams: Record<string, unknown> = {
+      p_user_id: session.user.id,
       p_team_id: teamId,
       p_banner_id: bannerId || null,
       p_consent_id: consentId || null,
       p_date_from: dateFrom || null,
-      p_date_to: dateTo || null,
+      p_date_to: dateToInclusive,
       p_decision: decision || null,
       p_limit: limit,
       p_offset: (page - 1) * limit,
@@ -107,11 +110,12 @@ export async function GET(request: NextRequest) {
     const [logsResult, countResult] = await Promise.all([
       supabase.rpc('get_consent_logs', rpcParams),
       supabase.rpc('count_consent_logs', {
+        p_user_id: session.user.id,
         p_team_id: teamId,
         p_banner_id: bannerId || null,
         p_consent_id: consentId || null,
         p_date_from: dateFrom || null,
-        p_date_to: dateTo || null,
+        p_date_to: dateToInclusive,
         p_decision: decision || null,
       }),
     ])
@@ -123,10 +127,12 @@ export async function GET(request: NextRequest) {
 
     if (countResult.error) {
       console.error('[CONSENT-LOGS] count_consent_logs RPC failed:', countResult.error.message)
-      // Non-fatal — return data without total
+      // Non-fatal — return total: null so the client knows the count is
+      // unavailable (coercing to 0 would hide pagination and strand records
+      // past page 1).
     }
 
-    const total = countResult.data ?? 0
+    const total: number | null = countResult.error ? null : (countResult.data ?? 0)
 
     return NextResponse.json({
       data: logsResult.data || [],
