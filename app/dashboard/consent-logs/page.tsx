@@ -95,7 +95,9 @@ export default function ConsentLogsPage() {
         })
         if (res.ok) {
           const json = await res.json()
-          setBanners(json.data || json || [])
+          // /api/banners/simple returns { banners: [...] }
+          const list = json.banners ?? json.data ?? json
+          setBanners(Array.isArray(list) ? list : [])
         }
       } catch {
         // non-fatal
