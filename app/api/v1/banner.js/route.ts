@@ -291,11 +291,6 @@ export async function GET(request: NextRequest) {
     // Build internal analytics tracking code (only when analytics is enabled)
     // Analytics is automatically enabled for pro/enterprise plans
     const analyticsUserId = (ownerPlanTier !== 'free') ? (bannerUserId || '') : ''
-    if (!analyticsUserId) {
-      console.log(`[BANNER] Analytics disabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
-    } else {
-      console.log(`[BANNER] Analytics enabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
-    }
     // Server-side GPC detection via Sec-GPC header (W3C spec Section 3.3)
     const secGpc = request.headers.get('sec-gpc') === '1'
 
@@ -310,7 +305,6 @@ export async function GET(request: NextRequest) {
   var _cbTrackUrl = ${JSON.stringify(baseUrl + '/api/v1/track')};
   var _cbBannerShownAt = 0;
   var _cbEventQueue = [];
-  var _cbFlushTimer = null;
 
   // Visitor dimension collection
   var _cbSource = (function() {
@@ -352,18 +346,15 @@ export async function GET(request: NextRequest) {
     _cbEventQueue.push(evt);
     // Decision events (accept/reject/dismiss) flush immediately via sendBeacon
     // because saveConsent() loads third-party scripts that may trigger page reloads,
-    // and a 1s debounce timer would be killed before firing.
-    // Impressions still debounce since they fire during a stable page state.
+    // and a deferred flush would be killed before firing. Queued impressions ride
+    // along in the same request.
+    // Impressions do NOT flush on their own timer: they wait for a decision event
+    // or the pagehide/visibilitychange beacon, so a plain page view costs at most
+    // one /api/v1/track request instead of two.
     if (type !== 'impression') {
-      if (_cbFlushTimer) { clearTimeout(_cbFlushTimer); _cbFlushTimer = null; }
       _cbFlushEvents();
-    } else {
-      if (_cbFlushTimer) clearTimeout(_cbFlushTimer);
-      if (_cbEventQueue.length >= 5) {
-        _cbFlushEvents();
-      } else {
-        _cbFlushTimer = setTimeout(_cbFlushEvents, 1000);
-      }
+    } else if (_cbEventQueue.length >= 5) {
+      _cbFlushEvents();
     }
   }
 
