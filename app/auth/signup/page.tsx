@@ -310,7 +310,7 @@ function SignUpContent() {
                     placeholder="John Doe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
                   />
@@ -327,7 +327,7 @@ function SignUpContent() {
                     placeholder="name@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
                   />
@@ -344,7 +344,7 @@ function SignUpContent() {
                     placeholder="Create a strong password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
                   />

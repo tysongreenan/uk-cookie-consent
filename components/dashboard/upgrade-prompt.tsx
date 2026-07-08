@@ -46,7 +46,7 @@ export function UpgradePrompt({
           <Button asChild className="bg-blue-600 hover:bg-blue-700">
             <Link href="/upgrade">
               <Zap className="h-4 w-4 mr-2" />
-              Upgrade to Pro - $99
+              Upgrade to Pro - $99 USD
             </Link>
           </Button>
         </div>
@@ -77,7 +77,7 @@ export function UpgradePrompt({
           </div>
           <div className="pt-4 border-t">
             <div className="text-center mb-4">
-              <div className="text-2xl font-bold">$99</div>
+              <div className="text-2xl font-bold">$99 <span className="text-base font-medium text-gray-600">USD</span></div>
               <div className="text-sm text-gray-600">One-time payment</div>
             </div>
             <Button asChild className="w-full">

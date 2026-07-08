@@ -204,6 +204,7 @@ function UpgradeContent() {
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold">
                   {isLifetimeUser ? '$49' : '$99'}
+                  <span className="text-lg font-medium text-muted-foreground ml-1">USD</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {isLifetimeUser
@@ -227,10 +228,10 @@ function UpgradeContent() {
                   <>
                     <Crown className="h-4 w-4 mr-2" />
                     {isLifetimeUser
-                      ? 'Upgrade to Annual — $49/year'
+                      ? 'Upgrade to Annual — $49 USD/year'
                       : billingCycle === 'annual'
-                        ? 'Start Annual Plan — $99/year'
-                        : 'Buy Lifetime — $99'}
+                        ? 'Start Annual Plan — $99 USD/year'
+                        : 'Buy Lifetime — $99 USD'}
                   </>
                 )}
               </Button>
@@ -242,7 +243,7 @@ function UpgradeContent() {
               )}
 
               <p className="text-xs text-center text-muted-foreground mt-4">
-                30-day money-back guarantee. Cancel anytime.
+                All prices in US dollars (USD). 30-day money-back guarantee. Cancel anytime.
               </p>
             </div>
           </CardContent>

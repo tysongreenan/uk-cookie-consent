@@ -21,7 +21,7 @@ const plans = [
   {
     name: 'Pro',
     price: '$99',
-    period: 'one-time',
+    period: 'USD one-time',
     description: 'Everything you need, forever',
     features: [
       'Unlimited banners',

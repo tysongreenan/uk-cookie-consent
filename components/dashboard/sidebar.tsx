@@ -227,7 +227,7 @@ export function Sidebar({ className }: SidebarProps) {
             <Crown className="w-4 h-4 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">Upgrade to Pro</p>
-              <p className="text-xs opacity-80">$99/year — all features</p>
+              <p className="text-xs opacity-80">$99 USD/year — all features</p>
             </div>
           </Link>
         )}
