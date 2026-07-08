@@ -17,7 +17,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "CAD",
+      "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
       "priceValidUntil": "2026-12-31",
       "description": "Free plan available. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features."

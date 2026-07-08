@@ -39,6 +39,9 @@ export default function PricingPage() {
           <p className="text-xl text-muted-foreground">
             Start free. Upgrade when you're ready. No surprises.
           </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            All prices in US dollars (USD).
+          </p>
         </div>
 
         {/* Pricing Cards */}
@@ -54,6 +57,7 @@ export default function PricingPage() {
               <CardTitle className="text-xl">Free</CardTitle>
               <div className="flex items-baseline justify-center">
                 <span className="text-4xl font-bold">$0</span>
+                <span className="text-muted-foreground ml-1">USD</span>
               </div>
               <CardDescription>Build your first banner free</CardDescription>
             </CardHeader>
@@ -96,7 +100,7 @@ export default function PricingPage() {
               <CardTitle className="text-xl">Pro</CardTitle>
               <div className="flex items-baseline justify-center">
                 <span className="text-4xl font-bold">$99</span>
-                <span className="text-muted-foreground ml-1">once</span>
+                <span className="text-muted-foreground ml-1">USD once</span>
               </div>
               <CardDescription>Pay once, use forever</CardDescription>
             </CardHeader>
@@ -121,7 +125,7 @@ export default function PricingPage() {
               </ul>
               <Button size="lg" className="w-full" asChild>
                 <Link href="/upgrade?billing=one_time">
-                  Buy Pro — $99
+                  Buy Pro — $99 USD
                 </Link>
               </Button>
               <p className="text-xs text-center text-muted-foreground">
@@ -146,7 +150,7 @@ export default function PricingPage() {
               <CardTitle className="text-xl">Pro Annual</CardTitle>
               <div className="flex items-baseline justify-center">
                 <span className="text-4xl font-bold">$99</span>
-                <span className="text-muted-foreground ml-1">/year</span>
+                <span className="text-muted-foreground ml-1">USD/year</span>
               </div>
               <CardDescription>Every new feature, the day we ship it</CardDescription>
             </CardHeader>
@@ -262,6 +266,12 @@ export default function PricingPage() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
+            <div className="border rounded-lg p-6">
+              <h3 className="font-semibold mb-2">What currency are prices in?</h3>
+              <p className="text-sm text-muted-foreground">
+                All prices are in US dollars (USD). We're a Canadian company, but we bill in USD — if you pay with a Canadian card, your bank will convert the charge to CAD at its exchange rate.
+              </p>
+            </div>
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">What's the difference between one-time and annual?</h3>
               <p className="text-sm text-muted-foreground">

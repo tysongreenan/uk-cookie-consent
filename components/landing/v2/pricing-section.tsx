@@ -34,7 +34,7 @@ const CARDS: PriceCard[] = [
   {
     tier: 'Pro · One-time',
     price: '$99',
-    unit: 'once',
+    unit: 'USD once',
     desc: "Lock in today's features forever. Security patches, no new features.",
     features: [
       { text: '14 layouts' },
@@ -51,7 +51,7 @@ const CARDS: PriceCard[] = [
   {
     tier: 'Pro · Annual',
     price: '$99',
-    unit: '/ year',
+    unit: 'USD / year',
     desc: 'Pro + every new feature we ship. Cancel anytime.',
     features: [
       { text: 'Everything in Pro', emphasized: true },
@@ -106,7 +106,7 @@ export function PricingSection() {
           <strong className="font-semibold text-foreground">
             PIPEDA, Law 25, GDPR &amp; CCPA
           </strong>{' '}
-          compliance. 30-day money-back guarantee on Pro plans.
+          compliance. 30-day money-back guarantee on Pro plans. All prices in US dollars (USD).
         </p>
       </div>
     </section>

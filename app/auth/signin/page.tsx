@@ -218,7 +218,7 @@ function SignInContent() {
                     placeholder="name@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
                   />
@@ -243,7 +243,7 @@ function SignInContent() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                    className="pl-10 pr-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
                   />

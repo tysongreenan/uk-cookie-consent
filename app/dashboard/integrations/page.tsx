@@ -84,7 +84,7 @@ export default function IntegrationsPage() {
     try {
       // Validate measurement ID format
       if (newSettings.enabled && newSettings.measurementId) {
-        const gaIdRegex = /^G-[A-Z0-9]{10}$/
+        const gaIdRegex = /^G-[A-Z0-9]{4,14}$/
         if (!gaIdRegex.test(newSettings.measurementId)) {
           toast.error('Invalid GA4 Measurement ID format. Expected: G-XXXXXXXXXX')
           setSaving(null)
@@ -106,7 +106,7 @@ export default function IntegrationsPage() {
       }
 
       const updateResponse = await fetch(`/api/banners/simple/${bannerId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -143,15 +143,16 @@ export default function IntegrationsPage() {
       return
     }
 
-    const gaIdRegex = /^G-[A-Z0-9]{10}$/
+    const gaIdRegex = /^G-[A-Z0-9]{4,14}$/
     if (!gaIdRegex.test(measurementId)) {
       toast.error('Invalid GA4 Measurement ID format. Expected: G-XXXXXXXXXX')
       return
     }
 
-    // Open GA4 property in new tab
-    window.open(`https://analytics.google.com/analytics/web/#/p${measurementId}`, '_blank')
-    toast.success('Opening your GA4 property in a new tab')
+    // Measurement IDs can't be deep-linked (GA URLs use the numeric property ID),
+    // so send the user to Tag Assistant to verify the tag instead
+    window.open('https://tagassistant.google.com/', '_blank')
+    toast.success('Measurement ID format is valid — opening Google Tag Assistant to verify your tag')
   }
 
   const updateBannerSettings = (bannerId: string, field: string, value: any) => {

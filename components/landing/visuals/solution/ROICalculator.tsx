@@ -238,7 +238,7 @@ export function ROICalculator({ industry = 'ecommerce' }: ROICalculatorProps) {
                 Net Annual Savings vs. Risk
               </p>
               <p className="text-sm text-blue-500 mt-2">
-                Our solution costs $9/month vs. ${results.totalRisk.toLocaleString()}/year in risk
+                Our solution costs $99 USD one-time vs. ${results.totalRisk.toLocaleString()}/year in risk
               </p>
             </div>
           </div>
