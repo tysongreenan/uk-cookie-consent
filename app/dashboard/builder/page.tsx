@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -529,6 +529,19 @@ function BannerBuilderContent() {
   // What the express setup applied, shown as a dismissible summary above the
   // wizard so the user doesn't have to hunt through tabs to find out.
   const [expressSummary, setExpressSummary] = useState<{ domain: string; items: { label: string; tab: string }[] } | null>(null)
+  // Scripts tab: configured scripts render collapsed to a one-line row; the
+  // editor (and its how-to copy) only appears on demand. Scripts without code
+  // stay expanded — there's nothing to collapse to.
+  const [expandedScripts, setExpandedScripts] = useState<Set<string>>(new Set())
+  const isScriptExpanded = (id: string) => expandedScripts.has(id)
+  const toggleScriptExpanded = (id: string) => {
+    setExpandedScripts(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -3037,6 +3050,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3052,12 +3075,12 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
-                            {script.scriptCode.trim() && (
+                            {script.scriptCode.trim() && isScriptExpanded(script.id) && (
                               <div className="px-3 pb-3 space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground mb-1 block">
-                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm') 
-                                      ? 'Head Code (Step 1: Paste in <head> section)' 
+                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')
+                                      ? 'Head Code (Step 1: Paste in <head> section)'
                                       : 'Script Code'}
                                   </Label>
                                   <textarea
@@ -3247,6 +3270,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3262,6 +3295,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3325,6 +3359,7 @@ function BannerBuilderContent() {
                                 />
                               </div>
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -3413,6 +3448,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3428,6 +3473,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3528,6 +3574,7 @@ function BannerBuilderContent() {
                                 </div>
                               )}
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -3616,6 +3663,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3631,6 +3688,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3694,6 +3752,7 @@ function BannerBuilderContent() {
                                 />
                               </div>
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
