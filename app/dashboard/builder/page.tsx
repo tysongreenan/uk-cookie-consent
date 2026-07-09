@@ -4690,6 +4690,8 @@ function BannerBuilderContent() {
                       bannerId={bannerId || undefined}
                       planTier={session?.user?.planTier || 'free'}
                       detectedCmpVendor={detectedCmpVendor || undefined}
+                      onRequestSave={handleSave}
+                      isSaving={isLoading}
                     />
                   </CardContent>
                 </Card>
