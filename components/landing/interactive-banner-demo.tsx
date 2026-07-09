@@ -699,7 +699,8 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
       behavior: {
         ...prev.behavior,
         showPreferences: template.compliance.requiresGranularConsent,
-        cookieExpiry: template.compliance.consentExpiry
+        // consentExpiry is months; cookieExpiry is days
+        cookieExpiry: Math.round(template.compliance.consentExpiry * 30.44)
       }
     }))
     

@@ -90,6 +90,13 @@ export async function POST(request: NextRequest) {
     // Validate bannerId format if provided
     const safeBannerId = bannerId && isValidUuid(bannerId) ? bannerId : null
 
+    // Visitor country comes from this request's own Vercel geo header —
+    // banner.js is edge-cached and shared across visitors, so it can no
+    // longer bake the country into the events it sends. The payload value
+    // remains as a fallback for older cached copies of banner.js.
+    const headerCountry = request.headers.get('x-vercel-ip-country')
+    const requestCountry = (headerCountry && /^[A-Z]{2}$/.test(headerCountry)) ? headerCountry : null
+
     // Build all RPC calls first, then fire in parallel
     const rpcCalls: PromiseLike<{ event: string; type: 'stat' | 'visitor'; error: any }>[] = []
 
@@ -114,8 +121,9 @@ export async function POST(request: NextRequest) {
         ? event.source.toLowerCase() : 'direct'
       const safeDevice = (typeof event.device === 'string' && VALID_DEVICES.has(event.device))
         ? event.device : 'desktop'
-      const safeCountry = (typeof event.country === 'string' && /^[A-Z]{2}$/.test(event.country))
-        ? event.country : 'unknown'
+      const safeCountry = requestCountry
+        || ((typeof event.country === 'string' && /^[A-Z]{2}$/.test(event.country))
+          ? event.country : 'unknown')
       const safePagePath = (typeof event.pagePath === 'string')
         ? event.pagePath.replace(/[<>"']/g, '').slice(0, 200) : '/'
 

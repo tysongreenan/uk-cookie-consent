@@ -22,7 +22,9 @@ function BuilderContent() {
     const savedConfig = localStorage.getItem('pendingBannerConfig')
     if (!savedConfig) {
       if (url) {
-        router.push('/dashboard/builder')
+        // Carry the URL into the dashboard's express setup so the scan
+        // starts automatically after signup.
+        router.push(`/dashboard/builder?url=${encodeURIComponent(url)}`)
       }
       return
     }

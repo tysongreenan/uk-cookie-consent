@@ -115,13 +115,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Country: normalize instead of reject. banner.js sends 'unknown' when the
-    // x-vercel-ip-country header is absent; the DB column also defaults to
-    // 'unknown'. A consent record with an unknown country is far better than a
-    // dropped Law 25 proof-of-consent record.
-    const safeCountry = (typeof country === 'string' && isValidCountryCode(country))
-      ? country
-      : 'unknown'
+    // Country: prefer this request's own Vercel geo header — banner.js is
+    // edge-cached and shared across visitors, so it can no longer bake the
+    // country into the payload. The payload value remains as a fallback for
+    // older cached copies of banner.js, and we normalize instead of reject:
+    // a consent record with an unknown country is far better than a dropped
+    // Law 25 proof-of-consent record.
+    const headerCountry = request.headers.get('x-vercel-ip-country')
+    const safeCountry = (headerCountry && isValidCountryCode(headerCountry))
+      ? headerCountry
+      : (typeof country === 'string' && isValidCountryCode(country))
+        ? country
+        : 'unknown'
 
     const safePagePath = (typeof pagePath === 'string')
       ? pagePath.replace(/[<>"']/g, '').slice(0, 200)

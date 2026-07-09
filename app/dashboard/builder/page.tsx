@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -25,7 +25,7 @@ import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
-import { getComplianceRequirements } from '@/lib/compliance-frameworks'
+import { getComplianceRequirements, consentExpiryToCookieDays } from '@/lib/compliance-frameworks'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -34,6 +34,7 @@ import { Slider } from '@/components/ui/slider'
 import { ContrastBadge } from '@/components/ui/contrast-badge'
 import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
 import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
+import { ExpressStart, ExpressSetupResult } from '@/components/banner/express-start'
 import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
@@ -512,7 +513,6 @@ function BannerBuilderContent() {
   useEffect(() => { setPreviewView(null) }, [activeTab])
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
-  const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<PlanTier>('free')
   const [brandImportUrl, setBrandImportUrl] = useState('')
@@ -522,6 +522,26 @@ function BannerBuilderContent() {
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
+  // Express setup: new banners start with a URL-first screen that pre-fills
+  // brand, scripts, and compliance from a site scan. Completed or skipped
+  // once per visit; editing an existing banner bypasses it entirely.
+  const [expressDone, setExpressDone] = useState(false)
+  // What the express setup applied, shown as a dismissible summary above the
+  // wizard so the user doesn't have to hunt through tabs to find out.
+  const [expressSummary, setExpressSummary] = useState<{ domain: string; items: { label: string; tab: string }[] } | null>(null)
+  // Scripts tab: configured scripts render collapsed to a one-line row; the
+  // editor (and its how-to copy) only appears on demand. Scripts without code
+  // stay expanded — there's nothing to collapse to.
+  const [expandedScripts, setExpandedScripts] = useState<Set<string>>(new Set())
+  const isScriptExpanded = (id: string) => expandedScripts.has(id)
+  const toggleScriptExpanded = (id: string) => {
+    setExpandedScripts(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -622,8 +642,6 @@ function BannerBuilderContent() {
         setConfig(bannerConfig)
         setIsEditing(true)
         setBannerId(id)
-        // Store updatedAt for cache-busting in script URLs
-        setBannerUpdatedAt(data.banner.updatedAt ? new Date(data.banner.updatedAt) : new Date())
         toast.success(`Loaded "${data.banner.name}" for editing`)
       } else {
         console.error('Failed to load banner:', data.error)
@@ -796,10 +814,10 @@ function BannerBuilderContent() {
       behavior: {
         ...prev.behavior,
         showPreferences: compliance.requiresGranularConsent,
-        cookieExpiry: compliance.consentExpiry
+        cookieExpiry: consentExpiryToCookieDays(compliance.consentExpiry)
       }
     }))
-    
+
     toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
@@ -850,6 +868,113 @@ function BannerBuilderContent() {
 
   const [isPushing, setIsPushing] = useState(false)
 
+  const applyExpressSetup = (result: ExpressSetupResult) => {
+    // GA4 found on the site: paid plans get the native integration (consent
+    // events, impression tracking) and skip importing the raw gtag script so
+    // analytics doesn't load twice. Free plans keep it as a regular script.
+    const useNativeGa4 = !!result.ga4MeasurementId && canAccessFeature(userPlan, 'hasGA4Integration')
+    const scriptsToImport = useNativeGa4
+      ? result.scripts.filter(script => !result.ga4ScriptIds.includes(script.id))
+      : result.scripts
+
+    setConfig(prev => {
+      let next: BannerConfig = { ...prev, name: `${result.domain} Cookie Banner` }
+
+      if (result.framework) {
+        const compliance = getComplianceRequirements(result.framework)
+        next = {
+          ...next,
+          compliance,
+          behavior: {
+            ...next.behavior,
+            showPreferences: compliance.requiresGranularConsent,
+            cookieExpiry: consentExpiryToCookieDays(compliance.consentExpiry),
+          },
+        }
+      }
+
+      if (useNativeGa4) {
+        next = {
+          ...next,
+          integrations: {
+            ...next.integrations,
+            googleAnalytics: {
+              enabled: true,
+              measurementId: result.ga4MeasurementId!,
+              trackConsentEvents: true,
+              trackImpressions: true,
+              anonymizeIp: true,
+            },
+          },
+        }
+      }
+
+      if (result.brand?.colorsDiscovered && result.brand.suggestions) {
+        next = { ...next, theme: 'custom', colors: { ...next.colors, ...result.brand.suggestions } }
+      }
+
+      if (result.brand?.logo?.url) {
+        next = {
+          ...next,
+          branding: {
+            ...next.branding,
+            logo: { ...next.branding.logo, enabled: true, url: result.brand.logo.url },
+          },
+        }
+      }
+
+      if (result.scan?.privacyPolicyUrl) {
+        next = {
+          ...next,
+          branding: {
+            ...next.branding,
+            privacyPolicy: { ...next.branding.privacyPolicy, url: result.scan.privacyPolicyUrl },
+          },
+        }
+      }
+
+      if (scriptsToImport.length > 0) {
+        const buckets = {
+          strictlyNecessary: [...next.scripts.strictlyNecessary],
+          functionality: [...next.scripts.functionality],
+          trackingPerformance: [...next.scripts.trackingPerformance],
+          targetingAdvertising: [...next.scripts.targetingAdvertising],
+        }
+        scriptsToImport.forEach(script => {
+          buckets[categoryToConfigKey(script.category)].push(script)
+        })
+        next = { ...next, scripts: buckets }
+      }
+
+      return next
+    })
+
+    if (result.scan?.consentBanner?.detected) {
+      setDetectedCmpVendor(result.scan.consentBanner.vendor)
+    }
+    if (result.brand) {
+      setBrandDiscovery(result.brand)
+      setBrandImportUrl(result.url)
+    }
+
+    const items: { label: string; tab: string }[] = []
+    if (result.framework) items.push({ label: `${result.framework.toUpperCase()} compliance defaults`, tab: 'compliance' })
+    if (result.brand?.colorsDiscovered) items.push({ label: 'Brand colors', tab: 'brand' })
+    if (result.brand?.logo?.url) items.push({ label: 'Logo', tab: 'brand' })
+    if (scriptsToImport.length > 0) items.push({ label: `${scriptsToImport.length} tracking script${scriptsToImport.length === 1 ? '' : 's'}`, tab: 'scripts' })
+    if (useNativeGa4) items.push({ label: `Google Analytics (${result.ga4MeasurementId})`, tab: 'analytics' })
+    if (result.scan?.privacyPolicyUrl) items.push({ label: 'Privacy policy link', tab: 'cookie-settings' })
+    if (result.scan?.consentBanner?.detected && result.scan.consentBanner.vendor && result.scan.consentBanner.vendor !== 'UK Cookie Consent') {
+      items.push({ label: `Replace ${result.scan.consentBanner.vendor} checklist`, tab: 'code' })
+    }
+    setExpressSummary({ domain: result.domain, items })
+
+    setIsDirty(true)
+    setExpressDone(true)
+    setActiveTab('compliance')
+    toast.success(`Banner set up from ${result.domain} — review the summary, then push live.`, { duration: 6000 })
+  }
+
   const handleSave = async () => {
     setIsLoading(true)
     try {
@@ -880,12 +1005,6 @@ function BannerBuilderContent() {
       if (response.ok) {
         // Update local config with the version
         setConfig(configWithVersion)
-        // Update timestamp for cache-busting
-        if (data.banner?.updatedAt) {
-          setBannerUpdatedAt(new Date(data.banner.updatedAt))
-        } else {
-          setBannerUpdatedAt(new Date())
-        }
         setIsDirty(false)
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
@@ -944,27 +1063,12 @@ function BannerBuilderContent() {
       
       if (response.ok) {
         setConfig(configWithVersion)
-        // Update timestamp for cache-busting - this will update the script URL automatically
-        if (data.banner?.updatedAt) {
-          setBannerUpdatedAt(new Date(data.banner.updatedAt))
-        } else {
-          setBannerUpdatedAt(new Date())
-        }
-        
-        // Force refresh the banner script by hitting it with nocache
-        // Use cache: 'no-store' to bypass browser's HTTP cache entirely
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
-        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`, {
-          cache: 'no-store'
-        })
-        
         setIsDirty(false)
         toast.success(
           <div>
             <strong>Changes pushed live!</strong>
-            <p className="text-sm mt-1">The script URL has been updated with a new cache-busting parameter.</p>
-            <p className="text-sm mt-1">Browsers will automatically fetch the latest version.</p>
-            <p className="text-xs mt-1 text-muted-foreground">If you see old content, hard refresh (Ctrl+Shift+R).</p>
+            <p className="text-sm mt-1">Your banner is delivered from our edge cache — the update rolls out to your website within about 5 minutes.</p>
+            <p className="text-sm mt-1">No code changes needed on your site.</p>
           </div>,
           { duration: 6000 }
         )
@@ -1045,6 +1149,21 @@ function BannerBuilderContent() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="mt-2 text-muted-foreground">Loading banner for editing...</p>
         </div>
+      </div>
+    )
+  }
+
+  // New banners start with the express URL-first screen. Editing an existing
+  // banner (id/edit param) skips it, and "I don't have a website yet" drops
+  // into the classic step-by-step wizard with defaults.
+  if (!isEditing && !searchParams.get('id') && !searchParams.get('edit') && !expressDone) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ExpressStart
+          initialUrl={searchParams.get('url') || undefined}
+          onComplete={applyExpressSetup}
+          onSkip={() => setExpressDone(true)}
+        />
       </div>
     )
   }
@@ -1316,7 +1435,46 @@ function BannerBuilderContent() {
                    'Copy the code below and paste it into your website to activate your cookie banner.'}
                 </p>
               </div>
-              
+
+              {/* Express setup summary — everything the URL scan pre-filled,
+                  with jump links so users don't have to hunt through tabs */}
+              {expressSummary && (
+                <div className="relative mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
+                  <button
+                    onClick={() => setExpressSummary(null)}
+                    className="absolute right-3 top-3 text-green-700 hover:text-green-900 dark:text-green-400 dark:hover:text-green-200"
+                    aria-label="Dismiss setup summary"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <p className="pr-6 text-sm font-semibold text-green-900 dark:text-green-300">
+                    Set up from {expressSummary.domain}
+                  </p>
+                  {expressSummary.items.length > 0 ? (
+                    <>
+                      <p className="mt-1 text-xs text-green-800 dark:text-green-400">
+                        Here&apos;s what we applied — click any item to review it:
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {expressSummary.items.map(item => (
+                          <button
+                            key={item.label}
+                            onClick={() => setActiveTab(item.tab)}
+                            className="rounded-full border border-green-300 bg-white px-2.5 py-1 text-xs font-medium text-green-900 transition-colors hover:bg-green-100 dark:border-green-700 dark:bg-green-900/40 dark:text-green-200 dark:hover:bg-green-900/70"
+                          >
+                            ✓ {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs text-green-800 dark:text-green-400">
+                      We scanned the site but couldn&apos;t pre-fill anything — configure the steps below.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               {/* Compliance Tab */}
@@ -2892,6 +3050,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -2907,12 +3075,12 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
-                            {script.scriptCode.trim() && (
+                            {script.scriptCode.trim() && isScriptExpanded(script.id) && (
                               <div className="px-3 pb-3 space-y-3">
                                 <div>
                                   <Label className="text-xs text-muted-foreground mb-1 block">
-                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm') 
-                                      ? 'Head Code (Step 1: Paste in <head> section)' 
+                                    {script.name.toLowerCase().includes('google tag manager') || script.name.toLowerCase().includes('gtm')
+                                      ? 'Head Code (Step 1: Paste in <head> section)'
                                       : 'Script Code'}
                                   </Label>
                                   <textarea
@@ -3102,6 +3270,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3117,6 +3295,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3180,6 +3359,7 @@ function BannerBuilderContent() {
                                 />
                               </div>
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -3268,6 +3448,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3283,6 +3473,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3383,6 +3574,7 @@ function BannerBuilderContent() {
                                 </div>
                               )}
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -3471,6 +3663,16 @@ function BannerBuilderContent() {
                                     </Button>
                                   )
                                 ) : null}
+                                {script.scriptCode.trim() && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleScriptExpanded(script.id)}
+                                    aria-label={isScriptExpanded(script.id) ? 'Hide script code' : 'Show script code'}
+                                  >
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isScriptExpanded(script.id) ? 'rotate-180' : ''}`} />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -3486,6 +3688,7 @@ function BannerBuilderContent() {
                                 </Button>
                               </div>
                             </div>
+                            {(!script.scriptCode.trim() || isScriptExpanded(script.id)) && (
                             <div className="px-3 pb-3 space-y-3">
                               {!script.scriptCode.trim() && (
                                 <div className="p-3 bg-muted/50 rounded-lg border">
@@ -3549,6 +3752,7 @@ function BannerBuilderContent() {
                                 />
                               </div>
                             </div>
+                            )}
                           </div>
                         ))}
                         <Button
@@ -4545,6 +4749,8 @@ function BannerBuilderContent() {
                       bannerId={bannerId || undefined}
                       planTier={session?.user?.planTier || 'free'}
                       detectedCmpVendor={detectedCmpVendor || undefined}
+                      onRequestSave={handleSave}
+                      isSaving={isLoading}
                     />
                   </CardContent>
                 </Card>

@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 5
+export const GENERATOR_VERSION = 6
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 6,
+    date: '2026-07-09',
+    title: 'Faster Banner Delivery via Edge Caching',
+    changes: [
+      'Hosted banner scripts are now served from a global edge cache — faster loads for your visitors, especially on high-traffic sites',
+      'Banner updates roll out worldwide within about 5 minutes of pushing live',
+      'Geo-targeted banners now resolve visitor location client-side, so they get the same edge-cached speed',
+      'Hosted script users: no action needed. Manual copy-paste users: switch to the hosted script to get this and all future updates automatically',
+    ],
+  },
   {
     version: 5,
     date: '2026-03-16',
