@@ -68,8 +68,8 @@ export function UpdateAnnouncement() {
             )}
 
             <div className="relative container mx-auto px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center space-x-4">
                   {/* Animated icon */}
                   <motion.div
                     animate={{ 
@@ -89,10 +89,10 @@ export function UpdateAnnouncement() {
                   </motion.div>
 
                   {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3">
-                      <motion.h2 
-                        className="text-lg font-bold"
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <motion.h2
+                        className="text-base font-bold sm:text-lg"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
@@ -123,11 +123,12 @@ export function UpdateAnnouncement() {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-none items-center space-x-3">
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 }}
+                    className="hidden md:block"
                   >
                     <Button 
                       asChild

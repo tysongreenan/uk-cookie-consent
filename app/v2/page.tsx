@@ -56,7 +56,8 @@ export default function HomePageV2() {
     <div className="min-h-screen bg-background">
       <AEOStructuredData baseUrl={baseUrl} />
 
-      <ABTracker experiment="homepage" variant="v2" />
+      {/* This route now hosts the CLASSIC design (the redesign lives at /). */}
+      <ABTracker experiment="homepage" variant="v1-classic" />
       <LiveCookieBanner />
       <Header />
       <main>
