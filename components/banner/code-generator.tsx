@@ -249,7 +249,7 @@ ${generateBannerHTML(config, { showBranding })}
 
         {/* Explanation */}
         <p className="text-xs text-muted-foreground text-center">
-          This script loads your cookie banner from our servers. When you update your banner in the builder and save, the changes go live automatically — no code changes needed on your website.
+          This script loads your cookie banner from our global edge network. When you update your banner in the builder and push live, the changes roll out automatically within about 5 minutes — no code changes needed on your website.
         </p>
 
         {/* Collapsible manual code section */}

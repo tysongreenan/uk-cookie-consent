@@ -1,16 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
+import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript, generateGeoLoader } from '@/lib/banner-generator'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
 import { resolveEffectivePlan } from '@/lib/team-permissions'
 import { PlanTier } from '@/types'
-// NOTE: In-memory banner cache removed intentionally.
-// On Vercel serverless, each instance has its own memory — invalidating cache
-// on one instance doesn't clear others, causing stale banners after updates.
-// We rely on ETag/304 (database updatedAt) + short Cache-Control max-age instead.
+
+// ── Caching model ────────────────────────────────────────────────────────────
+// This response is identical for every visitor, so Vercel's edge cache serves
+// it without invoking this function. Cost scales with the number of banners
+// (one regeneration per banner per edge region per s-maxage window), not with
+// customer pageviews.
+//
+// Everything per-visitor has been moved out of the response:
+//   - Geo rules: banners with geo rules return a small cacheable loader that
+//     resolves the visitor's country via /api/v1/geo (edge runtime, cached in
+//     sessionStorage) and then loads banner.js?id=X&geo=CC — each country
+//     variant is its own edge-cached URL.
+//   - GPC: detected client-side via navigator.globalPrivacyControl (the same
+//     browsers that send the Sec-GPC header expose the JS property).
+//   - Analytics/consent-log country: derived server-side by /api/v1/track and
+//     /api/v1/consent-log from their own request headers at ingestion time.
+//
+// Publish propagation: s-maxage=300 + stale-while-revalidate=600 means edits
+// are typically live within ~5 minutes and guaranteed within 15.
+
+const SCRIPT_CACHE_HEADERS = {
+  'Cache-Control': 'public, max-age=60, must-revalidate',
+  'CDN-Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+}
+
+// Error responses cache briefly so a dead/disabled banner ID embedded on a
+// high-traffic page can't hammer the function, while recovering fast once
+// the banner is created or re-enabled.
+const ERROR_CACHE_HEADERS = {
+  'Cache-Control': 'public, max-age=0, must-revalidate',
+  'CDN-Cache-Control': 'public, s-maxage=60',
+}
 
 // Lazy initialization to avoid build-time errors and ensure service role key is used
 function getSupabaseClient() {
@@ -33,7 +61,9 @@ function getSupabaseClient() {
   })
 }
 
-// Rate limiter: 100 requests per minute per IP (generous for legitimate use)
+// Rate limiter: 100 requests per minute per IP. With edge caching in front,
+// only cache misses reach this function, so the limit protects regeneration
+// (e.g. cache-key spraying via junk geo params) rather than normal traffic.
 const bannerScriptRateLimit = new RateLimit({
   name: 'banner-script',
   windowMs: 60 * 1000, // 1 minute
@@ -44,6 +74,15 @@ const bannerScriptRateLimit = new RateLimit({
 function isValidBannerId(id: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
   return uuidRegex.test(id)
+}
+
+// Validate the geo variant param: "CA", "CA-QC", or "XX" (resolution failed).
+// Anything else is dropped so junk values can't multiply cache entries.
+function parseGeoParam(raw: string | null): { country: string; region: string } | null {
+  if (!raw || !/^[A-Z]{2}(-[A-Z0-9]{1,3})?$/.test(raw)) return null
+  const [country, region] = raw.split('-')
+  if (country === 'XX') return { country: '', region: '' }
+  return { country, region: region || '' }
 }
 
 export const dynamic = 'force-dynamic'
@@ -57,6 +96,8 @@ export async function GET(request: NextRequest) {
         status: 429,
         headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
+          // Per-IP response — must never be shared by a cache
+          'Cache-Control': 'private, no-store',
           'X-RateLimit-Limit': '100',
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
@@ -68,12 +109,13 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const bannerId = searchParams.get('id')
-    
+
     if (!bannerId) {
-      return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
+      return new NextResponse('console.error("Cookie Banner: Missing banner ID");', {
         status: 400,
-        headers: { 
+        headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
+          ...ERROR_CACHE_HEADERS,
           ...SECURITY_HEADERS,
         }
       })
@@ -81,77 +123,30 @@ export async function GET(request: NextRequest) {
 
     // Validate banner ID format to prevent injection attacks
     if (!isValidBannerId(bannerId)) {
-      return new NextResponse('console.error("Cookie Banner: Invalid banner ID format");', { 
+      return new NextResponse('console.error("Cookie Banner: Invalid banner ID format");', {
         status: 400,
-        headers: { 
+        headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
+          ...ERROR_CACHE_HEADERS,
           ...SECURITY_HEADERS,
         }
       })
     }
-    
-    // Fetch updatedAt from DB for ETag generation
-    // This is the source of truth for cache invalidation across serverless instances
+
+    const geoVariant = parseGeoParam(searchParams.get('geo'))
+
     const supabase = getSupabaseClient()
 
-    // Quick query to get just updatedAt for ETag
-    let updatedAt: number | null = null
-    const { data: bannerMeta } = await supabase
-      .from('SimpleBanners')
-      .select('"updatedAt"')
-      .eq('id', bannerId)
-      .single()
-
-    if (bannerMeta?.updatedAt) {
-      updatedAt = new Date(bannerMeta.updatedAt).getTime()
-    }
-
-    // Generate ETag based on database updatedAt + geo data (source of truth)
-    // Geo data is included because the same banner serves different JS to different regions
-    const earlyGeoCountry = request.headers.get('x-vercel-ip-country') || 'unknown'
-    const earlyGeoRegion = request.headers.get('x-vercel-ip-country-region') || ''
-    // Include the deploy SHA so a new Vercel deploy invalidates every browser's
-    // cached banner.js — generator-code fixes reach all customer sites on the
-    // next page load without anyone needing to re-publish their banner.
-    const deployVersion = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || 'dev'
-    const etag = updatedAt
-      ? `"${bannerId}-${updatedAt}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
-      : `"${bannerId}-${Date.now()}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
-    const ifNoneMatch = request.headers.get('if-none-match')
-
-    // If client has matching ETag (same updatedAt + same geo), return 304 Not Modified
-    // The ETag is based on database timestamp, so this works correctly across serverless instances
-    if (ifNoneMatch === etag && updatedAt) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          'ETag': etag,
-          'Cache-Control': 'private, no-cache, must-revalidate',
-          'X-Cache': 'NOT-MODIFIED',
-          ...SECURITY_HEADERS,
-        },
-      })
-    }
-
-    // Fetch full banner from database
-    // No in-memory cache — every request gets fresh data from DB, with ETag/304 for browser caching
-    // Try SimpleBanners first (new system)
-    let banner: any = null
-    let error: any = null
-    
-    // First try SimpleBanners table
-    const { data: simpleBanner, error: simpleError } = await supabase
+    // Single query for the full banner row — updatedAt (for the ETag) comes
+    // with it. With the edge cache absorbing repeat traffic, this function
+    // only runs on cache misses, so there's no need for a separate
+    // lightweight ETag pre-check query.
+    const { data: banner, error } = await supabase
       .from('SimpleBanners')
       .select('id, name, config, "isActive", "updatedAt", "userId"')
       .eq('id', bannerId)
       .single()
 
-    if (!simpleError && simpleBanner) {
-      banner = simpleBanner
-    } else {
-      error = simpleError
-    }
-    
     if (error || !banner) {
       console.error('Banner fetch error:', error)
       return new NextResponse(
@@ -160,30 +155,34 @@ export async function GET(request: NextRequest) {
           status: 404,
           headers: {
             'Content-Type': 'application/javascript; charset=utf-8',
+            ...ERROR_CACHE_HEADERS,
             ...SECURITY_HEADERS,
           }
         }
       )
     }
-    
-    // Use updatedAt from banner (already fetched above)
-    // Reuse earlyGeoCountry/earlyGeoRegion from above for consistent ETag format
+
+    // ETag identifies the generated content: banner revision + deploy SHA
+    // (so generator fixes invalidate every cached copy on the next deploy).
+    // Geo no longer participates — each geo variant is its own URL and
+    // therefore its own cache entry.
     const bannerUpdatedAt = banner.updatedAt ? new Date(banner.updatedAt).getTime() : Date.now()
-    const finalEtag = `"${bannerId}-${bannerUpdatedAt}-${earlyGeoCountry}-${earlyGeoRegion}-${deployVersion}"`
-    
+    const deployVersion = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) || 'dev'
+    const etag = `"${bannerId}-${bannerUpdatedAt}-${deployVersion}"`
+    const ifNoneMatch = request.headers.get('if-none-match')
+
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'ETag': etag,
+          ...SCRIPT_CACHE_HEADERS,
+          ...SECURITY_HEADERS,
+        },
+      })
+    }
+
     if (banner.isActive === false) {
-      // Check if client has cached version (304 Not Modified)
-      if (ifNoneMatch === finalEtag) {
-        return new NextResponse(null, {
-          status: 304,
-          headers: {
-            'ETag': finalEtag,
-            'Cache-Control': 'private, no-cache, must-revalidate',
-            ...SECURITY_HEADERS,
-          },
-        })
-      }
-      
       const inactiveMessage =
         `console.warn("[Cookie Banner] " + ${JSON.stringify(banner.name || 'Unnamed banner')} +
           " (id: " + ${JSON.stringify(bannerId)} + ") is currently disabled. " +
@@ -192,14 +191,13 @@ export async function GET(request: NextRequest) {
       return new NextResponse(inactiveMessage, {
         headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
-          'Cache-Control': 'private, no-cache, must-revalidate',
-          'ETag': finalEtag,
-          'X-Cache': 'MISS',
+          'ETag': etag,
+          ...ERROR_CACHE_HEADERS,
           ...SECURITY_HEADERS,
         }
       })
     }
-    
+
     let config = typeof banner.config === 'string'
       ? JSON.parse(banner.config)
       : banner.config
@@ -247,17 +245,42 @@ export async function GET(request: NextRequest) {
       config.integrations.tcf = undefined
     }
 
-    // Geo-targeting: read Vercel geo headers and apply matching rule overrides
-    // Only apply geo rules for paid plans (server-side enforcement)
-    const visitorCountry = request.headers.get('x-vercel-ip-country') || ''
-    const visitorRegion = request.headers.get('x-vercel-ip-country-region') || ''
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
+
+    // Extract the inner JS from the consent init script tag (shared by the
+    // geo loader and the full script)
+    const consentInitJs = generateConsentInitScript(config)
+      .replace(/<script[^>]*>/i, '')
+      .replace(/<\/script>/i, '')
+      .trim()
+
+    // Geo-targeting (paid plans only, server-side enforcement). Banners with
+    // active geo rules use the two-step loader flow so this response stays
+    // shareable across visitors; the loader comes back with a ?geo= variant
+    // and we apply the matching rule below.
     const geoRules = ownerPlanTier !== 'free' ? (config.geoRules || []) : []
+    const activeGeoRules = geoRules.filter((rule: any) => rule.enabled)
+
+    if (activeGeoRules.length > 0 && !geoVariant) {
+      const useRegion = activeGeoRules.some((rule: any) => !!rule.region)
+      const loader = generateGeoLoader(bannerId, baseUrl, useRegion, consentInitJs)
+      return new NextResponse(loader, {
+        headers: {
+          'Content-Type': 'application/javascript; charset=utf-8',
+          'ETag': etag,
+          'Access-Control-Allow-Origin': '*',
+          ...SCRIPT_CACHE_HEADERS,
+          ...SECURITY_HEADERS,
+        },
+      })
+    }
+
+    const visitorCountry = geoVariant?.country || ''
+    const visitorRegion = geoVariant?.region || ''
     // Try specific match (country + region) first, then fall back to country-only match
-    const matchedGeoRule = geoRules.find((rule: any) => {
-      if (!rule.enabled) return false
+    const matchedGeoRule = activeGeoRules.find((rule: any) => {
       return rule.country === visitorCountry && rule.region && rule.region === visitorRegion
-    }) || geoRules.find((rule: any) => {
-      if (!rule.enabled) return false
+    }) || activeGeoRules.find((rule: any) => {
       return rule.country === visitorCountry && !rule.region
     })
 
@@ -284,13 +307,6 @@ export async function GET(request: NextRequest) {
     const html = generateBannerHTML(config, { showBranding })
     const css = generateBannerCSS(config)
     const js = generateBannerJS(config)
-    const consentInit = generateConsentInitScript(config)
-    
-    // Extract the inner JS from the consent init script tag
-    const consentInitJs = consentInit
-      .replace(/<script[^>]*>/i, '')
-      .replace(/<\/script>/i, '')
-      .trim()
 
     // Build internal analytics tracking code (only when analytics is enabled)
     // Analytics is automatically enabled for pro/enterprise plans
@@ -300,13 +316,12 @@ export async function GET(request: NextRequest) {
     } else {
       console.log(`[BANNER] Analytics enabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
     }
-    // Server-side GPC detection via Sec-GPC header (W3C spec Section 3.3)
-    const secGpc = request.headers.get('sec-gpc') === '1'
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     const internalAnalyticsJs = `
-  // Server-side GPC detection (Sec-GPC header) — defense-in-depth alongside client-side navigator.globalPrivacyControl
-  window.__cbServerGpc = ${secGpc};
+  // GPC detection is fully client-side: browsers that send the Sec-GPC header
+  // also expose navigator.globalPrivacyControl, and a header-derived value
+  // can't be baked into this script now that it's shared via the edge cache.
+  window.__cbServerGpc = (typeof navigator !== 'undefined' && navigator.globalPrivacyControl === true);
 
   // Internal Analytics Tracking
   var _cbAnalyticsUserId = ${JSON.stringify(analyticsUserId)};
@@ -335,7 +350,9 @@ export async function GET(request: NextRequest) {
     } catch(e) { return 'direct'; }
   })();
   var _cbDevice = screen.width < 768 ? 'mobile' : (screen.width < 1024 ? 'tablet' : 'desktop');
-  var _cbCountry = ${JSON.stringify(visitorCountry || 'unknown')};
+  // Country is resolved server-side by the track endpoint from its own
+  // request headers — it can't be baked into this shared, edge-cached script
+  var _cbCountry = 'unknown';
   var _cbPagePath = location.pathname.slice(0, 200);
 
   function _cbQueueEvent(type, extra) {
@@ -416,7 +433,9 @@ export async function GET(request: NextRequest) {
   var _cbConsentLogUrl = ${JSON.stringify(baseUrl + '/api/v1/consent-log')};
   var _cbConsentLogUserId = ${JSON.stringify(bannerUserId || '')};
   var _cbConsentLogBannerId = ${JSON.stringify(bannerId)};
-  var _cbConsentLogCountry = ${JSON.stringify(visitorCountry || 'unknown')};
+  // Country is resolved server-side by the consent-log endpoint from its own
+  // request headers — it can't be baked into this shared, edge-cached script
+  var _cbConsentLogCountry = 'unknown';
 
   function _cbGenerateUUID() {
     // UUID v4 using crypto.getRandomValues
@@ -594,33 +613,13 @@ export async function GET(request: NextRequest) {
   }
 })();
 `
-    
-    // Check if client has cached version (304 Not Modified)
-    // This is the key: when banner updates, updatedAt changes, ETag changes, browser re-fetches automatically
-    if (ifNoneMatch === finalEtag) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          'ETag': finalEtag,
-          'Cache-Control': 'private, no-cache, must-revalidate',
-          'X-Cache': 'HIT',
-          ...SECURITY_HEADERS,
-        },
-      })
-    }
-    
+
     return new NextResponse(combinedScript, {
       headers: {
         'Content-Type': 'application/javascript; charset=utf-8',
-        'Cache-Control': 'private, no-cache, must-revalidate',
-        'CDN-Cache-Control': 'no-store', // Prevent CDN caching (Vercel, Cloudflare, Brizy, etc.)
-        'Surrogate-Control': 'no-store', // Prevent CDN caching (Fastly, Akamai, etc.)
-        'ETag': finalEtag,
+        'ETag': etag,
         'Access-Control-Allow-Origin': '*',
-        'X-Cache': 'MISS',
-        'X-RateLimit-Limit': '100',
-        'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-        'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+        ...SCRIPT_CACHE_HEADERS,
         ...SECURITY_HEADERS,
       },
     })
@@ -630,6 +629,7 @@ export async function GET(request: NextRequest) {
       status: 500,
       headers: {
         'Content-Type': 'application/javascript; charset=utf-8',
+        'Cache-Control': 'private, no-store',
         ...SECURITY_HEADERS,
       }
     })

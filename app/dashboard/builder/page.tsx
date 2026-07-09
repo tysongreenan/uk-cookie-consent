@@ -512,7 +512,6 @@ function BannerBuilderContent() {
   useEffect(() => { setPreviewView(null) }, [activeTab])
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
-  const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<PlanTier>('free')
   const [brandImportUrl, setBrandImportUrl] = useState('')
@@ -622,8 +621,6 @@ function BannerBuilderContent() {
         setConfig(bannerConfig)
         setIsEditing(true)
         setBannerId(id)
-        // Store updatedAt for cache-busting in script URLs
-        setBannerUpdatedAt(data.banner.updatedAt ? new Date(data.banner.updatedAt) : new Date())
         toast.success(`Loaded "${data.banner.name}" for editing`)
       } else {
         console.error('Failed to load banner:', data.error)
@@ -880,12 +877,6 @@ function BannerBuilderContent() {
       if (response.ok) {
         // Update local config with the version
         setConfig(configWithVersion)
-        // Update timestamp for cache-busting
-        if (data.banner?.updatedAt) {
-          setBannerUpdatedAt(new Date(data.banner.updatedAt))
-        } else {
-          setBannerUpdatedAt(new Date())
-        }
         setIsDirty(false)
         toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         if (!isEditing) {
@@ -944,27 +935,12 @@ function BannerBuilderContent() {
       
       if (response.ok) {
         setConfig(configWithVersion)
-        // Update timestamp for cache-busting - this will update the script URL automatically
-        if (data.banner?.updatedAt) {
-          setBannerUpdatedAt(new Date(data.banner.updatedAt))
-        } else {
-          setBannerUpdatedAt(new Date())
-        }
-        
-        // Force refresh the banner script by hitting it with nocache
-        // Use cache: 'no-store' to bypass browser's HTTP cache entirely
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
-        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`, {
-          cache: 'no-store'
-        })
-        
         setIsDirty(false)
         toast.success(
           <div>
             <strong>Changes pushed live!</strong>
-            <p className="text-sm mt-1">The script URL has been updated with a new cache-busting parameter.</p>
-            <p className="text-sm mt-1">Browsers will automatically fetch the latest version.</p>
-            <p className="text-xs mt-1 text-muted-foreground">If you see old content, hard refresh (Ctrl+Shift+R).</p>
+            <p className="text-sm mt-1">Your banner is delivered from our edge cache — the update rolls out to your website within about 5 minutes.</p>
+            <p className="text-sm mt-1">No code changes needed on your site.</p>
           </div>,
           { duration: 6000 }
         )

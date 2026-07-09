@@ -2574,6 +2574,62 @@ if (document.readyState === 'loading') {
 })();`
 }
 
+// Small cacheable stub served for banners with geo rules. Sets Consent Mode
+// defaults immediately (the geo lookup must never delay denied-by-default),
+// resolves the visitor's location via /api/v1/geo (sessionStorage-cached),
+// then loads the country-specific banner variant. The variant URL always
+// carries a geo param ("XX" when resolution fails) so it can never recurse
+// back into this loader.
+export const generateGeoLoader = (
+  bannerId: string,
+  baseUrl: string,
+  useRegion: boolean,
+  consentInitJs: string
+): string => {
+  return `
+(function() {
+  ${consentInitJs}
+
+  var GEO_KEY = '__cb_geo_v1';
+  var USE_REGION = ${useRegion};
+  var done = false;
+
+  function loadBanner(geo) {
+    if (done) return;
+    done = true;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = ${JSON.stringify(`${baseUrl}/api/v1/banner.js?id=${bannerId}&geo=`)} + encodeURIComponent(geo || 'XX');
+    (document.head || document.documentElement).appendChild(s);
+  }
+
+  function normalize(country, region) {
+    if (!/^[A-Z]{2}$/.test(country || '')) return '';
+    if (USE_REGION && /^[A-Z0-9]{1,3}$/.test(region || '')) return country + '-' + region;
+    return country;
+  }
+
+  var cached = null;
+  try { cached = sessionStorage.getItem(GEO_KEY); } catch (e) {}
+  if (cached) { loadBanner(cached); return; }
+
+  // Never let a slow or failed geo lookup block the banner. The timeout path
+  // deliberately skips sessionStorage so the next page retries the lookup.
+  setTimeout(function() { loadBanner('XX'); }, 1500);
+  try {
+    fetch(${JSON.stringify(`${baseUrl}/api/v1/geo`)}, { mode: 'cors' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var geo = normalize(d.country, d.region) || 'XX';
+        try { sessionStorage.setItem(GEO_KEY, geo); } catch (e) {}
+        loadBanner(geo);
+      })
+      .catch(function() { loadBanner('XX'); });
+  } catch (e) { loadBanner('XX'); }
+})();
+`
+}
+
 export const generateConsentInitScript = (config?: BannerConfig) => {
   const tcfEnabled = config?.integrations?.tcf?.enabled === true
 
@@ -2607,22 +2663,27 @@ export const generateConsentInitScript = (config?: BannerConfig) => {
   
   // Set consent defaults to DENIED before any trackers load
   // This blocks ALL trackers (GTM, GA4, Meta Pixel, Google Ads, etc.) until user grants consent
-  gtag('consent', 'default', {
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': 500  // Wait 500ms for consent update before allowing trackers
-  });
-  
-  // Also push to dataLayer for GTM compatibility
-  window.dataLayer.push({
-    'event': 'cookie_consent_default',
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied'
-  });
+  // Run-once guard: geo-targeted banners run this script twice (once in the
+  // geo loader, once in the country variant) — the defaults must only fire once
+  if (!window.__cbConsentDefaultSet) {
+    window.__cbConsentDefaultSet = true;
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500  // Wait 500ms for consent update before allowing trackers
+    });
+
+    // Also push to dataLayer for GTM compatibility
+    window.dataLayer.push({
+      'event': 'cookie_consent_default',
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied'
+    });
+  }
 })();
 </script>`
 }
