@@ -26,8 +26,8 @@ export function HeroV2() {
       <div className="container mx-auto max-w-7xl px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left: copy + form */}
-          <div>
-            <h1 className="mt-5 font-heading text-5xl font-bold leading-[0.96] tracking-[-0.035em] text-foreground sm:text-6xl lg:text-[76px]">
+          <div className="min-w-0">
+            <h1 className="mt-5 font-heading text-4xl font-bold leading-[1.02] tracking-[-0.035em] text-foreground sm:text-6xl sm:leading-[0.96] lg:text-[76px]">
               <span>Free Cookie Banner</span>
               <br />
               <span className="relative inline-block whitespace-nowrap px-1 [background:linear-gradient(180deg,transparent_62%,#FFE9A8_62%,#FFE9A8_92%,transparent_92%)] dark:[background:linear-gradient(180deg,transparent_62%,rgba(255,233,168,0.35)_62%,rgba(255,233,168,0.35)_92%,transparent_92%)]">
@@ -50,7 +50,7 @@ export function HeroV2() {
 
             <form
               onSubmit={handleSubmit}
-              className="mt-7 flex max-w-xl gap-2 rounded-2xl border border-border bg-background p-2 shadow-md"
+              className="mt-7 flex max-w-xl flex-col gap-2 rounded-2xl border border-border bg-background p-2 shadow-md sm:flex-row"
             >
               <input
                 type="text"
@@ -59,13 +59,13 @@ export function HeroV2() {
                 placeholder="yourdomain.com"
                 aria-label="Your website"
                 inputMode="url"
-                className="flex-1 rounded-xl bg-transparent px-3.5 text-base text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
+                className="w-full min-w-0 rounded-xl bg-transparent px-3.5 text-base text-foreground placeholder:text-muted-foreground/70 focus:outline-none sm:flex-1"
                 style={{ height: 52 }}
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex h-[52px] items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 text-[15.5px] font-semibold text-primary-foreground transition-all hover:bg-[hsl(var(--primary-hover))] disabled:opacity-60"
+                className="inline-flex h-[52px] w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 text-[15.5px] font-semibold text-primary-foreground transition-all hover:bg-[hsl(var(--primary-hover))] disabled:opacity-60 sm:w-auto"
               >
                 {submitting ? 'Loading...' : 'Build my banner — free'}
                 <ArrowRight className="h-4 w-4" />
@@ -118,7 +118,7 @@ export function HeroV2() {
               ]}
             />
             <Sticker
-              className="absolute left-[70px] top-[240px] z-[3] w-[300px] rotate-2 bg-[#FDF6E9] dark:bg-[#FDF6E9]"
+              className="absolute left-6 top-[240px] z-[3] w-[300px] rotate-2 bg-[#FDF6E9] dark:bg-[#FDF6E9] sm:left-[70px]"
               tag="LAW 25"
               tagClassName="bg-[#F5E5C2] text-[#8B6A1A]"
               title="Nous utilisons des témoins"

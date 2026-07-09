@@ -4,11 +4,13 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ── A/B Test: Homepage V2 (disabled for bots) ──
-  // Split traffic 50/50 between / and /v2. A cookie keeps the user on
-  // the same variant for the duration of the session.
-  // IMPORTANT: Always serve v1 to search engine crawlers so Google sees
-  // consistent content — serving random variants caused ranking instability.
+  // ── A/B Test: Homepage (disabled for bots) ──
+  // Split traffic 50/50 between / (redesigned homepage) and /v2 (the
+  // classic design, noindexed). A cookie keeps the user on the same
+  // variant for the duration of the session.
+  // IMPORTANT: Always serve the indexed page at / to search engine
+  // crawlers so Google sees consistent content — serving random variants
+  // caused ranking instability.
   if (pathname === '/') {
     const ua = request.headers.get('user-agent') || ''
     const isBot = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|msnbot|petalbot|linkedinbot|facebookexternalhit|twitterbot|applebot|gptbot|oai-searchbot|claudebot|perplexitybot|bytespider/i.test(ua)
