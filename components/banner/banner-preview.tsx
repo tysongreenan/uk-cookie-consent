@@ -522,9 +522,12 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
 
 
   return (
-    <div className="relative">
+    // Fill the parent frame (the builder wraps this in a fixed-height browser
+    // chrome) so position: bottom actually pins the banner to the visible
+    // bottom edge instead of the bottom of a content-height inner box.
+    <div className="relative flex h-full min-h-[300px] flex-col">
       {/* Website Preview Background */}
-      <div className="bg-gray-100 rounded-lg p-4 mb-4 min-h-[300px] relative overflow-hidden">
+      <div className="bg-gray-100 p-4 min-h-[300px] flex-1 relative overflow-hidden">
         <div className="bg-white rounded shadow-sm p-4 h-full">
           <div className="h-4 bg-gray-200 rounded mb-4"></div>
           <div className="space-y-2">
@@ -741,7 +744,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
       />
 
       {/* Preview Controls */}
-      <div className="text-xs text-muted-foreground space-y-1">
+      <div className="border-t bg-background p-3 text-xs text-muted-foreground space-y-1">
         <p>Position: {safeConfig.position}</p>
         <p>Theme: {safeConfig.theme}</p>
         <p>Auto-show: {safeConfig.behavior.autoShow ? 'Yes' : 'No'}</p>
