@@ -34,6 +34,7 @@ import { Slider } from '@/components/ui/slider'
 import { ContrastBadge } from '@/components/ui/contrast-badge'
 import { TCFConfigPanel } from '@/components/banner/tcf-config-panel'
 import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
+import { ExpressStart, ExpressSetupResult } from '@/components/banner/express-start'
 import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
@@ -521,6 +522,10 @@ function BannerBuilderContent() {
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
+  // Express setup: new banners start with a URL-first screen that pre-fills
+  // brand, scripts, and compliance from a site scan. Completed or skipped
+  // once per visit; editing an existing banner bypasses it entirely.
+  const [expressDone, setExpressDone] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -847,6 +852,87 @@ function BannerBuilderContent() {
 
   const [isPushing, setIsPushing] = useState(false)
 
+  const applyExpressSetup = (result: ExpressSetupResult) => {
+    setConfig(prev => {
+      let next: BannerConfig = { ...prev, name: `${result.domain} Cookie Banner` }
+
+      if (result.framework) {
+        const compliance = getComplianceRequirements(result.framework)
+        next = {
+          ...next,
+          compliance,
+          behavior: {
+            ...next.behavior,
+            showPreferences: compliance.requiresGranularConsent,
+            cookieExpiry: compliance.consentExpiry,
+          },
+        }
+      }
+
+      if (result.brand?.colorsDiscovered && result.brand.suggestions) {
+        next = { ...next, theme: 'custom', colors: { ...next.colors, ...result.brand.suggestions } }
+      }
+
+      if (result.brand?.logo?.url) {
+        next = {
+          ...next,
+          branding: {
+            ...next.branding,
+            logo: { ...next.branding.logo, enabled: true, url: result.brand.logo.url },
+          },
+        }
+      }
+
+      if (result.scan?.privacyPolicyUrl) {
+        next = {
+          ...next,
+          branding: {
+            ...next.branding,
+            privacyPolicy: { ...next.branding.privacyPolicy, url: result.scan.privacyPolicyUrl },
+          },
+        }
+      }
+
+      if (result.scripts.length > 0) {
+        const buckets = {
+          strictlyNecessary: [...next.scripts.strictlyNecessary],
+          functionality: [...next.scripts.functionality],
+          trackingPerformance: [...next.scripts.trackingPerformance],
+          targetingAdvertising: [...next.scripts.targetingAdvertising],
+        }
+        result.scripts.forEach(script => {
+          buckets[categoryToConfigKey(script.category)].push(script)
+        })
+        next = { ...next, scripts: buckets }
+      }
+
+      return next
+    })
+
+    if (result.scan?.consentBanner?.detected) {
+      setDetectedCmpVendor(result.scan.consentBanner.vendor)
+    }
+    if (result.brand) {
+      setBrandDiscovery(result.brand)
+      setBrandImportUrl(result.url)
+    }
+    setIsDirty(true)
+    setExpressDone(true)
+    setActiveTab('compliance')
+
+    const applied: string[] = []
+    if (result.brand?.colorsDiscovered) applied.push('brand colors')
+    if (result.brand?.logo?.url) applied.push('logo')
+    if (result.scripts.length > 0) applied.push(`${result.scripts.length} tracking script${result.scripts.length === 1 ? '' : 's'}`)
+    if (result.scan?.privacyPolicyUrl) applied.push('privacy policy link')
+    toast.success(
+      applied.length > 0
+        ? `Set up from ${result.domain}: ${applied.join(', ')} applied. Review each step, then push live.`
+        : `Scanned ${result.domain}. Review each step, then push live.`,
+      { duration: 8000 }
+    )
+  }
+
   const handleSave = async () => {
     setIsLoading(true)
     try {
@@ -1021,6 +1107,21 @@ function BannerBuilderContent() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="mt-2 text-muted-foreground">Loading banner for editing...</p>
         </div>
+      </div>
+    )
+  }
+
+  // New banners start with the express URL-first screen. Editing an existing
+  // banner (id/edit param) skips it, and "I don't have a website yet" drops
+  // into the classic step-by-step wizard with defaults.
+  if (!isEditing && !searchParams.get('id') && !searchParams.get('edit') && !expressDone) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ExpressStart
+          initialUrl={searchParams.get('url') || undefined}
+          onComplete={applyExpressSetup}
+          onSkip={() => setExpressDone(true)}
+        />
       </div>
     )
   }
