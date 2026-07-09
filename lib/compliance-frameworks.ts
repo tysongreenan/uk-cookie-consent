@@ -109,6 +109,13 @@ export function getComplianceRequirements(framework: ComplianceFramework): Compl
   return COMPLIANCE_FRAMEWORKS[framework]
 }
 
+// compliance.consentExpiry is in MONTHS (e.g. 24 for PIPEDA, 12 for GDPR);
+// behavior.cookieExpiry is in DAYS. Assigning one to the other directly gave
+// banners a 24-day consent cookie instead of 24 months.
+export function consentExpiryToCookieDays(consentExpiryMonths: number): number {
+  return Math.round(consentExpiryMonths * 30.44)
+}
+
 export function getFrameworkDescription(framework: ComplianceFramework): string {
   return COMPLIANCE_DESCRIPTIONS[framework]
 }

@@ -25,7 +25,7 @@ import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
-import { getComplianceRequirements } from '@/lib/compliance-frameworks'
+import { getComplianceRequirements, consentExpiryToCookieDays } from '@/lib/compliance-frameworks'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -526,6 +526,9 @@ function BannerBuilderContent() {
   // brand, scripts, and compliance from a site scan. Completed or skipped
   // once per visit; editing an existing banner bypasses it entirely.
   const [expressDone, setExpressDone] = useState(false)
+  // What the express setup applied, shown as a dismissible summary above the
+  // wizard so the user doesn't have to hunt through tabs to find out.
+  const [expressSummary, setExpressSummary] = useState<{ domain: string; items: { label: string; tab: string }[] } | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -798,10 +801,10 @@ function BannerBuilderContent() {
       behavior: {
         ...prev.behavior,
         showPreferences: compliance.requiresGranularConsent,
-        cookieExpiry: compliance.consentExpiry
+        cookieExpiry: consentExpiryToCookieDays(compliance.consentExpiry)
       }
     }))
-    
+
     toast.success(`Switched to ${framework.toUpperCase()} compliance framework`)
   }
 
@@ -853,6 +856,14 @@ function BannerBuilderContent() {
   const [isPushing, setIsPushing] = useState(false)
 
   const applyExpressSetup = (result: ExpressSetupResult) => {
+    // GA4 found on the site: paid plans get the native integration (consent
+    // events, impression tracking) and skip importing the raw gtag script so
+    // analytics doesn't load twice. Free plans keep it as a regular script.
+    const useNativeGa4 = !!result.ga4MeasurementId && canAccessFeature(userPlan, 'hasGA4Integration')
+    const scriptsToImport = useNativeGa4
+      ? result.scripts.filter(script => !result.ga4ScriptIds.includes(script.id))
+      : result.scripts
+
     setConfig(prev => {
       let next: BannerConfig = { ...prev, name: `${result.domain} Cookie Banner` }
 
@@ -864,7 +875,23 @@ function BannerBuilderContent() {
           behavior: {
             ...next.behavior,
             showPreferences: compliance.requiresGranularConsent,
-            cookieExpiry: compliance.consentExpiry,
+            cookieExpiry: consentExpiryToCookieDays(compliance.consentExpiry),
+          },
+        }
+      }
+
+      if (useNativeGa4) {
+        next = {
+          ...next,
+          integrations: {
+            ...next.integrations,
+            googleAnalytics: {
+              enabled: true,
+              measurementId: result.ga4MeasurementId!,
+              trackConsentEvents: true,
+              trackImpressions: true,
+              anonymizeIp: true,
+            },
           },
         }
       }
@@ -893,14 +920,14 @@ function BannerBuilderContent() {
         }
       }
 
-      if (result.scripts.length > 0) {
+      if (scriptsToImport.length > 0) {
         const buckets = {
           strictlyNecessary: [...next.scripts.strictlyNecessary],
           functionality: [...next.scripts.functionality],
           trackingPerformance: [...next.scripts.trackingPerformance],
           targetingAdvertising: [...next.scripts.targetingAdvertising],
         }
-        result.scripts.forEach(script => {
+        scriptsToImport.forEach(script => {
           buckets[categoryToConfigKey(script.category)].push(script)
         })
         next = { ...next, scripts: buckets }
@@ -916,21 +943,23 @@ function BannerBuilderContent() {
       setBrandDiscovery(result.brand)
       setBrandImportUrl(result.url)
     }
+
+    const items: { label: string; tab: string }[] = []
+    if (result.framework) items.push({ label: `${result.framework.toUpperCase()} compliance defaults`, tab: 'compliance' })
+    if (result.brand?.colorsDiscovered) items.push({ label: 'Brand colors', tab: 'brand' })
+    if (result.brand?.logo?.url) items.push({ label: 'Logo', tab: 'brand' })
+    if (scriptsToImport.length > 0) items.push({ label: `${scriptsToImport.length} tracking script${scriptsToImport.length === 1 ? '' : 's'}`, tab: 'scripts' })
+    if (useNativeGa4) items.push({ label: `Google Analytics (${result.ga4MeasurementId})`, tab: 'analytics' })
+    if (result.scan?.privacyPolicyUrl) items.push({ label: 'Privacy policy link', tab: 'cookie-settings' })
+    if (result.scan?.consentBanner?.detected && result.scan.consentBanner.vendor && result.scan.consentBanner.vendor !== 'UK Cookie Consent') {
+      items.push({ label: `Replace ${result.scan.consentBanner.vendor} checklist`, tab: 'code' })
+    }
+    setExpressSummary({ domain: result.domain, items })
+
     setIsDirty(true)
     setExpressDone(true)
     setActiveTab('compliance')
-
-    const applied: string[] = []
-    if (result.brand?.colorsDiscovered) applied.push('brand colors')
-    if (result.brand?.logo?.url) applied.push('logo')
-    if (result.scripts.length > 0) applied.push(`${result.scripts.length} tracking script${result.scripts.length === 1 ? '' : 's'}`)
-    if (result.scan?.privacyPolicyUrl) applied.push('privacy policy link')
-    toast.success(
-      applied.length > 0
-        ? `Set up from ${result.domain}: ${applied.join(', ')} applied. Review each step, then push live.`
-        : `Scanned ${result.domain}. Review each step, then push live.`,
-      { duration: 8000 }
-    )
+    toast.success(`Banner set up from ${result.domain} — review the summary, then push live.`, { duration: 6000 })
   }
 
   const handleSave = async () => {
@@ -1393,7 +1422,46 @@ function BannerBuilderContent() {
                    'Copy the code below and paste it into your website to activate your cookie banner.'}
                 </p>
               </div>
-              
+
+              {/* Express setup summary — everything the URL scan pre-filled,
+                  with jump links so users don't have to hunt through tabs */}
+              {expressSummary && (
+                <div className="relative mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
+                  <button
+                    onClick={() => setExpressSummary(null)}
+                    className="absolute right-3 top-3 text-green-700 hover:text-green-900 dark:text-green-400 dark:hover:text-green-200"
+                    aria-label="Dismiss setup summary"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <p className="pr-6 text-sm font-semibold text-green-900 dark:text-green-300">
+                    Set up from {expressSummary.domain}
+                  </p>
+                  {expressSummary.items.length > 0 ? (
+                    <>
+                      <p className="mt-1 text-xs text-green-800 dark:text-green-400">
+                        Here&apos;s what we applied — click any item to review it:
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {expressSummary.items.map(item => (
+                          <button
+                            key={item.label}
+                            onClick={() => setActiveTab(item.tab)}
+                            className="rounded-full border border-green-300 bg-white px-2.5 py-1 text-xs font-medium text-green-900 transition-colors hover:bg-green-100 dark:border-green-700 dark:bg-green-900/40 dark:text-green-200 dark:hover:bg-green-900/70"
+                          >
+                            ✓ {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs text-green-800 dark:text-green-400">
+                      We scanned the site but couldn&apos;t pre-fill anything — configure the steps below.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 
               {/* Compliance Tab */}

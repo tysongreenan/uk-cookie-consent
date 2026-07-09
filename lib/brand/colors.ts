@@ -176,50 +176,59 @@ function buildColorCandidates(colorMap: Map<string, ColorAccumulator>): BrandCol
     .sort((a, b) => b.score - a.score)
 }
 
-function buildColorSuggestions(colors: BrandColorCandidate[]) {
-  const fallbackBackground = '#1f2937'
-  const fallbackText = '#ffffff'
-  const fallbackButton = '#3b82f6'
+// Banner color mapping: neutral surface, brand-colored accent.
+//
+// Earlier versions used the site's most prominent chromatic color as the
+// banner BACKGROUND and a second one as the button, which produced garish,
+// low-contrast banners (vivid blue background + orange button + unreadable
+// links). Bold brand colors make good buttons, not surfaces — so the banner
+// background stays neutral (matched to the site's light/dark feel), the top
+// brand color becomes the button, and the link is that same brand color
+// nudged until it actually reads against the background.
+export function buildColorSuggestions(colors: BrandColorCandidate[]) {
+  const FALLBACK = {
+    background: '#1f2937',
+    text: '#ffffff',
+    button: '#3b82f6',
+    buttonText: '#ffffff',
+    link: '#60a5fa',
+  }
 
   if (colors.length === 0) {
-    return {
-      background: fallbackBackground,
-      text: fallbackText,
-      button: fallbackButton,
-      buttonText: '#ffffff',
-      link: fallbackButton
-    }
+    return FALLBACK
   }
 
-  let background = selectColorByUsage(colors, 'background')?.hex ?? colors[0].hex
-
-  if (!background) {
-    background = fallbackBackground
+  const isChromatic = (candidate: BrandColorCandidate) => {
+    const [, sat] = chroma(candidate.hex).hsl()
+    return !isNaN(sat) && sat >= 0.25 && candidate.luminance > 0.02 && candidate.luminance < 0.95
   }
 
-  const textCandidate = colors
-    .filter(color => color.hex !== background)
-    .map(color => ({
-      hex: color.hex,
-      contrast: chroma.contrast(color.hex, background)
-    }))
-    .sort((a, b) => b.contrast - a.contrast)[0]
+  // Brand accent: highest-scored colorful color (scores already boost
+  // saturated colors over structural grays)
+  const accent = colors.find(isChromatic)?.hex ?? FALLBACK.button
 
-  const text = textCandidate && textCandidate.contrast >= 3 ? textCandidate.hex : (chroma.contrast(background, '#ffffff') >= 4.5 ? '#ffffff' : '#111111')
+  // Surface: follow the site's dominant neutral. A clearly dark site gets a
+  // dark banner; everything else gets a light one.
+  const topNeutral = colors.find(candidate => !isChromatic(candidate))
+  const useDarkSurface = !!topNeutral && topNeutral.luminance < 0.2
+  const background = useDarkSurface ? topNeutral.hex : '#ffffff'
+  const text = chroma.contrast(background, '#ffffff') >= 4.5 ? '#ffffff' : '#1f2937'
 
-  const buttonCandidate = colors
-    .filter(color => color.hex !== background && color.hex !== text)
-    .find(color => color.recommendedUsage.includes('button')) ?? colors.find(color => color.hex !== background && color.hex !== text)
+  // Button carries the brand color; its label is whichever of white/black
+  // reads better on it.
+  const button = accent
+  const buttonText = chroma.contrast(button, '#ffffff') >= chroma.contrast(button, '#111111')
+    ? '#ffffff'
+    : '#111111'
 
-  const button = buttonCandidate?.hex ?? fallbackButton
-  const buttonText = chroma.contrast(button, '#ffffff') >= 4.5 ? '#ffffff' : (chroma.contrast(button, '#111111') >= 4.5 ? '#111111' : text)
+  // Link: brand color adjusted until it passes WCAG AA (4.5:1) against the
+  // surface — this was previously unchecked and produced unreadable links.
+  let link = chroma(accent)
+  const backgroundIsLight = chroma(background).luminance() > 0.5
+  for (let i = 0; i < 12 && chroma.contrast(link, background) < 4.5; i++) {
+    link = backgroundIsLight ? link.darken(0.4) : link.brighten(0.4)
+  }
 
-  const link = colors.find(color => color.recommendedUsage.includes('link') && color.hex !== button)?.hex ?? button
-
-  return { background, text, button, buttonText, link }
-}
-
-function selectColorByUsage(colors: BrandColorCandidate[], usage: BrandColorCandidate['recommendedUsage'][number]) {
-  return colors.find(color => color.recommendedUsage.includes(usage))
+  return { background, text, button, buttonText, link: link.hex().toLowerCase() }
 }
 

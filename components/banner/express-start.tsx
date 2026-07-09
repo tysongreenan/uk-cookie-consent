@@ -17,6 +17,11 @@ export interface ExpressSetupResult {
   scan: BuilderScannerResult | null
   /** High-confidence trackers ready to drop into config.scripts */
   scripts: TrackingScript[]
+  /** GA4 measurement ID extracted from detected gtag scripts, if any */
+  ga4MeasurementId: string | null
+  /** ids within `scripts` that only exist to load GA4 — excluded from the
+   *  import when the native GA4 integration is used instead */
+  ga4ScriptIds: string[]
 }
 
 interface ExpressStartProps {
@@ -71,6 +76,23 @@ function autoImportScripts(candidates: ScannerImportCandidate[]): TrackingScript
       confidence: c.confidence,
       importWarning: c.importWarning,
     } as TrackingScript))
+}
+
+// Detect GA4 among the imported scripts and pull out the measurement ID so
+// the builder can offer the native GA4 integration instead of a raw script.
+function extractGa4(scripts: TrackingScript[]): { measurementId: string | null; scriptIds: string[] } {
+  let measurementId: string | null = null
+  const scriptIds: string[] = []
+  for (const script of scripts) {
+    const haystack = `${script.scriptCode} ${script.sourceUrl || ''}`
+    const isGtag = haystack.includes('googletagmanager.com/gtag/js') || /gtag\s*\(/.test(haystack)
+    if (!isGtag) continue
+    const idMatch = haystack.match(/\bG-[A-Z0-9]{4,14}\b/)
+    if (!idMatch) continue
+    measurementId = measurementId || idMatch[0]
+    scriptIds.push(script.id)
+  }
+  return { measurementId, scriptIds }
 }
 
 type StepState = 'pending' | 'active' | 'done' | 'failed'
@@ -130,13 +152,17 @@ export function ExpressStart({ initialUrl, onComplete, onSkip }: ExpressStartPro
     }
 
     const domain = new URL(normalized).hostname.replace(/^www\./, '')
+    const scripts = scan ? autoImportScripts(scan.scripts) : []
+    const ga4 = extractGa4(scripts)
     onComplete({
       url: normalized,
       domain,
       framework: guessFramework(domain),
       brand,
       scan,
-      scripts: scan ? autoImportScripts(scan.scripts) : [],
+      scripts,
+      ga4MeasurementId: ga4.measurementId,
+      ga4ScriptIds: ga4.scriptIds,
     })
   }
 
