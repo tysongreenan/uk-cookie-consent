@@ -10,7 +10,24 @@ import { PlanTier } from '@/types'
 // NOTE: In-memory banner cache removed intentionally.
 // On Vercel serverless, each instance has its own memory — invalidating cache
 // on one instance doesn't clear others, causing stale banners after updates.
-// We rely on ETag/304 (database updatedAt) + short Cache-Control max-age instead.
+//
+// Caching strategy (cost control — this endpoint is hit on every page view of
+// every customer site, so uncached it dominates our function invocations):
+// - Vercel CDN caches each (bannerId, country, region, GPC) variant for
+//   s-maxage seconds. Cache hits are served from the edge and never invoke
+//   this function. The Vary header keys the cache on exactly the request
+//   headers that change the generated script.
+// - Browsers cache for max-age, then revalidate via ETag (database updatedAt).
+// - Every cacheable response carries a `banner-<id>` cache tag; banner writes
+//   purge it via lib/banner-cache.ts, so edits reach new page loads in seconds.
+//   Even if the purge fails, TTLs are short and deterministic: fully live
+//   within ~10 minutes worst case (browser 300s + CDN 300s + one SWR serve),
+//   unlike per-instance memory which could stay stale indefinitely.
+// - ?nocache=1 bypasses all caching (used by the builder and for support/testing).
+const CACHE_VARY = 'x-vercel-ip-country, x-vercel-ip-country-region, sec-gpc'
+const BROWSER_CACHE_CONTROL = 'public, max-age=300'
+const VERCEL_CDN_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=60'
+const NO_STORE_CACHE_CONTROL = 'private, no-cache, no-store, must-revalidate'
 
 // Lazy initialization to avoid build-time errors and ensure service role key is used
 function getSupabaseClient() {
@@ -68,7 +85,13 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const bannerId = searchParams.get('id')
-    
+    // Explicit cache bypass for builder pushes and support/testing.
+    // (The differing query string already gives it a separate CDN cache key;
+    // no-store keeps that key from being cached at all.)
+    const noCache = searchParams.get('nocache') !== null
+    const browserCacheControl = noCache ? NO_STORE_CACHE_CONTROL : BROWSER_CACHE_CONTROL
+    const cdnCacheControl = noCache ? 'no-store' : VERCEL_CDN_CACHE_CONTROL
+
     if (!bannerId) {
       return new NextResponse('console.error("Cookie Banner: Missing banner ID");', { 
         status: 400,
@@ -126,7 +149,8 @@ export async function GET(request: NextRequest) {
         status: 304,
         headers: {
           'ETag': etag,
-          'Cache-Control': 'private, no-cache, must-revalidate',
+          'Cache-Control': browserCacheControl,
+          'Vary': CACHE_VARY,
           'X-Cache': 'NOT-MODIFIED',
           ...SECURITY_HEADERS,
         },
@@ -160,6 +184,11 @@ export async function GET(request: NextRequest) {
           status: 404,
           headers: {
             'Content-Type': 'application/javascript; charset=utf-8',
+            // Cache misses briefly so a live site with a bad/deleted ID can't
+            // hammer the origin; a newly created banner is picked up within 60s
+            'Cache-Control': noCache ? NO_STORE_CACHE_CONTROL : 'public, max-age=60',
+            'Vercel-CDN-Cache-Control': noCache ? 'no-store' : 'public, s-maxage=60',
+            'Vercel-Cache-Tag': `banner-${bannerId}`,
             ...SECURITY_HEADERS,
           }
         }
@@ -178,7 +207,8 @@ export async function GET(request: NextRequest) {
           status: 304,
           headers: {
             'ETag': finalEtag,
-            'Cache-Control': 'private, no-cache, must-revalidate',
+            'Cache-Control': browserCacheControl,
+            'Vary': CACHE_VARY,
             ...SECURITY_HEADERS,
           },
         })
@@ -192,7 +222,10 @@ export async function GET(request: NextRequest) {
       return new NextResponse(inactiveMessage, {
         headers: {
           'Content-Type': 'application/javascript; charset=utf-8',
-          'Cache-Control': 'private, no-cache, must-revalidate',
+          'Cache-Control': browserCacheControl,
+          'Vercel-CDN-Cache-Control': cdnCacheControl,
+          'Vercel-Cache-Tag': `banner-${bannerId}`,
+          'Vary': CACHE_VARY,
           'ETag': finalEtag,
           'X-Cache': 'MISS',
           ...SECURITY_HEADERS,
@@ -295,11 +328,6 @@ export async function GET(request: NextRequest) {
     // Build internal analytics tracking code (only when analytics is enabled)
     // Analytics is automatically enabled for pro/enterprise plans
     const analyticsUserId = (ownerPlanTier !== 'free') ? (bannerUserId || '') : ''
-    if (!analyticsUserId) {
-      console.log(`[BANNER] Analytics disabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
-    } else {
-      console.log(`[BANNER] Analytics enabled for banner ${bannerId}: plan=${ownerPlanTier}, userId=${bannerUserId}`)
-    }
     // Server-side GPC detection via Sec-GPC header (W3C spec Section 3.3)
     const secGpc = request.headers.get('sec-gpc') === '1'
 
@@ -314,7 +342,6 @@ export async function GET(request: NextRequest) {
   var _cbTrackUrl = ${JSON.stringify(baseUrl + '/api/v1/track')};
   var _cbBannerShownAt = 0;
   var _cbEventQueue = [];
-  var _cbFlushTimer = null;
 
   // Visitor dimension collection
   var _cbSource = (function() {
@@ -356,18 +383,15 @@ export async function GET(request: NextRequest) {
     _cbEventQueue.push(evt);
     // Decision events (accept/reject/dismiss) flush immediately via sendBeacon
     // because saveConsent() loads third-party scripts that may trigger page reloads,
-    // and a 1s debounce timer would be killed before firing.
-    // Impressions still debounce since they fire during a stable page state.
+    // and a deferred flush would be killed before firing. Queued impressions ride
+    // along in the same request.
+    // Impressions do NOT flush on their own timer: they wait for a decision event
+    // or the pagehide/visibilitychange beacon, so a plain page view costs at most
+    // one /api/v1/track request instead of two.
     if (type !== 'impression') {
-      if (_cbFlushTimer) { clearTimeout(_cbFlushTimer); _cbFlushTimer = null; }
       _cbFlushEvents();
-    } else {
-      if (_cbFlushTimer) clearTimeout(_cbFlushTimer);
-      if (_cbEventQueue.length >= 5) {
-        _cbFlushEvents();
-      } else {
-        _cbFlushTimer = setTimeout(_cbFlushEvents, 1000);
-      }
+    } else if (_cbEventQueue.length >= 5) {
+      _cbFlushEvents();
     }
   }
 
@@ -602,7 +626,8 @@ export async function GET(request: NextRequest) {
         status: 304,
         headers: {
           'ETag': finalEtag,
-          'Cache-Control': 'private, no-cache, must-revalidate',
+          'Cache-Control': browserCacheControl,
+          'Vary': CACHE_VARY,
           'X-Cache': 'HIT',
           ...SECURITY_HEADERS,
         },
@@ -612,9 +637,15 @@ export async function GET(request: NextRequest) {
     return new NextResponse(combinedScript, {
       headers: {
         'Content-Type': 'application/javascript; charset=utf-8',
-        'Cache-Control': 'private, no-cache, must-revalidate',
-        'CDN-Cache-Control': 'no-store', // Prevent CDN caching (Vercel, Cloudflare, Brizy, etc.)
-        'Surrogate-Control': 'no-store', // Prevent CDN caching (Fastly, Akamai, etc.)
+        // Browser (and any customer-side CDN like Cloudflare) caches ≤5 min;
+        // Vercel-CDN-Cache-Control is consumed by Vercel's edge only and is
+        // never forwarded downstream, so third-party CDNs stay bounded to 5 min.
+        // The cache tag lets banner writes purge all variants instantly
+        // (lib/banner-cache.ts).
+        'Cache-Control': browserCacheControl,
+        'Vercel-CDN-Cache-Control': cdnCacheControl,
+        'Vercel-Cache-Tag': `banner-${bannerId}`,
+        'Vary': CACHE_VARY,
         'ETag': finalEtag,
         'Access-Control-Allow-Origin': '*',
         'X-Cache': 'MISS',

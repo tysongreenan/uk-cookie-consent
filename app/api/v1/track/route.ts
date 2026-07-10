@@ -35,7 +35,6 @@ export async function POST(request: NextRequest) {
     // Rate limit
     const rateLimitResult = await trackRateLimit.check(request)
     if (!rateLimitResult.allowed) {
-      console.log('[TRACK] Rate limited')
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429, headers: CORS_HEADERS }
@@ -44,8 +43,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { userId, bannerId, events } = body
-
-    console.log('[TRACK] Received:', { userId, bannerId, eventCount: events?.length, events })
 
     if (!userId || !isValidUuid(userId)) {
       console.warn('[TRACK] Invalid userId:', userId)
@@ -78,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     const tier = user?.planTier || 'free'
     if (tier === 'free') {
-      console.log('[TRACK] Analytics not available on free plan:', userId)
       return NextResponse.json(
         { success: false, reason: 'plan_required' },
         { status: 200, headers: CORS_HEADERS }
