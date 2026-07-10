@@ -956,9 +956,8 @@ function BannerBuilderContent() {
         toast.success(
           <div>
             <strong>Changes pushed live!</strong>
-            <p className="text-sm mt-1">The script URL has been updated with a new cache-busting parameter.</p>
-            <p className="text-sm mt-1">Browsers will automatically fetch the latest version.</p>
-            <p className="text-xs mt-1 text-muted-foreground">If you see old content, hard refresh (Ctrl+Shift+R).</p>
+            <p className="text-sm mt-1">New visitors will see the update within seconds.</p>
+            <p className="text-xs mt-1 text-muted-foreground">Visitors who loaded your site in the last few minutes may see the previous version for up to 5 minutes.</p>
           </div>,
           { duration: 6000 }
         )

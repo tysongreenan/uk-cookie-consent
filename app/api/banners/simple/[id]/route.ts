@@ -6,6 +6,7 @@ import { canUseLayout } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { getAccessibleUserIds } from '@/lib/banner-access'
+import { invalidateBannerCache } from '@/lib/banner-cache'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -124,6 +125,9 @@ export async function PUT(
         }, { status: 404 })
       }
 
+      // Purge the CDN-cached script so the toggle reaches live sites in seconds
+      await invalidateBannerCache(params.id)
+
       return NextResponse.json({
         success: true,
         bannerId: params.id,
@@ -204,6 +208,9 @@ function rejectCookies() {
       .eq('id', params.id)
       .single()
 
+    // Purge the CDN-cached script so the edit reaches live sites in seconds
+    await invalidateBannerCache(params.id)
+
     console.log('✅ Simple Update: Banner updated:', params.id)
     logActivity(session.user.id, AuditAction.BANNER_UPDATE, request, { bannerId: params.id, bannerName })
 
@@ -262,6 +269,9 @@ export async function DELETE(
       console.error('❌ Simple Delete: Error deleting banner:', error)
       return NextResponse.json({ error: 'Failed to delete banner' }, { status: 500 })
     }
+
+    // Purge the CDN-cached script so the deleted banner stops serving in seconds
+    await invalidateBannerCache(params.id)
 
     console.log('✅ Simple Delete: Banner deleted successfully:', params.id)
     logActivity(session.user.id, AuditAction.BANNER_DELETE, request, { bannerId: params.id })
