@@ -47,10 +47,10 @@ export default function PrivacyPolicyPage() {
       "PIPEDA compliant privacy policies",
       "CCPA/CPRA compliant privacy policies",
       "Quebec Law 25 compliant privacy policies",
+      "English and French generation",
       "Customizable for any business type",
-      "Free to generate and download",
-      "Hosted privacy policy pages",
-      "Automatic jurisdiction detection"
+      "Free to generate, copy, and download",
+      "Pro: save, publish, and host on a custom URL"
     ]
   }
 
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
     },
     {
       question: "Is a generated privacy policy legally binding?",
-      answer: "A generated privacy policy creates a legally binding commitment between your business and your users. However, it is only as accurate as the information you provide. Make sure you answer all questions truthfully and update the policy when your practices change. For complex legal situations, consult a privacy attorney."
+      answer: "Publishing a privacy policy is a commitment to your users about how you handle personal information. Our generator creates a template from the answers you provide — it is not a substitute for legal advice. Answer truthfully, review the text before you publish, update it when your practices change, and consult a privacy attorney for complex situations."
     }
   ]
 
@@ -133,17 +133,17 @@ export default function PrivacyPolicyPage() {
               {/* Compact header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <div className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2.5 py-1 rounded-full">
-                      100% Free
+                      Free to generate
                     </div>
-                    <span className="text-xs text-muted-foreground">No signup required</span>
+                    <span className="text-xs text-muted-foreground">No signup required to create</span>
                   </div>
                   <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
                     Privacy Policy Generator
                   </h1>
                   <p className="text-muted-foreground mt-1">
-                    Answer 3 quick questions. Get a legally compliant privacy policy. Copy &amp; paste it on your site.
+                    Answer a few questions. Get a GDPR, PIPEDA, CCPA &amp; Law 25 policy in English or French. Copy it free — Pro hosts it for you.
                   </p>
                 </div>
                 <div className="flex items-center gap-4 text-center sm:text-right">
@@ -161,20 +161,82 @@ export default function PrivacyPolicyPage() {
 
               {/* Generator — immediately visible */}
               <PrivacyPolicyGenerator />
+
+              {/* Legal expectation — not a law firm opinion */}
+              <p className="mt-4 text-xs text-muted-foreground leading-relaxed max-w-3xl">
+                This tool generates a template based on the answers you provide. It is not legal advice.
+                Review the policy (and have counsel review it when needed) before publishing, and update it
+                when your practices or applicable laws change.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Free vs Pro — clear upgrade path without blocking free generate */}
+        <section className="py-10 border-y border-border bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-xl font-semibold mb-4 text-center sm:text-left">Free vs Pro</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Free</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Generate English or French policies
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Copy HTML &amp; download for your own site
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      GDPR, PIPEDA, CCPA &amp; Law 25 sections
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-primary/40">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Pro</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Save policies to your dashboard
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Hosted URL you can customize (e.g. cookie-banner.ca/p/your-brand)
+                    </p>
+                    <p className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Edit, publish, and keep policies up to date
+                    </p>
+                    <Button asChild size="sm" className="mt-2">
+                      <Link href="/pricing">
+                        See Pro pricing
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </section>
 
         {/* What you get strip */}
-        <section className="bg-muted/50 py-5 border-y border-border">
+        <section className="bg-muted/50 py-5 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />GDPR compliant</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />PIPEDA compliant</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />CCPA compliant</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Law 25 compliant</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Copy &amp; paste ready</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />No signup</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />GDPR</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />PIPEDA</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />CCPA</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Law 25</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />English &amp; French</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Copy free · host on Pro</span>
             </div>
           </div>
         </section>

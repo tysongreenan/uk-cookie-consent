@@ -61,10 +61,10 @@ export default function PricingPage() {
               <ul className="space-y-3">
                 {[
                   'GDPR, PIPEDA & CCPA Compliance',
-                  'Works on Unlimited Websites',
+                  '1 Cookie Banner (install on your site)',
                   '7 Standard Layouts',
                   'Copy & Paste in 5 Minutes',
-                  '1 Cookie Banner',
+                  'Free privacy policy generator (copy & download)',
                   'Community Support',
                   '"Powered by" Branding',
                 ].map((feature, i) => (
@@ -106,6 +106,8 @@ export default function PricingPage() {
                   '14 Layouts Including Modal & Slide-In',
                   'Remove "Powered by" Branding',
                   'Unlimited Banners',
+                  'Save & host privacy policies (custom URL)',
+                  'English & French privacy policies',
                   'GA4 Analytics Integration',
                   'Analytics Dashboard & Insights',
                   'Upload Your Logo & Images',
@@ -151,11 +153,13 @@ export default function PricingPage() {
               <CardDescription>Every new feature, the day we ship it</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* What's included beyond Pro */}
+              {/* What's included beyond Pro lifetime */}
               <ul className="space-y-3">
                 {[
                   'Everything in Pro',
                   'Consent Logs & DSAR Proof',
+                  'Privacy policy version history',
+                  'Every new feature we ship this year',
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm font-medium">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
@@ -164,25 +168,23 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              {/* Divider — upcoming features included */}
+              {/* Divider — roadmap extras (not already live Pro features) */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-primary/30" />
                 </div>
                 <div className="relative flex justify-center">
                   <span className="bg-card px-3 text-xs font-medium text-primary uppercase tracking-wider">
-                    Plus Everything Coming Next
+                    Plus What We&apos;re Building Next
                   </span>
                 </div>
               </div>
 
-              {/* Future features — included */}
               <ul className="space-y-3">
                 {[
                   'Auto Cookie Categorization',
                   'A/B Testing for Banners',
                   'IAB TCF 2.2 Support',
-                  'Privacy Policy Generator',
                   'Google CMP Certification',
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm">
@@ -290,6 +292,16 @@ export default function PricingPage() {
               <h3 className="font-semibold mb-2">Is there a free trial?</h3>
               <p className="text-sm text-muted-foreground">
                 The Free plan is your trial. Build a banner, install it on your site, and see how it works. Upgrade to Pro whenever you're ready.
+              </p>
+            </div>
+            <div className="border rounded-lg p-6">
+              <h3 className="font-semibold mb-2">Is the privacy policy generator free?</h3>
+              <p className="text-sm text-muted-foreground">
+                Yes. Anyone can generate, copy, and download a privacy policy in English or French for free at{' '}
+                <Link href="/tools/privacy-policy" className="text-primary underline underline-offset-2">
+                  /tools/privacy-policy
+                </Link>
+                . Pro unlocks saving to your dashboard, custom hosted URLs (cookie-banner.ca/p/your-brand), and publishing. Pro Annual adds version history.
               </p>
             </div>
           </div>
