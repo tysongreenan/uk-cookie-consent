@@ -51,10 +51,11 @@ const DEFAULT_INPUTS: PrivacyPolicyInputs = {
   sharesDataWithThirdParties: false,
   thirdPartyRecipients: [],
   transfersDataInternationally: false,
-  dataRetentionPeriod: '',
+  // Sensible defaults when the short wizard skips purposes / retention / rights steps
+  dataRetentionPeriod: 'as_needed',
   customRetentionPeriod: undefined,
-  allowsUserDeletion: false,
-  allowsUserExport: false,
+  allowsUserDeletion: true,
+  allowsUserExport: true,
   jurisdictions: [],
   language: 'en',
   collectsChildrenData: false,
@@ -173,9 +174,17 @@ export default function NewPrivacyPolicyPage() {
       )
       if (!saveRes.ok) {
         const data = await saveRes.json().catch(() => null)
+        if (saveRes.status === 403 && data?.upgradeRequired) {
+          toast.error('Saving privacy policies requires a Pro plan')
+          router.push('/upgrade')
+          return
+        }
         throw new Error(data?.error || `Save failed (${saveRes.status})`)
       }
       const saved = await saveRes.json()
+      if (!saved?.id) {
+        throw new Error('Save succeeded but no policy id was returned')
+      }
       toast.success(isRegenerating ? 'Privacy policy regenerated' : 'Privacy policy created')
       router.push(`/dashboard/privacy-policy/${saved.id}`)
     } catch (err) {

@@ -31,6 +31,21 @@ async function getPublishedPolicy(slug: string) {
   return data
 }
 
+function resolveBusinessName(policy: any): string {
+  return (
+    policy.inputs?.businessName ||
+    policy.business_name ||
+    policy.metadata?.businessName ||
+    policy.name ||
+    'Business'
+  )
+}
+
+function resolveLanguage(policy: any): 'en' | 'fr' {
+  const lang = policy.language || policy.inputs?.language || policy.metadata?.language
+  return lang === 'fr' ? 'fr' : 'en'
+}
+
 export async function generateMetadata({ params }: HostedPolicyPageProps): Promise<Metadata> {
   const policy = await getPublishedPolicy(params.slug)
 
@@ -40,11 +55,16 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
     }
   }
 
-  const businessName = policy.business_name || policy.metadata?.businessName || 'Business'
+  const businessName = resolveBusinessName(policy)
+  const isFr = resolveLanguage(policy) === 'fr'
 
   return {
-    title: `Privacy Policy - ${businessName}`,
-    description: `Privacy policy for ${businessName}. Learn how your personal information is collected, used, and protected.`,
+    title: isFr
+      ? `Politique de confidentialité - ${businessName}`
+      : `Privacy Policy - ${businessName}`,
+    description: isFr
+      ? `Politique de confidentialité de ${businessName}. Découvrez comment vos renseignements personnels sont recueillis, utilisés et protégés.`
+      : `Privacy policy for ${businessName}. Learn how your personal information is collected, used, and protected.`,
     alternates: {
       canonical: `https://www.cookie-banner.ca/p/${params.slug}`,
     },
@@ -59,15 +79,22 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     notFound()
   }
 
-  const businessName = policy.business_name || policy.metadata?.businessName || 'Business'
-  const updatedAt = policy.updated_at ? new Date(policy.updated_at).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }) : null
-  const jurisdictions: string[] = policy.metadata?.jurisdictions || []
+  const businessName = resolveBusinessName(policy)
+  const isFr = resolveLanguage(policy) === 'fr'
+  const locale = isFr ? 'fr-CA' : 'en-US'
+  const updatedAt = policy.updated_at
+    ? new Date(policy.updated_at).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : null
+  const jurisdictions: string[] =
+    policy.jurisdictions ||
+    policy.metadata?.jurisdictions ||
+    policy.inputs?.jurisdictions ||
+    []
 
-  // Extract FAQ sections from content_json if available
   const contentJson = policy.content_json
   const faqItems: Array<{ question: string; answer: string }> = []
   if (contentJson?.sections) {
@@ -81,67 +108,96 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     }
   }
 
+  const title = isFr
+    ? `Politique de confidentialité - ${businessName}`
+    : `Privacy Policy - ${businessName}`
+
   const webPageSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": `Privacy Policy - ${businessName}`,
-    "description": `Privacy policy for ${businessName}`,
-    "url": `https://www.cookie-banner.ca/p/${params.slug}`,
-    "dateModified": policy.updated_at,
-    "publisher": {
-      "@type": "Organization",
-      "name": businessName,
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description: isFr
+      ? `Politique de confidentialité de ${businessName}`
+      : `Privacy policy for ${businessName}`,
+    url: `https://www.cookie-banner.ca/p/${params.slug}`,
+    dateModified: policy.updated_at,
+    inLanguage: isFr ? 'fr-CA' : 'en',
+    publisher: {
+      '@type': 'Organization',
+      name: businessName,
     },
   }
 
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.cookie-banner.ca" },
-      { "@type": "ListItem", "position": 2, "name": "Privacy Policy Generator", "item": "https://www.cookie-banner.ca/tools/privacy-policy" },
-      { "@type": "ListItem", "position": 3, "name": businessName, "item": `https://www.cookie-banner.ca/p/${params.slug}` },
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: isFr ? 'Accueil' : 'Home', item: 'https://www.cookie-banner.ca' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: isFr ? 'Générateur de politique de confidentialité' : 'Privacy Policy Generator',
+        item: 'https://www.cookie-banner.ca/tools/privacy-policy',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: businessName,
+        item: `https://www.cookie-banner.ca/p/${params.slug}`,
+      },
     ],
   }
 
-  const faqSchema = faqItems.length > 0 ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqItems.map((item) => ({
-      "@type": "Question",
-      "name": item.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": item.answer,
-      },
-    })),
-  } : null
+  const faqSchema =
+    faqItems.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqItems.map((item) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: item.answer,
+            },
+          })),
+        }
+      : null
 
-  // Content is produced by our server-side generator from Zod-validated inputs,
-  // stored in the database, and rendered here. It is not arbitrary user HTML.
   const policyHtml = policy.content_html
 
   return (
-    <div className="min-h-screen bg-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+    <div className="min-h-screen bg-white" lang={isFr ? 'fr' : 'en'}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {faqSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
       )}
 
-      {/* Breadcrumb navigation */}
       <nav className="border-b border-gray-200 print:hidden">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <ol className="flex items-center gap-2 text-sm text-gray-500">
             <li>
               <Link href="/" className="hover:text-gray-800 transition-colors">
-                Home
+                {isFr ? 'Accueil' : 'Home'}
               </Link>
             </li>
             <li>/</li>
             <li>
-              <Link href="/tools/privacy-policy" className="hover:text-gray-800 transition-colors">
-                Privacy Policy Generator
+              <Link
+                href="/tools/privacy-policy"
+                className="hover:text-gray-800 transition-colors"
+              >
+                {isFr ? 'Générateur de politique' : 'Privacy Policy Generator'}
               </Link>
             </li>
             <li>/</li>
@@ -150,19 +206,22 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
         </div>
       </nav>
 
-      {/* Policy content */}
       <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <header className="mb-8 pb-8 border-b border-gray-200">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            Privacy Policy
+            {isFr ? 'Politique de confidentialité' : 'Privacy Policy'}
           </h1>
           <p className="text-lg text-gray-600">{businessName}</p>
           <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
             {updatedAt && (
-              <span>Last updated: {updatedAt}</span>
+              <span>
+                {isFr ? 'Dernière mise à jour :' : 'Last updated:'} {updatedAt}
+              </span>
             )}
             {jurisdictions.length > 0 && (
-              <span>Covers: {jurisdictions.join(', ')}</span>
+              <span>
+                {isFr ? 'Couvre :' : 'Covers:'} {jurisdictions.join(', ')}
+              </span>
             )}
           </div>
         </header>
@@ -179,21 +238,24 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
         />
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-gray-200 print:hidden">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <p>
-              Generated with{' '}
+              {isFr ? 'Généré avec ' : 'Generated with '}
               <Link
                 href="https://www.cookie-banner.ca/tools/privacy-policy"
                 className="text-blue-600 hover:underline font-medium"
               >
-                Cookie Banner Privacy Policy Generator
+                {isFr
+                  ? 'le générateur Cookie Banner'
+                  : 'Cookie Banner Privacy Policy Generator'}
               </Link>
             </p>
             {updatedAt && (
-              <p>Last updated: {updatedAt}</p>
+              <p>
+                {isFr ? 'Dernière mise à jour :' : 'Last updated:'} {updatedAt}
+              </p>
             )}
           </div>
         </div>

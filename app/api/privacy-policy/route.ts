@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('privacy_policies')
-      .select('id, name, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
+      .select('id, name, slug, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
 
     if (teamId) {
       // Verify the user is a member of this team
@@ -67,19 +67,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch policies' }, { status: 500 })
     }
 
-    // Slim down the response — only include businessName from inputs
+    // Shape matches dashboard list UI (camelCase + title/slug).
+    // Keep `data`/`policies` aliases for backward compatibility.
     const policies = (data || []).map((p: any) => ({
       id: p.id,
+      title: p.name,
       name: p.name,
       status: p.status,
+      slug: p.slug || undefined,
       jurisdictions: p.jurisdictions,
       language: p.language,
+      createdAt: p.created_at,
+      updatedAt: p.updated_at,
       created_at: p.created_at,
       updated_at: p.updated_at,
-      businessName: p.inputs?.businessName || null,
+      businessName: p.inputs?.businessName || p.name || null,
     }))
 
     return NextResponse.json({
+      policies,
       data: policies,
       total: count ?? 0,
       page,
@@ -194,7 +200,28 @@ export async function POST(request: NextRequest) {
       // Non-fatal — policy was created, version tracking failed
     }
 
-    return NextResponse.json(policy, { status: 201 })
+    // CamelCase shape for dashboard consumers (same as GET /[id])
+    const serialized = {
+      id: policy.id,
+      title: policy.name,
+      businessName: (policy.inputs as any)?.businessName || policy.name || 'Untitled',
+      status: policy.status,
+      slug: policy.slug || undefined,
+      contentHtml: policy.content_html || '',
+      contentJson: policy.content_json || { sections: [] },
+      inputs: policy.inputs || {},
+      metadata: {
+        generatedAt: policy.updated_at || policy.created_at,
+        jurisdictions: policy.jurisdictions || [],
+        language: policy.language || 'en',
+        businessName: (policy.inputs as any)?.businessName || policy.name || '',
+      },
+      createdAt: policy.created_at,
+      updatedAt: policy.updated_at,
+      version: policy.version,
+    }
+
+    return NextResponse.json(serialized, { status: 201 })
   } catch (error) {
     console.error('[PRIVACY-POLICY] Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -1,19 +1,51 @@
 import { PrivacyPolicyInputs, PolicySection, PolicyOutput } from '@/types'
 import { getCommonSections } from './templates/common'
+import { getCommonSectionsFr } from './templates/common.fr'
 import { getGdprSections } from './templates/gdpr'
+import { getGdprSectionsFr } from './templates/gdpr.fr'
 import { getCcpaSections } from './templates/ccpa'
+import { getCcpaSectionsFr } from './templates/ccpa.fr'
 import { getPipedaSections } from './templates/pipeda'
+import { getPipedaSectionsFr } from './templates/pipeda.fr'
 import { getLaw25Sections } from './templates/law25'
+import { getLaw25SectionsFr } from './templates/law25.fr'
+import { escapeHtml, getPolicyLang } from './templates/shared'
+
+/**
+ * Escape free-text fields that are interpolated into HTML templates.
+ * Prevents XSS when content is rendered with dangerouslySetInnerHTML.
+ * Does not alter structured keys (jurisdictions, enums, arrays of keys).
+ */
+function sanitizeInputsForHtml(inputs: PrivacyPolicyInputs): PrivacyPolicyInputs {
+  return {
+    ...inputs,
+    businessName: escapeHtml(inputs.businessName || ''),
+    websiteUrl: escapeHtml(inputs.websiteUrl || ''),
+    contactEmail: escapeHtml(inputs.contactEmail || ''),
+    customRetentionPeriod: inputs.customRetentionPeriod
+      ? escapeHtml(inputs.customRetentionPeriod)
+      : inputs.customRetentionPeriod,
+    // Cookie fields are escaped at render time in the cookie table helpers.
+    thirdPartyRecipients: inputs.thirdPartyRecipients?.map((r) => escapeHtml(r)),
+  }
+}
 
 // ── Jurisdiction → template mapping ──────────────────────────────────
 
 type TemplateFn = (inputs: PrivacyPolicyInputs) => PolicySection[]
 
-const JURISDICTION_TEMPLATES: Record<string, TemplateFn> = {
+const JURISDICTION_TEMPLATES_EN: Record<string, TemplateFn> = {
   gdpr: getGdprSections,
   ccpa: getCcpaSections,
   pipeda: getPipedaSections,
   law25: getLaw25Sections,
+}
+
+const JURISDICTION_TEMPLATES_FR: Record<string, TemplateFn> = {
+  gdpr: getGdprSectionsFr,
+  ccpa: getCcpaSectionsFr,
+  pipeda: getPipedaSectionsFr,
+  law25: getLaw25SectionsFr,
 }
 
 // ── Section ordering ─────────────────────────────────────────────────
@@ -67,7 +99,6 @@ function sortSections(sections: PolicySection[]): PolicySection[] {
   return sections.sort((a, b) => {
     const aIdx = SECTION_ORDER.indexOf(a.id)
     const bIdx = SECTION_ORDER.indexOf(b.id)
-    // Unknown sections go to the end
     const aOrder = aIdx === -1 ? 999 : aIdx
     const bOrder = bIdx === -1 ? 999 : bIdx
     return aOrder - bOrder
@@ -76,8 +107,6 @@ function sortSections(sections: PolicySection[]): PolicySection[] {
 
 // ── Deduplication ────────────────────────────────────────────────────
 
-/** If GDPR or CCPA provides jurisdiction-specific rights, remove the
- *  generic "Your Rights" common section to avoid redundancy. */
 function deduplicateSections(
   sections: PolicySection[],
   jurisdictions: string[]
@@ -91,8 +120,6 @@ function deduplicateSections(
   return sections
 }
 
-/** If GDPR transfers section is present, remove the generic international
- *  transfers section. */
 function deduplicateTransfers(
   sections: PolicySection[],
   jurisdictions: string[]
@@ -105,14 +132,10 @@ function deduplicateTransfers(
 
 // ── HTML rendering ───────────────────────────────────────────────────
 
-function renderSectionsToHtml(
-  sections: PolicySection[],
-  businessName: string
-): string {
+function renderSectionsToHtml(sections: PolicySection[]): string {
   const lines: string[] = []
 
   for (const section of sections) {
-    // Use H1 for the top-level title, H2 for all others
     const tag = section.id === 'introduction' ? 'h1' : 'h2'
     lines.push(`<${tag} id="${section.id}">${section.heading}</${tag}>`)
 
@@ -121,7 +144,7 @@ function renderSectionsToHtml(
     }
 
     lines.push(section.content)
-    lines.push('') // blank line separator
+    lines.push('')
   }
 
   return lines.join('\n')
@@ -131,11 +154,7 @@ function renderSectionsToHtml(
 
 /**
  * Generate a complete privacy policy from structured inputs.
- *
- * This is a pure function — no side effects, no database access.
- * It combines common sections with jurisdiction-specific sections,
- * deduplicates overlapping content, orders everything logically,
- * and renders to HTML.
+ * When inputs.language === 'fr', full French (fr-CA) templates are used.
  */
 export function generatePrivacyPolicy(
   inputs: PrivacyPolicyInputs
@@ -145,30 +164,40 @@ export function generatePrivacyPolicy(
 
 /**
  * Alias used by the API route handler.
- * Kept as a separate export for backward compatibility.
  */
 export function generatePolicyFromInputs(
   inputs: PrivacyPolicyInputs
 ): PolicyOutput {
-  // 1. Collect all applicable sections
-  let sections: PolicySection[] = [...getCommonSections(inputs)]
+  const lang = getPolicyLang(inputs)
+  const isFr = lang === 'fr'
+  // Escape user-controlled text before HTML interpolation (templates inject into HTML).
+  // Keep original businessName in metadata for UI display / storage.
+  const safe = sanitizeInputsForHtml(inputs)
 
-  for (const jurisdiction of inputs.jurisdictions) {
-    const templateFn = JURISDICTION_TEMPLATES[jurisdiction]
+  const getCommon = isFr ? getCommonSectionsFr : getCommonSections
+  const jurisdictionTemplates = isFr
+    ? JURISDICTION_TEMPLATES_FR
+    : JURISDICTION_TEMPLATES_EN
+
+  // 1. Collect all applicable sections
+  let sections: PolicySection[] = [...getCommon(safe)]
+
+  for (const jurisdiction of safe.jurisdictions || []) {
+    const templateFn = jurisdictionTemplates[jurisdiction]
     if (templateFn) {
-      sections.push(...templateFn(inputs))
+      sections.push(...templateFn(safe))
     }
   }
 
   // 2. Deduplicate
-  sections = deduplicateSections(sections, inputs.jurisdictions)
-  sections = deduplicateTransfers(sections, inputs.jurisdictions)
+  sections = deduplicateSections(sections, safe.jurisdictions || [])
+  sections = deduplicateTransfers(sections, safe.jurisdictions || [])
 
-  // 3. Sort
-  sections = sortSections(sections)
+  // 3. Sort (copy first — Array.sort mutates)
+  sections = sortSections([...sections])
 
   // 4. Render HTML
-  const contentHtml = renderSectionsToHtml(sections, inputs.businessName)
+  const contentHtml = renderSectionsToHtml(sections)
 
   return {
     sections,
@@ -176,8 +205,9 @@ export function generatePolicyFromInputs(
     contentJson: { sections },
     metadata: {
       generatedAt: new Date().toISOString(),
-      jurisdictions: inputs.jurisdictions,
-      language: inputs.language,
+      jurisdictions: inputs.jurisdictions || [],
+      language: lang,
+      // Original (unescaped) name for dashboard titles / downloads
       businessName: inputs.businessName,
     },
   }

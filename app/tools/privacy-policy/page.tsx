@@ -68,6 +68,10 @@ export default function PrivacyPolicyPage() {
       answer: "The generator covers GDPR (EU/EEA/UK), PIPEDA (Canada), CCPA/CPRA (California), and Quebec Law 25. It automatically includes the relevant sections based on your business location and where your users are located."
     },
     {
+      question: "Can I generate a French privacy policy?",
+      answer: "Yes. Choose Français (Québec / Canada) as the policy language in Step 1. Selecting Quebec as your province also suggests French automatically. The full policy — including PIPEDA and Law 25 sections — is generated in French. You can keep a separate English version by creating another policy."
+    },
+    {
       question: "How often should I update my privacy policy?",
       answer: "You should update your privacy policy whenever you change how you collect or use personal data, add new third-party services, change your data retention practices, or when privacy laws are updated. At minimum, review your policy annually."
     },

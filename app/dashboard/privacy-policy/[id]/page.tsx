@@ -81,7 +81,25 @@ export default function PolicyDetailPage() {
         throw new Error('Failed to fetch policy')
       }
       const data = await res.json()
-      setPolicy(data)
+      // Normalize in case an older API shape is returned
+      setPolicy({
+        ...data,
+        title: data.title || data.name || data.businessName,
+        businessName: data.businessName || data.inputs?.businessName || data.title || 'Untitled',
+        contentHtml: data.contentHtml || data.content_html || '',
+        contentJson: data.contentJson || data.content_json || { sections: [] },
+        createdAt: data.createdAt || data.created_at,
+        updatedAt: data.updatedAt || data.updated_at,
+        slug: data.slug,
+        status: data.status || 'draft',
+        metadata: data.metadata || {
+          generatedAt: data.updatedAt || data.updated_at,
+          jurisdictions: data.jurisdictions || [],
+          language: data.language || data.inputs?.language || 'en',
+          businessName: data.businessName || data.inputs?.businessName || '',
+        },
+        inputs: data.inputs || {},
+      })
     } catch (err) {
       console.error('Failed to fetch policy:', err)
       toast.error('Failed to load policy')
@@ -220,13 +238,16 @@ export default function PolicyDetailPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-6 mt-4 flex-wrap gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-2xl font-bold">{policy.title || `Privacy Policy - ${policy.businessName}`}</h1>
               <Badge variant={
                 policy.status === 'published' ? 'default' :
                 policy.status === 'archived' ? 'secondary' : 'outline'
               }>
                 {policy.status}
+              </Badge>
+              <Badge variant="outline">
+                {(policy.metadata?.language || policy.inputs?.language) === 'fr' ? 'Français' : 'English'}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">

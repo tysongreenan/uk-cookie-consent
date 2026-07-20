@@ -240,7 +240,15 @@ export function StepBusinessInfo({ inputs, onChange, errors }: StepProps) {
             <Label htmlFor="province">Province</Label>
             <Select
               value={inputs.province || ''}
-              onValueChange={(value) => onChange({ province: value })}
+              onValueChange={(value) => {
+                // Auto-suggest French when Quebec is selected (Loi 25 / Charte).
+                // User can still switch back to English via the language control.
+                const updates: Partial<PrivacyPolicyInputs> = { province: value }
+                if (value === 'QC') {
+                  updates.language = 'fr'
+                }
+                onChange(updates)
+              }}
             >
               <SelectTrigger id="province">
                 <SelectValue placeholder="Select province" />
@@ -255,6 +263,28 @@ export function StepBusinessInfo({ inputs, onChange, errors }: StepProps) {
             </Select>
           </div>
         )}
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="language">
+            Policy language / Langue de la politique
+          </Label>
+          <Select
+            value={inputs.language || 'en'}
+            onValueChange={(value: 'en' | 'fr') => onChange({ language: value })}
+          >
+            <SelectTrigger id="language" className="max-w-md">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="fr">Français (Québec / Canada)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Generates the full privacy policy in the selected language. Choosing Quebec
+            suggests French automatically — you can switch back anytime.
+          </p>
+        </div>
       </div>
     </div>
   )

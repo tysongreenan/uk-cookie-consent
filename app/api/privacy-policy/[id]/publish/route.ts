@@ -27,13 +27,18 @@ function isValidUuid(id: string): boolean {
 
 /** Convert a business name into a URL-safe slug with a random suffix. */
 function generateSlug(businessName: string): string {
-  const base = businessName
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/[\s]+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 50)
+  // Normalize accents (Orinha Média → orinha-media) then strip non URL-safe chars.
+  const base =
+    businessName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[\s]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 50) || 'policy'
 
   const suffix = crypto.randomUUID().slice(0, 8)
   return `${base}-${suffix}`
@@ -119,12 +124,33 @@ export async function POST(
       .select()
       .single()
 
-    if (updateError) {
-      console.error('[PRIVACY-POLICY-PUBLISH] Update failed:', updateError.message)
+    if (updateError || !updated) {
+      console.error('[PRIVACY-POLICY-PUBLISH] Update failed:', updateError?.message)
       return NextResponse.json({ error: 'Failed to publish policy' }, { status: 500 })
     }
 
-    return NextResponse.json(updated)
+    // Return camelCase shape matching GET /api/privacy-policy/[id]
+    // so the detail page can merge without overwriting UI fields.
+    const inputs = updated.inputs || {}
+    return NextResponse.json({
+      id: updated.id,
+      title: updated.name,
+      businessName: inputs.businessName || updated.name || 'Untitled',
+      status: updated.status,
+      slug: updated.slug || undefined,
+      contentHtml: updated.content_html || '',
+      contentJson: updated.content_json || { sections: [] },
+      inputs,
+      metadata: {
+        generatedAt: updated.updated_at || updated.created_at,
+        jurisdictions: updated.jurisdictions || [],
+        language: updated.language || inputs.language || 'en',
+        businessName: inputs.businessName || updated.name || '',
+      },
+      createdAt: updated.created_at,
+      updatedAt: updated.updated_at,
+      version: updated.version,
+    })
   } catch (error) {
     console.error('[PRIVACY-POLICY-PUBLISH] Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
