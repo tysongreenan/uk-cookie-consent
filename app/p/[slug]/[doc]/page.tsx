@@ -10,8 +10,12 @@ import {
   expectedDocForPolicy,
 } from '@/lib/privacy-policy/resolve-hosted'
 
+// Hosted policies are DB-backed; never serve a static empty shell.
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 interface HostedPolicyPageProps {
-  params: { slug: string; doc: string }
+  params: { slug: string; doc: string } | Promise<{ slug: string; doc: string }>
 }
 
 function resolveBusinessName(policy: any): string {
@@ -48,11 +52,13 @@ function preparePolicyHtml(html: string): string {
 }
 
 export async function generateMetadata({ params }: HostedPolicyPageProps): Promise<Metadata> {
-  if (!isPolicyDocSegment(params.doc)) {
+  const { slug, doc } = await Promise.resolve(params)
+
+  if (!isPolicyDocSegment(doc)) {
     return { title: 'Privacy Policy Not Found' }
   }
 
-  const resolved = await resolvePublishedPolicy(params.slug)
+  const resolved = await resolvePublishedPolicy(slug)
 
   if (resolved.kind === 'redirect') {
     return {
@@ -68,7 +74,7 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
   const policy = resolved.policy
   const businessName = resolveBusinessName(policy)
   const isFr = resolveLanguage(policy) === 'fr'
-  const liveKey = policy.slug || policy.id || params.slug
+  const liveKey = policy.slug || policy.id || slug
   const canonical = publicPolicyUrl(liveKey, policy.language)
 
   return {
@@ -91,11 +97,13 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
  * {uniqueKey} is unique per policy. The last segment is the same for everyone.
  */
 export default async function HostedPolicyPage({ params }: HostedPolicyPageProps) {
-  if (!isPolicyDocSegment(params.doc)) {
+  const { slug, doc } = await Promise.resolve(params)
+
+  if (!isPolicyDocSegment(doc)) {
     notFound()
   }
 
-  const resolved = await resolvePublishedPolicy(params.slug)
+  const resolved = await resolvePublishedPolicy(slug)
 
   if (resolved.kind === 'redirect') {
     permanentRedirect(resolved.path)
@@ -107,10 +115,10 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
 
   const policy = resolved.policy
   const expectedDoc = expectedDocForPolicy(policy)
-  const liveKey = policy.slug || policy.id || params.slug
+  const liveKey = policy.slug || policy.id || slug
 
   // Wrong language segment or outdated key → canonical path
-  if (params.doc !== expectedDoc || (policy.slug && params.slug !== policy.slug)) {
+  if (doc !== expectedDoc || (policy.slug && slug !== policy.slug)) {
     permanentRedirect(canonicalPathForPolicy(policy))
   }
 

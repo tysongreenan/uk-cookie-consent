@@ -60,6 +60,14 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      // Legacy hosted policy short URLs (pre URL-shape change):
+      // /p/orinha-media-5ac8d3c8 → /p/orinha-media-5ac8d3c8/privacy-policy
+      // French policies are corrected to …/politique-de-confidentialite by the doc page.
+      {
+        source: '/p/:slug',
+        destination: '/p/:slug/privacy-policy',
+        permanent: true,
+      },
     ]
   },
 
