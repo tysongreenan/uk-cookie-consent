@@ -1,12 +1,21 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { TeamRole, TeamPermission, hasTeamPermission } from '@/types'
 
-// Use service role key for server-side operations (bypasses RLS)
-// This is safe because callers authenticate via NextAuth session before using these functions
-const supabase = createClient(
-  (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
-  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "placeholder-key")
-)
+// Lazy service-role client — never bake env at module load (build/edge can
+// leave placeholders and cause plan lookups to fail open as "free").
+let _supabase: SupabaseClient | null = null
+function getSupabase(): SupabaseClient {
+  if (_supabase) return _supabase
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  if (!url || !key) {
+    throw new Error('[team-permissions] Supabase configuration is missing')
+  }
+  _supabase = createClient(url, key)
+  return _supabase
+}
 
 export interface TeamPermissionResult {
   hasPermission: boolean
@@ -25,7 +34,7 @@ export async function checkTeamPermission(
 ): Promise<TeamPermissionResult> {
   try {
     // Get user's role in the team
-    const { data: member, error } = await supabase
+    const { data: member, error } = await getSupabase()
       .from('TeamMember')
       .select('role')
       .eq('team_id', teamId)
@@ -63,7 +72,7 @@ export async function isTeamMember(
   teamId: string
 ): Promise<boolean> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('TeamMember')
       .select('id')
       .eq('team_id', teamId)
@@ -85,7 +94,7 @@ export async function getUserTeamRole(
   teamId: string
 ): Promise<TeamRole | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('TeamMember')
       .select('role')
       .eq('team_id', teamId)
@@ -108,7 +117,7 @@ export async function getUserTeamRole(
  */
 export async function getUserTeams(userId: string) {
   try {
-    const { data: memberships, error } = await supabase
+    const { data: memberships, error } = await getSupabase()
       .from('TeamMember')
       .select('team_id, role, joined_at')
       .eq('user_id', userId)
@@ -122,7 +131,7 @@ export async function getUserTeams(userId: string) {
     const teamIds = (memberships || []).map(member => member.team_id).filter(Boolean)
     if (teamIds.length === 0) return []
 
-    const { data: teams, error: teamsError } = await supabase
+    const { data: teams, error: teamsError } = await getSupabase()
       .from('Team')
       .select('id, name, owner_id, created_at, updated_at')
       .in('id', teamIds)
@@ -157,7 +166,7 @@ export async function getUserTeams(userId: string) {
  */
 export async function getTeamMembers(teamId: string) {
   try {
-    const { data: members, error } = await supabase
+    const { data: members, error } = await getSupabase()
       .from('TeamMember')
       .select('id, user_id, role, joined_at, created_at')
       .eq('team_id', teamId)
@@ -170,7 +179,7 @@ export async function getTeamMembers(teamId: string) {
 
     const userIds = (members || []).map(member => member.user_id).filter(Boolean)
     const { data: users, error: usersError } = userIds.length > 0
-      ? await supabase
+      ? await getSupabase()
         .from('User')
         .select('id, name, email, image')
         .in('id', userIds)
@@ -201,7 +210,7 @@ export async function getTeamMembers(teamId: string) {
  */
 export async function getTeamInvitations(teamId: string) {
   try {
-    const { data: invitations, error } = await supabase
+    const { data: invitations, error } = await getSupabase()
       .from('TeamInvitation')
       .select('id, email, role, token, status, expires_at, created_at, invited_by')
       .eq('team_id', teamId)
@@ -215,7 +224,7 @@ export async function getTeamInvitations(teamId: string) {
 
     const inviterIds = (invitations || []).map(invitation => invitation.invited_by).filter(Boolean)
     const { data: inviters, error: invitersError } = inviterIds.length > 0
-      ? await supabase
+      ? await getSupabase()
         .from('User')
         .select('id, name, email')
         .in('id', inviterIds)
@@ -271,7 +280,7 @@ export async function canPerformTeamAction(
 }
 
 async function getPlanForUser(userId: string): Promise<{ planTier: string; featureFreezeDate: string | null }> {
-  const { data: user, error } = await supabase
+  const { data: user, error } = await getSupabase()
     .from('User')
     .select('planTier')
     .eq('id', userId)
@@ -285,7 +294,7 @@ async function getPlanForUser(userId: string): Promise<{ planTier: string; featu
   let featureFreezeDate: string | null = null
 
   try {
-    const { data: freezeData, error: freezeError } = await supabase
+    const { data: freezeData, error: freezeError } = await getSupabase()
       .from('User')
       .select('featureFreezeDate')
       .eq('id', userId)
@@ -317,7 +326,7 @@ export async function resolveEffectivePlan(
   }
 
   try {
-    const { data: team } = await supabase
+    const { data: team } = await getSupabase()
       .from('Team')
       .select('owner_id')
       .eq('id', currentTeamId)
