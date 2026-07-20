@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { X, Sparkles, Zap, Gift, ArrowRight } from 'lucide-react'
@@ -10,6 +11,13 @@ import { useAnnouncement } from '@/lib/announcement-context'
 export function UpdateAnnouncement() {
   const { isVisible, setIsVisible } = useAnnouncement()
   const [showParticles, setShowParticles] = useState(false)
+  const pathname = usePathname()
+
+  // Hosted privacy policies (/p/…) should look like clean legal documents —
+  // never show the marketing announcement banner on those pages.
+  if (pathname?.startsWith('/p/')) {
+    return null
+  }
 
   useEffect(() => {
     if (isVisible) {

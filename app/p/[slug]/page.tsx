@@ -46,6 +46,30 @@ function resolveLanguage(policy: any): 'en' | 'fr' {
   return lang === 'fr' ? 'fr' : 'en'
 }
 
+function resolveLogoUrl(policy: any): string | null {
+  const url = policy.inputs?.logoUrl
+  if (typeof url === 'string' && url.trim() && !url.startsWith('data:')) {
+    return url.trim()
+  }
+  // Data URLs can be huge; still allow small ones for branding
+  if (typeof url === 'string' && url.startsWith('data:image/') && url.length < 200_000) {
+    return url
+  }
+  return null
+}
+
+/**
+ * Policy HTML already includes an H1 "Privacy Policy" / "Politique…".
+ * The page has its own document title, so strip the first H1 to avoid
+ * a doubled, unprofessional header.
+ */
+function preparePolicyHtml(html: string): string {
+  if (!html) return ''
+  return html
+    .replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>\s*/i, '')
+    .replace(/^\s*<p class="policy-subheading">[\s\S]*?<\/p>\s*/i, '')
+}
+
 export async function generateMetadata({ params }: HostedPolicyPageProps): Promise<Metadata> {
   const policy = await getPublishedPolicy(params.slug)
 
@@ -60,8 +84,8 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
 
   return {
     title: isFr
-      ? `Politique de confidentialité - ${businessName}`
-      : `Privacy Policy - ${businessName}`,
+      ? `Politique de confidentialité — ${businessName}`
+      : `Privacy Policy — ${businessName}`,
     description: isFr
       ? `Politique de confidentialité de ${businessName}. Découvrez comment vos renseignements personnels sont recueillis, utilisés et protégés.`
       : `Privacy policy for ${businessName}. Learn how your personal information is collected, used, and protected.`,
@@ -81,6 +105,7 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
 
   const businessName = resolveBusinessName(policy)
   const isFr = resolveLanguage(policy) === 'fr'
+  const logoUrl = resolveLogoUrl(policy)
   const locale = isFr ? 'fr-CA' : 'en-US'
   const updatedAt = policy.updated_at
     ? new Date(policy.updated_at).toLocaleDateString(locale, {
@@ -109,8 +134,8 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
   }
 
   const title = isFr
-    ? `Politique de confidentialité - ${businessName}`
-    : `Privacy Policy - ${businessName}`
+    ? `Politique de confidentialité — ${businessName}`
+    : `Privacy Policy — ${businessName}`
 
   const webPageSchema = {
     '@context': 'https://schema.org',
@@ -132,11 +157,16 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: isFr ? 'Accueil' : 'Home', item: 'https://www.cookie-banner.ca' },
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: isFr ? 'Accueil' : 'Home',
+        item: 'https://www.cookie-banner.ca',
+      },
       {
         '@type': 'ListItem',
         position: 2,
-        name: isFr ? 'Générateur de politique de confidentialité' : 'Privacy Policy Generator',
+        name: isFr ? 'Politiques de confidentialité' : 'Privacy Policies',
         item: 'https://www.cookie-banner.ca/tools/privacy-policy',
       },
       {
@@ -164,10 +194,20 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
         }
       : null
 
-  const policyHtml = policy.content_html
+  const policyHtml = preparePolicyHtml(policy.content_html || '')
+
+  const jurisdictionLabels: Record<string, string> = {
+    gdpr: 'GDPR',
+    ccpa: 'CCPA / CPRA',
+    pipeda: 'PIPEDA',
+    law25: isFr ? 'Loi 25' : 'Law 25',
+  }
 
   return (
-    <div className="min-h-screen bg-white" lang={isFr ? 'fr' : 'en'}>
+    <div
+      className="min-h-screen bg-[#f7f6f3] text-slate-900 antialiased"
+      lang={isFr ? 'fr' : 'en'}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
@@ -183,83 +223,177 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
         />
       )}
 
-      <nav className="border-b border-gray-200 print:hidden">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <ol className="flex items-center gap-2 text-sm text-gray-500">
-            <li>
-              <Link href="/" className="hover:text-gray-800 transition-colors">
-                {isFr ? 'Accueil' : 'Home'}
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link
-                href="/tools/privacy-policy"
-                className="hover:text-gray-800 transition-colors"
-              >
-                {isFr ? 'Générateur de politique' : 'Privacy Policy Generator'}
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-gray-800 font-medium">{businessName}</li>
-          </ol>
-        </div>
-      </nav>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        <header className="mb-8 pb-8 border-b border-gray-200">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            {isFr ? 'Politique de confidentialité' : 'Privacy Policy'}
-          </h1>
-          <p className="text-lg text-gray-600">{businessName}</p>
-          <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
-            {updatedAt && (
-              <span>
-                {isFr ? 'Dernière mise à jour :' : 'Last updated:'} {updatedAt}
+      {/* Slim top bar — no card boxes */}
+      <header className="print:hidden border-b border-slate-200/80 bg-white/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="max-w-3xl mx-auto px-5 sm:px-6 h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt=""
+                className="h-7 w-7 rounded object-contain shrink-0"
+              />
+            ) : (
+              <span className="h-7 w-7 rounded-full bg-slate-900 text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
+                {businessName.trim().charAt(0).toUpperCase() || 'P'}
               </span>
             )}
-            {jurisdictions.length > 0 && (
-              <span>
-                {isFr ? 'Couvre :' : 'Covers:'} {jurisdictions.join(', ')}
-              </span>
-            )}
+            <span className="text-sm font-medium text-slate-800 truncate">
+              {businessName}
+            </span>
           </div>
-        </header>
+          <nav className="flex items-center gap-3 text-xs text-slate-500 shrink-0">
+            <Link
+              href="/tools/privacy-policy"
+              className="hover:text-slate-800 transition-colors hidden sm:inline"
+            >
+              {isFr ? 'Générateur' : 'Generator'}
+            </Link>
+            <Link
+              href="/"
+              className="hover:text-slate-800 transition-colors"
+            >
+              Cookie Banner
+            </Link>
+          </nav>
+        </div>
+      </header>
 
-        <article
-          className="prose prose-gray prose-lg max-w-none
-            prose-headings:text-gray-900 prose-headings:font-bold
-            prose-p:text-gray-700 prose-p:leading-relaxed
-            prose-li:text-gray-700
-            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-gray-900
-            print:prose-sm"
-          dangerouslySetInnerHTML={{ __html: policyHtml }}
-        />
-      </main>
+      <main className="px-4 sm:px-6 py-10 sm:py-14">
+        {/* Document surface */}
+        <article className="max-w-3xl mx-auto bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)] sm:rounded-xl border border-slate-200/60 overflow-hidden">
+          {/* Document header — clean, no chip boxes */}
+          <div className="px-6 sm:px-12 pt-10 sm:pt-14 pb-8 border-b border-slate-100">
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-slate-400 mb-4">
+              {businessName}
+            </p>
+            <h1 className="text-3xl sm:text-[2.35rem] font-semibold tracking-tight text-slate-900 leading-tight">
+              {isFr ? 'Politique de confidentialité' : 'Privacy Policy'}
+            </h1>
 
-      <footer className="border-t border-gray-200 print:hidden">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+            <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-x-6 gap-y-2 text-sm text-slate-500">
+              {updatedAt && (
+                <p>
+                  <span className="text-slate-400">
+                    {isFr ? 'Dernière mise à jour' : 'Last updated'}
+                  </span>
+                  <span className="mx-1.5 text-slate-300">·</span>
+                  <time dateTime={policy.updated_at}>{updatedAt}</time>
+                </p>
+              )}
+              {jurisdictions.length > 0 && (
+                <p>
+                  <span className="text-slate-400">
+                    {isFr ? 'Cadres' : 'Frameworks'}
+                  </span>
+                  <span className="mx-1.5 text-slate-300">·</span>
+                  <span className="text-slate-600">
+                    {jurisdictions
+                      .map((j) => jurisdictionLabels[j] || j.toUpperCase())
+                      .join(' · ')}
+                  </span>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Body */}
+          <div
+            className="policy-document px-6 sm:px-12 py-10 sm:py-12
+              prose prose-slate max-w-none
+              prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-slate-900
+              prose-h2:text-xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100
+              prose-h3:text-base prose-h3:mt-8 prose-h3:mb-3 prose-h3:text-slate-800
+              prose-p:text-[15.5px] prose-p:leading-[1.75] prose-p:text-slate-600
+              prose-li:text-[15.5px] prose-li:leading-[1.7] prose-li:text-slate-600
+              prose-strong:text-slate-800 prose-strong:font-semibold
+              prose-a:text-teal-700 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+              prose-ul:my-4 prose-ol:my-4
+              prose-table:text-sm
+              print:prose-sm print:px-0"
+            dangerouslySetInnerHTML={{ __html: policyHtml }}
+          />
+        </article>
+
+        {/* Quiet footer under document */}
+        <footer className="max-w-3xl mx-auto mt-8 px-1 print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-slate-400">
             <p>
-              {isFr ? 'Généré avec ' : 'Generated with '}
+              {isFr ? 'Hébergé par ' : 'Hosted by '}
               <Link
-                href="https://www.cookie-banner.ca/tools/privacy-policy"
-                className="text-blue-600 hover:underline font-medium"
+                href="https://www.cookie-banner.ca"
+                className="text-slate-500 hover:text-slate-700 transition-colors"
               >
-                {isFr
-                  ? 'le générateur Cookie Banner'
-                  : 'Cookie Banner Privacy Policy Generator'}
+                Cookie Banner
               </Link>
             </p>
             {updatedAt && (
               <p>
-                {isFr ? 'Dernière mise à jour :' : 'Last updated:'} {updatedAt}
+                {isFr ? 'Mise à jour le ' : 'Updated '}
+                {updatedAt}
               </p>
             )}
           </div>
-        </div>
-      </footer>
+        </footer>
+      </main>
+
+      {/* Policy-specific table + subheading polish (not card boxes) */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .policy-document .policy-subheading {
+              color: #94a3b8;
+              font-size: 0.875rem;
+              margin-top: -0.25rem;
+              margin-bottom: 1.5rem;
+            }
+            .policy-document table.cookie-table,
+            .policy-document table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 1.5rem 0;
+              font-size: 0.875rem;
+              border: 1px solid #e2e8f0;
+              border-radius: 0.5rem;
+              overflow: hidden;
+            }
+            .policy-document table thead {
+              background: #f8fafc;
+            }
+            .policy-document table th {
+              text-align: left;
+              font-weight: 600;
+              color: #334155;
+              padding: 0.75rem 1rem;
+              border-bottom: 1px solid #e2e8f0;
+            }
+            .policy-document table td {
+              padding: 0.7rem 1rem;
+              border-bottom: 1px solid #f1f5f9;
+              color: #475569;
+              vertical-align: top;
+            }
+            .policy-document table tr:last-child td {
+              border-bottom: none;
+            }
+            .policy-document table code {
+              font-size: 0.8em;
+              background: #f1f5f9;
+              padding: 0.1rem 0.35rem;
+              border-radius: 0.25rem;
+              color: #0f172a;
+            }
+            .policy-document h2:first-child {
+              margin-top: 0;
+            }
+            @media print {
+              body { background: white !important; }
+              .policy-document table { break-inside: avoid; }
+            }
+          `,
+        }}
+      />
     </div>
   )
 }
