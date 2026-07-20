@@ -124,7 +124,28 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to publish policy' }, { status: 500 })
     }
 
-    return NextResponse.json(updated)
+    // Return camelCase shape matching GET /api/privacy-policy/[id]
+    // so the detail page can merge without overwriting UI fields.
+    const inputs = updated.inputs || {}
+    return NextResponse.json({
+      id: updated.id,
+      title: updated.name,
+      businessName: inputs.businessName || updated.name || 'Untitled',
+      status: updated.status,
+      slug: updated.slug || undefined,
+      contentHtml: updated.content_html || '',
+      contentJson: updated.content_json || { sections: [] },
+      inputs,
+      metadata: {
+        generatedAt: updated.updated_at || updated.created_at,
+        jurisdictions: updated.jurisdictions || [],
+        language: updated.language || 'en',
+        businessName: inputs.businessName || updated.name || '',
+      },
+      createdAt: updated.created_at,
+      updatedAt: updated.updated_at,
+      version: updated.version,
+    })
   } catch (error) {
     console.error('[PRIVACY-POLICY-PUBLISH] Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

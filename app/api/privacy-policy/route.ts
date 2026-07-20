@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('privacy_policies')
-      .select('id, name, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
+      .select('id, name, slug, status, jurisdictions, language, created_at, updated_at, inputs', { count: 'exact' })
 
     if (teamId) {
       // Verify the user is a member of this team
@@ -67,19 +67,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch policies' }, { status: 500 })
     }
 
-    // Slim down the response — only include businessName from inputs
+    // Shape matches dashboard list UI (camelCase + title/slug).
+    // Keep `data`/`policies` aliases for backward compatibility.
     const policies = (data || []).map((p: any) => ({
       id: p.id,
+      title: p.name,
       name: p.name,
       status: p.status,
+      slug: p.slug || undefined,
       jurisdictions: p.jurisdictions,
       language: p.language,
+      createdAt: p.created_at,
+      updatedAt: p.updated_at,
       created_at: p.created_at,
       updated_at: p.updated_at,
-      businessName: p.inputs?.businessName || null,
+      businessName: p.inputs?.businessName || p.name || null,
     }))
 
     return NextResponse.json({
+      policies,
       data: policies,
       total: count ?? 0,
       page,

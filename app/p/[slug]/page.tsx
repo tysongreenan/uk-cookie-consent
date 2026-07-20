@@ -40,7 +40,13 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
     }
   }
 
-  const businessName = policy.business_name || policy.metadata?.businessName || 'Business'
+  // DB stores business name in inputs.businessName (not business_name / metadata)
+  const businessName =
+    policy.inputs?.businessName ||
+    policy.business_name ||
+    policy.metadata?.businessName ||
+    policy.name ||
+    'Business'
 
   return {
     title: `Privacy Policy - ${businessName}`,
@@ -59,13 +65,23 @@ export default async function HostedPolicyPage({ params }: HostedPolicyPageProps
     notFound()
   }
 
-  const businessName = policy.business_name || policy.metadata?.businessName || 'Business'
+  // DB stores business name in inputs.businessName (not business_name / metadata)
+  const businessName =
+    policy.inputs?.businessName ||
+    policy.business_name ||
+    policy.metadata?.businessName ||
+    policy.name ||
+    'Business'
   const updatedAt = policy.updated_at ? new Date(policy.updated_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }) : null
-  const jurisdictions: string[] = policy.metadata?.jurisdictions || []
+  const jurisdictions: string[] =
+    policy.jurisdictions ||
+    policy.metadata?.jurisdictions ||
+    policy.inputs?.jurisdictions ||
+    []
 
   // Extract FAQ sections from content_json if available
   const contentJson = policy.content_json

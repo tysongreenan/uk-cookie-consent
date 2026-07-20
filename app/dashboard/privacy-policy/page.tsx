@@ -45,7 +45,13 @@ export default function PrivacyPoliciesPage() {
       const res = await fetch('/api/privacy-policy')
       if (!res.ok) throw new Error('Failed to fetch policies')
       const data = await res.json()
-      setPolicies(data.policies || [])
+      // API returns { policies } (and legacy { data }) — accept either shape.
+      const list = Array.isArray(data.policies)
+        ? data.policies
+        : Array.isArray(data.data)
+          ? data.data
+          : []
+      setPolicies(list)
     } catch (err) {
       console.error('Failed to fetch policies:', err)
       toast.error('Failed to load privacy policies')
