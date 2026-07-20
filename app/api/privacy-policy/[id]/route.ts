@@ -12,7 +12,7 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 import { isTeamMember } from '@/lib/team-permissions'
-import { validateSlug } from '@/lib/privacy-policy/slug'
+import { suggestSlugs, validateSlug } from '@/lib/privacy-policy/slug'
 import type { PlanTier } from '@/types'
 
 function getSupabase() {
@@ -184,10 +184,22 @@ export async function PUT(
       ? [...existing.previous_slugs]
       : []
 
+    const businessLabel =
+      (inputs && typeof inputs === 'object' && (inputs as any).businessName) ||
+      existing.inputs?.businessName ||
+      existing.name ||
+      'policy'
+
     if (typeof slug === 'string') {
       const check = validateSlug(slug)
       if (!check.ok) {
-        return NextResponse.json({ error: check.error }, { status: 400 })
+        return NextResponse.json(
+          {
+            error: check.error,
+            suggestions: suggestSlugs(businessLabel, slug),
+          },
+          { status: 400 }
+        )
       }
       if (check.slug !== existing.slug) {
         const { data: taken } = await supabase
@@ -197,7 +209,10 @@ export async function PUT(
           .maybeSingle()
         if (taken && taken.id !== id) {
           return NextResponse.json(
-            { error: 'That URL is already taken. Please choose another.' },
+            {
+              error: 'That URL is already taken. Please choose another.',
+              suggestions: suggestSlugs(businessLabel, check.slug),
+            },
             { status: 409 }
           )
         }
