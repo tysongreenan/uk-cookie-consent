@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { brandPrivacySlug, normalizeSlug, slugFromBusinessName } from '@/lib/privacy-policy/slug'
+import { publicPolicyDisplay, publicPolicyPath, policyDocSegment } from '@/lib/privacy-policy/hosted-url'
 import type { PolicyOutput } from '@/types'
 
 interface PolicyDetail {
@@ -326,12 +327,12 @@ export default function PolicyDetailPage() {
               <p className="text-sm text-primary mt-1">
                 <ExternalLink className="h-3 w-3 inline mr-1" />
                 <a
-                  href={`https://www.cookie-banner.ca/p/${policy.slug}`}
+                  href={publicPolicyPath(policy.slug, policy.metadata?.language || policy.inputs?.language)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"
                 >
-                  cookie-banner.ca/p/{policy.slug}
+                  {publicPolicyDisplay(policy.slug, policy.metadata?.language || policy.inputs?.language)}
                 </a>
               </p>
             )}
@@ -394,19 +395,18 @@ export default function PolicyDetailPage() {
                     {policy.status === 'published' ? 'Your policy is live' : 'Hosted URL'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Use your <span className="font-medium text-foreground">business name</span>
-                    {' '}(e.g. <span className="font-mono">orinha-media</span>), not a generic word like{' '}
-                    <span className="font-mono">privacy-policy</span> — those are reserved so everyone
-                    can have a unique brand URL.
+                    The <span className="font-medium text-foreground">unique part</span> is your brand
+                    key (e.g. <span className="font-mono">orinha-media</span>). Everyone ends with{' '}
+                    <span className="font-mono">/privacy-policy</span> — that name is shared, not raced for.
                     {policy.status === 'published' &&
-                      ' Renaming keeps the old path redirecting when history is available.'}
+                      ' Renaming keeps old paths redirecting when history is available.'}
                   </p>
                 </div>
               </div>
               {policy.status === 'published' && policy.slug && (
                 <Button variant="outline" size="sm" asChild>
                   <a
-                    href={`https://www.cookie-banner.ca/p/${policy.slug}`}
+                    href={publicPolicyPath(policy.slug, policy.metadata?.language || policy.inputs?.language)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -418,10 +418,10 @@ export default function PolicyDetailPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="policy-slug">Public URL</Label>
+              <Label htmlFor="policy-slug">Your unique key</Label>
               <div className="flex flex-col sm:flex-row gap-2">
-                <div className="flex flex-1 items-center rounded-md border border-input bg-background overflow-hidden">
-                  <span className="px-3 py-2 text-sm text-muted-foreground bg-muted border-r border-input whitespace-nowrap">
+                <div className="flex flex-1 items-center rounded-md border border-input bg-background overflow-hidden min-w-0">
+                  <span className="px-2 sm:px-3 py-2 text-xs sm:text-sm text-muted-foreground bg-muted border-r border-input whitespace-nowrap shrink-0">
                     cookie-banner.ca/p/
                   </span>
                   <Input
@@ -430,11 +430,14 @@ export default function PolicyDetailPage() {
                     onChange={(e) => setSlugDraft(e.target.value.toLowerCase())}
                     onBlur={() => setSlugDraft((s) => normalizeSlug(s))}
                     placeholder="orinha-media"
-                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-mono"
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-mono min-w-0"
                     disabled={isSavingSlug || isPublishing || isEditing}
                     autoComplete="off"
                     spellCheck={false}
                   />
+                  <span className="px-2 sm:px-3 py-2 text-xs sm:text-sm text-muted-foreground bg-muted border-l border-input whitespace-nowrap shrink-0 font-mono">
+                    /{policyDocSegment(policy.metadata?.language || policy.inputs?.language)}
+                  </span>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <Button
@@ -473,9 +476,12 @@ export default function PolicyDetailPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Letters, numbers, and hyphens only. Preview:{' '}
-                <span className="font-mono text-foreground">
-                  cookie-banner.ca/p/{normalizeSlug(slugDraft) || '…'}
+                Letters, numbers, and hyphens only. Full URL:{' '}
+                <span className="font-mono text-foreground break-all">
+                  {publicPolicyDisplay(
+                    normalizeSlug(slugDraft) || '…',
+                    policy.metadata?.language || policy.inputs?.language,
+                  )}
                 </span>
               </p>
               {slugSuggestions.length > 0 && (

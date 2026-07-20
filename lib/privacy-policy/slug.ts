@@ -1,9 +1,9 @@
 /**
- * Shared slug helpers for hosted privacy policy URLs (/p/[slug]).
+ * Shared helpers for the unique key in:
+ *   /p/{uniqueKey}/privacy-policy
  *
- * Public URLs are global (one slug for the whole product). We never default
- * to generic paths like "privacy-policy" — those are reserved so every
- * customer gets a brand-based URL instead of racing for the same name.
+ * {uniqueKey} is global-unique (business brand). The trailing
+ * /privacy-policy is shared by everyone — uniqueness lives in the middle.
  */
 
 const SLUG_MIN = 3
