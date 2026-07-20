@@ -147,7 +147,7 @@ export default function ToolsPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button asChild>
-                    <Link href="/dashboard">
+                    <Link href="/builder">
                       Get Started Free
                     </Link>
                   </Button>

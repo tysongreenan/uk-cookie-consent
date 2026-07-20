@@ -30,18 +30,16 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "GDPR compliance",
       "Bilingual support (English/French)",
       "Granular consent & blocking behavior",
-      "Unlimited cookie banners",
-      "Unlimited websites",
+      "Free plan: 1 banner, full compliance features",
+      "Pro: unlimited banners, analytics, team features ($99 one-time)",
       "5-minute setup",
-      "No credit card required",
-      "Free plan with Pro upgrade for $99 one-time",
+      "No credit card required for free plan",
       "Consent transaction logging",
-      "Multi-site/deployment scalability",
       "Integration with tag management (Google Tag Manager)",
-      "Low performance impact (loads in milliseconds)",
-      "Zero performance impact on page speed"
+      "Low performance impact (loads in milliseconds)"
     ],
-    "screenshot": `${baseUrl}/og-image.png`,
+    // Use real assets (public/logos/logo.svg; OG via app/opengraph-image.tsx)
+    "screenshot": `${baseUrl}/opengraph-image`,
     "softwareVersion": "2.0",
     "releaseNotes": "Full GDPR, PIPEDA, CASL, and Quebec Law 25 compliance. Google Consent Mode V2 ready.",
     "url": baseUrl,
@@ -60,7 +58,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.svg`
+        "url": `${baseUrl}/logos/logo.svg`
       },
       "address": {
         "@type": "PostalAddress",
@@ -75,12 +73,8 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     },
     "inLanguage": ["en", "fr"],
     "availableLanguage": ["English", "French"],
-    "countriesSupported": ["CA", "US", "GB", "EU"],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "127"
-    }
+    "countriesSupported": ["CA", "US", "GB", "EU"]
+    // No aggregateRating — Google treats fabricated review markup as spam
   }
 
   const organization = {
@@ -89,7 +83,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     "name": "Cookie Banner Generator",
     "alternateName": "Cookie-Banner.ca",
     "url": baseUrl,
-    "logo": `${baseUrl}/logo.svg`,
+    "logo": `${baseUrl}/logos/logo.svg`,
     "description": "Canadian cookie consent banner generator providing GDPR, PIPEDA, CASL, and Quebec Law 25 compliant solutions. Free plan available, Pro for $99 one-time.",
     "address": {
       "@type": "PostalAddress",
@@ -117,7 +111,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.svg`
+        "url": `${baseUrl}/logos/logo.svg`
       }
     },
     "inLanguage": ["en", "fr"],

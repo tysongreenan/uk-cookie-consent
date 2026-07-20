@@ -50,6 +50,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://www.cookie-banner.ca',
+    // Only list locales that actually exist (no fake /fr hreflang).
+    languages: {
+      'en-ca': 'https://www.cookie-banner.ca',
+      'x-default': 'https://www.cookie-banner.ca',
+    },
   },
 }
 

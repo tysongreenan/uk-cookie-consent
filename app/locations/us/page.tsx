@@ -8,19 +8,19 @@ import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2025',
-  description: 'Complete guide to US cookie consent compliance. CCPA, CPRA, state privacy laws (Virginia VCDPA, Colorado CPA, Connecticut CTDPA), and federal privacy regulations.',
-  keywords: 'us cookie consent, ccpa compliance, cpra california, state privacy laws, vcdpa virginia, cpa colorado, ctdpa connecticut, us privacy law',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
-  },
+  title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2026',
+  description:
+    'Complete guide to US cookie consent compliance. CCPA, CPRA, state privacy laws (Virginia VCDPA, Colorado CPA, Connecticut CTDPA), and federal privacy regulations.',
+  keywords:
+    'us cookie consent, ccpa compliance, cpra california, state privacy laws, vcdpa virginia, cpa colorado, ctdpa connecticut, us privacy law',
   openGraph: {
-    title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2025',
-    description: 'Complete guide to US cookie consent compliance. CCPA, CPRA, and state privacy laws.',
+    title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2026',
+    description:
+      'Complete guide to US cookie consent compliance. CCPA, CPRA, and state privacy laws.',
     type: 'article',
+  },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/locations/us',
   },
 }
 

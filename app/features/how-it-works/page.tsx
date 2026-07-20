@@ -57,12 +57,11 @@ const faqData = [
 
 const breadcrumbData = [
   { name: 'Home', url: 'https://www.cookie-banner.ca/' },
-  { name: 'Features', url: 'https://www.cookie-banner.ca/features' },
   { name: 'How Do I Know It\'s Working?', url: 'https://www.cookie-banner.ca/features/how-it-works' }
 ]
 
 export default function HowItWorksPage() {
-  const updatedDate = '2025-01-20'
+  const updatedDate = '2026-07-19'
   const publishedDate = '2025-01-15'
 
   const articleSchema = {
@@ -120,14 +119,14 @@ export default function HowItWorksPage() {
           description: "Step-by-step verification guide for cookie banner functionality",
           badge: "Verification Guide",
           updatedDate: updatedDate,
-          ctaText: "See Your Banner in Action",
-          ctaHref: "/dashboard",
+          ctaText: "Build Your Banner Free",
+          ctaHref: "/builder",
           directAnswer: directAnswer,
-          directAnswerLink: "/dashboard",
-          directAnswerLinkText: "View dashboard"
+          directAnswerLink: "/builder",
+          directAnswerLinkText: "Open free builder"
         }}
-        ctaText="See Your Banner in Action"
-        ctaHref="/dashboard"
+        ctaText="Build Your Banner Free"
+        ctaHref="/builder"
         relatedLinks={[
           { href: "/features/will-this-keep-me-compliant", text: "Will This Keep Me Compliant?" },
           { href: "/features/privacy-laws", text: "What Privacy Laws Does This Cover?" },

@@ -38,19 +38,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Block direct access to location pages (only allow from landing page or bots)
-  if (pathname.startsWith('/locations/')) {
-    const ua = request.headers.get('user-agent') || ''
-    const isCrawler = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|msnbot|petalbot|gptbot|oai-searchbot|claudebot|perplexitybot|bytespider/i.test(ua)
-
-    if (!isCrawler) {
-      const referer = request.headers.get('referer')
-      const host = request.headers.get('host')
-      if (!referer || !referer.includes(host || 'cookie-banner.ca')) {
-        return NextResponse.redirect(new URL('/', request.url))
-      }
-    }
-  }
+  // Location pages (/locations/*) are public SEO landing pages — do not gate them.
 
   // ── Dashboard auth gate ──
   // Redirect unauthenticated users to sign-in. The public /builder route must

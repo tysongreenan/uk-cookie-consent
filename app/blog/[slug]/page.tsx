@@ -56,13 +56,25 @@ export async function generateMetadata({
       publishedTime: post.date,
       modifiedTime: post.updatedDate || post.date,
       authors: [post.author],
-      images: [post.image ? (post.image.startsWith('http') ? post.image : `https://www.cookie-banner.ca${post.image}`) : 'https://www.cookie-banner.ca/og-image.png'],
+      images: [
+        post.image
+          ? post.image.startsWith('http')
+            ? post.image
+            : `https://www.cookie-banner.ca${post.image}`
+          : 'https://www.cookie-banner.ca/opengraph-image',
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [post.image ? (post.image.startsWith('http') ? post.image : `https://www.cookie-banner.ca${post.image}`) : 'https://www.cookie-banner.ca/og-image.png'],
+      images: [
+        post.image
+          ? post.image.startsWith('http')
+            ? post.image
+            : `https://www.cookie-banner.ca${post.image}`
+          : 'https://www.cookie-banner.ca/opengraph-image',
+      ],
     },
   }
 }
@@ -88,7 +100,7 @@ export default async function BlogPostPage({
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
-    image: post.image || 'https://www.cookie-banner.ca/og-image.png',
+    image: post.image || 'https://www.cookie-banner.ca/opengraph-image',
     datePublished: post.date,
     dateModified: post.updatedDate || post.date,
     author: {

@@ -13,8 +13,9 @@ import {
 import { StructuredData } from '@/components/seo/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator — No Credit Card, No Limits',
-  description: 'Generate cookie consent banners for free. GDPR, CCPA, PIPEDA & Law 25 compliant. Unlimited websites. No credit card needed. Works on WordPress, Shopify, Webflow & any site.',
+  title: 'Free Cookie Banner Generator — No Credit Card (2026)',
+  description:
+    'Generate a free GDPR, CCPA, PIPEDA & Law 25 cookie banner. No credit card. Free plan includes 1 banner; Pro unlocks unlimited banners for $99 one-time. WordPress, Shopify, Webflow & any site.',
   keywords: [
     'free cookie banner generator',
     'cookie banner generator free',
@@ -28,8 +29,9 @@ export const metadata: Metadata = {
     'cookie consent banner generator free',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator — No Credit Card, No Limits',
-    description: 'Generate cookie consent banners for free. GDPR, CCPA, PIPEDA & Law 25 compliant. Unlimited websites. No credit card needed. Works on WordPress, Shopify, Webflow & any site.',
+    title: 'Free Cookie Banner Generator — No Credit Card (2026)',
+    description:
+      'Generate a free compliant cookie banner. Free plan: 1 banner. Pro: unlimited for $99 one-time. Works on WordPress, Shopify, Webflow & any site.',
     type: 'website',
   },
   alternates: {
@@ -85,8 +87,8 @@ export default function FreeCookieBannerGeneratorPage() {
             text: "Free Plan — No Credit Card Required",
           }}
           title="Free Cookie Banner Generator"
-          title2="No Limits. No Credit Card. No Catch."
-          description="Generate GDPR, CCPA, PIPEDA & Law 25 compliant cookie banners. Free plan available — upgrade to Pro for $99 one-time."
+          title2="No Credit Card. Full Compliance. One Free Banner."
+          description="Generate GDPR, CCPA, PIPEDA & Law 25 compliant cookie banners. Free plan includes 1 banner — upgrade to Pro for unlimited banners ($99 one-time)."
           emailCapture={true}
           useGeometricBackground={true}
         />
