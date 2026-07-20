@@ -25,7 +25,7 @@ import {
   X,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { normalizeSlug } from '@/lib/privacy-policy/slug'
+import { brandPrivacySlug, normalizeSlug, slugFromBusinessName } from '@/lib/privacy-policy/slug'
 import type { PolicyOutput } from '@/types'
 
 interface PolicyDetail {
@@ -62,6 +62,7 @@ export default function PolicyDetailPage() {
 
   // Custom hosted URL (slug)
   const [slugDraft, setSlugDraft] = useState('')
+  const [slugSuggestions, setSlugSuggestions] = useState<string[]>([])
   const [isSavingSlug, setIsSavingSlug] = useState(false)
 
   useEffect(() => {
@@ -108,12 +109,13 @@ export default function PolicyDetailPage() {
         inputs: data.inputs || {},
       }
       setPolicy(normalized)
-      // Prefer existing slug; otherwise suggest a clean one from the business name
+      // Prefer existing slug; otherwise brand-based (never bare "privacy-policy")
       setSlugDraft(
         normalized.slug ||
-          normalizeSlug(normalized.businessName || normalized.title || 'policy') ||
-          '',
+          slugFromBusinessName(normalized.businessName || normalized.title || '') ||
+          brandPrivacySlug(normalized.businessName || normalized.title || 'business'),
       )
+      setSlugSuggestions([])
     } catch (err) {
       console.error('Failed to fetch policy:', err)
       toast.error('Failed to load policy')
@@ -176,7 +178,7 @@ export default function PolicyDetailPage() {
     if (!policy) return
     const next = normalizeSlug(slugDraft)
     if (!next) {
-      toast.error('Enter a URL slug (e.g. orinha-media)')
+      toast.error('Enter a URL based on your business name (e.g. orinha-media)')
       return
     }
     if (next === policy.slug) {
@@ -184,6 +186,7 @@ export default function PolicyDetailPage() {
       return
     }
     setIsSavingSlug(true)
+    setSlugSuggestions([])
     try {
       const res = await fetch(`/api/privacy-policy/${policyId}`, {
         method: 'PUT',
@@ -192,6 +195,9 @@ export default function PolicyDetailPage() {
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
+        if (Array.isArray(data?.suggestions) && data.suggestions.length > 0) {
+          setSlugSuggestions(data.suggestions)
+        }
         throw new Error(data?.error || 'Failed to update URL')
       }
       setPolicy((prev) =>
@@ -204,6 +210,7 @@ export default function PolicyDetailPage() {
           : prev,
       )
       setSlugDraft(data.slug || next)
+      setSlugSuggestions([])
       toast.success('Hosted URL updated')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to update URL'
@@ -387,9 +394,12 @@ export default function PolicyDetailPage() {
                     {policy.status === 'published' ? 'Your policy is live' : 'Hosted URL'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Choose a clean public link (e.g. <span className="font-mono">orinha-media</span>).
+                    Use your <span className="font-medium text-foreground">business name</span>
+                    {' '}(e.g. <span className="font-mono">orinha-media</span>), not a generic word like{' '}
+                    <span className="font-mono">privacy-policy</span> — those are reserved so everyone
+                    can have a unique brand URL.
                     {policy.status === 'published' &&
-                      ' After you save a new URL, the old one redirects to this one when history is available.'}
+                      ' Renaming keeps the old path redirecting when history is available.'}
                   </p>
                 </div>
               </div>
@@ -468,6 +478,47 @@ export default function PolicyDetailPage() {
                   cookie-banner.ca/p/{normalizeSlug(slugDraft) || '…'}
                 </span>
               </p>
+              {slugSuggestions.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="text-xs text-muted-foreground">Try:</span>
+                  {slugSuggestions.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className="text-xs font-mono px-2 py-1 rounded-md border border-border bg-background hover:bg-muted transition-colors"
+                      onClick={() => {
+                        setSlugDraft(s)
+                        setSlugSuggestions([])
+                      }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!policy.slug && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    className="text-xs text-primary hover:underline"
+                    onClick={() =>
+                      setSlugDraft(slugFromBusinessName(policy.businessName || 'business'))
+                    }
+                  >
+                    Use business name
+                  </button>
+                  <span className="text-xs text-muted-foreground">·</span>
+                  <button
+                    type="button"
+                    className="text-xs text-primary hover:underline"
+                    onClick={() =>
+                      setSlugDraft(brandPrivacySlug(policy.businessName || 'business'))
+                    }
+                  >
+                    Use name + privacy-policy
+                  </button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

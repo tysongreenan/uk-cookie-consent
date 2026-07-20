@@ -12,7 +12,13 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 import { isTeamMember } from '@/lib/team-permissions'
-import { generateUniqueSlug, validateSlug } from '@/lib/privacy-policy/slug'
+import {
+  brandPrivacySlug,
+  generateUniqueSlug,
+  slugFromBusinessName,
+  suggestSlugs,
+  validateSlug,
+} from '@/lib/privacy-policy/slug'
 import type { PlanTier } from '@/types'
 
 function getSupabase() {
@@ -121,15 +127,26 @@ export async function POST(
       ? [...policy.previous_slugs]
       : []
 
+    const businessLabel = policy.inputs?.businessName || policy.name || 'policy'
+
     if (requestedSlug) {
       const check = validateSlug(requestedSlug)
       if (!check.ok) {
-        return NextResponse.json({ error: check.error }, { status: 400 })
+        return NextResponse.json(
+          {
+            error: check.error,
+            suggestions: suggestSlugs(businessLabel, requestedSlug),
+          },
+          { status: 400 }
+        )
       }
       const available = await isSlugAvailable(supabase, check.slug, id)
       if (!available) {
         return NextResponse.json(
-          { error: 'That URL is already taken. Please choose another.' },
+          {
+            error: 'That URL is already taken. Please choose another.',
+            suggestions: suggestSlugs(businessLabel, check.slug),
+          },
           { status: 409 }
         )
       }
@@ -139,15 +156,20 @@ export async function POST(
       previousSlugs = previousSlugs.filter((s) => s !== check.slug)
       slug = check.slug
     } else if (!slug) {
-      // Prefer clean business-name slug when free; otherwise add a short suffix.
-      const preferred = validateSlug(
-        policy.inputs?.businessName || policy.name || 'policy'
-      )
-      if (preferred.ok && (await isSlugAvailable(supabase, preferred.slug, id))) {
-        slug = preferred.slug
-      } else {
-        slug = generateUniqueSlug(policy.inputs?.businessName || policy.name || 'policy')
+      // Brand-first defaults — never generic "privacy-policy"
+      const candidates = [
+        slugFromBusinessName(businessLabel),
+        brandPrivacySlug(businessLabel),
+      ]
+      let picked: string | null = null
+      for (const candidate of candidates) {
+        const check = validateSlug(candidate)
+        if (check.ok && (await isSlugAvailable(supabase, check.slug, id))) {
+          picked = check.slug
+          break
+        }
       }
+      slug = picked || generateUniqueSlug(businessLabel)
     }
 
     // ── Publish ─────────────────────────────────────────────────────
