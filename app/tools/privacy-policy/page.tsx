@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
     },
     {
       question: "Can I host my privacy policy on your platform?",
-      answer: "Yes. Pro users can publish their privacy policy to a hosted URL (e.g., cookie-banner.ca/p/your-business). This page is SEO-optimized, always up to date, and includes a 'last updated' timestamp for compliance."
+      answer: "Yes. Pro users can publish to a hosted URL like cookie-banner.ca/p/your-business/privacy-policy. The middle part (your-business) is unique to you; every customer ends with /privacy-policy. The page is SEO-optimized with a last-updated timestamp."
     },
     {
       question: "Do I need a privacy policy if I only use cookies?",
@@ -208,7 +208,7 @@ export default function PrivacyPolicyPage() {
                     </p>
                     <p className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                      Hosted URL you can customize (e.g. cookie-banner.ca/p/your-brand)
+                      Hosted URL: /p/your-brand/privacy-policy
                     </p>
                     <p className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />

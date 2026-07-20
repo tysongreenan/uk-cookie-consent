@@ -11,6 +11,7 @@ import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { Plus, FileText, ExternalLink, Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { publicPolicyDisplay } from '@/lib/privacy-policy/hosted-url'
 
 interface SavedPolicy {
   id: string
@@ -120,7 +121,7 @@ export default function PrivacyPoliciesPage() {
               <h3 className="text-lg font-semibold mb-2">No privacy policies yet</h3>
               <p className="text-muted-foreground mb-4 text-center max-w-md">
                 Generate a policy tailored to your business, then publish it to a clean hosted URL
-                (e.g. cookie-banner.ca/p/your-brand).
+                (e.g. cookie-banner.ca/p/your-brand/privacy-policy).
               </p>
               <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
                 Need French? On step 1 choose <span className="font-medium text-foreground">Français</span>
@@ -159,7 +160,7 @@ export default function PrivacyPoliciesPage() {
                       {policy.status === 'published' && policy.slug && (
                         <p className="text-sm text-primary mt-1">
                           <ExternalLink className="h-3 w-3 inline mr-1" />
-                          cookie-banner.ca/p/{policy.slug}
+                          {publicPolicyDisplay(policy.slug, policy.language)}
                         </p>
                       )}
                     </div>

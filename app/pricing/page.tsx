@@ -311,7 +311,7 @@ export default function PricingPage() {
                 <Link href="/tools/privacy-policy" className="text-primary underline underline-offset-2">
                   /tools/privacy-policy
                 </Link>
-                . Pro unlocks saving to your dashboard, custom hosted URLs (cookie-banner.ca/p/your-brand), and publishing. Pro Annual adds version history.
+                . Pro unlocks saving to your dashboard, custom hosted URLs (cookie-banner.ca/p/your-brand/privacy-policy), and publishing. Pro Annual adds version history.
               </p>
             </div>
           </div>
