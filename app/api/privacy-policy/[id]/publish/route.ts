@@ -12,6 +12,7 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 import { isTeamMember } from '@/lib/team-permissions'
+import { generateUniqueSlug, validateSlug } from '@/lib/privacy-policy/slug'
 import type { PlanTier } from '@/types'
 
 function getSupabase() {
@@ -25,23 +26,19 @@ function isValidUuid(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
 }
 
-/** Convert a business name into a URL-safe slug with a random suffix. */
-function generateSlug(businessName: string): string {
-  // Normalize accents (Orinha Média → orinha-media) then strip non URL-safe chars.
-  const base =
-    businessName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/[\s]+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 50) || 'policy'
+/** Returns true if slug is free, or already owned by this policy. */
+async function isSlugAvailable(
+  supabase: ReturnType<typeof getSupabase>,
+  slug: string,
+  policyId: string
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('privacy_policies')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle()
 
-  const suffix = crypto.randomUUID().slice(0, 8)
-  return `${base}-${suffix}`
+  return !data || data.id === policyId
 }
 
 export async function POST(
@@ -107,9 +104,46 @@ export async function POST(
       }
     }
 
-    // ── Publish ─────────────────────────────────────────────────────
+    // ── Resolve slug (optional custom slug in body) ─────────────────
 
-    const slug = policy.slug || generateSlug(policy.inputs?.businessName || policy.name || 'policy')
+    let requestedSlug: string | undefined
+    try {
+      const body = await request.json().catch(() => ({}))
+      if (body && typeof body.slug === 'string' && body.slug.trim()) {
+        requestedSlug = body.slug
+      }
+    } catch {
+      // No body / empty body is fine — auto-generate
+    }
+
+    let slug = policy.slug as string | null
+
+    if (requestedSlug) {
+      const check = validateSlug(requestedSlug)
+      if (!check.ok) {
+        return NextResponse.json({ error: check.error }, { status: 400 })
+      }
+      const available = await isSlugAvailable(supabase, check.slug, id)
+      if (!available) {
+        return NextResponse.json(
+          { error: 'That URL is already taken. Please choose another.' },
+          { status: 409 }
+        )
+      }
+      slug = check.slug
+    } else if (!slug) {
+      // Prefer clean business-name slug when free; otherwise add a short suffix.
+      const preferred = validateSlug(
+        policy.inputs?.businessName || policy.name || 'policy'
+      )
+      if (preferred.ok && (await isSlugAvailable(supabase, preferred.slug, id))) {
+        slug = preferred.slug
+      } else {
+        slug = generateUniqueSlug(policy.inputs?.businessName || policy.name || 'policy')
+      }
+    }
+
+    // ── Publish ─────────────────────────────────────────────────────
 
     const { data: updated, error: updateError } = await supabase
       .from('privacy_policies')
@@ -125,6 +159,13 @@ export async function POST(
       .single()
 
     if (updateError || !updated) {
+      // Unique index race
+      if (updateError?.code === '23505' || updateError?.message?.includes('slug')) {
+        return NextResponse.json(
+          { error: 'That URL is already taken. Please choose another.' },
+          { status: 409 }
+        )
+      }
       console.error('[PRIVACY-POLICY-PUBLISH] Update failed:', updateError?.message)
       return NextResponse.json({ error: 'Failed to publish policy' }, { status: 500 })
     }

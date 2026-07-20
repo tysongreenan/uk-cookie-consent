@@ -12,6 +12,7 @@ import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 import { isTeamMember } from '@/lib/team-permissions'
+import { validateSlug } from '@/lib/privacy-policy/slug'
 import type { PlanTier } from '@/types'
 
 function getSupabase() {
@@ -166,30 +167,64 @@ export async function PUT(
     // ── Parse body ──────────────────────────────────────────────────
 
     const body = await request.json()
-    const { name, inputs, content_html, content_json, jurisdictions, language } = body
+    const { name, inputs, content_html, content_json, jurisdictions, language, slug } = body
 
-    // ── Save previous version ───────────────────────────────────────
+    const contentChanging =
+      content_html !== undefined ||
+      content_json !== undefined ||
+      inputs !== undefined ||
+      name !== undefined ||
+      jurisdictions !== undefined ||
+      language !== undefined
 
-    const { error: versionError } = await supabase
-      .from('privacy_policy_versions')
-      .insert({
-        id: crypto.randomUUID(),
-        policy_id: id,
-        version: existing.version,
-        inputs: existing.inputs,
-        content_html: existing.content_html,
-        content_json: existing.content_json,
-        created_at: new Date().toISOString(),
-      })
+    // ── Optional custom hosted URL (slug) ───────────────────────────
 
-    if (versionError) {
-      console.error('[PRIVACY-POLICY] Version snapshot failed:', versionError.message)
-      // Non-fatal — continue with update
+    let nextSlug = existing.slug as string | null
+    if (typeof slug === 'string') {
+      const check = validateSlug(slug)
+      if (!check.ok) {
+        return NextResponse.json({ error: check.error }, { status: 400 })
+      }
+      if (check.slug !== existing.slug) {
+        const { data: taken } = await supabase
+          .from('privacy_policies')
+          .select('id')
+          .eq('slug', check.slug)
+          .maybeSingle()
+        if (taken && taken.id !== id) {
+          return NextResponse.json(
+            { error: 'That URL is already taken. Please choose another.' },
+            { status: 409 }
+          )
+        }
+        nextSlug = check.slug
+      }
+    }
+
+    // ── Version snapshot only when content/metadata changes ─────────
+
+    if (contentChanging) {
+      const { error: versionError } = await supabase
+        .from('privacy_policy_versions')
+        .insert({
+          id: crypto.randomUUID(),
+          policy_id: id,
+          version: existing.version,
+          inputs: existing.inputs,
+          content_html: existing.content_html,
+          content_json: existing.content_json,
+          created_at: new Date().toISOString(),
+        })
+
+      if (versionError) {
+        console.error('[PRIVACY-POLICY] Version snapshot failed:', versionError.message)
+        // Non-fatal — continue with update
+      }
     }
 
     // ── Update policy ───────────────────────────────────────────────
 
-    const newVersion = (existing.version || 1) + 1
+    const newVersion = contentChanging ? (existing.version || 1) + 1 : existing.version
 
     const { data: updated, error: updateError } = await supabase
       .from('privacy_policies')
@@ -200,6 +235,7 @@ export async function PUT(
         content_json: content_json ?? existing.content_json,
         jurisdictions: jurisdictions ?? existing.jurisdictions,
         language: language ?? existing.language,
+        slug: nextSlug,
         version: newVersion,
         updated_at: new Date().toISOString(),
       })
@@ -208,6 +244,12 @@ export async function PUT(
       .single()
 
     if (updateError) {
+      if (updateError.code === '23505' || updateError.message?.includes('slug')) {
+        return NextResponse.json(
+          { error: 'That URL is already taken. Please choose another.' },
+          { status: 409 }
+        )
+      }
       console.error('[PRIVACY-POLICY] Update failed:', updateError.message)
       return NextResponse.json({ error: 'Failed to update policy' }, { status: 500 })
     }
