@@ -167,25 +167,28 @@ Do not re-do; verify live after deploy.
 
 ## Execution checklist (copy into issues)
 
-### Issue A — End homepage A/B *(in progress)*
+### Issue A — End homepage A/B
 - [x] Middleware  
 - [x] Tracker off home  
 - [x] `/v2` redirect  
-- [ ] Merge + deploy develop  
-- [ ] Smoke  
+- [x] Merge develop  
+- [ ] Smoke after production deploy  
 
 ### Issue B — Privacy policy truth & polish
-- [ ] Pricing “Coming Next” fix  
-- [ ] Generator legal disclaimer  
-- [ ] Tool page Free vs Pro hosted URL  
-- [ ] Optional slug redirect on rename  
+- [x] Pricing: Free generate / Pro host (not “Coming Next”)  
+- [x] Homepage pricing section aligned  
+- [x] Generator legal disclaimer  
+- [x] Tool page Free vs Pro hosted URL  
+- [x] Dashboard empty state FR + slug tip  
+- [x] Dashboard create/regenerate language + disclaimer  
+- [ ] Optional slug redirect on rename *(later)*  
 
 ### Issue C — Free page cannibalization
 - [ ] Three differentiated title/H1 packages  
 - [ ] Internal linking map  
 
 ### Issue D — Tools / features chrome
-- [ ] `/tools` Header + Footer  
+- [x] `/tools` Header + Footer  
 - [ ] Feature breadcrumbs / hub  
 - [ ] Schema dates  
 

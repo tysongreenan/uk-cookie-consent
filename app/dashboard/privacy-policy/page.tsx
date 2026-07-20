@@ -118,8 +118,13 @@ export default function PrivacyPoliciesPage() {
             <CardContent className="flex flex-col items-center justify-center py-16">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No privacy policies yet</h3>
-              <p className="text-muted-foreground mb-6 text-center max-w-md">
-                Generate a privacy policy tailored to your business and privacy law requirements. You can publish it to a hosted URL or download it.
+              <p className="text-muted-foreground mb-4 text-center max-w-md">
+                Generate a policy tailored to your business, then publish it to a clean hosted URL
+                (e.g. cookie-banner.ca/p/your-brand).
+              </p>
+              <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
+                Need French? On step 1 choose <span className="font-medium text-foreground">Français</span>
+                — selecting Quebec suggests French automatically. You can keep separate EN and FR policies.
               </p>
               <Button asChild>
                 <Link href="/dashboard/privacy-policy/new">

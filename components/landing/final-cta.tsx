@@ -56,7 +56,7 @@ export function FinalCTA() {
           <div className="mx-auto max-w-md">
             {session ? (
               <Button asChild size="lg" className="w-full min-h-[48px] text-base font-semibold sm:h-14 sm:text-lg">
-                <Link href="/dashboard">
+                <Link href="/builder">
                   Go to Dashboard
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Link>

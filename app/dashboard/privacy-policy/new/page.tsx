@@ -225,8 +225,11 @@ export default function NewPrivacyPolicyPage() {
           </h1>
           <p className="text-muted-foreground mt-1">
             {fromPolicyId
-              ? 'Review and update your details. Regenerating creates a new version of this policy.'
-              : 'Fill in your business details to generate and save a privacy policy.'}
+              ? 'Review and update your details. Regenerating creates a new version of this policy. Language is on step 1 (English or Français).'
+              : 'Fill in your business details to generate and save a privacy policy. Choose English or Français on step 1.'}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2 max-w-2xl">
+            Generated content is a template based on your answers—not legal advice. Review (and consult counsel when needed) before publishing.
           </p>
         </div>
 

@@ -3,11 +3,17 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Shield, FileText, Globe, Zap, CheckCircle } from 'lucide-react'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
 
 export const metadata: Metadata = {
-  title: 'Cookie Consent Tools | Free Compliance Checker & Scanner',
-  description: 'Free tools to help you achieve cookie consent compliance. Cookie scanner, compliance checker, and more privacy tools.',
-  keywords: ['cookie consent tools', 'compliance checker', 'cookie scanner', 'privacy tools', 'GDPR tools'],
+  title: 'Cookie Consent Tools | Free Scanner & Privacy Policy Generator',
+  description:
+    'Free tools for cookie consent compliance: cookie scanner, privacy policy generator (English & French), and more. Generate free; Pro hosts policies.',
+  keywords: ['cookie consent tools', 'compliance checker', 'cookie scanner', 'privacy tools', 'GDPR tools', 'privacy policy generator'],
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/tools',
+  },
 }
 
 const tools = [
@@ -23,43 +29,44 @@ const tools = [
     status: 'Available'
   },
   {
-    name: 'Compliance Checker',
-    description: 'Determine which privacy laws apply to your business',
-    icon: Shield,
-    path: '/tools/compliance-checker',
-    features: ['Location-based requirements', 'Business type analysis', 'Compliance roadmap'],
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    status: 'Coming Soon'
-  },
-  {
     name: 'Privacy Policy Generator',
     description: 'Generate compliant privacy policies for your website',
     icon: FileText,
     path: '/tools/privacy-policy',
-    features: ['GDPR, PIPEDA, CCPA, Law 25', 'Free to generate', 'Hosted policy pages'],
+    features: ['GDPR, PIPEDA, CCPA, Law 25', 'Free generate · EN & FR', 'Pro: hosted custom URL'],
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
     status: 'Available'
   },
   {
-    name: 'Cookie Audit Tool',
-    description: 'Comprehensive audit of your cookie practices',
+    name: 'Cookie Policy Template',
+    description: 'Cookie-focused policy template for your website',
     icon: Globe,
-    path: '/tools/cookie-audit',
-    features: ['Full website scan', 'Risk assessment', 'Remediation plan'],
+    path: '/tools/cookie-policy',
+    features: ['Cookie categories explained', 'Third-party disclosures', 'Copy & customize'],
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
-    status: 'Coming Soon'
-  }
+    status: 'Available'
+  },
+  {
+    name: 'PIPEDA Guide',
+    description: 'Canadian cookie consent requirements under PIPEDA',
+    icon: Shield,
+    path: '/compliance/pipeda',
+    features: ['Canada-focused rules', 'Checklist-style guidance', 'Link to free banner'],
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    status: 'Available'
+  },
 ]
 
 export default function ToolsPage() {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container px-4 py-12 sm:px-6 sm:py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           {/* Header */}
@@ -68,8 +75,8 @@ export default function ToolsPage() {
               Free Privacy Tools
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to achieve cookie consent compliance. 
-              Free tools to scan, audit, and optimize your privacy practices.
+              Scan cookies, generate privacy policies (English &amp; French), and improve compliance.
+              Generate free — Pro unlocks hosted policy URLs and dashboard saves.
             </p>
           </div>
 
@@ -162,6 +169,7 @@ export default function ToolsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
