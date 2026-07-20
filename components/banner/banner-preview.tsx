@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type CSSProperties } from 'react'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
@@ -472,18 +472,28 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
   }
 
   const getLayoutStyles = () => {
-    const baseStyles: any = {
+    const baseStyles: CSSProperties = {
       borderRadius: `${safeConfig.layout.borderRadius}px`,
       padding: `${safeConfig.layout.padding}px`,
       margin: `${safeConfig.layout.margin}px`,
+      boxSizing: 'border-box',
     }
 
-    // Width handling
-    if (safeConfig.layout.width === 'custom' && safeConfig.layout.customWidth) {
-      baseStyles.width = `${safeConfig.layout.customWidth}px`
-    } else if (safeConfig.layout.width === 'container') {
-      baseStyles.maxWidth = `${safeConfig.layout.maxWidth || 1200}px`
-      baseStyles.margin = '0 auto'
+    // Match production: container/custom width only for full-width bars.
+    // Applying max-width: 1200px to floating cards overrides the card size.
+    const isFullWidthBar =
+      safeConfig.position === 'top' || safeConfig.position === 'bottom'
+
+    if (isFullWidthBar) {
+      if (safeConfig.layout.width === 'custom' && safeConfig.layout.customWidth) {
+        baseStyles.width = `${safeConfig.layout.customWidth}px`
+      } else if (safeConfig.layout.width === 'container') {
+        baseStyles.maxWidth = `${safeConfig.layout.maxWidth || 1200}px`
+        baseStyles.margin = '0 auto'
+      }
+    } else if (safeConfig.layout.width === 'custom' && safeConfig.layout.customWidth) {
+      baseStyles.maxWidth = `${safeConfig.layout.customWidth}px`
+      baseStyles.width = '100%'
     }
 
     // Shadow handling
@@ -549,25 +559,24 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
             ...getLayoutStyles(),
           }}
         >
-          <div className="relative" style={{ paddingRight: 56 }}>
+          <div className="relative min-w-0 box-border" style={{ paddingRight: 44 }}>
             {/* Mirror the production banner: a 44x44 close button is rendered
                 regardless of position so builders can see where it lands
                 against their copy before publishing. */}
             <button
               onClick={handleClose}
               aria-label="Close"
-              className="absolute flex items-start justify-center"
+              className="absolute flex items-center justify-center"
               style={{
                 top: 0,
                 right: 0,
                 width: 44,
                 height: 44,
-                paddingTop: 2,
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
                 color: safeConfig.colors.text,
-                fontSize: 24,
+                fontSize: 28,
                 lineHeight: 1,
                 opacity: 0.7,
                 zIndex: 2,
@@ -576,11 +585,11 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
               ×
             </button>
 
-            <div className={`flex items-start ${
+            <div className={`flex items-start gap-4 min-w-0 flex-wrap ${
               safeConfig.branding.logo.position === 'center' ? 'flex-col' : 'flex-row'
             }`}>
               {safeConfig.branding.logo.position === 'left' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
-                <div className="flex items-center mr-3">
+                <div className="flex items-center shrink-0">
                   <img
                     src={safeConfig.branding.logo.url}
                     alt="Logo"
@@ -596,7 +605,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                 </div>
               )}
               
-              <div className="flex-1">
+              <div className="flex-1 min-w-0 max-w-full">
                 {safeConfig.branding.logo.position === 'center' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
                   <div className="flex items-center justify-center mb-2">
                     <img
@@ -614,11 +623,16 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                   </div>
                 )}
                 
-                <h3 className="font-semibold text-lg mb-2" style={{ color: safeConfig.colors.text }}>
-                  {safeConfig.text.title}
-                </h3>
+                {safeConfig.text.title?.trim() ? (
+                  <h3
+                    className="font-semibold text-lg mb-2 break-words"
+                    style={{ color: safeConfig.colors.text, whiteSpace: 'normal' }}
+                  >
+                    {safeConfig.text.title}
+                  </h3>
+                ) : null}
                 
-                <p className="text-sm mb-4 leading-relaxed">
+                <p className="text-sm mb-4 leading-relaxed break-words" style={{ whiteSpace: 'normal' }}>
                   {safeConfig.text.message}
                   {safeConfig.branding.privacyPolicy.url && (
                     <>
@@ -643,6 +657,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                     style={{
                       backgroundColor: safeConfig.colors.button,
                       color: safeConfig.colors.buttonText,
+                      minHeight: 44,
                     }}
                     className="hover:opacity-90"
                   >
@@ -658,6 +673,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                         backgroundColor: safeConfig.colors.rejectButton || 'transparent',
                         borderColor: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
                         color: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
+                        minHeight: 44,
                       }}
                       className="hover:bg-opacity-10"
                     >
@@ -670,7 +686,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                       onClick={handlePreferences}
                       variant="ghost"
                       size="sm"
-                      style={{ color: safeConfig.colors.link }}
+                      style={{ color: safeConfig.colors.link, minHeight: 44 }}
                       className="hover:bg-opacity-10"
                     >
                       {safeConfig.text.preferencesButton}
@@ -681,7 +697,7 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
               </div>
 
               {safeConfig.branding.logo.position === 'right' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
-                <div className="flex items-center ml-3">
+                <div className="flex items-center shrink-0">
                   <img
                     src={safeConfig.branding.logo.url}
                     alt="Logo"

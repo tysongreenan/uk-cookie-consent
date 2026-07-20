@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 5
+export const GENERATOR_VERSION = 6
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 6,
+    date: '2026-07-20',
+    title: 'Mobile & Desktop Layout Polish',
+    changes: [
+      'Fixed floating banners overflowing on mobile (close button overlapping text)',
+      'Card layouts stay within the viewport on desktop and mobile',
+      'Buttons stack full-width on phones for reliable touch targets',
+      'Safe-area support for notched iPhones and home indicators',
+    ],
+  },
   {
     version: 5,
     date: '2026-03-16',
