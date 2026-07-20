@@ -8,10 +8,14 @@ export const metadata: Metadata = {
   title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
   description: 'Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent. Learn how to verify compliance.',
   keywords: 'will cookie banner keep me compliant, cookie consent compliance verification, how to know if cookie banner is compliant, cookie banner compliance check, GDPR compliance verification, PIPEDA compliance check',
+  alternates: {
+    canonical: '/features/will-this-keep-me-compliant',
+  },
   openGraph: {
     title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
     description: 'Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent.',
     type: 'article',
+    url: '/features/will-this-keep-me-compliant',
   },
 }
 

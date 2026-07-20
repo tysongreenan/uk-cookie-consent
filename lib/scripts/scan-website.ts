@@ -515,7 +515,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
     const headless = await scanWithBrowser(targetUrl)
 
     let productAdvice: ProductAdvice | undefined
-    const isOurBanner = headless.consentBanner.vendor === 'UK Cookie Consent'
+    const isOurBanner = ['UK Cookie Consent', 'Cookie Banner'].includes(headless.consentBanner.vendor ?? '')
 
     if (isOurBanner && headless.ourBannerId) {
       const config = await fetchBannerConfig(headless.ourBannerId)

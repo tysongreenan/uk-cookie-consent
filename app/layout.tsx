@@ -50,6 +50,13 @@ export const metadata: Metadata = {
   verification: {
     google: 'A3HHfv-cqaYqh6td64AMTu4v8TT8xuLZmpBQh2zWvBY',
   },
+  alternates: {
+    types: {
+      'application/rss+xml': [
+        { url: '/rss.xml', title: 'Cookie-Banner.ca — Privacy & Cookie Consent Blog' },
+      ],
+    },
+  },
   openGraph: {
     title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
     description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site. No code needed.',

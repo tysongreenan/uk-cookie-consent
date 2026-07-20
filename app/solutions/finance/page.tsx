@@ -4,21 +4,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DollarSign, Shield, Lock, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, CreditCard, TrendingUp } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'Financial Cookie Consent | Banking GDPR Compliance Solution 2025',
   description: 'Complete financial cookie consent solution for banks, fintech, and investment platforms. GLBA, PCI-DSS + cookie law compliance, fraud prevention, security-focused cookie management.',
   keywords: 'financial website cookies, banking gdpr compliance, fintech privacy, investment platform cookies, financial data protection',
+  alternates: {
+    canonical: '/solutions/finance',
+  },
   openGraph: {
     title: 'Financial Cookie Consent | Banking GDPR Compliance Solution 2025',
     description: 'Complete financial cookie consent solution for banks, fintech, and investment platforms. GLBA, PCI-DSS + cookie law compliance.',
     type: 'article',
+    url: '/solutions/finance',
   },
 }
 
 export default function FinanceSolutionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Solutions', url: '/solutions' },
+          { name: 'Finance', url: '/solutions/finance' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-slate-700 to-gray-800 text-white">
         <div className="absolute inset-0 bg-black/20"></div>

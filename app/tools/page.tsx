@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   title: 'Cookie Consent Tools | Free Compliance Checker & Scanner',
   description: 'Free tools to help you achieve cookie consent compliance. Cookie scanner, compliance checker, and more privacy tools.',
   keywords: ['cookie consent tools', 'compliance checker', 'cookie scanner', 'privacy tools', 'GDPR tools'],
+  alternates: {
+    canonical: '/tools',
+  },
+  openGraph: {
+    title: 'Cookie Consent Tools | Free Compliance Checker & Scanner',
+    description: 'Free tools to help you achieve cookie consent compliance. Cookie scanner, compliance checker, and more privacy tools.',
+    type: 'website',
+    url: '/tools',
+  },
 }
 
 const tools = [

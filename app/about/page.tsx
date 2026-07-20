@@ -19,11 +19,15 @@ export const metadata: Metadata = {
     'no per-domain fees',
     'creative-first compliance',
   ],
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
     title: 'About Cookie-Banner.ca — Built in Canada',
     description: 'A no-BS, unlimited, branded cookie banner generator from a Canadian founder who believes compliance should empower creativity.',
     type: 'website',
     locale: 'en_CA',
+    url: '/about',
   },
   robots: {
     index: true,

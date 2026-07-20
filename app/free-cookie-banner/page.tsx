@@ -34,10 +34,14 @@ export const metadata: Metadata = {
     'free privacy compliance',
     'no cost cookie banner'
   ],
+  alternates: {
+    canonical: '/free-cookie-banner',
+  },
   openGraph: {
     title: 'Free Cookie Banner Generator | No Cost GDPR Compliance 2025',
     description: 'Create unlimited free cookie banners. GDPR, PIPEDA & CCPA compliant. No credit card, no limits, no catch. Better than paid alternatives.',
     type: 'website',
+    url: '/free-cookie-banner',
   },
 }
 

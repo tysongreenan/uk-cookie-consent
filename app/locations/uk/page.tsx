@@ -6,27 +6,33 @@ import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2025',
   description: 'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, Brexit implications, ICO guidance, and UK-specific implementation strategies.',
   keywords: 'uk cookie consent, gdpr uk, pecr compliance, ico guidance, uk privacy law, brexit privacy, uk cookie law',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
+  alternates: {
+    canonical: '/locations/uk',
   },
   openGraph: {
     title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2025',
     description: 'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, and ICO guidance.',
     type: 'article',
+    url: '/locations/uk',
   },
 }
 
 export default function UKCompliancePage() {
   return (
     <div className="min-h-screen bg-background">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Locations', url: '/locations' },
+          { name: 'United Kingdom', url: '/locations/uk' },
+        ]}
+      />
       <Header />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 text-white">

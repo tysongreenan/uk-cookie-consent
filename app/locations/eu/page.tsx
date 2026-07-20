@@ -6,27 +6,33 @@ import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2025',
   description: 'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, Cookie Law, Data Protection Authorities, and multi-language support across 27 EU countries.',
   keywords: 'eu cookie consent, gdpr compliance, eprivacy directive, cookie law eu, eu data protection, dpa enforcement, multi-language cookie banner',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
+  alternates: {
+    canonical: '/locations/eu',
   },
   openGraph: {
     title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2025',
     description: 'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, and multi-language support.',
     type: 'article',
+    url: '/locations/eu',
   },
 }
 
 export default function EUCompliancePage() {
   return (
     <div className="min-h-screen bg-background">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Locations', url: '/locations' },
+          { name: 'European Union', url: '/locations/eu' },
+        ]}
+      />
       <Header />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-yellow-500 text-white">

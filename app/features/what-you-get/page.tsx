@@ -8,10 +8,14 @@ export const metadata: Metadata = {
   title: 'What Else Do I Get With This Cookie Banner? | Complete Feature List',
   description: 'Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates. Complete feature list for cookie consent solution.',
   keywords: 'cookie banner features, cookie consent tool features, what\'s included in cookie banner, cookie banner customization options, cookie consent solution features',
+  alternates: {
+    canonical: '/features/what-you-get',
+  },
   openGraph: {
     title: 'What Else Do I Get With This Cookie Banner? | Complete Feature List',
     description: 'Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates.',
     type: 'article',
+    url: '/features/what-you-get',
   },
 }
 

@@ -93,6 +93,84 @@ export async function sendWelcomeEmail(to: string, name: string, product: 'banne
   })
 }
 
+// ── Purchase confirmation ─────────────────────────────────────────────
+
+export async function sendPurchaseConfirmationEmail(
+  to: string,
+  name: string,
+  planTier: 'pro_lifetime' | 'pro_annual'
+) {
+  const isLifetime = planTier === 'pro_lifetime'
+  const dashboardUrl = 'https://cookie-banner.ca/dashboard'
+
+  return sendEmail({
+    to,
+    subject: isLifetime ? "You're in — Pro is unlocked for life" : "You're in — Pro is active on your account",
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 0;">
+        <div style="background: #0E768C; padding: 24px 32px; border-radius: 12px 12px 0 0;">
+          <h1 style="color: #fff; margin: 0; font-size: 20px;">Thanks for upgrading to Pro</h1>
+        </div>
+        <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+          <p style="color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
+            Hi ${name || 'there'},
+          </p>
+          <p style="color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
+            ${isLifetime
+              ? "Your one-time payment is confirmed and Pro is unlocked on your account for good — no subscriptions, no renewals."
+              : "Your annual subscription is confirmed and Pro is now active on your account."}
+            You now have access to advanced customization, analytics, team collaboration, and custom branding.
+          </p>
+          <a href="${dashboardUrl}" style="display: inline-block; background: #0E768C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+            Go to Dashboard
+          </a>
+          <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 24px 0 0;">
+            A separate email from Stripe has your receipt for your records. If anything looks off, just reply to this email.
+          </p>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">
+          cookie-banner.ca — Cookie consent made simple
+        </p>
+      </div>
+    `,
+  })
+}
+
+// ── No banner created yet (nudge) ───────────────────────────────────────
+
+export async function sendNoBannerNudgeEmail(to: string, name: string) {
+  const dashboardUrl = 'https://cookie-banner.ca/dashboard'
+
+  return sendEmail({
+    to,
+    subject: "You haven't created a cookie banner yet — takes 2 minutes",
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 0;">
+        <div style="background: #0E768C; padding: 24px 32px; border-radius: 12px 12px 0 0;">
+          <h1 style="color: #fff; margin: 0; font-size: 20px;">Let's get your banner live</h1>
+        </div>
+        <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+          <p style="color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
+            Hi ${name || 'there'},
+          </p>
+          <p style="color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 16px;">
+            Looks like you haven't created your first cookie consent banner yet. It only takes a couple of minutes to set one up and start covering your site.
+          </p>
+          <a href="${dashboardUrl}" style="display: inline-block; background: #0E768C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+            Create Your Banner
+          </a>
+          <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 24px 0 0;">
+            Stuck or have questions? Just reply to this email — we're happy to help.
+          </p>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">
+          cookie-banner.ca — Cookie consent made simple
+        </p>
+      </div>
+    `,
+  })
+}
+
 // ── DSAR deadline reminder ────────────────────────────────────────────
 
 export async function sendDSARDeadlineReminder(

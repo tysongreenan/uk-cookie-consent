@@ -7,8 +7,17 @@ import { Badge } from '@/components/ui/badge'
 import { Mail, Code, HelpCircle, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Support - Cookie Banner Generator',
-  description: 'Get help with Cookie Banner Generator. Contact our support team for assistance with your cookie consent banners.',
+  title: 'Support — Cookie Banner Generator Help Center',
+  description: 'Get help with Cookie Banner Generator. Contact our support team for assistance with your cookie consent banners, GDPR, PIPEDA, and Law 25 setup.',
+  alternates: {
+    canonical: '/support',
+  },
+  openGraph: {
+    title: 'Support — Cookie Banner Generator Help Center',
+    description: 'Get help with Cookie Banner Generator. Contact our support team for assistance with your cookie consent banners.',
+    type: 'website',
+    url: '/support',
+  },
 }
 
 export default function SupportPage() {

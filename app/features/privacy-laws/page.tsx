@@ -8,10 +8,14 @@ export const metadata: Metadata = {
   title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
   description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location and applies the right rules. Free plan.',
   keywords: 'cookie consent laws, cookie banner privacy laws, GDPR PIPEDA cookie banner, multi-jurisdiction cookie consent, cookie consent compliance, cookie compliance, eu cookie compliance',
+  alternates: {
+    canonical: '/features/privacy-laws',
+  },
   openGraph: {
     title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
     description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location.',
     type: 'article',
+    url: '/features/privacy-laws',
   },
 }
 

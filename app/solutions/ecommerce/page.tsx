@@ -7,21 +7,33 @@ import { ShoppingCart, TrendingUp, Shield, Zap, Users, Globe, BarChart3, CheckCi
 import { ROICalculator } from '@/components/landing/visuals/solution/ROICalculator'
 import { EcommerceBannerDemo } from '@/components/landing/visuals/solution/EcommerceBannerDemo'
 import { SetupSpeedometer } from '@/components/landing/visuals/core/SetupSpeedometer'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'E-commerce Cookie Consent | Shopify GDPR Compliance Solution 2025',
   description: 'Complete e-commerce cookie consent solution for online stores. Shopify, WooCommerce, Magento compliance with conversion optimization. Cart tracking, payment processors, advertising pixels.',
   keywords: 'ecommerce cookie consent, shopify gdpr compliance, woocommerce cookie banner, online store privacy compliance, e-commerce cookie tracking',
+  alternates: {
+    canonical: '/solutions/ecommerce',
+  },
   openGraph: {
     title: 'E-commerce Cookie Consent | Shopify GDPR Compliance Solution 2025',
     description: 'Complete e-commerce cookie consent solution for online stores. Shopify, WooCommerce, Magento compliance with conversion optimization.',
     type: 'article',
+    url: '/solutions/ecommerce',
   },
 }
 
 export default function EcommerceSolutionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Solutions', url: '/solutions' },
+          { name: 'E-commerce', url: '/solutions/ecommerce' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-700 text-white">
         <div className="absolute inset-0 bg-black/20"></div>

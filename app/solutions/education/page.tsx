@@ -4,21 +4,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GraduationCap, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, BookOpen, Laptop, UserCheck } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'Education Cookie Consent | FERPA COPPA Compliance Solution 2025',
   description: 'Complete education cookie consent solution for schools, universities, and EdTech platforms. FERPA compliance, COPPA for children under 13, student data protection, LMS integration.',
   keywords: 'school website cookies, edtech privacy compliance, FERPA cookie consent, COPPA compliance, student data protection, university privacy',
+  alternates: {
+    canonical: '/solutions/education',
+  },
   openGraph: {
     title: 'Education Cookie Consent | FERPA COPPA Compliance Solution 2025',
     description: 'Complete education cookie consent solution for schools, universities, and EdTech platforms. FERPA compliance, COPPA for children under 13.',
     type: 'article',
+    url: '/solutions/education',
   },
 }
 
 export default function EducationSolutionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Solutions', url: '/solutions' },
+          { name: 'Education', url: '/solutions/education' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
         <div className="absolute inset-0 bg-black/20"></div>

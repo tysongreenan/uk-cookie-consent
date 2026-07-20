@@ -23,6 +23,8 @@ export const AuditAction = {
   DATA_REQUEST_DOWNLOAD: 'data_request.download',
   DATA_REQUEST_REFUSE: 'data_request.refuse',
   DATA_REQUEST_VERIFY: 'data_request.verify',
+  EMAIL_PURCHASE_CONFIRMATION: 'email.purchase_confirmation',
+  EMAIL_NO_BANNER_NUDGE: 'email.no_banner_nudge',
 } as const
 
 export type AuditActionType = (typeof AuditAction)[keyof typeof AuditAction]

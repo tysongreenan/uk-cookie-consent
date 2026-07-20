@@ -41,7 +41,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "Low performance impact (loads in milliseconds)",
       "Zero performance impact on page speed"
     ],
-    "screenshot": `${baseUrl}/og-image.png`,
+    "screenshot": `${baseUrl}/opengraph-image`,
     "softwareVersion": "2.0",
     "releaseNotes": "Full GDPR, PIPEDA, CASL, and Quebec Law 25 compliance. Google Consent Mode V2 ready.",
     "url": baseUrl,
@@ -60,7 +60,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.svg`
+        "url": `${baseUrl}/logos/logo.svg`
       },
       "address": {
         "@type": "PostalAddress",
@@ -73,14 +73,9 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "@type": "Audience",
       "audienceType": "Businesses requiring cookie consent compliance"
     },
-    "inLanguage": ["en", "fr"],
+    "inLanguage": "en",
     "availableLanguage": ["English", "French"],
-    "countriesSupported": ["CA", "US", "GB", "EU"],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "127"
-    }
+    "countriesSupported": ["CA", "US", "GB", "EU"]
   }
 
   const organization = {
@@ -89,7 +84,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     "name": "Cookie Banner Generator",
     "alternateName": "Cookie-Banner.ca",
     "url": baseUrl,
-    "logo": `${baseUrl}/logo.svg`,
+    "logo": `${baseUrl}/logos/logo.svg`,
     "description": "Canadian cookie consent banner generator providing GDPR, PIPEDA, CASL, and Quebec Law 25 compliant solutions. Free plan available, Pro for $99 one-time.",
     "address": {
       "@type": "PostalAddress",
@@ -117,10 +112,10 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "url": baseUrl,
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.svg`
+        "url": `${baseUrl}/logos/logo.svg`
       }
     },
-    "inLanguage": ["en", "fr"],
+    "inLanguage": "en",
     "potentialAction": {
       "@type": "SearchAction",
       "target": `${baseUrl}/search?q={search_term_string}`,

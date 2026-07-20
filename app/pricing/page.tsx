@@ -13,16 +13,40 @@ export default function PricingPage() {
   const { data: session } = useSession()
 
   // Developer-defined schema — not user input
+  const shippingDetails = {
+    "@type": "OfferShippingDetails",
+    "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "USD" },
+    "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "CA" },
+    "deliveryTime": {
+      "@type": "ShippingDeliveryTime",
+      "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY" },
+      "transitTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY" },
+    },
+  }
+  const paidReturnPolicy = {
+    "@type": "MerchantReturnPolicy",
+    "applicableCountry": "CA",
+    "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+    "merchantReturnDays": 30,
+    "returnMethod": "https://schema.org/ReturnByMail",
+    "returnFees": "https://schema.org/FreeReturn",
+  }
+  const freeReturnPolicy = {
+    "@type": "MerchantReturnPolicy",
+    "applicableCountry": "CA",
+    "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+  }
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Cookie Banner Generator",
     "description": "Cookie consent banner generator with PIPEDA, Law 25, GDPR & CCPA compliance.",
-    "brand": { "@type": "Organization", "name": "Cookie-Banner.ca" },
+    "image": "https://www.cookie-banner.ca/opengraph-image",
+    "brand": { "@type": "Brand", "name": "Cookie-Banner.ca" },
     "offers": [
-      { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
-      { "@type": "Offer", "name": "Pro (One-Time)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
-      { "@type": "Offer", "name": "Pro (Annual)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://www.cookie-banner.ca/pricing", "hasMerchantReturnPolicy": freeReturnPolicy, "shippingDetails": shippingDetails },
+      { "@type": "Offer", "name": "Pro (One-Time)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://www.cookie-banner.ca/upgrade?billing=one_time", "hasMerchantReturnPolicy": paidReturnPolicy, "shippingDetails": shippingDetails },
+      { "@type": "Offer", "name": "Pro (Annual)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://www.cookie-banner.ca/upgrade?billing=annual", "hasMerchantReturnPolicy": paidReturnPolicy, "shippingDetails": shippingDetails },
     ],
   }
 

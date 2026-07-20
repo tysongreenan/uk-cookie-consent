@@ -47,15 +47,9 @@ export const metadata: Metadata = {
     description: 'Build a free cookie banner in 5 minutes. No code needed. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site.',
     type: 'website',
     locale: 'en_CA',
-    alternateLocale: 'fr_CA',
   },
   alternates: {
     canonical: 'https://www.cookie-banner.ca',
-    languages: {
-      'en-ca': 'https://www.cookie-banner.ca',
-      'fr-ca': 'https://www.cookie-banner.ca/fr',
-      'x-default': 'https://www.cookie-banner.ca',
-    },
   },
 }
 

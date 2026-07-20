@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   title: 'Cookie Consent by Location | GDPR, PIPEDA, CCPA Compliance',
   description: 'Find the right cookie consent requirements for your location. GDPR for Europe, PIPEDA for Canada, CCPA for California, and more.',
   keywords: ['cookie consent by location', 'GDPR compliance', 'PIPEDA compliance', 'CCPA compliance', 'privacy laws by country'],
+  alternates: {
+    canonical: '/locations',
+  },
+  openGraph: {
+    title: 'Cookie Consent by Location | GDPR, PIPEDA, CCPA Compliance',
+    description: 'Find the right cookie consent requirements for your location. GDPR for Europe, PIPEDA for Canada, CCPA for California, and more.',
+    type: 'website',
+    url: '/locations',
+  },
 }
 
 const locations = [

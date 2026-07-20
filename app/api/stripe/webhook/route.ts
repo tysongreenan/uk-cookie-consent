@@ -5,6 +5,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { validatePaymentAmount } from '@/lib/security-validation'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { generateDisputeEvidence } from '@/lib/dispute-evidence'
+import { sendPurchaseConfirmationEmail } from '@/lib/email'
 import Stripe from 'stripe'
 import { randomUUID } from 'crypto'
 
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
 
         const { data: user, error: userErr } = await supabase
           .from('User')
-          .select('id, email, "planTier"')
+          .select('id, email, name, "planTier"')
           .eq('id', userId)
           .single()
 
@@ -171,6 +172,12 @@ export async function POST(request: NextRequest) {
 
           console.log('[WEBHOOK] User upgraded to pro_annual:', { userId, email: user.email })
 
+          if (user.email) {
+            sendPurchaseConfirmationEmail(user.email, user.name || '', 'pro_annual').catch((err) =>
+              console.error('[WEBHOOK] Purchase confirmation email failed (annual):', err)
+            )
+          }
+
         } else {
           // ── One-time payment ──
           const amount = session.amount_total || 0
@@ -248,6 +255,12 @@ export async function POST(request: NextRequest) {
           })
 
           console.log('[WEBHOOK] User upgraded to pro_lifetime:', { userId, email: user.email, amount: amount / 100 })
+
+          if (user.email) {
+            sendPurchaseConfirmationEmail(user.email, user.name || '', 'pro_lifetime').catch((err) =>
+              console.error('[WEBHOOK] Purchase confirmation email failed (lifetime):', err)
+            )
+          }
         }
 
         break

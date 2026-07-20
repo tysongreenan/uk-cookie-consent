@@ -136,3 +136,4 @@ working-header.html
 
 # Local sandbox pages
 public/sandbox-*.html
+.env.sentry-build-plugin

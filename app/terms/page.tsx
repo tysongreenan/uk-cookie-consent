@@ -1,8 +1,11 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Cookie Banner Generator',
+  title: 'Terms of Service — Cookie Banner Generator',
   description: 'Terms of Service for Cookie Banner Generator. Read our terms and conditions for using our cookie consent banner service.',
+  alternates: {
+    canonical: '/terms',
+  },
 }
 
 export default function TermsPage() {

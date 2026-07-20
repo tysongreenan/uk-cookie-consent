@@ -6,27 +6,33 @@ import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2025',
   description: 'Complete guide to US cookie consent compliance. CCPA, CPRA, state privacy laws (Virginia VCDPA, Colorado CPA, Connecticut CTDPA), and federal privacy regulations.',
   keywords: 'us cookie consent, ccpa compliance, cpra california, state privacy laws, vcdpa virginia, cpa colorado, ctdpa connecticut, us privacy law',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
+  alternates: {
+    canonical: '/locations/us',
   },
   openGraph: {
     title: 'US Cookie Consent | CCPA, CPRA & State Privacy Laws Guide 2025',
     description: 'Complete guide to US cookie consent compliance. CCPA, CPRA, and state privacy laws.',
     type: 'article',
+    url: '/locations/us',
   },
 }
 
 export default function USCompliancePage() {
   return (
     <div className="min-h-screen bg-background">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Locations', url: '/locations' },
+          { name: 'United States', url: '/locations/us' },
+        ]}
+      />
       <Header />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-red-600 to-blue-600 text-white">

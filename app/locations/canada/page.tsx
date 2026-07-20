@@ -10,27 +10,33 @@ import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink,
 import { CanadaMapCompliance } from '@/components/landing/visuals/location/CanadaMapCompliance'
 import { BilingualBannerToggle } from '@/components/landing/visuals/compliance/BilingualBannerToggle'
 import { ThreeStepAnimation } from '@/components/landing/visuals/core/ThreeStepAnimation'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'Canada Cookie Consent | PIPEDA Compliance Guide 2025',
   description: 'Complete guide to Canadian cookie consent compliance. PIPEDA requirements, provincial privacy laws (Quebec Law 25, Alberta PIPA, BC PIPA), French-language support, and Canadian case studies.',
   keywords: 'canada cookie consent, pipeda compliance, quebec law 25, alberta pipa, bc pipa, canadian privacy law, french language cookie banner',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
+  alternates: {
+    canonical: '/locations/canada',
   },
   openGraph: {
     title: 'Canada Cookie Consent | PIPEDA Compliance Guide 2025',
     description: 'Complete guide to Canadian cookie consent compliance. PIPEDA requirements, provincial privacy laws, and French-language support.',
     type: 'article',
+    url: '/locations/canada',
   },
 }
 
 export default function CanadaCompliancePage() {
   return (
     <div className="min-h-screen bg-background">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Locations', url: '/locations' },
+          { name: 'Canada', url: '/locations/canada' },
+        ]}
+      />
       <Header />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-red-600 to-red-700 text-white">

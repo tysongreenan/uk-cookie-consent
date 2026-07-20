@@ -4,21 +4,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Code, Database, Shield, Zap, Users, Globe, BarChart3, CheckCircle, AlertTriangle, ExternalLink, Download, Settings } from 'lucide-react'
+import { BreadcrumbSchema } from '@/components/seo/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'Cookie Consent for SaaS — Free GDPR Solution (2026)',
   description: 'Add cookie consent to your SaaS app in minutes. GDPR, CCPA & PIPEDA compliant. Multi-tenant support, developer API, and lightweight script under 10KB.',
   keywords: 'cookie consent for saas, saas gdpr compliance, b2b cookie consent, software privacy compliance, multi-tenant consent management, enterprise cookie consent, saas cookie consent',
+  alternates: {
+    canonical: '/solutions/saas',
+  },
   openGraph: {
     title: 'Cookie Consent for SaaS — Free GDPR Solution',
     description: 'Add cookie consent to your SaaS app in minutes. GDPR, CCPA & PIPEDA compliant. Multi-tenant support, developer API.',
     type: 'article',
+    url: '/solutions/saas',
   },
 }
 
 export default function SaaSSolutionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Solutions', url: '/solutions' },
+          { name: 'SaaS', url: '/solutions/saas' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-700 text-white">
         <div className="absolute inset-0 bg-black/20"></div>
