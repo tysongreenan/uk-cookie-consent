@@ -49,7 +49,34 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
-  
+
+  // 301 redirects for renamed content (preserve SEO equity)
+  async redirects() {
+    return [
+      {
+        source: '/blog/cookie-consent-canada-guide-2025',
+        destination: '/blog/cookie-consent-canada-guide-2026',
+        permanent: true,
+      },
+      {
+        source: '/blog/gtm-setup',
+        destination: '/blog/google-tag-manager-cookie-consent-guide',
+        permanent: true,
+      },
+      {
+        source: '/blog/cpra-cookie-requirements-guide',
+        destination: '/blog/ccpa-cpra-cookie-compliance-guide',
+        permanent: true,
+      },
+      // Homepage A/B ended — always use canonical home
+      {
+        source: '/v2',
+        destination: '/',
+        permanent: true,
+      },
+    ]
+  },
+
   // Security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production'

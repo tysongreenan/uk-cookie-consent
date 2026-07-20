@@ -4,7 +4,6 @@ import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
-import { ABTracker } from '@/components/ab-tracker'
 
 import { HeroV2 } from '@/components/landing/v2/hero-v2'
 import { PlatformStrip } from '@/components/landing/v2/platform-strip'
@@ -64,7 +63,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <AEOStructuredData baseUrl={baseUrl} />
-      <ABTracker experiment="homepage" variant="v2" />
       <LiveCookieBanner />
       <Header />
       <main>
