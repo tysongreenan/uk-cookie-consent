@@ -200,7 +200,28 @@ export async function POST(request: NextRequest) {
       // Non-fatal — policy was created, version tracking failed
     }
 
-    return NextResponse.json(policy, { status: 201 })
+    // CamelCase shape for dashboard consumers (same as GET /[id])
+    const serialized = {
+      id: policy.id,
+      title: policy.name,
+      businessName: (policy.inputs as any)?.businessName || policy.name || 'Untitled',
+      status: policy.status,
+      slug: policy.slug || undefined,
+      contentHtml: policy.content_html || '',
+      contentJson: policy.content_json || { sections: [] },
+      inputs: policy.inputs || {},
+      metadata: {
+        generatedAt: policy.updated_at || policy.created_at,
+        jurisdictions: policy.jurisdictions || [],
+        language: policy.language || 'en',
+        businessName: (policy.inputs as any)?.businessName || policy.name || '',
+      },
+      createdAt: policy.created_at,
+      updatedAt: policy.updated_at,
+      version: policy.version,
+    }
+
+    return NextResponse.json(serialized, { status: 201 })
   } catch (error) {
     console.error('[PRIVACY-POLICY] Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

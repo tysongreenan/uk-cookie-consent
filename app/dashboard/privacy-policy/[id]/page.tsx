@@ -81,7 +81,25 @@ export default function PolicyDetailPage() {
         throw new Error('Failed to fetch policy')
       }
       const data = await res.json()
-      setPolicy(data)
+      // Normalize in case an older API shape is returned
+      setPolicy({
+        ...data,
+        title: data.title || data.name || data.businessName,
+        businessName: data.businessName || data.inputs?.businessName || data.title || 'Untitled',
+        contentHtml: data.contentHtml || data.content_html || '',
+        contentJson: data.contentJson || data.content_json || { sections: [] },
+        createdAt: data.createdAt || data.created_at,
+        updatedAt: data.updatedAt || data.updated_at,
+        slug: data.slug,
+        status: data.status || 'draft',
+        metadata: data.metadata || {
+          generatedAt: data.updatedAt || data.updated_at,
+          jurisdictions: data.jurisdictions || [],
+          language: data.language || data.inputs?.language || 'en',
+          businessName: data.businessName || data.inputs?.businessName || '',
+        },
+        inputs: data.inputs || {},
+      })
     } catch (err) {
       console.error('Failed to fetch policy:', err)
       toast.error('Failed to load policy')

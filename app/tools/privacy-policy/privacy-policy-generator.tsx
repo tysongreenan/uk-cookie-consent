@@ -297,13 +297,24 @@ export function PrivacyPolicyGenerator() {
     if (!output || !session) return
     setIsSaving(true)
     try {
-      const policyName = `${output.metadata.businessName || inputs.businessName} Privacy Policy`
+      const biz = output.metadata.businessName || inputs.businessName || 'Business'
+      const isFr = (output.metadata.language || inputs.language) === 'fr'
+      const policyName = isFr
+        ? `Politique de confidentialité — ${biz}`
+        : `${biz} Privacy Policy`
+      if (!output.contentHtml) {
+        throw new Error('Generated policy has no content to save')
+      }
       const res = await fetch('/api/privacy-policy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: policyName,
-          inputs: { ...inputs, jurisdictions: output.metadata.jurisdictions },
+          inputs: {
+            ...inputs,
+            jurisdictions: output.metadata.jurisdictions,
+            language: output.metadata.language || inputs.language || 'en',
+          },
           content_html: output.contentHtml,
           content_json: output.contentJson,
           jurisdictions: output.metadata.jurisdictions,
@@ -319,7 +330,10 @@ export function PrivacyPolicyGenerator() {
         }
         throw new Error(data?.error || `Save failed (${res.status})`)
       }
-      toast.success('Policy saved to your dashboard')
+      if (!data?.id) {
+        throw new Error('Save succeeded but no policy id was returned')
+      }
+      toast.success(isFr ? 'Politique enregistrée' : 'Policy saved to your dashboard')
       window.location.href = `/dashboard/privacy-policy/${data.id}`
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save policy'

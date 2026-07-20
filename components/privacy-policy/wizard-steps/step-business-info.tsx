@@ -241,10 +241,10 @@ export function StepBusinessInfo({ inputs, onChange, errors }: StepProps) {
             <Select
               value={inputs.province || ''}
               onValueChange={(value) => {
-                // Suggest French for Quebec (Loi 25 / Charte de la langue française)
-                // without overriding if the user already chose a language.
+                // Auto-suggest French when Quebec is selected (Loi 25 / Charte).
+                // User can still switch back to English via the language control.
                 const updates: Partial<PrivacyPolicyInputs> = { province: value }
-                if (value === 'QC' && inputs.language !== 'fr') {
+                if (value === 'QC') {
                   updates.language = 'fr'
                 }
                 onChange(updates)

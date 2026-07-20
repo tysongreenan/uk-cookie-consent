@@ -9,7 +9,26 @@ import { getPipedaSections } from './templates/pipeda'
 import { getPipedaSectionsFr } from './templates/pipeda.fr'
 import { getLaw25Sections } from './templates/law25'
 import { getLaw25SectionsFr } from './templates/law25.fr'
-import { getPolicyLang } from './templates/shared'
+import { escapeHtml, getPolicyLang } from './templates/shared'
+
+/**
+ * Escape free-text fields that are interpolated into HTML templates.
+ * Prevents XSS when content is rendered with dangerouslySetInnerHTML.
+ * Does not alter structured keys (jurisdictions, enums, arrays of keys).
+ */
+function sanitizeInputsForHtml(inputs: PrivacyPolicyInputs): PrivacyPolicyInputs {
+  return {
+    ...inputs,
+    businessName: escapeHtml(inputs.businessName || ''),
+    websiteUrl: escapeHtml(inputs.websiteUrl || ''),
+    contactEmail: escapeHtml(inputs.contactEmail || ''),
+    customRetentionPeriod: inputs.customRetentionPeriod
+      ? escapeHtml(inputs.customRetentionPeriod)
+      : inputs.customRetentionPeriod,
+    // Cookie fields are escaped at render time in the cookie table helpers.
+    thirdPartyRecipients: inputs.thirdPartyRecipients?.map((r) => escapeHtml(r)),
+  }
+}
 
 // ── Jurisdiction → template mapping ──────────────────────────────────
 
@@ -151,6 +170,9 @@ export function generatePolicyFromInputs(
 ): PolicyOutput {
   const lang = getPolicyLang(inputs)
   const isFr = lang === 'fr'
+  // Escape user-controlled text before HTML interpolation (templates inject into HTML).
+  // Keep original businessName in metadata for UI display / storage.
+  const safe = sanitizeInputsForHtml(inputs)
 
   const getCommon = isFr ? getCommonSectionsFr : getCommonSections
   const jurisdictionTemplates = isFr
@@ -158,21 +180,21 @@ export function generatePolicyFromInputs(
     : JURISDICTION_TEMPLATES_EN
 
   // 1. Collect all applicable sections
-  let sections: PolicySection[] = [...getCommon(inputs)]
+  let sections: PolicySection[] = [...getCommon(safe)]
 
-  for (const jurisdiction of inputs.jurisdictions) {
+  for (const jurisdiction of safe.jurisdictions || []) {
     const templateFn = jurisdictionTemplates[jurisdiction]
     if (templateFn) {
-      sections.push(...templateFn(inputs))
+      sections.push(...templateFn(safe))
     }
   }
 
   // 2. Deduplicate
-  sections = deduplicateSections(sections, inputs.jurisdictions)
-  sections = deduplicateTransfers(sections, inputs.jurisdictions)
+  sections = deduplicateSections(sections, safe.jurisdictions || [])
+  sections = deduplicateTransfers(sections, safe.jurisdictions || [])
 
-  // 3. Sort
-  sections = sortSections(sections)
+  // 3. Sort (copy first — Array.sort mutates)
+  sections = sortSections([...sections])
 
   // 4. Render HTML
   const contentHtml = renderSectionsToHtml(sections)
@@ -183,8 +205,9 @@ export function generatePolicyFromInputs(
     contentJson: { sections },
     metadata: {
       generatedAt: new Date().toISOString(),
-      jurisdictions: inputs.jurisdictions,
+      jurisdictions: inputs.jurisdictions || [],
       language: lang,
+      // Original (unescaped) name for dashboard titles / downloads
       businessName: inputs.businessName,
     },
   }

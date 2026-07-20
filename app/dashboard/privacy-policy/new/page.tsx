@@ -182,6 +182,9 @@ export default function NewPrivacyPolicyPage() {
         throw new Error(data?.error || `Save failed (${saveRes.status})`)
       }
       const saved = await saveRes.json()
+      if (!saved?.id) {
+        throw new Error('Save succeeded but no policy id was returned')
+      }
       toast.success(isRegenerating ? 'Privacy policy regenerated' : 'Privacy policy created')
       router.push(`/dashboard/privacy-policy/${saved.id}`)
     } catch (err) {
