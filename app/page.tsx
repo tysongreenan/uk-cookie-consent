@@ -51,9 +51,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://www.cookie-banner.ca',
+    // Only list locales that actually exist. French product UI is language-toggle
+    // based, not a separate /fr route — invalid hreflang hurts international SEO.
     languages: {
       'en-ca': 'https://www.cookie-banner.ca',
-      'fr-ca': 'https://www.cookie-banner.ca/fr',
       'x-default': 'https://www.cookie-banner.ca',
     },
   },

@@ -8,19 +8,19 @@ import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2025',
-  description: 'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, Brexit implications, ICO guidance, and UK-specific implementation strategies.',
-  keywords: 'uk cookie consent, gdpr uk, pecr compliance, ico guidance, uk privacy law, brexit privacy, uk cookie law',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
-  },
+  title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2026',
+  description:
+    'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, Brexit implications, ICO guidance, and UK-specific implementation strategies.',
+  keywords:
+    'uk cookie consent, gdpr uk, pecr compliance, ico guidance, uk privacy law, brexit privacy, uk cookie law',
   openGraph: {
-    title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2025',
-    description: 'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, and ICO guidance.',
+    title: 'UK Cookie Consent | GDPR & PECR Compliance Guide 2026',
+    description:
+      'Complete guide to UK cookie consent compliance. GDPR requirements, PECR regulations, and ICO guidance.',
     type: 'article',
+  },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/locations/uk',
   },
 }
 

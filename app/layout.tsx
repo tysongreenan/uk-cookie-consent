@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: '%s'
   },
   description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'),
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',

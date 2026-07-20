@@ -8,19 +8,19 @@ import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2025',
-  description: 'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, Cookie Law, Data Protection Authorities, and multi-language support across 27 EU countries.',
-  keywords: 'eu cookie consent, gdpr compliance, eprivacy directive, cookie law eu, eu data protection, dpa enforcement, multi-language cookie banner',
-  robots: {
-    index: false,
-    follow: false,
-    noarchive: true,
-    nosnippet: true,
-  },
+  title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2026',
+  description:
+    'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, Cookie Law, Data Protection Authorities, and multi-language support across 27 EU countries.',
+  keywords:
+    'eu cookie consent, gdpr compliance, eprivacy directive, cookie law eu, eu data protection, dpa enforcement, multi-language cookie banner',
   openGraph: {
-    title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2025',
-    description: 'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, and multi-language support.',
+    title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2026',
+    description:
+      'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, and multi-language support.',
     type: 'article',
+  },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/locations/eu',
   },
 }
 

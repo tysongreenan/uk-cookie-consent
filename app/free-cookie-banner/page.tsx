@@ -23,21 +23,26 @@ import { Footer } from '@/components/landing/footer'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator | No Cost GDPR Compliance 2025',
-  description: 'Create unlimited free cookie banners. GDPR, PIPEDA & CCPA compliant. No credit card, no limits, no catch. Better than paid alternatives like Cookiebot & OneTrust.',
+  title: 'Free Cookie Banner Generator — GDPR, PIPEDA & CCPA (2026)',
+  description:
+    'Create a free GDPR, PIPEDA & CCPA compliant cookie banner. No credit card. Free plan includes 1 banner with full compliance features. Upgrade to Pro for unlimited banners.',
   keywords: [
-    'free cookie banner', 
-    'free cookie consent', 
-    'free gdpr banner', 
-    'cookiebot alternative free', 
+    'free cookie banner',
+    'free cookie consent',
+    'free gdpr banner',
+    'cookiebot alternative free',
     'onetrust alternative free',
     'free privacy compliance',
-    'no cost cookie banner'
+    'no cost cookie banner',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator | No Cost GDPR Compliance 2025',
-    description: 'Create unlimited free cookie banners. GDPR, PIPEDA & CCPA compliant. No credit card, no limits, no catch. Better than paid alternatives.',
+    title: 'Free Cookie Banner Generator — GDPR, PIPEDA & CCPA (2026)',
+    description:
+      'Create a free compliant cookie banner. No credit card. Free plan: 1 banner with full compliance. Pro: unlimited banners for $99 one-time.',
     type: 'website',
+  },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/free-cookie-banner',
   },
 }
 
@@ -96,7 +101,7 @@ export default function FreeCookieBannerPage() {
                   </div>
                   <div className="flex items-center justify-center gap-2 text-green-700">
                     <CheckCircle className="h-5 w-5" />
-                    <span>No Limits</span>
+                    <span>1 Banner Free</span>
                   </div>
                 </div>
                 
@@ -117,9 +122,9 @@ export default function FreeCookieBannerPage() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 px-8 text-base">
-                  <Link href="/demo">
+                  <Link href="/pricing">
                     <Zap className="mr-2 h-5 w-5" />
-                    See Live Demo
+                    Compare Free vs Pro
                   </Link>
                 </Button>
               </div>

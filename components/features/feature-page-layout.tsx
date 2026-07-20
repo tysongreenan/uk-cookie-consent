@@ -25,7 +25,7 @@ export function FeaturePageLayout({
   hero,
   children,
   ctaText = "Get Started",
-  ctaHref = "/dashboard",
+  ctaHref = "/builder",
   relatedLinks = []
 }: FeaturePageLayoutProps) {
   const author = getAuthor('cookie-banner-team')
