@@ -13,25 +13,24 @@ import {
 import { StructuredData } from '@/components/seo/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator — No Credit Card (2026)',
+  // Intent: tool / “how do I generate” long-tail (distinct from home + alternative page)
+  title: 'Generate a Free Cookie Banner — No Signup Card Required (2026)',
   description:
-    'Generate a free GDPR, CCPA, PIPEDA & Law 25 cookie banner. No credit card. Free plan includes 1 banner; Pro unlocks unlimited banners for $99 one-time. WordPress, Shopify, Webflow & any site.',
+    'Step-by-step free cookie banner generator for GDPR, CCPA, PIPEDA & Law 25. No credit card. Free plan: 1 banner. Pro: unlimited for $99 one-time. WordPress, Shopify, Webflow & any site.',
   keywords: [
     'free cookie banner generator',
     'cookie banner generator free',
     'free cookie consent banner generator',
-    'free cookie consent banner',
-    'free cookie banner',
-    'cookie banner free',
+    'generate free cookie banner',
     'free cookie consent generator',
     'free cookie banner for website',
     'free gdpr cookie banner',
     'cookie consent banner generator free',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator — No Credit Card (2026)',
+    title: 'Generate a Free Cookie Banner — No Credit Card (2026)',
     description:
-      'Generate a free compliant cookie banner. Free plan: 1 banner. Pro: unlimited for $99 one-time. Works on WordPress, Shopify, Webflow & any site.',
+      'Create your free compliant cookie banner step by step. Free plan: 1 banner. Pro: unlimited.',
     type: 'website',
   },
   alternates: {
@@ -86,12 +85,25 @@ export default function FreeCookieBannerGeneratorPage() {
           badge={{
             text: "Free Plan — No Credit Card Required",
           }}
-          title="Free Cookie Banner Generator"
+          title="Generate Your Free Cookie Banner"
           title2="No Credit Card. Full Compliance. One Free Banner."
-          description="Generate GDPR, CCPA, PIPEDA & Law 25 compliant cookie banners. Free plan includes 1 banner — upgrade to Pro for unlimited banners ($99 one-time)."
+          description="Step-by-step free generator for GDPR, CCPA, PIPEDA & Law 25. Free plan includes 1 banner — Pro unlocks unlimited for $99 one-time. Prefer comparing to paid tools? See our free Cookiebot alternative."
           emailCapture={true}
           useGeometricBackground={true}
         />
+        <div className="container mx-auto px-4 -mt-8 mb-8 text-center text-sm text-muted-foreground">
+          <Link href="/" className="text-primary underline underline-offset-2 hover:text-primary/80">
+            Product homepage
+          </Link>
+          {' · '}
+          <Link href="/free-cookie-banner" className="text-primary underline underline-offset-2 hover:text-primary/80">
+            Free vs Cookiebot &amp; OneTrust
+          </Link>
+          {' · '}
+          <Link href="/builder" className="text-primary underline underline-offset-2 hover:text-primary/80">
+            Open builder
+          </Link>
+        </div>
 
         {/* What You Get Free */}
         <section className="py-24 bg-muted/50">

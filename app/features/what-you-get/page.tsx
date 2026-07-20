@@ -57,7 +57,7 @@ const breadcrumbData = [
 ]
 
 export default function WhatYouGetPage() {
-  const updatedDate = '2025-01-20'
+  const updatedDate = '2026-07-20'
   const publishedDate = '2025-01-15'
 
   // Article structured data

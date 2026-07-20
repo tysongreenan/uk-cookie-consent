@@ -184,17 +184,18 @@ Do not re-do; verify live after deploy.
 - [ ] Optional slug redirect on rename *(later)*  
 
 ### Issue C — Free page cannibalization
-- [ ] Three differentiated title/H1 packages  
-- [ ] Internal linking map  
+- [x] Three differentiated title/H1 packages  
+- [x] Internal linking map  
 
 ### Issue D — Tools / features chrome
 - [x] `/tools` Header + Footer  
-- [ ] Feature breadcrumbs / hub  
-- [ ] Schema dates  
+- [x] Feature breadcrumbs / hub (`/features`)  
+- [x] Schema dates on feature pages  
 
 ### Issue E — Measure & cleanup
 - [ ] Baselines in sheet  
-- [ ] Delete `app/v2` later  
+- [x] Delete `app/v2` (301 `/v2` → `/` remains)  
+- [x] Slug rename history + redirect (`previous_slugs` migration)  
 
 ---
 
