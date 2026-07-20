@@ -1,4 +1,4 @@
-# Customer journey & privacy policy fixes
+ # Customer journey & privacy policy fixes
 
 **Date:** 19–20 July 2026  
 **Branch:** `security/endpoint-hardening` → merged into `develop`  

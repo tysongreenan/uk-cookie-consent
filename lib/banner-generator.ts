@@ -376,21 +376,32 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     }
   }
 
+  // Full-width bar positions can use layout.width (container / custom).
+  // Card positions already set max-width in getPositionStyles — applying
+  // layout.container's max-width: 1200px after that overrides the card width,
+  // so the message stays on one line and the close button covers the text.
+  const isFullWidthBar = config.position === 'top' || config.position === 'bottom'
+
   const getLayoutStyles = () => {
     let styles = ''
-    
-    if (config.layout.width === 'custom' && config.layout.customWidth) {
-      styles += `width: ${config.layout.customWidth}px;`
-    } else if (config.layout.width === 'container') {
-      styles += `max-width: ${config.layout.maxWidth || 1200}px; margin: 0 auto;`
+
+    if (isFullWidthBar) {
+      if (config.layout.width === 'custom' && config.layout.customWidth) {
+        styles += `width: ${config.layout.customWidth}px;`
+      } else if (config.layout.width === 'container') {
+        styles += `max-width: ${config.layout.maxWidth || 1200}px; margin: 0 auto;`
+      }
+    } else if (config.layout.width === 'custom' && config.layout.customWidth) {
+      // Optional explicit card width from the builder
+      styles += `max-width: ${config.layout.customWidth}px; width: 100%;`
     }
-    
+
     if (config.layout.borderRadius > 0) {
       styles += `border-radius: ${config.layout.borderRadius}px;`
     }
-    
+
     styles += `padding: ${config.layout.padding}px;`
-    
+
     switch (config.layout.shadow) {
       case 'small':
         styles += 'box-shadow: 0 2px 4px rgba(0,0,0,0.1);'
@@ -402,7 +413,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
         styles += 'box-shadow: 0 8px 24px rgba(0,0,0,0.2);'
         break
     }
-    
+
     return styles
   }
 
@@ -421,20 +432,24 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     }
   }
 
+  const hasTitle = Boolean(config.text.title?.trim())
+
   // Main banner HTML
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none;">
-  <div style="position: relative; padding-right: 40px;">
+  // Close button is absolutely positioned — reserve space with padding-right so
+  // title/message wrap instead of running under the ×.
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box;">
+  <div style="position: relative; padding-right: 44px; box-sizing: border-box; min-width: 0;">
     <button id="cookie-close-btn" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
     
-    <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; min-width: 0;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
       
-      <div style="flex: 1; min-width: 250px;">
+      <div style="flex: 1; min-width: 0; max-width: 100%;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        <h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.title)}</h3>
+        ${hasTitle ? `<h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>` : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`}
         
-        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
         
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;">${escapeHtml(config.text.acceptButton)}</button>
@@ -759,10 +774,21 @@ export const generateBannerCSS = (config: BannerConfig) => {
 
 #cookie-consent-banner {
   position: fixed !important;
+  box-sizing: border-box !important;
 }
 
 #cookie-consent-banner * {
   box-sizing: border-box;
+}
+
+/* Host themes (Elementor etc.) sometimes set white-space/nowrap or fixed
+   widths on p/h3 — force the consent copy to wrap inside the card. */
+#cookie-consent-banner #cookie-title,
+#cookie-consent-banner #cookie-message {
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  max-width: 100% !important;
 }
 
 #cookie-consent-banner button {
@@ -1785,8 +1811,19 @@ function applyTranslations() {
     if (el) el.textContent = text;
   }
 
-  // Main banner text
-  setText('cookie-title', trans.title);
+  // Main banner text — show title only when non-empty so it doesn't leave a blank gap
+  var titleEl = document.getElementById('cookie-title');
+  if (titleEl) {
+    var titleText = trans.title || '';
+    titleEl.textContent = titleText;
+    if (titleText.trim()) {
+      titleEl.style.display = '';
+      titleEl.style.margin = '0 0 8px 0';
+    } else {
+      titleEl.style.display = 'none';
+      titleEl.style.margin = '0';
+    }
+  }
   // Update message text without destroying the privacy policy link inside it
   var msgEl = document.getElementById('cookie-message');
   if (msgEl) {

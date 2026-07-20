@@ -104,7 +104,7 @@ export function HeroV2() {
               ]}
             />
             <Sticker
-              className="absolute right-4 top-[60px] z-[2] w-[260px] rotate-[4deg] bg-[#1F2937] dark:bg-[#1F2937]"
+              className="absolute right-4 top-[60px] z-[2] w-[260px] rotate-[4deg]"
               tag="GDPR"
               tagClassName="bg-white/10 text-white/80"
               title="Privacy choices"
@@ -118,13 +118,14 @@ export function HeroV2() {
               ]}
             />
             <Sticker
-              className="absolute left-[70px] top-[240px] z-[3] w-[300px] rotate-2 bg-[#FDF6E9] dark:bg-[#FDF6E9]"
+              className="absolute left-[70px] top-[240px] z-[3] w-[300px] rotate-2"
               tag="LAW 25"
               tagClassName="bg-[#F5E5C2] text-[#8B6A1A]"
               title="Nous utilisons des témoins"
               titleClassName="text-[#4A3414]"
               body="Pour personnaliser votre expérience sur ce site."
               bodyClassName="text-[#7A5C2A]"
+              surfaceClassName="bg-[#FDF6E9]"
               borderClassName="border-[#E8D7B0]"
               actions={[
                 { label: 'Accepter', variant: 'dark' },
@@ -165,6 +166,7 @@ function Sticker({
   titleClassName,
   body,
   bodyClassName,
+  surfaceClassName,
   borderClassName,
   dark,
   actions,
@@ -176,6 +178,8 @@ function Sticker({
   titleClassName: string
   body: string
   bodyClassName: string
+  /** Card surface color. Prefer this over putting bg-* in className. */
+  surfaceClassName?: string
   borderClassName?: string
   dark?: boolean
   actions: StickerAction[]
@@ -189,9 +193,12 @@ function Sticker({
     coral: 'bg-[hsl(var(--accent-warm))] text-[hsl(var(--accent-warm-foreground))]',
   }
 
+  // Single surface class — avoids Tailwind cascade fights when className also has bg-*.
+  const surfaceClass = surfaceClassName ?? (dark ? 'bg-[#1F2937]' : 'bg-background')
+
   return (
     <div
-      className={`rounded-[18px] border bg-background p-[18px] shadow-[0_2px_0_rgba(20,30,35,0.02),0_12px_28px_-12px_rgba(14,118,140,0.16)] transition-transform duration-300 hover:rotate-0 hover:-translate-y-1 ${
+      className={`rounded-[18px] border p-[18px] shadow-[0_2px_0_rgba(20,30,35,0.02),0_12px_28px_-12px_rgba(14,118,140,0.16)] transition-transform duration-300 hover:rotate-0 hover:-translate-y-1 ${surfaceClass} ${
         borderClassName ?? 'border-border'
       } ${className}`}
     >
