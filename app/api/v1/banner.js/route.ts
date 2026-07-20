@@ -259,7 +259,11 @@ export async function GET(request: NextRequest) {
       ownerFeatureFreezeDate = effective.featureFreezeDate
     }
 
-    const showBranding = ownerPlanTier === 'free' || config.branding?.showPoweredBy !== false
+    // Free always shows "Powered by" branding. Paid plans never do — branding
+    // removal is a Pro benefit and must apply automatically (no opt-in toggle
+    // required). Existing paid banners often still have showPoweredBy: true
+    // from the old default; ignore that flag for paid owners.
+    const showBranding = ownerPlanTier === 'free'
 
     // Strip GA4 integration for free users (server-side enforcement)
     if (ownerPlanTier === 'free' && config.integrations?.googleAnalytics) {
