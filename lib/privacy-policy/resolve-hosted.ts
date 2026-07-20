@@ -18,29 +18,42 @@ function getServiceClient() {
  */
 export async function resolvePublishedPolicy(key: string): Promise<PolicyLookup> {
   const supabase = getServiceClient()
-  if (!supabase || !key) return { kind: 'missing' }
+  const normalized = typeof key === 'string' ? key.trim() : ''
+  if (!supabase || !normalized) return { kind: 'missing' }
 
   // 1) Current slug
-  const { data: bySlug } = await supabase
+  const { data: bySlug, error: slugError } = await supabase
     .from('privacy_policies')
     .select('*')
-    .eq('slug', key)
+    .eq('slug', normalized)
     .eq('status', 'published')
     .maybeSingle()
 
-  if (bySlug) return { kind: 'found', policy: bySlug }
+  if (slugError) {
+    console.error('[resolvePublishedPolicy] slug lookup failed', {
+      key: normalized,
+      message: slugError.message,
+    })
+  } else if (bySlug) {
+    return { kind: 'found', policy: bySlug }
+  }
 
   // 2) Policy id (always unique — never races for "privacy-policy")
-  const { data: byId } = await supabase
+  const { data: byId, error: idError } = await supabase
     .from('privacy_policies')
     .select('*')
-    .eq('id', key)
+    .eq('id', normalized)
     .eq('status', 'published')
     .maybeSingle()
 
-  if (byId) {
+  if (idError) {
+    console.error('[resolvePublishedPolicy] id lookup failed', {
+      key: normalized,
+      message: idError.message,
+    })
+  } else if (byId) {
     // Prefer brand slug path if they have one
-    if (byId.slug && byId.slug !== key) {
+    if (byId.slug && byId.slug !== normalized) {
       return {
         kind: 'redirect',
         path: publicPolicyPath(byId.slug, byId.language),
@@ -54,11 +67,16 @@ export async function resolvePublishedPolicy(key: string): Promise<PolicyLookup>
     .from('privacy_policies')
     .select('slug, language')
     .eq('status', 'published')
-    .contains('previous_slugs', [key])
+    .contains('previous_slugs', [normalized])
     .limit(1)
     .maybeSingle()
 
-  if (!prevError && byPrevious?.slug && byPrevious.slug !== key) {
+  if (prevError) {
+    console.error('[resolvePublishedPolicy] previous_slugs lookup failed', {
+      key: normalized,
+      message: prevError.message,
+    })
+  } else if (byPrevious?.slug && byPrevious.slug !== normalized) {
     return {
       kind: 'redirect',
       path: publicPolicyPath(byPrevious.slug, byPrevious.language),
