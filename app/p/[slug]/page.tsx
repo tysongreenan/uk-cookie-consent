@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
@@ -7,12 +7,17 @@ interface HostedPolicyPageProps {
   params: { slug: string }
 }
 
-async function getPublishedPolicy(slug: string) {
+type PolicyLookup =
+  | { kind: 'found'; policy: any }
+  | { kind: 'redirect'; toSlug: string }
+  | { kind: 'missing' }
+
+async function resolvePublishedPolicy(slug: string): Promise<PolicyLookup> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    return null
+    return { kind: 'missing' }
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -22,13 +27,26 @@ async function getPublishedPolicy(slug: string) {
     .select('*')
     .eq('slug', slug)
     .eq('status', 'published')
-    .single()
+    .maybeSingle()
 
-  if (error || !data) {
-    return null
+  if (!error && data) {
+    return { kind: 'found', policy: data }
   }
 
-  return data
+  // Renamed URL: previous_slugs contains this slug → 301 to current slug
+  const { data: byPrevious, error: prevError } = await supabase
+    .from('privacy_policies')
+    .select('slug')
+    .eq('status', 'published')
+    .contains('previous_slugs', [slug])
+    .limit(1)
+    .maybeSingle()
+
+  if (!prevError && byPrevious?.slug && byPrevious.slug !== slug) {
+    return { kind: 'redirect', toSlug: byPrevious.slug }
+  }
+
+  return { kind: 'missing' }
 }
 
 function resolveBusinessName(policy: any): string {
@@ -71,16 +89,27 @@ function preparePolicyHtml(html: string): string {
 }
 
 export async function generateMetadata({ params }: HostedPolicyPageProps): Promise<Metadata> {
-  const policy = await getPublishedPolicy(params.slug)
+  const resolved = await resolvePublishedPolicy(params.slug)
 
-  if (!policy) {
+  if (resolved.kind === 'redirect') {
+    return {
+      title: 'Redirecting…',
+      alternates: {
+        canonical: `https://www.cookie-banner.ca/p/${resolved.toSlug}`,
+      },
+    }
+  }
+
+  if (resolved.kind !== 'found') {
     return {
       title: 'Privacy Policy Not Found',
     }
   }
 
+  const policy = resolved.policy
   const businessName = resolveBusinessName(policy)
   const isFr = resolveLanguage(policy) === 'fr'
+  const liveSlug = policy.slug || params.slug
 
   return {
     title: isFr
@@ -90,18 +119,24 @@ export async function generateMetadata({ params }: HostedPolicyPageProps): Promi
       ? `Politique de confidentialité de ${businessName}. Découvrez comment vos renseignements personnels sont recueillis, utilisés et protégés.`
       : `Privacy policy for ${businessName}. Learn how your personal information is collected, used, and protected.`,
     alternates: {
-      canonical: `https://www.cookie-banner.ca/p/${params.slug}`,
+      canonical: `https://www.cookie-banner.ca/p/${liveSlug}`,
     },
     robots: 'index, follow',
   }
 }
 
 export default async function HostedPolicyPage({ params }: HostedPolicyPageProps) {
-  const policy = await getPublishedPolicy(params.slug)
+  const resolved = await resolvePublishedPolicy(params.slug)
 
-  if (!policy) {
+  if (resolved.kind === 'redirect') {
+    permanentRedirect(`/p/${resolved.toSlug}`)
+  }
+
+  if (resolved.kind !== 'found') {
     notFound()
   }
+
+  const policy = resolved.policy
 
   const businessName = resolveBusinessName(policy)
   const isFr = resolveLanguage(policy) === 'fr'

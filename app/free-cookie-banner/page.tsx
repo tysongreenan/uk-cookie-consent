@@ -23,22 +23,23 @@ import { Footer } from '@/components/landing/footer'
 import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator — GDPR, PIPEDA & CCPA (2026)',
+  // Intent: free alternative to paid CMP tools (Cookiebot / OneTrust), not the primary home SERP
+  title: 'Free Cookiebot & OneTrust Alternative (2026) — 1 Banner Free',
   description:
-    'Create a free GDPR, PIPEDA & CCPA compliant cookie banner. No credit card. Free plan includes 1 banner with full compliance features. Upgrade to Pro for unlimited banners.',
+    'Skip $50–200/month tools. Get a free GDPR, PIPEDA & CCPA cookie banner with full compliance features. One free banner, no credit card. Pro unlocks unlimited banners for $99 once.',
   keywords: [
     'free cookie banner',
-    'free cookie consent',
-    'free gdpr banner',
     'cookiebot alternative free',
     'onetrust alternative free',
+    'free cookie consent',
+    'free gdpr banner',
     'free privacy compliance',
     'no cost cookie banner',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator — GDPR, PIPEDA & CCPA (2026)',
+    title: 'Free Cookiebot & OneTrust Alternative (2026)',
     description:
-      'Create a free compliant cookie banner. No credit card. Free plan: 1 banner with full compliance. Pro: unlimited banners for $99 one-time.',
+      'Free compliant cookie banner without monthly CMP fees. One free banner; Pro for unlimited.',
     type: 'website',
   },
   alternates: {
@@ -76,13 +77,24 @@ export default function FreeCookieBannerPage() {
                 <span>Free Plan — No Credit Card Required</span>
               </div>
 
-              {/* H1 */}
+              {/* H1 — comparison angle (distinct from / and /free-cookie-banner-generator) */}
               <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-6">
-                Free Cookie Banner Generator —{' '}
+                Free Alternative to{' '}
                 <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Better Than Paid Alternatives
+                  Cookiebot &amp; OneTrust
                 </span>
               </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+                Same compliance outcome for $0 — one free banner. Prefer the full product tour?{' '}
+                <Link href="/" className="text-green-700 font-medium underline underline-offset-2 hover:text-green-800">
+                  Start on the homepage
+                </Link>
+                {' '}or use the{' '}
+                <Link href="/free-cookie-banner-generator" className="text-green-700 font-medium underline underline-offset-2 hover:text-green-800">
+                  step-by-step free generator
+                </Link>
+                .
+              </p>
               
               {/* Value Props */}
               <div className="mx-auto max-w-4xl space-y-4 mb-8">

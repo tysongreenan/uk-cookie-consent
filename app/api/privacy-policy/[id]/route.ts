@@ -180,6 +180,10 @@ export async function PUT(
     // ── Optional custom hosted URL (slug) ───────────────────────────
 
     let nextSlug = existing.slug as string | null
+    let previousSlugs: string[] = Array.isArray(existing.previous_slugs)
+      ? [...existing.previous_slugs]
+      : []
+
     if (typeof slug === 'string') {
       const check = validateSlug(slug)
       if (!check.ok) {
@@ -197,6 +201,12 @@ export async function PUT(
             { status: 409 }
           )
         }
+        // Keep old public URL working via redirect on /p/[slug]
+        if (existing.slug && !previousSlugs.includes(existing.slug)) {
+          previousSlugs = [...previousSlugs, existing.slug].slice(-20)
+        }
+        // New slug is live — drop it from previous list if reclaimed
+        previousSlugs = previousSlugs.filter((s) => s !== check.slug)
         nextSlug = check.slug
       }
     }
@@ -226,22 +236,36 @@ export async function PUT(
 
     const newVersion = contentChanging ? (existing.version || 1) + 1 : existing.version
 
-    const { data: updated, error: updateError } = await supabase
+    const updatePayload: Record<string, unknown> = {
+      name: name ?? existing.name,
+      inputs: inputs ?? existing.inputs,
+      content_html: content_html ?? existing.content_html,
+      content_json: content_json ?? existing.content_json,
+      jurisdictions: jurisdictions ?? existing.jurisdictions,
+      language: language ?? existing.language,
+      slug: nextSlug,
+      version: newVersion,
+      updated_at: new Date().toISOString(),
+    }
+
+    // previous_slugs column may not exist until migration runs — try with it first
+    const withHistory = { ...updatePayload, previous_slugs: previousSlugs }
+    let { data: updated, error: updateError } = await supabase
       .from('privacy_policies')
-      .update({
-        name: name ?? existing.name,
-        inputs: inputs ?? existing.inputs,
-        content_html: content_html ?? existing.content_html,
-        content_json: content_json ?? existing.content_json,
-        jurisdictions: jurisdictions ?? existing.jurisdictions,
-        language: language ?? existing.language,
-        slug: nextSlug,
-        version: newVersion,
-        updated_at: new Date().toISOString(),
-      })
+      .update(withHistory)
       .eq('id', id)
       .select()
       .single()
+
+    if (updateError && /previous_slugs/i.test(updateError.message || '')) {
+      // Migration not applied yet — still rename slug without history
+      ;({ data: updated, error: updateError } = await supabase
+        .from('privacy_policies')
+        .update(updatePayload)
+        .eq('id', id)
+        .select()
+        .single())
+    }
 
     if (updateError) {
       if (updateError.code === '23505' || updateError.message?.includes('slug')) {

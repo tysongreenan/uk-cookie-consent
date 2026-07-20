@@ -389,7 +389,7 @@ export default function PolicyDetailPage() {
                   <p className="text-sm text-muted-foreground">
                     Choose a clean public link (e.g. <span className="font-mono">orinha-media</span>).
                     {policy.status === 'published' &&
-                      ' Changing the URL will stop the old link from working.'}
+                      ' After you save a new URL, the old one redirects to this one when history is available.'}
                   </p>
                 </div>
               </div>

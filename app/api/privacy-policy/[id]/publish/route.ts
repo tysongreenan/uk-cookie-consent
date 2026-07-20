@@ -117,6 +117,9 @@ export async function POST(
     }
 
     let slug = policy.slug as string | null
+    let previousSlugs: string[] = Array.isArray(policy.previous_slugs)
+      ? [...policy.previous_slugs]
+      : []
 
     if (requestedSlug) {
       const check = validateSlug(requestedSlug)
@@ -130,6 +133,10 @@ export async function POST(
           { status: 409 }
         )
       }
+      if (policy.slug && policy.slug !== check.slug && !previousSlugs.includes(policy.slug)) {
+        previousSlugs = [...previousSlugs, policy.slug].slice(-20)
+      }
+      previousSlugs = previousSlugs.filter((s) => s !== check.slug)
       slug = check.slug
     } else if (!slug) {
       // Prefer clean business-name slug when free; otherwise add a short suffix.
@@ -145,18 +152,29 @@ export async function POST(
 
     // ── Publish ─────────────────────────────────────────────────────
 
-    const { data: updated, error: updateError } = await supabase
+    const publishPayload: Record<string, unknown> = {
+      status: 'published',
+      slug,
+      published_at: new Date().toISOString(),
+      is_hosted: true,
+      updated_at: new Date().toISOString(),
+    }
+
+    let { data: updated, error: updateError } = await supabase
       .from('privacy_policies')
-      .update({
-        status: 'published',
-        slug,
-        published_at: new Date().toISOString(),
-        is_hosted: true,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ ...publishPayload, previous_slugs: previousSlugs })
       .eq('id', id)
       .select()
       .single()
+
+    if (updateError && /previous_slugs/i.test(updateError.message || '')) {
+      ;({ data: updated, error: updateError } = await supabase
+        .from('privacy_policies')
+        .update(publishPayload)
+        .eq('id', id)
+        .select()
+        .single())
+    }
 
     if (updateError || !updated) {
       // Unique index race

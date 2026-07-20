@@ -57,6 +57,7 @@ const faqData = [
 
 const breadcrumbData = [
   { name: 'Home', url: 'https://www.cookie-banner.ca/' },
+  { name: 'Features', url: 'https://www.cookie-banner.ca/features' },
   { name: 'How Do I Know It\'s Working?', url: 'https://www.cookie-banner.ca/features/how-it-works' }
 ]
 
