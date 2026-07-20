@@ -109,8 +109,13 @@ ${generateBannerHTML(config, { showBranding })}
     if (!bannerId) return ''
     const scriptUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}`
 
-    return `<script src="${scriptUrl}" async></script>
+    // Paid plans do not include the noscript attribution link
+    if (showBranding) {
+      return `<script src="${scriptUrl}" async></script>
 <noscript><a href="https://cookie-banner.ca/?ref=banner" rel="noopener" style="font-size:10px;color:rgba(128,128,128,0.5);text-decoration:none;">Cookie consent by cookie-banner.ca</a></noscript>`
+    }
+
+    return `<script src="${scriptUrl}" async></script>`
   }
 
   const getCode = () => {

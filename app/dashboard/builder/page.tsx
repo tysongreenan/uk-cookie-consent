@@ -277,7 +277,8 @@ const defaultConfig: BannerConfig = {
         includeLogo: false
       }
     },
-    showPoweredBy: true
+    // Free plan still forces branding server-side. Paid plans never show it.
+    showPoweredBy: false
   },
   layout: {
     width: 'full',
@@ -2465,19 +2466,13 @@ function BannerBuilderContent() {
 
                     <div className="pt-2 border-t">
                       {canAccessFeature(userPlan, 'hasBrandingRemoval') ? (
-                        <div className="flex items-start gap-3">
-                          <Switch
-                            id="remove-branding"
-                            checked={config.branding.showPoweredBy === false}
-                            onCheckedChange={(checked) => updateConfig('branding', {
-                              showPoweredBy: !checked
-                            })}
-                            className="mt-0.5"
-                          />
-                          <div>
-                            <Label htmlFor="remove-branding" className="cursor-pointer">Remove &quot;Powered by&quot; branding</Label>
-                            <p className="text-xs text-muted-foreground">Hide the cookie-banner.ca attribution</p>
-                          </div>
+                        <div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 px-3 py-2.5">
+                          <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                            &quot;Powered by&quot; branding removed
+                          </p>
+                          <p className="text-xs text-green-700/80 dark:text-green-400/80 mt-0.5">
+                            Included with your Pro plan — the cookie-banner.ca attribution is hidden on your live banner.
+                          </p>
                         </div>
                       ) : (
                         <UpgradePrompt
