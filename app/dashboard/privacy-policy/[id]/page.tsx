@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import {
@@ -23,6 +25,7 @@ import {
   X,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { normalizeSlug } from '@/lib/privacy-policy/slug'
 import type { PolicyOutput } from '@/types'
 
 interface PolicyDetail {
@@ -57,6 +60,10 @@ export default function PolicyDetailPage() {
   const [draftHtml, setDraftHtml] = useState<string | null>(null)
   const [isSavingEdit, setIsSavingEdit] = useState(false)
 
+  // Custom hosted URL (slug)
+  const [slugDraft, setSlugDraft] = useState('')
+  const [isSavingSlug, setIsSavingSlug] = useState(false)
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin')
@@ -82,7 +89,7 @@ export default function PolicyDetailPage() {
       }
       const data = await res.json()
       // Normalize in case an older API shape is returned
-      setPolicy({
+      const normalized = {
         ...data,
         title: data.title || data.name || data.businessName,
         businessName: data.businessName || data.inputs?.businessName || data.title || 'Untitled',
@@ -99,7 +106,14 @@ export default function PolicyDetailPage() {
           businessName: data.businessName || data.inputs?.businessName || '',
         },
         inputs: data.inputs || {},
-      })
+      }
+      setPolicy(normalized)
+      // Prefer existing slug; otherwise suggest a clean one from the business name
+      setSlugDraft(
+        normalized.slug ||
+          normalizeSlug(normalized.businessName || normalized.title || 'policy') ||
+          '',
+      )
     } catch (err) {
       console.error('Failed to fetch policy:', err)
       toast.error('Failed to load policy')
@@ -137,22 +151,67 @@ export default function PolicyDetailPage() {
     if (!policy) return
     setIsPublishing(true)
     try {
+      const preferred = slugDraft.trim() || policy.slug || ''
       const res = await fetch(`/api/privacy-policy/${policyId}/publish`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(preferred ? { slug: preferred } : {}),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => null)
         throw new Error(data?.error || 'Failed to publish')
       }
       const updated = await res.json()
-      setPolicy((prev) => prev ? { ...prev, ...updated } : prev)
+      setPolicy((prev) => (prev ? { ...prev, ...updated } : prev))
+      if (updated.slug) setSlugDraft(updated.slug)
       toast.success('Privacy policy published successfully')
     } catch (err: any) {
       toast.error(err.message || 'Failed to publish policy')
     } finally {
       setIsPublishing(false)
     }
-  }, [policy, policyId])
+  }, [policy, policyId, slugDraft])
+
+  const handleSaveSlug = useCallback(async () => {
+    if (!policy) return
+    const next = normalizeSlug(slugDraft)
+    if (!next) {
+      toast.error('Enter a URL slug (e.g. orinha-media)')
+      return
+    }
+    if (next === policy.slug) {
+      toast.success('URL is already set to that value')
+      return
+    }
+    setIsSavingSlug(true)
+    try {
+      const res = await fetch(`/api/privacy-policy/${policyId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: next }),
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        throw new Error(data?.error || 'Failed to update URL')
+      }
+      setPolicy((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...data,
+              slug: data.slug || next,
+            }
+          : prev,
+      )
+      setSlugDraft(data.slug || next)
+      toast.success('Hosted URL updated')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update URL'
+      toast.error(message)
+    } finally {
+      setIsSavingSlug(false)
+    }
+  }, [policy, policyId, slugDraft])
 
   const handleStartEdit = useCallback(() => {
     if (!policy) return
@@ -307,40 +366,111 @@ export default function PolicyDetailPage() {
           </div>
         </div>
 
-        {/* Published URL notice */}
-        {policy.status === 'published' && policy.slug && (
-          <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
-            <CardContent className="p-4 flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-green-600" />
+        {/* Hosted URL — customizable professional slug */}
+        <Card
+          className={`mb-6 ${
+            policy.status === 'published'
+              ? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/30'
+              : ''
+          }`}
+        >
+          <CardContent className="p-4 sm:p-5 space-y-3">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div className="flex items-start gap-2">
+                <Globe
+                  className={`h-5 w-5 mt-0.5 shrink-0 ${
+                    policy.status === 'published' ? 'text-green-600' : 'text-muted-foreground'
+                  }`}
+                />
                 <div>
-                  <p className="text-sm font-medium">Your policy is live</p>
+                  <p className="text-sm font-medium">
+                    {policy.status === 'published' ? 'Your policy is live' : 'Hosted URL'}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Visitors can view it at{' '}
-                    <a
-                      href={`https://www.cookie-banner.ca/p/${policy.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      cookie-banner.ca/p/{policy.slug}
-                    </a>
+                    Choose a clean public link (e.g. <span className="font-mono">orinha-media</span>).
+                    {policy.status === 'published' &&
+                      ' Changing the URL will stop the old link from working.'}
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <a
-                  href={`https://www.cookie-banner.ca/p/${policy.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Live Page
-                  <ExternalLink className="h-4 w-4 ml-1" />
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+              {policy.status === 'published' && policy.slug && (
+                <Button variant="outline" size="sm" asChild>
+                  <a
+                    href={`https://www.cookie-banner.ca/p/${policy.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Live Page
+                    <ExternalLink className="h-4 w-4 ml-1" />
+                  </a>
+                </Button>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="policy-slug">Public URL</Label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex flex-1 items-center rounded-md border border-input bg-background overflow-hidden">
+                  <span className="px-3 py-2 text-sm text-muted-foreground bg-muted border-r border-input whitespace-nowrap">
+                    cookie-banner.ca/p/
+                  </span>
+                  <Input
+                    id="policy-slug"
+                    value={slugDraft}
+                    onChange={(e) => setSlugDraft(e.target.value.toLowerCase())}
+                    onBlur={() => setSlugDraft((s) => normalizeSlug(s))}
+                    placeholder="orinha-media"
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-mono"
+                    disabled={isSavingSlug || isPublishing || isEditing}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <Button
+                    variant="outline"
+                    size="default"
+                    onClick={handleSaveSlug}
+                    disabled={
+                      isSavingSlug ||
+                      isPublishing ||
+                      isEditing ||
+                      !slugDraft.trim() ||
+                      normalizeSlug(slugDraft) === (policy.slug || '')
+                    }
+                  >
+                    {isSavingSlug ? (
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-1" />
+                    )}
+                    Save URL
+                  </Button>
+                  {policy.status !== 'published' && (
+                    <Button
+                      size="default"
+                      onClick={handlePublish}
+                      disabled={isPublishing || isEditing || isSavingSlug}
+                    >
+                      {isPublishing ? (
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      ) : (
+                        <Globe className="h-4 w-4 mr-1" />
+                      )}
+                      Publish
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Letters, numbers, and hyphens only. Preview:{' '}
+                <span className="font-mono text-foreground">
+                  cookie-banner.ca/p/{normalizeSlug(slugDraft) || '…'}
+                </span>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Policy Content — read-only by default, switches to a contentEditable
             canvas when the user clicks "Edit Content". */}
