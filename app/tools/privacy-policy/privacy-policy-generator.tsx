@@ -68,10 +68,11 @@ const DEFAULT_INPUTS: PrivacyPolicyInputs = {
   sharesDataWithThirdParties: false,
   thirdPartyRecipients: [],
   transfersDataInternationally: false,
-  dataRetentionPeriod: '',
+  // Defaults used when the 3-step wizard does not ask for these fields
+  dataRetentionPeriod: 'as_needed',
   customRetentionPeriod: undefined,
-  allowsUserDeletion: false,
-  allowsUserExport: false,
+  allowsUserDeletion: true,
+  allowsUserExport: true,
   jurisdictions: [],
   language: 'en',
   collectsChildrenData: false,
@@ -100,6 +101,7 @@ export function PrivacyPolicyGenerator() {
   })
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Restore draft on mount.
   useEffect(() => {
@@ -290,6 +292,43 @@ export function PrivacyPolicyGenerator() {
     } catch {}
   }, [])
 
+  /** Save the already-generated policy to the Pro dashboard (no re-wizard). */
+  const handleSaveToDashboard = useCallback(async () => {
+    if (!output || !session) return
+    setIsSaving(true)
+    try {
+      const policyName = `${output.metadata.businessName || inputs.businessName} Privacy Policy`
+      const res = await fetch('/api/privacy-policy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: policyName,
+          inputs: { ...inputs, jurisdictions: output.metadata.jurisdictions },
+          content_html: output.contentHtml,
+          content_json: output.contentJson,
+          jurisdictions: output.metadata.jurisdictions,
+          language: output.metadata.language || inputs.language || 'en',
+        }),
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        if (res.status === 403 && data?.upgradeRequired) {
+          toast.error('Saving policies requires a Pro plan')
+          window.location.href = '/upgrade'
+          return
+        }
+        throw new Error(data?.error || `Save failed (${res.status})`)
+      }
+      toast.success('Policy saved to your dashboard')
+      window.location.href = `/dashboard/privacy-policy/${data.id}`
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save policy'
+      toast.error(message)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [output, session, inputs])
+
   // If we have output, show the result
   if (output) {
     return (
@@ -376,7 +415,7 @@ export function PrivacyPolicyGenerator() {
           </CardContent>
         </Card>
 
-        {/* Save CTA for authenticated users */}
+        {/* Save CTA for authenticated users — actually saves this generated policy */}
         {session && (
           <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-green-200 dark:border-green-800">
             <CardContent className="p-6 text-center">
@@ -384,12 +423,26 @@ export function PrivacyPolicyGenerator() {
               <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
                 Save this policy to your dashboard to edit, publish to a hosted URL, and track version history.
               </p>
-              <Button asChild>
-                <Link href="/dashboard/privacy-policy/new">
-                  Save & Manage Policy
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button onClick={handleSaveToDashboard} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Saving…
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-1" />
+                      Save & Manage Policy
+                    </>
+                  )}
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard/privacy-policy/new">
+                    Create another from scratch
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

@@ -8,6 +8,14 @@ const CCPA_CATEGORY_LABELS: Record<string, string> = {
   ip_address: 'Internet or other electronic network activity information (e.g., IP address)',
   device_info: 'Internet or other electronic network activity information (e.g., browsing history, device information)',
   location: 'Geolocation data',
+  // Wizard values (step-data-collection)
+  payment_data: 'Commercial information (e.g., purchasing or consuming histories, payment information)',
+  browsing_history: 'Internet or other electronic network activity information (e.g., browsing history)',
+  account_credentials: 'Identifiers (e.g., account name and login credentials)',
+  social_media_profiles: 'Identifiers (e.g., social media handles)',
+  employment_info: 'Professional or employment-related information',
+  health_info: 'Characteristics of protected classifications / sensitive personal information (health)',
+  // Legacy / alternate keys
   payment: 'Commercial information (e.g., purchasing or consuming histories, payment information)',
   usage_data: 'Internet or other electronic network activity information (e.g., interaction with a website or application)',
   cookies: 'Internet or other electronic network activity information (e.g., cookies and tracking data)',

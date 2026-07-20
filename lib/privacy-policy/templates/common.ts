@@ -28,6 +28,13 @@ function formatList(items: string[]): string {
   return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1]
 }
 
+/** Fallback for unknown wizard keys: payment_data → Payment data */
+function humanizeKey(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 /** Map data collection keys to human-readable labels */
 const DATA_LABELS: Record<string, string> = {
   name: 'Full name',
@@ -37,6 +44,14 @@ const DATA_LABELS: Record<string, string> = {
   ip_address: 'IP address',
   device_info: 'Device and browser information',
   location: 'Approximate geographic location',
+  // Wizard values (step-data-collection)
+  payment_data: 'Payment and billing information',
+  browsing_history: 'Browsing and usage history',
+  account_credentials: 'Account credentials',
+  social_media_profiles: 'Social media profile information',
+  employment_info: 'Employment information',
+  health_info: 'Health information',
+  // Legacy / alternate keys
   payment: 'Payment and billing information',
   usage_data: 'Usage and browsing data',
   cookies: 'Cookies and similar tracking technologies',
@@ -47,29 +62,49 @@ const DATA_LABELS: Record<string, string> = {
 }
 
 function labelData(key: string): string {
-  return DATA_LABELS[key] || key
+  return DATA_LABELS[key] || humanizeKey(key)
 }
 
 const PURPOSE_LABELS: Record<string, string> = {
   service_delivery: 'To provide and maintain our services',
   communication: 'To communicate with you about your account, updates, and support requests',
   analytics: 'To analyse usage patterns and improve our services',
+  // Wizard values (step-data-usage)
+  analytics_improvement: 'To analyse usage patterns and improve our services',
   marketing: 'To send promotional materials and marketing communications (with your consent)',
+  marketing_advertising: 'To send promotional materials and marketing communications (with your consent)',
   legal_compliance: 'To comply with applicable laws, regulations, and legal processes',
+  customer_support: 'To provide customer support and respond to your requests',
+  account_management: 'To create and manage your account',
   security: 'To detect, prevent, and address fraud, security breaches, and technical issues',
   personalisation: 'To personalise your experience and deliver content relevant to your interests',
+  personalization: 'To personalise your experience and deliver content relevant to your interests',
   payment_processing: 'To process transactions and manage billing',
   research: 'To conduct research and development to improve our products',
+}
+
+function labelPurpose(key: string): string {
+  return PURPOSE_LABELS[key] || humanizeKey(key)
 }
 
 const METHOD_LABELS: Record<string, string> = {
   forms: 'Information you provide directly through forms, registrations, and account creation',
   cookies: 'Automated data collection through cookies and similar technologies',
   analytics: 'Analytics tools that record how you interact with our services',
+  // Wizard values (step-data-collection)
+  account_creation: 'Information you provide when creating or managing an account',
+  purchases: 'Information collected during purchases and checkout',
+  third_party_sources: 'Information received from third-party services and partners',
+  automatic_collection: 'Information collected automatically when you use our services',
+  // Legacy / alternate keys
   third_party: 'Information received from third-party services and partners',
   user_content: 'Content you create, upload, or share while using our services',
   support: 'Communications with our support team',
   payment_processor: 'Payment processors when you complete transactions',
+}
+
+function labelMethod(key: string): string {
+  return METHOD_LABELS[key] || humanizeKey(key)
 }
 
 const THIRD_PARTY_LABELS: Record<string, string> = {
@@ -84,10 +119,20 @@ const THIRD_PARTY_LABELS: Record<string, string> = {
   cloudflare: 'Cloudflare (security and performance)',
   aws: 'Amazon Web Services (cloud hosting)',
   sentry: 'Sentry (error monitoring)',
+  // Wizard values (step-cookies)
+  linkedin: 'LinkedIn (advertising and analytics)',
+  twitter_x: 'Twitter/X (advertising and analytics)',
+  tiktok: 'TikTok (advertising and analytics)',
+  shopify: 'Shopify (e-commerce platform)',
+  wordpress_plugins: 'WordPress plugins (site functionality)',
 }
 
 function labelThirdParty(key: string): string {
-  return THIRD_PARTY_LABELS[key] || key
+  return THIRD_PARTY_LABELS[key] || humanizeKey(key)
+}
+
+function labelCookieCategory(key: string): string {
+  return formatCategory(key)
 }
 
 const RETENTION_LABELS: Record<string, string> = {
@@ -101,6 +146,72 @@ const RETENTION_LABELS: Record<string, string> = {
   custom: '',
 }
 
+/**
+ * Infer sensible purposes when the short wizard leaves dataPurposes empty
+ * (public tools + dashboard create only collect 3 steps).
+ */
+function resolvePurposes(inputs: PrivacyPolicyInputs): string[] {
+  if (inputs.dataPurposes.length > 0) return inputs.dataPurposes
+
+  const purposes = new Set<string>([
+    'service_delivery',
+    'communication',
+    'security',
+    'legal_compliance',
+  ])
+
+  const cats = inputs.cookieCategories || []
+  const methods = inputs.collectionMethods || []
+  const services = inputs.thirdPartyServices || []
+
+  if (
+    cats.includes('analytics') ||
+    methods.includes('analytics') ||
+    services.includes('google_analytics') ||
+    services.includes('hotjar')
+  ) {
+    purposes.add('analytics')
+  }
+  if (
+    cats.includes('marketing') ||
+    services.includes('facebook_pixel') ||
+    services.includes('google_ads') ||
+    services.includes('linkedin') ||
+    services.includes('twitter_x') ||
+    services.includes('tiktok')
+  ) {
+    purposes.add('marketing')
+  }
+  if (
+    inputs.dataCollected.includes('payment_data') ||
+    inputs.dataCollected.includes('payment') ||
+    methods.includes('purchases') ||
+    services.includes('stripe') ||
+    services.includes('shopify')
+  ) {
+    purposes.add('payment_processing')
+  }
+  if (cats.includes('functional') || cats.includes('necessary')) {
+    purposes.add('personalisation')
+  }
+
+  return Array.from(purposes)
+}
+
+function resolveRetentionText(inputs: PrivacyPolicyInputs): string {
+  if (inputs.dataRetentionPeriod === 'custom' && inputs.customRetentionPeriod) {
+    return inputs.customRetentionPeriod
+  }
+  if (inputs.dataRetentionPeriod && RETENTION_LABELS[inputs.dataRetentionPeriod]) {
+    return RETENTION_LABELS[inputs.dataRetentionPeriod]
+  }
+  if (inputs.dataRetentionPeriod?.trim()) {
+    return inputs.dataRetentionPeriod
+  }
+  // Default when short wizard leaves retention blank
+  return RETENTION_LABELS.as_needed
+}
+
 export function getCommonSections(inputs: PrivacyPolicyInputs): PolicySection[] {
   const lastUpdated = new Date().toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -108,10 +219,9 @@ export function getCommonSections(inputs: PrivacyPolicyInputs): PolicySection[] 
     year: 'numeric',
   })
 
-  const retentionText =
-    inputs.dataRetentionPeriod === 'custom' && inputs.customRetentionPeriod
-      ? inputs.customRetentionPeriod
-      : RETENTION_LABELS[inputs.dataRetentionPeriod] || inputs.dataRetentionPeriod
+  const purposes = resolvePurposes(inputs)
+  const retentionText = resolveRetentionText(inputs)
+  const hasServiceProviders = inputs.thirdPartyServices.length > 0
 
   const sections: PolicySection[] = [
     // ── Introduction ──────────────────────────────────────────────
@@ -136,14 +246,14 @@ ${inputs.dataCollected.map((d) => `<li><strong>${labelData(d)}</strong></li>`).j
 <h3>How We Collect Your Information</h3>
 <p>We collect personal information through the following methods:</p>
 <ul>
-${inputs.collectionMethods.map((m) => `<li>${METHOD_LABELS[m] || m}</li>`).join('\n')}
+${inputs.collectionMethods.map((m) => `<li>${labelMethod(m)}</li>`).join('\n')}
 </ul>
 ${
   inputs.cookieCategories.length > 0 || (inputs.cookies && inputs.cookies.length > 0)
     ? `<h3>Cookies and Tracking Technologies</h3>
 <p>We use cookies and similar tracking technologies to collect and track information about your activity on our services.${
         inputs.cookieCategories.length > 0
-          ? ` The categories of cookies we use include: ${formatList(inputs.cookieCategories)}.`
+          ? ` The categories of cookies we use include: ${formatList(inputs.cookieCategories.map(labelCookieCategory))}.`
           : ''
       } You can manage your cookie preferences through our cookie consent banner or your browser settings.</p>${
         inputs.cookies && inputs.cookies.length > 0
@@ -175,7 +285,7 @@ ${inputs.cookies
       heading: 'How We Use Your Information',
       content: `<p>${inputs.businessName} uses the personal information we collect for the following purposes:</p>
 <ul>
-${inputs.dataPurposes.map((p) => `<li>${PURPOSE_LABELS[p] || p}</li>`).join('\n')}
+${purposes.map((p) => `<li>${labelPurpose(p)}</li>`).join('\n')}
 </ul>
 <p>We will not use your personal information for purposes materially different from those described above without first obtaining your consent or providing you with notice as required by applicable law.</p>`,
       applicableJurisdictions: ['all'],
@@ -190,7 +300,7 @@ ${inputs.dataPurposes.map((p) => `<li>${PURPOSE_LABELS[p] || p}</li>`).join('\n'
 <h3>Service Providers</h3>
 <p>We engage trusted third-party companies and individuals to perform services on our behalf, such as hosting, analytics, payment processing, and customer support. These service providers have access to your personal information only to the extent necessary to perform their tasks and are obligated to protect it.</p>
 ${
-  inputs.thirdPartyServices.length > 0
+  hasServiceProviders
     ? `<p>The third-party services we currently use include:</p>
 <ul>
 ${inputs.thirdPartyServices.map((s) => `<li>${labelThirdParty(s)}</li>`).join('\n')}
@@ -200,7 +310,7 @@ ${inputs.thirdPartyServices.map((s) => `<li>${labelThirdParty(s)}</li>`).join('\
 ${
   inputs.thirdPartyRecipients && inputs.thirdPartyRecipients.length > 0
     ? `<h3>Other Recipients</h3>
-<p>We may also share your information with: ${formatList(inputs.thirdPartyRecipients)}.</p>`
+<p>We may also share your information with: ${formatList(inputs.thirdPartyRecipients.map(humanizeKey))}.</p>`
     : ''
 }
 <h3>Legal Requirements</h3>
@@ -208,6 +318,15 @@ ${
 <h3>Business Transfers</h3>
 <p>In the event of a merger, acquisition, reorganisation, or sale of assets, your personal information may be transferred to the acquiring entity. We will provide notice before your personal information becomes subject to a different privacy policy.</p>`
         : `<p>${inputs.businessName} does not sell, trade, or otherwise share your personal information with third parties for their own marketing purposes.</p>
+${
+  hasServiceProviders
+    ? `<h3>Service Providers</h3>
+<p>We engage trusted third-party companies to help operate our website and services (for example analytics, payments, or hosting). These providers process personal information only on our behalf and are obligated to protect it:</p>
+<ul>
+${inputs.thirdPartyServices.map((s) => `<li>${labelThirdParty(s)}</li>`).join('\n')}
+</ul>`
+    : ''
+}
 <p>We may disclose your personal information only in the following limited circumstances:</p>
 <ul>
 <li><strong>Legal requirements:</strong> When required by law, court order, or governmental regulation.</li>
@@ -331,16 +450,22 @@ ${inputs.allowsUserExport ? '<li><strong>Right to data portability:</strong> You
       id: 'faq',
       heading: 'Frequently Asked Questions',
       content: `<h3>What personal information does ${inputs.businessName} collect?</h3>
-<p>We collect the following types of personal information: ${formatList(inputs.dataCollected.map(labelData))}. This information is collected through ${formatList(inputs.collectionMethods.map((m) => METHOD_LABELS[m] || m).map((s) => s.toLowerCase()))}.</p>
+<p>We collect the following types of personal information: ${formatList(inputs.dataCollected.map(labelData))}. This information is collected through ${formatList(inputs.collectionMethods.map((m) => labelMethod(m).toLowerCase()))}.</p>
 
 <h3>How does ${inputs.businessName} use my personal information?</h3>
-<p>We use your personal information for the following purposes: ${formatList(inputs.dataPurposes.map((p) => (PURPOSE_LABELS[p] || p).toLowerCase()))}. We do not use your information for purposes beyond those described in this policy without your consent.</p>
+<p>We use your personal information for the following purposes: ${formatList(purposes.map((p) => labelPurpose(p).toLowerCase()))}. We do not use your information for purposes beyond those described in this policy without your consent.</p>
 
 <h3>Does ${inputs.businessName} share my personal information with third parties?</h3>
 <p>${
         inputs.sharesDataWithThirdParties
-          ? `Yes, we share personal information with trusted service providers who help us operate our business, including ${formatList(inputs.thirdPartyServices.map(labelThirdParty))}. These providers are contractually obligated to protect your information and may only use it for the specific services they provide to us.`
-          : `We do not sell or share your personal information with third parties for their marketing purposes. We may share information only when required by law, to protect our rights, or in connection with a business transfer.`
+          ? `Yes, we share personal information with trusted service providers who help us operate our business${
+              hasServiceProviders
+                ? `, including ${formatList(inputs.thirdPartyServices.map(labelThirdParty))}`
+                : ''
+            }. These providers are contractually obligated to protect your information and may only use it for the specific services they provide to us.`
+          : hasServiceProviders
+            ? `We do not sell or share your personal information with third parties for their marketing purposes. We use service providers such as ${formatList(inputs.thirdPartyServices.map(labelThirdParty))} to help operate our services; they process data only on our behalf.`
+            : `We do not sell or share your personal information with third parties for their marketing purposes. We may share information only when required by law, to protect our rights, or in connection with a business transfer.`
       }</p>
 
 <h3>How long does ${inputs.businessName} keep my personal information?</h3>
@@ -363,7 +488,7 @@ ${
     : ''
 }`,
       faqQuestion: `What is ${inputs.businessName}'s privacy policy?`,
-      faqAnswer: `${inputs.businessName} collects ${formatList(inputs.dataCollected.map(labelData).slice(0, 3))} and other personal information to ${formatList(inputs.dataPurposes.map((p) => (PURPOSE_LABELS[p] || p).toLowerCase()).slice(0, 2))}. Data is retained for ${retentionText} and users can exercise their privacy rights by contacting ${inputs.contactEmail}.`,
+      faqAnswer: `${inputs.businessName} collects ${formatList(inputs.dataCollected.map(labelData).slice(0, 3))} and other personal information to ${formatList(purposes.map((p) => labelPurpose(p).toLowerCase()).slice(0, 2))}. Data is retained for ${retentionText} and users can exercise their privacy rights by contacting ${inputs.contactEmail}.`,
       applicableJurisdictions: ['all'],
     },
   ]

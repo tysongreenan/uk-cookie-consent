@@ -78,7 +78,13 @@ export function PolicyWizard() {
         return
       }
 
-      setGeneratedHtml(data.html)
+      // API returns PolicyOutput with contentHtml (not a bare `html` field)
+      const html = data.contentHtml || data.html
+      if (!html) {
+        toast.error('Generation returned empty content')
+        return
+      }
+      setGeneratedHtml(html)
       toast.success('Privacy policy generated successfully')
     } catch {
       toast.error('Something went wrong. Please try again.')

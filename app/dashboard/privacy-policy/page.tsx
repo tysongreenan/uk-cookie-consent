@@ -43,6 +43,10 @@ export default function PrivacyPoliciesPage() {
   const fetchPolicies = async () => {
     try {
       const res = await fetch('/api/privacy-policy')
+      if (res.status === 401) {
+        router.push('/auth/signin')
+        return
+      }
       if (!res.ok) throw new Error('Failed to fetch policies')
       const data = await res.json()
       // API returns { policies } (and legacy { data }) — accept either shape.
@@ -51,7 +55,17 @@ export default function PrivacyPoliciesPage() {
         : Array.isArray(data.data)
           ? data.data
           : []
-      setPolicies(list)
+      setPolicies(
+        list.map((p: any) => ({
+          id: p.id,
+          title: p.title || p.name || p.businessName || 'Untitled policy',
+          businessName: p.businessName || p.title || p.name || 'Untitled',
+          status: p.status || 'draft',
+          slug: p.slug,
+          createdAt: p.createdAt || p.created_at || new Date().toISOString(),
+          updatedAt: p.updatedAt || p.updated_at || new Date().toISOString(),
+        })),
+      )
     } catch (err) {
       console.error('Failed to fetch policies:', err)
       toast.error('Failed to load privacy policies')
