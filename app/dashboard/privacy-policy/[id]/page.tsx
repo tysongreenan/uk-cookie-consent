@@ -220,13 +220,16 @@ export default function PolicyDetailPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-6 mt-4 flex-wrap gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h1 className="text-2xl font-bold">{policy.title || `Privacy Policy - ${policy.businessName}`}</h1>
               <Badge variant={
                 policy.status === 'published' ? 'default' :
                 policy.status === 'archived' ? 'secondary' : 'outline'
               }>
                 {policy.status}
+              </Badge>
+              <Badge variant="outline">
+                {(policy.metadata?.language || policy.inputs?.language) === 'fr' ? 'Français' : 'English'}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">

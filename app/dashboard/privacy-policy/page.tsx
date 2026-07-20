@@ -18,6 +18,7 @@ interface SavedPolicy {
   businessName: string
   status: 'draft' | 'published' | 'archived'
   slug?: string
+  language?: string
   createdAt: string
   updatedAt: string
 }
@@ -62,6 +63,7 @@ export default function PrivacyPoliciesPage() {
           businessName: p.businessName || p.title || p.name || 'Untitled',
           status: p.status || 'draft',
           slug: p.slug,
+          language: p.language || 'en',
           createdAt: p.createdAt || p.created_at || new Date().toISOString(),
           updatedAt: p.updatedAt || p.updated_at || new Date().toISOString(),
         })),
@@ -134,13 +136,16 @@ export default function PrivacyPoliciesPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-1">
+                      <div className="flex items-center gap-3 mb-1 flex-wrap">
                         <h3 className="font-semibold truncate">{policy.title || policy.businessName}</h3>
                         <Badge variant={
                           policy.status === 'published' ? 'default' :
                           policy.status === 'archived' ? 'secondary' : 'outline'
                         }>
                           {policy.status}
+                        </Badge>
+                        <Badge variant="outline">
+                          {policy.language === 'fr' ? 'FR' : 'EN'}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
