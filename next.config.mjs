@@ -54,6 +54,12 @@ const nextConfig = {
         destination: '/blog/ccpa-cpra-cookie-compliance-guide',
         permanent: true,
       },
+      // Homepage A/B ended — always use canonical home
+      {
+        source: '/v2',
+        destination: '/',
+        permanent: true,
+      },
     ]
   },
 
