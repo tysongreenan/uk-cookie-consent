@@ -1,8 +1,9 @@
-// Stripe Customer Portal for invoice and receipt access
+// Stripe Customer Portal for invoice and receipt access.
+// Uses Supabase client (not Prisma) to avoid PgBouncer / direct-DB connectivity issues on serverless.
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
 const getStripe = () => {
@@ -12,6 +13,15 @@ const getStripe = () => {
   return new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2025-09-30.clover',
   })
+}
+
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    throw new Error('Supabase configuration is missing')
+  }
+  return createClient(url, key)
 }
 
 export async function POST(request: NextRequest) {
@@ -25,18 +35,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user with Stripe customer ID
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        email: true,
-        stripeCustomerId: true,
-        planTier: true,
-      },
-    })
+    const supabase = getSupabase()
+    const { data: user, error: userError } = await supabase
+      .from('User')
+      .select('id, email, stripeCustomerId, planTier')
+      .eq('id', session.user.id)
+      .single()
 
-    if (!user) {
+    if (userError || !user) {
+      console.error('[PORTAL] User lookup failed:', userError?.message || 'not found')
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -52,18 +59,18 @@ export async function POST(request: NextRequest) {
 
     const stripe = getStripe()
 
-    // Create a portal session for invoice/receipt access
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/dashboard/settings`,
     })
 
     return NextResponse.json({ url: portalSession.url })
-  } catch (error: any) {
-    console.error('[PORTAL] Error creating portal session:', error?.message || error)
-    console.error('[PORTAL] Error type:', error?.type, 'Code:', error?.code, 'Status:', error?.statusCode)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[PORTAL] Error creating portal session:', message)
+    // Never return internal/DB/Stripe details to the client
     return NextResponse.json(
-      { error: error?.message || 'Failed to create portal session' },
+      { error: 'Failed to create portal session' },
       { status: 500 }
     )
   }

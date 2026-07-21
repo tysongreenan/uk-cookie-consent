@@ -1,7 +1,9 @@
+// Stripe invoice list for paid members.
+// Uses Supabase client (not Prisma) to avoid PgBouncer / direct-DB connectivity issues on serverless.
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
 function getStripe(): Stripe {
@@ -11,6 +13,15 @@ function getStripe(): Stripe {
   return new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2025-09-30.clover',
   })
+}
+
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    throw new Error('Supabase configuration is missing')
+  }
+  return createClient(url, key)
 }
 
 function isStripeUrl(url: string | null): boolean {
@@ -34,10 +45,20 @@ export async function GET() {
       )
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true },
-    })
+    const supabase = getSupabase()
+    const { data: user, error: userError } = await supabase
+      .from('User')
+      .select('stripeCustomerId')
+      .eq('id', session.user.id)
+      .single()
+
+    if (userError) {
+      console.error('[INVOICES] User lookup failed:', userError.message)
+      return NextResponse.json(
+        { error: 'Failed to fetch invoices' },
+        { status: 500 }
+      )
+    }
 
     if (!user?.stripeCustomerId) {
       return NextResponse.json({ invoices: [] })
@@ -62,8 +83,9 @@ export async function GET() {
     }))
 
     return NextResponse.json({ invoices: formatted })
-  } catch (error) {
-    console.error('[INVOICES] Error fetching invoices:', error)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[INVOICES] Error fetching invoices:', message)
     return NextResponse.json(
       { error: 'Failed to fetch invoices' },
       { status: 500 }
