@@ -81,6 +81,11 @@ interface BannerPreviewProps {
   view?: PreviewView
   /** Called when the user interacts with the preview in a way that should switch the parent's view chip (e.g., clicking the floating button to open preferences). */
   onViewChange?: (view: PreviewView) => void
+  /**
+   * When true, fills the parent frame (absolute inset-0) and skips the nested
+   * gray "fake website" card chrome. Use inside gallery / browser frames.
+   */
+  fillParent?: boolean
 }
 
 // Helper function to generate floating button preview styles
@@ -194,7 +199,7 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   )
 }
 
-export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps) {
+export function BannerPreview({ config, view, onViewChange, fillParent = false }: BannerPreviewProps) {
   const [internalIsVisible, setInternalIsVisible] = useState(true)
   const [internalShowPreferences, setInternalShowPreferences] = useState(false)
 
@@ -531,30 +536,14 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
   }
 
 
-  return (
-    <div className="relative">
-      {/* Website Preview Background */}
-      <div className="bg-gray-100 rounded-lg p-4 mb-4 min-h-[300px] relative overflow-hidden">
-        <div className="bg-white rounded shadow-sm p-4 h-full">
-          <div className="h-4 bg-gray-200 rounded mb-4"></div>
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-          </div>
-          <div className="mt-6 space-y-2">
-            <div className="h-2 bg-gray-200 rounded w-full"></div>
-            <div className="h-2 bg-gray-200 rounded w-4/5"></div>
-            <div className="h-2 bg-gray-200 rounded w-3/5"></div>
-          </div>
-        </div>
-
-        {/* Cookie Banner */}
+  const bannerPanel = (
         <div
           className={`absolute ${getPositionClasses()} ${getAnimationClasses()} z-50`}
           style={{
             backgroundColor: safeConfig.colors.background,
             color: safeConfig.colors.text,
+            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 2px 4px rgba(15,23,42,0.04), 0 12px 28px -6px rgba(15,23,42,0.14)',
             ...(safeConfig.fontFamily ? { fontFamily: `"${safeConfig.fontFamily}", sans-serif` } : {}),
             ...getLayoutStyles(),
           }}
@@ -736,46 +725,95 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
             })()}
           </div>
         </div>
-      </div>
+  )
 
-      {/* Enhanced Floating Cookie Settings Button (Preview) */}
-      {safeConfig.branding.footerLink.enabled && ((safeConfig as any).branding.footerLink.style === 'floating' || (safeConfig as any).branding.footerLink.style === 'both') && !isVisible && (
-        view === 'floating' ? (
-          // Forced view: render centered inside the preview frame so it's visible
-          <div className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none">
-            <div
-              className="cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
-              style={generateFloatingButtonPreviewStyles(safeConfig)}
-              onClick={() => setIsVisible(true)}
-            >
-              {generateFloatingButtonPreviewContent(safeConfig)}
-            </div>
-          </div>
-        ) : (
+  const floatingPreview =
+    safeConfig.branding.footerLink.enabled &&
+    ((safeConfig as any).branding.footerLink.style === 'floating' ||
+      (safeConfig as any).branding.footerLink.style === 'both') &&
+    !isVisible ? (
+      view === 'floating' || fillParent ? (
+        <div className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none z-40">
           <div
-            className="fixed z-40 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center"
-            style={{
-              ...generateFloatingButtonPreviewStyles(safeConfig),
-              [safeConfig.branding.footerLink.floatingPosition === 'bottom-right' ? 'right' : 'left']: '20px',
-              bottom: '20px',
-            }}
+            className="cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
+            style={generateFloatingButtonPreviewStyles(safeConfig)}
             onClick={() => setIsVisible(true)}
           >
             {generateFloatingButtonPreviewContent(safeConfig)}
           </div>
-        )
-      )}
+        </div>
+      ) : (
+        <div
+          className="fixed z-40 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center"
+          style={{
+            ...generateFloatingButtonPreviewStyles(safeConfig),
+            [safeConfig.branding.footerLink.floatingPosition === 'bottom-right'
+              ? 'right'
+              : 'left']: '20px',
+            bottom: '20px',
+          }}
+          onClick={() => setIsVisible(true)}
+        >
+          {generateFloatingButtonPreviewContent(safeConfig)}
+        </div>
+      )
+    ) : null
 
-      {/* Preferences Modal — previewMode anchors it inside the builder's preview frame instead of the viewport */}
-      <PreferencesModal
-        config={config}
-        isVisible={showPreferences}
-        onClose={() => setShowPreferences(false)}
-        onAcceptAll={handleAcceptAll}
-        onConfirmChoices={handleConfirmChoices}
-        domain="cookie-banner.ca"
-        previewMode
-      />
+  const preferences = (
+    <PreferencesModal
+      config={config}
+      isVisible={showPreferences}
+      onClose={() => setShowPreferences(false)}
+      onAcceptAll={handleAcceptAll}
+      onConfirmChoices={handleConfirmChoices}
+      domain="cookie-banner.ca"
+      previewMode
+    />
+  )
+
+  // Gallery / framed embed: fill parent, no nested chrome or meta dump
+  if (fillParent) {
+    return (
+      <div className="absolute inset-0 overflow-hidden bg-slate-50 transform-gpu">
+        <div className="pointer-events-none p-6 opacity-50">
+          <div className="mb-3 h-3 w-1/3 rounded bg-slate-300/80" />
+          <div className="mb-2 h-2.5 w-full rounded bg-slate-200" />
+          <div className="mb-2 h-2.5 w-5/6 rounded bg-slate-200" />
+          <div className="mb-6 h-2.5 w-2/3 rounded bg-slate-200" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-lg bg-white/80 shadow-sm" />
+            <div className="h-20 rounded-lg bg-white/80 shadow-sm" />
+          </div>
+        </div>
+        {isVisible && bannerPanel}
+        {floatingPreview}
+        {preferences}
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative">
+      {/* Website Preview Background */}
+      <div className="bg-gray-100 rounded-lg p-4 mb-4 min-h-[300px] relative overflow-hidden transform-gpu">
+        <div className="bg-white rounded shadow-sm p-4 h-full">
+          <div className="h-4 bg-gray-200 rounded mb-4"></div>
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+          </div>
+          <div className="mt-6 space-y-2">
+            <div className="h-2 bg-gray-200 rounded w-full"></div>
+            <div className="h-2 bg-gray-200 rounded w-4/5"></div>
+            <div className="h-2 bg-gray-200 rounded w-3/5"></div>
+          </div>
+        </div>
+
+        {isVisible && bannerPanel}
+        {floatingPreview}
+        {preferences}
+      </div>
 
       {/* Preview Controls */}
       <div className="text-xs text-muted-foreground space-y-1">
@@ -788,18 +826,19 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
             <p>Cookie Settings: ✓ Enabled</p>
             {(safeConfig as any).branding.footerLink.style === 'floating' && (
               <p className="text-xs">
-                Floating: {(safeConfig as any).branding.footerLink.floatingStyle?.shape || 'pill'} ({(safeConfig as any).branding.footerLink.floatingStyle?.size || 'small'})
+                Floating:{' '}
+                {(safeConfig as any).branding.footerLink.floatingStyle?.shape || 'pill'} (
+                {(safeConfig as any).branding.footerLink.floatingStyle?.size || 'small'})
               </p>
             )}
             {(safeConfig as any).branding.footerLink.style === 'inline' && (
               <p className="text-xs">
-                Inline: {(safeConfig as any).branding.footerLink.inlineStyle?.linkType || 'plain'} link
+                Inline: {(safeConfig as any).branding.footerLink.inlineStyle?.linkType || 'plain'}{' '}
+                link
               </p>
             )}
             {(safeConfig as any).branding.footerLink.style === 'both' && (
-              <p className="text-xs">
-                Both: Floating + Inline options
-              </p>
+              <p className="text-xs">Both: Floating + Inline options</p>
             )}
           </div>
         )}
