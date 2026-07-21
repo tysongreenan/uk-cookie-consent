@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 6
+export const GENERATOR_VERSION = 7
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 7,
+    date: '2026-07-20',
+    title: 'Professional Banner Appearance',
+    changes: [
+      'Refined card shadows, borders, and typography for a polished look',
+      'Equal-width action buttons with better touch targets',
+      'Smoother close control and focus states for keyboard users',
+      'Mobile bottom-sheet elevation and scroll for long consent copy',
+    ],
+  },
   {
     version: 6,
     date: '2026-07-20',

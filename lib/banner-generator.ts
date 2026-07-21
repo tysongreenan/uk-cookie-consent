@@ -347,8 +347,14 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // desktop. width:100% + max-width keeps them fluid on narrow viewports.
   // max-width uses min(..., calc(100vw - gutter)) so cards never overflow the
   // viewport when a fixed left/right offset is also applied.
+  // 420px gives French copy room without looking oversized on desktop.
   const cardMax = (px: number) =>
     `max-width: min(${px}px, calc(100vw - 40px)); width: 100%;`
+
+  const usesTransformPosition = [
+    'modal-center', 'modal-bottom', 'modal-top',
+    'slide-in-right', 'slide-in-left', 'slide-in-top', 'slide-in-bottom',
+  ].includes(config.position)
 
   const getPositionStyles = () => {
     switch (config.position) {
@@ -357,27 +363,27 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       case 'bottom':
         return 'bottom: 0; left: 0; right: 0;'
       case 'floating-bottom-right':
-        return `bottom: 20px; right: 20px; ${cardMax(400)}`
+        return `bottom: 20px; right: 20px; ${cardMax(420)}`
       case 'floating-bottom-left':
-        return `bottom: 20px; left: 20px; ${cardMax(400)}`
+        return `bottom: 20px; left: 20px; ${cardMax(420)}`
       case 'floating-top-right':
-        return `top: 20px; right: 20px; ${cardMax(400)}`
+        return `top: 20px; right: 20px; ${cardMax(420)}`
       case 'floating-top-left':
-        return `top: 20px; left: 20px; ${cardMax(400)}`
+        return `top: 20px; left: 20px; ${cardMax(420)}`
       case 'modal-center':
-        return `top: 50%; left: 50%; transform: translate(-50%, -50%); ${cardMax(500)}`
+        return `top: 50%; left: 50%; transform: translate(-50%, -50%); ${cardMax(480)}`
       case 'modal-bottom':
-        return `bottom: 20px; left: 50%; transform: translateX(-50%); ${cardMax(500)}`
+        return `bottom: 20px; left: 50%; transform: translateX(-50%); ${cardMax(480)}`
       case 'modal-top':
-        return `top: 20px; left: 50%; transform: translateX(-50%); ${cardMax(500)}`
+        return `top: 20px; left: 50%; transform: translateX(-50%); ${cardMax(480)}`
       case 'slide-in-right':
-        return `top: 50%; right: 0; transform: translateY(-50%); ${cardMax(400)}`
+        return `top: 50%; right: 0; transform: translateY(-50%); ${cardMax(420)}`
       case 'slide-in-left':
-        return `top: 50%; left: 0; transform: translateY(-50%); ${cardMax(400)}`
+        return `top: 50%; left: 0; transform: translateY(-50%); ${cardMax(420)}`
       case 'slide-in-top':
-        return `top: 0; left: 50%; transform: translateX(-50%); ${cardMax(500)}`
+        return `top: 0; left: 50%; transform: translateX(-50%); ${cardMax(480)}`
       case 'slide-in-bottom':
-        return `bottom: 0; left: 50%; transform: translateX(-50%); ${cardMax(500)}`
+        return `bottom: 0; left: 50%; transform: translateX(-50%); ${cardMax(480)}`
       default:
         return 'bottom: 0; left: 0; right: 0;'
     }
@@ -407,17 +413,27 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       styles += `border-radius: ${config.layout.borderRadius}px;`
     }
 
+    // Subtle edge definition so cards read on light host pages; bars only
+    // need a hairline on the open edge so they don't look boxed-in.
+    if (isFullWidthBar) {
+      styles += config.position === 'top'
+        ? `border-bottom: 1px solid ${borderColor};`
+        : `border-top: 1px solid ${borderColor};`
+    } else {
+      styles += `border: 1px solid ${borderColor};`
+    }
+
     styles += `padding: ${config.layout.padding}px;`
 
     switch (config.layout.shadow) {
       case 'small':
-        styles += 'box-shadow: 0 2px 4px rgba(0,0,0,0.1);'
+        styles += 'box-shadow: 0 1px 2px rgba(15,23,42,0.06), 0 4px 12px rgba(15,23,42,0.06);'
         break
       case 'medium':
-        styles += 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);'
+        styles += 'box-shadow: 0 2px 4px rgba(15,23,42,0.04), 0 12px 28px -6px rgba(15,23,42,0.14);'
         break
       case 'large':
-        styles += 'box-shadow: 0 8px 24px rgba(0,0,0,0.2);'
+        styles += 'box-shadow: 0 4px 8px rgba(15,23,42,0.06), 0 20px 40px -8px rgba(15,23,42,0.2);'
         break
     }
 
@@ -425,50 +441,64 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   }
 
   const getAnimationStyles = () => {
-    switch (config.layout.animation) {
+    // Positions that use transform for placement cannot use transform-based
+    // enter animations (slide/bounce) — those would override centering.
+    const anim = config.layout.animation
+    if (usesTransformPosition && (anim === 'slide' || anim === 'bounce')) {
+      return 'animation: cookieFadeIn 0.35s ease-out;'
+    }
+    switch (anim) {
       case 'fade':
-        return 'animation: cookieFadeIn 0.5s ease-out;'
+        return 'animation: cookieFadeIn 0.35s ease-out;'
       case 'slide':
-        return 'animation: cookieSlideIn 0.5s ease-out;'
+        return 'animation: cookieSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);'
       case 'bounce':
-        return 'animation: cookieBounceIn 0.6s ease-out;'
+        return 'animation: cookieBounceIn 0.55s ease-out;'
       case 'pulse':
         return 'animation: cookiePulse 2s infinite;'
       default:
-        return ''
+        return 'animation: cookieFadeIn 0.35s ease-out;'
     }
   }
 
   const hasTitle = Boolean(config.text.title?.trim())
 
+  const rejectBorder = escapeHtml(config.colors.rejectButtonText || config.colors.text)
+  const rejectBg = escapeHtml(config.colors.rejectButton || 'transparent')
+  const rejectFg = escapeHtml(config.colors.rejectButtonText || config.colors.text)
+
+  // Shared professional button base (inline so host CSS can't flatten them)
+  const btnBase =
+    'display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;min-height:44px;padding:11px 18px;font-family:inherit;letter-spacing:-0.01em;-webkit-tap-highlight-color:transparent;'
+
   // Main banner HTML
   // Close button is absolutely positioned — reserve space with padding-right so
   // title/message wrap instead of running under the ×.
   // min-width: 0 (not 250px) is critical so flex children can shrink on mobile.
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box;">
-  <div style="position: relative; padding-right: 44px; box-sizing: border-box; min-width: 0;">
-    <button id="cookie-close-btn" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: ${config.colors.text}; font-size: 28px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.7; z-index: 2;" aria-label="Close">&times;</button>
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; max-height: min(90vh, 100dvh);">
+  <div style="position: relative; padding-right: 40px; box-sizing: border-box; min-width: 0; max-height: inherit; overflow-y: auto; overscroll-behavior: contain;">
+    <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
     
-    <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; min-width: 0;">
+    <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
       
       <div style="flex: 1; min-width: 0; max-width: 100%;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         
-        ${hasTitle ? `<h3 id="cookie-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>` : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 18px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`}
+        ${hasTitle ? `<h3 id="cookie-title" style="margin: 0 0 6px 0; padding-right: 8px; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>` : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 17px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`}
         
-        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
+        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.55; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
         
-        <div id="cookie-banner-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch;">
-          <button id="cookie-accept-btn" style="background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; min-height: 44px;">${escapeHtml(config.text.acceptButton)}</button>
+        <div id="cookie-banner-actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch;">
+          <button id="cookie-accept-btn" type="button" style="${btnBase} flex: 1 1 auto; background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>
           
-          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" style="background-color: ${escapeHtml(config.colors.rejectButton || 'transparent')}; color: ${escapeHtml(config.colors.rejectButtonText || config.colors.text)} !important; border: 1px solid ${escapeHtml(config.colors.rejectButtonText || config.colors.text)} !important; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; min-height: 44px;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
+          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" type="button" style="${btnBase} flex: 1 1 auto; background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
           
-          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" style="background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; min-height: 44px;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
+          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" type="button" style="${btnBase} flex: 1 1 100%; background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; min-height: 40px; padding: 8px 12px; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
         </div>
         ${showBranding ? `
-        <div style="margin-top: 8px;">
-          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Powered by cookie-banner.ca</a>
+        <div style="margin-top: 10px;">
+          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.65;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Powered by cookie-banner.ca</a>
         </div>` : ''}
       </div>
       
@@ -802,12 +832,39 @@ export const generateBannerCSS = (config: BannerConfig) => {
 }
 
 #cookie-consent-banner button {
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-#cookie-consent-banner button:hover {
-  opacity: 0.9;
+#cookie-consent-banner #cookie-accept-btn:hover,
+#cookie-consent-banner #cookie-reject-btn:hover {
+  opacity: 0.92;
   transform: translateY(-1px);
+}
+
+#cookie-consent-banner #cookie-preferences-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+#cookie-consent-banner #cookie-close-btn:hover {
+  opacity: 0.95 !important;
+  background: ${config.theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} !important;
+}
+
+#cookie-consent-banner button:focus-visible,
+#cookie-preferences-modal button:focus-visible {
+  outline: 2px solid ${escapeHtml(config.colors.link || config.colors.button)};
+  outline-offset: 2px;
+}
+
+/* Prefer equal primary actions on wider cards; wrap cleanly when tight */
+#cookie-consent-banner #cookie-banner-actions {
+  width: 100%;
+}
+
+#cookie-consent-banner #cookie-accept-btn,
+#cookie-consent-banner #cookie-reject-btn {
+  min-width: min(100%, 132px);
 }
 
 @keyframes cookieFadeIn {
@@ -844,9 +901,10 @@ input:checked + span:before {
 
 @media (max-width: 768px) {
   #cookie-consent-banner {
-    padding: 16px !important;
+    padding: 18px 16px !important;
     box-sizing: border-box !important;
     margin: 0 !important;
+    max-height: min(88vh, 100dvh) !important;
   }
 
   ${isFullWidthBar ? `
@@ -858,18 +916,21 @@ input:checked + span:before {
     width: auto !important;
     transform: none !important;
     border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
     padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
     ${isBottomBar ? `
     top: auto !important;
     bottom: 0 !important;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;` : `
+    border-bottom: none !important;
+    padding-bottom: max(18px, env(safe-area-inset-bottom, 0px)) !important;` : `
     top: 0 !important;
     bottom: auto !important;
-    padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;`}
+    border-top: none !important;
+    padding-top: max(18px, env(safe-area-inset-top, 0px)) !important;`}
   }` : `
-  /* Floating / modal / slide-in cards: bottom sheet with gutters so copy
-     never clips the close button or the phone home indicator. */
+  /* Floating / modal / slide-in cards: elevated bottom sheet with gutters */
   #cookie-consent-banner {
     left: max(12px, env(safe-area-inset-left, 0px)) !important;
     right: max(12px, env(safe-area-inset-right, 0px)) !important;
@@ -878,11 +939,13 @@ input:checked + span:before {
     max-width: none !important;
     width: auto !important;
     transform: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.06) !important;
   }`}
 
   /* Inner content can shrink — never force a large min-width on phones */
   #cookie-consent-banner > div {
-    padding-right: 44px !important;
+    padding-right: 36px !important;
     min-width: 0 !important;
     max-width: 100% !important;
   }
@@ -890,15 +953,16 @@ input:checked + span:before {
   #cookie-consent-banner > div > div {
     min-width: 0 !important;
     max-width: 100% !important;
+    flex-wrap: wrap !important;
   }
 
   #cookie-consent-banner #cookie-close-btn {
-    top: 0 !important;
-    right: 0 !important;
-    width: 44px !important;
-    height: 44px !important;
+    top: -4px !important;
+    right: -4px !important;
+    width: 40px !important;
+    height: 40px !important;
     padding: 0 !important;
-    font-size: 28px !important;
+    font-size: 22px !important;
     line-height: 1 !important;
     display: flex !important;
     align-items: center !important;
@@ -908,26 +972,38 @@ input:checked + span:before {
 
   #cookie-consent-banner #cookie-title {
     font-size: 16px !important;
+    line-height: 1.3 !important;
     max-width: 100% !important;
   }
 
   #cookie-consent-banner #cookie-message {
-    font-size: 13px !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
     max-width: 100% !important;
+    margin-bottom: 14px !important;
   }
 
   /* Stack actions full-width for reliable touch targets on narrow screens */
   #cookie-consent-banner #cookie-banner-actions {
     flex-direction: column !important;
     width: 100% !important;
+    gap: 8px !important;
   }
 
   #cookie-consent-banner #cookie-banner-actions button {
     width: 100% !important;
-    padding: 12px 16px !important;
-    font-size: 14px !important;
-    min-height: 44px !important;
+    flex: none !important;
+    padding: 13px 16px !important;
+    font-size: 15px !important;
+    min-height: 48px !important;
     justify-content: center !important;
+    border-radius: 10px !important;
+  }
+
+  #cookie-consent-banner #cookie-preferences-btn {
+    min-height: 42px !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
   }
 
   #cookie-preferences-modal {
