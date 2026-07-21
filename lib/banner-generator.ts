@@ -521,8 +521,11 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // Main banner HTML
   // Close button is absolutely positioned — reserve space with padding-right so
   // title/message wrap instead of running under the ×.
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; max-height: min(90vh, 100dvh);">
-  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; max-height: inherit; overflow-y: auto; overscroll-behavior: contain;">
+  // Note: do NOT put overflow-y:auto on short banners — macOS draws a gray
+  // "slider" scrollbar track that looks broken. Scroll only kicks in on mobile
+  // when content exceeds the viewport (see CSS below).
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden;">
+  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; overflow: visible;">
     <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
     ${bodyHtml}
   </div>
@@ -836,6 +839,15 @@ export const generateBannerCSS = (config: BannerConfig) => {
 #cookie-consent-banner {
   position: fixed !important;
   box-sizing: border-box !important;
+  /* Never reserve scrollbar gutters — they render as a fake "slider" on macOS */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#cookie-consent-banner::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 #cookie-consent-banner * {
@@ -930,7 +942,20 @@ input:checked + span:before {
     padding: 18px 16px !important;
     box-sizing: border-box !important;
     margin: 0 !important;
+    /* Only scroll when the banner is taller than the phone viewport */
     max-height: min(88vh, 100dvh) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #cookie-consent-banner::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   ${isFullWidthBar ? `
