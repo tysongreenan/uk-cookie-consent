@@ -23,6 +23,16 @@ const LAYOUTS: { id: BannerConfig['position']; label: string; tier: 'Free' | 'Pr
 
 function baseConfig(position: BannerConfig['position']): BannerConfig {
   return {
+    compliance: {
+      framework: 'gdpr',
+      requiresExplicitConsent: true,
+      requiresOptIn: true,
+      requiresGranularConsent: true,
+      requiresPrivacyPolicy: true,
+      requiresDataRetentionPolicy: false,
+      maxPenalty: '',
+      consentExpiry: 12,
+    },
     name: `Layout · ${position}`,
     position,
     theme: 'light',
@@ -78,7 +88,7 @@ function baseConfig(position: BannerConfig['position']): BannerConfig {
           showText: true,
           useCustomColors: false,
         },
-      } as any,
+      } as BannerConfig['branding']['footerLink'],
       showPoweredBy: false,
     },
     layout: {
@@ -102,7 +112,7 @@ function baseConfig(position: BannerConfig['position']): BannerConfig {
       customCSS: '',
       customJS: '',
     },
-  } as BannerConfig
+  }
 }
 
 export default function LayoutGalleryPage() {
