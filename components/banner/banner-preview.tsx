@@ -559,55 +559,57 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
             ...getLayoutStyles(),
           }}
         >
-          <div className="relative min-w-0 box-border" style={{ paddingRight: 44 }}>
-            {/* Mirror the production banner: a 44x44 close button is rendered
-                regardless of position so builders can see where it lands
-                against their copy before publishing. */}
+          <div className="relative min-w-0 box-border" style={{ paddingRight: 36 }}>
+            {/* Mirror production: compact close control that does not cover copy */}
             <button
               onClick={handleClose}
               aria-label="Close"
-              className="absolute flex items-center justify-center"
+              type="button"
+              className="absolute flex items-center justify-center rounded-lg"
               style={{
-                top: 0,
-                right: 0,
-                width: 44,
-                height: 44,
+                top: -2,
+                right: -4,
+                width: 36,
+                height: 36,
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
                 color: safeConfig.colors.text,
-                fontSize: 28,
+                fontSize: 22,
                 lineHeight: 1,
-                opacity: 0.7,
+                opacity: 0.55,
                 zIndex: 2,
               }}
             >
               ×
             </button>
 
-            <div className={`flex items-start gap-4 min-w-0 flex-wrap ${
-              safeConfig.branding.logo.position === 'center' ? 'flex-col' : 'flex-row'
-            }`}>
-              {safeConfig.branding.logo.position === 'left' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
-                <div className="flex items-center shrink-0">
-                  <img
-                    src={safeConfig.branding.logo.url}
-                    alt="Logo"
-                    className="object-contain"
-                    style={{
-                      maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
-                      maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                </div>
-              )}
-              
-              <div className="flex-1 min-w-0 max-w-full">
-                {safeConfig.branding.logo.position === 'center' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
-                  <div className="flex items-center justify-center mb-2">
+            {(() => {
+              const isBar =
+                safeConfig.position === 'top' || safeConfig.position === 'bottom'
+              const logoLeft =
+                safeConfig.branding.logo.position === 'left' &&
+                safeConfig.branding.logo.enabled &&
+                safeConfig.branding.logo.url
+              const logoRight =
+                safeConfig.branding.logo.position === 'right' &&
+                safeConfig.branding.logo.enabled &&
+                safeConfig.branding.logo.url
+              const logoCenter =
+                safeConfig.branding.logo.position === 'center' &&
+                safeConfig.branding.logo.enabled &&
+                safeConfig.branding.logo.url
+
+              const logoEl = (side: 'left' | 'right' | 'center') => {
+                const show =
+                  side === 'left' ? logoLeft : side === 'right' ? logoRight : logoCenter
+                if (!show) return null
+                return (
+                  <div
+                    className={`flex items-center shrink-0 ${
+                      side === 'center' ? 'justify-center mb-2' : ''
+                    }`}
+                  >
                     <img
                       src={safeConfig.branding.logo.url}
                       alt="Logo"
@@ -621,49 +623,28 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                       }}
                     />
                   </div>
-                )}
-                
-                {safeConfig.text.title?.trim() ? (
-                  <h3
-                    className="font-semibold text-lg mb-2 break-words"
-                    style={{ color: safeConfig.colors.text, whiteSpace: 'normal' }}
-                  >
-                    {safeConfig.text.title}
-                  </h3>
-                ) : null}
-                
-                <p className="text-sm mb-4 leading-relaxed break-words" style={{ whiteSpace: 'normal' }}>
-                  {safeConfig.text.message}
-                  {safeConfig.branding.privacyPolicy.url && (
-                    <>
-                      {' '}
-                      <a
-                        href={safeConfig.branding.privacyPolicy.url}
-                        target={safeConfig.branding.privacyPolicy.openInNewTab ? '_blank' : '_self'}
-                        rel={safeConfig.branding.privacyPolicy.openInNewTab ? 'noopener noreferrer' : ''}
-                        className="underline hover:no-underline"
-                        style={{ color: safeConfig.colors.link }}
-                      >
-                        {safeConfig.branding.privacyPolicy.text}
-                      </a>
-                    </>
-                  )}
-                </p>
+                )
+              }
 
-                <div className="flex flex-wrap gap-2">
+              const actions = (
+                <div
+                  className={`flex flex-wrap gap-2 items-center shrink-0 ${
+                    isBar ? 'sm:ml-auto' : 'w-full'
+                  }`}
+                >
                   <Button
                     onClick={handleAccept}
                     size="sm"
                     style={{
                       backgroundColor: safeConfig.colors.button,
                       color: safeConfig.colors.buttonText,
-                      minHeight: 44,
+                      minHeight: 42,
                     }}
-                    className="hover:opacity-90"
+                    className={`hover:opacity-90 ${isBar ? '' : 'flex-1'}`}
                   >
                     {safeConfig.text.acceptButton}
                   </Button>
-                  
+
                   {safeConfig.behavior.showRejectButton !== false && (
                     <Button
                       onClick={handleReject}
@@ -671,11 +652,13 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                       size="sm"
                       style={{
                         backgroundColor: safeConfig.colors.rejectButton || 'transparent',
-                        borderColor: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
-                        color: safeConfig.colors.rejectButtonText || safeConfig.colors.text,
-                        minHeight: 44,
+                        borderColor:
+                          safeConfig.colors.rejectButtonText || safeConfig.colors.text,
+                        color:
+                          safeConfig.colors.rejectButtonText || safeConfig.colors.text,
+                        minHeight: 42,
                       }}
-                      className="hover:bg-opacity-10"
+                      className={`hover:bg-opacity-10 ${isBar ? '' : 'flex-1'}`}
                     >
                       {safeConfig.text.rejectButton}
                     </Button>
@@ -686,33 +669,71 @@ export function BannerPreview({ config, view, onViewChange }: BannerPreviewProps
                       onClick={handlePreferences}
                       variant="ghost"
                       size="sm"
-                      style={{ color: safeConfig.colors.link, minHeight: 44 }}
+                      style={{ color: safeConfig.colors.link, minHeight: 40 }}
                       className="hover:bg-opacity-10"
                     >
                       {safeConfig.text.preferencesButton}
                     </Button>
                   )}
                 </div>
+              )
 
-              </div>
-
-              {safeConfig.branding.logo.position === 'right' && safeConfig.branding.logo.enabled && safeConfig.branding.logo.url && (
-                <div className="flex items-center shrink-0">
-                  <img
-                    src={safeConfig.branding.logo.url}
-                    alt="Logo"
-                    className="object-contain"
-                    style={{
-                      maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
-                      maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
+              const copy = (
+                <div className={`min-w-0 max-w-full ${isBar ? 'flex-1 basis-[220px]' : 'flex-1'}`}>
+                  {logoEl('center')}
+                  {safeConfig.text.title?.trim() ? (
+                    <h3
+                      className="font-semibold text-base mb-1 break-words"
+                      style={{ color: safeConfig.colors.text, whiteSpace: 'normal' }}
+                    >
+                      {safeConfig.text.title}
+                    </h3>
+                  ) : null}
+                  <p
+                    className={`text-sm leading-relaxed break-words ${isBar ? '' : 'mb-3.5'}`}
+                    style={{ whiteSpace: 'normal', opacity: 0.92 }}
+                  >
+                    {safeConfig.text.message}
+                    {safeConfig.branding.privacyPolicy.url && (
+                      <>
+                        {' '}
+                        <a
+                          href={safeConfig.branding.privacyPolicy.url}
+                          target={
+                            safeConfig.branding.privacyPolicy.openInNewTab ? '_blank' : '_self'
+                          }
+                          rel={
+                            safeConfig.branding.privacyPolicy.openInNewTab
+                              ? 'noopener noreferrer'
+                              : ''
+                          }
+                          className="underline hover:no-underline"
+                          style={{ color: safeConfig.colors.link }}
+                        >
+                          {safeConfig.branding.privacyPolicy.text}
+                        </a>
+                      </>
+                    )}
+                  </p>
+                  {!isBar && actions}
                 </div>
-              )}
-            </div>
+              )
+
+              return (
+                <div
+                  className={`flex min-w-0 gap-4 ${
+                    isBar
+                      ? 'flex-wrap items-center gap-x-6 gap-y-3'
+                      : 'items-start flex-nowrap'
+                  }`}
+                >
+                  {logoEl('left')}
+                  {copy}
+                  {isBar && actions}
+                  {logoEl('right')}
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>

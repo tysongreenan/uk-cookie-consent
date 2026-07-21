@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, Monitor, Smartphone } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -220,15 +220,18 @@ const defaultConfig: BannerConfig = {
     }
   },
   name: 'My Cookie Banner',
+  // Default: bottom bar with compact side-by-side actions (Accept | Reject | Preferences)
   position: 'bottom',
-  theme: 'dark',
+  theme: 'light',
   language: 'auto',
   colors: {
-    background: '#1f2937',
-    text: '#ffffff',
-    button: '#3b82f6',
+    background: '#ffffff',
+    text: '#1f2937',
+    button: '#0f766e',
     buttonText: '#ffffff',
-    link: '#60a5fa'
+    link: '#0f766e',
+    rejectButton: 'transparent',
+    rejectButtonText: '#1f2937',
   },
   text: {
     title: 'We use cookies',
@@ -243,6 +246,7 @@ const defaultConfig: BannerConfig = {
     showPreferences: true,
     cookieExpiry: 182,
     buttonLayout: 'standard',
+    // Reject shown by default so free users start closer to GDPR/PECR compliance
     showRejectButton: true
   },
   branding: {
@@ -509,6 +513,8 @@ function BannerBuilderContent() {
   const [activeTab, setActiveTab] = useState('compliance')
   // null = use auto-derived view from activeTab; otherwise user has clicked a preview tab and wants to lock it
   const [previewView, setPreviewView] = useState<'banner' | 'preferences' | 'floating' | null>(null)
+  // Desktop vs phone frame width for the live preview pane
+  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop')
   // Reset preview override whenever the user navigates to a different builder tab so auto-derivation kicks back in
   useEffect(() => { setPreviewView(null) }, [activeTab])
   const [isEditing, setIsEditing] = useState(false)
@@ -4551,9 +4557,39 @@ function BannerBuilderContent() {
               <div className="sticky top-6">
                 <Card>
                   <CardHeader className="space-y-3">
-                    <CardTitle className="flex items-center">
-                      <Eye className="mr-2 h-5 w-5" />
-                      Live Preview
+                    <CardTitle className="flex items-center justify-between gap-2">
+                      <span className="flex items-center">
+                        <Eye className="mr-2 h-5 w-5" />
+                        Live Preview
+                      </span>
+                      <div className="inline-flex rounded-md border bg-muted/40 p-0.5 text-xs font-normal">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewViewport('desktop')}
+                          className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+                            previewViewport === 'desktop'
+                              ? 'bg-background shadow-sm font-medium'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                          title="Desktop preview"
+                        >
+                          <Monitor className="h-3.5 w-3.5" />
+                          Desk
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewViewport('mobile')}
+                          className={`inline-flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+                            previewViewport === 'mobile'
+                              ? 'bg-background shadow-sm font-medium'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                          title="Mobile preview"
+                        >
+                          <Smartphone className="h-3.5 w-3.5" />
+                          Phone
+                        </button>
+                      </div>
                     </CardTitle>
                     {(() => {
                       // Auto-derive default view from active tab; user can override with the buttons below
@@ -4582,8 +4618,8 @@ function BannerBuilderContent() {
                     })()}
                   </CardHeader>
                   <CardContent>
-                    {/* Browser Chrome Frame */}
-                    <div className="border rounded-lg overflow-hidden">
+                    {/* Browser Chrome Frame — mobile uses a phone-width column so layouts are easy to judge */}
+                    <div className={`border rounded-lg overflow-hidden mx-auto ${previewViewport === 'mobile' ? 'max-w-[390px]' : ''}`}>
                       <div className="bg-muted rounded-t-lg px-3 py-2 flex items-center gap-2 border-b">
                         <div className="flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-red-400" />
@@ -4591,11 +4627,11 @@ function BannerBuilderContent() {
                           <span className="w-2 h-2 rounded-full bg-green-400" />
                         </div>
                         <div className="flex-1 mx-2 bg-muted-foreground/15 rounded-md px-3 py-1 text-xs text-muted-foreground text-center truncate">
-                          yoursite.com
+                          yoursite.com · {previewViewport === 'mobile' ? '390px' : 'desktop'}
                         </div>
                       </div>
                       {/* transform-gpu anchors fixed-positioned descendants; overscroll-contain stops mouse-wheel from bubbling to the page when you scroll inside the preview */}
-                      <div className="bg-white rounded-b-lg h-[640px] relative overflow-hidden overscroll-contain transform-gpu">
+                      <div className={`bg-white rounded-b-lg relative overflow-hidden overscroll-contain transform-gpu ${previewViewport === 'mobile' ? 'h-[700px]' : 'h-[640px]'}`}>
                         <BannerPreview
                           config={config}
                           view={previewView ?? (
@@ -4607,6 +4643,13 @@ function BannerBuilderContent() {
                         />
                       </div>
                     </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+                      Tip: change <span className="font-medium">Design → Position</span> to switch layouts.
+                      Full gallery (no login):{' '}
+                      <a href="/demo/layouts" className="underline hover:text-foreground" target="_blank" rel="noreferrer">
+                        /demo/layouts
+                      </a>
+                    </p>
                   </CardContent>
                 </Card>
               </div>

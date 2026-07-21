@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 7
+export const GENERATOR_VERSION = 8
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 8,
+    date: '2026-07-20',
+    title: 'Default Bottom Bar Layout Fix',
+    changes: [
+      'Bottom/top bars use compact side-by-side buttons (no full-width Accept stretch)',
+      'Desktop bar layout: copy on the left, actions on the right',
+      'Reject shown by default for a compliant starting point',
+      'Builder preview matches production bar vs card layouts',
+    ],
+  },
   {
     version: 7,
     date: '2026-07-20',

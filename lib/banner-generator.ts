@@ -466,44 +466,65 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   const rejectBorder = escapeHtml(config.colors.rejectButtonText || config.colors.text)
   const rejectBg = escapeHtml(config.colors.rejectButton || 'transparent')
   const rejectFg = escapeHtml(config.colors.rejectButtonText || config.colors.text)
+  const showReject = config.behavior.showRejectButton !== false
+  const showPrefs = Boolean(config.behavior.showPreferences)
 
-  // Shared professional button base (inline so host CSS can't flatten them)
+  // Shared professional button base (inline so host CSS can't flatten them).
+  // flex: 0 1 auto — NEVER stretch a lone Accept across a full bottom bar.
   const btnBase =
-    'display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;min-height:44px;padding:11px 18px;font-family:inherit;letter-spacing:-0.01em;-webkit-tap-highlight-color:transparent;'
+    'display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;min-height:42px;padding:10px 18px;font-family:inherit;letter-spacing:-0.01em;-webkit-tap-highlight-color:transparent;flex:0 1 auto;white-space:nowrap;'
+
+  const titleHtml = hasTitle
+    ? `<h3 id="cookie-title" style="margin: 0 0 4px 0; padding-right: 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>`
+    : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 16px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`
+
+  const messageHtml = `<p id="cookie-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>`
+
+  const actionsHtml = `<div id="cookie-banner-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0;">
+          <button id="cookie-accept-btn" type="button" style="${btnBase} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>
+          ${showReject ? `<button id="cookie-reject-btn" type="button" style="${btnBase} background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
+          ${showPrefs ? `<button id="cookie-preferences-btn" type="button" style="${btnBase} background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; font-weight: 500; min-height: 40px; padding: 8px 12px;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
+        </div>`
+
+  const brandingHtml = showBranding
+    ? `<div class="cb-powered" style="margin-top: 8px;">
+          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.65;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Powered by cookie-banner.ca</a>
+        </div>`
+    : ''
+
+  // Full-width bars (top/bottom): horizontal "text | actions" on desktop.
+  // Floating / modal cards: stacked copy then actions (classic card).
+  const bodyHtml = isFullWidthBar
+    ? `<div class="cb-banner-body" style="display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; min-width: 0;">
+      ${config.branding.logo.position === 'left' ? logoElement : ''}
+      <div class="cb-banner-copy" style="flex: 1 1 220px; min-width: 0; max-width: 100%;">
+        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 8px;">${logoElement}</div>` : ''}
+        ${titleHtml}
+        ${messageHtml}
+        ${brandingHtml}
+      </div>
+      ${actionsHtml}
+      ${config.branding.logo.position === 'right' ? logoElement : ''}
+    </div>`
+    : `<div class="cb-banner-body" style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0;">
+      ${config.branding.logo.position === 'left' ? logoElement : ''}
+      <div class="cb-banner-copy" style="flex: 1; min-width: 0; max-width: 100%;">
+        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
+        ${titleHtml}
+        <div style="margin-bottom: 14px;">${messageHtml}</div>
+        ${actionsHtml}
+        ${brandingHtml}
+      </div>
+      ${config.branding.logo.position === 'right' ? logoElement : ''}
+    </div>`
 
   // Main banner HTML
   // Close button is absolutely positioned — reserve space with padding-right so
   // title/message wrap instead of running under the ×.
-  // min-width: 0 (not 250px) is critical so flex children can shrink on mobile.
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; max-height: min(90vh, 100dvh);">
-  <div style="position: relative; padding-right: 40px; box-sizing: border-box; min-width: 0; max-height: inherit; overflow-y: auto; overscroll-behavior: contain;">
-    <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
-    
-    <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0;">
-      ${config.branding.logo.position === 'left' ? logoElement : ''}
-      
-      <div style="flex: 1; min-width: 0; max-width: 100%;">
-        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
-        
-        ${hasTitle ? `<h3 id="cookie-title" style="margin: 0 0 6px 0; padding-right: 8px; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>` : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 17px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`}
-        
-        <p id="cookie-message" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.55; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>
-        
-        <div id="cookie-banner-actions" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch;">
-          <button id="cookie-accept-btn" type="button" style="${btnBase} flex: 1 1 auto; background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>
-          
-          ${config.behavior.showRejectButton !== false ? `<button id="cookie-reject-btn" type="button" style="${btnBase} flex: 1 1 auto; background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
-          
-          ${config.behavior.showPreferences ? `<button id="cookie-preferences-btn" type="button" style="${btnBase} flex: 1 1 100%; background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; min-height: 40px; padding: 8px 12px; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
-        </div>
-        ${showBranding ? `
-        <div style="margin-top: 10px;">
-          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.65;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Powered by cookie-banner.ca</a>
-        </div>` : ''}
-      </div>
-      
-      ${config.branding.logo.position === 'right' ? logoElement : ''}
-    </div>
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; max-height: min(90vh, 100dvh);">
+  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; max-height: inherit; overflow-y: auto; overscroll-behavior: contain;">
+    <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
+    ${bodyHtml}
   </div>
 </div>`
 
@@ -857,14 +878,19 @@ export const generateBannerCSS = (config: BannerConfig) => {
   outline-offset: 2px;
 }
 
-/* Prefer equal primary actions on wider cards; wrap cleanly when tight */
-#cookie-consent-banner #cookie-banner-actions {
+/* Cards: actions fill the card width; bars: actions stay compact on the right */
+#cookie-consent-banner[data-cb-layout="card"] #cookie-banner-actions {
   width: 100%;
 }
 
-#cookie-consent-banner #cookie-accept-btn,
-#cookie-consent-banner #cookie-reject-btn {
-  min-width: min(100%, 132px);
+#cookie-consent-banner[data-cb-layout="card"] #cookie-accept-btn,
+#cookie-consent-banner[data-cb-layout="card"] #cookie-reject-btn {
+  flex: 1 1 auto;
+  min-width: min(100%, 120px);
+}
+
+#cookie-consent-banner[data-cb-layout="bar"] #cookie-banner-actions {
+  margin-left: auto;
 }
 
 @keyframes cookieFadeIn {
@@ -983,16 +1009,24 @@ input:checked + span:before {
     margin-bottom: 14px !important;
   }
 
-  /* Stack actions full-width for reliable touch targets on narrow screens */
+  /* On phones: always stack copy then actions; buttons full-width for touch */
+  #cookie-consent-banner .cb-banner-body {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
   #cookie-consent-banner #cookie-banner-actions {
     flex-direction: column !important;
     width: 100% !important;
+    margin-left: 0 !important;
     gap: 8px !important;
   }
 
   #cookie-consent-banner #cookie-banner-actions button {
     width: 100% !important;
     flex: none !important;
+    white-space: normal !important;
     padding: 13px 16px !important;
     font-size: 15px !important;
     min-height: 48px !important;
@@ -1004,6 +1038,10 @@ input:checked + span:before {
     min-height: 42px !important;
     padding: 10px 12px !important;
     font-size: 14px !important;
+  }
+
+  #cookie-consent-banner .cb-banner-copy #cookie-message {
+    margin-bottom: 0 !important;
   }
 
   #cookie-preferences-modal {
