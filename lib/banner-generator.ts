@@ -589,58 +589,61 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
           </div>
         </div>` : ''
 
+  // Preferences modal uses a strict flex column so the middle pane scrolls on
+  // phone and desktop: header (fixed) → content (flex:1 + overflow-y:auto +
+  // min-height:0) → footer (fixed). Without min-height:0, flex children refuse
+  // to shrink and overflow-y never kicks in.
   const preferencesModal = needsPreferencesModal ? `
 <!-- Preferences Modal -->
-<div id="cookie-preferences-modal" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 16px;">
-  <div style="background: ${config.colors.background}; border-radius: 8px; width: 100%; max-width: 512px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-    <!-- Header -->
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 16px 24px; border-bottom: 1px solid ${borderColor};">
+<div id="cookie-preferences-modal" role="dialog" aria-modal="true" aria-labelledby="prefs-title" style="position: fixed; inset: 0; z-index: 99999; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); box-sizing: border-box;">
+  <div id="cookie-preferences-card" style="background: ${config.colors.background}; border-radius: 12px; width: 100%; max-width: 512px; max-height: min(90vh, calc(100dvh - 24px)); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); box-sizing: border-box;">
+    <!-- Header (pinned) -->
+    <div id="cookie-prefs-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid ${borderColor}; flex-shrink: 0; gap: 12px;">
       ${config.branding.logo.enabled && config.branding.logo.url ? `
       <img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="height: 32px; object-fit: contain; max-width: ${config.branding.logo.maxWidth}px; max-height: ${config.branding.logo.maxHeight}px; flex-shrink: 0;" onerror="this.style.display='none'" />
       ` : `
-      <span id="prefs-header-title" style="font-weight: 600; color: ${config.colors.text};">Cookie Settings</span>
+      <span id="prefs-header-title" style="font-weight: 600; color: ${config.colors.text}; font-size: 15px;">Cookie Settings</span>
       `}
 
-      <button id="cookie-prefs-close-btn" style="padding: 8px; background: none; border: none; border-radius: 6px; cursor: pointer; color: ${config.colors.text}; font-size: 20px; line-height: 1; flex-shrink: 0; opacity: 0.7;" aria-label="Close">
+      <button id="cookie-prefs-close-btn" type="button" style="padding: 8px; background: none; border: none; border-radius: 8px; cursor: pointer; color: ${config.colors.text}; font-size: 22px; line-height: 1; flex-shrink: 0; opacity: 0.65; min-width: 40px; min-height: 40px;" aria-label="Close">
         ×
       </button>
     </div>
 
-    <!-- Content -->
-    <div style="display: flex; flex-direction: column; height: 100%; max-height: calc(90vh - 80px);">
-      <div id="cookie-prefs-content" style="padding: 24px 24px 0 24px; flex: 1; overflow-y: auto;">
+    <!-- Scrollable body -->
+    <div id="cookie-prefs-content" style="flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 20px; box-sizing: border-box;">
         <!-- Title -->
-        <h2 id="prefs-title" style="font-size: 20px; font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0;">
+        <h2 id="prefs-title" style="font-size: 18px; font-weight: 700; color: ${config.colors.text}; margin: 0 0 10px 0; letter-spacing: -0.02em;">
           Privacy Center
         </h2>
 
         <!-- Description -->
-        <p id="prefs-description" style="font-size: 14px; color: ${secondaryTextColor}; margin: 0 0 24px 0; line-height: 1.5;">
+        <p id="prefs-description" style="font-size: 14px; color: ${secondaryTextColor}; margin: 0 0 20px 0; line-height: 1.55;">
           ${tcfEnabled ? 'We and our partners use technologies such as cookies to store and access information on your device. We process personal data for the purposes described below. You may consent to or object to processing based on legitimate interest, for each purpose.' : "By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts."}
         </p>
 
         <!-- Accept All / Reject All Buttons -->
-        <div style="display: flex; gap: 8px; margin-bottom: 24px;">
-          <button id="cookie-accept-all-btn" style="flex: 1; height: 48px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+          <button id="cookie-accept-all-btn" type="button" style="flex: 1 1 140px; min-height: 48px; font-size: 15px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
             Accept All
           </button>
-          ${tcfEnabled ? `<button id="cookie-reject-all-btn" style="flex: 1; height: 48px; font-size: 16px; font-weight: 500; border-radius: 8px; border: 1px solid ${escapeHtml(config.colors.rejectButtonText || config.colors.text)}; cursor: pointer; background-color: ${escapeHtml(config.colors.rejectButton || 'transparent')}; color: ${escapeHtml(config.colors.rejectButtonText || config.colors.text)};">
+          ${tcfEnabled ? `<button id="cookie-reject-all-btn" type="button" style="flex: 1 1 140px; min-height: 48px; font-size: 15px; font-weight: 600; border-radius: 8px; border: 1px solid ${escapeHtml(config.colors.rejectButtonText || config.colors.text)}; cursor: pointer; background-color: ${escapeHtml(config.colors.rejectButton || 'transparent')}; color: ${escapeHtml(config.colors.rejectButtonText || config.colors.text)};">
             Reject All
           </button>` : ''}
         </div>
 
         ${tcfEnabled ? `
         <!-- TCF Purposes Section: Consent Required -->
-        <div style="margin-bottom: 24px;">
-          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Consent Required</h3>
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-weight: 700; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Consent Required</h3>
           <div style="display: flex; flex-direction: column; gap: 8px;">
             ${consentPurposes.map(p => generateTcfPurposeToggle(p.id, p.name, p.description, p.legalBasis)).join('')}
           </div>
         </div>
 
         <!-- TCF Purposes Section: Legitimate Interest -->
-        <div style="margin-bottom: 24px;">
-          <h3 style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Legitimate Interest</h3>
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-weight: 700; color: ${config.colors.text}; margin: 0 0 12px 0; font-size: 15px;">Legitimate Interest</h3>
           <div style="display: flex; flex-direction: column; gap: 8px;">
             ${liPurposes.map(p => generateTcfPurposeToggle(p.id, p.name, p.description, p.legalBasis)).join('')}
           </div>
@@ -649,33 +652,31 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
         ${tcfVendorSection}
         ` : `
         <!-- Cookie Preferences Section -->
-        <div style="margin-bottom: 24px;">
-          <h3 id="prefs-manage-heading" style="font-weight: bold; color: ${config.colors.text}; margin: 0 0 16px 0;">
+        <div style="margin-bottom: 8px;">
+          <h3 id="prefs-manage-heading" style="font-weight: 700; color: ${config.colors.text}; margin: 0 0 14px 0; font-size: 15px;">
             Manage cookie preferences
           </h3>
 
-          <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
             <!-- Strictly Necessary -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px; background-color: ${cardBackgroundColor};">
-              <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 10px; background-color: ${cardBackgroundColor}; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; flex: 1; min-width: 0;">
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-necessary" style="font-weight: 500; color: ${config.colors.text};">Strictly Necessary Cookies</div>
-                  <div id="cat-necessary-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Always active</div>
+                  <div id="cat-necessary" style="font-weight: 600; color: ${config.colors.text}; font-size: 14px;">Strictly Necessary Cookies</div>
+                  <div id="cat-necessary-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">Always active</div>
                 </div>
               </div>
             </div>
 
             <!-- Functionality -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
-              <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 10px; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; flex: 1; min-width: 0;">
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-functionality" style="font-weight: 500; color: ${config.colors.text};">Functional Cookies</div>
-                  <div id="cat-functionality-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Remember preferences and choices</div>
+                  <div id="cat-functionality" style="font-weight: 600; color: ${config.colors.text}; font-size: 14px;">Functional Cookies</div>
+                  <div id="cat-functionality-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">Remember preferences and choices</div>
                 </div>
               </div>
-              <div style="flex-shrink: 0; margin-left: 12px;">
+              <div style="flex-shrink: 0;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-func-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
                   <span id="cookie-func-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
@@ -685,15 +686,14 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             </div>
 
             <!-- Performance -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
-              <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 10px; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; flex: 1; min-width: 0;">
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-analytics" style="font-weight: 500; color: ${config.colors.text};">Performance Cookies</div>
-                  <div id="cat-analytics-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Help us improve our website</div>
+                  <div id="cat-analytics" style="font-weight: 600; color: ${config.colors.text}; font-size: 14px;">Performance Cookies</div>
+                  <div id="cat-analytics-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">Help us improve our website</div>
                 </div>
               </div>
-              <div style="flex-shrink: 0; margin-left: 12px;">
+              <div style="flex-shrink: 0;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-performance-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
                   <span id="cookie-performance-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
@@ -703,15 +703,14 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             </div>
 
             <!-- Targeting -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
-              <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 10px; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; flex: 1; min-width: 0;">
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-marketing" style="font-weight: 500; color: ${config.colors.text};">Targeting Cookies</div>
-                  <div id="cat-marketing-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Personalized ads and content</div>
+                  <div id="cat-marketing" style="font-weight: 600; color: ${config.colors.text}; font-size: 14px;">Targeting Cookies</div>
+                  <div id="cat-marketing-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">Personalized ads and content</div>
                 </div>
               </div>
-              <div style="flex-shrink: 0; margin-left: 12px;">
+              <div style="flex-shrink: 0;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-targeting-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
                   <span id="cookie-targeting-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
@@ -721,15 +720,14 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
             </div>
 
             <!-- Social Media -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid ${borderColor}; border-radius: 8px;">
-              <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                <span style="margin-right: 12px; color: ${secondaryTextColor}; font-size: 20px; flex-shrink: 0;">›</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid ${borderColor}; border-radius: 10px; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; flex: 1; min-width: 0;">
                 <div style="min-width: 0; flex: 1;">
-                  <div id="cat-social" style="font-weight: 500; color: ${config.colors.text};">Social Media Cookies</div>
-                  <div id="cat-social-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px;">Social media integration</div>
+                  <div id="cat-social" style="font-weight: 600; color: ${config.colors.text}; font-size: 14px;">Social Media Cookies</div>
+                  <div id="cat-social-desc" style="font-size: 12px; color: ${secondaryTextColor}; margin-top: 4px; line-height: 1.4;">Social media integration</div>
                 </div>
               </div>
-              <div style="flex-shrink: 0; margin-left: 12px;">
+              <div style="flex-shrink: 0;">
                 <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
                   <input type="checkbox" id="cookie-social-toggle-modal" style="opacity: 0; width: 0; height: 0;" />
                   <span id="cookie-social-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af'}; transition: .4s; border-radius: 24px;"></span>
@@ -740,22 +738,20 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
           </div>
         </div>
         `}
-      </div>
+    </div>
 
-      <!-- Footer with buttons -->
-      <div style="padding: 24px 24px 0 24px; border-top: 1px solid ${borderColor}; background-color: ${cardBackgroundColor};">
-        <!-- Confirm Button -->
-        <button id="cookie-confirm-choices-btn" style="width: 100%; height: 48px; margin-bottom: 16px; font-size: 16px; font-weight: 500; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
-          Confirm My Choices
-        </button>
+    <!-- Footer (pinned) -->
+    <div id="cookie-prefs-footer" style="flex-shrink: 0; padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid ${borderColor}; background-color: ${cardBackgroundColor}; box-sizing: border-box;">
+      <button id="cookie-confirm-choices-btn" type="button" style="width: 100%; min-height: 48px; margin-bottom: ${showBranding ? '12px' : '0'}; font-size: 15px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background-color: ${config.colors.button}; color: ${config.colors.buttonText};">
+        Confirm My Choices
+      </button>
 
-        ${showBranding ? `<!-- Powered by -->
-        <div style="text-align: center;">
-          <p style="font-size: 12px; color: ${secondaryTextColor}; margin: 0;">
-            Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: ${config.colors.link}; text-decoration: none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">cookie-banner.ca</a>
-          </p>
-        </div>` : ''}
-      </div>
+      ${showBranding ? `<!-- Powered by -->
+      <div style="text-align: center;">
+        <p style="font-size: 11px; color: ${secondaryTextColor}; margin: 0;">
+          Powered by <a href="https://cookie-banner.ca/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; color: ${config.colors.link}; text-decoration: none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">cookie-banner.ca</a>
+        </p>
+      </div>` : ''}
     </div>
   </div>
 </div>` : ''
@@ -932,9 +928,47 @@ input:checked + span:before {
   transform: translateX(20px);
 }
 
-/* Modal Styles */
+/* Preferences modal — flex column card with a real scroll pane */
 #cookie-preferences-modal {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#cookie-preferences-card {
+  /* Reinforce flex column in case host CSS resets display */
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+#cookie-prefs-header,
+#cookie-prefs-footer {
+  flex-shrink: 0 !important;
+}
+
+#cookie-prefs-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* Thin, unobtrusive scrollbar (visible only when content overflows) */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.45) transparent;
+}
+
+#cookie-prefs-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#cookie-prefs-content::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.4);
+  border-radius: 8px;
+}
+
+#cookie-prefs-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 @media (max-width: 768px) {
@@ -1069,24 +1103,39 @@ input:checked + span:before {
     margin-bottom: 0 !important;
   }
 
+  /* Full-screen preferences sheet on phones — middle pane still scrolls */
   #cookie-preferences-modal {
     padding: 0 !important;
-    align-items: flex-start !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
   }
 
-  #cookie-preferences-modal > div {
+  #cookie-preferences-card {
     margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
     max-height: 100vh !important;
     max-height: 100dvh !important;
     height: 100vh !important;
     height: 100dvh !important;
     border-radius: 0 !important;
-    max-width: 100% !important;
   }
 
-  #cookie-preferences-modal > div > div:last-child {
-    max-height: calc(100vh - 80px) !important;
-    max-height: calc(100dvh - 80px) !important;
+  #cookie-prefs-header {
+    padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  }
+
+  #cookie-prefs-content {
+    padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  }
+
+  #cookie-prefs-footer {
+    padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
   }
 
   #cookie-settings-float {
@@ -2272,6 +2321,45 @@ function loadConsentIntoModal(consent) {
   setupToggleSwitches();
 }
 
+function lockPageScroll() {
+  try {
+    if (document.body.dataset.cbScrollLocked === '1') return;
+    document.body.dataset.cbScrollY = String(window.scrollY || window.pageYOffset || 0);
+    document.body.dataset.cbScrollLocked = '1';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    // iOS: freeze background scroll position
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + (document.body.dataset.cbScrollY || '0') + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  } catch (e) {}
+}
+
+function unlockPageScroll() {
+  try {
+    if (document.body.dataset.cbScrollLocked !== '1') return;
+    var y = parseInt(document.body.dataset.cbScrollY || '0', 10) || 0;
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    delete document.body.dataset.cbScrollLocked;
+    delete document.body.dataset.cbScrollY;
+    window.scrollTo(0, y);
+  } catch (e) {}
+}
+
+function hidePreferencesModal() {
+  var modal = document.getElementById('cookie-preferences-modal');
+  if (modal) modal.style.display = 'none';
+  unlockPageScroll();
+}
+
 function showPreferencesModal() {
   var modal = document.getElementById('cookie-preferences-modal');
 
@@ -2288,6 +2376,10 @@ function showPreferencesModal() {
   }
 
   modal.style.display = 'flex';
+  lockPageScroll();
+  // Reset scroll position of the pane so long TCF lists start at the top
+  var pane = document.getElementById('cookie-prefs-content');
+  if (pane) pane.scrollTop = 0;
   applyGpcModalState();
 }
 
@@ -2586,18 +2678,7 @@ function init() {
   ${config.behavior.showPreferences ? `
   if (prefsBtn && !prefsBtn.dataset.handlerAttached) {
     prefsBtn.addEventListener('click', function() {
-      var modal = document.getElementById('cookie-preferences-modal');
-      if (modal) {
-        modal.style.display = 'flex';
-        // Load current consent state into modal
-        var currentConsent = getConsent();
-        if (currentConsent) {
-          loadConsentIntoModal(currentConsent);
-        } else {
-          loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
-        }
-        applyGpcModalState();
-      }
+      showPreferencesModal();
     });
     prefsBtn.dataset.handlerAttached = 'true';
   }
@@ -2622,9 +2703,17 @@ function init() {
 
   if (modalCloseBtn && !modalCloseBtn.dataset.handlerAttached) {
     modalCloseBtn.addEventListener('click', function() {
-      modal.style.display = 'none';
+      hidePreferencesModal();
     });
     modalCloseBtn.dataset.handlerAttached = 'true';
+  }
+
+  // Tap backdrop (outside the card) to close
+  if (modal && !modal.dataset.backdropHandlerAttached) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hidePreferencesModal();
+    });
+    modal.dataset.backdropHandlerAttached = 'true';
   }
 
   if (acceptAllBtn && !acceptAllBtn.dataset.handlerAttached) {
@@ -2644,7 +2733,7 @@ function init() {
       loadConsentIntoModal(consent);
 
       banner.style.display = 'none';
-      modal.style.display = 'none';
+      hidePreferencesModal();
       if (GPC_ACTIVE) showGpcAcknowledgment();
     });
     acceptAllBtn.dataset.handlerAttached = 'true';
@@ -2663,7 +2752,7 @@ function init() {
       trackConsentEvent('reject', consent);
       saveConsent(consent, tcfPurposes);
       banner.style.display = 'none';
-      modal.style.display = 'none';
+      hidePreferencesModal();
     });
     rejectAllBtn.dataset.handlerAttached = 'true';
   }
@@ -2711,19 +2800,9 @@ function init() {
       saveConsent(consent, tcfPurposes);
 
       banner.style.display = 'none';
-      modal.style.display = 'none';
+      hidePreferencesModal();
     });
     confirmChoicesBtn.dataset.handlerAttached = 'true';
-  }
-
-  // Close modal when clicking outside
-  if (modal && !modal.dataset.handlerAttached) {
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-    modal.dataset.handlerAttached = 'true';
   }
   
   // Initialize toggles

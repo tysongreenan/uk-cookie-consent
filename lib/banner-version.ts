@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 8
+export const GENERATOR_VERSION = 9
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,17 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 9,
+    date: '2026-07-21',
+    title: 'Preferences Modal Scroll Fix',
+    changes: [
+      'Preferences panel scrolls reliably on phone and desktop',
+      'Header and Confirm footer stay pinned while categories scroll',
+      'Background page scroll locked while preferences are open',
+      'Safe-area padding for notched iPhones',
+    ],
+  },
   {
     version: 8,
     date: '2026-07-20',

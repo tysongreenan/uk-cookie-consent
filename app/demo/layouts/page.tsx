@@ -119,6 +119,7 @@ export default function LayoutGalleryPage() {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop')
   const [active, setActive] = useState<BannerConfig['position']>('floating-bottom-left')
   const [showFr, setShowFr] = useState(false)
+  const [panel, setPanel] = useState<'banner' | 'preferences'>('banner')
 
   const config = useMemo(() => {
     const c = baseConfig(active)
@@ -184,6 +185,26 @@ export default function LayoutGalleryPage() {
             >
               {showFr ? 'FR copy (on)' : 'EN copy'}
             </button>
+            <div className="inline-flex rounded-lg border bg-slate-50 p-0.5 text-sm">
+              <button
+                type="button"
+                onClick={() => setPanel('banner')}
+                className={`rounded-md px-3 py-1.5 ${
+                  panel === 'banner' ? 'bg-white shadow-sm font-medium' : 'text-slate-500'
+                }`}
+              >
+                Banner
+              </button>
+              <button
+                type="button"
+                onClick={() => setPanel('preferences')}
+                className={`rounded-md px-3 py-1.5 ${
+                  panel === 'preferences' ? 'bg-white shadow-sm font-medium' : 'text-slate-500'
+                }`}
+              >
+                Preferences
+              </button>
+            </div>
             <a
               href="/dashboard/builder"
               className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800"
@@ -265,21 +286,14 @@ export default function LayoutGalleryPage() {
                 </div>
               </div>
               <div
-                className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] transform-gpu"
+                className="relative overflow-hidden transform-gpu"
                 style={{ height: frameHeight }}
               >
-                {/* Fake page content so the banner has context */}
-                <div className="pointer-events-none p-6 opacity-60">
-                  <div className="mb-4 h-4 w-1/3 rounded bg-slate-300/80" />
-                  <div className="mb-2 h-3 w-full rounded bg-slate-200/90" />
-                  <div className="mb-2 h-3 w-5/6 rounded bg-slate-200/90" />
-                  <div className="mb-6 h-3 w-2/3 rounded bg-slate-200/90" />
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="h-24 rounded-lg bg-white/70 shadow-sm" />
-                    <div className="h-24 rounded-lg bg-white/70 shadow-sm" />
-                  </div>
-                </div>
-                <BannerPreview config={config} view="banner" />
+                <BannerPreview
+                  config={config}
+                  view={panel === 'preferences' ? 'preferences' : 'banner'}
+                  fillParent
+                />
               </div>
             </div>
           </div>
@@ -306,8 +320,8 @@ export default function LayoutGalleryPage() {
                     </span>
                   </div>
                   <div className="relative h-44 overflow-hidden bg-slate-100 transform-gpu">
-                    <div className="pointer-events-none scale-[0.72] origin-top-left absolute inset-0 w-[138%] h-[138%]">
-                      <BannerPreview config={baseConfig(layout.id)} view="banner" />
+                    <div className="pointer-events-none absolute inset-0 origin-top-left scale-[0.55] w-[182%] h-[182%]">
+                      <BannerPreview config={baseConfig(layout.id)} view="banner" fillParent />
                     </div>
                   </div>
                 </button>

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Button } from '@/components/ui/button'
-import { X, ChevronRight } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 
 interface BannerConfig {
@@ -29,6 +29,7 @@ interface BannerConfig {
     buttonText: string
     link: string
   }
+  theme?: string
 }
 
 interface PreferencesModalProps {
@@ -44,7 +45,7 @@ interface PreferencesModalProps {
     socialMedia: boolean
   }) => void
   domain?: string
-  /** When true, the modal sizes itself to its containing block instead of the viewport — for use inside a constrained preview frame. */
+  /** When true, sizes to its containing preview frame instead of the viewport. */
   previewMode?: boolean
 }
 
@@ -55,46 +56,138 @@ export function PreferencesModal({
   onAcceptAll,
   onConfirmChoices,
   domain = 'cookie-banner.ca',
-  previewMode = false
+  previewMode = false,
 }: PreferencesModalProps) {
   const [cookiePreferences, setCookiePreferences] = useState({
-    strictlyNecessary: true, // Always enabled
+    strictlyNecessary: true,
     functionality: false,
     trackingPerformance: false,
     targetingAdvertising: false,
-    socialMedia: false
+    socialMedia: false,
   })
 
+  // Lock background page scroll when the real (non-preview) modal is open
+  useEffect(() => {
+    if (previewMode || !isVisible) return
+    const scrollY = window.scrollY
+    const { style } = document.body
+    const prev = {
+      overflow: style.overflow,
+      position: style.position,
+      top: style.top,
+      left: style.left,
+      right: style.right,
+      width: style.width,
+    }
+    style.overflow = 'hidden'
+    style.position = 'fixed'
+    style.top = `-${scrollY}px`
+    style.left = '0'
+    style.right = '0'
+    style.width = '100%'
+    return () => {
+      style.overflow = prev.overflow
+      style.position = prev.position
+      style.top = prev.top
+      style.left = prev.left
+      style.right = prev.right
+      style.width = prev.width
+      window.scrollTo(0, scrollY)
+    }
+  }, [isVisible, previewMode])
+
   const handleToggle = (category: keyof typeof cookiePreferences) => {
-    if (category === 'strictlyNecessary') return // Can't disable
-    setCookiePreferences(prev => ({
+    if (category === 'strictlyNecessary') return
+    setCookiePreferences((prev) => ({
       ...prev,
-      [category]: !prev[category]
+      [category]: !prev[category],
     }))
   }
 
   if (!isVisible) return null
 
-  // In preview mode we render the modal contents directly inside the preview frame:
-  // no fixed-position overlay, no backdrop dimmer, no centered card — just a clean column
-  // that fills the available space so the user can see every section without scroll conflict.
+  const bg = config.colors.background || '#ffffff'
+  const text = config.colors.text || '#111827'
+  const muted =
+    config.theme === 'dark' ? 'rgba(255,255,255,0.65)' : 'rgba(17,24,39,0.6)'
+  const border =
+    config.theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'
+  const footerBg =
+    config.theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'
+
+  // Flex column: header (fixed) → scroll body (flex-1 min-h-0 overflow-y-auto) → footer (fixed)
   const wrapperClass = previewMode
-    ? 'absolute inset-0 bg-white flex flex-col overflow-hidden'
-    : 'fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4'
+    ? 'absolute inset-0 z-50 flex flex-col overflow-hidden'
+    : 'fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4'
+  const wrapperStyle = previewMode
+    ? { backgroundColor: bg }
+    : { backgroundColor: 'rgba(0,0,0,0.5)' }
   const cardClass = previewMode
-    ? 'w-full h-full flex flex-col'
-    : 'bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl flex flex-col'
+    ? 'flex h-full w-full min-h-0 flex-col overflow-hidden'
+    : 'flex w-full max-w-lg min-h-0 flex-col overflow-hidden rounded-xl shadow-2xl'
+  const cardStyle = previewMode
+    ? { backgroundColor: bg }
+    : {
+        backgroundColor: bg,
+        maxHeight: 'min(90vh, calc(100dvh - 24px))',
+      }
+
+  const categories: {
+    key: keyof typeof cookiePreferences
+    title: string
+    desc: string
+    locked?: boolean
+  }[] = [
+    {
+      key: 'strictlyNecessary',
+      title: 'Strictly Necessary Cookies',
+      desc: 'Always active',
+      locked: true,
+    },
+    {
+      key: 'functionality',
+      title: 'Functional Cookies',
+      desc: 'Remember preferences and choices',
+    },
+    {
+      key: 'trackingPerformance',
+      title: 'Performance Cookies',
+      desc: 'Help us improve our website',
+    },
+    {
+      key: 'targetingAdvertising',
+      title: 'Targeting Cookies',
+      desc: 'Personalized ads and content',
+    },
+    {
+      key: 'socialMedia',
+      title: 'Social Media Cookies',
+      desc: 'Social media integration',
+    },
+  ]
 
   return (
-    <div className={wrapperClass}>
-      <div className={cardClass}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200">
+    <div
+      className={wrapperClass}
+      style={wrapperStyle}
+      onClick={(e) => {
+        if (!previewMode && e.target === e.currentTarget) onClose()
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="prefs-title-preview"
+    >
+      <div className={cardClass} style={cardStyle}>
+        {/* Header — pinned */}
+        <div
+          className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3 sm:px-5"
+          style={{ borderColor: border }}
+        >
           {config.branding.logo.enabled && config.branding.logo.url ? (
             <img
               src={config.branding.logo.url}
               alt="Logo"
-              className="h-8 object-contain flex-shrink-0"
+              className="h-8 flex-shrink-0 object-contain"
               style={{
                 maxWidth: `${config.branding.logo.maxWidth}px`,
                 maxHeight: `${config.branding.logo.maxHeight}px`,
@@ -104,159 +197,129 @@ export function PreferencesModal({
               }}
             />
           ) : (
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-gray-700" style={{ fontSize: '24px' }}>cookie</span>
-              <span className="font-semibold text-gray-900">Cookie Settings</span>
-            </div>
+            <span className="text-sm font-semibold" style={{ color: text }}>
+              Cookie Settings
+            </span>
           )}
-          
+
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg opacity-70 transition hover:opacity-100"
+            style={{ color: text }}
+            aria-label="Close"
           >
-            <X className="h-5 w-5 text-gray-600" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className={`flex flex-col flex-1 min-h-0 ${previewMode ? '' : 'max-h-[calc(90vh-80px)]'}`}>
-          <div className="p-6 pt-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
-            {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
-              Privacy Center
-            </h2>
-            
-            {/* Description */}
-            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-              By clicking 'Accept', you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
-            </p>
+        {/* Scrollable body — min-h-0 is required for overflow to work in flex */}
+        <div
+          className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-4 py-4 sm:px-5"
+          style={{ WebkitOverflowScrolling: 'touch' } as CSSProperties}
+        >
+          <h2
+            id="prefs-title-preview"
+            className="mb-2 text-lg font-bold tracking-tight"
+            style={{ color: text }}
+          >
+            Privacy Center
+          </h2>
 
-            {/* Accept All Button */}
-            <Button
-              onClick={onAcceptAll}
-              className="w-full mb-6 h-12 text-base font-medium rounded-lg"
-              style={{
-                backgroundColor: config.colors.button,
-                color: config.colors.buttonText,
-              }}
-            >
-              ACCEPT ALL
-            </Button>
+          <p className="mb-5 text-sm leading-relaxed" style={{ color: muted }}>
+            By clicking &apos;Accept&apos;, you agree to the storing of cookies on
+            your device to enhance site navigation, analyze site usage, and
+            assist in our marketing efforts.
+          </p>
 
-            {/* Cookie Preferences Section */}
-            <div className="mb-6">
-              <h3 className="font-bold text-gray-900 mb-4">
-                Manage cookie preferences
-              </h3>
-              
-              <div className="space-y-3">
-                {/* Strictly Necessary */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <div className="flex items-center flex-1 min-w-0">
-                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900">Strictly Necessary Cookies</div>
-                      <div className="text-xs text-gray-500 mt-1">Always active</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Functionality */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center flex-1 min-w-0">
-                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900">Functional Cookies</div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 ml-3">
-                    <Switch
-                      checked={cookiePreferences.functionality}
-                      onCheckedChange={() => handleToggle('functionality')}
-                    />
-                  </div>
-                </div>
-
-                {/* Performance */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center flex-1 min-w-0">
-                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900">Performance Cookies</div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 ml-3">
-                    <Switch
-                      checked={cookiePreferences.trackingPerformance}
-                      onCheckedChange={() => handleToggle('trackingPerformance')}
-                    />
-                  </div>
-                </div>
-
-                {/* Targeting */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center flex-1 min-w-0">
-                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900">Targeting Cookies</div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 ml-3">
-                    <Switch
-                      checked={cookiePreferences.targetingAdvertising}
-                      onCheckedChange={() => handleToggle('targetingAdvertising')}
-                    />
-                  </div>
-                </div>
-
-                {/* Social Media */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center flex-1 min-w-0">
-                    <ChevronRight className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900">Social Media Cookies</div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0 ml-3">
-                    <Switch
-                      checked={cookiePreferences.socialMedia}
-                      onCheckedChange={() => handleToggle('socialMedia')}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer with buttons */}
-          <div className="p-6 pt-0 border-t border-gray-100 bg-gray-50">
-          {/* Confirm Button */}
           <Button
-            onClick={() => onConfirmChoices(cookiePreferences)}
-            className="w-full mb-4 h-12 text-base font-medium rounded-lg"
+            onClick={onAcceptAll}
+            className="mb-5 h-12 w-full rounded-lg text-base font-semibold"
             style={{
               backgroundColor: config.colors.button,
               color: config.colors.buttonText,
             }}
           >
-            CONFIRM MY CHOICES
+            Accept All
           </Button>
 
-            {/* Powered by */}
-            <div className="text-center">
-              <p className="text-xs text-gray-500">
-                Powered by{' '}
-                <a 
-                  href="https://cookie-banner.ca/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="font-semibold text-gray-500 hover:text-gray-700 transition-colors"
+          <div className="mb-2">
+            <h3 className="mb-3 text-sm font-bold" style={{ color: text }}>
+              Manage cookie preferences
+            </h3>
+
+            <div className="space-y-2.5">
+              {categories.map((cat) => (
+                <div
+                  key={cat.key}
+                  className="flex items-center justify-between gap-3 rounded-[10px] border px-4 py-3.5"
+                  style={{
+                    borderColor: border,
+                    backgroundColor: cat.locked ? footerBg : 'transparent',
+                  }}
                 >
-                  cookie-banner.ca
-                </a>
-              </p>
+                  <div className="min-w-0 flex-1">
+                    <div
+                      className="text-sm font-semibold"
+                      style={{ color: text }}
+                    >
+                      {cat.title}
+                    </div>
+                    <div
+                      className="mt-1 text-xs leading-snug"
+                      style={{ color: muted }}
+                    >
+                      {cat.desc}
+                    </div>
+                  </div>
+                  {!cat.locked && (
+                    <div className="flex-shrink-0">
+                      <Switch
+                        checked={cookiePreferences[cat.key]}
+                        onCheckedChange={() => handleToggle(cat.key)}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
+        </div>
+
+        {/* Footer — pinned */}
+        <div
+          className="shrink-0 border-t px-4 py-3.5 sm:px-5"
+          style={{
+            borderColor: border,
+            backgroundColor: footerBg,
+            paddingBottom: previewMode
+              ? undefined
+              : 'max(0.875rem, env(safe-area-inset-bottom, 0px))',
+          }}
+        >
+          <Button
+            onClick={() => onConfirmChoices(cookiePreferences)}
+            className="mb-3 h-12 w-full rounded-lg text-base font-semibold"
+            style={{
+              backgroundColor: config.colors.button,
+              color: config.colors.buttonText,
+            }}
+          >
+            Confirm My Choices
+          </Button>
+
+          <p className="text-center text-[11px]" style={{ color: muted }}>
+            Powered by{' '}
+            <a
+              href={`https://cookie-banner.ca/?ref=preview&d=${encodeURIComponent(domain)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline-offset-2 hover:underline"
+              style={{ color: config.colors.link }}
+            >
+              cookie-banner.ca
+            </a>
+          </p>
         </div>
       </div>
     </div>
