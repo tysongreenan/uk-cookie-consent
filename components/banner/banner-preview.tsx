@@ -668,7 +668,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
               )
 
               const copy = (
-                <div className={`min-w-0 max-w-full ${isBar ? 'flex-1 basis-[220px]' : 'flex-1'}`}>
+                <div className={`min-w-0 max-w-full h-auto ${isBar ? 'flex-1 basis-auto min-w-[min(100%,220px)]' : 'flex-1 basis-auto'}`}>
                   {logoEl('center')}
                   {safeConfig.text.title?.trim() ? (
                     <h3
@@ -710,10 +710,10 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
 
               return (
                 <div
-                  className={`flex min-w-0 gap-4 ${
+                  className={`flex min-w-0 h-auto gap-4 ${
                     isBar
-                      ? 'flex-wrap items-center gap-x-6 gap-y-3'
-                      : 'items-start flex-nowrap'
+                      ? 'flex-wrap items-center justify-start gap-x-6 gap-y-3'
+                      : 'items-start justify-start flex-nowrap'
                   }`}
                 >
                   {logoEl('left')}

@@ -274,8 +274,10 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   }
 
   const showBranding = options?.showBranding !== false // default true
+  const logoMaxW = Math.max(16, Number(config.branding.logo.maxWidth) || 120)
+  const logoMaxH = Math.max(16, Number(config.branding.logo.maxHeight) || 40)
   const logoElement = config.branding?.logo?.enabled && config.branding?.logo?.url
-    ? `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${config.branding.logo.maxWidth || 120}px; max-height: ${config.branding.logo.maxHeight || 40}px; object-fit: contain;" />`
+    ? `<img class="cb-banner-logo" src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="max-width: ${logoMaxW}px !important; max-height: ${logoMaxH}px !important; width: auto !important; height: auto !important; object-fit: contain !important; flex-shrink: 0 !important; display: block !important;" />`
     : ''
 
   const privacyPolicyLink = config.branding?.privacyPolicy?.url
@@ -494,10 +496,14 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   // Full-width bars (top/bottom): horizontal "text | actions" on desktop.
   // Floating / modal cards: stacked copy then actions (classic card).
+  // IMPORTANT: never use a px flex-basis on .cb-banner-copy for bars.
+  // flex-basis is main-axis — when mobile/tablet stacks to column, a 220px
+  // basis becomes a 220px+ height and leaves a giant empty gap above the buttons.
+  // Use flex-grow + min-width (cross-axis for rows) instead.
   const bodyHtml = isFullWidthBar
-    ? `<div class="cb-banner-body" style="display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; min-width: 0;">
+    ? `<div class="cb-banner-body" style="display: flex; align-items: center; justify-content: flex-start; gap: 16px 24px; flex-wrap: wrap; min-width: 0; height: auto;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
-      <div class="cb-banner-copy" style="flex: 1 1 220px; min-width: 0; max-width: 100%;">
+      <div class="cb-banner-copy" style="flex: 1 1 auto; min-width: min(100%, 220px); max-width: 100%; height: auto;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 8px;">${logoElement}</div>` : ''}
         ${titleHtml}
         ${messageHtml}
@@ -506,9 +512,9 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       ${actionsHtml}
       ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>`
-    : `<div class="cb-banner-body" style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0;">
+    : `<div class="cb-banner-body" style="display: flex; align-items: flex-start; justify-content: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0; height: auto;">
       ${config.branding.logo.position === 'left' ? logoElement : ''}
-      <div class="cb-banner-copy" style="flex: 1; min-width: 0; max-width: 100%;">
+      <div class="cb-banner-copy" style="flex: 1 1 auto; min-width: 0; max-width: 100%; height: auto;">
         ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
         ${titleHtml}
         <div style="margin-bottom: 14px;">${messageHtml}</div>
@@ -524,8 +530,10 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // Note: do NOT put overflow-y:auto on short banners — macOS draws a gray
   // "slider" scrollbar track that looks broken. Scroll only kicks in on mobile
   // when content exceeds the viewport (see CSS below).
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden;">
-  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; overflow: visible;">
+  // height:auto is explicit so host themes (and old flex-basis bugs) cannot
+  // stretch the banner to nearly full viewport with a void between copy and buttons.
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; height: auto; max-height: min(90vh, 100dvh);">
+  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; height: auto; overflow: visible;">
     <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
     ${bodyHtml}
   </div>
@@ -835,6 +843,10 @@ export const generateBannerCSS = (config: BannerConfig) => {
 #cookie-consent-banner {
   position: fixed !important;
   box-sizing: border-box !important;
+  /* Hug content — never stretch to a forced viewport height */
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: min(90vh, 100dvh) !important;
   /* Never reserve scrollbar gutters — they render as a fake "slider" on macOS */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -848,6 +860,27 @@ export const generateBannerCSS = (config: BannerConfig) => {
 
 #cookie-consent-banner * {
   box-sizing: border-box;
+}
+
+#cookie-consent-banner .cb-banner-body {
+  height: auto !important;
+  min-height: 0 !important;
+  align-content: flex-start !important;
+}
+
+#cookie-consent-banner .cb-banner-copy {
+  height: auto !important;
+  min-height: 0 !important;
+  /* flex-basis must stay auto so column stacking never invents vertical space */
+  flex-basis: auto !important;
+}
+
+#cookie-consent-banner .cb-banner-logo {
+  flex-shrink: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  align-self: flex-start !important;
 }
 
 /* Host themes (Elementor etc.) sometimes set white-space:nowrap or fixed
@@ -971,12 +1004,19 @@ input:checked + span:before {
   background: transparent;
 }
 
-@media (max-width: 768px) {
+/*
+ * Tablet + phone (≤1024px): covers iPad portrait (820–834), iPad Pro, and phones.
+ * Previous layout only stacked at ≤768px — most iPads kept the desktop bar flex,
+ * which either looked cramped or (with the old 220px flex-basis) left a tall void.
+ */
+@media (max-width: 1024px) {
   #cookie-consent-banner {
     padding: 18px 16px !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    /* Only scroll when the banner is taller than the phone viewport */
+    height: auto !important;
+    min-height: 0 !important;
+    /* Only scroll when content exceeds the viewport — never force a tall shell */
     max-height: min(88vh, 100dvh) !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
@@ -999,6 +1039,7 @@ input:checked + span:before {
     right: 0 !important;
     max-width: none !important;
     width: auto !important;
+    height: auto !important;
     transform: none !important;
     border-radius: 0 !important;
     border-left: none !important;
@@ -1023,22 +1064,19 @@ input:checked + span:before {
     bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
     max-width: none !important;
     width: auto !important;
+    height: auto !important;
     transform: none !important;
     border-radius: 16px !important;
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.06) !important;
   }`}
 
-  /* Inner content can shrink — never force a large min-width on phones */
+  /* Inner content hugs children — no phantom min-height from host CSS */
   #cookie-consent-banner > div {
     padding-right: 36px !important;
     min-width: 0 !important;
     max-width: 100% !important;
-  }
-
-  #cookie-consent-banner > div > div {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
 
   #cookie-consent-banner #cookie-close-btn {
@@ -1068,25 +1106,53 @@ input:checked + span:before {
     margin-bottom: 14px !important;
   }
 
-  /* On phones: always stack copy then actions; buttons full-width for touch */
+  /*
+   * Stack copy above actions. Critical: kill flex-grow on .cb-banner-copy so
+   * it cannot expand to fill leftover height and shove buttons to the bottom.
+   */
   #cookie-consent-banner .cb-banner-body {
     flex-direction: column !important;
+    flex-wrap: nowrap !important;
     align-items: stretch !important;
+    align-content: flex-start !important;
+    justify-content: flex-start !important;
     gap: 14px !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  #cookie-consent-banner .cb-banner-copy {
+    flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-width: 100% !important;
+  }
+
+  #cookie-consent-banner .cb-banner-logo {
+    margin-bottom: 2px !important;
   }
 
   #cookie-consent-banner #cookie-banner-actions {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     width: 100% !important;
     margin-left: 0 !important;
+    margin-top: 0 !important;
     gap: 8px !important;
+    flex: 0 0 auto !important;
+    height: auto !important;
   }
 
   #cookie-consent-banner #cookie-banner-actions button {
-    width: 100% !important;
-    flex: none !important;
+    flex: 1 1 auto !important;
+    min-width: min(100%, 140px) !important;
     white-space: normal !important;
-    padding: 13px 16px !important;
+    padding: 12px 16px !important;
     font-size: 15px !important;
     min-height: 48px !important;
     justify-content: center !important;
@@ -1094,6 +1160,7 @@ input:checked + span:before {
   }
 
   #cookie-consent-banner #cookie-preferences-btn {
+    flex: 1 1 100% !important;
     min-height: 42px !important;
     padding: 10px 12px !important;
     font-size: 14px !important;
@@ -1103,7 +1170,31 @@ input:checked + span:before {
     margin-bottom: 0 !important;
   }
 
-  /* Full-screen preferences sheet on phones — middle pane still scrolls */
+  #cookie-settings-float {
+    bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* Phones only: full-width stacked primary actions for reliable touch targets */
+@media (max-width: 640px) {
+  #cookie-consent-banner #cookie-banner-actions {
+    flex-direction: column !important;
+  }
+
+  #cookie-consent-banner #cookie-banner-actions button {
+    width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+  }
+
+  #cookie-consent-banner #cookie-preferences-btn {
+    flex: none !important;
+    width: 100% !important;
+  }
+}
+
+/* Full-screen preferences sheet on phones — middle pane still scrolls */
+@media (max-width: 768px) {
   #cookie-preferences-modal {
     padding: 0 !important;
     align-items: stretch !important;
@@ -1136,10 +1227,6 @@ input:checked + span:before {
     padding-left: max(16px, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(16px, env(safe-area-inset-right, 0px)) !important;
     padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
-  }
-
-  #cookie-settings-float {
-    bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -2583,7 +2670,7 @@ function init() {
     banner.style.setProperty('left', '0', 'important');
     banner.style.setProperty('right', '0', 'important');
 
-    if (!window.visualViewport || window.innerWidth > 768) {
+    if (!window.visualViewport || window.innerWidth > 1024) {
       banner.style.removeProperty('--cookie-banner-viewport-y');
       banner.style.removeProperty('transform');
       return;

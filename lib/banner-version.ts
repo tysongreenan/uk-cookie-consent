@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 9
+export const GENERATOR_VERSION = 10
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,18 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 10,
+    date: '2026-07-22',
+    title: 'iPad & Tablet Banner Layout Fix',
+    changes: [
+      'Fixed giant empty gap between consent copy and buttons on iPad/tablet',
+      'Bar layout no longer uses a 220px flex-basis that became height when stacked',
+      'Responsive stacking now covers tablets (≤1024px), not only phones (≤768px)',
+      'Banner height hugs content — host CSS cannot stretch it full-screen',
+      'Logo size hardened so large brand marks cannot blow out the layout',
+    ],
+  },
   {
     version: 9,
     date: '2026-07-21',
