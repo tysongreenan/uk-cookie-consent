@@ -15,8 +15,10 @@ export const metadata: Metadata = {
     title: 'Blog - Cookie Banner Insights',
     description: 'Expert insights on cookie compliance, GDPR, PIPEDA, and web privacy.',
     type: 'website',
+    url: 'https://www.cookie-banner.ca/blog',
   },
   alternates: {
+    canonical: 'https://www.cookie-banner.ca/blog',
     types: {
       'application/rss+xml': '/rss.xml',
     },

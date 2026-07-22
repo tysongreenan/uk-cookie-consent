@@ -27,6 +27,13 @@ export async function generateStaticParams() {
   }))
 }
 
+const SITE_URL = 'https://www.cookie-banner.ca'
+
+/** Absolute self-canonical for the live route slug. Ignores stale frontmatter. */
+function absolutePostUrl(slug: string): string {
+  return `${SITE_URL}/blog/${slug}`
+}
+
 // Generate metadata for SEO
 export async function generateMetadata({
   params,
@@ -41,18 +48,21 @@ export async function generateMetadata({
     }
   }
 
+  const canonicalUrl = absolutePostUrl(params.slug)
+
   return {
     title: post.title,
     description: post.description,
     ...(post.keywords && { keywords: post.keywords.join(', ') }),
     authors: [{ name: post.author }],
     alternates: {
-      canonical: post.canonical || `/blog/${params.slug}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title: post.title,
       description: post.description,
       type: 'article',
+      url: canonicalUrl,
       publishedTime: post.date,
       modifiedTime: post.updatedDate || post.date,
       authors: [post.author],
@@ -60,8 +70,8 @@ export async function generateMetadata({
         post.image
           ? post.image.startsWith('http')
             ? post.image
-            : `https://www.cookie-banner.ca${post.image}`
-          : 'https://www.cookie-banner.ca/opengraph-image',
+            : `${SITE_URL}${post.image}`
+          : `${SITE_URL}/opengraph-image`,
       ],
     },
     twitter: {
@@ -72,8 +82,8 @@ export async function generateMetadata({
         post.image
           ? post.image.startsWith('http')
             ? post.image
-            : `https://www.cookie-banner.ca${post.image}`
-          : 'https://www.cookie-banner.ca/opengraph-image',
+            : `${SITE_URL}${post.image}`
+          : `${SITE_URL}/opengraph-image`,
       ],
     },
   }
@@ -94,30 +104,33 @@ export default async function BlogPostPage({
   const formattedDate = formatDate(date)
   const author = getAuthor(post.author || 'cookie-banner-team')
 
+  const postUrl = absolutePostUrl(post.slug)
+
   // JSON-LD structured data for SEO
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
-    image: post.image || 'https://www.cookie-banner.ca/opengraph-image',
+    image: post.image || `${SITE_URL}/opengraph-image`,
     datePublished: post.date,
     dateModified: post.updatedDate || post.date,
+    url: postUrl,
     author: {
       '@type': 'Person',
-      name: post.author,
+      name: post.author === 'cookie-banner-team' ? 'Cookie Banner Team' : post.author,
     },
     publisher: {
       '@type': 'Organization',
       name: 'Cookie Banner Generator',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.cookie-banner.ca/logos/logo.svg',
+        url: `${SITE_URL}/logos/logo.svg`,
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://www.cookie-banner.ca/blog/${post.slug}`,
+      '@id': postUrl,
     },
   }
 
@@ -141,9 +154,9 @@ export default async function BlogPostPage({
       <StructuredData
         type="breadcrumb"
         data={[
-          { name: 'Home', url: 'https://www.cookie-banner.ca' },
-          { name: 'Blog', url: 'https://www.cookie-banner.ca/blog' },
-          { name: post.title, url: `https://www.cookie-banner.ca/blog/${post.slug}` },
+          { name: 'Home', url: SITE_URL },
+          { name: 'Blog', url: `${SITE_URL}/blog` },
+          { name: post.title, url: postUrl },
         ]}
       />
 

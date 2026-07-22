@@ -54,8 +54,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        // Permanent redirect so Google consolidates ranking signals on 2026.
+        // Absolute destination avoids any host/relative ambiguity.
         source: '/blog/cookie-consent-canada-guide-2025',
-        destination: '/blog/cookie-consent-canada-guide-2026',
+        destination: 'https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026',
+        permanent: true,
+      },
+      {
+        // Trailing slash / hash-free variants still hit the redirect matcher via source
+        source: '/blog/cookie-consent-canada-guide-2025/',
+        destination: 'https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026',
         permanent: true,
       },
       {
