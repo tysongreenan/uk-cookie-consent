@@ -476,11 +476,16 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   const btnBase =
     'display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;min-height:42px;padding:10px 18px;font-family:inherit;letter-spacing:-0.01em;-webkit-tap-highlight-color:transparent;flex:0 1 auto;white-space:nowrap;'
 
-  const titleHtml = hasTitle
-    ? `<h3 id="cookie-title" style="margin: 0 0 4px 0; padding-right: 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>`
-    : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 16px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important;"></h3>`
+  // text-align:left is inline + !important in CSS — host themes (Webflow/Elementor)
+  // often set h1–h3 { text-align:center }, which otherwise centers "We use cookies".
+  const logoPos = config.branding.logo.position || 'left'
+  const copyAlign = logoPos === 'center' ? 'center' : 'left'
 
-  const messageHtml = `<p id="cookie-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>`
+  const titleHtml = hasTitle
+    ? `<h3 id="cookie-title" style="margin: 0 0 4px 0; padding-right: 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3; color: ${escapeHtml(config.colors.text)} !important; text-align: ${copyAlign}; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(config.text.title)}</h3>`
+    : `<h3 id="cookie-title" style="display: none; margin: 0; font-size: 16px; font-weight: 600; color: ${escapeHtml(config.colors.text)} !important; text-align: ${copyAlign};"></h3>`
+
+  const messageHtml = `<p id="cookie-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; text-align: ${copyAlign}; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>`
 
   const actionsHtml = `<div id="cookie-banner-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0;">
           <button id="cookie-accept-btn" type="button" style="${btnBase} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>
@@ -500,28 +505,65 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // flex-basis is main-axis — when mobile/tablet stacks to column, a 220px
   // basis becomes a 220px+ height and leaves a giant empty gap above the buttons.
   // Use flex-grow + min-width (cross-axis for rows) instead.
-  const bodyHtml = isFullWidthBar
-    ? `<div class="cb-banner-body" style="display: flex; align-items: center; justify-content: flex-start; gap: 16px 24px; flex-wrap: wrap; min-width: 0; height: auto;">
-      ${config.branding.logo.position === 'left' ? logoElement : ''}
-      <div class="cb-banner-copy" style="flex: 1 1 auto; min-width: min(100%, 220px); max-width: 100%; height: auto;">
-        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 8px;">${logoElement}</div>` : ''}
+  //
+  // Left/right logos live inside .cb-banner-brand with the copy so tablet/phone
+  // column stacks as: logo → title → message → buttons (all left-aligned).
+  // Previously the logo was a body sibling, so stacking left a lone mark on row 1
+  // and a host-centered title floating in the middle of row 2.
+  const brandBlock = (opts: { bar: boolean }) => {
+    const copyStyle = opts.bar
+      ? `flex: 1 1 auto; min-width: min(100%, 180px); max-width: 100%; height: auto; text-align: ${copyAlign};`
+      : `flex: 1 1 auto; min-width: 0; max-width: 100%; height: auto; text-align: ${copyAlign};`
+    const brandStyle = opts.bar
+      ? `display: flex; align-items: center; justify-content: flex-start; gap: 14px 16px; flex: 1 1 auto; min-width: min(100%, 220px); max-width: 100%; height: auto;`
+      : `display: flex; align-items: flex-start; justify-content: flex-start; gap: 14px; flex: 1 1 auto; min-width: 0; max-width: 100%; height: auto;`
+
+    if (logoPos === 'center') {
+      return `<div class="cb-banner-brand cb-banner-brand--center" style="display: flex; flex-direction: column; align-items: center; flex: 1 1 auto; min-width: ${opts.bar ? 'min(100%, 220px)' : '0'}; max-width: 100%; height: auto; text-align: center;">
+      <div class="cb-banner-logo-wrap" style="margin-bottom: 8px;">${logoElement}</div>
+      <div class="cb-banner-copy" style="${copyStyle}">
         ${titleHtml}
-        ${messageHtml}
-        ${brandingHtml}
+        ${opts.bar ? messageHtml : `<div style="margin-bottom: 14px;">${messageHtml}</div>`}
+        ${opts.bar ? brandingHtml : ''}
+        ${opts.bar ? '' : actionsHtml}
+        ${opts.bar ? '' : brandingHtml}
       </div>
-      ${actionsHtml}
-      ${config.branding.logo.position === 'right' ? logoElement : ''}
     </div>`
-    : `<div class="cb-banner-body" style="display: flex; align-items: flex-start; justify-content: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0; height: auto;">
-      ${config.branding.logo.position === 'left' ? logoElement : ''}
-      <div class="cb-banner-copy" style="flex: 1 1 auto; min-width: 0; max-width: 100%; height: auto;">
-        ${config.branding.logo.position === 'center' ? `<div style="text-align: center; margin-bottom: 12px;">${logoElement}</div>` : ''}
+    }
+
+    if (logoPos === 'right') {
+      return `<div class="cb-banner-brand cb-banner-brand--right" style="${brandStyle}">
+      <div class="cb-banner-copy" style="${copyStyle}">
         ${titleHtml}
-        <div style="margin-bottom: 14px;">${messageHtml}</div>
-        ${actionsHtml}
-        ${brandingHtml}
+        ${opts.bar ? messageHtml : `<div style="margin-bottom: 14px;">${messageHtml}</div>`}
+        ${opts.bar ? brandingHtml : ''}
+        ${opts.bar ? '' : actionsHtml}
+        ${opts.bar ? '' : brandingHtml}
       </div>
-      ${config.branding.logo.position === 'right' ? logoElement : ''}
+      ${logoElement}
+    </div>`
+    }
+
+    // left (default)
+    return `<div class="cb-banner-brand cb-banner-brand--left" style="${brandStyle}">
+      ${logoElement}
+      <div class="cb-banner-copy" style="${copyStyle}">
+        ${titleHtml}
+        ${opts.bar ? messageHtml : `<div style="margin-bottom: 14px;">${messageHtml}</div>`}
+        ${opts.bar ? brandingHtml : ''}
+        ${opts.bar ? '' : actionsHtml}
+        ${opts.bar ? '' : brandingHtml}
+      </div>
+    </div>`
+  }
+
+  const bodyHtml = isFullWidthBar
+    ? `<div class="cb-banner-body" style="display: flex; align-items: center; justify-content: flex-start; gap: 16px 24px; flex-wrap: wrap; min-width: 0; height: auto; text-align: left;">
+      ${brandBlock({ bar: true })}
+      ${actionsHtml}
+    </div>`
+    : `<div class="cb-banner-body" style="display: flex; align-items: flex-start; justify-content: flex-start; gap: 14px; flex-wrap: nowrap; min-width: 0; height: auto; text-align: left;">
+      ${brandBlock({ bar: false })}
     </div>`
 
   // Main banner HTML
@@ -532,8 +574,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // when content exceeds the viewport (see CSS below).
   // height:auto is explicit so host themes (and old flex-basis bugs) cannot
   // stretch the banner to nearly full viewport with a void between copy and buttons.
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; height: auto; max-height: min(90vh, 100dvh);">
-  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; height: auto; overflow: visible;">
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" data-cb-logo="${escapeHtml(logoPos)}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; height: auto; max-height: min(90vh, 100dvh); text-align: left;">
+  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; height: auto; overflow: visible; text-align: left;">
     <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
     ${bodyHtml}
   </div>
@@ -883,14 +925,52 @@ export const generateBannerCSS = (config: BannerConfig) => {
   align-self: flex-start !important;
 }
 
-/* Host themes (Elementor etc.) sometimes set white-space:nowrap or fixed
-   widths on p/h3 — force the consent copy to wrap inside the card. */
+/* Host themes (Elementor/Webflow etc.) often set h1–h3 { text-align:center }
+   and white-space:nowrap — pin consent copy left (or center only when logo is). */
+#cookie-consent-banner,
+#cookie-consent-banner .cb-banner-body,
+#cookie-consent-banner .cb-banner-brand,
+#cookie-consent-banner .cb-banner-copy {
+  text-align: left !important;
+}
+
 #cookie-consent-banner #cookie-title,
-#cookie-consent-banner #cookie-message {
+#cookie-consent-banner #cookie-message,
+#cookie-consent-banner h1,
+#cookie-consent-banner h2,
+#cookie-consent-banner h3,
+#cookie-consent-banner p {
   white-space: normal !important;
   overflow-wrap: break-word !important;
   word-wrap: break-word !important;
   max-width: 100% !important;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: auto !important;
+  float: none !important;
+}
+
+#cookie-consent-banner[data-cb-logo="center"],
+#cookie-consent-banner[data-cb-logo="center"] .cb-banner-body,
+#cookie-consent-banner[data-cb-logo="center"] .cb-banner-brand,
+#cookie-consent-banner[data-cb-logo="center"] .cb-banner-copy,
+#cookie-consent-banner[data-cb-logo="center"] #cookie-title,
+#cookie-consent-banner[data-cb-logo="center"] #cookie-message,
+#cookie-consent-banner[data-cb-logo="center"] h3,
+#cookie-consent-banner[data-cb-logo="center"] p {
+  text-align: center !important;
+}
+
+#cookie-consent-banner .cb-banner-brand {
+  height: auto !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+}
+
+#cookie-consent-banner .cb-banner-brand--left,
+#cookie-consent-banner .cb-banner-brand--right {
+  justify-content: flex-start !important;
 }
 
 #cookie-consent-banner button {
@@ -1107,8 +1187,9 @@ input:checked + span:before {
   }
 
   /*
-   * Stack copy above actions. Critical: kill flex-grow on .cb-banner-copy so
-   * it cannot expand to fill leftover height and shove buttons to the bottom.
+   * Stack brand (logo → title → message) above actions.
+   * Brand itself stacks to column so the title sits under the logo, left-aligned
+   * — not floating centered in the middle of the bar (host h3 centering).
    */
   #cookie-consent-banner .cb-banner-body {
     flex-direction: column !important;
@@ -1119,6 +1200,34 @@ input:checked + span:before {
     gap: 14px !important;
     height: auto !important;
     min-height: 0 !important;
+    text-align: left !important;
+  }
+
+  #cookie-consent-banner .cb-banner-brand {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    height: auto !important;
+  }
+
+  #cookie-consent-banner .cb-banner-brand--center {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  #cookie-consent-banner .cb-banner-brand--right {
+    /* Still logo under title? Right logo stacks as copy first then logo —
+       reorder so logo stays on top for a consistent mobile brand header. */
+    flex-direction: column !important;
+  }
+
+  #cookie-consent-banner .cb-banner-brand--right .cb-banner-logo {
+    order: -1 !important;
   }
 
   #cookie-consent-banner .cb-banner-copy {
@@ -1131,10 +1240,30 @@ input:checked + span:before {
     min-height: 0 !important;
     height: auto !important;
     max-width: 100% !important;
+    text-align: left !important;
+  }
+
+  #cookie-consent-banner[data-cb-logo="center"] .cb-banner-copy {
+    text-align: center !important;
   }
 
   #cookie-consent-banner .cb-banner-logo {
-    margin-bottom: 2px !important;
+    margin: 0 !important;
+    align-self: flex-start !important;
+  }
+
+  #cookie-consent-banner[data-cb-logo="center"] .cb-banner-logo {
+    align-self: center !important;
+  }
+
+  #cookie-consent-banner #cookie-title,
+  #cookie-consent-banner #cookie-message {
+    text-align: left !important;
+  }
+
+  #cookie-consent-banner[data-cb-logo="center"] #cookie-title,
+  #cookie-consent-banner[data-cb-logo="center"] #cookie-message {
+    text-align: center !important;
   }
 
   #cookie-consent-banner #cookie-banner-actions {

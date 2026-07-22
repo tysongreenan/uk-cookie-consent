@@ -3,7 +3,7 @@
 // Copy-paste embed users need to re-copy their code after these updates.
 // Hosted script users get updates automatically.
 
-export const GENERATOR_VERSION = 10
+export const GENERATOR_VERSION = 11
 
 export interface BannerUpdate {
   version: number
@@ -13,6 +13,16 @@ export interface BannerUpdate {
 }
 
 export const BANNER_UPDATES: BannerUpdate[] = [
+  {
+    version: 11,
+    date: '2026-07-22',
+    title: 'Left-align title under logo on tablet',
+    changes: [
+      'Title and message forced left-aligned so host h3 { text-align:center } cannot center them',
+      'Logo and copy grouped in one brand block — stacks as logo → title → message',
+      'Tablet/phone stack keeps brand mark above the consent text, left-aligned',
+    ],
+  },
   {
     version: 10,
     date: '2026-07-22',
