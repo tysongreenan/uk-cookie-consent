@@ -60,7 +60,12 @@ export class RateLimit {
     return ip
   }
 
-  public async check(req: Request): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  /**
+   * `customKey` overrides the default IP-based key — pass a user ID for
+   * endpoints where the caller is authenticated, so limits follow the
+   * account and can't be reset by rotating IPs.
+   */
+  public async check(req: Request, customKey?: string): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
     const deny = {
       allowed: false,
       remaining: 0,
@@ -73,7 +78,7 @@ export class RateLimit {
     const supabase = getClient()
     if (!supabase) return fallback
 
-    const key = `${this.name}:${this.windowMs}:${this.maxRequests}:${this.keyGenerator(req)}`
+    const key = `${this.name}:${this.windowMs}:${this.maxRequests}:${customKey ?? this.keyGenerator(req)}`
     const windowSeconds = Math.max(1, Math.ceil(this.windowMs / 1000))
 
     try {

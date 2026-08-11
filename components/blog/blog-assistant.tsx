@@ -3,7 +3,9 @@
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { useRef, useEffect, useState, useMemo } from 'react'
-import { Send, Sparkles, RotateCcw } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { Send, Sparkles, RotateCcw, Lock } from 'lucide-react'
 
 interface BlogAssistantProps {
   slug: string
@@ -17,6 +19,7 @@ function getTextFromMessage(message: UIMessage): string {
 }
 
 export function BlogAssistant({ slug }: BlogAssistantProps) {
+  const { status: authStatus } = useSession()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [input, setInput] = useState('')
@@ -134,8 +137,29 @@ export function BlogAssistant({ slug }: BlogAssistantProps) {
         </div>
       )}
 
-      {/* Input */}
-      {!isAtLimit ? (
+      {/* Input — signed-out visitors get a sign-up prompt instead */}
+      {authStatus !== 'authenticated' ? (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-3 border-t border-border/50">
+          <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            <Lock className="h-3.5 w-3.5 shrink-0" />
+            Create a free account to ask questions
+          </span>
+          <span className="sm:ml-auto flex items-center gap-3 text-[13px]">
+            <Link
+              href={`/auth/signup?callbackUrl=${encodeURIComponent(`/blog/${slug}`)}`}
+              className="font-medium text-primary hover:underline"
+            >
+              Sign up free
+            </Link>
+            <Link
+              href={`/auth/signin?callbackUrl=${encodeURIComponent(`/blog/${slug}`)}`}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sign in
+            </Link>
+          </span>
+        </div>
+      ) : !isAtLimit ? (
         <form
           onSubmit={onSubmit}
           className="flex items-center gap-2 px-4 py-2.5 border-t border-border/50"
