@@ -582,12 +582,12 @@ export default function CookieYesAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Script Performance</h3>
                 <p>
-                  CookieYes&apos;s script bundle weighs approximately 40KB+ and can delay page rendering on slower connections. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning it never blocks your page from rendering. For websites where <Link href="/blog/core-web-vitals-cookie-consent" className="text-primary underline hover:no-underline">Core Web Vitals</Link> matter -- especially ecommerce and ad-supported sites -- this difference can directly affect Google rankings.
+                  CookieYes&apos;s script bundle weighs approximately 40KB+ and can delay page rendering on slower connections. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning it never blocks your page from rendering. For websites where Core Web Vitals matter -- especially ecommerce and ad-supported sites -- this difference can directly affect Google rankings.
                 </p>
 
                 <h3 className="font-heading text-foreground">Canada-Specific Compliance</h3>
                 <p>
-                  CookieYes focuses primarily on GDPR (EU) and CCPA (California). Cookie-Banner.ca was built for the Canadian market first, with native support for <Link href="/compliance/pipeda" className="text-primary underline hover:no-underline">PIPEDA</Link>, <Link href="/compliance/canada" className="text-primary underline hover:no-underline">Quebec&apos;s Law 25</Link>, and bilingual French/English banners. If your audience includes Canadian visitors, Cookie-Banner.ca provides compliance out of the box.
+                  CookieYes focuses primarily on GDPR (EU) and CCPA (California). Cookie-Banner.ca was built for the Canadian market first, with native support for <Link href="/compliance/pipeda" className="text-primary underline hover:no-underline">PIPEDA</Link>, <Link href="/law-25-cookie-banner" className="text-primary underline hover:no-underline">Quebec&apos;s Law 25</Link>, and bilingual French/English banners. If your audience includes Canadian visitors, Cookie-Banner.ca provides compliance out of the box.
                 </p>
 
                 <h3 className="font-heading text-foreground">Auto-Translation</h3>

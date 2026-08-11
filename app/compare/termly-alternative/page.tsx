@@ -493,7 +493,7 @@ export default function TermlyAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Performance Impact</h3>
                 <p>
-                  Termly&apos;s script carries code for its broader compliance platform, resulting in a heavier load. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning zero impact on your page rendering speed. For sites where <Link href="/blog/core-web-vitals-cookie-consent" className="text-primary underline hover:no-underline">Core Web Vitals</Link> matter, this is significant.
+                  Termly&apos;s script carries code for its broader compliance platform, resulting in a heavier load. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning zero impact on your page rendering speed. For sites where Core Web Vitals matter, this is significant.
                 </p>
               </motion.div>
 
