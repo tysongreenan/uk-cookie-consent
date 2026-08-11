@@ -625,7 +625,7 @@ Yes. PIPEDA applies to all private-sector organizations engaged in commercial ac
 
 ### What is the difference between PIPEDA and Quebec's Law 25?
 
-PIPEDA is Canada's federal privacy law, while [Law 25](/compliance/canada) (formerly Bill 64) is Quebec's provincial privacy legislation. Law 25 is stricter than PIPEDA in several areas: it requires a designated privacy officer, mandatory privacy impact assessments for certain projects, and explicit consent for sharing personal information with third parties. If your business operates in Quebec or serves Quebec residents, you must comply with both PIPEDA and Law 25.
+PIPEDA is Canada's federal privacy law, while [Law 25](/law-25-cookie-banner) (formerly Bill 64) is Quebec's provincial privacy legislation. Law 25 is stricter than PIPEDA in several areas: it requires a designated privacy officer, mandatory privacy impact assessments for certain projects, and explicit consent for sharing personal information with third parties. If your business operates in Quebec or serves Quebec residents, you must comply with both PIPEDA and Law 25.
 
 ### How does PIPEDA compare to GDPR?
 

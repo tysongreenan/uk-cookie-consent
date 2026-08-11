@@ -16,7 +16,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        // /auth/signup-privacy got indexed while blocked, leaving a
+        // snippet-less zombie result. Crawling is re-allowed for that one
+        // path so crawlers can see its noindex tag and drop it; the longest
+        // matching rule wins, so this beats the /auth/ disallow below.
+        allow: ['/', '/auth/signup-privacy'],
         disallow: [
           // Block all dashboard pages (user-specific, no SEO value)
           '/dashboard/',
@@ -40,7 +44,7 @@ export default function robots(): MetadataRoute.Robots {
       // Googlebot-specific rules (more permissive for better indexing)
       {
         userAgent: 'Googlebot',
-        allow: '/',
+        allow: ['/', '/auth/signup-privacy'],
         disallow: [
           '/dashboard/',
           '/api/',

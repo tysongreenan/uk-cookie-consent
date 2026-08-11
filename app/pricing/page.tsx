@@ -18,7 +18,9 @@ export default function PricingPage() {
     "@type": "Product",
     "name": "Cookie Banner Generator",
     "description": "Cookie consent banner generator with PIPEDA, Law 25, GDPR & CCPA compliance.",
-    "brand": { "@type": "Organization", "name": "Cookie-Banner.ca" },
+    // Google Merchant listings require image and expect brand to be a Brand.
+    "image": "https://www.cookie-banner.ca/opengraph-image",
+    "brand": { "@type": "Brand", "name": "Cookie-Banner.ca" },
     "offers": [
       { "@type": "Offer", "name": "Free Plan", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
       { "@type": "Offer", "name": "Pro (One-Time)", "price": "99", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },

@@ -82,6 +82,24 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      // GSC-reported 404s from old/incorrect paths that never had pages.
+      // /fr never existed (bilingual banners live on one URL); send home.
+      {
+        source: '/fr',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/privacy-policy',
+        destination: '/privacy',
+        permanent: true,
+      },
+      // Quebec Law 25 content lives on the Law 25 landing page.
+      {
+        source: '/compliance/canada',
+        destination: '/law-25-cookie-banner',
+        permanent: true,
+      },
       // Legacy hosted policy short URLs (pre URL-shape change):
       // /p/orinha-media-5ac8d3c8 → /p/orinha-media-5ac8d3c8/privacy-policy
       // French policies are corrected to …/politique-de-confidentialite by the doc page.

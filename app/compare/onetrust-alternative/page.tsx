@@ -481,7 +481,7 @@ export default function OneTrustAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Script Performance</h3>
                 <p>
-                  OneTrust&apos;s consent script is one of the heaviest in the industry at <strong className="text-foreground">80KB+</strong>, often loading additional configuration and categorization files. For websites where <Link href="/blog/core-web-vitals-cookie-consent" className="text-primary underline hover:no-underline">Core Web Vitals</Link> matter, this overhead can push Largest Contentful Paint and First Input Delay outside Google&apos;s recommended thresholds. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously.
+                  OneTrust&apos;s consent script is one of the heaviest in the industry at <strong className="text-foreground">80KB+</strong>, often loading additional configuration and categorization files. For websites where Core Web Vitals matter, this overhead can push Largest Contentful Paint and First Input Delay outside Google&apos;s recommended thresholds. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously.
                 </p>
 
                 <h3 className="font-heading text-foreground">When OneTrust Makes Sense</h3>
