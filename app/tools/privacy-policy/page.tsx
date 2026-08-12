@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
       "Quebec Law 25 compliant privacy policies",
       "English and French generation",
       "Customizable for any business type",
-      "Free to generate, copy, and download",
+      "Free to generate; free account to copy and download",
       "Pro: save, publish, and host on a custom URL"
     ]
   }
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
   const faqItems = [
     {
       question: "Is this privacy policy generator really free?",
-      answer: "Yes, generating a privacy policy is 100% free. You can create, copy, and use the policy on your website at no cost. Paid plans offer additional features like hosted policy pages with a custom URL, automatic updates, and version history."
+      answer: "Yes. You can generate a privacy policy with no signup and no credit card. A free account unlocks copy HTML and download so you can put the policy on your own site. Paid plans add hosted policy pages with a custom URL, automatic updates, and version history."
     },
     {
       question: "Does this privacy policy cover GDPR requirements?",
@@ -137,13 +137,13 @@ export default function PrivacyPolicyPage() {
                     <div className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2.5 py-1 rounded-full">
                       Free to generate
                     </div>
-                    <span className="text-xs text-muted-foreground">No signup required to create</span>
+                    <span className="text-xs text-muted-foreground">No signup required to create · free account to copy</span>
                   </div>
                   <h1 className="text-3xl md:text-4xl font-heading font-bold tracking-tight">
                     Privacy Policy Generator
                   </h1>
                   <p className="text-muted-foreground mt-1">
-                    Answer a few questions. Get a GDPR, PIPEDA, CCPA &amp; Law 25 policy in English or French. Copy it free — Pro hosts it for you.
+                    Answer a few questions. Get a GDPR, PIPEDA, CCPA &amp; Law 25 policy in English or French. Free account to copy or download — Pro hosts it for you.
                   </p>
                 </div>
                 <div className="flex items-center gap-4 text-center sm:text-right">
@@ -185,11 +185,11 @@ export default function PrivacyPolicyPage() {
                   <CardContent className="text-sm text-muted-foreground space-y-2">
                     <p className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                      Generate English or French policies
+                      Generate English or French policies (no signup)
                     </p>
                     <p className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                      Copy HTML &amp; download for your own site
+                      Free account to copy HTML &amp; download
                     </p>
                     <p className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
@@ -236,7 +236,7 @@ export default function PrivacyPolicyPage() {
               <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />CCPA</span>
               <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Law 25</span>
               <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />English &amp; French</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Copy free · host on Pro</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-500" />Free account to copy · host on Pro</span>
             </div>
           </div>
         </section>
