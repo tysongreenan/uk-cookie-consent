@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, ArrowRight, Loader2, FileText } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { cn } from '@/lib/utils'
+import { captureEvent } from '@/lib/analytics'
 
 import { StepBusinessInfo } from './wizard-steps/step-business-info'
 import { StepDataCollection } from './wizard-steps/step-data-collection'
@@ -85,6 +86,12 @@ export function PolicyWizard() {
         return
       }
       setGeneratedHtml(html)
+      captureEvent('privacy_policy_generated', {
+        business_type: inputs.businessType,
+        cookie_category_count: inputs.cookieCategories.length,
+        jurisdiction_count: inputs.jurisdictions.length,
+        language: inputs.language,
+      })
       toast.success('Privacy policy generated successfully')
     } catch {
       toast.error('Something went wrong. Please try again.')

@@ -50,6 +50,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
       capture_pageview: false,
       capture_pageleave: true,
+      opt_out_capturing_by_default: true,
+      opt_out_persistence_by_default: true,
       persistence: 'memory', // No cookies until consent
       loaded: (ph) => {
         if (process.env.NODE_ENV === 'development') ph.debug()
