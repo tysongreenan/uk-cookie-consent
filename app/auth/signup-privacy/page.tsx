@@ -6,6 +6,12 @@ import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { Shield, Mail, Lock, User, ArrowRight, Loader2, Chrome } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import {
+  captureEvent,
+  captureException,
+  identifyUser,
+  getPostHogRequestHeaders,
+} from '@/lib/analytics'
 
 function PrivacySignUpContent() {
   const [email, setEmail] = useState('')
@@ -20,6 +26,7 @@ function PrivacySignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    captureEvent('signup_started', { method: 'credentials', product: 'privacy' })
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters long')
@@ -36,7 +43,10 @@ function PrivacySignUpContent() {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getPostHogRequestHeaders(),
+        },
         body: JSON.stringify({
           name,
           email,
@@ -49,6 +59,14 @@ function PrivacySignUpContent() {
 
       if (response.ok) {
         toast.success('Account created! Welcome to Privacy Manager.')
+
+        if (data.user?.id) {
+          identifyUser(data.user.id, {
+            email: data.user.email || email,
+            name: data.user.name || name,
+          })
+        }
+        // signup_completed is captured server-side in /api/auth/register
 
         const signInResult = await signIn('credentials', {
           email,
@@ -64,7 +82,8 @@ function PrivacySignUpContent() {
       } else {
         setError(data.error || 'Failed to create account')
       }
-    } catch {
+    } catch (error) {
+      captureException(error, { context: 'privacy_signup' })
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)

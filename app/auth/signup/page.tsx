@@ -12,6 +12,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, Lock, User, ArrowRight, Loader2, Check } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import {
+  captureEvent,
+  captureException,
+  identifyUser,
+  getPostHogRequestHeaders,
+} from '@/lib/analytics'
 
 function SignUpContent() {
   const searchParams = useSearchParams()
@@ -62,10 +68,12 @@ function SignUpContent() {
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true)
+    captureEvent('signup_started', { method: 'google', product: 'banner' })
     try {
       await signIn('google', { callbackUrl })
     } catch (error) {
       console.error('Google sign up error:', error)
+      captureException(error, { context: 'google_signup' })
       setError('An error occurred during Google sign up.')
       setIsGoogleLoading(false)
     }
@@ -75,6 +83,7 @@ function SignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    captureEvent('signup_started', { method: 'credentials', product: 'banner' })
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters long')
@@ -93,6 +102,7 @@ function SignUpContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...getPostHogRequestHeaders(),
         },
         body: JSON.stringify({
           name,
@@ -105,6 +115,14 @@ function SignUpContent() {
 
       if (response.ok) {
         toast.success('Account created successfully! Welcome to Cookie Banner!')
+
+        if (data.user?.id) {
+          identifyUser(data.user.id, {
+            email: data.user.email || email,
+            name: data.user.name || name,
+          })
+        }
+        // signup_completed is captured server-side in /api/auth/register
         
         // Auto sign-in after successful registration
         const signInResult = await signIn('credentials', {
@@ -123,6 +141,7 @@ function SignUpContent() {
       }
     } catch (error) {
       console.error('Registration error:', error)
+      captureException(error, { context: 'credentials_signup' })
       setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
