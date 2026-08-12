@@ -7,9 +7,9 @@ import { signIn } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Mail, Lock, User, ArrowRight, Loader2, Check } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Loader2, Check, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import {
@@ -18,6 +18,7 @@ import {
   identifyUser,
   getPostHogRequestHeaders,
 } from '@/lib/analytics'
+import { validatePassword } from '@/lib/sanitize'
 
 function SignUpContent() {
   const searchParams = useSearchParams()
@@ -25,6 +26,7 @@ function SignUpContent() {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [agreeToTerms, setAgreeToTerms] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState('')
@@ -85,14 +87,15 @@ function SignUpContent() {
     setError('')
     captureEvent('signup_started', { method: 'credentials', product: 'banner' })
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long')
+    if (!agreeToTerms) {
+      setError('Please agree to the Terms of Service and Privacy Policy')
       setIsLoading(false)
       return
     }
 
-    if (!agreeToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy')
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.valid) {
+      setError(passwordValidation.errors[0] || 'Please choose a stronger password')
       setIsLoading(false)
       return
     }
@@ -218,13 +221,13 @@ function SignUpContent() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>GDPR, CCPA & PIPEDA compliant</span>
+                    <span>GDPR, CCPA, PIPEDA &amp; Law 25</span>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <p className="text-sm font-semibold text-white mb-3">Start free — upgrade to Pro for $99 one-time</p>
+                <p className="text-sm font-semibold text-white mb-3">Start free — Pro from $99 USD/year</p>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
@@ -232,7 +235,7 @@ function SignUpContent() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>No subscriptions or recurring fees</span>
+                    <span>PIPEDA, Law 25, GDPR &amp; CCPA ready</span>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
@@ -240,7 +243,7 @@ function SignUpContent() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>GDPR, CCPA & PIPEDA compliant</span>
+                    <span>Create your first banner in minutes</span>
                   </div>
                 </div>
               </>
@@ -326,9 +329,11 @@ function SignUpContent() {
                   <Input
                     id="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Jane Smith"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
+                    autoFocus
                     className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
@@ -346,6 +351,7 @@ function SignUpContent() {
                     placeholder="name@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                     className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
@@ -359,45 +365,64 @@ function SignUpContent() {
                   <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                   <Input
                     id="password"
-                    type="password"
-                    placeholder="Create a strong password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="At least 8 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
+                    autoComplete="new-password"
+                    className="pl-10 pr-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
                     required
                     disabled={isLoading || isGoogleLoading}
+                    aria-describedby="password-requirements"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    disabled={isLoading || isGoogleLoading}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
+                <ul id="password-requirements" className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-500 pt-1">
+                  <li className={password.length >= 8 ? 'text-green-600' : ''}>8+ characters</li>
+                  <li className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>One uppercase letter</li>
+                  <li className={/[a-z]/.test(password) ? 'text-green-600' : ''}>One lowercase letter</li>
+                  <li className={/\d/.test(password) ? 'text-green-600' : ''}>One number</li>
+                </ul>
                 {password && (
-                  <div className="space-y-2 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                        <div 
-                          className={`h-1.5 rounded-full transition-all duration-300 ${getPasswordStrengthColor()}`}
-                          style={{ width: `${(passwordStrength / 5) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500 font-medium">{getPasswordStrengthText()}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full transition-all duration-300 ${getPasswordStrengthColor()}`}
+                        style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                      />
                     </div>
+                    <span className="text-xs text-gray-500 font-medium">{getPasswordStrengthText()}</span>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-start space-x-2 pt-2">
-                <Switch
+              <div
+                className={`flex items-start gap-3 rounded-lg border p-3 ${
+                  error.toLowerCase().includes('terms') ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                }`}
+              >
+                <Checkbox
                   id="terms"
                   checked={agreeToTerms}
-                  onCheckedChange={setAgreeToTerms}
+                  onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
                   disabled={isLoading || isGoogleLoading}
-                  className="mt-0.5"
+                  className="mt-0.5 size-5"
                 />
-                <Label htmlFor="terms" className="font-normal text-sm text-gray-600 leading-tight">
+                <Label htmlFor="terms" className="font-normal text-sm text-gray-600 leading-snug cursor-pointer">
                   I agree to the{' '}
-                  <Link href="/terms" className="text-blue-600 hover:text-blue-500">
+                  <Link href="/terms" className="text-blue-600 hover:text-blue-500" onClick={(e) => e.stopPropagation()}>
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
+                  <Link href="/privacy" className="text-blue-600 hover:text-blue-500" onClick={(e) => e.stopPropagation()}>
                     Privacy Policy
                   </Link>
                 </Label>
@@ -406,7 +431,7 @@ function SignUpContent() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white transition-colors mt-2"
-                disabled={isLoading || isGoogleLoading || !agreeToTerms}
+                disabled={isLoading || isGoogleLoading}
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

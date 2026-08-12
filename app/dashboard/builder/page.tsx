@@ -518,6 +518,19 @@ function BannerBuilderContent() {
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop')
   // Reset preview override whenever the user navigates to a different builder tab so auto-derivation kicks back in
   useEffect(() => { setPreviewView(null) }, [activeTab])
+
+  // Scroll the editor pane into view on tab change so sidebar clicks aren't "dead"
+  // (content swapped below the fold with no visible mutation).
+  useEffect(() => {
+    if (skipTabScrollRef.current) {
+      skipTabScrollRef.current = false
+      return
+    }
+    const panel = document.getElementById('builder-main-panel')
+    if (!panel) return
+    const top = panel.getBoundingClientRect().top + window.scrollY - 16
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }, [activeTab])
   const [isEditing, setIsEditing] = useState(false)
   const [bannerId, setBannerId] = useState<string | null>(null)
   const [bannerUpdatedAt, setBannerUpdatedAt] = useState<Date | null>(null)
@@ -530,6 +543,7 @@ function BannerBuilderContent() {
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
+  const skipTabScrollRef = useRef(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -1298,7 +1312,7 @@ function BannerBuilderContent() {
             </div>
 
             {/* Main Content Area */}
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-6" id="builder-main-panel">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-foreground capitalize">
                   {activeTab === 'compliance' ? 'Choose Compliance Framework' :
@@ -1503,9 +1517,12 @@ function BannerBuilderContent() {
                           (config.behavior.gpc?.mode || 'auto') === 'off'
                             ? 'border-primary ring-1 ring-primary bg-primary/5'
                             : 'border-border hover:border-muted-foreground/40'
-                        } ${session?.user?.planTier === 'free' ? 'opacity-60' : 'cursor-pointer'}`}
+                        } ${session?.user?.planTier === 'free' ? 'opacity-60 cursor-pointer' : 'cursor-pointer'}`}
                         onClick={() => {
-                          if (session?.user?.planTier === 'free') return
+                          if (session?.user?.planTier === 'free') {
+                            router.push('/upgrade')
+                            return
+                          }
                           setConfig(prev => ({
                             ...prev,
                             behavior: {
@@ -3676,6 +3693,7 @@ function BannerBuilderContent() {
                                 ...prev,
                                 geoRules: [...(prev.geoRules || []), newRule]
                               }))
+                              setIsDirty(true)
                             }}
                           >
                             <Plus className="h-4 w-4 mr-1" /> Add Rule
@@ -3715,6 +3733,7 @@ function BannerBuilderContent() {
                                     ...prev,
                                     geoRules: [...(prev.geoRules || []), quebecRule]
                                   }))
+                                  setIsDirty(true)
                                 }}
                               >
                                 Add Quebec Rule
@@ -4593,6 +4612,9 @@ function BannerBuilderContent() {
                         </button>
                       </div>
                     </CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      Mock only — use the chips below to switch Banner, Preferences, or Floating Button.
+                    </p>
                     {(() => {
                       // Auto-derive default view from active tab; user can override with the buttons below
                       const autoView: 'banner' | 'preferences' | 'floating' =
@@ -4605,7 +4627,9 @@ function BannerBuilderContent() {
                           {(['banner', 'preferences', 'floating'] as const).map((v) => (
                             <button
                               key={v}
+                              type="button"
                               onClick={() => setPreviewView(v)}
+                              aria-pressed={effective === v}
                               className={`px-3 py-1.5 rounded transition-colors ${
                                 effective === v
                                   ? 'bg-background shadow-sm font-medium'
