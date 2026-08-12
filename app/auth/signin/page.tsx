@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Eye, EyeOff, Loader2, Lock, Mail, ArrowRight, Shield, CheckCircle2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { captureException } from '@/lib/analytics'
 
 function SignInContent() {
   const [email, setEmail] = useState('')
@@ -43,6 +44,7 @@ function SignInContent() {
       await signIn('google', { callbackUrl })
     } catch (error) {
       console.error('Google sign in error:', error)
+      captureException(error, { context: 'google_signin' })
       setError('An error occurred during Google sign in.')
       setIsGoogleLoading(false)
     }
@@ -72,11 +74,14 @@ function SignInContent() {
         }
       } else if (result?.ok) {
         toast.success('Welcome back!')
+        // login_completed is captured server-side in NextAuth authorize();
+        // PostHogIdentify calls identify(user.id) once session hydrates
         router.push(callbackUrl)
         router.refresh()
       }
     } catch (error) {
       console.error('Sign in error:', error)
+      captureException(error, { context: 'credentials_signin' })
       setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
