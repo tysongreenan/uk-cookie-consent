@@ -14,6 +14,9 @@ import { toast } from 'react-hot-toast'
 import { captureEvent, getPostHogRequestHeaders } from '@/lib/analytics'
 
 const DRAFT_STORAGE_KEY = 'privacy-policy-draft-v1'
+/** Survives signup redirect so the generated policy is still available after auth. */
+const OUTPUT_STORAGE_KEY = 'privacy-policy-output'
+const INPUTS_STORAGE_KEY = 'privacy-policy-inputs'
 
 // Field-level validation that runs before we even hit the server.
 function validateStep(step: number, inputs: PrivacyPolicyInputs): Record<string, string> {
@@ -92,18 +95,9 @@ export function PrivacyPolicyGenerator() {
   const entrySource = useRef<'tools' | 'signup_callback'>('tools')
   const hasTrackedStart = useRef(false)
 
-  const [output, setOutput] = useState<PolicyOutput | null>(() => {
-    if (typeof window === 'undefined') return null
-    try {
-      const saved = sessionStorage.getItem('privacy-policy-output')
-      if (saved) {
-        sessionStorage.removeItem('privacy-policy-output')
-        entrySource.current = 'signup_callback'
-        return JSON.parse(saved)
-      }
-    } catch {}
-    return null
-  })
+  // Always start null on server + first client paint to avoid hydration mismatch.
+  // Post-signup restore happens in useEffect (sessionStorage is client-only).
+  const [output, setOutput] = useState<PolicyOutput | null>(null)
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -120,10 +114,45 @@ export function PrivacyPolicyGenerator() {
     return props
   }, [planTier, inputs.language, inputs.businessType])
 
-  // Restore draft on mount.
+  // Restore generated policy (and wizard inputs) after signup redirect, else draft.
   useEffect(() => {
     if (draftLoaded.current || typeof window === 'undefined') return
     draftLoaded.current = true
+
+    let restoredPolicy = false
+
+    try {
+      const savedOutput = sessionStorage.getItem(OUTPUT_STORAGE_KEY)
+      if (savedOutput) {
+        const parsed: PolicyOutput = JSON.parse(savedOutput)
+        if (parsed?.contentHtml) {
+          setOutput(parsed)
+          sessionStorage.removeItem(OUTPUT_STORAGE_KEY)
+          entrySource.current = 'signup_callback'
+          restoredPolicy = true
+        }
+      }
+    } catch {
+      // Ignore corrupt output stash.
+    }
+
+    try {
+      const savedInputs = sessionStorage.getItem(INPUTS_STORAGE_KEY)
+      if (savedInputs) {
+        const parsed = JSON.parse(savedInputs)
+        if (parsed && typeof parsed === 'object') {
+          setInputs({ ...DEFAULT_INPUTS, ...parsed })
+        }
+        sessionStorage.removeItem(INPUTS_STORAGE_KEY)
+      }
+    } catch {
+      // Ignore corrupt inputs stash.
+    }
+
+    // After signup we only care about the generated policy, not a wizard draft toast.
+    if (restoredPolicy) return
+
+    // No post-signup stash — restore in-progress wizard draft if present.
     try {
       const raw = localStorage.getItem(DRAFT_STORAGE_KEY)
       if (!raw) return
@@ -141,9 +170,9 @@ export function PrivacyPolicyGenerator() {
     }
   }, [])
 
-  // Auto-save draft (debounced) whenever inputs or step change.
+  // Auto-save draft (debounced) whenever inputs or step change — skip once we have output.
   useEffect(() => {
-    if (!draftLoaded.current) return
+    if (!draftLoaded.current || output) return
     const handle = window.setTimeout(() => {
       try {
         const now = new Date()
@@ -157,17 +186,20 @@ export function PrivacyPolicyGenerator() {
       }
     }, 500)
     return () => window.clearTimeout(handle)
-  }, [inputs, currentStep])
+  }, [inputs, currentStep, output])
 
-  // Save policy to sessionStorage before navigating to signup
+  // Persist policy + inputs before full-page navigate to signup (same tab / sessionStorage).
   const saveAndNavigate = useCallback((href: string) => {
     if (output) {
       try {
-        sessionStorage.setItem('privacy-policy-output', JSON.stringify(output))
-      } catch {}
+        sessionStorage.setItem(OUTPUT_STORAGE_KEY, JSON.stringify(output))
+        sessionStorage.setItem(INPUTS_STORAGE_KEY, JSON.stringify(inputs))
+      } catch {
+        // Private mode / quota — signup still works; user may need to regenerate.
+      }
     }
     window.location.href = href
-  }, [output])
+  }, [output, inputs])
 
   const handleChange = useCallback((updates: Partial<PrivacyPolicyInputs>) => {
     setInputs((prev) => ({ ...prev, ...updates }))
@@ -303,7 +335,11 @@ export function PrivacyPolicyGenerator() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `privacy-policy-${inputs.businessName.toLowerCase().replace(/\s+/g, '-')}.html`
+    const biz =
+      inputs.businessName?.trim() ||
+      output.metadata.businessName?.trim() ||
+      'policy'
+    a.download = `privacy-policy-${biz.toLowerCase().replace(/\s+/g, '-')}.html`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
