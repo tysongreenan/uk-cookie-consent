@@ -13,6 +13,12 @@ import { authOptions } from '@/lib/auth'
 import { RateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { generatePolicyFromInputs } from '@/lib/privacy-policy/generator'
+import {
+  captureServerEvent,
+  captureServerException,
+  getPostHogDistinctId,
+  getPostHogSessionId,
+} from '@/lib/posthog-server'
 
 // Unauthenticated: 10 requests per hour per IP
 const unauthRateLimit = new RateLimit({
@@ -120,9 +126,27 @@ export async function POST(request: NextRequest) {
 
     const policyOutput = await generatePolicyFromInputs(parsed.data)
 
+    const distinctId = getPostHogDistinctId(request, session?.user?.id || 'anonymous')
+    const sessionId = getPostHogSessionId(request)
+    void captureServerEvent({
+      distinctId,
+      event: 'privacy_policy_generated',
+      sessionId,
+      properties: {
+        source: 'api',
+        format: 'html',
+        language: parsed.data.language,
+        business_type: parsed.data.businessType,
+        jurisdiction_count: parsed.data.jurisdictions?.length ?? 0,
+        plan_tier: session?.user?.planTier || (session?.user?.id ? 'free' : 'anonymous'),
+        authenticated: Boolean(session?.user?.id),
+      },
+    })
+
     return NextResponse.json(policyOutput)
   } catch (error) {
     console.error('[PRIVACY-POLICY-GENERATE] Unexpected error:', error)
+    void captureServerException(error, 'anonymous', { context: 'privacy_policy_generate_api' })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

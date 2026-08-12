@@ -11,6 +11,7 @@ import type { PrivacyPolicyInputs, PolicyOutput } from '@/types'
 import { ArrowLeft, ArrowRight, Loader2, Copy, Check, Download, Save } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import { captureEvent, getPostHogRequestHeaders } from '@/lib/analytics'
 
 const DRAFT_STORAGE_KEY = 'privacy-policy-draft-v1'
 
@@ -87,6 +88,9 @@ export function PrivacyPolicyGenerator() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null)
   const draftLoaded = useRef(false)
+  // When output is restored after signup redirect, treat completion as signup_callback.
+  const entrySource = useRef<'tools' | 'signup_callback'>('tools')
+  const hasTrackedStart = useRef(false)
 
   const [output, setOutput] = useState<PolicyOutput | null>(() => {
     if (typeof window === 'undefined') return null
@@ -94,6 +98,7 @@ export function PrivacyPolicyGenerator() {
       const saved = sessionStorage.getItem('privacy-policy-output')
       if (saved) {
         sessionStorage.removeItem('privacy-policy-output')
+        entrySource.current = 'signup_callback'
         return JSON.parse(saved)
       }
     } catch {}
@@ -102,6 +107,18 @@ export function PrivacyPolicyGenerator() {
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+
+  const planTier = session?.user?.planTier || (session ? 'free' : undefined)
+
+  const analyticsProps = useCallback(() => {
+    const props: Record<string, unknown> = {
+      source: entrySource.current,
+    }
+    if (planTier) props.plan_tier = planTier
+    if (inputs.language) props.language = inputs.language
+    if (inputs.businessType) props.business_type = inputs.businessType
+    return props
+  }, [planTier, inputs.language, inputs.businessType])
 
   // Restore draft on mount.
   useEffect(() => {
@@ -196,6 +213,12 @@ export function PrivacyPolicyGenerator() {
     }
     setFieldErrors({})
 
+    // First validated generate submit counts as starting the tool flow.
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true
+      captureEvent('privacy_policy_started', analyticsProps())
+    }
+
     setIsGenerating(true)
     setError(null)
     try {
@@ -217,7 +240,10 @@ export function PrivacyPolicyGenerator() {
 
       const res = await fetch('/api/privacy-policy/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getPostHogRequestHeaders(),
+        },
         body: JSON.stringify(payload),
       })
       if (!res.ok) {
@@ -253,19 +279,23 @@ export function PrivacyPolicyGenerator() {
     } finally {
       setIsGenerating(false)
     }
-  }, [inputs])
+  }, [inputs, analyticsProps])
 
   const handleCopy = useCallback(async () => {
     if (!output) return
     try {
       await navigator.clipboard.writeText(output.contentHtml)
       setHasCopied(true)
+      captureEvent('privacy_policy_copied', {
+        ...analyticsProps(),
+        format: 'html',
+      })
       toast.success('Privacy policy copied to clipboard')
       setTimeout(() => setHasCopied(false), 2000)
     } catch {
       toast.error('Failed to copy to clipboard')
     }
-  }, [output])
+  }, [output, analyticsProps])
 
   const handleDownload = useCallback(() => {
     if (!output) return
@@ -278,7 +308,11 @@ export function PrivacyPolicyGenerator() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }, [output, inputs.businessName])
+    captureEvent('privacy_policy_downloaded', {
+      ...analyticsProps(),
+      format: 'html',
+    })
+  }, [output, inputs.businessName, analyticsProps])
 
   const handleStartOver = useCallback(() => {
     setOutput(null)
@@ -287,6 +321,8 @@ export function PrivacyPolicyGenerator() {
     setError(null)
     setFieldErrors({})
     setDraftSavedAt(null)
+    entrySource.current = 'tools'
+    hasTrackedStart.current = false
     try {
       localStorage.removeItem(DRAFT_STORAGE_KEY)
     } catch {}
