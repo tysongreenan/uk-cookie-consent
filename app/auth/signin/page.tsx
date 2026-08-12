@@ -129,7 +129,7 @@ function SignInContent() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-zinc-200">
               <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
-              <span>GDPR, CCPA, & ePrivacy compliant</span>
+              <span>PIPEDA, Law 25, GDPR &amp; CCPA compliant</span>
             </div>
             <div className="flex items-center gap-3 text-zinc-200">
               <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
@@ -292,11 +292,11 @@ function SignInContent() {
             </form>
 
             <p className="text-center text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href={signupUrl} className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up for free
-              </Link>
+              Don&apos;t have an account?
             </p>
+            <Button variant="outline" className="w-full h-11 font-medium" asChild>
+              <Link href={signupUrl}>Sign up for free</Link>
+            </Button>
           </div>
         </div>
       </div>

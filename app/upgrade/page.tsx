@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft, RefreshCw } from 'lucide-react'
+import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft, RefreshCw, Lock } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
@@ -75,8 +75,9 @@ function UpgradeContent() {
 
   const proFeatures = [
     { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', desc: 'Create as many banners as you need' },
+    { icon: <Shield className="h-5 w-5" />, title: 'PIPEDA & Law 25 Geo Rules', desc: 'Quebec opt-in, GPC, and region-specific consent' },
     { icon: <BarChart3 className="h-5 w-5" />, title: 'GA4 Analytics Integration', desc: 'Track consent events and impressions in Google Analytics' },
-    { icon: <Shield className="h-5 w-5" />, title: 'Remove Branding', desc: 'Remove "Powered by cookie-banner.ca"' },
+    { icon: <Zap className="h-5 w-5" />, title: 'Remove Branding', desc: 'Remove "Powered by cookie-banner.ca"' },
     { icon: <Users className="h-5 w-5" />, title: 'Team Collaboration', desc: 'Invite team members with role-based permissions' },
     { icon: <Palette className="h-5 w-5" />, title: '14 Custom Layouts', desc: 'Modal, slide-in, floating, and more' },
     { icon: <Upload className="h-5 w-5" />, title: 'Logo & Image Upload', desc: 'Add custom branding to your banners' },
@@ -133,7 +134,7 @@ function UpgradeContent() {
           <p className="text-xl text-muted-foreground mb-6">
             {isLifetimeUser
               ? 'Get all new features as they launch for $49/year (loyalty discount)'
-              : 'Choose the plan that works for you'}
+              : 'PIPEDA, Law 25, GDPR & CCPA — geo-targeting, GPC, and no branding'}
           </p>
         </div>
 
@@ -150,6 +151,7 @@ function UpgradeContent() {
                 }`}
               >
                 $99/year
+                <span className="ml-1 text-[10px] font-normal opacity-80">recommended</span>
               </button>
               <button
                 onClick={() => setBillingCycle('one_time')}
@@ -260,8 +262,13 @@ function UpgradeContent() {
               )}
 
               <p className="text-xs text-center text-muted-foreground mt-4">
-                All prices in US dollars (USD). 30-day money-back guarantee. Cancel anytime.
+                Secure checkout with Stripe. All prices in US dollars (USD). 30-day money-back guarantee. Cancel anytime.
               </p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1"><Lock className="h-3 w-3" /> Stripe checkout</span>
+                <span className="inline-flex items-center gap-1"><Shield className="h-3 w-3" /> PIPEDA &amp; Law 25</span>
+                <span className="inline-flex items-center gap-1"><Check className="h-3 w-3" /> 30-day refund</span>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -23,20 +23,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
 import { InviteMemberModal } from './invite-member-modal'
 import { canAccessFeature } from '@/lib/plan-restrictions'
+import { PlanTier } from '@/types'
 
 interface HeaderProps {}
 
 export function DashboardHeader({}: HeaderProps) {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
-  const [notifications] = useState(3) // Mock notification count
   const [showInviteModal, setShowInviteModal] = useState(false)
   
-  // Check if user has Pro plan (temporarily set to 'pro' for testing)
-  const userPlan = 'pro' // TODO: Get actual user plan from database
+  const userPlan = (session?.user?.planTier || 'free') as PlanTier
   const canInvite = canAccessFeature(userPlan, 'hasTeamCollaboration')
 
   const handleSignOut = async () => {
@@ -53,16 +51,8 @@ export function DashboardHeader({}: HeaderProps) {
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative" asChild>
-            <Link href="/roadmap">
+            <Link href="/roadmap" title="Product updates">
               <Bell className="h-5 w-5" />
-              {notifications > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {notifications}
-                </Badge>
-              )}
             </Link>
           </Button>
 
@@ -80,10 +70,12 @@ export function DashboardHeader({}: HeaderProps) {
             <Button 
               variant="ghost" 
               size="sm" 
-              disabled
+              asChild
               title="Upgrade to Pro to invite collaborators"
             >
-              <UserPlus className="h-5 w-5" />
+              <Link href="/upgrade">
+                <UserPlus className="h-5 w-5" />
+              </Link>
             </Button>
           )}
 

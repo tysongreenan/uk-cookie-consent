@@ -413,7 +413,7 @@ export function DashboardClient() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Welcome! Set up your first cookie banner</h3>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Get compliant in 3 easy steps — no coding experience needed.
+                  Get PIPEDA and Law 25 compliant in 3 easy steps — no coding experience needed.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
@@ -440,6 +440,14 @@ export function DashboardClient() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
+                {(session.user?.planTier || 'free') === 'free' && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Need Law 25 geo-targeting, GPC controls, and no branding?{' '}
+                    <Link href="/upgrade" className="text-primary font-medium hover:underline">
+                      Upgrade to Pro — $99/year
+                    </Link>
+                  </p>
+                )}
               </div>
               {searchTerm && (
                 <div className="p-4 text-center border-t">

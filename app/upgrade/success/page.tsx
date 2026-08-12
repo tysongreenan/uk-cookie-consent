@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { CheckCircle, BarChart3, Users, Palette, Upload, ArrowRight, RefreshCw, Clock } from 'lucide-react'
+import { CheckCircle, BarChart3, Users, ArrowRight, RefreshCw, Clock, Rocket } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -37,18 +37,6 @@ export default function UpgradeSuccessPage() {
       description: 'Add your team with role-based permissions',
       href: '/dashboard/team',
     },
-    {
-      icon: <Palette className="h-5 w-5" />,
-      title: 'Try Custom Layouts',
-      description: 'Create banners with modal, slide-in, and more',
-      href: '/dashboard/builder',
-    },
-    {
-      icon: <Upload className="h-5 w-5" />,
-      title: 'Upload Your Logo',
-      description: 'Add custom branding to your banners',
-      href: '/dashboard/builder',
-    },
   ]
 
   return (
@@ -63,7 +51,7 @@ export default function UpgradeSuccessPage() {
           </div>
           <h1 className="text-4xl font-bold mb-4">Welcome to Pro!</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Your account has been upgraded. All Pro features are now unlocked.
+            Your account has been upgraded. Create your banner next — then copy the install snippet onto your site.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <div className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center gap-1.5">
@@ -77,9 +65,36 @@ export default function UpgradeSuccessPage() {
               }
             </div>
           </div>
+          <Button size="lg" className="mt-8 h-12 px-8" asChild>
+            <Link href="/dashboard/builder">
+              <Rocket className="h-4 w-4 mr-2" />
+              Create your first banner
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+          <p className="text-sm text-muted-foreground mt-3">
+            Takes about 2 minutes. PIPEDA, Law 25, GPC, and geo rules are ready in the builder.
+          </p>
         </div>
 
-        {/* Next Steps */}
+        {/* Activation steps */}
+        <ol className="grid sm:grid-cols-3 gap-4 mb-10 max-w-3xl mx-auto">
+          {[
+            { step: '1', title: 'Design your banner', desc: 'Pick PIPEDA or Law 25, then match your brand.' },
+            { step: '2', title: 'Copy the snippet', desc: 'One script tag — WordPress, Shopify, or any site.' },
+            { step: '3', title: 'Paste and go live', desc: 'Drop it in your site header. You\'re compliant.' },
+          ].map((item) => (
+            <li key={item.step} className="rounded-lg border bg-muted/30 p-4 text-center">
+              <div className="mx-auto mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                {item.step}
+              </div>
+              <p className="text-sm font-medium">{item.title}</p>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </li>
+          ))}
+        </ol>
+
+        {/* Secondary next steps */}
         <div className="grid sm:grid-cols-2 gap-4 mb-12">
           {nextSteps.map((step, i) => (
             <Link key={i} href={step.href}>

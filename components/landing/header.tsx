@@ -4,8 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { Menu, X } from 'lucide-react'
+
 export function Header() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -73,7 +74,7 @@ export function Header() {
                   <Link href="/auth/signin">Sign In</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/builder">Start Building</Link>
+                  <Link href="/auth/signup">Sign up for free</Link>
                 </Button>
               </>
             )}
@@ -130,11 +131,11 @@ export function Header() {
                 </Button>
               ) : (
                 <>
+                  <Button asChild size="lg" className="w-full">
+                    <Link href="/auth/signup">Sign up for free</Link>
+                  </Button>
                   <Button asChild size="lg" variant="outline" className="w-full">
                     <Link href="/auth/signin">Sign In</Link>
-                  </Button>
-                  <Button asChild size="lg" className="w-full">
-                    <Link href="/builder">Start Building</Link>
                   </Button>
                 </>
               )}
