@@ -25,6 +25,7 @@ import { getBannerTemplate } from '@/lib/banner-templates'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { detectFrameworkFromUrl } from '@/lib/compliance-detection'
+import { captureEvent } from '@/lib/analytics'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -509,6 +510,16 @@ export function InteractiveBannerDemo({ initialUrl }: InteractiveBannerDemoProps
     } catch {
       // localStorage full or unavailable — continue without saving
     }
+    const configuredScripts = Object.values(config.scripts || {})
+      .flat()
+      .filter((script) => script.enabled && script.scriptCode?.trim()).length
+    captureEvent('banner_draft_completed', {
+      builder_mode: builderMode,
+      compliance_framework: config.compliance.framework,
+      configured_script_count: configuredScripts,
+      ga4_enabled: config.integrations?.googleAnalytics?.enabled === true,
+      has_source_url: Boolean(initialUrl),
+    })
     setShowSignupPrompt(true)
     setTimeout(() => {
       document.getElementById('signup-prompt')?.scrollIntoView({ behavior: 'smooth', block: 'center' })

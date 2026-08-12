@@ -20,6 +20,7 @@ import {
   Unlock,
 } from 'lucide-react'
 import Link from 'next/link'
+import { captureEvent } from '@/lib/analytics'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -287,6 +288,12 @@ export function CookieScanner() {
       return
     }
 
+    const scanStartedAt = Date.now()
+    captureEvent('cookie_scan_started', {
+      source: inputUrl ? 'example' : 'manual',
+      target_domain: domain,
+    })
+
     // Show the clean domain in the input
     setUrl(domain)
     setIsScanning(true)
@@ -309,10 +316,25 @@ export function CookieScanner() {
       const targetUrl = `https://${domain}`
       const scanResult = await performScan(targetUrl)
       setResult(scanResult)
+      captureEvent('cookie_scan_completed', {
+        cookie_count: scanResult.cookies.length,
+        duration_ms: Date.now() - scanStartedAt,
+        issue_count: Object.values(scanResult.compliance).reduce(
+          (total, regulation) => total + regulation.issues.length,
+          0
+        ),
+        overall_grade: scanResult.overallGrade,
+        overall_score: scanResult.overallScore,
+        target_domain: domain,
+      })
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 200)
     } catch {
+      captureEvent('cookie_scan_failed', {
+        duration_ms: Date.now() - scanStartedAt,
+        target_domain: domain,
+      })
       setError('Failed to scan website. Please try again.')
     } finally {
       setIsScanning(false)

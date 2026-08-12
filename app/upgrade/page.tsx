@@ -10,6 +10,7 @@ import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
+import { captureEvent } from '@/lib/analytics'
 
 function UpgradeContent() {
   const { data: session, status } = useSession()
@@ -29,6 +30,10 @@ function UpgradeContent() {
 
     setIsLoading(true)
     setError('')
+    captureEvent('checkout_started', {
+      billing_cycle: billingCycle,
+      current_plan: session.user.planTier || 'free',
+    })
 
     try {
       const response = await fetch('/api/upgrade/checkout', {
@@ -40,6 +45,10 @@ function UpgradeContent() {
       const data = await response.json()
 
       if (data.error) {
+        captureEvent('checkout_failed', {
+          billing_cycle: billingCycle,
+          failure_type: 'response',
+        })
         setError(data.error)
         return
       }
@@ -47,9 +56,17 @@ function UpgradeContent() {
       if (data.url) {
         window.location.href = data.url
       } else {
+        captureEvent('checkout_failed', {
+          billing_cycle: billingCycle,
+          failure_type: 'response',
+        })
         setError('Failed to create checkout session. Please try again.')
       }
     } catch {
+      captureEvent('checkout_failed', {
+        billing_cycle: billingCycle,
+        failure_type: 'request',
+      })
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
