@@ -6,6 +6,12 @@ import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restri
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { getBannerAccessScope } from '@/lib/banner-access'
+import {
+  captureServerEvent,
+  captureServerException,
+  getPostHogDistinctId,
+  getPostHogSessionId,
+} from '@/lib/posthog-server'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -96,6 +102,21 @@ function rejectCookies() {
     console.log('✅ Simple Save: Banner created successfully:', bannerId)
     logActivity(session.user.id, AuditAction.BANNER_CREATE, request, { bannerId, bannerName })
 
+    const distinctId = getPostHogDistinctId(request, session.user.id)
+    const sessionId = getPostHogSessionId(request)
+    void captureServerEvent({
+      distinctId,
+      event: 'banner_created',
+      sessionId,
+      properties: {
+        banner_id: bannerId,
+        banner_name: bannerName,
+        user_id: session.user.id,
+        is_first_banner: currentCount === 0,
+        plan_tier: userTier,
+      },
+    })
+
     return NextResponse.json({
       success: true,
       bannerId,
@@ -105,6 +126,7 @@ function rejectCookies() {
 
   } catch (error) {
     console.error('❌ Simple Save: Unexpected error:', error)
+    void captureServerException(error, 'anonymous', { context: 'banner_create_api' })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

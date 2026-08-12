@@ -19,6 +19,7 @@ import bcrypt from 'bcryptjs'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { resolveEffectivePlan } from '@/lib/team-permissions'
 import { sanitizeEmail } from '@/lib/sanitize'
+import { captureServerEvent } from '@/lib/posthog-server'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -145,6 +146,14 @@ export const authOptions: NextAuthOptions = {
 
           // Log successful login (no request object available in authorize callback)
           logActivity(user.id, AuditAction.LOGIN, null, { email: user.email, provider: 'credentials' })
+          void captureServerEvent({
+            distinctId: user.id,
+            event: 'login_completed',
+            properties: {
+              method: 'credentials',
+              email: user.email,
+            },
+          })
 
           return {
             id: user.id,
@@ -267,6 +276,14 @@ export const authOptions: NextAuthOptions = {
           ;(user as any).hasCommentTool = existingUser.hasCommentTool ?? false
 
           logActivity(existingUser.id, AuditAction.LOGIN, null, { email, provider: 'google' })
+          void captureServerEvent({
+            distinctId: existingUser.id,
+            event: 'login_completed',
+            properties: {
+              method: 'google',
+              email,
+            },
+          })
           console.log('✅ Google OAuth: Linked to existing account:', email)
           return true
         }
@@ -338,6 +355,16 @@ export const authOptions: NextAuthOptions = {
         ;(user as any).planTier = 'free'
 
         logActivity(userId, AuditAction.REGISTER, null, { email, provider: 'google' })
+        void captureServerEvent({
+          distinctId: userId,
+          event: 'signup_completed',
+          properties: {
+            method: 'google',
+            product: 'banner',
+            user_id: userId,
+            email,
+          },
+        })
         console.log('✅ Google OAuth: Created user + workspace for:', email)
         return true
       } catch (error) {

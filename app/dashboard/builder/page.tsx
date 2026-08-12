@@ -37,6 +37,7 @@ import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
 import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
+import { getPostHogRequestHeaders } from '@/lib/analytics'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -874,6 +875,7 @@ function BannerBuilderContent() {
         method: method,
         headers: {
           'Content-Type': 'application/json',
+          ...getPostHogRequestHeaders(),
         },
         body: JSON.stringify({
           name: config.name,

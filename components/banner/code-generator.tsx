@@ -14,6 +14,7 @@ import {
   generateConsentInitScript
 } from '@/lib/banner-generator'
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
+import { captureEvent, captureException } from '@/lib/analytics'
 
 interface CodeGeneratorProps {
   config: BannerConfig
@@ -132,8 +133,14 @@ ${generateBannerHTML(config, { showBranding })}
       await navigator.clipboard.writeText(getCode())
       setCopied(true)
       toast.success('Copied to clipboard!')
+      captureEvent('install_snippet_copied', {
+        banner_id: bannerId || null,
+        snippet_type: activeTab,
+        plan_tier: planTier || 'free',
+      })
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
+      captureException(err, { context: 'install_snippet_copy' })
       toast.error('Failed to copy code')
     }
   }

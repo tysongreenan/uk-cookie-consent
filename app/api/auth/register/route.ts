@@ -5,6 +5,12 @@ import { registrationRateLimit } from '@/lib/rate-limit'
 import { sanitizeEmail, sanitizeUserName, validatePassword } from '@/lib/sanitize'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { sendWelcomeEmail } from '@/lib/email'
+import {
+  captureServerEvent,
+  captureServerException,
+  getPostHogDistinctId,
+  getPostHogSessionId,
+} from '@/lib/posthog-server'
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -261,6 +267,35 @@ export async function POST(request: NextRequest) {
     // Send welcome email (fire-and-forget)
     sendWelcomeEmail(sanitizedEmail, sanitizedName || '', isPrivacySignup ? 'privacy' : 'banner')
 
+    // Server-side signup_completed (aligned to client distinct ID when present)
+    const distinctId = getPostHogDistinctId(request, user.id)
+    const sessionId = getPostHogSessionId(request)
+    void captureServerEvent({
+      distinctId,
+      event: 'signup_completed',
+      sessionId,
+      properties: {
+        method: 'credentials',
+        product: isPrivacySignup ? 'privacy' : 'banner',
+        user_id: user.id,
+        has_banner_config: !!bannerConfig,
+      },
+    })
+
+    // If registration also created a banner from pending demo config, that's activation
+    if (bannerConfig) {
+      void captureServerEvent({
+        distinctId,
+        event: 'banner_created',
+        sessionId,
+        properties: {
+          source: 'signup_pending_config',
+          user_id: user.id,
+          is_first_banner: true,
+        },
+      })
+    }
+
     return NextResponse.json({
       success: true,
       user,
@@ -269,6 +304,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Registration error:', error)
+    void captureServerException(error, 'anonymous', { context: 'register_api' })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
