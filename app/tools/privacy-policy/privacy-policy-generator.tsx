@@ -17,6 +17,111 @@ const DRAFT_STORAGE_KEY = 'privacy-policy-draft-v1'
 /** Survives signup redirect so the generated policy is still available after auth. */
 const OUTPUT_STORAGE_KEY = 'privacy-policy-output'
 const INPUTS_STORAGE_KEY = 'privacy-policy-inputs'
+/** localStorage handoff with TTL — survives OAuth full-page redirects and same-origin new tabs. */
+const AUTH_HANDOFF_KEY = 'privacy-policy-auth-handoff-v1'
+const AUTH_HANDOFF_TTL_MS = 2 * 60 * 60 * 1000 // 2 hours
+const CALLBACK_PATH = '/tools/privacy-policy'
+const SIGNUP_HREF = `/auth/signup?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
+const SIGNIN_HREF = `/auth/signin?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
+
+type AuthHandoff = {
+  output: PolicyOutput
+  inputs: PrivacyPolicyInputs
+  savedAt: string
+}
+
+function stashPolicyForAuth(output: PolicyOutput, inputs: PrivacyPolicyInputs) {
+  const payload: AuthHandoff = {
+    output,
+    inputs,
+    savedAt: new Date().toISOString(),
+  }
+  try {
+    sessionStorage.setItem(OUTPUT_STORAGE_KEY, JSON.stringify(output))
+    sessionStorage.setItem(INPUTS_STORAGE_KEY, JSON.stringify(inputs))
+  } catch {
+    // Private mode / quota
+  }
+  try {
+    localStorage.setItem(AUTH_HANDOFF_KEY, JSON.stringify(payload))
+  } catch {
+    // sessionStorage may still work same-tab
+  }
+}
+
+function readAndClearAuthHandoff(
+  defaults: PrivacyPolicyInputs,
+): { output: PolicyOutput | null; inputs: PrivacyPolicyInputs | null } {
+  let output: PolicyOutput | null = null
+  let inputs: PrivacyPolicyInputs | null = null
+
+  try {
+    const rawOut = sessionStorage.getItem(OUTPUT_STORAGE_KEY)
+    if (rawOut) {
+      const parsed: PolicyOutput = JSON.parse(rawOut)
+      if (parsed?.contentHtml) output = parsed
+      sessionStorage.removeItem(OUTPUT_STORAGE_KEY)
+    }
+    const rawIn = sessionStorage.getItem(INPUTS_STORAGE_KEY)
+    if (rawIn) {
+      const parsed = JSON.parse(rawIn)
+      if (parsed && typeof parsed === 'object') inputs = { ...defaults, ...parsed }
+      sessionStorage.removeItem(INPUTS_STORAGE_KEY)
+    }
+  } catch {
+    // ignore
+  }
+
+  try {
+    const raw = localStorage.getItem(AUTH_HANDOFF_KEY)
+    if (raw) {
+      const parsed: AuthHandoff = JSON.parse(raw)
+      const age = parsed?.savedAt ? Date.now() - new Date(parsed.savedAt).getTime() : Infinity
+      if (age <= AUTH_HANDOFF_TTL_MS && parsed?.output?.contentHtml) {
+        if (!output) output = parsed.output
+        if (!inputs && parsed.inputs && typeof parsed.inputs === 'object') {
+          inputs = { ...defaults, ...parsed.inputs }
+        }
+      }
+      localStorage.removeItem(AUTH_HANDOFF_KEY)
+    }
+  } catch {
+    try {
+      localStorage.removeItem(AUTH_HANDOFF_KEY)
+    } catch {
+      // ignore
+    }
+  }
+
+  return { output, inputs }
+}
+
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // Firefox private mode / permissions — fall through
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.left = '-9999px'
+    ta.style.top = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    ta.setSelectionRange(0, text.length)
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
 
 // Field-level validation that runs before we even hit the server.
 function validateStep(step: number, inputs: PrivacyPolicyInputs): Record<string, string> {
@@ -84,7 +189,9 @@ const DEFAULT_INPUTS: PrivacyPolicyInputs = {
 }
 
 export function PrivacyPolicyGenerator() {
-  const { data: session } = useSession()
+  const { data: session, status: sessionStatus } = useSession()
+  const isAuthed = sessionStatus === 'authenticated'
+  const isSessionLoading = sessionStatus === 'loading'
   const [currentStep, setCurrentStep] = useState(0)
   const [inputs, setInputs] = useState<PrivacyPolicyInputs>(DEFAULT_INPUTS)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -96,13 +203,13 @@ export function PrivacyPolicyGenerator() {
   const hasTrackedStart = useRef(false)
 
   // Always start null on server + first client paint to avoid hydration mismatch.
-  // Post-signup restore happens in useEffect (sessionStorage is client-only).
+  // Post-signup restore happens in useEffect (client storage only).
   const [output, setOutput] = useState<PolicyOutput | null>(null)
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const planTier = session?.user?.planTier || (session ? 'free' : undefined)
+  const planTier = session?.user?.planTier || (isAuthed ? 'free' : undefined)
 
   const analyticsProps = useCallback(() => {
     const props: Record<string, unknown> = {
@@ -119,38 +226,13 @@ export function PrivacyPolicyGenerator() {
     if (draftLoaded.current || typeof window === 'undefined') return
     draftLoaded.current = true
 
-    let restoredPolicy = false
-
-    try {
-      const savedOutput = sessionStorage.getItem(OUTPUT_STORAGE_KEY)
-      if (savedOutput) {
-        const parsed: PolicyOutput = JSON.parse(savedOutput)
-        if (parsed?.contentHtml) {
-          setOutput(parsed)
-          sessionStorage.removeItem(OUTPUT_STORAGE_KEY)
-          entrySource.current = 'signup_callback'
-          restoredPolicy = true
-        }
-      }
-    } catch {
-      // Ignore corrupt output stash.
+    const handoff = readAndClearAuthHandoff(DEFAULT_INPUTS)
+    if (handoff.output) {
+      setOutput(handoff.output)
+      if (handoff.inputs) setInputs(handoff.inputs)
+      entrySource.current = 'signup_callback'
+      return
     }
-
-    try {
-      const savedInputs = sessionStorage.getItem(INPUTS_STORAGE_KEY)
-      if (savedInputs) {
-        const parsed = JSON.parse(savedInputs)
-        if (parsed && typeof parsed === 'object') {
-          setInputs({ ...DEFAULT_INPUTS, ...parsed })
-        }
-        sessionStorage.removeItem(INPUTS_STORAGE_KEY)
-      }
-    } catch {
-      // Ignore corrupt inputs stash.
-    }
-
-    // After signup we only care about the generated policy, not a wizard draft toast.
-    if (restoredPolicy) return
 
     // No post-signup stash — restore in-progress wizard draft if present.
     try {
@@ -188,15 +270,10 @@ export function PrivacyPolicyGenerator() {
     return () => window.clearTimeout(handle)
   }, [inputs, currentStep, output])
 
-  // Persist policy + inputs before full-page navigate to signup (same tab / sessionStorage).
+  // Persist policy + inputs before full-page navigate to auth (session + local handoff).
   const saveAndNavigate = useCallback((href: string) => {
     if (output) {
-      try {
-        sessionStorage.setItem(OUTPUT_STORAGE_KEY, JSON.stringify(output))
-        sessionStorage.setItem(INPUTS_STORAGE_KEY, JSON.stringify(inputs))
-      } catch {
-        // Private mode / quota — signup still works; user may need to regenerate.
-      }
+      stashPolicyForAuth(output, inputs)
     }
     window.location.href = href
   }, [output, inputs])
@@ -296,6 +373,12 @@ export function PrivacyPolicyGenerator() {
           else setCurrentStep(2)
           throw new Error(data.error || 'Please review the highlighted fields.')
         }
+        if (res.status === 429) {
+          throw new Error(
+            data?.error ||
+              'Too many policies generated from this network. Please wait a bit and try again, or sign in for higher limits.',
+          )
+        }
         throw new Error(data?.error || `Generation failed (${res.status})`)
       }
       const data: PolicyOutput = await res.json()
@@ -315,8 +398,8 @@ export function PrivacyPolicyGenerator() {
 
   const handleCopy = useCallback(async () => {
     if (!output) return
-    try {
-      await navigator.clipboard.writeText(output.contentHtml)
+    const ok = await copyTextToClipboard(output.contentHtml)
+    if (ok) {
       setHasCopied(true)
       captureEvent('privacy_policy_copied', {
         ...analyticsProps(),
@@ -324,8 +407,8 @@ export function PrivacyPolicyGenerator() {
       })
       toast.success('Privacy policy copied to clipboard')
       setTimeout(() => setHasCopied(false), 2000)
-    } catch {
-      toast.error('Failed to copy to clipboard')
+    } else {
+      toast.error('Could not copy automatically. Use Download instead, or select the policy text and copy.')
     }
   }, [output, analyticsProps])
 
@@ -366,7 +449,7 @@ export function PrivacyPolicyGenerator() {
 
   /** Save the already-generated policy to the Pro dashboard (no re-wizard). */
   const handleSaveToDashboard = useCallback(async () => {
-    if (!output || !session) return
+    if (!output || !isAuthed) return
     setIsSaving(true)
     try {
       const biz = output.metadata.businessName || inputs.businessName || 'Business'
@@ -396,7 +479,7 @@ export function PrivacyPolicyGenerator() {
       const data = await res.json().catch(() => null)
       if (!res.ok) {
         if (res.status === 403 && data?.upgradeRequired) {
-          toast.error('Saving policies requires a Pro plan')
+          toast.error('Hosting & dashboard save is a Pro feature — copy or download is free with your account.')
           window.location.href = '/upgrade'
           return
         }
@@ -413,10 +496,13 @@ export function PrivacyPolicyGenerator() {
     } finally {
       setIsSaving(false)
     }
-  }, [output, session, inputs])
+  }, [output, isAuthed, inputs])
 
   // If we have output, show the result
   if (output) {
+    const showGuestGate = !isAuthed && !isSessionLoading
+    const showAuthedActions = isAuthed
+
     return (
       <div className="space-y-6">
         {/* Success header */}
@@ -437,25 +523,42 @@ export function PrivacyPolicyGenerator() {
           </CardContent>
         </Card>
 
-        {/* Signup CTA FIRST for non-signed-in users */}
-        {!session && (
+        {/* Auth CTA — hide while session is loading so post-signup doesn't flash the wall */}
+        {showGuestGate && (
           <Card className="border-2 border-primary">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold mb-1">Create a free account to get your policy</h3>
                   <p className="text-sm text-muted-foreground">
-                    Sign up (free) to copy, download, and save your privacy policy. Pro users also get a hosted URL, automatic updates, and version history.
+                    Sign up free to copy or download your privacy policy. Already registered? Sign in and we&apos;ll bring you right back.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto" onClick={() => saveAndNavigate('/auth/signup?callbackUrl=/tools/privacy-policy')}>
+                  <Button size="lg" className="w-full sm:w-auto" onClick={() => saveAndNavigate(SIGNUP_HREF)}>
                     Sign Up Free
                     <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-full sm:w-auto"
+                    onClick={() => saveAndNavigate(SIGNIN_HREF)}
+                  >
+                    Already have an account? Sign in
                   </Button>
                   <p className="text-[11px] text-muted-foreground text-center">No credit card required</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {isSessionLoading && !isAuthed && (
+          <Card>
+            <CardContent className="p-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking your account…
             </CardContent>
           </Card>
         )}
@@ -467,7 +570,7 @@ export function PrivacyPolicyGenerator() {
               <CardTitle className="text-lg">
                 Privacy Policy for {output.metadata.businessName}
               </CardTitle>
-              {session && (
+              {showAuthedActions && (
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={handleCopy}>
                     {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
@@ -485,29 +588,35 @@ export function PrivacyPolicyGenerator() {
             <div className="relative">
               {/* Server-generated content from validated inputs, not user-supplied HTML */}
               <div
-                className={`prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card overflow-y-auto ${session ? 'max-h-[600px]' : 'max-h-[300px]'}`}
+                className={`prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card overflow-y-auto ${showAuthedActions ? 'max-h-[600px]' : 'max-h-[300px]'}`}
                 dangerouslySetInnerHTML={{ __html: output.contentHtml }}
               />
-              {/* Blur overlay — sign up to see full policy */}
-              {!session && (
-                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent rounded-b-lg flex items-end justify-center pb-6">
-                  <Button size="lg" onClick={() => saveAndNavigate('/auth/signup?callbackUrl=/tools/privacy-policy')}>
+              {showGuestGate && (
+                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent rounded-b-lg flex flex-col items-center justify-end gap-2 pb-6">
+                  <Button size="lg" onClick={() => saveAndNavigate(SIGNUP_HREF)}>
                     Sign Up Free to View Full Policy
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                    onClick={() => saveAndNavigate(SIGNIN_HREF)}
+                  >
+                    Or sign in
+                  </button>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Save CTA for authenticated users — actually saves this generated policy */}
-        {session && (
+        {/* Optional Pro path — free accounts already have copy/download above */}
+        {showAuthedActions && (
           <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-green-200 dark:border-green-800">
             <CardContent className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">Save to Your Dashboard</h3>
+              <h3 className="text-lg font-semibold mb-2">Want it hosted for you? (Pro)</h3>
               <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
-                Save this policy to your dashboard to edit, publish to a hosted URL, and track version history.
+                You can already copy or download above for free. Pro saves to your dashboard, publishes a hosted URL, and keeps version history.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Button onClick={handleSaveToDashboard} disabled={isSaving}>
@@ -519,14 +628,12 @@ export function PrivacyPolicyGenerator() {
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-1" />
-                      Save & Manage Policy
+                      Save &amp; host (Pro)
                     </>
                   )}
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link href="/dashboard/privacy-policy/new">
-                    Create another from scratch
-                  </Link>
+                  <Link href="/pricing">See Pro pricing</Link>
                 </Button>
               </div>
             </CardContent>

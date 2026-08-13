@@ -36,6 +36,11 @@ function SignUpContent() {
   // Prevent open redirect — only allow relative paths
   const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
   const isUpgradeFlow = callbackUrl.startsWith('/upgrade')
+  // Attribute funnel correctly when returning to free tools after signup
+  const product =
+    callbackUrl.includes('/tools/privacy-policy') || callbackUrl.includes('/dashboard/privacy')
+      ? 'privacy'
+      : 'banner'
 
   // Pre-fill email from query parameter or banner config
   useEffect(() => {
@@ -70,7 +75,7 @@ function SignUpContent() {
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true)
-    captureEvent('signup_started', { method: 'google', product: 'banner' })
+    captureEvent('signup_started', { method: 'google', product })
     try {
       await signIn('google', { callbackUrl })
     } catch (error) {
@@ -85,7 +90,7 @@ function SignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-    captureEvent('signup_started', { method: 'credentials', product: 'banner' })
+    captureEvent('signup_started', { method: 'credentials', product })
 
     if (!agreeToTerms) {
       setError('Please agree to the Terms of Service and Privacy Policy')
@@ -135,9 +140,11 @@ function SignUpContent() {
         })
 
         if (signInResult?.ok) {
+          // refresh so useSession on the destination sees the new cookie immediately
           router.push(callbackUrl)
+          router.refresh()
         } else {
-          router.push('/auth/signin')
+          router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`)
         }
       } else {
         setError(data.error || 'Failed to create account')
@@ -446,7 +453,10 @@ function SignUpContent() {
 
             <p className="text-center text-sm text-gray-600">
               Already have an account?{' '}
-              <Link href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link
+                href={`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
                 Sign in
               </Link>
             </p>
