@@ -20,7 +20,6 @@ import {
 } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
-import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 
 export const metadata: Metadata = {
   // Intent: free alternative to paid CMP tools (Cookiebot / OneTrust), not the primary home SERP
@@ -50,7 +49,6 @@ export const metadata: Metadata = {
 export default function FreeCookieBannerPage() {
   return (
     <div className="min-h-screen bg-background">
-      <LiveCookieBanner />
       <Header />
       
       {/* Breadcrumb */}

@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 import { InteractiveBannerDemo } from '@/components/landing/interactive-banner-demo'
 import { Footer } from '@/components/landing/footer'
 import { Header } from '@/components/landing/header'
-import { LiveCookieBanner } from '@/components/cookie-consent/live-banner'
 import { AEOStructuredData } from '@/components/seo/aeo-structured-data'
 
 import { HeroV2 } from '@/components/landing/v2/hero-v2'
@@ -63,7 +62,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <AEOStructuredData baseUrl={baseUrl} />
-      <LiveCookieBanner />
       <Header />
       <main>
         <HeroV2 />

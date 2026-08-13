@@ -16,6 +16,111 @@ const DRAFT_STORAGE_KEY = 'privacy-policy-draft-v1'
 /** Survives signup redirect so the generated policy is still available after auth. */
 const OUTPUT_STORAGE_KEY = 'privacy-policy-output'
 const INPUTS_STORAGE_KEY = 'privacy-policy-inputs'
+/** localStorage key with TTL — survives OAuth full-page redirects and same-origin new tabs. */
+const AUTH_HANDOFF_KEY = 'privacy-policy-auth-handoff-v1'
+const AUTH_HANDOFF_TTL_MS = 2 * 60 * 60 * 1000 // 2 hours
+const CALLBACK_PATH = '/tools/privacy-policy'
+const SIGNUP_HREF = `/auth/signup?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
+const SIGNIN_HREF = `/auth/signin?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
+
+type AuthHandoff = {
+  output: PolicyOutput
+  inputs: PrivacyPolicyInputs
+  savedAt: string
+}
+
+function stashPolicyForAuth(output: PolicyOutput, inputs: PrivacyPolicyInputs) {
+  const payload: AuthHandoff = {
+    output,
+    inputs,
+    savedAt: new Date().toISOString(),
+  }
+  const json = JSON.stringify(payload)
+  try {
+    sessionStorage.setItem(OUTPUT_STORAGE_KEY, JSON.stringify(output))
+    sessionStorage.setItem(INPUTS_STORAGE_KEY, JSON.stringify(inputs))
+  } catch {
+    // Private mode / quota
+  }
+  try {
+    localStorage.setItem(AUTH_HANDOFF_KEY, json)
+  } catch {
+    // Quota / private mode — sessionStorage may still work same-tab
+  }
+}
+
+function readAndClearAuthHandoff(): { output: PolicyOutput | null; inputs: PrivacyPolicyInputs | null } {
+  let output: PolicyOutput | null = null
+  let inputs: PrivacyPolicyInputs | null = null
+
+  // Prefer sessionStorage (same-tab path), then localStorage handoff (OAuth / new tab).
+  try {
+    const rawOut = sessionStorage.getItem(OUTPUT_STORAGE_KEY)
+    if (rawOut) {
+      const parsed: PolicyOutput = JSON.parse(rawOut)
+      if (parsed?.contentHtml) output = parsed
+      sessionStorage.removeItem(OUTPUT_STORAGE_KEY)
+    }
+    const rawIn = sessionStorage.getItem(INPUTS_STORAGE_KEY)
+    if (rawIn) {
+      const parsed = JSON.parse(rawIn)
+      if (parsed && typeof parsed === 'object') inputs = { ...DEFAULT_INPUTS, ...parsed }
+      sessionStorage.removeItem(INPUTS_STORAGE_KEY)
+    }
+  } catch {
+    // ignore
+  }
+
+  try {
+    const raw = localStorage.getItem(AUTH_HANDOFF_KEY)
+    if (raw) {
+      const parsed: AuthHandoff = JSON.parse(raw)
+      const age = parsed?.savedAt ? Date.now() - new Date(parsed.savedAt).getTime() : Infinity
+      if (age <= AUTH_HANDOFF_TTL_MS && parsed?.output?.contentHtml) {
+        if (!output) output = parsed.output
+        if (!inputs && parsed.inputs && typeof parsed.inputs === 'object') {
+          inputs = { ...DEFAULT_INPUTS, ...parsed.inputs }
+        }
+      }
+      localStorage.removeItem(AUTH_HANDOFF_KEY)
+    }
+  } catch {
+    try {
+      localStorage.removeItem(AUTH_HANDOFF_KEY)
+    } catch {
+      // ignore
+    }
+  }
+
+  return { output, inputs }
+}
+
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // Fall through — Firefox private mode / permissions can reject clipboard API
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.left = '-9999px'
+    ta.style.top = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    ta.setSelectionRange(0, text.length)
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
 
 // Field-level validation that runs before we even hit the server.
 function validateStep(step: number, inputs: PrivacyPolicyInputs): Record<string, string> {
@@ -83,7 +188,9 @@ const DEFAULT_INPUTS: PrivacyPolicyInputs = {
 }
 
 export function PrivacyPolicyGenerator() {
-  const { data: session } = useSession()
+  const { data: session, status: sessionStatus } = useSession()
+  const isAuthed = sessionStatus === 'authenticated'
+  const isSessionLoading = sessionStatus === 'loading'
   const [currentStep, setCurrentStep] = useState(0)
   const [inputs, setInputs] = useState<PrivacyPolicyInputs>(DEFAULT_INPUTS)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -92,7 +199,7 @@ export function PrivacyPolicyGenerator() {
   const draftLoaded = useRef(false)
 
   // Always start null on server + first client paint to avoid hydration mismatch.
-  // Post-signup restore happens in useEffect (sessionStorage is client-only).
+  // Post-signup restore happens in useEffect (client storage only).
   const [output, setOutput] = useState<PolicyOutput | null>(null)
   const [hasCopied, setHasCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -103,37 +210,12 @@ export function PrivacyPolicyGenerator() {
     if (draftLoaded.current || typeof window === 'undefined') return
     draftLoaded.current = true
 
-    let restoredPolicy = false
-
-    try {
-      const savedOutput = sessionStorage.getItem(OUTPUT_STORAGE_KEY)
-      if (savedOutput) {
-        const parsed: PolicyOutput = JSON.parse(savedOutput)
-        if (parsed?.contentHtml) {
-          setOutput(parsed)
-          sessionStorage.removeItem(OUTPUT_STORAGE_KEY)
-          restoredPolicy = true
-        }
-      }
-    } catch {
-      // Ignore corrupt output stash.
+    const handoff = readAndClearAuthHandoff()
+    if (handoff.output) {
+      setOutput(handoff.output)
+      if (handoff.inputs) setInputs(handoff.inputs)
+      return
     }
-
-    try {
-      const savedInputs = sessionStorage.getItem(INPUTS_STORAGE_KEY)
-      if (savedInputs) {
-        const parsed = JSON.parse(savedInputs)
-        if (parsed && typeof parsed === 'object') {
-          setInputs({ ...DEFAULT_INPUTS, ...parsed })
-        }
-        sessionStorage.removeItem(INPUTS_STORAGE_KEY)
-      }
-    } catch {
-      // Ignore corrupt inputs stash.
-    }
-
-    // After signup we only care about the generated policy, not a wizard draft toast.
-    if (restoredPolicy) return
 
     // No post-signup stash — restore in-progress wizard draft if present.
     try {
@@ -171,15 +253,10 @@ export function PrivacyPolicyGenerator() {
     return () => window.clearTimeout(handle)
   }, [inputs, currentStep, output])
 
-  // Persist policy + inputs before full-page navigate to signup (same tab / sessionStorage).
+  // Persist policy + inputs before full-page navigate to auth (session + local handoff).
   const saveAndNavigate = useCallback((href: string) => {
     if (output) {
-      try {
-        sessionStorage.setItem(OUTPUT_STORAGE_KEY, JSON.stringify(output))
-        sessionStorage.setItem(INPUTS_STORAGE_KEY, JSON.stringify(inputs))
-      } catch {
-        // Private mode / quota — signup still works; user may need to regenerate.
-      }
+      stashPolicyForAuth(output, inputs)
     }
     window.location.href = href
   }, [output, inputs])

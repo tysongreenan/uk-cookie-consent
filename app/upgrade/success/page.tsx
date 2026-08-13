@@ -7,14 +7,21 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { captureEvent } from '@/lib/analytics'
 
 export default function UpgradeSuccessPage() {
   const { data: session, update } = useSession()
   const planTier = session?.user?.planTier || 'pro_lifetime'
+  const capturedSuccess = useRef(false)
 
   // Force session refresh so the new planTier from the webhook is reflected immediately
   useEffect(() => { update() }, [])
+  useEffect(() => {
+    if (!session?.user?.id || capturedSuccess.current) return
+    capturedSuccess.current = true
+    captureEvent('upgrade_success_viewed', { plan_tier: planTier })
+  }, [planTier, session?.user?.id])
   const isAnnual = planTier === 'pro_annual'
 
   const nextSteps = [
