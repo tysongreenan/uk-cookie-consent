@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft, RefreshCw, Lock } from 'lucide-react'
+import { Check, Crown, Zap, Users, Palette, Upload, BarChart3, Shield, Clock, ArrowLeft, RefreshCw, Lock, Map, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
@@ -110,6 +110,12 @@ function UpgradeContent() {
             Already have an account?{' '}
             <Link href="/auth/signin?callbackUrl=/upgrade" className="text-primary hover:underline">
               Sign in
+            </Link>
+          </p>
+          <p className="text-sm text-muted-foreground mt-6">
+            Want to see what&apos;s coming?{' '}
+            <Link href="/roadmap" className="text-primary hover:underline font-medium">
+              Browse the product roadmap
             </Link>
           </p>
         </div>
@@ -219,6 +225,22 @@ function UpgradeContent() {
               </li>
             </ul>
 
+            {/* Roadmap link — show what's coming / what one-time misses */}
+            <Link
+              href="/roadmap"
+              className="flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm transition-colors hover:bg-primary/10 hover:border-primary/30"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Map className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-muted-foreground">
+                  {billingCycle === 'annual' || isLifetimeUser
+                    ? "See what's coming on the roadmap — all included with annual"
+                    : "See what you're missing — new features land on annual first"}
+                </span>
+              </div>
+              <ArrowRight className="h-4 w-4 text-primary shrink-0" />
+            </Link>
+
             <div className="border-t pt-6">
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold">
@@ -275,7 +297,7 @@ function UpgradeContent() {
 
         {/* Comparison for non-lifetime users */}
         {!isLifetimeUser && billingCycle === 'one_time' && (
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="max-w-2xl mx-auto text-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Want all future features too?{' '}
               <button
@@ -284,6 +306,33 @@ function UpgradeContent() {
               >
                 Switch to annual ($99/year)
               </button>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Or{' '}
+              <Link href="/roadmap" className="text-primary hover:underline font-medium">
+                browse the product roadmap
+              </Link>
+              {' '}to see what&apos;s planned.
+            </p>
+          </div>
+        )}
+        {!isLifetimeUser && billingCycle === 'annual' && (
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-sm text-muted-foreground">
+              Curious what&apos;s next?{' '}
+              <Link href="/roadmap" className="text-primary hover:underline font-medium">
+                View the product roadmap
+              </Link>
+            </p>
+          </div>
+        )}
+        {isLifetimeUser && (
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-sm text-muted-foreground">
+              See everything you&apos;ll unlock:{' '}
+              <Link href="/roadmap" className="text-primary hover:underline font-medium">
+                View the product roadmap
+              </Link>
             </p>
           </div>
         )}

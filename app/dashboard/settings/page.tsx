@@ -17,9 +17,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown, FileText, Download } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown, FileText, Download, Terminal, Key, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+
+type DeveloperKey = {
+  id: string
+  name: string
+  prefix: string
+  last_used_at: string | null
+  expires_at: string | null
+  revoked_at: string | null
+  created_at: string
+}
 
 export default function SettingsPage() {
   const { data: session } = useSession()
@@ -38,8 +48,25 @@ export default function SettingsPage() {
   }>>([])
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false)
   const [invoiceError, setInvoiceError] = useState(false)
+  const [devKeys, setDevKeys] = useState<DeveloperKey[]>([])
+  const [isLoadingDevKeys, setIsLoadingDevKeys] = useState(false)
+  const [isCreatingDevKey, setIsCreatingDevKey] = useState(false)
+  const [newDevKey, setNewDevKey] = useState<string | null>(null)
+  const [copiedKey, setCopiedKey] = useState(false)
 
   const planTier = session?.user?.planTier || 'free'
+
+  const loadDevKeys = () => {
+    setIsLoadingDevKeys(true)
+    fetch('/api/developer/api-keys')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch keys')
+        return res.json()
+      })
+      .then((data) => setDevKeys(data.keys || []))
+      .catch(() => toast.error('Failed to load developer keys'))
+      .finally(() => setIsLoadingDevKeys(false))
+  }
 
   useEffect(() => {
     if (planTier !== 'free') {
@@ -56,6 +83,12 @@ export default function SettingsPage() {
     }
   }, [planTier])
 
+  useEffect(() => {
+    if (session?.user?.id) {
+      loadDevKeys()
+    }
+  }, [session?.user?.id])
+
   const handleManageBilling = async () => {
     setIsLoadingPortal(true)
     try {
@@ -71,6 +104,56 @@ export default function SettingsPage() {
     } finally {
       setIsLoadingPortal(false)
     }
+  }
+
+  const handleCreateDevKey = async () => {
+    setIsCreatingDevKey(true)
+    setNewDevKey(null)
+    try {
+      const res = await fetch('/api/developer/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'MCP Server' }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.message || data.error || 'Failed to create key')
+        return
+      }
+      setNewDevKey(data.key)
+      toast.success('Developer API key created')
+      loadDevKeys()
+    } catch {
+      toast.error('Failed to create developer key')
+    } finally {
+      setIsCreatingDevKey(false)
+    }
+  }
+
+  const handleRevokeDevKey = async (id: string) => {
+    try {
+      const res = await fetch('/api/developer/api-keys', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+      if (!res.ok) {
+        toast.error('Failed to revoke key')
+        return
+      }
+      toast.success('API key revoked')
+      loadDevKeys()
+    } catch {
+      toast.error('Failed to revoke key')
+    }
+  }
+
+  const handleCopyDevKey = async () => {
+    if (!newDevKey) return
+    await navigator.clipboard.writeText(newDevKey)
+    setCopiedKey(true)
+    toast.success('Copied to clipboard')
+    setTimeout(() => setCopiedKey(false), 2000)
   }
 
   const handleDeleteAccount = async () => {
@@ -280,6 +363,93 @@ export default function SettingsPage() {
                     </div>
                   )}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Developer / MCP */}
+          <Card id="developer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Terminal className="mr-2 h-5 w-5" />
+                Developer &amp; MCP
+              </CardTitle>
+              <CardDescription>
+                API keys for terminal and AI coding agents — list and update banners without the dashboard
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Generate a <code className="text-xs bg-muted px-1 py-0.5 rounded">cb_</code> key, set{' '}
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">COOKIE_BANNER_API_KEY</code>, and
+                connect the MCP server from Claude Code, Cursor, or any MCP client. See{' '}
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">packages/mcp</code> in the repo.
+              </p>
+
+              {newDevKey && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
+                  <p className="text-sm font-medium text-amber-900 flex items-center gap-2">
+                    <Key className="h-4 w-4" />
+                    Save this key now — it won&apos;t be shown again
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-xs break-all bg-white border rounded px-2 py-1.5">
+                      {newDevKey}
+                    </code>
+                    <Button type="button" size="sm" variant="outline" onClick={handleCopyDevKey}>
+                      {copiedKey ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Active keys</h4>
+                <Button
+                  size="sm"
+                  onClick={handleCreateDevKey}
+                  disabled={isCreatingDevKey}
+                >
+                  {isCreatingDevKey ? 'Creating…' : 'Generate API key'}
+                </Button>
+              </div>
+
+              {isLoadingDevKeys ? (
+                <p className="text-sm text-muted-foreground">Loading keys…</p>
+              ) : devKeys.filter((k) => !k.revoked_at).length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No developer keys yet. Generate one to use the MCP server from your terminal.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {devKeys
+                    .filter((k) => !k.revoked_at)
+                    .map((k) => (
+                      <li
+                        key={k.id}
+                        className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{k.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {k.prefix}… · created{' '}
+                            {new Date(k.created_at).toLocaleDateString()}
+                            {k.last_used_at
+                              ? ` · last used ${new Date(k.last_used_at).toLocaleDateString()}`
+                              : ' · never used'}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={() => handleRevokeDevKey(k.id)}
+                        >
+                          Revoke
+                        </Button>
+                      </li>
+                    ))}
+                </ul>
               )}
             </CardContent>
           </Card>

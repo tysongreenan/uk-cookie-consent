@@ -45,9 +45,21 @@ export function RoadmapPreview() {
       const response = await fetch('/api/roadmap')
       if (response.ok) {
         const data = await response.json()
-        // Get top 4 voted items
-        const sorted = data.items.sort((a: RoadmapItem, b: RoadmapItem) => b.vote_count - a.vote_count)
-        setTopItems(sorted.slice(0, 4))
+        const items: RoadmapItem[] = data.items || []
+        // Prefer active work, then planned — not already-shipped items
+        const statusRank: Record<string, number> = {
+          'in-progress': 0,
+          planned: 1,
+          completed: 2,
+        }
+        const sorted = [...items].sort((a, b) => {
+          const sa = statusRank[a.status] ?? 3
+          const sb = statusRank[b.status] ?? 3
+          if (sa !== sb) return sa - sb
+          if (b.vote_count !== a.vote_count) return b.vote_count - a.vote_count
+          return a.priority - b.priority
+        })
+        setTopItems(sorted.filter((i) => i.status !== 'completed').slice(0, 4))
       }
     } catch (error) {
       console.error('Error fetching roadmap items:', error)
