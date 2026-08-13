@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, Monitor, Smartphone } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Copy, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, Monitor, Smartphone, Check } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -37,7 +37,9 @@ import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
 import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
-import { getPostHogRequestHeaders } from '@/lib/analytics'
+import { getPostHogRequestHeaders, captureEvent } from '@/lib/analytics'
+import { copyToClipboard } from '@/lib/utils'
+import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -562,6 +564,9 @@ function BannerBuilderContent() {
       loadedBannerRef.current = editId
       loadBannerForEdit(editId)
     }
+    if (searchParams.get('tab') === 'code') {
+      setActiveTab('code')
+    }
   }, [searchParams, session])
 
   // Warn user about unsaved changes before leaving the page
@@ -1001,6 +1006,37 @@ function BannerBuilderContent() {
     }
   }
 
+  const [snippetCopied, setSnippetCopied] = useState(false)
+
+  const handleCopyInstallSnippet = async () => {
+    if (!bannerId) {
+      setActiveTab('code')
+      toast.error('Save the banner first to get a one-line install snippet')
+      return
+    }
+    try {
+      const planTier = session?.user?.planTier || 'free'
+      const snippet = hostedInstallSnippet(bannerId, {
+        showBranding: planTier === 'free',
+      })
+      await copyToClipboard(snippet)
+      markInstallSnippetCopied(bannerId)
+      captureEvent('install_snippet_copied', {
+        banner_id: bannerId,
+        snippet_type: 'hosted',
+        plan_tier: planTier,
+        source: 'builder_header',
+      })
+      setSnippetCopied(true)
+      setActiveTab('code')
+      toast.success('Install snippet copied — paste it in your site header')
+      setTimeout(() => setSnippetCopied(false), 3000)
+    } catch {
+      setActiveTab('code')
+      toast.error('Could not copy automatically. Use the Install snippet step below.')
+    }
+  }
+
   const isStepComplete = (step: string): boolean => {
     switch (step) {
       case 'compliance':
@@ -1095,9 +1131,13 @@ function BannerBuilderContent() {
                 </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button onClick={handleSave} disabled={isLoading} size="sm">
+              <Button onClick={handleSave} disabled={isLoading} size="sm" variant="outline">
                 <Save className="h-4 w-4" />
                 {isLoading ? 'Saving...' : 'Save Draft'}
+              </Button>
+              <Button onClick={handleCopyInstallSnippet} size="sm">
+                {snippetCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                {snippetCopied ? 'Copied!' : 'Copy snippet'}
               </Button>
               {isEditing && (
                 <Button 
@@ -1304,7 +1344,7 @@ function BannerBuilderContent() {
                     }`}
                   >
                     <Code className="h-4 w-4" />
-                    <span className="flex-1 text-left">Code</span>
+                    <span className="flex-1 text-left">Install snippet</span>
                     {isStepComplete('code') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                 </nav>
@@ -1323,7 +1363,7 @@ function BannerBuilderContent() {
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
                    activeTab === 'behavior' ? 'Set Banner Behavior' :
                    activeTab === 'geo-targeting' ? 'Geo-Targeting Rules' :
-                   activeTab === 'analytics' ? 'Analytics Integration' : 'Get Your Code'}
+                   activeTab === 'analytics' ? 'Analytics Integration' : 'Get your install snippet'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-prose">
                   {activeTab === 'compliance' ? 'Select the privacy law that applies to your website. This will configure your banner\'s requirements and legal text.' :
@@ -1335,7 +1375,7 @@ function BannerBuilderContent() {
                    activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
                    activeTab === 'geo-targeting' ? 'Show different consent behavior based on visitor location. Requires Pro plan.' :
                    activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
-                   'Copy the code below and paste it into your website to activate your cookie banner.'}
+                   'Copy the snippet below and paste it into your website to activate your cookie banner.'}
                 </p>
               </div>
               
@@ -4554,10 +4594,10 @@ function BannerBuilderContent() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Code className="mr-2 h-5 w-5" />
-                      Implementation Code
+                      Install snippet
                     </CardTitle>
                     <CardDescription>
-                      Copy and paste this code into your website to activate your cookie banner
+                      Copy this snippet and paste it into your website&apos;s head to activate your cookie banner
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

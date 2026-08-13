@@ -1,19 +1,19 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { CheckCircle, BarChart3, Users, ArrowRight, RefreshCw, Clock, Rocket } from 'lucide-react'
+import { CheckCircle, ArrowRight, RefreshCw, Clock, Rocket } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { captureEvent } from '@/lib/analytics'
 
 export default function UpgradeSuccessPage() {
   const { data: session, update } = useSession()
   const planTier = session?.user?.planTier || 'pro_lifetime'
   const capturedSuccess = useRef(false)
+  const [existingBannerId, setExistingBannerId] = useState<string | null>(null)
 
   // Force session refresh so the new planTier from the webhook is reflected immediately
   useEffect(() => { update() }, [])
@@ -22,22 +22,27 @@ export default function UpgradeSuccessPage() {
     capturedSuccess.current = true
     captureEvent('upgrade_success_viewed', { plan_tier: planTier })
   }, [planTier, session?.user?.id])
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/banners/simple')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return
+        const first = data?.banners?.[0]
+        setExistingBannerId(first?.id ?? null)
+      })
+      .catch(() => {
+        if (!cancelled) setExistingBannerId(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   const isAnnual = planTier === 'pro_annual'
-
-  const nextSteps = [
-    {
-      icon: <BarChart3 className="h-5 w-5" />,
-      title: 'Explore Analytics',
-      description: 'Track banner performance and consent rates',
-      href: '/dashboard/analytics',
-    },
-    {
-      icon: <Users className="h-5 w-5" />,
-      title: 'Invite Team Members',
-      description: 'Add your team with role-based permissions',
-      href: '/dashboard/team',
-    },
-  ]
+  const hasBanner = Boolean(existingBannerId)
+  const primaryHref = hasBanner
+    ? `/dashboard/builder?id=${existingBannerId}&tab=code`
+    : '/dashboard/builder'
 
   return (
     <div className="min-h-screen bg-background">
@@ -51,7 +56,9 @@ export default function UpgradeSuccessPage() {
           </div>
           <h1 className="text-4xl font-bold mb-4">Welcome to Pro!</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Your account has been upgraded. Create your banner next — then copy the install snippet onto your site.
+            {hasBanner
+              ? 'Your account has been upgraded. Copy the install snippet onto your site to go live.'
+              : 'Your account has been upgraded. Create your banner next — then copy the install snippet onto your site.'}
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <div className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center gap-1.5">
@@ -66,14 +73,16 @@ export default function UpgradeSuccessPage() {
             </div>
           </div>
           <Button size="lg" className="mt-8 h-12 px-8" asChild>
-            <Link href="/dashboard/builder">
+            <Link href={primaryHref}>
               <Rocket className="h-4 w-4 mr-2" />
-              Create your first banner
+              {hasBanner ? 'Copy your install snippet' : 'Create your first banner'}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
           <p className="text-sm text-muted-foreground mt-3">
-            Takes about 2 minutes. PIPEDA, Law 25, GPC, and geo rules are ready in the builder.
+            {hasBanner
+              ? 'Open the Install snippet step, copy the one-line script, and paste it in your site header.'
+              : 'Takes about 2 minutes. PIPEDA, Law 25, GPC, and geo rules are ready in the builder.'}
           </p>
         </div>
 
@@ -95,24 +104,9 @@ export default function UpgradeSuccessPage() {
         </ol>
 
         {/* Secondary next steps */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-12">
-          {nextSteps.map((step, i) => (
-            <Link key={i} href={step.href}>
-              <Card className="hover:border-primary/50 hover:shadow-md transition-all cursor-pointer h-full">
-                <CardContent className="p-5 flex items-start gap-4">
-                  <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
-                    {step.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm">{step.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground ml-auto mt-1 shrink-0" />
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <p className="text-center text-sm text-muted-foreground mb-12">
+          Analytics, team invites, and integrations are in the dashboard after you install.
+        </p>
 
         {/* Info card */}
         {isAnnual ? (
@@ -132,7 +126,7 @@ export default function UpgradeSuccessPage() {
               All current Pro features are yours forever. Want all future features too? You can upgrade to annual anytime at a loyalty discount.
             </p>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard">Go to Dashboard</Link>
+              <Link href={hasBanner ? primaryHref : '/dashboard'}>{hasBanner ? 'Open installer' : 'Go to Dashboard'}</Link>
             </Button>
           </div>
         )}

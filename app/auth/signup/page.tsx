@@ -250,7 +250,11 @@ function SignUpContent() {
                   </div>
                   <div className="flex items-center gap-2 text-zinc-300 text-sm">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    <span>Create your first banner in minutes</span>
+                    <span>
+                      {product === 'privacy'
+                        ? 'Copy your policy, then create a banner in minutes'
+                        : 'Create your first banner in minutes'}
+                    </span>
                   </div>
                 </div>
               </>
@@ -274,7 +278,9 @@ function SignUpContent() {
           <div className="text-center lg:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Create an account</h1>
             <p className="mt-2 text-gray-600">
-              Get started with your free account
+              {product === 'privacy'
+                ? 'You\'ll return to your privacy policy so you can copy it, then create a cookie banner.'
+                : 'Get started with your free account'}
             </p>
           </div>
 
