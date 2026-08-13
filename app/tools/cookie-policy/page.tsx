@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { FinalCTA } from '@/components/landing/final-cta'
@@ -20,6 +21,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/tools/cookie-policy',
+    types: {
+      'text/markdown': '/tools/cookie-policy.md',
+    },
   },
 }
 
@@ -62,6 +66,11 @@ export default function CookiePolicyPage() {
               </div>
 
               <CookiePolicyGenerator />
+              <p className="text-xs text-muted-foreground mt-4">
+                <Link href="/tools/cookie-policy.md" className="hover:underline">
+                  Read as markdown
+                </Link>
+              </p>
             </div>
           </div>
         </section>

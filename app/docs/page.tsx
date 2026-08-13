@@ -106,6 +106,11 @@ export default function DocsPage() {
             <p className="text-xl text-muted-foreground mb-8">
               Learn how to create, customize, and integrate GDPR-compliant cookie consent banners in just a few simple steps.
             </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              <Link href="/docs.md" className="hover:underline">
+                Read as markdown
+              </Link>
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
                 <Link href="/dashboard/builder">

@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/tools/privacy-policy',
+    types: {
+      'text/markdown': '/tools/privacy-policy.md',
+    },
   },
 }
 
@@ -161,6 +164,11 @@ export default function PrivacyPolicyPage() {
 
               {/* Generator — immediately visible */}
               <PrivacyPolicyGenerator />
+              <p className="text-xs text-muted-foreground mt-4">
+                <Link href="/tools/privacy-policy.md" className="hover:underline">
+                  Read as markdown
+                </Link>
+              </p>
 
               {/* Legal expectation — not a law firm opinion */}
               <p className="mt-4 text-xs text-muted-foreground leading-relaxed max-w-3xl">

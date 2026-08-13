@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { getPostBySlug, getAllPostSlugs } from '@/lib/blog/blog'
+import { getPostBySlug, getAllPostSlugs, isValidBlogSlug } from '@/lib/blog/blog'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -40,11 +40,19 @@ export async function generateMetadata({
 }: {
   params: { slug: string }
 }): Promise<Metadata> {
+  if (!isValidBlogSlug(params.slug)) {
+    return {
+      title: 'Post Not Found',
+      robots: { index: false, follow: false },
+    }
+  }
+
   const post = await getPostBySlug(params.slug)
 
   if (!post) {
     return {
       title: 'Post Not Found',
+      robots: { index: false, follow: false },
     }
   }
 
@@ -57,6 +65,9 @@ export async function generateMetadata({
     authors: [{ name: post.author }],
     alternates: {
       canonical: canonicalUrl,
+      types: {
+        'text/markdown': `${canonicalUrl}.md`,
+      },
     },
     openGraph: {
       title: post.title,

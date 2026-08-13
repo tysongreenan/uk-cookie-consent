@@ -43,6 +43,23 @@ function remarkHeadingIds() {
 
 const postsDirectory = path.join(process.cwd(), 'content/blog')
 
+/** Published blog slugs are lowercase kebab-case. Rejects `.md` suffixes and path traversal. */
+export function isValidBlogSlug(slug: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
+}
+
+export interface BlogPostSource {
+  slug: string
+  title: string
+  description: string
+  date: string
+  updatedDate?: string
+  author: string
+  tags: string[]
+  published: boolean
+  markdown: string
+}
+
 export interface BlogPost {
   slug: string
   title: string
@@ -82,6 +99,53 @@ export function getAllPostSlugs(): string[] {
   return fileNames
     .filter((fileName) => fileName.endsWith('.md'))
     .map((fileName) => fileName.replace(/\.md$/, ''))
+    .filter(isValidBlogSlug)
+}
+
+function readPostFile(slug: string): { data: Record<string, unknown>; content: string } | null {
+  if (!isValidBlogSlug(slug)) {
+    return null
+  }
+
+  try {
+    const fullPath = path.join(postsDirectory, `${slug}.md`)
+    const postsRoot = path.resolve(postsDirectory)
+    const resolved = path.resolve(fullPath)
+    if (resolved !== postsRoot && !resolved.startsWith(postsRoot + path.sep)) {
+      return null
+    }
+    if (!fs.existsSync(fullPath)) {
+      return null
+    }
+
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
+    const { data, content } = matter(fileContents)
+    return { data, content }
+  } catch {
+    return null
+  }
+}
+
+/** Raw markdown + frontmatter for agent-facing `.md` routes. Does not convert to HTML. */
+export function getPostSourceBySlug(slug: string): BlogPostSource | null {
+  const parsed = readPostFile(slug)
+  if (!parsed) {
+    return null
+  }
+
+  const { data, content } = parsed
+
+  return {
+    slug,
+    title: typeof data.title === 'string' ? data.title : '',
+    description: typeof data.description === 'string' ? data.description : '',
+    date: typeof data.date === 'string' ? data.date : '',
+    updatedDate: typeof data.updatedDate === 'string' ? data.updatedDate : undefined,
+    author: typeof data.author === 'string' ? data.author : 'Cookie Banner Team',
+    tags: Array.isArray(data.tags) ? data.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+    published: data.published !== false,
+    markdown: content.replace(/^\uFEFF/, '').trim(),
+  }
 }
 
 // Get all published posts metadata (for listing page)
@@ -116,38 +180,39 @@ export function getAllPosts(): BlogPostMetadata[] {
 
 // Get single post by slug
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  try {
-    const fullPath = path.join(postsDirectory, `${slug}.md`)
-    const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data, content } = matter(fileContents)
-
-    // Convert markdown to HTML with heading IDs
-    const processedContent = await remark()
-      .use(remarkHeadingIds)
-      .use(html, { sanitize: false })
-      .process(content)
-    const contentHtml = processedContent.toString()
-
-    const stats = readingTime(content)
-
-    return {
-      slug,
-      title: data.title || '',
-      description: data.description || '',
-      date: data.date || '',
-      updatedDate: data.updatedDate || undefined,
-      author: data.author || 'Cookie Banner Team',
-      image: data.image || '',
-      tags: data.tags || [],
-      content: contentHtml,
-      readingTime: stats.text,
-      published: data.published !== false,
-      keywords: data.keywords || undefined,
-      canonical: data.canonical || undefined,
-      schema: data.schema || null,
-    }
-  } catch (error) {
+  const parsed = readPostFile(slug)
+  if (!parsed) {
     return null
+  }
+
+  const { data, content } = parsed
+
+  // Convert markdown to HTML with heading IDs
+  const processedContent = await remark()
+    .use(remarkHeadingIds)
+    .use(html, { sanitize: false })
+    .process(content)
+  const contentHtml = processedContent.toString()
+
+  const stats = readingTime(content)
+
+  return {
+    slug,
+    title: typeof data.title === 'string' ? data.title : '',
+    description: typeof data.description === 'string' ? data.description : '',
+    date: typeof data.date === 'string' ? data.date : '',
+    updatedDate: typeof data.updatedDate === 'string' ? data.updatedDate : undefined,
+    author: typeof data.author === 'string' ? data.author : 'Cookie Banner Team',
+    image: typeof data.image === 'string' ? data.image : '',
+    tags: Array.isArray(data.tags) ? data.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+    content: contentHtml,
+    readingTime: stats.text,
+    published: data.published !== false,
+    keywords: Array.isArray(data.keywords)
+      ? data.keywords.filter((keyword): keyword is string => typeof keyword === 'string')
+      : undefined,
+    canonical: typeof data.canonical === 'string' ? data.canonical : undefined,
+    schema: data.schema ?? null,
   }
 }
 

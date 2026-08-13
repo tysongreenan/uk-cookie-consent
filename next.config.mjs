@@ -29,6 +29,8 @@ const nextConfig = {
     // libraries: libnss3.so". Force the whole package into the route bundle.
     outputFileTracingIncludes: {
       '/api/tools/cookie-scanner': ['./node_modules/@sparticuz/chromium/**'],
+      '/api/md/blog/[slug]': ['./content/blog/**'],
+      '/api/md/page/[slug]': ['./content/pages/**'],
     },
   },
   webpack: (config, { isServer }) => {
@@ -76,6 +78,21 @@ const nextConfig = {
         destination: '/blog/ccpa-cpra-cookie-compliance-guide',
         permanent: true,
       },
+      {
+        source: '/blog/cookie-consent-canada-guide-2025.md',
+        destination: 'https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026.md',
+        permanent: true,
+      },
+      {
+        source: '/blog/gtm-setup.md',
+        destination: '/blog/google-tag-manager-cookie-consent-guide.md',
+        permanent: true,
+      },
+      {
+        source: '/blog/cpra-cookie-requirements-guide.md',
+        destination: '/blog/ccpa-cpra-cookie-compliance-guide.md',
+        permanent: true,
+      },
       // Homepage A/B ended — always use canonical home
       {
         source: '/v2',
@@ -116,6 +133,18 @@ const nextConfig = {
     const isProduction = process.env.NODE_ENV === 'production'
     
     return [
+      {
+        source: '/blog/:slug',
+        headers: [{ key: 'Vary', value: 'Accept' }],
+      },
+      {
+        source: '/docs',
+        headers: [{ key: 'Vary', value: 'Accept' }],
+      },
+      {
+        source: '/tools/:path*',
+        headers: [{ key: 'Vary', value: 'Accept' }],
+      },
       {
         source: '/(.*)',
         headers: [

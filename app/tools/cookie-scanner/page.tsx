@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
+    types: {
+      'text/markdown': '/tools/cookie-scanner.md',
+    },
   },
 }
 
@@ -219,10 +222,20 @@ export default function CookieScannerPage() {
               </p>
 
               <CookieScanner />
+              <noscript>
+                <p className="text-sm text-muted-foreground mt-6">
+                  The scanner needs JavaScript. Read the{' '}
+                  <a href="/tools/cookie-scanner.md">markdown guide</a> for what it does and how to run it in a browser.
+                </p>
+              </noscript>
 
               <p className="text-xs text-muted-foreground mt-8">
                 <Link href="#what-is-cookie-scanner" className="hover:underline">
                   Learn more about cookie scanning &darr;
+                </Link>
+                {' · '}
+                <Link href="/tools/cookie-scanner.md" className="hover:underline">
+                  Read as markdown
                 </Link>
               </p>
             </div>
