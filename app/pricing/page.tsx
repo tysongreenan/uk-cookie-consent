@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Crown, Star, Shield } from 'lucide-react'
+import { Check, Zap, Crown, Star, Shield, Map, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -127,6 +127,16 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
+              <Link
+                href="/roadmap"
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-xs transition-colors hover:bg-muted hover:border-foreground/20"
+              >
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Map className="h-3.5 w-3.5 shrink-0" />
+                  See what you&apos;re missing on the roadmap
+                </span>
+                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              </Link>
               <Button size="lg" className="w-full" asChild>
                 <Link href="/upgrade?billing=one_time">
                   Buy Pro — $99 USD
@@ -199,6 +209,17 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
+
+              <Link
+                href="/roadmap"
+                className="flex items-center justify-between gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs transition-colors hover:bg-primary/10 hover:border-primary/30"
+              >
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Map className="h-3.5 w-3.5 text-primary shrink-0" />
+                  See everything coming on the roadmap
+                </span>
+                <ArrowRight className="h-3.5 w-3.5 text-primary shrink-0" />
+              </Link>
 
               <Button size="lg" className="w-full" asChild>
                 <Link href="/upgrade?billing=annual">
@@ -277,9 +298,13 @@ export default function PricingPage() {
               </p>
             </div>
             <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What's the difference between one-time and annual?</h3>
+              <h3 className="font-semibold mb-2">What&apos;s the difference between one-time and annual?</h3>
               <p className="text-sm text-muted-foreground">
-                Both plans include all current Pro features. The annual plan ($99/year) also includes every new feature we release, priority support, and early access. The one-time plan ($99 once) gives you everything available today, forever — security patches included, but new features require the annual plan.
+                Both plans include all current Pro features. The annual plan ($99/year) also includes every new feature we release, priority support, and early access. The one-time plan ($99 once) gives you everything available today, forever — security patches included, but new features require the annual plan.{' '}
+                <Link href="/roadmap" className="text-primary underline underline-offset-2">
+                  See the product roadmap
+                </Link>{' '}
+                for what&apos;s shipping next.
               </p>
             </div>
             <div className="border rounded-lg p-6">

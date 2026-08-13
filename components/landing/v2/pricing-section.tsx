@@ -11,6 +11,8 @@ type PriceCard = {
   ctaHref: string
   recommended?: boolean
   enterprise?: boolean
+  /** Optional link to roadmap for Pro plans */
+  roadmapNote?: string
 }
 
 const CARDS: PriceCard[] = [
@@ -49,6 +51,7 @@ const CARDS: PriceCard[] = [
     ],
     ctaLabel: 'Buy once · $99',
     ctaHref: '/pricing',
+    roadmapNote: "See what you're missing →",
   },
   {
     tier: 'Pro · Annual',
@@ -68,6 +71,7 @@ const CARDS: PriceCard[] = [
     ctaLabel: 'Get Pro Annual',
     ctaHref: '/pricing',
     recommended: true,
+    roadmapNote: "See what's coming →",
   },
   {
     tier: 'Enterprise',
@@ -108,7 +112,11 @@ export function PricingSection() {
           <strong className="font-semibold text-foreground">
             PIPEDA, Law 25, GDPR &amp; CCPA
           </strong>{' '}
-          compliance. 30-day money-back guarantee on Pro plans. All prices in US dollars (USD).
+          compliance. 30-day money-back guarantee on Pro plans. All prices in US dollars (USD).{' '}
+          <Link href="/roadmap" className="font-medium text-primary underline-offset-2 hover:underline">
+            See the product roadmap
+          </Link>
+          {' '}for what&apos;s shipping next.
         </p>
       </div>
     </section>
@@ -201,9 +209,24 @@ function PriceCardItem({ card }: { card: PriceCard }) {
         ))}
       </ul>
 
+      {card.roadmapNote ? (
+        <Link
+          href="/roadmap"
+          className={`mt-4 text-center text-[12.5px] font-medium underline-offset-2 hover:underline ${
+            enterprise
+              ? 'text-background/70 hover:text-background'
+              : recommended
+                ? 'text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {card.roadmapNote}
+        </Link>
+      ) : null}
+
       <Link
         href={card.ctaHref}
-        className={`mt-6 inline-flex h-[52px] w-full items-center justify-center rounded-[12px] px-5 text-[15.5px] font-semibold transition-colors ${
+        className={`${card.roadmapNote ? 'mt-3' : 'mt-6'} inline-flex h-[52px] w-full items-center justify-center rounded-[12px] px-5 text-[15.5px] font-semibold transition-colors ${
           enterprise
             ? 'bg-background text-foreground hover:bg-background/90'
             : recommended
