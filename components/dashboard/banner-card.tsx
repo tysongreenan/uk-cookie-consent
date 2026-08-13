@@ -8,10 +8,8 @@ import {
   MoreHorizontal, 
   Edit, 
   Trash2, 
-  Copy, 
-  ExternalLink,
-  Eye,
-  Settings
+  Copy,
+  Settings,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -100,24 +98,15 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
                     Edit Banner
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Eye className="mr-2 h-4 w-4" />
-                  Preview
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onCopy(banner.id)}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy Static Code
-                </DropdownMenuItem>
                 {onCopyEmbed && (
                   <DropdownMenuItem onClick={() => onCopyEmbed(banner.id)}>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Embed Code
-                    <NewBadge variant="sparkle" className="ml-2" />
+                    Copy install snippet
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem>
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View Live
+                <DropdownMenuItem onClick={() => onCopy(banner.id)}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy static code
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
@@ -182,12 +171,20 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
               </span>
             </div>
             
-            <Button size="sm" asChild>
-              <Link href={`/dashboard/builder?id=${banner.id}`}>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              {onCopyEmbed && (
+                <Button size="sm" onClick={() => onCopyEmbed(banner.id)}>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy snippet
+                </Button>
+              )}
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/dashboard/builder?id=${banner.id}&tab=code`}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Filter, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Palette, Code } from 'lucide-react'
+import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Palette, Code, Copy, X } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
@@ -17,6 +17,15 @@ import { CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { BannerCard } from '@/components/dashboard/banner-card'
+import { captureEvent } from '@/lib/analytics'
+import { copyToClipboard } from '@/lib/utils'
+import {
+  hostedInstallSnippet,
+  markInstallSnippetCopied,
+  anyInstallSnippetCopied,
+  isInstallNudgeDismissed,
+  dismissInstallNudge,
+} from '@/lib/install-snippet'
 
 interface Banner {
   id: string
@@ -44,6 +53,7 @@ export function DashboardClient() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // 'grid' or 'list'
   const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
   const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number; userRole: string } | null>(null)
+  const [showInstallNudge, setShowInstallNudge] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -133,6 +143,10 @@ export function DashboardClient() {
         // Check if any banners need migration
         const hasOutdated = parsedBanners.some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
+        const ids = parsedBanners.map((b: Banner) => b.id)
+        setShowInstallNudge(
+          ids.length > 0 && !isInstallNudgeDismissed() && !anyInstallSnippetCopied(ids),
+        )
       } else {
         console.error('Failed to fetch banners:', data?.error || 'Unknown error')
         setBanners([])
@@ -227,7 +241,15 @@ export function DashboardClient() {
         throw new Error('Failed to fetch banner code')
       }
       const data = await response.json()
-      await navigator.clipboard.writeText(data.code)
+      await copyToClipboard(data.code)
+      markInstallSnippetCopied(bannerId)
+      captureEvent('install_snippet_copied', {
+        banner_id: bannerId,
+        snippet_type: 'static',
+        plan_tier: session?.user?.planTier || 'free',
+        source: 'dashboard_card',
+      })
+      setShowInstallNudge(false)
       toast.success('Banner code copied to clipboard!')
     } catch (error) {
       console.error('Error copying banner code:', error)
@@ -237,19 +259,24 @@ export function DashboardClient() {
 
   const copyEmbedCode = async (bannerId: string) => {
     try {
-      const embedCode = `<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}"></script>`
-      await navigator.clipboard.writeText(embedCode)
-      toast.success('Embed code copied to clipboard!', {
+      const embedCode = hostedInstallSnippet(bannerId, {
+        showBranding: (session?.user?.planTier || 'free') === 'free',
+      })
+      await copyToClipboard(embedCode)
+      markInstallSnippetCopied(bannerId)
+      captureEvent('install_snippet_copied', {
+        banner_id: bannerId,
+        snippet_type: 'hosted',
+        plan_tier: session?.user?.planTier || 'free',
+        source: 'dashboard_card',
+      })
+      setShowInstallNudge(false)
+      toast.success('Install snippet copied — paste it in your site header', {
         duration: 4000,
-        icon: '🚀',
-        style: {
-          background: '#10b981',
-          color: 'white',
-        },
       })
     } catch (error) {
       console.error('Error copying embed code:', error)
-      toast.error('Failed to copy embed code')
+      toast.error('Failed to copy install snippet')
     }
   }
 
@@ -312,6 +339,41 @@ export function DashboardClient() {
             isVisible={hasOutdatedBanners}
             onDismiss={() => setHasOutdatedBanners(false)}
           />
+        )}
+
+        {showInstallNudge && banners[0] && (
+          <Card className="border-2 border-primary">
+            <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
+                <h2 className="font-semibold">Last step: install your banner</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Copy the snippet and paste it in your site&apos;s &lt;head&gt;. Until you do, visitors won&apos;t see the banner.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button onClick={() => copyEmbedCode(banners[0].id)}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy install snippet
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href={`/dashboard/builder?id=${banners[0].id}&tab=code`}>
+                    Open installer
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Dismiss install reminder"
+                  onClick={() => {
+                    dismissInstallNudge()
+                    setShowInstallNudge(false)
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Team Context */}
@@ -436,7 +498,7 @@ export function DashboardClient() {
 
                 <Link href="/dashboard/builder">
                   <Button size="lg" className="h-12 px-8 text-base">
-                    Get Started
+                    Create your first banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>

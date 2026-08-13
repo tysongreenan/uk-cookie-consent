@@ -38,23 +38,31 @@ export function validateUrl(url: string): boolean {
   }
 }
 
-export function copyToClipboard(text: string): Promise<void> {
-  if (navigator.clipboard) {
-    return navigator.clipboard.writeText(text)
-  } else {
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea')
-    textArea.value = text
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-    try {
-      document.execCommand('copy')
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
+export async function copyToClipboard(text: string): Promise<void> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return
     }
+  } catch {
+    // Permissions / Firefox private mode — fall through to execCommand
+  }
+
+  const textArea = document.createElement('textarea')
+  textArea.value = text
+  textArea.setAttribute('readonly', '')
+  textArea.style.position = 'fixed'
+  textArea.style.left = '-9999px'
+  textArea.style.top = '0'
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+  textArea.setSelectionRange(0, text.length)
+  try {
+    const ok = document.execCommand('copy')
+    if (!ok) throw new Error('Failed to copy text')
+  } finally {
     document.body.removeChild(textArea)
-    return Promise.resolve()
   }
 }
 

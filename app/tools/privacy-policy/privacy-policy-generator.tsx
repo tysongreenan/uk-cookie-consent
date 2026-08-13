@@ -8,7 +8,7 @@ import { StepBusinessInfo } from '@/components/privacy-policy/wizard-steps/step-
 import { StepDataCollection } from '@/components/privacy-policy/wizard-steps/step-data-collection'
 import { StepCookies } from '@/components/privacy-policy/wizard-steps/step-cookies'
 import type { PrivacyPolicyInputs, PolicyOutput } from '@/types'
-import { ArrowLeft, ArrowRight, Loader2, Copy, Check, Download, Save } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader2, Copy, Check, Download, Save, Palette } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { captureEvent, getPostHogRequestHeaders } from '@/lib/analytics'
@@ -20,6 +20,8 @@ const INPUTS_STORAGE_KEY = 'privacy-policy-inputs'
 /** localStorage handoff with TTL — survives OAuth full-page redirects and same-origin new tabs. */
 const AUTH_HANDOFF_KEY = 'privacy-policy-auth-handoff-v1'
 const AUTH_HANDOFF_TTL_MS = 2 * 60 * 60 * 1000 // 2 hours
+/** Set before navigating to auth so a failed restore still knows this was a gated signup. */
+const AUTH_RETURN_KEY = 'privacy-policy-auth-return-v1'
 const CALLBACK_PATH = '/tools/privacy-policy'
 const SIGNUP_HREF = `/auth/signup?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
 const SIGNIN_HREF = `/auth/signin?callbackUrl=${encodeURIComponent(CALLBACK_PATH)}`
@@ -201,6 +203,8 @@ export function PrivacyPolicyGenerator() {
   // When output is restored after signup redirect, treat completion as signup_callback.
   const entrySource = useRef<'tools' | 'signup_callback'>('tools')
   const hasTrackedStart = useRef(false)
+  const hasTrackedCompleted = useRef(false)
+  const [returnedFromAuth, setReturnedFromAuth] = useState(false)
 
   // Always start null on server + first client paint to avoid hydration mismatch.
   // Post-signup restore happens in useEffect (client storage only).
@@ -221,17 +225,41 @@ export function PrivacyPolicyGenerator() {
     return props
   }, [planTier, inputs.language, inputs.businessType])
 
+  const markToolCompleted = useCallback((action: 'copied' | 'downloaded' | 'saved') => {
+    if (hasTrackedCompleted.current) return
+    hasTrackedCompleted.current = true
+    captureEvent('privacy_policy_completed', {
+      ...analyticsProps(),
+      action,
+    })
+  }, [analyticsProps])
+
   // Restore generated policy (and wizard inputs) after signup redirect, else draft.
   useEffect(() => {
     if (draftLoaded.current || typeof window === 'undefined') return
     draftLoaded.current = true
+
+    let cameFromAuth = false
+    try {
+      cameFromAuth = sessionStorage.getItem(AUTH_RETURN_KEY) === '1'
+      if (cameFromAuth) sessionStorage.removeItem(AUTH_RETURN_KEY)
+    } catch {
+      // ignore
+    }
 
     const handoff = readAndClearAuthHandoff(DEFAULT_INPUTS)
     if (handoff.output) {
       setOutput(handoff.output)
       if (handoff.inputs) setInputs(handoff.inputs)
       entrySource.current = 'signup_callback'
+      setReturnedFromAuth(true)
+      toast.success('Welcome back — copy your policy, then create a cookie banner.', { duration: 4000 })
       return
+    }
+
+    if (cameFromAuth) {
+      entrySource.current = 'signup_callback'
+      setReturnedFromAuth(true)
     }
 
     // No post-signup stash — restore in-progress wizard draft if present.
@@ -245,7 +273,12 @@ export function PrivacyPolicyGenerator() {
           setCurrentStep(Math.min(Math.max(0, parsed.currentStep), 2))
         }
         if (parsed.savedAt) setDraftSavedAt(new Date(parsed.savedAt))
-        toast.success('Draft restored', { duration: 2000 })
+        toast.success(
+          cameFromAuth
+            ? 'Welcome back — finish generating your policy, then create a cookie banner.'
+            : 'Draft restored',
+          { duration: cameFromAuth ? 4000 : 2000 },
+        )
       }
     } catch {
       // Ignore corrupt drafts.
@@ -270,10 +303,22 @@ export function PrivacyPolicyGenerator() {
     return () => window.clearTimeout(handle)
   }, [inputs, currentStep, output])
 
+  // Keep the generated policy stashed while it is on screen so header Sign up
+  // (or a refresh mid-gate) can restore it after auth — not only the in-tool CTA.
+  useEffect(() => {
+    if (!output) return
+    stashPolicyForAuth(output, inputs)
+  }, [output, inputs])
+
   // Persist policy + inputs before full-page navigate to auth (session + local handoff).
   const saveAndNavigate = useCallback((href: string) => {
     if (output) {
       stashPolicyForAuth(output, inputs)
+    }
+    try {
+      sessionStorage.setItem(AUTH_RETURN_KEY, '1')
+    } catch {
+      // ignore
     }
     window.location.href = href
   }, [output, inputs])
@@ -405,12 +450,13 @@ export function PrivacyPolicyGenerator() {
         ...analyticsProps(),
         format: 'html',
       })
+      markToolCompleted('copied')
       toast.success('Privacy policy copied to clipboard')
       setTimeout(() => setHasCopied(false), 2000)
     } else {
       toast.error('Could not copy automatically. Use Download instead, or select the policy text and copy.')
     }
-  }, [output, analyticsProps])
+  }, [output, analyticsProps, markToolCompleted])
 
   const handleDownload = useCallback(() => {
     if (!output) return
@@ -431,7 +477,8 @@ export function PrivacyPolicyGenerator() {
       ...analyticsProps(),
       format: 'html',
     })
-  }, [output, inputs.businessName, analyticsProps])
+    markToolCompleted('downloaded')
+  }, [output, inputs.businessName, analyticsProps, markToolCompleted])
 
   const handleStartOver = useCallback(() => {
     setOutput(null)
@@ -442,6 +489,8 @@ export function PrivacyPolicyGenerator() {
     setDraftSavedAt(null)
     entrySource.current = 'tools'
     hasTrackedStart.current = false
+    hasTrackedCompleted.current = false
+    setReturnedFromAuth(false)
     try {
       localStorage.removeItem(DRAFT_STORAGE_KEY)
     } catch {}
@@ -489,6 +538,7 @@ export function PrivacyPolicyGenerator() {
         throw new Error('Save succeeded but no policy id was returned')
       }
       toast.success(isFr ? 'Politique enregistrée' : 'Policy saved to your dashboard')
+      markToolCompleted('saved')
       window.location.href = `/dashboard/privacy-policy/${data.id}`
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save policy'
@@ -496,7 +546,7 @@ export function PrivacyPolicyGenerator() {
     } finally {
       setIsSaving(false)
     }
-  }, [output, isAuthed, inputs])
+  }, [output, isAuthed, inputs, markToolCompleted])
 
   // If we have output, show the result
   if (output) {
@@ -559,6 +609,36 @@ export function PrivacyPolicyGenerator() {
             <CardContent className="p-4 flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
               Checking your account…
+            </CardContent>
+          </Card>
+        )}
+
+        {showAuthedActions && (
+          <Card className="border-2 border-primary">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-1">
+                {returnedFromAuth ? 'Welcome back — finish what you started' : 'Your policy is ready. Next up: your cookie banner.'}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Copy or download the policy below, then create a banner and paste the install snippet on your site.
+              </p>
+              <ol className="text-sm text-muted-foreground space-y-1.5 mb-5 list-decimal ml-4">
+                <li>Copy HTML or download the policy</li>
+                <li>Create a cookie banner and copy the install snippet</li>
+              </ol>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button size="lg" onClick={handleCopy}>
+                  {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {hasCopied ? 'Copied' : 'Copy HTML'}
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/dashboard/builder">
+                    <Palette className="h-4 w-4 mr-1" />
+                    Create a cookie banner
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -644,6 +724,27 @@ export function PrivacyPolicyGenerator() {
   }
 
   return (
+    <div className="space-y-6">
+      {returnedFromAuth && (
+        <Card className="border-2 border-primary">
+          <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <p className="font-semibold">
+                {returnedFromAuth ? 'Welcome back — pick up where you left off' : 'You\'re signed in'}
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Finish generating your policy, then create a cookie banner and copy the install snippet.
+              </p>
+            </div>
+            <Button variant="outline" asChild className="shrink-0">
+              <Link href="/dashboard/builder">
+                Create a cookie banner instead
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     <Card className="border-2 border-primary/20 shadow-lg">
       <CardHeader className="pb-4">
         {/* What to do — clear instruction */}
@@ -734,5 +835,6 @@ export function PrivacyPolicyGenerator() {
         )}
       </CardContent>
     </Card>
+    </div>
   )
 }

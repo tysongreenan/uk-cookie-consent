@@ -15,6 +15,8 @@ import {
 } from '@/lib/banner-generator'
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 import { captureEvent, captureException } from '@/lib/analytics'
+import { copyToClipboard as copyText } from '@/lib/utils'
+import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
 
 interface CodeGeneratorProps {
   config: BannerConfig
@@ -108,15 +110,7 @@ ${generateBannerHTML(config, { showBranding })}
 
   const generateHostedScript = () => {
     if (!bannerId) return ''
-    const scriptUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca'}/api/v1/banner.js?id=${bannerId}`
-
-    // Paid plans do not include the noscript attribution link
-    if (showBranding) {
-      return `<script src="${scriptUrl}" async></script>
-<noscript><a href="https://cookie-banner.ca/?ref=banner" rel="noopener" style="font-size:10px;color:rgba(128,128,128,0.5);text-decoration:none;">Cookie consent by cookie-banner.ca</a></noscript>`
-    }
-
-    return `<script src="${scriptUrl}" async></script>`
+    return hostedInstallSnippet(bannerId, { showBranding })
   }
 
   const getCode = () => {
@@ -128,16 +122,22 @@ ${generateBannerHTML(config, { showBranding })}
     }
   }
 
-  const copyToClipboard = async () => {
+  const copyCode = async (code?: string, snippetType?: 'head' | 'body' | 'hosted') => {
+    const text = code ?? getCode()
+    const type = snippetType ?? activeTab
     try {
-      await navigator.clipboard.writeText(getCode())
+      await copyText(text)
       setCopied(true)
       toast.success('Copied to clipboard!')
       captureEvent('install_snippet_copied', {
         banner_id: bannerId || null,
-        snippet_type: activeTab,
+        snippet_type: type,
         plan_tier: planTier || 'free',
+        source: 'builder_code_tab',
       })
+      if (bannerId && type === 'hosted') {
+        markInstallSnippetCopied(bannerId)
+      }
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
       captureException(err, { context: 'install_snippet_copy' })
@@ -196,16 +196,30 @@ ${generateBannerHTML(config, { showBranding })}
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-xs text-muted-foreground">Paste this in your &lt;head&gt; section</span>
               </div>
-              <span className="text-[10px] bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 font-semibold px-1.5 py-0.5 rounded-full">RECOMMENDED</span>
+              <Button type="button" size="sm" variant="outline" onClick={() => copyCode()}>
+                {copied ? <><Check className="mr-1 h-3.5 w-3.5" /> Copied</> : <><Copy className="mr-1 h-3.5 w-3.5" /> Copy</>}
+              </Button>
             </div>
-            <pre className="p-4 text-sm overflow-x-auto bg-muted/50">
+            <pre
+              className="p-4 text-sm overflow-x-auto bg-muted/50 cursor-pointer"
+              onClick={() => copyCode()}
+              title="Click to copy"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  copyCode()
+                }
+              }}
+            >
               <code>{getCode()}</code>
             </pre>
           </CardContent>
         </Card>
 
         {/* Big copy button */}
-        <Button onClick={copyToClipboard} className="w-full h-11" size="default">
+        <Button onClick={() => copyCode()} className="w-full h-11" size="default">
           {copied ? (
             <><Check className="mr-2 h-4 w-4" /> Copied!</>
           ) : (
@@ -306,21 +320,25 @@ ${generateBannerHTML(config, { showBranding })}
                       </span>
                     </div>
                   </div>
-                  <pre className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-72">
+                  <pre
+                    className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-72 cursor-pointer"
+                    onClick={() => copyCode(manualTab === 'head' ? generateHeadCode() : generateBodyCode(), manualTab)}
+                    title="Click to copy"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        copyCode(manualTab === 'head' ? generateHeadCode() : generateBodyCode(), manualTab)
+                      }
+                    }}
+                  >
                     <code>{manualTab === 'head' ? generateHeadCode() : generateBodyCode()}</code>
                   </pre>
                 </CardContent>
               </Card>
               <Button
-                onClick={async () => {
-                  try {
-                    const code = manualTab === 'head' ? generateHeadCode() : generateBodyCode()
-                    await navigator.clipboard.writeText(code)
-                    toast.success(`${manualTab === 'head' ? 'Head' : 'Body'} code copied!`)
-                  } catch {
-                    toast.error('Failed to copy code')
-                  }
-                }}
+                onClick={() => copyCode(manualTab === 'head' ? generateHeadCode() : generateBodyCode(), manualTab)}
                 size="sm"
                 variant="outline"
                 className="mt-2"
@@ -338,6 +356,14 @@ ${generateBannerHTML(config, { showBranding })}
   // Head/Body code view (manual installation or no bannerId)
   return (
     <div className="space-y-4">
+      {!bannerId && (
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">Save the banner to get a one-line install snippet</p>
+          <p className="text-sm text-amber-800 dark:text-amber-400 mt-1">
+            Use <strong>Save Draft</strong> in the header. Then copy the hosted script tag — no head + body paste required.
+          </p>
+        </div>
+      )}
       {/* Update notification for copy-paste users */}
       {showUpdateNotice && (
         <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 rounded-lg relative">
@@ -408,7 +434,7 @@ ${generateBannerHTML(config, { showBranding })}
 
       {/* Action Buttons */}
       <div className="flex space-x-2">
-        <Button onClick={copyToClipboard} size="sm" className="flex-[2]">
+        <Button onClick={() => copyCode()} size="sm" className="flex-[2]">
           {copied ? <><Check className="mr-2 h-4 w-4" /> Copied!</> : <><Copy className="mr-2 h-4 w-4" /> Copy Code</>}
         </Button>
         <Button onClick={regenerateCode} variant="outline" size="sm" disabled={isGenerating} className="flex-1">
@@ -434,7 +460,19 @@ ${generateBannerHTML(config, { showBranding })}
               </span>
             </div>
           </div>
-          <pre className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-96">
+          <pre
+            className="p-4 text-sm overflow-x-auto bg-muted/50 max-h-96 cursor-pointer"
+            onClick={() => copyCode()}
+            title="Click to copy"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                copyCode()
+              }
+            }}
+          >
             <code>{getCode()}</code>
           </pre>
         </CardContent>

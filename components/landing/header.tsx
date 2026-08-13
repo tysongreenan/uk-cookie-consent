@@ -5,11 +5,17 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSession } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 
 export function Header() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname() || '/'
+  const authCallback =
+    pathname.startsWith('/tools/')
+      ? `?callbackUrl=${encodeURIComponent(pathname)}`
+      : ''
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
@@ -71,10 +77,10 @@ export function Header() {
             ) : (
               <>
                 <Button variant="ghost" asChild size="sm">
-                  <Link href="/auth/signin">Sign In</Link>
+                  <Link href={`/auth/signin${authCallback}`}>Sign In</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/auth/signup">Sign up for free</Link>
+                  <Link href={`/auth/signup${authCallback}`}>Sign up for free</Link>
                 </Button>
               </>
             )}
@@ -132,10 +138,10 @@ export function Header() {
               ) : (
                 <>
                   <Button asChild size="lg" className="w-full">
-                    <Link href="/auth/signup">Sign up for free</Link>
+                    <Link href={`/auth/signup${authCallback}`}>Sign up for free</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full">
-                    <Link href="/auth/signin">Sign In</Link>
+                    <Link href={`/auth/signin${authCallback}`}>Sign In</Link>
                   </Button>
                 </>
               )}
