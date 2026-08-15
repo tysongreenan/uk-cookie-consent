@@ -50,7 +50,7 @@ export async function GET(
         status,
         created_at,
         expires_at,
-        invite_link
+        token
       `)
       .eq('team_id', teamId)
       .in('status', ['pending', 'accepted', 'expired'])
@@ -61,9 +61,19 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch invitations' }, { status: 500 })
     }
 
+    // Build the invite link from the token. The UI reads it as invite_link.
+    const baseUrl = request.headers.get('origin') ||
+                   process.env.NEXT_PUBLIC_BASE_URL ||
+                   process.env.NEXTAUTH_URL ||
+                   'http://localhost:3000'
+    const data = (invitations || []).map(({ token, ...invitation }) => ({
+      ...invitation,
+      invite_link: `${baseUrl}/invite/${token}`,
+    }))
+
     return NextResponse.json({
       success: true,
-      data: invitations
+      data
     })
   } catch (error) {
     console.error('Error in GET /api/teams/[teamId]/invitations:', error)

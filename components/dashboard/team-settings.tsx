@@ -69,21 +69,29 @@ interface TeamInfo {
 }
 
 export function TeamSettings() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null)
   const [members, setMembers] = useState<TeamMember[]>([])
   const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([])
+  const [canManageInvitations, setCanManageInvitations] = useState(true)
   const [loading, setLoading] = useState(true)
   const [showInviteModal, setShowInviteModal] = useState(false)
 
   useEffect(() => {
+    if (status === 'loading') return
     if (session?.user?.currentTeamId) {
       fetchTeamData()
+    } else {
+      // No workspace selected. Stop the skeleton loaders.
+      setLoading(false)
     }
-  }, [session])
+  }, [session, status])
 
   const fetchTeamData = async () => {
-    if (!session?.user?.currentTeamId) return
+    if (!session?.user?.currentTeamId) {
+      setLoading(false)
+      return
+    }
 
     try {
       // Fetch team info
@@ -114,6 +122,11 @@ export function TeamSettings() {
       
       if (invitationsResponse.ok && invitationsData.success) {
         setPendingInvitations(invitationsData.data)
+        setCanManageInvitations(true)
+      } else if (invitationsResponse.status === 403) {
+        // Viewers and editors cannot manage invitations. This is expected.
+        setPendingInvitations([])
+        setCanManageInvitations(false)
       } else {
         console.error('Failed to fetch workspace invitations:', invitationsData)
         toast.error('Failed to load workspace invitations')
@@ -404,7 +417,15 @@ export function TeamSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {pendingInvitations.length === 0 ? (
+          {!canManageInvitations ? (
+            <div className="text-center py-6 text-gray-500">
+              <Eye className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm">You do not have access to view invitations</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Only workspace owners and admins can manage invitations.
+              </p>
+            </div>
+          ) : pendingInvitations.length === 0 ? (
             <div className="text-center py-6 text-gray-500">
               <UserPlus className="h-8 w-8 mx-auto mb-2 text-gray-400" />
               <p className="text-sm">No pending invitations</p>
