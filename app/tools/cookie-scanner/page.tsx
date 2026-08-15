@@ -9,14 +9,19 @@ import { CookieScanner } from './cookie-scanner'
 import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Cookie Scanner: Free Website Audit Tool — GDPR, CCPA & PIPEDA (2026)',
-  description: 'Free cookie scanner to audit any website in 30 seconds. Detect all cookies, check GDPR/CCPA/PIPEDA compliance, categorize by type. No signup — instant results. Used for 47,000+ scans.',
+  title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
+  description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
   keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner, website cookie checker, cookie scanning',
   openGraph: {
-    title: 'Cookie Scanner: Free Website Cookie Audit Tool (2026)',
-    description: 'Free cookie scanner to audit any website in 30 seconds. Detect all cookies, check GDPR/CCPA/PIPEDA compliance, categorize by type. No signup — instant results.',
+    title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
+    description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
+    description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
@@ -44,7 +49,7 @@ export default function CookieScannerPage() {
       "name": "Cookie Banner",
       "url": "https://www.cookie-banner.ca"
     },
-    "description": "Free cookie scanner tool to audit your website cookies. Scan any website to find all cookies, analyze compliance, and get recommendations for GDPR, PIPEDA, CCPA, and Law 25 compliance.",
+    "description": "Free cookie scanner and checker. Paste any public URL to list cookies and categories, then check GDPR, PIPEDA, CCPA, and Law 25. About 30 seconds. No signup.",
     "featureList": [
       "Instant website cookie scanning",
       "GDPR compliance analysis",
@@ -207,18 +212,18 @@ export default function CookieScannerPage() {
       <Header />
 
       <main>
-        {/* Hero: Scanner Above the Fold */}
-        <section className="min-h-[calc(100vh-56px)] flex flex-col justify-center py-12 sm:py-16 md:py-24">
+        {/* Hero: compact, top-aligned so the URL field stays above the site cookie banner */}
+        <section className="pt-6 pb-28 sm:pt-10 sm:pb-16 md:pt-12">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <div className="border border-border rounded-full px-3 py-1 text-xs font-mono tracking-wide uppercase text-muted-foreground inline-block mb-4">
+              <div className="border border-border rounded-full px-3 py-1 text-xs font-mono tracking-wide uppercase text-muted-foreground inline-block mb-3">
                 Free &mdash; No Signup Required
               </div>
-              <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight mb-3">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold tracking-tight mb-2">
                 Scan any website for cookies
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">
-                Check GDPR, CCPA & PIPEDA compliance in 30 seconds
+              <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6">
+                Cookies, categories, and GDPR, CCPA, PIPEDA &amp; Law 25 — about 30 seconds
               </p>
 
               <CookieScanner />
@@ -229,7 +234,7 @@ export default function CookieScannerPage() {
                 </p>
               </noscript>
 
-              <p className="text-xs text-muted-foreground mt-8">
+              <p className="text-xs text-muted-foreground mt-5 sm:mt-8">
                 <Link href="#what-is-cookie-scanner" className="hover:underline">
                   Learn more about cookie scanning &darr;
                 </Link>
