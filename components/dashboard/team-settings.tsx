@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { InviteMemberModal } from './invite-member-modal'
+import { invitationsFromApiResponse } from '@/lib/team-invitations'
 
 interface TeamMember {
   id: string
@@ -77,9 +78,13 @@ export function TeamSettings() {
   const [showInviteModal, setShowInviteModal] = useState(false)
 
   useEffect(() => {
-    if (session?.user?.currentTeamId) {
-      fetchTeamData()
+    if (!session) return
+    if (!session.user?.currentTeamId) {
+      setLoading(false)
+      setPendingInvitations([])
+      return
     }
+    fetchTeamData()
   }, [session])
 
   const fetchTeamData = async () => {
@@ -108,15 +113,17 @@ export function TeamSettings() {
         toast.error('Failed to load workspace members')
       }
 
-      // Fetch pending invitations
+      // Fetch pending invitations. Empty / no-permission is a normal empty state.
       const invitationsResponse = await fetch(`/api/teams/${session.user.currentTeamId}/invitations`)
-      const invitationsData = await invitationsResponse.json()
-      
-      if (invitationsResponse.ok && invitationsData.success) {
-        setPendingInvitations(invitationsData.data)
-      } else {
+      const invitationsData = await invitationsResponse.json().catch(() => null)
+      const invitationsResult = invitationsFromApiResponse({
+        ok: invitationsResponse.ok,
+        status: invitationsResponse.status,
+        body: invitationsData,
+      })
+      setPendingInvitations(invitationsResult.invitations)
+      if (invitationsResult.showErrorToast) {
         console.error('Failed to fetch workspace invitations:', invitationsData)
-        toast.error('Failed to load workspace invitations')
       }
     } catch (error) {
       console.error('Error fetching team data:', error)

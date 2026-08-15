@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { mapInvitationRows } from '@/lib/team-invitations'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -33,25 +34,11 @@ export async function GET(
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    if (!['owner', 'admin'].includes(teamMember.role)) {
-      return NextResponse.json(
-        { error: 'Only workspace owners and admins can view invitations.' },
-        { status: 403 }
-      )
-    }
-
-    // Get pending invitations for this team
+    // Any workspace member can see the invite list. Empty is a normal state.
+    // invite_link is not a DB column — it is derived from token.
     const { data: invitations, error } = await supabase
       .from('TeamInvitation')
-      .select(`
-        id,
-        email,
-        role,
-        status,
-        created_at,
-        expires_at,
-        invite_link
-      `)
+      .select('id, email, role, status, created_at, expires_at, token')
       .eq('team_id', teamId)
       .in('status', ['pending', 'accepted', 'expired'])
       .order('created_at', { ascending: false })
@@ -61,9 +48,10 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch invitations' }, { status: 500 })
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     return NextResponse.json({
       success: true,
-      data: invitations
+      data: mapInvitationRows(invitations, baseUrl)
     })
   } catch (error) {
     console.error('Error in GET /api/teams/[teamId]/invitations:', error)

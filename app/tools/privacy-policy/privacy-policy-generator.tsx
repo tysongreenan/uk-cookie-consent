@@ -285,9 +285,10 @@ export function PrivacyPolicyGenerator() {
     }
   }, [])
 
-  // Auto-save draft (debounced) whenever inputs or step change — skip once we have output.
+  // Auto-save draft (debounced) whenever inputs or step change, including after generate
+  // so an uploaded logo is still there if they hit Start Over or a signup gate.
   useEffect(() => {
-    if (!draftLoaded.current || output) return
+    if (!draftLoaded.current) return
     const handle = window.setTimeout(() => {
       try {
         const now = new Date()
@@ -428,10 +429,8 @@ export function PrivacyPolicyGenerator() {
       }
       const data: PolicyOutput = await res.json()
       setOutput(data)
-      // Clear the saved draft on success — it's been generated.
-      try {
-        localStorage.removeItem(DRAFT_STORAGE_KEY)
-      } catch {}
+      // Keep the wizard draft (including logo) so Start Over / signup never
+      // forces the user to re-enter Step 1. Output is also stashed below.
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
       setError(message)
@@ -483,17 +482,14 @@ export function PrivacyPolicyGenerator() {
   const handleStartOver = useCallback(() => {
     setOutput(null)
     setCurrentStep(0)
-    setInputs(DEFAULT_INPUTS)
     setError(null)
     setFieldErrors({})
-    setDraftSavedAt(null)
     entrySource.current = 'tools'
     hasTrackedStart.current = false
     hasTrackedCompleted.current = false
     setReturnedFromAuth(false)
-    try {
-      localStorage.removeItem(DRAFT_STORAGE_KEY)
-    } catch {}
+    // Keep wizard inputs (including uploaded logo) so Start Over does not
+    // throw away the work they already typed. Only the generated document resets.
   }, [])
 
   /** Save the already-generated policy to the Pro dashboard (no re-wizard). */
@@ -548,10 +544,10 @@ export function PrivacyPolicyGenerator() {
     }
   }, [output, isAuthed, inputs, markToolCompleted])
 
-  // If we have output, show the result
+  // If we have output, show the result. Guests can view, copy, and download.
+  // Account is optional — used to save/host, not to obtain the file.
   if (output) {
-    const showGuestGate = !isAuthed && !isSessionLoading
-    const showAuthedActions = isAuthed
+    const showGuestSaveCta = !isAuthed && !isSessionLoading
 
     return (
       <div className="space-y-6">
@@ -573,20 +569,51 @@ export function PrivacyPolicyGenerator() {
           </CardContent>
         </Card>
 
-        {/* Auth CTA — hide while session is loading so post-signup doesn't flash the wall */}
-        {showGuestGate && (
-          <Card className="border-2 border-primary">
+        <Card className="border-2 border-primary">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-1">
+              {returnedFromAuth
+                ? 'Welcome back — your policy is still here'
+                : 'Copy or download your policy'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              You can take the file now. A free account is only needed if you want to save it to a dashboard later.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button size="lg" onClick={handleCopy}>
+                {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                {hasCopied ? 'Copied' : 'Copy HTML'}
+              </Button>
+              <Button size="lg" variant="outline" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-1" />
+                Download
+              </Button>
+              {isAuthed ? (
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/dashboard/builder">
+                    <Palette className="h-4 w-4 mr-1" />
+                    Create a cookie banner
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
+
+        {showGuestSaveCta && (
+          <Card>
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-1">Create a free account to get your policy</h3>
+                  <h3 className="text-lg font-semibold mb-1">Optional: save this to an account</h3>
                   <p className="text-sm text-muted-foreground">
-                    Sign up free to copy or download your privacy policy. Already registered? Sign in and we&apos;ll bring you right back.
+                    Your answers and logo stay in this browser. After you sign up you&apos;ll land back on this finished policy — you will not start the wizard over.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto" onClick={() => saveAndNavigate(SIGNUP_HREF)}>
-                    Sign Up Free
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto" onClick={() => saveAndNavigate(SIGNUP_HREF)}>
+                    Create a free account
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                   <Button
@@ -597,7 +624,6 @@ export function PrivacyPolicyGenerator() {
                   >
                     Already have an account? Sign in
                   </Button>
-                  <p className="text-[11px] text-muted-foreground text-center">No credit card required</p>
                 </div>
               </div>
             </CardContent>
@@ -613,36 +639,6 @@ export function PrivacyPolicyGenerator() {
           </Card>
         )}
 
-        {showAuthedActions && (
-          <Card className="border-2 border-primary">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-1">
-                {returnedFromAuth ? 'Welcome back — finish what you started' : 'Your policy is ready. Next up: your cookie banner.'}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Copy or download the policy below, then create a banner and paste the install snippet on your site.
-              </p>
-              <ol className="text-sm text-muted-foreground space-y-1.5 mb-5 list-decimal ml-4">
-                <li>Copy HTML or download the policy</li>
-                <li>Create a cookie banner and copy the install snippet</li>
-              </ol>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button size="lg" onClick={handleCopy}>
-                  {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                  {hasCopied ? 'Copied' : 'Copy HTML'}
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/dashboard/builder">
-                    <Palette className="h-4 w-4 mr-1" />
-                    Create a cookie banner
-                    <ArrowRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Policy content */}
         <Card>
           <CardHeader>
@@ -650,48 +646,28 @@ export function PrivacyPolicyGenerator() {
               <CardTitle className="text-lg">
                 Privacy Policy for {output.metadata.businessName}
               </CardTitle>
-              {showAuthedActions && (
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleCopy}>
-                    {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                    {hasCopied ? 'Copied' : 'Copy HTML'}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownload}>
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleCopy}>
+                  {hasCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {hasCopied ? 'Copied' : 'Copy HTML'}
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownload}>
+                  <Download className="h-4 w-4 mr-1" />
+                  Download
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="relative">
-              {/* Server-generated content from validated inputs, not user-supplied HTML */}
-              <div
-                className={`prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card overflow-y-auto ${showAuthedActions ? 'max-h-[600px]' : 'max-h-[300px]'}`}
-                dangerouslySetInnerHTML={{ __html: output.contentHtml }}
-              />
-              {showGuestGate && (
-                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent rounded-b-lg flex flex-col items-center justify-end gap-2 pb-6">
-                  <Button size="lg" onClick={() => saveAndNavigate(SIGNUP_HREF)}>
-                    Sign Up Free to View Full Policy
-                    <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                  <button
-                    type="button"
-                    className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
-                    onClick={() => saveAndNavigate(SIGNIN_HREF)}
-                  >
-                    Or sign in
-                  </button>
-                </div>
-              )}
-            </div>
+            <div
+              className="prose prose-sm max-w-none dark:prose-invert border border-border rounded-lg p-6 bg-white dark:bg-card overflow-y-auto max-h-[600px]"
+              dangerouslySetInnerHTML={{ __html: output.contentHtml }}
+            />
           </CardContent>
         </Card>
 
         {/* Optional Pro path — free accounts already have copy/download above */}
-        {showAuthedActions && (
+        {isAuthed && (
           <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 border-green-200 dark:border-green-800">
             <CardContent className="p-6 text-center">
               <h3 className="text-lg font-semibold mb-2">Want it hosted for you? (Pro)</h3>

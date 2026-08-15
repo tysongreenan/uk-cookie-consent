@@ -17,15 +17,18 @@ import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
 import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
+import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 
 interface CodeGeneratorProps {
   config: BannerConfig
   bannerId?: string
   planTier?: string
   detectedCmpVendor?: string
+  /** Persist an unsaved banner before copying a hosted snippet. */
+  onEnsureSaved?: () => Promise<string | null>
 }
 
-export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, onEnsureSaved }: CodeGeneratorProps) {
   const showBranding = !planTier || planTier === 'free'
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>(bannerId ? 'hosted' : 'head')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -123,9 +126,35 @@ ${generateBannerHTML(config, { showBranding })}
   }
 
   const copyCode = async (code?: string, snippetType?: 'head' | 'body' | 'hosted') => {
-    const text = code ?? getCode()
     const type = snippetType ?? activeTab
     try {
+      if (onEnsureSaved && (type === 'hosted' || !bannerId)) {
+        const { persisted, bannerId: savedId } = await persistThenCopySnippet({
+          bannerId,
+          persist: onEnsureSaved,
+          copy: async (id) => {
+            const hosted = hostedInstallSnippet(id, { showBranding })
+            await copyText(hosted)
+            markInstallSnippetCopied(id)
+            captureEvent('install_snippet_copied', {
+              banner_id: id,
+              snippet_type: 'hosted',
+              plan_tier: planTier || 'free',
+              source: 'builder_code_tab',
+            })
+          },
+        })
+        setCopied(true)
+        toast.success(
+          persisted
+            ? 'Banner saved. Install snippet copied — this snippet is live.'
+            : 'Copied to clipboard!',
+        )
+        setTimeout(() => setCopied(false), 3000)
+        return savedId
+      }
+
+      const text = code ?? getCode()
       await copyText(text)
       setCopied(true)
       toast.success('Copied to clipboard!')
@@ -141,7 +170,7 @@ ${generateBannerHTML(config, { showBranding })}
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
       captureException(err, { context: 'install_snippet_copy' })
-      toast.error('Failed to copy code')
+      toast.error('Save the banner so the snippet is real, then copy again.')
     }
   }
 
@@ -358,9 +387,13 @@ ${generateBannerHTML(config, { showBranding })}
     <div className="space-y-4">
       {!bannerId && (
         <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">Save the banner to get a one-line install snippet</p>
+          <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+            {onEnsureSaved ? 'Copy will save this banner first' : 'Save the banner to get a one-line install snippet'}
+          </p>
           <p className="text-sm text-amber-800 dark:text-amber-400 mt-1">
-            Use <strong>Save Draft</strong> in the header. Then copy the hosted script tag — no head + body paste required.
+            {onEnsureSaved
+              ? 'The hosted script tag only works after the banner exists. Copy Code saves it, then copies a real snippet.'
+              : 'Use Save Draft in the header. Then copy the hosted script tag — no head + body paste required.'}
           </p>
         </div>
       )}

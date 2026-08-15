@@ -40,6 +40,7 @@ import { FONT_PRESETS } from '@/lib/font-presets'
 import { getPostHogRequestHeaders, captureEvent } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
+import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -877,7 +878,7 @@ function BannerBuilderContent() {
 
   const [isPushing, setIsPushing] = useState(false)
 
-  const handleSave = async () => {
+  const persistBanner = async (options?: { silent?: boolean }): Promise<string | null> => {
     setIsLoading(true)
     try {
       const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
@@ -915,30 +916,35 @@ function BannerBuilderContent() {
           setBannerUpdatedAt(new Date())
         }
         setIsDirty(false)
-        toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
-        if (!isEditing) {
+        const savedId = (!isEditing && data.bannerId) ? data.bannerId : bannerId
+        if (!options?.silent) {
+          toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
+        }
+        if (!isEditing && data.bannerId) {
           // For new banners, stay in the builder so users can copy the hosted
           // replacement script and finish switching from their old CMP.
-          if (data.bannerId) {
-            setBannerId(data.bannerId)
-            setIsEditing(true)
-            setActiveTab('code')
-            router.replace(`/dashboard/builder?id=${data.bannerId}`)
-          }
-        } else {
-          // For updated banners, stay on the page but show success
-          console.log('Banner updated successfully:', data.banner)
+          setBannerId(data.bannerId)
+          setIsEditing(true)
+          setActiveTab('code')
+          router.replace(`/dashboard/builder?id=${data.bannerId}`)
         }
+        return savedId
       } else {
         console.error('Save/Update error:', data.error)
         toast.error(data.error || 'Failed to save banner')
+        return null
       }
     } catch (error) {
       console.error('Save error:', error)
       toast.error('Failed to save banner')
+      return null
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSave = async () => {
+    await persistBanner()
   }
 
   const handlePushLive = async () => {
@@ -1009,31 +1015,36 @@ function BannerBuilderContent() {
   const [snippetCopied, setSnippetCopied] = useState(false)
 
   const handleCopyInstallSnippet = async () => {
-    if (!bannerId) {
-      setActiveTab('code')
-      toast.error('Save the banner first to get a one-line install snippet')
-      return
-    }
     try {
       const planTier = session?.user?.planTier || 'free'
-      const snippet = hostedInstallSnippet(bannerId, {
-        showBranding: planTier === 'free',
-      })
-      await copyToClipboard(snippet)
-      markInstallSnippetCopied(bannerId)
-      captureEvent('install_snippet_copied', {
-        banner_id: bannerId,
-        snippet_type: 'hosted',
-        plan_tier: planTier,
-        source: 'builder_header',
+      const { persisted } = await persistThenCopySnippet({
+        bannerId,
+        persist: () => persistBanner({ silent: true }),
+        copy: async (id) => {
+          const snippet = hostedInstallSnippet(id, {
+            showBranding: planTier === 'free',
+          })
+          await copyToClipboard(snippet)
+          markInstallSnippetCopied(id)
+          captureEvent('install_snippet_copied', {
+            banner_id: id,
+            snippet_type: 'hosted',
+            plan_tier: planTier,
+            source: 'builder_header',
+          })
+        },
       })
       setSnippetCopied(true)
       setActiveTab('code')
-      toast.success('Install snippet copied — paste it in your site header')
+      toast.success(
+        persisted
+          ? 'Banner saved. Install snippet copied — paste it in your site header'
+          : 'Install snippet copied — paste it in your site header',
+      )
       setTimeout(() => setSnippetCopied(false), 3000)
     } catch {
       setActiveTab('code')
-      toast.error('Could not copy automatically. Use the Install snippet step below.')
+      toast.error('Could not save and copy. Try Save Draft, then copy again.')
     }
   }
 
@@ -1200,12 +1211,16 @@ function BannerBuilderContent() {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="space-y-1">
+                <nav className="space-y-1" role="tablist" aria-label="Banner builder sections">
                   <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     Configuration Steps
                   </div>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'compliance'}
+                    aria-controls="compliance-panel"
                     onClick={() => setActiveTab('compliance')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'compliance'
@@ -1219,6 +1234,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'brand'}
+                    aria-controls="brand-panel"
                     onClick={() => setActiveTab('brand')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'brand'
@@ -1232,6 +1251,10 @@ function BannerBuilderContent() {
                   </button>
 
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'design'}
+                    aria-controls="design-panel"
                     onClick={() => setActiveTab('design')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'design'
@@ -1245,6 +1268,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'content'}
+                    aria-controls="content-panel"
                     onClick={() => setActiveTab('content')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'content'
@@ -1258,6 +1285,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'language'}
+                    aria-controls="language-panel"
                     onClick={() => setActiveTab('language')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'language'
@@ -1271,6 +1302,10 @@ function BannerBuilderContent() {
                   </button>
 
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'scripts'}
+                    aria-controls="scripts-panel"
                     onClick={() => setActiveTab('scripts')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'scripts'
@@ -1284,6 +1319,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'cookie-settings'}
+                    aria-controls="cookie-settings-panel"
                     onClick={() => setActiveTab('cookie-settings')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'cookie-settings'
@@ -1297,6 +1336,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'behavior'}
+                    aria-controls="behavior-panel"
                     onClick={() => setActiveTab('behavior')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'behavior'
@@ -1310,6 +1353,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'geo-targeting'}
+                    aria-controls="geo-targeting-panel"
                     onClick={() => setActiveTab('geo-targeting')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'geo-targeting'
@@ -1323,6 +1370,10 @@ function BannerBuilderContent() {
                   </button>
 
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'analytics'}
+                    aria-controls="analytics-panel"
                     onClick={() => setActiveTab('analytics')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'analytics'
@@ -1336,6 +1387,10 @@ function BannerBuilderContent() {
                   </button>
                   
                   <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'code'}
+                    aria-controls="code-panel"
                     onClick={() => setActiveTab('code')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'code'
@@ -1359,6 +1414,7 @@ function BannerBuilderContent() {
                    activeTab === 'brand' ? 'Brand & Colors' :
                    activeTab === 'design' ? 'Layout & Spacing' :
                    activeTab === 'content' ? 'Set Text & Messages' :
+                   activeTab === 'language' ? 'Language' :
                    activeTab === 'scripts' ? 'Configure Tracking Scripts' :
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
                    activeTab === 'behavior' ? 'Set Banner Behavior' :
@@ -1370,6 +1426,7 @@ function BannerBuilderContent() {
                    activeTab === 'brand' ? 'Import your brand, choose colors, fonts, and logo for your cookie consent banner.' :
                    activeTab === 'design' ? 'Configure position, layout, spacing, and animation settings.' :
                    activeTab === 'content' ? 'Set the text, messages, and button labels for your banner.' :
+                   activeTab === 'language' ? 'Choose automatic translation or lock the banner to one language.' :
                    activeTab === 'scripts' ? 'Configure tracking scripts and cookie categories.' :
                    activeTab === 'cookie-settings' ? 'Configure how users can manage their cookie preferences after initial consent.' :
                    activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
@@ -3445,6 +3502,7 @@ function BannerBuilderContent() {
                           </div>
                         ))}
                         <Button
+                          type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => {
@@ -4606,6 +4664,7 @@ function BannerBuilderContent() {
                       bannerId={bannerId || undefined}
                       planTier={session?.user?.planTier || 'free'}
                       detectedCmpVendor={detectedCmpVendor || undefined}
+                      onEnsureSaved={() => persistBanner({ silent: true })}
                     />
                   </CardContent>
                 </Card>
@@ -4668,7 +4727,10 @@ function BannerBuilderContent() {
                             <button
                               key={v}
                               type="button"
-                              onClick={() => setPreviewView(v)}
+                              onClick={() => {
+                                setPreviewView(v)
+                                if (v === 'floating') setActiveTab('cookie-settings')
+                              }}
                               aria-pressed={effective === v}
                               className={`px-3 py-1.5 rounded transition-colors ${
                                 effective === v
