@@ -598,6 +598,57 @@ select:-webkit-autofill:focus {
     letter-spacing: 0.05em;
     color: hsl(var(--muted-foreground));
   }
+
+  /* In-article next-step buttons (used above the TOC on landing posts) */
+  .article-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.25rem 0 2rem;
+  }
+
+  .article-cta p {
+    flex: 1 0 100%;
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .article-cta a.article-cta-primary,
+  .article-cta a.article-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+    text-underline-offset: 0;
+  }
+
+  .article-cta a.article-cta-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .article-cta a.article-cta-primary:hover {
+    background: hsl(var(--primary-hover));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .article-cta a.article-cta-secondary {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .article-cta a.article-cta-secondary:hover {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+  }
 }
 
 /* Homepage v2 — bento card animations */

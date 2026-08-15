@@ -48,6 +48,16 @@ export function isValidBlogSlug(slug: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
 }
 
+export interface BlogCtaLink {
+  label: string
+  href: string
+}
+
+export interface BlogHeroCta {
+  primary: BlogCtaLink
+  secondary?: BlogCtaLink
+}
+
 export interface BlogPostSource {
   slug: string
   title: string
@@ -75,6 +85,47 @@ export interface BlogPost {
   published: boolean
   canonical?: string
   schema?: any
+  heroCta?: BlogHeroCta
+}
+
+/** Internal site paths only — rejects protocol-relative and external URLs. */
+function isSafeInternalHref(href: string): boolean {
+  return href.startsWith('/') && !href.startsWith('//') && !href.includes('\\')
+}
+
+function parseCtaLink(value: unknown): BlogCtaLink | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const link = value as { label?: unknown; href?: unknown }
+  if (typeof link.label !== 'string' || typeof link.href !== 'string') {
+    return null
+  }
+
+  const label = link.label.trim()
+  const href = link.href.trim()
+  if (!label || !isSafeInternalHref(href)) {
+    return null
+  }
+
+  return { label, href }
+}
+
+/** Optional above-fold CTA from frontmatter. Missing or invalid data is ignored. */
+export function parseHeroCta(value: unknown): BlogHeroCta | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined
+  }
+
+  const raw = value as { primary?: unknown; secondary?: unknown }
+  const primary = parseCtaLink(raw.primary)
+  if (!primary) {
+    return undefined
+  }
+
+  const secondary = parseCtaLink(raw.secondary)
+  return secondary ? { primary, secondary } : { primary }
 }
 
 export interface BlogPostMetadata {
@@ -213,6 +264,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       : undefined,
     canonical: typeof data.canonical === 'string' ? data.canonical : undefined,
     schema: data.schema ?? null,
+    heroCta: parseHeroCta(data.heroCta),
   }
 }
 
