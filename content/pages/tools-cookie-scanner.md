@@ -1,6 +1,6 @@
 ---
-title: "Cookie scanner"
-description: "Free website cookie audit. Enter a public URL, wait about 30 seconds, and get cookies, categories, and GDPR / CCPA / PIPEDA / Law 25 notes. No signup."
+title: "Cookie Scanner: Free, No Signup, Any URL in 30s"
+description: "Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup."
 ---
 
 The interactive scanner on this page needs a browser. This markdown page is the agent-readable version: what the tool does, how to run it, and what the report contains.

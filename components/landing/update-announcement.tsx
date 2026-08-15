@@ -15,7 +15,9 @@ export function UpdateAnnouncement() {
 
   // Hosted privacy policies (/p/…) should look like clean legal documents —
   // never show the marketing announcement banner on those pages.
-  if (pathname?.startsWith('/p/')) {
+  // The cookie scanner first screen is a single job (start a scan). A site-wide
+  // promo above the URL field competes with that and pushes the form down.
+  if (pathname?.startsWith('/p/') || pathname?.startsWith('/tools/cookie-scanner')) {
     return null
   }
 

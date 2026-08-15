@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import {
@@ -274,17 +274,31 @@ export function CookieScanner() {
   const [isEmailing, setIsEmailing] = useState(false)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const urlInputRef = useRef<HTMLInputElement>(null)
+
+  // Autofocus the URL field on desktop only. On phones the keyboard plus this
+  // site's bottom cookie banner would cover the Scan control.
+  useEffect(() => {
+    const canAutofocus = window.matchMedia('(min-width: 768px) and (hover: hover) and (pointer: fine)').matches
+    if (!canAutofocus) return
+    const frame = window.requestAnimationFrame(() => {
+      urlInputRef.current?.focus({ preventScroll: true })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
 
   const handleScan = async (inputUrl?: string) => {
     const rawUrl = inputUrl || url
     if (!rawUrl.trim()) {
       setError('Please enter a website URL')
+      urlInputRef.current?.focus()
       return
     }
 
     const domain = normalizeUrl(rawUrl)
     if (!validateUrl(rawUrl)) {
       setError('Enter a valid domain (e.g., example.com)')
+      urlInputRef.current?.focus()
       return
     }
 
@@ -417,34 +431,43 @@ export function CookieScanner() {
       {/* ── Scanner Input ── */}
       <div className={`transition-all duration-500 ${result ? 'pb-6' : ''}`}>
         <div className="bg-card border-2 border-border rounded-xl p-2 shadow-lg">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <div className="flex items-center flex-1 gap-2 px-3">
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex items-center min-w-0 flex-1 gap-2 px-2 sm:px-3">
               <span className="text-muted-foreground text-sm font-mono hidden sm:inline select-none">https://</span>
               <input
+                ref={urlInputRef}
                 type="text"
+                inputMode="url"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 aria-label="Website URL"
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? 'cookie-scanner-url-error' : undefined}
                 placeholder="example.com"
                 value={url}
                 onChange={(e) => { setUrl(e.target.value); setError('') }}
                 onKeyDown={(e) => e.key === 'Enter' && handleScan()}
                 disabled={isScanning}
-                className="flex-1 text-lg h-14 bg-transparent border-0 outline-none placeholder:text-muted-foreground/50 font-sans disabled:opacity-60"
+                className="min-w-0 flex-1 text-base sm:text-lg h-12 sm:h-14 bg-transparent border-0 outline-none placeholder:text-muted-foreground/50 font-sans disabled:opacity-60"
               />
             </div>
             <Button
               onClick={() => handleScan()}
-              disabled={isScanning || !url.trim()}
+              disabled={isScanning}
               size="lg"
-              className="h-12 px-8 rounded-lg text-base font-semibold shrink-0"
+              className="h-12 px-4 sm:px-8 rounded-lg text-base font-semibold shrink-0"
             >
               {isScanning ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Scanning...
+                  <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
+                  <span className="hidden sm:inline">Scanning...</span>
+                  <span className="sr-only sm:hidden">Scanning</span>
                 </>
               ) : (
                 <>
-                  Scan Now
+                  Scan
+                  <span className="hidden sm:inline">&nbsp;Now</span>
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -454,6 +477,7 @@ export function CookieScanner() {
 
         {error && (
           <motion.div
+            id="cookie-scanner-url-error"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2 mt-3 text-sm text-red-600"
@@ -517,8 +541,21 @@ export function CookieScanner() {
 
       {/* ── Trust Signals & Examples (only when no results and not scanning) ── */}
       {!result && !isScanning && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <span>Try it:</span>
+            {EXAMPLE_URLS.map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => handleScan(example)}
+                className="font-mono px-2 py-1 rounded border border-border hover:bg-accent transition-colors cursor-pointer"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <Activity className="h-3.5 w-3.5" /> 47,000+ scans run
             </span>
@@ -528,18 +565,6 @@ export function CookieScanner() {
             <span className="flex items-center gap-1.5">
               <Zap className="h-3.5 w-3.5" /> Results in &lt;30s
             </span>
-          </div>
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span>Try it:</span>
-            {EXAMPLE_URLS.map((example) => (
-              <button
-                key={example}
-                onClick={() => handleScan(example)}
-                className="font-mono px-2 py-1 rounded border border-border hover:bg-accent transition-colors cursor-pointer"
-              >
-                {example}
-              </button>
-            ))}
           </div>
         </motion.div>
       )}
@@ -572,6 +597,13 @@ export function CookieScanner() {
                 Scanned on {new Date(result.timestamp).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })} at{' '}
                 {new Date(result.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}
               </p>
+              {result.cookies.some((cookie) => cookie.category !== 'necessary') ? (
+                <p className="text-sm mt-3">
+                  <Link href="/free-cookie-banner" className="text-primary font-medium hover:underline">
+                    Create a free cookie banner for these cookies
+                  </Link>
+                </p>
+              ) : null}
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs font-mono">
                   {result.cookies.filter(c => !c.thirdParty).length} first-party
