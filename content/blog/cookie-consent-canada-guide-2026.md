@@ -65,7 +65,7 @@ schema:
 Yes. If your site uses analytics, advertising, or marketing cookies, Canadian law requires **explicit opt-in consent** before those cookies are set. PIPEDA, CASL, and Quebec's Law 25 all apply. Law 25 fines can reach **$25 million** or 4% of global revenue.
 
 <div class="article-cta">
-<p>Scan your site to see what you're setting, or start a free banner you can paste in today.</p>
+<span class="article-cta-note">Scan your site to see what you're setting, or start a free banner you can paste in today.</span>
 <a class="article-cta-primary" href="/tools/cookie-scanner">Scan your site</a>
 <a class="article-cta-secondary" href="/free-cookie-banner">Start a free banner</a>
 </div>

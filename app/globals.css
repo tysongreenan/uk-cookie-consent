@@ -608,7 +608,7 @@ select:-webkit-autofill:focus {
     margin: 1.25rem 0 2rem;
   }
 
-  .article-cta p {
+  .article-cta-note {
     flex: 1 0 100%;
     margin: 0 0 0.25rem;
     font-size: 1rem;
