@@ -16,6 +16,7 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { StructuredData } from '@/components/seo/structured-data'
 import { BlogAssistant } from '@/components/blog/blog-assistant'
+import { BlogHeroCta } from '@/components/blog/blog-hero-cta'
 import { getAuthor } from '@/lib/authors'
 import { formatDate } from '@/lib/utils'
 
@@ -226,6 +227,8 @@ export default async function BlogPostPage({
                 {post.description}
               </p>
             )}
+
+            {post.heroCta && <BlogHeroCta {...post.heroCta} />}
           </div>
         </div>
 
