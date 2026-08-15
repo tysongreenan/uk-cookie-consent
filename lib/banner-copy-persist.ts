@@ -6,23 +6,27 @@ export function needsBannerPersistBeforeCopy(bannerId?: string | null): boolean 
   return !bannerId
 }
 
+/**
+ * `copy` is invoked immediately — inside the original user gesture — with a
+ * promise of the (possibly just-persisted) banner id. Pair it with
+ * `copyToClipboard(() => idPromise.then(...))` so Safari's clipboard access
+ * survives the async save; a plain `await persist(); copy(id)` does not.
+ */
 export async function persistThenCopySnippet(options: {
   bannerId?: string | null
   persist: () => Promise<string | null>
-  copy: (bannerId: string) => Promise<void>
+  copy: (bannerId: Promise<string>) => Promise<void>
 }): Promise<{ bannerId: string; persisted: boolean }> {
-  let bannerId = options.bannerId ?? null
-  let persisted = false
+  const persisted = needsBannerPersistBeforeCopy(options.bannerId)
+  const idPromise = persisted
+    ? options.persist().then((id) => {
+        if (!id) {
+          throw new Error('Banner must be saved before the install snippet can be copied')
+        }
+        return id
+      })
+    : Promise.resolve(options.bannerId as string)
 
-  if (needsBannerPersistBeforeCopy(bannerId)) {
-    bannerId = await options.persist()
-    persisted = true
-  }
-
-  if (!bannerId) {
-    throw new Error('Banner must be saved before the install snippet can be copied')
-  }
-
-  await options.copy(bannerId)
-  return { bannerId, persisted }
+  await options.copy(idPromise)
+  return { bannerId: await idPromise, persisted }
 }

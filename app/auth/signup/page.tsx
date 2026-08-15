@@ -18,7 +18,7 @@ import {
   identifyUser,
   getPostHogRequestHeaders,
 } from '@/lib/analytics'
-import { getPasswordRuleStates, getSignupFieldErrors, isSignupFormValid } from '@/lib/signup-form'
+import { getPasswordRuleStates, getSignupFieldErrors } from '@/lib/signup-form'
 
 function SignUpContent() {
   const searchParams = useSearchParams()
@@ -167,7 +167,6 @@ function SignUpContent() {
     return 'Strong'
   }
 
-  const formValid = isSignupFormValid({ name, email, password, agreeToTerms })
   const passwordRules = getPasswordRuleStates(password)
 
   return (
@@ -473,7 +472,7 @@ function SignUpContent() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white transition-colors mt-2 disabled:opacity-50"
-                disabled={isLoading || isGoogleLoading || !formValid}
+                disabled={isLoading || isGoogleLoading}
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

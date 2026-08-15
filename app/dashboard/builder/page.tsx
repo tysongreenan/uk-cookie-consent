@@ -1020,11 +1020,11 @@ function BannerBuilderContent() {
       const { persisted } = await persistThenCopySnippet({
         bannerId,
         persist: () => persistBanner({ silent: true }),
-        copy: async (id) => {
-          const snippet = hostedInstallSnippet(id, {
-            showBranding: planTier === 'free',
-          })
-          await copyToClipboard(snippet)
+        copy: async (idPromise) => {
+          await copyToClipboard(() =>
+            idPromise.then((id) => hostedInstallSnippet(id, { showBranding: planTier === 'free' })),
+          )
+          const id = await idPromise
           markInstallSnippetCopied(id)
           captureEvent('install_snippet_copied', {
             banner_id: id,

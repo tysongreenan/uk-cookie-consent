@@ -37,7 +37,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { InviteMemberModal } from './invite-member-modal'
-import { invitationsFromApiResponse } from '@/lib/team-invitations'
+import { invitationsFromApiResponse, type MappedInvitation } from '@/lib/team-invitations'
 
 interface TeamMember {
   id: string
@@ -51,15 +51,7 @@ interface TeamMember {
   }
 }
 
-interface PendingInvitation {
-  id: string
-  email: string
-  role: string
-  status: 'pending' | 'accepted' | 'expired'
-  created_at: string
-  expires_at: string
-  invite_link: string
-}
+type PendingInvitation = MappedInvitation
 
 interface TeamInfo {
   id: string
@@ -451,22 +443,28 @@ export function TeamSettings() {
                       {getRoleIcon(invitation.role)}
                       <span className="ml-1">{invitation.role}</span>
                     </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyInviteLink(invitation.invite_link)}
-                      aria-label={`Copy invite link for ${invitation.email}`}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCancelInvitationWithConfirm(invitation.id, invitation.email)}
-                      aria-label={`Cancel invitation for ${invitation.email}`}
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
+                    {/* invite_link is only sent to owners/admins — the same
+                        roles allowed to cancel, so it gates both actions. */}
+                    {invitation.invite_link && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyInviteLink(invitation.invite_link!)}
+                          aria-label={`Copy invite link for ${invitation.email}`}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCancelInvitationWithConfirm(invitation.id, invitation.email)}
+                          aria-label={`Cancel invitation for ${invitation.email}`}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

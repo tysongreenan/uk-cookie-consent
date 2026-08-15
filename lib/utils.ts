@@ -38,7 +38,27 @@ export function validateUrl(url: string): boolean {
   }
 }
 
-export async function copyToClipboard(text: string): Promise<void> {
+export async function copyToClipboard(text: string | (() => Promise<string>)): Promise<void> {
+  if (typeof text !== 'string') {
+    // Deferred text (e.g. save the banner, then copy its snippet). Safari
+    // revokes clipboard access after an await, so hand the browser a promise
+    // via ClipboardItem — the write stays inside the original user gesture.
+    const pending = text()
+    if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      try {
+        const item = new ClipboardItem({
+          'text/plain': pending.then((value) => new Blob([value], { type: 'text/plain' })),
+        })
+        await navigator.clipboard.write([item])
+        return
+      } catch {
+        // Unsupported or blocked — fall through to the plain path.
+        // (If `pending` itself rejected, the await below rethrows it.)
+      }
+    }
+    return copyToClipboard(await pending)
+  }
+
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text)

@@ -36,6 +36,26 @@ describe('mapInvitationRows', () => {
     )
     expect(mapped[0]?.invite_link).toBe('https://www.cookie-banner.ca/invite/tok-1')
   })
+
+  it('omits the invite link (bearer token) for non-admin viewers', () => {
+    const mapped = mapInvitationRows(
+      [
+        {
+          id: 'inv-1',
+          email: 'teammate@example.com',
+          role: 'editor',
+          status: 'pending',
+          created_at: '2026-08-12T00:00:00.000Z',
+          expires_at: '2026-08-19T00:00:00.000Z',
+          token: 'tok-1',
+        },
+      ],
+      'https://www.cookie-banner.ca',
+      { includeLink: false },
+    )
+    expect(mapped[0]?.invite_link).toBeUndefined()
+    expect(JSON.stringify(mapped)).not.toContain('tok-1')
+  })
 })
 
 describe('invitationsFromApiResponse', () => {
@@ -64,6 +84,20 @@ describe('invitationsFromApiResponse', () => {
       invitations: [],
       showErrorToast: false,
       emptyReason: 'forbidden',
+    })
+  })
+
+  it('stays quiet on an expired session — the members fetch surfaces it', () => {
+    expect(
+      invitationsFromApiResponse({
+        ok: false,
+        status: 401,
+        body: { error: 'Unauthorized' },
+      }),
+    ).toEqual({
+      invitations: [],
+      showErrorToast: false,
+      emptyReason: 'unauthenticated',
     })
   })
 

@@ -132,9 +132,9 @@ ${generateBannerHTML(config, { showBranding })}
         const { persisted, bannerId: savedId } = await persistThenCopySnippet({
           bannerId,
           persist: onEnsureSaved,
-          copy: async (id) => {
-            const hosted = hostedInstallSnippet(id, { showBranding })
-            await copyText(hosted)
+          copy: async (idPromise) => {
+            await copyText(() => idPromise.then((id) => hostedInstallSnippet(id, { showBranding })))
+            const id = await idPromise
             markInstallSnippetCopied(id)
             captureEvent('install_snippet_copied', {
               banner_id: id,
@@ -170,7 +170,11 @@ ${generateBannerHTML(config, { showBranding })}
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
       captureException(err, { context: 'install_snippet_copy' })
-      toast.error('Save the banner so the snippet is real, then copy again.')
+      toast.error(
+        bannerId
+          ? 'Failed to copy code'
+          : 'Save the banner so the snippet is real, then copy again.',
+      )
     }
   }
 

@@ -35,6 +35,9 @@ export async function GET(
     }
 
     // Any workspace member can see the invite list. Empty is a normal state.
+    // The invite token is a bearer secret, so only owners/admins get the link.
+    const canManageInvites = ['owner', 'admin'].includes(teamMember.role)
+
     // invite_link is not a DB column — it is derived from token.
     const { data: invitations, error } = await supabase
       .from('TeamInvitation')
@@ -51,7 +54,7 @@ export async function GET(
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
     return NextResponse.json({
       success: true,
-      data: mapInvitationRows(invitations, baseUrl)
+      data: mapInvitationRows(invitations, baseUrl, { includeLink: canManageInvites })
     })
   } catch (error) {
     console.error('Error in GET /api/teams/[teamId]/invitations:', error)
