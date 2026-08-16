@@ -487,10 +487,31 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   const messageHtml = `<p id="cookie-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; text-align: ${copyAlign}; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>`
 
-  const actionsHtml = `<div id="cookie-banner-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0;">
-          <button id="cookie-accept-btn" type="button" style="${btnBase} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>
-          ${showReject ? `<button id="cookie-reject-btn" type="button" style="${btnBase} background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''}
-          ${showPrefs ? `<button id="cookie-preferences-btn" type="button" style="${btnBase} background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; font-weight: 500; min-height: 40px; padding: 8px 12px;">${escapeHtml(config.text.preferencesButton)}</button>` : ''}
+  // Bars can stack the actions in a right-hand column (TrustArc-style:
+  // preferences on top, then accept/reject). Older configs lack the field —
+  // default to the classic inline row.
+  const stackedActions = isFullWidthBar && config.layout?.buttonPlacement === 'stacked-right'
+
+  const acceptBtnHtml = `<button id="cookie-accept-btn" type="button" style="${btnBase} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>`
+  const rejectBtnHtml = showReject ? `<button id="cookie-reject-btn" type="button" style="${btnBase} background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''
+  // In the stacked column the preferences button reads as a bordered button
+  // (a borderless text link floating above filled buttons looks broken).
+  const prefsBtnHtml = showPrefs
+    ? (stackedActions
+      ? `<button id="cookie-preferences-btn" type="button" style="${btnBase} background-color: transparent; color: ${escapeHtml(config.colors.text)} !important; border: 1.5px solid ${borderColor} !important; font-weight: 500;">${escapeHtml(config.text.preferencesButton)}</button>`
+      : `<button id="cookie-preferences-btn" type="button" style="${btnBase} background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; font-weight: 500; min-height: 40px; padding: 8px 12px;">${escapeHtml(config.text.preferencesButton)}</button>`)
+    : ''
+
+  const actionsHtml = stackedActions
+    ? `<div id="cookie-banner-actions" style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; flex-shrink: 0; min-width: 180px; max-width: 240px;">
+          ${prefsBtnHtml}
+          ${acceptBtnHtml}
+          ${rejectBtnHtml}
+        </div>`
+    : `<div id="cookie-banner-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0;">
+          ${acceptBtnHtml}
+          ${rejectBtnHtml}
+          ${prefsBtnHtml}
         </div>`
 
   const brandingHtml = showBranding

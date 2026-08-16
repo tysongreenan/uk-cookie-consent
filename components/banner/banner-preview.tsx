@@ -615,12 +615,36 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
                 )
               }
 
+              // Bars can stack actions in a right-hand column (TrustArc-style):
+              // preferences on top as a bordered button, then accept/reject.
+              const stackedBarActions =
+                isBar && (safeConfig as any).layout?.buttonPlacement === 'stacked-right'
+
+              const prefsButton = safeConfig.behavior.showPreferences ? (
+                <Button
+                  onClick={handlePreferences}
+                  variant={stackedBarActions ? 'outline' : 'ghost'}
+                  size="sm"
+                  style={
+                    stackedBarActions
+                      ? { color: safeConfig.colors.text, borderColor: 'rgba(128,128,128,0.4)', backgroundColor: 'transparent', minHeight: 42 }
+                      : { color: safeConfig.colors.link, minHeight: 40 }
+                  }
+                  className="hover:bg-opacity-10"
+                >
+                  {safeConfig.text.preferencesButton}
+                </Button>
+              ) : null
+
               const actions = (
                 <div
-                  className={`flex flex-wrap gap-2 items-center shrink-0 ${
-                    isBar ? 'sm:ml-auto' : 'w-full'
-                  }`}
+                  className={
+                    stackedBarActions
+                      ? 'flex flex-col gap-2 items-stretch shrink-0 sm:ml-auto min-w-[180px] max-w-[240px]'
+                      : `flex flex-wrap gap-2 items-center shrink-0 ${isBar ? 'sm:ml-auto' : 'w-full'}`
+                  }
                 >
+                  {stackedBarActions && prefsButton}
                   <Button
                     onClick={handleAccept}
                     size="sm"
@@ -629,7 +653,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
                       color: safeConfig.colors.buttonText,
                       minHeight: 42,
                     }}
-                    className={`hover:opacity-90 ${isBar ? '' : 'flex-1'}`}
+                    className={`hover:opacity-90 ${isBar || stackedBarActions ? '' : 'flex-1'}`}
                   >
                     {safeConfig.text.acceptButton}
                   </Button>
@@ -647,23 +671,13 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
                           safeConfig.colors.rejectButtonText || safeConfig.colors.text,
                         minHeight: 42,
                       }}
-                      className={`hover:bg-opacity-10 ${isBar ? '' : 'flex-1'}`}
+                      className={`hover:bg-opacity-10 ${isBar || stackedBarActions ? '' : 'flex-1'}`}
                     >
                       {safeConfig.text.rejectButton}
                     </Button>
                   )}
 
-                  {safeConfig.behavior.showPreferences && (
-                    <Button
-                      onClick={handlePreferences}
-                      variant="ghost"
-                      size="sm"
-                      style={{ color: safeConfig.colors.link, minHeight: 40 }}
-                      className="hover:bg-opacity-10"
-                    >
-                      {safeConfig.text.preferencesButton}
-                    </Button>
-                  )}
+                  {!stackedBarActions && prefsButton}
                 </div>
               )
 

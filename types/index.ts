@@ -166,6 +166,9 @@ export interface BannerConfig {
     margin: number
     shadow: 'none' | 'small' | 'medium' | 'large'
     animation: 'none' | 'fade' | 'slide' | 'bounce' | 'pulse'
+    /** Top/bottom bars only: inline button row (default) or a vertically
+     *  stacked column on the right (TrustArc-style). */
+    buttonPlacement?: 'inline' | 'stacked-right'
   }
   
   // Scripts

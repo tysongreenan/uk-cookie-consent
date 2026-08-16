@@ -2321,6 +2321,29 @@ function BannerBuilderContent() {
                       </div>
                     </div>
 
+                    {/* Button placement — bars only: buttons beside the text or
+                        stacked in a column on the right (TrustArc-style) */}
+                    {(config.position === 'top' || config.position === 'bottom') && (
+                      <div className="space-y-3">
+                        <Label htmlFor="button-placement" className="text-sm font-medium">Button Placement</Label>
+                        <Select
+                          value={config.layout.buttonPlacement || 'inline'}
+                          onValueChange={(value: any) => updateConfig('layout', { ...config.layout, buttonPlacement: value })}
+                        >
+                          <SelectTrigger id="button-placement">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="inline">Inline row (default)</SelectItem>
+                            <SelectItem value="stacked-right">Stacked on the right</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Stacked places Preferences, Accept, and Reject in a vertical column on the right edge of the bar — a common enterprise CMP look.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Animation */}
                     <div className="space-y-3">
                       <Label htmlFor="animation" className="text-sm font-medium">Animation</Label>
