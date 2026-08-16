@@ -1,8 +1,10 @@
-import { getAllPosts } from '@/lib/blog/blog'
+import { listCmsPosts } from '@/lib/cms-content'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
-  const posts = getAllPosts()
+  const posts = await listCmsPosts()
 
   const items = posts
     .map(

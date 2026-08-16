@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllPosts, type BlogPostMetadata } from "@/lib/blog/blog";
+import { listCmsPosts } from "@/lib/cms-content";
 import { formatDate } from "@/lib/utils";
 
 interface ReadMoreSectionProps {
@@ -7,11 +7,11 @@ interface ReadMoreSectionProps {
   currentTags?: string[];
 }
 
-export function ReadMoreSection({
+export async function ReadMoreSection({
   currentSlug,
   currentTags = [],
 }: ReadMoreSectionProps) {
-  const allPosts = getAllPosts();
+  const allPosts = await listCmsPosts();
 
   const otherPosts = allPosts
     .filter((post) => post.slug !== currentSlug)

@@ -2,16 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { getLlmsSections, renderLlmsTxt, renderSitemapMd } from '@/lib/seo/llms-catalog'
 
 describe('llms catalog', () => {
-  it('includes product, compliance, and published blog markdown URLs', () => {
+  it('includes product, compliance, and a blog index without hardcoded articles', () => {
     const headings = getLlmsSections().map((section) => section.heading)
     expect(headings).toContain('Product')
     expect(headings).toContain('Compliance')
     expect(headings).toContain('Blog')
 
     const blog = getLlmsSections().find((section) => section.heading === 'Blog')
-    const canada = blog?.links.find((link) => link.path.includes('cookie-consent-canada-guide-2026'))
-    expect(canada?.path).toBe('/blog/cookie-consent-canada-guide-2026.md')
+    expect(blog?.links.some((link) => link.path === '/blog')).toBe(true)
+    expect(blog?.links.some((link) => link.path.includes('cookie-consent-canada-guide-2026'))).toBe(false)
     expect(blog?.links.some((link) => link.path.includes('blog-post-template'))).toBe(false)
+  })
+
+  it('lists CMS posts when they are provided', () => {
+    const blog = getLlmsSections([
+      { title: 'Welcome', slug: 'welcome', description: 'From the CMS' },
+    ]).find((section) => section.heading === 'Blog')
+    expect(blog?.links.some((link) => link.path === '/blog/welcome')).toBe(true)
   })
 
   it('renders a valid llms.txt index', () => {
@@ -20,8 +27,9 @@ describe('llms catalog', () => {
     expect(txt).toContain('## Product')
     expect(txt).toContain('https://www.cookie-banner.ca/pricing')
     expect(txt).toContain('https://www.cookie-banner.ca/tools/cookie-scanner.md')
-    expect(txt).toContain('https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026.md')
+    expect(txt).toContain('https://www.cookie-banner.ca/blog')
     expect(txt).toContain('https://www.cookie-banner.ca/llms-full.txt')
+    expect(txt).not.toContain('https://www.cookie-banner.ca/blog/cookie-consent-canada-guide-2026.md')
   })
 
   it('renders a markdown sitemap', () => {

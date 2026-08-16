@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { getAllPosts } from '@/lib/blog/blog'
+import { listCmsPosts } from '@/lib/cms-content'
 
 /**
  * Optimized sitemap.xml for Google crawl budget
@@ -11,7 +11,7 @@ import { getAllPosts } from '@/lib/blog/blog'
  * - Exclude low-value pages (auth, dashboard, test pages)
  * - Group by priority for better crawl budget allocation
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
   // Use a fixed date for static pages so crawlers don't re-crawl unchanged content.
   // Update this date when you actually modify these pages.
@@ -403,7 +403,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Blog posts (Priority 0.7 - content marketing)
   let blogPosts: MetadataRoute.Sitemap = []
   try {
-    const posts = getAllPosts()
+    const posts = await listCmsPosts()
     blogPosts = posts
       .filter((post) => {
         // Only include posts with valid dates

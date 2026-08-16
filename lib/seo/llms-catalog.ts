@@ -1,4 +1,4 @@
-import { getAllPosts } from '@/lib/blog/blog'
+import type { CmsPost } from '@/lib/cms-content'
 
 export interface LlmsLink {
   title: string
@@ -90,12 +90,11 @@ const COMPANY: LlmsLink[] = [
   { title: 'Terms', path: '/terms', description: 'Terms of use' },
 ]
 
-export function getLlmsSections(): LlmsSection[] {
-  const posts = getAllPosts().map((post) => ({
+export function getLlmsSections(posts: Pick<CmsPost, 'title' | 'slug' | 'description'>[] = []): LlmsSection[] {
+  const blogPosts = posts.map((post) => ({
     title: post.title,
-    path: `/blog/${post.slug}.md`,
+    path: `/blog/${post.slug}`,
     description: post.description,
-    markdown: true,
   }))
 
   return [
@@ -109,7 +108,7 @@ export function getLlmsSections(): LlmsSection[] {
       heading: 'Blog',
       links: [
         { title: 'Blog', path: '/blog', description: 'Privacy compliance guides and cookie consent best practices' },
-        ...posts,
+        ...blogPosts,
       ],
     },
     { heading: 'Company', links: COMPANY },
@@ -121,8 +120,11 @@ export function absoluteLlmsHref(path: string, baseUrl = siteBaseUrl()): string 
   return `${baseUrl}${path}`
 }
 
-export function renderLlmsTxt(baseUrl = siteBaseUrl()): string {
-  const sections = getLlmsSections()
+export function renderLlmsTxt(
+  baseUrl = siteBaseUrl(),
+  posts: Pick<CmsPost, 'title' | 'slug' | 'description'>[] = []
+): string {
+  const sections = getLlmsSections(posts)
   const lines = [
     '# Cookie-Banner.ca',
     '',
@@ -148,15 +150,18 @@ export function renderLlmsTxt(baseUrl = siteBaseUrl()): string {
     '## Machine-readable copies',
     `- [llms-full.txt](${baseUrl}/llms-full.txt): This index plus the full markdown of every published blog post`,
     `- [sitemap.md](${baseUrl}/sitemap.md): Sectioned markdown sitemap`,
-    `- Blog posts also accept \`Accept: text/markdown\` on their HTML URLs and have a \`.md\` suffix (example: ${baseUrl}/blog/cookie-consent-canada-guide-2026.md)`,
+    `- Published blog posts are listed above when the CMS has them`,
     '',
   )
 
   return lines.join('\n')
 }
 
-export function renderSitemapMd(baseUrl = siteBaseUrl()): string {
-  const sections = getLlmsSections()
+export function renderSitemapMd(
+  baseUrl = siteBaseUrl(),
+  posts: Pick<CmsPost, 'title' | 'slug' | 'description'>[] = []
+): string {
+  const sections = getLlmsSections(posts)
   const lines = [
     '# Cookie-Banner.ca sitemap',
     '',

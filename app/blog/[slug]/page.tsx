@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { getPostBySlug, getAllPostSlugs, isValidBlogSlug } from '@/lib/blog/blog'
-import { ArrowLeft, Calendar, Clock } from 'lucide-react'
+import { isValidBlogSlug } from '@/lib/blog/blog'
+import { getCmsPostBySlug, listCmsPosts } from '@/lib/cms-content'
+import { ArrowLeft, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { TableOfContents } from '@/components/blog/table-of-contents'
 import { MobileTableOfContents } from '@/components/blog/mobile-toc'
 import { AuthorCard } from '@/components/blog/author-card'
@@ -15,16 +15,16 @@ import { FlickeringGrid } from '@/components/magicui/flickering-grid'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { StructuredData } from '@/components/seo/structured-data'
-import { BlogAssistant } from '@/components/blog/blog-assistant'
-import { BlogHeroCta } from '@/components/blog/blog-hero-cta'
 import { getAuthor } from '@/lib/authors'
 import { formatDate } from '@/lib/utils'
 
-// Generate static params for all blog posts
+export const dynamic = 'force-dynamic'
+
+// Generate static params from published CMS posts only
 export async function generateStaticParams() {
-  const slugs = getAllPostSlugs()
-  return slugs.map((slug) => ({
-    slug,
+  const posts = await listCmsPosts()
+  return posts.map((post) => ({
+    slug: post.slug,
   }))
 }
 
@@ -48,7 +48,7 @@ export async function generateMetadata({
     }
   }
 
-  const post = await getPostBySlug(params.slug)
+  const post = await getCmsPostBySlug(params.slug)
 
   if (!post) {
     return {
@@ -62,7 +62,6 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
-    ...(post.keywords && { keywords: post.keywords.join(', ') }),
     authors: [{ name: post.author }],
     alternates: {
       canonical: canonicalUrl,
@@ -106,9 +105,9 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string }
 }) {
-  const post = await getPostBySlug(params.slug)
+  const post = await getCmsPostBySlug(params.slug)
 
-  if (!post || !post.published) {
+  if (!post) {
     notFound()
   }
 
@@ -154,14 +153,6 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       
-      {/* FAQ Structured Data if available */}
-      {post.schema && (
-        <StructuredData
-          type="faq"
-          data={post.schema.mainEntity || []}
-        />
-      )}
-
       {/* Breadcrumb Structured Data */}
       <StructuredData
         type="breadcrumb"
@@ -228,7 +219,6 @@ export default async function BlogPostPage({
               </p>
             )}
 
-            {post.heroCta && <BlogHeroCta {...post.heroCta} />}
           </div>
         </div>
 
@@ -245,13 +235,13 @@ export default async function BlogPostPage({
               </div>
             )}
             <div className="p-6 lg:p-10">
-              <div className="mb-8">
-                <BlogAssistant slug={post.slug} />
-              </div>
-              <div className="prose dark:prose-invert max-w-none prose-headings:scroll-mt-8 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-balance prose-p:tracking-tight prose-p:text-balance prose-lg">
-                {/* Blog content rendered from markdown — trusted source, not user input */}
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
-              </div>
+              {post.contentHtml ? (
+                <div className="prose dark:prose-invert max-w-none prose-headings:scroll-mt-8 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-balance prose-p:tracking-tight prose-p:text-balance prose-lg">
+                  <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No published content yet.</p>
+              )}
             </div>
             <div className="mt-10">
               <ReadMoreSection

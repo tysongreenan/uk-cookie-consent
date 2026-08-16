@@ -1,21 +1,30 @@
-import { getAllPosts, getPostSourceBySlug } from '@/lib/blog/blog'
-import { formatPostAsAgentMarkdown, markdownHeaders } from '@/lib/blog/agent-markdown'
+import { listCmsPosts } from '@/lib/cms-content'
+import { markdownHeaders } from '@/lib/blog/agent-markdown'
 import { renderLlmsTxt, siteBaseUrl } from '@/lib/seo/llms-catalog'
 
 export const runtime = 'nodejs'
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const baseUrl = siteBaseUrl()
-  const parts = [renderLlmsTxt(baseUrl)]
+  const posts = await listCmsPosts()
+  const parts = [renderLlmsTxt(baseUrl, posts)]
 
-  for (const post of getAllPosts()) {
-    const source = getPostSourceBySlug(post.slug)
-    if (!source || !source.published) continue
-    parts.push('', '---', '', formatPostAsAgentMarkdown(source, baseUrl).trimEnd())
+  for (const post of posts) {
+    if (!post.contentHtml) continue
+    parts.push(
+      '',
+      '---',
+      '',
+      `# ${post.title}`,
+      '',
+      post.description ? `> ${post.description}` : '',
+      '',
+      post.contentHtml.replace(/<[^>]+>/g, '').trim()
+    )
   }
 
-  return new Response(`${parts.join('\n')}\n`, {
+  return new Response(`${parts.filter((part) => part !== undefined).join('\n')}\n`, {
     headers: markdownHeaders(),
   })
 }

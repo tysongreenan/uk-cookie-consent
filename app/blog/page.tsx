@@ -1,12 +1,14 @@
 import { Metadata } from 'next'
 import { Suspense } from 'react'
-import { getAllPosts } from '@/lib/blog/blog'
+import { listCmsPosts } from '@/lib/cms-content'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { BlogCard } from '@/components/blog/blog-card'
 import { TagFilter } from '@/components/blog/tag-filter'
 import { FlickeringGrid } from '@/components/magicui/flickering-grid'
 import { formatDate } from '@/lib/utils'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Blog - Cookie Banner Insights | Cookie Banner Generator',
@@ -31,7 +33,7 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const resolvedSearchParams = await searchParams
-  const allPosts = getAllPosts()
+  const allPosts = await listCmsPosts()
 
   // Sort posts by date (newest first)
   const sortedPosts = allPosts.sort((a, b) => {

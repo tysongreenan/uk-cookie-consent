@@ -13,6 +13,7 @@ import { ComparisonSection } from '@/components/landing/v2/comparison-section'
 import { PricingSection } from '@/components/landing/v2/pricing-section'
 import { FaqV2 } from '@/components/landing/v2/faq-v2'
 import { FinalCtaV2 } from '@/components/landing/v2/final-cta-v2'
+import { FeaturedVideo } from '@/components/cms/featured-video'
 
 export const metadata: Metadata = {
   title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
@@ -65,6 +66,7 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroV2 />
+        <FeaturedVideo />
         <PlatformStrip />
         <BuilderHeader />
         <InteractiveBannerDemo />

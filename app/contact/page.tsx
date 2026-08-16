@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StructuredData } from '@/components/seo/structured-data'
 import { Mail, Clock, MessageSquare, FileText } from 'lucide-react'
+import { CmsPageOverlay } from '@/components/cms/cms-page-overlay'
 
 export const metadata: Metadata = {
   title: 'Contact Us — Cookie Banner Generator Support',
@@ -38,6 +39,7 @@ export default function ContactPage() {
       <main>
         <section className="py-20 md:py-28 border-b border-border">
           <div className="max-w-4xl mx-auto px-6 text-center">
+            <CmsPageOverlay slug="contact">
             <Badge variant="outline" className="mb-6">Support</Badge>
             <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
               How can we help?
@@ -46,6 +48,7 @@ export default function ContactPage() {
               We&apos;re here to help you get the most out of your cookie consent banners.
               Reach out and we&apos;ll get back to you within 24 hours.
             </p>
+            </CmsPageOverlay>
           </div>
         </section>
 

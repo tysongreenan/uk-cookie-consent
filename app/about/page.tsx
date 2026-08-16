@@ -4,6 +4,7 @@ import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CmsPageOverlay } from '@/components/cms/cms-page-overlay'
 
 export const metadata: Metadata = {
   title: 'About Cookie-Banner.ca — The Rebellious Cookie Banner Tool Built in Canada',
@@ -36,6 +37,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-4xl py-16">
+        <CmsPageOverlay slug="about">
         <Link 
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -285,6 +287,7 @@ export default function AboutPage() {
             </div>
           </section>
         </div>
+        </CmsPageOverlay>
       </main>
       <Footer />
     </div>
