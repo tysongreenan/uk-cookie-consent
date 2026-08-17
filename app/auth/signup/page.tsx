@@ -18,7 +18,7 @@ import {
   identifyUser,
   getPostHogRequestHeaders,
 } from '@/lib/analytics'
-import { validatePassword } from '@/lib/sanitize'
+import { getPasswordRuleStates, getSignupFieldErrors } from '@/lib/signup-form'
 
 function SignUpContent() {
   const searchParams = useSearchParams()
@@ -30,6 +30,7 @@ function SignUpContent() {
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string; terms?: string }>({})
   const [passwordStrength, setPasswordStrength] = useState(0)
   const router = useRouter()
   const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -92,18 +93,14 @@ function SignUpContent() {
     setError('')
     captureEvent('signup_started', { method: 'credentials', product })
 
-    if (!agreeToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy')
+    const nextFieldErrors = getSignupFieldErrors({ name, email, password, agreeToTerms })
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors)
+      setError(nextFieldErrors.password || nextFieldErrors.terms || nextFieldErrors.email || nextFieldErrors.name || 'Please fix the highlighted fields')
       setIsLoading(false)
       return
     }
-
-    const passwordValidation = validatePassword(password)
-    if (!passwordValidation.valid) {
-      setError(passwordValidation.errors[0] || 'Please choose a stronger password')
-      setIsLoading(false)
-      return
-    }
+    setFieldErrors({})
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -169,6 +166,8 @@ function SignUpContent() {
     if (passwordStrength <= 3) return 'Medium'
     return 'Strong'
   }
+
+  const passwordRules = getPasswordRuleStates(password)
 
   return (
     <div className="min-h-screen w-full flex">
@@ -344,14 +343,19 @@ function SignUpContent() {
                     type="text"
                     placeholder="Jane Smith"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }))
+                    }}
                     autoComplete="name"
                     autoFocus
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
+                    className={`pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors ${fieldErrors.name ? 'border-red-400' : ''}`}
                     required
                     disabled={isLoading || isGoogleLoading}
+                    aria-invalid={!!fieldErrors.name}
                   />
                 </div>
+                {fieldErrors.name && <p className="text-xs text-red-600">{fieldErrors.name}</p>}
               </div>
 
               <div className="space-y-2">
@@ -363,13 +367,18 @@ function SignUpContent() {
                     type="email"
                     placeholder="name@company.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }))
+                    }}
                     autoComplete="email"
-                    className="pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
+                    className={`pl-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors ${fieldErrors.email ? 'border-red-400' : ''}`}
                     required
                     disabled={isLoading || isGoogleLoading}
+                    aria-invalid={!!fieldErrors.email}
                   />
                 </div>
+                {fieldErrors.email && <p className="text-xs text-red-600">{fieldErrors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -381,12 +390,16 @@ function SignUpContent() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="At least 8 characters"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }))
+                    }}
                     autoComplete="new-password"
-                    className="pl-10 pr-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors"
+                    className={`pl-10 pr-10 h-11 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white transition-colors ${fieldErrors.password ? 'border-red-400' : ''}`}
                     required
                     disabled={isLoading || isGoogleLoading}
                     aria-describedby="password-requirements"
+                    aria-invalid={!!fieldErrors.password}
                   />
                   <button
                     type="button"
@@ -398,12 +411,18 @@ function SignUpContent() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <ul id="password-requirements" className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-500 pt-1">
-                  <li className={password.length >= 8 ? 'text-green-600' : ''}>8+ characters</li>
-                  <li className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>One uppercase letter</li>
-                  <li className={/[a-z]/.test(password) ? 'text-green-600' : ''}>One lowercase letter</li>
-                  <li className={/\d/.test(password) ? 'text-green-600' : ''}>One number</li>
+                <ul id="password-requirements" className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-600 pt-1">
+                  {passwordRules.map((rule) => (
+                    <li key={rule.id} className={rule.met ? 'text-green-600' : fieldErrors.password ? 'text-red-600' : ''}>
+                      {rule.met ? '✓' : '○'} {rule.label}
+                    </li>
+                  ))}
                 </ul>
+                {fieldErrors.password && (
+                  <p className="text-sm text-red-600 font-medium" role="alert">
+                    {fieldErrors.password}
+                  </p>
+                )}
                 {password && (
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-100 rounded-full h-1.5">
@@ -419,15 +438,19 @@ function SignUpContent() {
 
               <div
                 className={`flex items-start gap-3 rounded-lg border p-3 ${
-                  error.toLowerCase().includes('terms') ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  fieldErrors.terms || error.toLowerCase().includes('terms') ? 'border-red-300 bg-red-50' : 'border-gray-200'
                 }`}
               >
                 <Checkbox
                   id="terms"
                   checked={agreeToTerms}
-                  onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
+                  onCheckedChange={(checked) => {
+                    setAgreeToTerms(checked === true)
+                    if (fieldErrors.terms) setFieldErrors((prev) => ({ ...prev, terms: undefined }))
+                  }}
                   disabled={isLoading || isGoogleLoading}
                   className="mt-0.5 size-5"
+                  aria-invalid={!!fieldErrors.terms}
                 />
                 <Label htmlFor="terms" className="font-normal text-sm text-gray-600 leading-snug cursor-pointer">
                   I agree to the{' '}
@@ -440,10 +463,15 @@ function SignUpContent() {
                   </Link>
                 </Label>
               </div>
+              {fieldErrors.terms && (
+                <p className="text-sm text-red-600 font-medium" role="alert">
+                  {fieldErrors.terms}
+                </p>
+              )}
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white transition-colors mt-2"
+                className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white transition-colors mt-2 disabled:opacity-50"
                 disabled={isLoading || isGoogleLoading}
               >
                 {isLoading ? (

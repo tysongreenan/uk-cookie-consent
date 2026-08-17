@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { InviteMemberModal } from './invite-member-modal'
+import { invitationsFromApiResponse, type MappedInvitation } from '@/lib/team-invitations'
 
 interface TeamMember {
   id: string
@@ -50,15 +51,7 @@ interface TeamMember {
   }
 }
 
-interface PendingInvitation {
-  id: string
-  email: string
-  role: string
-  status: 'pending' | 'accepted' | 'expired'
-  created_at: string
-  expires_at: string
-  invite_link: string
-}
+type PendingInvitation = MappedInvitation
 
 interface TeamInfo {
   id: string
@@ -77,9 +70,13 @@ export function TeamSettings() {
   const [showInviteModal, setShowInviteModal] = useState(false)
 
   useEffect(() => {
-    if (session?.user?.currentTeamId) {
-      fetchTeamData()
+    if (!session) return
+    if (!session.user?.currentTeamId) {
+      setLoading(false)
+      setPendingInvitations([])
+      return
     }
+    fetchTeamData()
   }, [session])
 
   const fetchTeamData = async () => {
@@ -108,15 +105,17 @@ export function TeamSettings() {
         toast.error('Failed to load workspace members')
       }
 
-      // Fetch pending invitations
+      // Fetch pending invitations. Empty / no-permission is a normal empty state.
       const invitationsResponse = await fetch(`/api/teams/${session.user.currentTeamId}/invitations`)
-      const invitationsData = await invitationsResponse.json()
-      
-      if (invitationsResponse.ok && invitationsData.success) {
-        setPendingInvitations(invitationsData.data)
-      } else {
+      const invitationsData = await invitationsResponse.json().catch(() => null)
+      const invitationsResult = invitationsFromApiResponse({
+        ok: invitationsResponse.ok,
+        status: invitationsResponse.status,
+        body: invitationsData,
+      })
+      setPendingInvitations(invitationsResult.invitations)
+      if (invitationsResult.showErrorToast) {
         console.error('Failed to fetch workspace invitations:', invitationsData)
-        toast.error('Failed to load workspace invitations')
       }
     } catch (error) {
       console.error('Error fetching team data:', error)
@@ -444,22 +443,28 @@ export function TeamSettings() {
                       {getRoleIcon(invitation.role)}
                       <span className="ml-1">{invitation.role}</span>
                     </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyInviteLink(invitation.invite_link)}
-                      aria-label={`Copy invite link for ${invitation.email}`}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCancelInvitationWithConfirm(invitation.id, invitation.email)}
-                      aria-label={`Cancel invitation for ${invitation.email}`}
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
+                    {/* invite_link is only sent to owners/admins — the same
+                        roles allowed to cancel, so it gates both actions. */}
+                    {invitation.invite_link && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyInviteLink(invitation.invite_link!)}
+                          aria-label={`Copy invite link for ${invitation.email}`}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCancelInvitationWithConfirm(invitation.id, invitation.email)}
+                          aria-label={`Cancel invitation for ${invitation.email}`}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

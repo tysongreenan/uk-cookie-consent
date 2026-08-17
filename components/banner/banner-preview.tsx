@@ -758,7 +758,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
         </div>
       ) : (
         <div
-          className="fixed z-40 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center"
+          className="absolute z-20 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
           style={{
             ...generateFloatingButtonPreviewStyles(safeConfig),
             [safeConfig.branding.footerLink.floatingPosition === 'bottom-right'

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Palette, Code, Copy, X } from 'lucide-react'
+import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Copy, X } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
@@ -26,6 +26,7 @@ import {
   isInstallNudgeDismissed,
   dismissInstallNudge,
 } from '@/lib/install-snippet'
+import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
 
 interface Banner {
   id: string
@@ -328,6 +329,52 @@ export function DashboardClient() {
     return null // Should redirect via useEffect
   }
 
+  const showZeroBannerEmpty = shouldShowZeroBannerEmptyState({
+    isLoading,
+    bannerCount: banners.length,
+  })
+  const showSearchEmpty = shouldShowBannerSearchEmpty({
+    bannerCount: banners.length,
+    filteredCount: filteredBanners.length,
+    searchTerm,
+  })
+
+  if (showZeroBannerEmpty) {
+    return (
+      <DashboardLayout>
+        <div className="p-6">
+          <Card className="p-0 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-10 text-center min-h-[60vh] flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <h1 className="text-3xl font-bold mb-2">Create your first banner</h1>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  You do not have a cookie banner yet. Start here — you can open Analytics, Team, and Docs after this one is saved.
+                </p>
+                <Link href="/dashboard/builder">
+                  <Button size="lg" className="h-12 px-8 text-base">
+                    Create your first banner
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                {(session.user?.planTier || 'free') === 'free' && (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Need Law 25 geo-targeting, GPC controls, and no branding?{' '}
+                    <Link href="/upgrade" className="text-primary font-medium hover:underline">
+                      Upgrade to Pro — $99/year
+                    </Link>
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6">
@@ -466,58 +513,13 @@ export function DashboardClient() {
               </Card>
             ))}
           </div>
-        ) : filteredBanners.length === 0 ? (
-          <Card className="p-0 overflow-hidden">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-10 text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Welcome! Set up your first cookie banner</h3>
-                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Get PIPEDA and Law 25 compliant in 3 easy steps — no coding experience needed.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
-                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">1</div>
-                    <Palette className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-xs font-medium">Design your banner</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">2</div>
-                    <Code className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-xs font-medium">Copy your code</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background/80 border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">3</div>
-                    <Shield className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-xs font-medium">You're compliant</span>
-                  </div>
-                </div>
-
-                <Link href="/dashboard/builder">
-                  <Button size="lg" className="h-12 px-8 text-base">
-                    Create your first banner
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                {(session.user?.planTier || 'free') === 'free' && (
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    Need Law 25 geo-targeting, GPC controls, and no branding?{' '}
-                    <Link href="/upgrade" className="text-primary font-medium hover:underline">
-                      Upgrade to Pro — $99/year
-                    </Link>
-                  </p>
-                )}
-              </div>
-              {searchTerm && (
-                <div className="p-4 text-center border-t">
-                  <Button variant="link" onClick={() => setSearchTerm('')}>
-                    Clear Search
-                  </Button>
-                </div>
-              )}
+        ) : showSearchEmpty ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <p className="text-muted-foreground mb-3">No banners match “{searchTerm}”.</p>
+              <Button variant="link" onClick={() => setSearchTerm('')}>
+                Clear Search
+              </Button>
             </CardContent>
           </Card>
         ) : (
