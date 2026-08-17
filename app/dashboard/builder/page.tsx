@@ -37,10 +37,11 @@ import { ScriptScannerImport } from '@/components/banner/script-scanner-import'
 import { categoryToConfigKey, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
-import { getPostHogRequestHeaders, captureEvent } from '@/lib/analytics'
+import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
-import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
+import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
+import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -1017,6 +1018,7 @@ function BannerBuilderContent() {
   const handleCopyInstallSnippet = async () => {
     try {
       const planTier = session?.user?.planTier || 'free'
+      let showedHelp = false
       const { persisted } = await persistThenCopySnippet({
         bannerId,
         persist: () => persistBanner({ silent: true }),
@@ -1025,22 +1027,25 @@ function BannerBuilderContent() {
             idPromise.then((id) => hostedInstallSnippet(id, { showBranding: planTier === 'free' })),
           )
           const id = await idPromise
-          markInstallSnippetCopied(id)
-          captureEvent('install_snippet_copied', {
-            banner_id: id,
-            snippet_type: 'hosted',
-            plan_tier: planTier,
+          const result = await copyHostedSnippet({
+            snippet: hostedInstallSnippet(id, { showBranding: planTier === 'free' }),
+            bannerId: id,
             source: 'builder_header',
+            planTier,
+            alreadyCopied: true,
           })
+          showedHelp = result.showedHelp
         },
       })
       setSnippetCopied(true)
       setActiveTab('code')
-      toast.success(
-        persisted
-          ? 'Banner saved. Install snippet copied — paste it in your site header'
-          : 'Install snippet copied — paste it in your site header',
-      )
+      if (!showedHelp) {
+        toast.success(
+          persisted
+            ? 'Banner saved. Install snippet copied — paste it in your site header'
+            : 'Install snippet copied — paste it in your site header',
+        )
+      }
       setTimeout(() => setSnippetCopied(false), 3000)
     } catch {
       setActiveTab('code')
@@ -1120,6 +1125,7 @@ function BannerBuilderContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      <InstallHelpDialog />
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-3">

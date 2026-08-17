@@ -16,8 +16,9 @@ import {
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
-import { hostedInstallSnippet, markInstallSnippetCopied } from '@/lib/install-snippet'
+import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
+import { copyHostedSnippet } from '@/components/banner/install-help-dialog'
 
 interface CodeGeneratorProps {
   config: BannerConfig
@@ -129,32 +130,50 @@ ${generateBannerHTML(config, { showBranding })}
     const type = snippetType ?? activeTab
     try {
       if (onEnsureSaved && (type === 'hosted' || !bannerId)) {
+        let showedHelp = false
         const { persisted, bannerId: savedId } = await persistThenCopySnippet({
           bannerId,
           persist: onEnsureSaved,
           copy: async (idPromise) => {
             await copyText(() => idPromise.then((id) => hostedInstallSnippet(id, { showBranding })))
             const id = await idPromise
-            markInstallSnippetCopied(id)
-            captureEvent('install_snippet_copied', {
-              banner_id: id,
-              snippet_type: 'hosted',
-              plan_tier: planTier || 'free',
+            const result = await copyHostedSnippet({
+              snippet: hostedInstallSnippet(id, { showBranding }),
+              bannerId: id,
               source: 'builder_code_tab',
+              planTier,
+              alreadyCopied: true,
             })
+            showedHelp = result.showedHelp
           },
         })
         setCopied(true)
-        toast.success(
-          persisted
-            ? 'Banner saved. Install snippet copied — this snippet is live.'
-            : 'Copied to clipboard!',
-        )
+        if (!showedHelp) {
+          toast.success(
+            persisted
+              ? 'Banner saved. Install snippet copied — this snippet is live.'
+              : 'Copied to clipboard!',
+          )
+        }
         setTimeout(() => setCopied(false), 3000)
         return savedId
       }
 
       const text = code ?? getCode()
+      if (type === 'hosted' && bannerId) {
+        const { showedHelp } = await copyHostedSnippet({
+          snippet: text,
+          bannerId,
+          source: 'builder_code_tab',
+          planTier,
+        })
+        setCopied(true)
+        if (!showedHelp) {
+          toast.success('Copied to clipboard!')
+        }
+        setTimeout(() => setCopied(false), 3000)
+        return
+      }
       await copyText(text)
       setCopied(true)
       toast.success('Copied to clipboard!')
@@ -164,9 +183,6 @@ ${generateBannerHTML(config, { showBranding })}
         plan_tier: planTier || 'free',
         source: 'builder_code_tab',
       })
-      if (bannerId && type === 'hosted') {
-        markInstallSnippetCopied(bannerId)
-      }
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
       captureException(err, { context: 'install_snippet_copy' })

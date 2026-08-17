@@ -27,6 +27,7 @@ import {
   dismissInstallNudge,
 } from '@/lib/install-snippet'
 import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
+import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 
 interface Banner {
   id: string
@@ -263,18 +264,18 @@ export function DashboardClient() {
       const embedCode = hostedInstallSnippet(bannerId, {
         showBranding: (session?.user?.planTier || 'free') === 'free',
       })
-      await copyToClipboard(embedCode)
-      markInstallSnippetCopied(bannerId)
-      captureEvent('install_snippet_copied', {
-        banner_id: bannerId,
-        snippet_type: 'hosted',
-        plan_tier: session?.user?.planTier || 'free',
+      const { showedHelp } = await copyHostedSnippet({
+        snippet: embedCode,
+        bannerId,
         source: 'dashboard_card',
+        planTier: session?.user?.planTier || 'free',
       })
       setShowInstallNudge(false)
-      toast.success('Install snippet copied — paste it in your site header', {
-        duration: 4000,
-      })
+      if (!showedHelp) {
+        toast.success('Install snippet copied — paste it in your site header', {
+          duration: 4000,
+        })
+      }
     } catch (error) {
       console.error('Error copying embed code:', error)
       toast.error('Failed to copy install snippet')
@@ -377,6 +378,7 @@ export function DashboardClient() {
 
   return (
     <DashboardLayout>
+      <InstallHelpDialog />
       <div className="p-6 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Cookie Banner' }]} />
