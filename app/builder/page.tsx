@@ -22,7 +22,7 @@ function BuilderContent() {
     const savedConfig = localStorage.getItem('pendingBannerConfig')
     if (!savedConfig) {
       if (url) {
-        router.push('/dashboard/builder')
+        router.push(`/dashboard/builder?url=${encodeURIComponent(url)}`)
       }
       return
     }

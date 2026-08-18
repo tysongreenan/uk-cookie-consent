@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { AlertTriangle, Check, ChevronDown, Info, Loader2, RefreshCw, Search, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, Check, ChevronDown, Info, Loader2, RefreshCw, Search } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -15,10 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress'
 import { dedupeTrackingScripts, type BuilderScannerResult, type ScannerImportCandidate } from '@/lib/scripts/import-candidates'
 import type { BannerConfig, TrackingScript } from '@/types'
+import { canScanWebsiteUrl, writeLastSiteUrl } from '@/lib/scan-url'
+import { getScanNextAction, scanActionImportsSelected } from '@/lib/scan-next-action'
 
 interface ScriptScannerImportProps {
   currentScripts: BannerConfig['scripts']
   privacyPolicyUrl?: string
+  initialUrl?: string
   onImport: (scripts: TrackingScript[], summary: { imported: number; skipped: number; warnings: string[] }) => void
   onUsePrivacyPolicy?: (url: string) => void
   onScanComplete?: (result: BuilderScannerResult) => void
@@ -76,11 +79,12 @@ function getSnippet(script: ScannerImportCandidate): string {
 export function ScriptScannerImport({
   currentScripts,
   privacyPolicyUrl,
+  initialUrl,
   onImport,
   onUsePrivacyPolicy,
   onScanComplete,
 }: ScriptScannerImportProps) {
-  const [url, setUrl] = useState('')
+  const [url, setUrl] = useState(initialUrl || '')
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<BuilderScannerResult | null>(null)
@@ -89,6 +93,12 @@ export function ScriptScannerImport({
   const [importSummary, setImportSummary] = useState<{ imported: number; skipped: number; warnings: string[] } | null>(null)
   const [showDetails, setShowDetails] = useState(true)
   const [showManagedDetails, setShowManagedDetails] = useState(false)
+
+  useEffect(() => {
+    if (initialUrl) {
+      setUrl((prev) => (prev.trim() ? prev : initialUrl))
+    }
+  }, [initialUrl])
 
   // Split candidates into two groups:
   //   importable — actually-detected scripts the user should consider importing
@@ -129,8 +139,26 @@ export function ScriptScannerImport({
     })
   }, [importableCandidates])
 
+  const nextAction = useMemo(() => {
+    const selectedImportableCount = importableCandidates.filter((candidate) => selectedIds.has(candidate.id)).length
+    return getScanNextAction({
+      cmpDetected: Boolean(result?.consentBanner.detected),
+      cmpVendor: result?.consentBanner.vendor,
+      managedCount: managedCandidates.length,
+      managedByLabel,
+      selectedImportableCount,
+    })
+  }, [importableCandidates, managedByLabel, managedCandidates.length, result, selectedIds])
+
+  const dismissScan = () => {
+    setResult(null)
+    setCandidates([])
+    setSelectedIds(new Set())
+    setImportSummary(null)
+  }
+
   const scanWebsite = async () => {
-    if (!url.trim()) {
+    if (!canScanWebsiteUrl(url)) {
       setError('Enter a website URL to scan.')
       return
     }
@@ -177,6 +205,7 @@ export function ScriptScannerImport({
           .map(candidate => candidate.id),
       ))
       onScanComplete?.(scanResult)
+      writeLastSiteUrl(url.trim())
       setShowDetails(true)
       const importableCount = deduped.filter(c => !c.managedByTagManager).length
       const managedCount = deduped.length - importableCount
@@ -257,11 +286,11 @@ export function ScriptScannerImport({
             value={url}
             onChange={(event) => setUrl(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && !isScanning) scanWebsite()
+              if (event.key === 'Enter' && !isScanning && canScanWebsiteUrl(url)) scanWebsite()
             }}
             className="flex-1"
           />
-          <Button onClick={scanWebsite} disabled={isScanning}>
+          <Button onClick={scanWebsite} disabled={isScanning || !canScanWebsiteUrl(url)}>
             {isScanning ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -512,23 +541,27 @@ export function ScriptScannerImport({
                     })
                   )}
 
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={importSelected} disabled={selectedIds.size === 0}>
-                      <Check className="mr-2 h-4 w-4" />
-                      Import selected scripts
-                    </Button>
+                  <div className="flex flex-wrap items-center gap-3">
                     <Button
-                      variant="outline"
                       onClick={() => {
-                        setResult(null)
-                        setCandidates([])
-                        setSelectedIds(new Set())
-                        setImportSummary(null)
+                        if (scanActionImportsSelected(nextAction.kind)) {
+                          importSelected()
+                        } else {
+                          dismissScan()
+                        }
                       }}
+                      disabled={scanActionImportsSelected(nextAction.kind) && selectedIds.size === 0}
                     >
-                      <X className="mr-2 h-4 w-4" />
-                      Ignore scan
+                      <Check className="mr-2 h-4 w-4" />
+                      {nextAction.label}
                     </Button>
+                    <button
+                      type="button"
+                      onClick={dismissScan}
+                      className="text-sm text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                    >
+                      Skip for now
+                    </button>
                   </div>
                 </div>
               )}

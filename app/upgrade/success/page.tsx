@@ -6,17 +6,29 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { captureEvent } from '@/lib/analytics'
+import { markJustPaid } from '@/lib/just-paid'
+import { postPayBuilderHref } from '@/lib/builder-draft'
+import { readLastSiteUrl } from '@/lib/scan-url'
 
 export default function UpgradeSuccessPage() {
   const { data: session, update } = useSession()
+  const router = useRouter()
   const planTier = session?.user?.planTier || 'pro_lifetime'
   const capturedSuccess = useRef(false)
+  const redirected = useRef(false)
   const [existingBannerId, setExistingBannerId] = useState<string | null>(null)
+  const [bannersLoaded, setBannersLoaded] = useState(false)
+  const [lastSiteUrl, setLastSiteUrl] = useState<string | null>(null)
 
   // Force session refresh so the new planTier from the webhook is reflected immediately
-  useEffect(() => { update() }, [])
+  useEffect(() => {
+    markJustPaid()
+    setLastSiteUrl(readLastSiteUrl())
+    update()
+  }, [])
   useEffect(() => {
     if (!session?.user?.id || capturedSuccess.current) return
     capturedSuccess.current = true
@@ -30,19 +42,31 @@ export default function UpgradeSuccessPage() {
         if (cancelled) return
         const first = data?.banners?.[0]
         setExistingBannerId(first?.id ?? null)
+        setBannersLoaded(true)
       })
       .catch(() => {
-        if (!cancelled) setExistingBannerId(null)
+        if (!cancelled) {
+          setExistingBannerId(null)
+          setBannersLoaded(true)
+        }
       })
     return () => {
       cancelled = true
     }
   }, [])
+
   const isAnnual = planTier === 'pro_annual'
   const hasBanner = Boolean(existingBannerId)
-  const primaryHref = hasBanner
-    ? `/dashboard/builder?id=${existingBannerId}&tab=code`
-    : '/dashboard/builder'
+  const primaryHref = postPayBuilderHref({
+    existingBannerId,
+    siteUrl: lastSiteUrl,
+  })
+
+  useEffect(() => {
+    if (!bannersLoaded || redirected.current) return
+    redirected.current = true
+    router.replace(primaryHref)
+  }, [bannersLoaded, primaryHref, router])
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,8 +81,8 @@ export default function UpgradeSuccessPage() {
           <h1 className="text-4xl font-bold mb-4">Welcome to Pro!</h1>
           <p className="text-xl text-muted-foreground mb-8">
             {hasBanner
-              ? 'Your account has been upgraded. Copy the install snippet onto your site to go live.'
-              : 'Your account has been upgraded. Create your banner next — then copy the install snippet onto your site.'}
+              ? 'Your account has been upgraded. Opening the installer…'
+              : 'Your account has been upgraded. Opening the builder so you can create your first banner…'}
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <div className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center gap-1.5">
