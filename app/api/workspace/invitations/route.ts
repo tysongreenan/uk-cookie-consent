@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
+import { sendTeamInvitationEmail } from '@/lib/email'
 import { canAccessFeature } from '@/lib/plan-restrictions'
+import {
+  buildInviteLink,
+  invitationApiPayload,
+  invitationApiStatus,
+  inviteEmailDisplayNames,
+  publicInviteBaseUrl,
+} from '@/lib/team-invitations'
 import { requireTeamPermission } from '@/lib/team-permissions'
 import { PlanTier } from '@/types'
 
@@ -165,22 +173,16 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existingInvite) {
-      // Return the existing invite link instead of creating a duplicate
-      const baseUrl = request.headers.get('origin') ||
-                     process.env.NEXT_PUBLIC_BASE_URL ||
-                     process.env.NEXTAUTH_URL ||
-                     'http://localhost:3000'
-      const inviteLink = `${baseUrl}/invite/${existingInvite.token}`
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          invitation: existingInvite,
-          inviteLink,
-          shareableLink: inviteLink
-        },
-        message: 'A pending invitation already exists for this email. Here is the existing invite link.'
-      }, { status: 200 })
+      return respondAfterInviteEmail({
+        request,
+        invitation: existingInvite,
+        token: existingInvite.token,
+        email: normalizedEmail,
+        inviterName: session.user.name,
+        inviterEmail: session.user.email,
+        teamId,
+        created: false,
+      })
     }
 
     // Create invitation record
@@ -207,22 +209,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate invite link - prioritize request origin for local development
-    const baseUrl = request.headers.get('origin') || 
-                   process.env.NEXT_PUBLIC_BASE_URL || 
-                   process.env.NEXTAUTH_URL || 
-                   'http://localhost:3000'
-    const inviteLink = `${baseUrl}/invite/${token}`
-    
-    return NextResponse.json({
-      success: true,
-      data: {
-        invitation,
-        inviteLink,
-        shareableLink: inviteLink
-      },
-      message: 'Invitation link created successfully! Share this link with your collaborator.'
-    }, { status: 201 })
+    return respondAfterInviteEmail({
+      request,
+      invitation,
+      token,
+      email: normalizedEmail,
+      inviterName: session.user.name,
+      inviterEmail: session.user.email,
+      teamId,
+      created: true,
+    })
 
   } catch (error) {
     console.error('Workspace invitation error:', error)
@@ -231,4 +227,55 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function respondAfterInviteEmail(input: {
+  request: NextRequest
+  invitation: { id: string; token?: string; expires_at?: string }
+  token: string
+  email: string
+  inviterName?: string | null
+  inviterEmail?: string | null
+  teamId: string
+  created: boolean
+}) {
+  const { data: team } = await supabase
+    .from('Team')
+    .select('name')
+    .eq('id', input.teamId)
+    .maybeSingle()
+
+  const { inviterName, teamName } = inviteEmailDisplayNames({
+    inviterName: input.inviterName,
+    inviterEmail: input.inviterEmail,
+    teamName: team?.name,
+  })
+
+  const inviteLink = buildInviteLink(
+    publicInviteBaseUrl(input.request.headers.get('origin')),
+    input.token
+  )
+  const emailSent = await sendTeamInvitationEmail(
+    input.email,
+    inviterName,
+    teamName,
+    inviteLink
+  )
+
+  if (!emailSent) {
+    console.error('[INVITE] Failed to send invitation email', {
+      email: input.email,
+      teamId: input.teamId,
+      created: input.created,
+    })
+  }
+
+  return NextResponse.json(
+    invitationApiPayload({
+      invitation: input.invitation,
+      inviteLink,
+      emailSent,
+    }),
+    { status: invitationApiStatus(emailSent, input.created) }
+  )
 }

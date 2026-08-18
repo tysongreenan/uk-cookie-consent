@@ -26,6 +26,80 @@ export function buildInviteLink(baseUrl: string, token: string): string {
   return `${origin}/invite/${token}`
 }
 
+/** Stable public origin for emailed accept links — env first, not the dashboard Origin. */
+export function publicInviteBaseUrl(requestOrigin?: string | null): string {
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.NEXTAUTH_URL ||
+    requestOrigin ||
+    'https://www.cookie-banner.ca'
+  ).replace(/\/$/, '')
+}
+
+export function inviteEmailDisplayNames(input: {
+  inviterName?: string | null
+  inviterEmail?: string | null
+  teamName?: string | null
+}): { inviterName: string; teamName: string } {
+  const inviterName = (input.inviterName || '').trim() || input.inviterEmail || 'A teammate'
+  const teamName = (input.teamName || '').trim() || 'a workspace'
+  return { inviterName, teamName }
+}
+
+export type InvitationEmailOutcome = {
+  success: boolean
+  emailSent: boolean
+  message?: string
+  error?: string
+}
+
+export function invitationEmailOutcome(emailSent: boolean): InvitationEmailOutcome {
+  if (emailSent) {
+    return {
+      success: true,
+      emailSent: true,
+      message: 'Invitation email sent. You can also copy the invite link as a backup.',
+    }
+  }
+
+  return {
+    success: false,
+    emailSent: false,
+    error:
+      'The invitation was saved, but we could not send the email. Copy the invite link below and share it yourself, or try again.',
+  }
+}
+
+export function invitationApiPayload(input: {
+  invitation: unknown
+  inviteLink: string
+  emailSent: boolean
+}): InvitationEmailOutcome & {
+  data: {
+    invitation: unknown
+    inviteLink: string
+    shareableLink: string
+    emailSent: boolean
+  }
+} {
+  const outcome = invitationEmailOutcome(input.emailSent)
+  return {
+    ...outcome,
+    data: {
+      invitation: input.invitation,
+      inviteLink: input.inviteLink,
+      shareableLink: input.inviteLink,
+      emailSent: input.emailSent,
+    },
+  }
+}
+
+/** 201 for a new invite that emailed; 200 for a resend that emailed; 503 if mail failed. */
+export function invitationApiStatus(emailSent: boolean, created: boolean): number {
+  if (!emailSent) return 503
+  return created ? 201 : 200
+}
+
 export function mapInvitationRows(
   rows: InvitationRow[] | null | undefined,
   baseUrl: string,

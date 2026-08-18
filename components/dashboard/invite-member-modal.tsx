@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Dialog, 
@@ -36,14 +34,15 @@ interface InviteMemberModalProps {
   onSuccess: () => void
 }
 
+type InviteResult = 'idle' | 'sent' | 'email_failed'
+
 export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMemberModalProps) {
-  const { data: session } = useSession()
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<Exclude<TeamRole, 'owner'>>('editor')
-  // Removed sendEmail since we're using link-based invitations only
   const [loading, setLoading] = useState(false)
   const [inviteLink, setInviteLink] = useState('')
-  const [inviteSent, setInviteSent] = useState(false)
+  const [result, setResult] = useState<InviteResult>('idle')
+  const [emailError, setEmailError] = useState('')
 
   // Reset state when modal reopens
   useEffect(() => {
@@ -51,7 +50,8 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
       setEmail('')
       setRole('editor')
       setInviteLink('')
-      setInviteSent(false)
+      setResult('idle')
+      setEmailError('')
       setLoading(false)
     }
   }, [open])
@@ -63,8 +63,6 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
       toast.error('Please enter a valid email address')
       return
     }
-
-    // Workspace invitations don't require a team - they're tied to the user's workspace
 
     setLoading(true)
     try {
@@ -78,14 +76,24 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
       })
 
       const data = await response.json()
+      const link = data.data?.inviteLink as string | undefined
 
-      if (data.success) {
-        setInviteLink(data.data.inviteLink)
-        setInviteSent(true)
-        toast.success('Invitation created successfully!')
-      } else {
-        toast.error(data.error || 'Failed to create invitation')
+      if (data.success && data.emailSent && link) {
+        setInviteLink(link)
+        setResult('sent')
+        toast.success('Invitation email sent')
+        return
       }
+
+      if (link) {
+        setInviteLink(link)
+        setEmailError(data.error || 'The invitation was saved, but we could not send the email.')
+        setResult('email_failed')
+        toast.error(data.error || 'Invitation email failed to send')
+        return
+      }
+
+      toast.error(data.error || 'Failed to create invitation')
     } catch (error) {
       console.error('Error creating invitation:', error)
       toast.error('Failed to create invitation')
@@ -143,36 +151,58 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
     }
   }
 
-  if (inviteSent) {
+  if (result === 'sent' || result === 'email_failed') {
+    const emailSent = result === 'sent'
+
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <span>Invitation Sent!</span>
+              {emailSent ? (
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              ) : (
+                <XCircle className="h-5 w-5 text-red-600" />
+              )}
+              <span>{emailSent ? 'Invitation email sent' : 'Invitation email failed'}</span>
             </DialogTitle>
             <DialogDescription>
-              The invitation has been created successfully.
+              {emailSent
+                ? `We emailed ${email} a link to join your workspace. The invite expires in 7 days.`
+                : emailError}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div
+              className={
+                emailSent
+                  ? 'p-4 bg-green-50 border border-green-200 rounded-lg'
+                  : 'p-4 bg-red-50 border border-red-200 rounded-lg'
+              }
+            >
               <div className="flex items-center space-x-2 mb-2">
-                <LinkIcon className="h-4 w-4 text-green-600" />
-                <span className="font-medium text-green-800">{email}</span>
+                {emailSent ? (
+                  <Send className="h-4 w-4 text-green-600" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-red-600" />
+                )}
+                <span className={emailSent ? 'font-medium text-green-800' : 'font-medium text-red-800'}>
+                  {email}
+                </span>
                 <Badge className={getRoleBadgeColor(role)}>
                   {role}
                 </Badge>
               </div>
-              <p className="text-sm text-green-700">
-                {getRoleDescription(role)}
+              <p className={emailSent ? 'text-sm text-green-700' : 'text-sm text-red-700'}>
+                {emailSent
+                  ? getRoleDescription(role)
+                  : 'The invite was saved. Share the backup link below, or try sending again.'}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>Invite Link</Label>
+              <Label>{emailSent ? 'Backup invite link' : 'Invite link'}</Label>
               <div className="flex space-x-2">
                 <Input
                   value={inviteLink}
@@ -189,13 +219,21 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
                 </Button>
               </div>
               <p className="text-xs text-gray-600">
-                Share this link with your collaborator to join your workspace
+                {emailSent
+                  ? 'Copy this link if they do not receive the email.'
+                  : 'Email was not sent. Copy this link and share it yourself.'}
               </p>
             </div>
 
             <Button onClick={onSuccess} className="w-full">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Done
+              {emailSent ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Done
+                </>
+              ) : (
+                'Close'
+              )}
             </Button>
           </div>
         </DialogContent>
@@ -208,11 +246,11 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <LinkIcon className="h-5 w-5" />
+            <Send className="h-5 w-5" />
             <span>Invite Team Member</span>
           </DialogTitle>
           <DialogDescription>
-            Generate a shareable link to invite someone to join your workspace with a specific role.
+            We will email them an invitation to join your workspace. The link expires in 7 days.
           </DialogDescription>
         </DialogHeader>
 
@@ -271,9 +309,9 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
           </div>
 
           <Alert>
-            <LinkIcon className="h-4 w-4" />
+            <Send className="h-4 w-4" />
             <AlertDescription>
-              A shareable invite link will be generated that you can send via email, Slack, or any other method.
+              We will email the invitation from cookie-banner.ca. After it sends, you can also copy a backup link.
             </AlertDescription>
           </Alert>
 
@@ -282,12 +320,12 @@ export function InviteMemberModal({ open = true, onClose, onSuccess }: InviteMem
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Creating...
+                  Sending...
                 </>
               ) : (
                 <>
-                  <LinkIcon className="h-4 w-4 mr-2" />
-                  Generate Invite Link
+                  <Send className="h-4 w-4 mr-2" />
+                  Send invitation
                 </>
               )}
             </Button>
