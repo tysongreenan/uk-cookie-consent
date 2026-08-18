@@ -16,7 +16,8 @@ function getResend() {
   return new Resend(key)
 }
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Cookie Banner <onboarding@resend.dev>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Cookie Banner <support@cookie-banner.ca>'
+const REPLY_TO_EMAIL = 'support@cookie-banner.ca'
 
 // ── Generic send ──────────────────────────────────────────────────────
 
@@ -35,6 +36,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: options.to,
+      replyTo: REPLY_TO_EMAIL,
       subject: options.subject,
       html: options.html,
       text: options.text,
