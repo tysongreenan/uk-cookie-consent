@@ -39,9 +39,17 @@ import { COLOR_PRESETS } from '@/lib/color-presets'
 import { FONT_PRESETS } from '@/lib/font-presets'
 import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
-import { hostedInstallSnippet } from '@/lib/install-snippet'
+import { hasInstallSnippetCopied, hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
+import {
+  clearPendingBannerConfig,
+  readPendingBannerConfig,
+  writePendingBannerConfig,
+} from '@/lib/builder-draft'
+import { isJustPaid } from '@/lib/just-paid'
+import { readLastSiteUrl, resolveScanPrefillUrl, writeLastSiteUrl } from '@/lib/scan-url'
+import { shouldShowLayoutProUpsell } from '@/lib/first-banner-upsell'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -541,11 +549,13 @@ function BannerBuilderContent() {
   const [isLoadingBanner, setIsLoadingBanner] = useState(false)
   const [userPlan, setUserPlan] = useState<PlanTier>('free')
   const [brandImportUrl, setBrandImportUrl] = useState('')
+  const [scanPrefillUrl, setScanPrefillUrl] = useState('')
   const [isDiscoveringBrand, setIsDiscoveringBrand] = useState(false)
   const [brandDiscovery, setBrandDiscovery] = useState<BrandDiscoveryResult | null>(null)
   const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
+  const recoveredDraftRef = useRef(false)
   const [isDirty, setIsDirty] = useState(false)
   const skipTabScrollRef = useRef(true)
 
@@ -570,6 +580,25 @@ function BannerBuilderContent() {
       setActiveTab('code')
     }
   }, [searchParams, session])
+
+  useEffect(() => {
+    const prefill = resolveScanPrefillUrl({
+      queryUrl: searchParams.get('url'),
+      lastSiteUrl: readLastSiteUrl(),
+      brandImportUrl,
+    })
+    if (!prefill) return
+    setScanPrefillUrl(prefill)
+    setBrandImportUrl((prev) => (prev.trim() ? prev : prefill))
+  }, [searchParams])
+
+  const welcomeToastRef = useRef(false)
+  useEffect(() => {
+    if (searchParams.get('from') === 'upgrade' && !welcomeToastRef.current) {
+      welcomeToastRef.current = true
+      toast.success('Welcome to Pro — finish your first banner here')
+    }
+  }, [searchParams])
 
   // Warn user about unsaved changes before leaving the page
   useEffect(() => {
@@ -803,6 +832,7 @@ function BannerBuilderContent() {
       }
 
       setBrandDiscovery(data)
+      writeLastSiteUrl(brandImportUrl.trim())
       if (data.suggestions) {
         applyColorUpdates(data.suggestions)
       }
@@ -879,15 +909,16 @@ function BannerBuilderContent() {
 
   const [isPushing, setIsPushing] = useState(false)
 
-  const persistBanner = async (options?: { silent?: boolean }): Promise<string | null> => {
+  const persistBanner = async (options?: { silent?: boolean; configOverride?: BannerConfig }): Promise<string | null> => {
     setIsLoading(true)
     try {
       const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
       const method = isEditing ? 'PUT' : 'POST'
+      const sourceConfig = options?.configOverride ?? config
       
       // Add version timestamp to ensure cache invalidation
       const configWithVersion = {
-        ...config,
+        ...sourceConfig,
         version: '2.1.0',
         lastUpdated: new Date().toISOString()
       }
@@ -899,7 +930,7 @@ function BannerBuilderContent() {
           ...getPostHogRequestHeaders(),
         },
         body: JSON.stringify({
-          name: config.name,
+          name: sourceConfig.name || 'My Cookie Banner',
           config: configWithVersion,
           isActive: true
         }),
@@ -917,6 +948,7 @@ function BannerBuilderContent() {
           setBannerUpdatedAt(new Date())
         }
         setIsDirty(false)
+        clearPendingBannerConfig()
         const savedId = (!isEditing && data.bannerId) ? data.bannerId : bannerId
         if (!options?.silent) {
           toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
@@ -947,6 +979,24 @@ function BannerBuilderContent() {
   const handleSave = async () => {
     await persistBanner()
   }
+
+  useEffect(() => {
+    if (bannerId || !isDirty) return
+    writePendingBannerConfig(config)
+  }, [bannerId, isDirty, config])
+
+  useEffect(() => {
+    if (!session || recoveredDraftRef.current) return
+    if (searchParams.get('id') || searchParams.get('edit')) return
+    const draft = readPendingBannerConfig()
+    if (!draft) return
+    recoveredDraftRef.current = true
+    setConfig(draft)
+    setIsDirty(true)
+    if (searchParams.get('from') === 'upgrade' || isJustPaid()) {
+      void persistBanner({ silent: true, configOverride: draft })
+    }
+  }, [session, searchParams])
 
   const handlePushLive = async () => {
     if (!isEditing || !bannerId) {
@@ -2279,12 +2329,13 @@ function BannerBuilderContent() {
                             )}
                           </SelectContent>
                         </Select>
-                        {!canAccessFeature(userPlan, 'hasCustomLayouts') && (
-                          <UpgradePrompt 
-                            feature="Custom Layouts"
-                            description="Modal, slide-in, and other advanced layouts"
-                            variant="inline"
-                          />
+                        {!canAccessFeature(userPlan, 'hasCustomLayouts') && shouldShowLayoutProUpsell({
+                          hasSavedBanner: Boolean(bannerId),
+                          hasCopiedInstallSnippet: Boolean(bannerId && hasInstallSnippetCopied(bannerId)),
+                        }) && (
+                          <p className="text-xs text-muted-foreground">
+                            Modal and slide-in layouts are available on Pro after this first banner is installed.
+                          </p>
                         )}
                       </div>
 
@@ -2967,6 +3018,7 @@ function BannerBuilderContent() {
                 <ScriptScannerImport
                   currentScripts={config.scripts}
                   privacyPolicyUrl={config.branding?.privacyPolicy?.url}
+                  initialUrl={scanPrefillUrl || brandImportUrl || undefined}
                   onImport={handleScannerImport}
                   onUsePrivacyPolicy={handleUseDetectedPrivacyPolicy}
                   onScanComplete={handleBuilderScanComplete}

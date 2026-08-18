@@ -27,6 +27,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { NewBadge } from '@/components/ui/new-badge'
 import { WorkspaceSwitcher } from '@/components/dashboard/workspace-switcher'
+import { shouldShowUpgradeCta } from '@/lib/just-paid'
 
 interface NavItem {
   title: string
@@ -87,6 +88,7 @@ export function Sidebar({ className }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const userPlan = (session?.user?.planTier || 'free') as string
   const isPro = userPlan !== 'free'
+  const showUpgradeCta = shouldShowUpgradeCta(userPlan)
   const hasBanner = (session?.user as any)?.hasConsentBanner ?? true
   const hasPrivacy = (session?.user as any)?.hasPrivacyConsumer ?? false
 
@@ -222,7 +224,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-3 border-t border-border space-y-2">
-        {!isPro && (
+        {showUpgradeCta && (
           <Link href="/upgrade" className="flex items-center space-x-3 p-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
             <Crown className="w-4 h-4 shrink-0" />
             <div className="flex-1 min-w-0">

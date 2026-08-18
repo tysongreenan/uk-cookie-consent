@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -28,6 +28,7 @@ import {
 } from '@/lib/install-snippet'
 import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
+import { isJustPaid, shouldShowUpgradeCta } from '@/lib/just-paid'
 
 interface Banner {
   id: string
@@ -47,7 +48,7 @@ interface Banner {
 }
 
 export function DashboardClient() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const router = useRouter()
   const [banners, setBanners] = useState<Banner[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -56,12 +57,20 @@ export function DashboardClient() {
   const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
   const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number; userRole: string } | null>(null)
   const [showInstallNudge, setShowInstallNudge] = useState(false)
+  const sessionRefreshed = useRef(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin')
     }
   }, [status, router])
+
+  useEffect(() => {
+    if (status === 'authenticated' && !sessionRefreshed.current) {
+      sessionRefreshed.current = true
+      update()
+    }
+  }, [status])
 
   useEffect(() => {
     if (session) {
@@ -73,9 +82,10 @@ export function DashboardClient() {
         console.error('Failed to fetch team info:', err)
       })
 
-      // Safety net: if signup redirect failed to reach /builder, auto-save pending config
+      // Safety net: if signup redirect failed to reach /builder, auto-save pending config.
+      // After checkout, leave the draft for /dashboard/builder to recover into a real banner.
       const pendingConfig = localStorage.getItem('pendingBannerConfig')
-      if (pendingConfig) {
+      if (pendingConfig && !isJustPaid()) {
         // Remove immediately to prevent duplicate saves on session changes
         localStorage.removeItem('pendingBannerConfig')
         try {
@@ -98,6 +108,12 @@ export function DashboardClient() {
       }
     }
   }, [session])
+
+  useEffect(() => {
+    if (isLoading || banners.length > 0) return
+    if (!isJustPaid()) return
+    router.replace('/dashboard/builder?from=upgrade')
+  }, [isLoading, banners.length, router])
 
   const fetchBanners = async () => {
     try {
@@ -360,7 +376,7 @@ export function DashboardClient() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                {(session.user?.planTier || 'free') === 'free' && (
+                {shouldShowUpgradeCta(session.user?.planTier) && (
                   <p className="mt-4 text-sm text-muted-foreground">
                     Need Law 25 geo-targeting, GPC controls, and no branding?{' '}
                     <Link href="/upgrade" className="text-primary font-medium hover:underline">

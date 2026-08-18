@@ -31,7 +31,7 @@ interface CodeGeneratorProps {
 
 export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, onEnsureSaved }: CodeGeneratorProps) {
   const showBranding = !planTier || planTier === 'free'
-  const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>(bannerId ? 'hosted' : 'head')
+  const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>('hosted')
   const [isGenerating, setIsGenerating] = useState(false)
   const [showUpdateNotice, setShowUpdateNotice] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -113,7 +113,9 @@ ${generateBannerHTML(config, { showBranding })}
   }
 
   const generateHostedScript = () => {
-    if (!bannerId) return ''
+    if (!bannerId) {
+      return '<!-- Copy saves this banner, then copies your one-line hosted script -->'
+    }
     return hostedInstallSnippet(bannerId, { showBranding })
   }
 
@@ -211,8 +213,8 @@ ${generateBannerHTML(config, { showBranding })}
 
   const latestUpdate = getLatestUpdate()
 
-  // Hosted script view (recommended, shown by default for saved banners)
-  if (activeTab === 'hosted' && bannerId) {
+  // Hosted script view (recommended default — Head + Body is Advanced)
+  if (activeTab === 'hosted') {
     return (
       <div className="space-y-4">
         {/* Update notice */}
@@ -234,7 +236,11 @@ ${generateBannerHTML(config, { showBranding })}
         {/* Instructions */}
         <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
           <p className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">One line of code. That's it.</p>
-          <p className="text-sm text-green-800 dark:text-green-300">Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</p>
+          <p className="text-sm text-green-800 dark:text-green-300">
+            {bannerId
+              ? <>Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</>
+              : <>Copy saves this banner, then copies a one-line script. Paste that in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section.</>}
+          </p>
         </div>
 
         {/* Code block */}
