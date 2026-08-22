@@ -35,9 +35,10 @@ export default function robots(): MetadataRoute.Robots {
           '/builder/',
           // Block invite tokens (user-specific, no SEO value)
           '/invite/',
-          // Block upgrade flow (no SEO value)
-          '/upgrade/',
-          // Location pages, webflow landing page, and free-cookie-banner are now
+          // Block upgrade flow (no SEO value). No trailing slash so
+          // /upgrade and /upgrade?billing=one_time are both covered.
+          '/upgrade',
+          // Location pages and free-cookie-banner are now
           // allowed for all crawlers (valuable SEO content)
         ],
       },
@@ -53,7 +54,7 @@ export default function robots(): MetadataRoute.Robots {
           '/demo/',
           '/builder/',
           '/invite/',
-          '/upgrade/',
+          '/upgrade',
         ],
       },
       // AI search crawlers — allow access for citation and search features
@@ -73,7 +74,7 @@ export default function robots(): MetadataRoute.Robots {
           '/auth/',
           '/builder/',
           '/invite/',
-          '/upgrade/',
+          '/upgrade',
         ],
       },
       // Block AI training-only crawlers (no search benefit)

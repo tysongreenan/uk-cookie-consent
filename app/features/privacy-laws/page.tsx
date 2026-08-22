@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location.',
     type: 'article',
   },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/features/privacy-laws',
+  },
 }
 
 const faqData = [
@@ -123,13 +126,13 @@ export default function PrivacyLawsPage() {
           badge: "Global Compliance",
           updatedDate: updatedDate,
           ctaText: "Achieve Global Compliance",
-          ctaHref: "/dashboard",
+          ctaHref: "/builder",
           directAnswer: directAnswer,
-          directAnswerLink: "/dashboard",
+          directAnswerLink: "/builder",
           directAnswerLinkText: "Get compliant now"
         }}
         ctaText="Achieve Global Compliance"
-        ctaHref="/dashboard"
+        ctaHref="/builder"
         relatedLinks={[
           { href: "/features/will-this-keep-me-compliant", text: "Will This Keep Me Compliant?" },
           { href: "/features/how-it-works", text: "How Do I Know It's Working?" },

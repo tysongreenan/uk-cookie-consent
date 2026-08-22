@@ -78,6 +78,29 @@ export default function ToolsPage() {
               Scan cookies, generate privacy policies (English &amp; French), and improve compliance.
               Generate free — Pro unlocks hosted policy URLs and dashboard saves.
             </p>
+            <p className="mt-4 text-sm text-muted-foreground max-w-2xl mx-auto">
+              Start with the{' '}
+              <Link href="/tools/cookie-scanner" className="underline underline-offset-2 hover:text-foreground">
+                cookie scanner
+              </Link>{' '}
+              to see what your site is setting, then generate a{' '}
+              <Link href="/tools/privacy-policy" className="underline underline-offset-2 hover:text-foreground">
+                privacy policy
+              </Link>{' '}
+              or{' '}
+              <Link href="/tools/cookie-policy" className="underline underline-offset-2 hover:text-foreground">
+                cookie policy
+              </Link>
+              . For legal context, read the{' '}
+              <Link href="/compliance" className="underline underline-offset-2 hover:text-foreground">
+                compliance overview
+              </Link>{' '}
+              or the{' '}
+              <Link href="/blog/cookie-consent-canada-guide-2026" className="underline underline-offset-2 hover:text-foreground">
+                Canada cookie consent guide
+              </Link>
+              .
+            </p>
           </div>
 
           {/* Tools Grid */}

@@ -106,6 +106,10 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string }
 }) {
+  if (!isValidBlogSlug(params.slug)) {
+    notFound()
+  }
+
   const post = await getPostBySlug(params.slug)
 
   if (!post || !post.published) {

@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       'Complete guide to US cookie consent compliance. CCPA, CPRA, and state privacy laws.',
     type: 'article',
   },
+  robots: { index: true, follow: true },
   alternates: {
     canonical: 'https://www.cookie-banner.ca/locations/us',
   },

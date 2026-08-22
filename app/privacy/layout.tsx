@@ -1,11 +1,13 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Cookie-Banner.ca',
-  description: 'How Cookie-Banner.ca collects, uses, and protects your data. Our privacy practices for the cookie consent banner generator.',
+  title: 'Privacy Manager — Cookie Banner Chrome Extension',
+  description:
+    'Set your cookie preferences once. Privacy Manager handles cookie banners as you browse.',
+  robots: { index: false, follow: false },
   openGraph: {
-    title: 'Privacy Policy — Cookie-Banner.ca',
-    description: 'How we collect, use, and protect your data.',
+    title: 'Privacy Manager — Cookie Banner Chrome Extension',
+    description: 'Set your cookie preferences once. Privacy Manager handles cookie banners as you browse.',
     type: 'website',
   },
   alternates: {

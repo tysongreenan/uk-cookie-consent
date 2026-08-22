@@ -3,11 +3,17 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { MapPin, Globe, Shield, FileText } from 'lucide-react'
+import { Header } from '@/components/landing/header'
+import { Footer } from '@/components/landing/footer'
 
 export const metadata: Metadata = {
   title: 'Cookie Consent by Location | GDPR, PIPEDA, CCPA Compliance',
   description: 'Find the right cookie consent requirements for your location. GDPR for Europe, PIPEDA for Canada, CCPA for California, and more.',
   keywords: ['cookie consent by location', 'GDPR compliance', 'PIPEDA compliance', 'CCPA compliance', 'privacy laws by country'],
+  robots: { index: true, follow: true },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/locations',
+  },
 }
 
 const locations = [
@@ -60,6 +66,7 @@ const locations = [
 export default function LocationsPage() {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container px-4 py-12 sm:px-6 sm:py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           {/* Header */}
@@ -136,6 +143,7 @@ export default function LocationsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

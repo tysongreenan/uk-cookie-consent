@@ -13,12 +13,15 @@ export const metadata: Metadata = {
     description: 'Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates.',
     type: 'article',
   },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/features/what-you-get',
+  },
 }
 
 const faqData = [
   {
     question: "What features are included with this cookie banner?",
-    answer: "Our cookie banner includes unlimited banners, brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, Webflow, custom sites), zero performance impact, automatic compliance updates, consent logging, granular controls, and bilingual support. All features are included with your account."
+    answer: "Our cookie banner includes unlimited banners, brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, custom sites), zero performance impact, automatic compliance updates, consent logging, granular controls, and bilingual support. All features are included with your account."
   },
   {
     question: "What customization options are available?",
@@ -26,7 +29,7 @@ const faqData = [
   },
   {
     question: "Which platforms does this cookie banner work on?",
-    answer: "Our cookie banner works on any platform including WordPress, Shopify, Webflow, Squarespace, Wix, custom HTML sites, React apps, and any website that can include JavaScript. The installation is the same simple code snippet for all platforms."
+    answer: "Our cookie banner works on any platform including WordPress, Shopify, Squarespace, Wix, custom HTML sites, React apps, and any website that can include JavaScript. The installation is the same simple code snippet for all platforms."
   },
   {
     question: "What about performance and page speed impact?",
@@ -86,7 +89,7 @@ export default function WhatYouGetPage() {
     }
   }
 
-  const directAnswer = "With our cookie banner, you get unlimited banners across unlimited websites, complete brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, Webflow, custom sites), zero performance impact, automatic compliance updates, consent logging, granular cookie controls, and bilingual support. All features are included—no additional fees or premium tiers. You can customize everything to match your brand perfectly and use it on as many websites as you need."
+  const directAnswer = "With our cookie banner, you get unlimited banners across unlimited websites, complete brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, custom sites), zero performance impact, automatic compliance updates, consent logging, granular cookie controls, and bilingual support. All features are included—no additional fees or premium tiers. You can customize everything to match your brand perfectly and use it on as many websites as you need."
 
   const featuresList = [
     {
@@ -118,13 +121,13 @@ export default function WhatYouGetPage() {
           badge: "Comprehensive Features",
           updatedDate: updatedDate,
           ctaText: "View All Features",
-          ctaHref: "/dashboard",
+          ctaHref: "/builder",
           directAnswer: directAnswer,
-          directAnswerLink: "/dashboard",
+          directAnswerLink: "/builder",
           directAnswerLinkText: "View all features"
         }}
         ctaText="View All Features"
-        ctaHref="/dashboard"
+        ctaHref="/builder"
         relatedLinks={[
           { href: "/features/will-this-keep-me-compliant", text: "Will This Keep Me Compliant?" },
           { href: "/features/privacy-laws", text: "What Privacy Laws Does This Cover?" },
@@ -165,7 +168,6 @@ export default function WhatYouGetPage() {
         <ul>
           <li><strong>WordPress:</strong> Simple plugin installation or code snippet integration</li>
           <li><strong>Shopify:</strong> Easy integration into your store's theme files</li>
-          <li><strong>Webflow:</strong> Embed the code snippet directly into your project</li>
           <li><strong>Squarespace & Wix:</strong> Add the code via custom code injection features</li>
           <li><strong>Custom HTML/React/Vue/Angular Sites:</strong> Integrate with a single JavaScript snippet</li>
         </ul>

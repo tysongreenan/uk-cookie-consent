@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { prefersMarkdown } from '@/lib/seo/content-negotiation'
 import { aiCrawlerLogLine, detectAiCrawler } from '@/lib/seo/ai-crawlers'
 import { getPageMarkdownKey } from '@/lib/seo/markdown-routes'
+import { isGonePath } from '@/lib/seo/gone-paths'
 
 function logAiCrawler(request: NextRequest) {
   const bot = detectAiCrawler(request.headers.get('user-agent'))
@@ -40,6 +41,16 @@ function htmlPathFromMarkdownUrl(pathname: string): string | null {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   logAiCrawler(request)
+
+  if (isGonePath(pathname)) {
+    return new NextResponse('Gone', {
+      status: 410,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    })
+  }
 
   // Explicit `.md` URL, or the same HTML URL with Accept: text/markdown.
   const blogMarkdown = pathname.match(/^\/blog\/([a-z0-9-]+)\.md\/?$/i)

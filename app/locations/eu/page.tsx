@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, and multi-language support.',
     type: 'article',
   },
+  robots: { index: true, follow: true },
   alternates: {
     canonical: 'https://www.cookie-banner.ca/locations/eu',
   },
