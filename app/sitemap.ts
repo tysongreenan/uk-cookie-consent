@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'
   // Use a fixed date for static pages so crawlers don't re-crawl unchanged content.
   // Update this date when you actually modify these pages.
-  const staticDate = new Date('2026-03-27')
+  const staticDate = new Date('2026-08-22')
   const now = new Date()
 
   // Priority 1.0 - Homepage (most important)
@@ -221,12 +221,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/webflow-cookie-consent-free`,
-      lastModified: staticDate,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
       url: `${baseUrl}/ccpa-cookie-banner`,
       lastModified: staticDate,
       changeFrequency: 'monthly',
@@ -285,12 +279,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/integrations/webflow`,
-      lastModified: staticDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
       url: `${baseUrl}/integrations/google-tag-manager`,
       lastModified: staticDate,
       changeFrequency: 'monthly',
@@ -319,6 +307,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: staticDate,
       changeFrequency: 'monthly',
       priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/integrations/ai`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
   ]
 
@@ -359,6 +353,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Priority 0.7 - Location pages
   const locationPages: MetadataRoute.Sitemap = [
     {
+      url: `${baseUrl}/locations`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/locations/canada`,
       lastModified: staticDate,
       changeFrequency: 'monthly',
@@ -387,8 +387,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Priority 0.5 - Legal/Supporting pages
   const legalPages: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}/privacy`,
-      lastModified: staticDate,
+      url: `${baseUrl}/privacy-policy`,
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
@@ -422,8 +422,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     console.warn('Could not load blog posts for sitemap:', error)
   }
 
-  // Combine all pages in priority order
-  return [
+  // Combine all pages in priority order, dropping duplicate URLs
+  const combined = [
     ...homepage,
     ...highPriorityPages,
     ...importantPages,
@@ -433,5 +433,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...blogPosts,
     ...legalPages,
   ]
+
+  const seen = new Set<string>()
+  return combined.filter((entry) => {
+    if (seen.has(entry.url)) return false
+    seen.add(entry.url)
+    return true
+  })
 }
 

@@ -13,7 +13,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname() || '/'
   const authCallback =
-    pathname.startsWith('/tools/')
+    pathname.startsWith('/tools/') || pathname.startsWith('/integrations/ai')
       ? `?callbackUrl=${encodeURIComponent(pathname)}`
       : ''
 
@@ -60,6 +60,12 @@ export function Header() {
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Compliance
+            </Link>
+            <Link
+              href="/features"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Features
             </Link>
             <Link
               href="/support"
@@ -121,6 +127,13 @@ export function Header() {
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
               Compliance
+            </Link>
+            <Link
+              href="/features"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Features
             </Link>
             <Link
               href="/support"

@@ -742,7 +742,7 @@ export default function PrivacyManagerPage() {
               <Link href="/terms" className="hover:text-slate-600">
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-slate-600">
+              <Link href="/privacy-policy" className="hover:text-slate-600">
                 Privacy Policy
               </Link>
               <Link href="/" className="hover:text-slate-600">

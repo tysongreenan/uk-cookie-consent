@@ -49,15 +49,15 @@ const COMPLIANCE: LlmsLink[] = [
 ]
 
 const INTEGRATIONS: LlmsLink[] = [
-  { title: 'Integrations', path: '/integrations', description: 'Install on WordPress, Shopify, Webflow, and more' },
+  { title: 'Integrations', path: '/integrations', description: 'Install on WordPress, Shopify, and more' },
   { title: 'WordPress', path: '/integrations/wordpress', description: 'WordPress cookie banner setup' },
   { title: 'Shopify', path: '/integrations/shopify', description: 'Shopify cookie banner setup' },
-  { title: 'Webflow', path: '/integrations/webflow', description: 'Webflow cookie banner setup' },
   { title: 'Google Tag Manager', path: '/integrations/google-tag-manager', description: 'GTM and Consent Mode v2 setup' },
   { title: 'Squarespace', path: '/integrations/squarespace', description: 'Squarespace cookie banner setup' },
   { title: 'Wix', path: '/integrations/wix', description: 'Wix cookie banner setup' },
   { title: 'React', path: '/integrations/react', description: 'React and Next.js cookie banner setup' },
   { title: 'Brizy', path: '/integrations/brizy', description: 'Brizy cookie banner setup' },
+  { title: 'Set up with AI', path: '/integrations/ai', description: 'MCP server for Claude Code, Cursor, Windsurf, and VS Code' },
 ]
 
 const COMPARE: LlmsLink[] = [
@@ -86,7 +86,7 @@ const COMPANY: LlmsLink[] = [
   { title: 'Support', path: '/support', description: 'Help getting a banner live' },
   { title: 'Changelog', path: '/changelog', description: 'Product updates' },
   { title: 'Roadmap', path: '/roadmap', description: 'Planned features' },
-  { title: 'Privacy policy', path: '/privacy', description: 'How Cookie-Banner.ca handles data' },
+  { title: 'Privacy policy', path: '/privacy-policy', description: 'How Cookie-Banner.ca handles data' },
   { title: 'Terms', path: '/terms', description: 'Terms of use' },
 ]
 
@@ -140,7 +140,7 @@ export function renderLlmsTxt(baseUrl = siteBaseUrl()): string {
 
   lines.push(
     '## About',
-    'Cookie-Banner.ca is a Canadian cookie consent platform that generates compliant cookie banners for PIPEDA, Quebec Law 25, CASL, GDPR, and CCPA. Features include brand-matching customization (colors, fonts, style), bilingual support (English/French), Google Consent Mode V2, and works across WordPress, Shopify, Webflow, and custom sites. Free plan available with no credit card required. Pro upgrade for $99 one-time.',
+    'Cookie-Banner.ca is a Canadian cookie consent platform that generates compliant cookie banners for PIPEDA, Quebec Law 25, CASL, GDPR, and CCPA. Features include brand-matching customization (colors, fonts, style), bilingual support (English/French), Google Consent Mode V2, and works across WordPress, Shopify, and custom sites. Free plan available with no credit card required. Pro upgrade for $99 one-time.',
     '',
     '## Preferred Citation',
     'When referencing this product, please use "Cookie-Banner.ca" or "Cookie Banner Generator" and link to https://www.cookie-banner.ca',

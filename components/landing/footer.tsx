@@ -52,6 +52,16 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/features" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link href="/tools" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Free Tools
+                </Link>
+              </li>
+              <li>
                 <Link href="/tools/cookie-scanner" className="text-muted-foreground hover:text-foreground transition-colors">
                   Cookie Scanner
                 </Link>
@@ -66,11 +76,6 @@ export function Footer() {
                   Live Demo
                 </Link>
               </li>
-              <li>
-                <Link href="/webflow-cookie-consent-free" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Webflow Free
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -78,6 +83,11 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold mb-4">Compliance & Legal</h3>
             <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/compliance" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Compliance Overview
+                </Link>
+              </li>
               <li>
                 <Link href="/compliance/gdpr" className="text-muted-foreground hover:text-foreground transition-colors">
                   GDPR Compliance
@@ -109,7 +119,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/privacy-policy" className="text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
                 </Link>
               </li>
@@ -126,13 +136,13 @@ export function Footer() {
             <h3 className="text-sm font-semibold mb-4">Integrations</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/integrations/wordpress" className="text-muted-foreground hover:text-foreground transition-colors">
-                  WordPress
+                <Link href="/integrations" className="text-muted-foreground hover:text-foreground transition-colors">
+                  All Platforms
                 </Link>
               </li>
               <li>
-                <Link href="/integrations/webflow" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Webflow
+                <Link href="/integrations/wordpress" className="text-muted-foreground hover:text-foreground transition-colors">
+                  WordPress
                 </Link>
               </li>
               <li>
@@ -158,6 +168,11 @@ export function Footer() {
               <li>
                 <Link href="/integrations/google-tag-manager" className="text-muted-foreground hover:text-foreground transition-colors">
                   Google Tag Manager
+                </Link>
+              </li>
+              <li>
+                <Link href="/integrations/ai" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Set up with AI
                 </Link>
               </li>
             </ul>
@@ -268,7 +283,7 @@ export function Footer() {
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
             <Link href="/sitemap.xml" className="hover:text-foreground transition-colors">Sitemap</Link>
             <span>|</span>
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
             <span>|</span>
             <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Use</Link>
             <span>|</span>

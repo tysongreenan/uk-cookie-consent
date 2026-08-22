@@ -107,14 +107,19 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/privacy-policy',
-        destination: '/privacy',
+        source: '/compliance/canada',
+        destination: '/compliance/pipeda',
         permanent: true,
       },
-      // Quebec Law 25 content lives on the Law 25 landing page.
+      // Webflow was never a real product integration — send old URLs to remaining pages.
       {
-        source: '/compliance/canada',
-        destination: '/law-25-cookie-banner',
+        source: '/integrations/webflow',
+        destination: '/integrations',
+        permanent: true,
+      },
+      {
+        source: '/webflow-cookie-consent-free',
+        destination: '/free-cookie-banner',
         permanent: true,
       },
       // Legacy hosted policy short URLs (pre URL-shape change):

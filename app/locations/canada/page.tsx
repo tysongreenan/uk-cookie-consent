@@ -23,6 +23,7 @@ export const metadata: Metadata = {
       'Complete guide to Canadian cookie consent compliance. PIPEDA requirements, provincial privacy laws, and French-language support.',
     type: 'article',
   },
+  robots: { index: true, follow: true },
   alternates: {
     canonical: 'https://www.cookie-banner.ca/locations/canada',
   },

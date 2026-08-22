@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     description: 'Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent.',
     type: 'article',
   },
+  alternates: {
+    canonical: 'https://www.cookie-banner.ca/features/will-this-keep-me-compliant',
+  },
 }
 
 const faqData = [
@@ -123,18 +126,20 @@ export default function WillThisKeepMeCompliantPage() {
           badge: "Compliance Assurance",
           updatedDate: updatedDate,
           ctaText: "Get Compliant Now",
-          ctaHref: "/dashboard",
+          ctaHref: "/builder",
           directAnswer: directAnswer,
-          directAnswerLink: "/dashboard",
+          directAnswerLink: "/builder",
           directAnswerLinkText: "Get compliant now"
         }}
         ctaText="Get Compliant Now"
-        ctaHref="/dashboard"
+        ctaHref="/builder"
         relatedLinks={[
           { href: "/features/privacy-laws", text: "What Privacy Laws Does This Cover?" },
           { href: "/features/how-it-works", text: "How Do I Know It's Working?" },
+          { href: "/compliance", text: "Cookie compliance overview" },
           { href: "/compliance/pipeda", text: "PIPEDA Compliance Guide" },
           { href: "/compliance/gdpr", text: "GDPR Compliance Guide" },
+          { href: "/tools/cookie-scanner", text: "Free cookie scanner" },
         ]}
       >
         {/* Features Section */}
