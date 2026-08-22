@@ -135,7 +135,7 @@ export default function CookieScannerPage() {
         "name": "Does the cookie scanner work with WordPress, Shopify, and other platforms?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, our cookie scanner works with any publicly accessible website regardless of platform — WordPress, Shopify, Wix, Squarespace, Webflow, Next.js, custom-built sites, and any other web platform. The scanner loads your site in a real browser, so it detects cookies the same way your visitors experience them."
+          "text": "Yes, our cookie scanner works with any publicly accessible website regardless of platform — WordPress, Shopify, Wix, Squarespace, Next.js, custom-built sites, and any other web platform. The scanner loads your site in a real browser, so it detects cookies the same way your visitors experience them."
         }
       },
       {
@@ -730,7 +730,7 @@ export default function CookieScannerPage() {
                 <div className="border-2 rounded-xl p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-3">Does the cookie scanner work with any website platform?</h3>
                   <p className="text-muted-foreground">
-                    Yes, our cookie scanner works with any publicly accessible website — WordPress, Shopify, Wix, Squarespace, Webflow, custom-built sites, and any other web platform.
+                    Yes, our cookie scanner works with any publicly accessible website — WordPress, Shopify, Wix, Squarespace, custom-built sites, and any other web platform.
                   </p>
                 </div>
 

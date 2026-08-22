@@ -22,10 +22,10 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       "priceValidUntil": "2026-12-31",
       "description": "Free plan available. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features."
     },
-    "description": "Cookie consent banner generator built in Canada, tailored for Canadian privacy laws (PIPEDA, CASL, Quebec Law 25) as well as global laws like GDPR. Features brand-matching customization (colors, fonts, style), works across platforms (WordPress, Shopify, Webflow, custom sites), supports bilingual (English/French), and provides granular consent & blocking behavior. Free plan available, no credit card required. Pro upgrade for $99 one-time. Quick 5-minute setup: pick template, customize, copy code into site.",
+    "description": "Cookie consent banner generator built in Canada, tailored for Canadian privacy laws (PIPEDA, CASL, Quebec Law 25) as well as global laws like GDPR. Features brand-matching customization (colors, fonts, style), works across platforms (WordPress, Shopify, custom sites), supports bilingual (English/French), and provides granular consent & blocking behavior. Free plan available, no credit card required. Pro upgrade for $99 one-time. Quick 5-minute setup: pick template, customize, copy code into site.",
     "featureList": [
       "Brand-matching customization (colors, fonts, style)",
-      "Works across platforms (WordPress, Shopify, Webflow, custom sites)",
+      "Works across platforms (WordPress, Shopify, custom sites)",
       "Canadian privacy law compliance (PIPEDA, CASL, Quebec Law 25)",
       "GDPR compliance",
       "Bilingual support (English/French)",

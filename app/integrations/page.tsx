@@ -18,6 +18,7 @@ import {
   Copy,
   CheckCircle2,
   Circle,
+  Sparkles,
 } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
@@ -78,15 +79,6 @@ const websiteBuilders = [
     time: '2 min',
   },
   {
-    slug: 'webflow',
-    name: 'Webflow',
-    description: 'Add via Project Settings > Custom Code. Requires a site plan.',
-    icon: Palette,
-    badge: null,
-    difficulty: 'Easy',
-    time: '3 min',
-  },
-  {
     slug: 'wix',
     name: 'Wix',
     description: 'Embed via the Velo custom code editor or HTML embed block.',
@@ -107,6 +99,15 @@ const websiteBuilders = [
 ]
 
 const developerTools = [
+  {
+    slug: 'ai',
+    name: 'Set up with AI',
+    description: 'Connect Cursor, Claude Code, or Windsurf. The agent creates the banner, attaches scripts, and pastes the snippet.',
+    icon: Sparkles,
+    badge: 'New',
+    difficulty: 'Easy',
+    time: '2 min',
+  },
   {
     slug: 'react',
     name: 'React & Next.js',
@@ -253,7 +254,7 @@ export default function IntegrationsPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  One script tag. Works on WordPress, Shopify, Webflow, React, and more.
+                  One script tag. Works on WordPress, Shopify, React, and more.
                   Follow a step-by-step guide for your platform.
                 </p>
               </motion.div>
@@ -273,8 +274,9 @@ export default function IntegrationsPage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
-                  <Link href="#platforms">
-                    Browse Platforms
+                  <Link href="/integrations/ai">
+                    Set up with AI
+                    <Sparkles className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </motion.div>

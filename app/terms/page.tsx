@@ -29,7 +29,7 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
                 <p className="text-gray-600 mb-4">
                   Welcome to Cookie Banner Generator ("we," "our," or "us"). These Terms of Service ("Terms") govern your use of our website, 
-                  services, and products, including but not limited to our cookie consent banner generation tools and Webflow Designer Extension.
+                  services, and products, including but not limited to our cookie consent banner generation tools.
                 </p>
                 <p className="text-gray-600">
                   By accessing or using our services, you agree to be bound by these Terms. If you disagree with any part of these terms, 
@@ -58,7 +58,6 @@ export default function TermsPage() {
                 </p>
                 <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
                   <li>Cookie banner generation tools and templates</li>
-                  <li>Webflow Designer Extension</li>
                   <li>GDPR, PIPEDA, CASL, and Quebec Law 25 compliance guidance</li>
                   <li>Account management and banner storage</li>
                   <li>Code generation and customization tools</li>

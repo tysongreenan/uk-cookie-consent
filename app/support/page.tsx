@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Mail, Code, HelpCircle, ArrowRight } from 'lucide-react'
+import { Mail, BookOpen, HelpCircle, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Support - Cookie Banner Generator',
@@ -65,27 +65,27 @@ export default function SupportPage() {
               </CardContent>
             </Card>
 
-            {/* Webflow Extension Support */}
+            {/* Setup Guides */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-center mb-4">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Code className="w-8 h-8 text-primary" />
+                    <BookOpen className="w-8 h-8 text-primary" />
                   </div>
                 </div>
-                <CardTitle className="text-center">Webflow Extension Help</CardTitle>
+                <CardTitle className="text-center">Setup Guides</CardTitle>
                 <CardDescription className="text-center">
-                  Having trouble with the Designer Extension?
+                  Step-by-step install instructions for every platform
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-muted-foreground mb-6">
-                  We can help you get it working
+                  WordPress, Shopify, Squarespace, Wix, React, and more
                 </p>
                 <Button asChild variant="outline" className="w-full">
-                  <a href="mailto:support@cookie-banner.ca?subject=Webflow Extension Support">
-                    <Code className="w-4 h-4 mr-2" />
-                    Extension Support
+                  <a href="/integrations">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    View Integrations
                   </a>
                 </Button>
               </CardContent>
@@ -104,11 +104,11 @@ export default function SupportPage() {
               <div className="space-y-6">
                 <div className="border-b border-border pb-6">
                   <h3 className="text-lg font-semibold text-foreground mb-2">
-                    How do I install the Webflow Extension?
+                    How do I install the cookie banner?
                   </h3>
                   <p className="text-muted-foreground">
-                    Install the extension from your Webflow workspace settings, then press 'E' in the Designer to launch it. 
-                    Sign in with your Cookie Banner account to access your saved configurations.
+                    Copy the generated script tag from the dashboard and paste it into your site&apos;s header.
+                    We have step-by-step guides for WordPress, Shopify, Squarespace, Wix, React, and Google Tag Manager.
                   </p>
                 </div>
 

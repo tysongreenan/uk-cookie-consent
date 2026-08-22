@@ -5,14 +5,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 
-type Platform = 'wordpress' | 'wix' | 'squarespace' | 'shopify' | 'webflow' | 'other'
+type Platform = 'wordpress' | 'wix' | 'squarespace' | 'shopify' | 'other'
 
 const platforms: { id: Platform; label: string }[] = [
   { id: 'wordpress', label: 'WordPress' },
   { id: 'wix', label: 'Wix' },
   { id: 'squarespace', label: 'Squarespace' },
   { id: 'shopify', label: 'Shopify' },
-  { id: 'webflow', label: 'Webflow' },
   { id: 'other', label: 'Other' },
 ]
 
@@ -48,14 +47,6 @@ const instructions: Record<Platform, { steps: string[]; link?: string }> = {
       'Paste before </head>',
     ],
     link: '/integrations/shopify',
-  },
-  webflow: {
-    steps: [
-      'Go to Project Settings → Custom Code',
-      'Paste in Head Code',
-      'Publish',
-    ],
-    link: '/integrations/webflow',
   },
   other: {
     steps: [

@@ -16,14 +16,6 @@ const PLATFORMS = [
     ),
   },
   {
-    name: 'Webflow',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.802 8.56s-1.946 6.023-2.105 6.538c-.047-.404-1.1-6.538-1.1-6.538-2.07 0-3.166 1.462-3.755 3.026 0 0-1.313 3.48-1.412 3.756-.02-.342-.338-3.756-.338-3.756-.19-1.846-1.97-3.026-3.397-3.026l1.636 10.879c2.17-.005 3.317-1.463 3.942-3.027 0 0 1.08-2.79 1.126-2.932.038.328.993 5.959.993 5.959 2.17-.005 3.318-1.348 3.94-2.892L19.847 8.56h-2.045z" />
-      </svg>
-    ),
-  },
-  {
     name: 'Squarespace',
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -60,7 +52,7 @@ export function PlatformStrip() {
         <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
           Works on every platform you ship to
         </p>
-        <ul className="grid grid-cols-2 items-center justify-items-center gap-6 sm:grid-cols-3 md:grid-cols-6">
+        <ul className="grid grid-cols-2 items-center justify-items-center gap-6 sm:grid-cols-3 md:grid-cols-5">
           {PLATFORMS.map((p) => (
             <li
               key={p.name}

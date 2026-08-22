@@ -155,7 +155,7 @@ function CodeCard() {
         </h3>
         <p className="mt-2 max-w-[380px] text-sm leading-relaxed text-muted-foreground">
           Drop the snippet before{' '}
-          <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs">&lt;/body&gt;</code>. Works on WordPress, Shopify, Webflow, raw HTML.
+          <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs">&lt;/body&gt;</code>. Works on WordPress, Shopify, raw HTML.
         </p>
       </div>
       <pre

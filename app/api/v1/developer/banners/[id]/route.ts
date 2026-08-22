@@ -9,6 +9,11 @@ import { canUseLayout } from '@/lib/plan-restrictions'
 import type { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { invalidateBannerCache } from '@/lib/banner-cache'
+import { hostedInstallSnippet } from '@/lib/install-snippet'
+import {
+  getInstallInstructions,
+  isSiteFramework,
+} from '@/lib/ai-setup'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -50,13 +55,20 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     )
   }
 
+  const installSnippet = hostedInstallSnippet(banner.id)
+  const frameworkParam = request.nextUrl.searchParams.get('framework') || ''
+  const installInstructions = isSiteFramework(frameworkParam)
+    ? getInstallInstructions(frameworkParam, banner.id, installSnippet)
+    : undefined
+
   return NextResponse.json(
     {
       banner: {
         ...banner,
         isActive: banner.isActive ?? true,
         installUrl: `https://www.cookie-banner.ca/api/v1/banner.js?id=${banner.id}`,
-        installSnippet: `<script async src="https://www.cookie-banner.ca/api/v1/banner.js?id=${banner.id}"></script>`,
+        installSnippet,
+        ...(installInstructions ? { installInstructions } : {}),
       },
     },
     { headers: CORS_HEADERS }

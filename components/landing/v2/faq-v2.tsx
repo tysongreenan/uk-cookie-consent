@@ -25,7 +25,7 @@ const FAQ_DATA = [
   {
     question: 'How do I install the cookie banner?',
     answer:
-      "Installation is simple — just copy the generated code and paste it into your website's HTML, right before the closing </body> tag. It works on WordPress, Webflow, Shopify, Squarespace, custom HTML sites, and virtually any other platform.",
+      "Installation is simple — just copy the generated code and paste it into your website's HTML, right before the closing </body> tag. It works on WordPress, Shopify, Squarespace, custom HTML sites, and virtually any other platform.",
   },
   {
     question: "What's the difference between Pro One-Time and Pro Annual?",

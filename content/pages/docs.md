@@ -30,9 +30,9 @@ Copy the generated snippet from the dashboard and paste it before `</body>`. The
 
 Platform-specific install guides:
 
+- [Set up with AI](https://www.cookie-banner.ca/integrations/ai) — connect Claude Code, Cursor, or Windsurf via MCP
 - [WordPress](https://www.cookie-banner.ca/integrations/wordpress)
 - [Shopify](https://www.cookie-banner.ca/integrations/shopify)
-- [Webflow](https://www.cookie-banner.ca/integrations/webflow)
 - [Google Tag Manager](https://www.cookie-banner.ca/integrations/google-tag-manager)
 - [React / Next.js](https://www.cookie-banner.ca/integrations/react)
 
