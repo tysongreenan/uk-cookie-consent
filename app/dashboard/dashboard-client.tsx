@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Copy, X } from 'lucide-react'
+import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Copy, X } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { UpdateNotification } from '@/components/dashboard/update-notification'
@@ -26,9 +26,9 @@ import {
   isInstallNudgeDismissed,
   dismissInstallNudge,
 } from '@/lib/install-snippet'
-import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
+import { shouldRedirectZeroBannerToBuilder, shouldShowBannerSearchEmpty } from '@/lib/dashboard-empty'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
-import { isJustPaid, shouldShowUpgradeCta } from '@/lib/just-paid'
+import { isJustPaid } from '@/lib/just-paid'
 
 interface Banner {
   id: string
@@ -110,9 +110,8 @@ export function DashboardClient() {
   }, [session])
 
   useEffect(() => {
-    if (isLoading || banners.length > 0) return
-    if (!isJustPaid()) return
-    router.replace('/dashboard/builder?from=upgrade')
+    if (!shouldRedirectZeroBannerToBuilder({ isLoading, bannerCount: banners.length })) return
+    router.replace(isJustPaid() ? '/dashboard/builder?from=upgrade' : '/dashboard/builder')
   }, [isLoading, banners.length, router])
 
   const fetchBanners = async () => {
@@ -346,7 +345,7 @@ export function DashboardClient() {
     return null // Should redirect via useEffect
   }
 
-  const showZeroBannerEmpty = shouldShowZeroBannerEmptyState({
+  const redirectZeroBanner = shouldRedirectZeroBannerToBuilder({
     isLoading,
     bannerCount: banners.length,
   })
@@ -356,37 +355,11 @@ export function DashboardClient() {
     searchTerm,
   })
 
-  if (showZeroBannerEmpty) {
+  if (redirectZeroBanner) {
     return (
       <DashboardLayout>
-        <div className="p-6">
-          <Card className="p-0 overflow-hidden">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-10 text-center min-h-[60vh] flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="w-8 h-8 text-primary" />
-                </div>
-                <h1 className="text-3xl font-bold mb-2">Create your first banner</h1>
-                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  You do not have a cookie banner yet. Start here — you can open Analytics, Team, and Docs after this one is saved.
-                </p>
-                <Link href="/dashboard/builder">
-                  <Button size="lg" className="h-12 px-8 text-base">
-                    Create your first banner
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                {shouldShowUpgradeCta(session.user?.planTier) && (
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    Need Law 25 geo-targeting, GPC controls, and no branding?{' '}
-                    <Link href="/upgrade" className="text-primary font-medium hover:underline">
-                      Upgrade to Pro — $99/year
-                    </Link>
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
         </div>
       </DashboardLayout>
     )

@@ -1,11 +1,18 @@
-export function shouldShowZeroBannerEmptyState(options: {
+/** Zero-banner sessions skip the empty dashboard CTA and go to the builder. */
+export function shouldRedirectZeroBannerToBuilder(options: {
+  isLoading: boolean
+  bannerCount: number
+}): boolean {
+  if (options.isLoading) return false
+  return options.bannerCount === 0
+}
+
+export function shouldShowZeroBannerEmptyState(_options: {
   isLoading: boolean
   bannerCount: number
   searchTerm?: string
 }): boolean {
-  if (options.isLoading) return false
-  if (options.bannerCount > 0) return false
-  return true
+  return false
 }
 
 export function shouldShowBannerSearchEmpty(options: {

@@ -22,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule, PlanTier } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
-import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
+import { migrateBannerConfig, needsMigration, getMigrationNotes, CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { getComplianceRequirements } from '@/lib/compliance-frameworks'
@@ -50,6 +50,7 @@ import {
 import { isJustPaid } from '@/lib/just-paid'
 import { readLastSiteUrl, resolveScanPrefillUrl, writeLastSiteUrl } from '@/lib/scan-url'
 import { shouldShowLayoutProUpsell } from '@/lib/first-banner-upsell'
+import { awaitDefaultBannerMint, ensureDefaultBanner } from '@/lib/ensure-default-banner'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -211,7 +212,7 @@ function generateFloatingButtonPreviewContent(config: any): React.ReactNode {
 }
 
 const defaultConfig: BannerConfig = {
-  version: '2.1.0',
+  version: CURRENT_BANNER_VERSION,
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'pipeda',
@@ -556,6 +557,9 @@ function BannerBuilderContent() {
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
   const recoveredDraftRef = useRef(false)
+  const mintingDefaultRef = useRef(false)
+  const configRef = useRef(config)
+  configRef.current = config
   const [isDirty, setIsDirty] = useState(false)
   const skipTabScrollRef = useRef(true)
 
@@ -580,6 +584,35 @@ function BannerBuilderContent() {
       setActiveTab('code')
     }
   }, [searchParams, session])
+
+  useEffect(() => {
+    if (status !== 'authenticated' || !session) return
+    const queryId = searchParams.get('id') || searchParams.get('edit')
+    if (queryId || bannerId || mintingDefaultRef.current) return
+    // Just-paid draft persist POSTs the pending config — don't race a second create.
+    if (readPendingBannerConfig() && (searchParams.get('from') === 'upgrade' || isJustPaid())) {
+      return
+    }
+
+    const hasConsentBanner =
+      (session.user as { hasConsentBanner?: boolean }).hasConsentBanner ?? true
+    mintingDefaultRef.current = true
+    void ensureDefaultBanner({
+      config: configRef.current,
+      hasQueryBannerId: false,
+      hasConsentBanner,
+      headers: getPostHogRequestHeaders(),
+    }).then((id) => {
+      if (!id) {
+        mintingDefaultRef.current = false
+        return
+      }
+      loadedBannerRef.current = id
+      setBannerId(id)
+      setIsEditing(true)
+      router.replace(`/dashboard/builder?id=${id}`)
+    })
+  }, [status, session, searchParams, bannerId, router])
 
   useEffect(() => {
     const prefill = resolveScanPrefillUrl({
@@ -912,14 +945,17 @@ function BannerBuilderContent() {
   const persistBanner = async (options?: { silent?: boolean; configOverride?: BannerConfig }): Promise<string | null> => {
     setIsLoading(true)
     try {
-      const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
-      const method = isEditing ? 'PUT' : 'POST'
+      const mintedId = !isEditing && !bannerId ? await awaitDefaultBannerMint() : null
+      const existingId = bannerId || mintedId
+      const editing = Boolean(isEditing || existingId)
+      const url = editing && existingId ? `/api/banners/simple/${existingId}` : '/api/banners/simple'
+      const method = editing && existingId ? 'PUT' : 'POST'
       const sourceConfig = options?.configOverride ?? config
       
       // Add version timestamp to ensure cache invalidation
       const configWithVersion = {
         ...sourceConfig,
-        version: '2.1.0',
+        version: CURRENT_BANNER_VERSION,
         lastUpdated: new Date().toISOString()
       }
       
@@ -949,17 +985,18 @@ function BannerBuilderContent() {
         }
         setIsDirty(false)
         clearPendingBannerConfig()
-        const savedId = (!isEditing && data.bannerId) ? data.bannerId : bannerId
+        const savedId = existingId || data.bannerId || bannerId
         if (!options?.silent) {
-          toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
+          toast.success(editing ? 'Banner updated successfully!' : 'Banner saved successfully!')
         }
-        if (!isEditing && data.bannerId) {
+        if (savedId && (!isEditing || savedId !== bannerId)) {
           // For new banners, stay in the builder so users can copy the hosted
           // replacement script and finish switching from their old CMP.
-          setBannerId(data.bannerId)
+          loadedBannerRef.current = savedId
+          setBannerId(savedId)
           setIsEditing(true)
           setActiveTab('code')
-          router.replace(`/dashboard/builder?id=${data.bannerId}`)
+          router.replace(`/dashboard/builder?id=${savedId}`)
         }
         return savedId
       } else {
@@ -1009,7 +1046,7 @@ function BannerBuilderContent() {
       // First save any pending changes
       const configWithVersion = {
         ...config,
-        version: '2.1.0',
+        version: CURRENT_BANNER_VERSION,
         lastUpdated: new Date().toISOString()
       }
       

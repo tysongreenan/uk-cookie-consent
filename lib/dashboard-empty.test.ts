@@ -1,19 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from './dashboard-empty'
+import {
+  shouldRedirectZeroBannerToBuilder,
+  shouldShowBannerSearchEmpty,
+  shouldShowZeroBannerEmptyState,
+} from './dashboard-empty'
 
-describe('shouldShowZeroBannerEmptyState', () => {
-  it('shows the create-first-banner CTA when the user has zero banners', () => {
+describe('shouldRedirectZeroBannerToBuilder', () => {
+  it('redirects every zero-banner session after the list loads', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
         isLoading: false,
         bannerCount: 0,
       }),
     ).toBe(true)
   })
 
-  it('does not hide existing banners', () => {
+  it('does not redirect when banners exist', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
         isLoading: false,
         bannerCount: 1,
       }),
@@ -22,8 +26,19 @@ describe('shouldShowZeroBannerEmptyState', () => {
 
   it('waits until the banner list has loaded', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
         isLoading: true,
+        bannerCount: 0,
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('shouldShowZeroBannerEmptyState', () => {
+  it('no longer shows the empty dashboard CTA', () => {
+    expect(
+      shouldShowZeroBannerEmptyState({
+        isLoading: false,
         bannerCount: 0,
       }),
     ).toBe(false)

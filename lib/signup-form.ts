@@ -52,3 +52,11 @@ export function getSignupFieldErrors(input: SignupFormInput): SignupFieldErrors 
 export function isSignupFormValid(input: SignupFormInput): boolean {
   return Object.keys(getSignupFieldErrors(input)).length === 0
 }
+
+export const DEFAULT_SIGNUP_CALLBACK = '/dashboard/builder'
+
+/** Relative-path callback only. Cookie-banner signups land in the builder. */
+export function resolveSignupCallbackUrl(raw: string | null | undefined): string {
+  if (raw && raw.startsWith('/') && !raw.startsWith('//')) return raw
+  return DEFAULT_SIGNUP_CALLBACK
+}

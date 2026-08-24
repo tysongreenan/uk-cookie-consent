@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { getPasswordRuleStates, getSignupFieldErrors, isSignupFormValid } from './signup-form'
+import {
+  DEFAULT_SIGNUP_CALLBACK,
+  getPasswordRuleStates,
+  getSignupFieldErrors,
+  isSignupFormValid,
+  resolveSignupCallbackUrl,
+} from './signup-form'
 
 const validInput = {
   name: 'Jamie Monastyrski',
@@ -43,5 +49,20 @@ describe('getSignupFieldErrors', () => {
   it('returns no errors for a complete valid form', () => {
     expect(getSignupFieldErrors(validInput)).toEqual({})
     expect(isSignupFormValid(validInput)).toBe(true)
+  })
+})
+
+describe('resolveSignupCallbackUrl', () => {
+  it('defaults cookie-banner signups to the builder', () => {
+    expect(resolveSignupCallbackUrl(null)).toBe('/dashboard/builder')
+    expect(resolveSignupCallbackUrl(undefined)).toBe(DEFAULT_SIGNUP_CALLBACK)
+    expect(resolveSignupCallbackUrl('https://evil.example')).toBe('/dashboard/builder')
+  })
+
+  it('keeps privacy, upgrade, and tool callbacks', () => {
+    expect(resolveSignupCallbackUrl('/upgrade')).toBe('/upgrade')
+    expect(resolveSignupCallbackUrl('/tools/privacy-policy')).toBe('/tools/privacy-policy')
+    expect(resolveSignupCallbackUrl('/dashboard/privacy')).toBe('/dashboard/privacy')
+    expect(resolveSignupCallbackUrl('/tools/cookie-policy')).toBe('/tools/cookie-policy')
   })
 })

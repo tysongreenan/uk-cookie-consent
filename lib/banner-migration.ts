@@ -396,6 +396,19 @@ export function needsMigration(config: any): boolean {
 }
 
 /**
+ * Code-generator amber "update available" is for old hosted banners that
+ * still need a republish. Unsaved drafts and brand-new current-version
+ * banners should never scare the user.
+ */
+export function shouldShowGeneratorUpdateNotice(options: {
+  bannerId?: string | null
+  config?: { version?: string } | null
+}): boolean {
+  if (!options.bannerId) return false
+  return needsMigration(options.config)
+}
+
+/**
  * Gets migration notes for users about what was updated
  */
 export function getMigrationNotes(oldVersion: string, newVersion: string): string[] {
