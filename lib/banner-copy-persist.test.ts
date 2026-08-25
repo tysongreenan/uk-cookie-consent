@@ -164,4 +164,31 @@ describe('persistThenCopySnippet', () => {
     expect(persist).toHaveBeenCalledOnce()
     expect(result).toEqual({ bannerId: 'banner-2', persisted: true })
   })
+
+  it('Copy after mint PUTs the minted id instead of POSTing a second banner', async () => {
+    const mintedId = activeBannerIdForBuilder({
+      urlId: null,
+      urlNew: null,
+      stateBannerId: 'minted-id',
+      createdThisDraftId: 'minted-id',
+    })
+    expect(mintedId).toBe('minted-id')
+    expect(needsBannerPersistBeforeCopy(mintedId)).toBe(false)
+    expect(resolveBannerPersistRequest(mintedId)).toEqual({
+      method: 'PUT',
+      url: '/api/banners/simple/minted-id',
+    })
+
+    const persist = vi.fn()
+    const result = await persistThenCopySnippet({
+      bannerId: mintedId,
+      persist,
+      copy: async (idPromise) => {
+        await expect(idPromise).resolves.toBe('minted-id')
+      },
+    })
+
+    expect(persist).not.toHaveBeenCalled()
+    expect(result).toEqual({ bannerId: 'minted-id', persisted: false })
+  })
 })

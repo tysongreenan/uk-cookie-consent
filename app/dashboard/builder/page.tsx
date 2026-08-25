@@ -22,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule, PlanTier } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
-import { migrateBannerConfig, needsMigration, getMigrationNotes } from '@/lib/banner-migration'
+import { migrateBannerConfig, needsMigration, getMigrationNotes, CURRENT_BANNER_VERSION, withCurrentBannerVersion } from '@/lib/banner-migration'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { getComplianceRequirements } from '@/lib/compliance-frameworks'
@@ -44,9 +44,11 @@ import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import {
   BannerPersistError,
   activeBannerIdForBuilder,
+  isCreateNewBannerQuery,
   isNewBuilderDraft,
   resolveBannerPersistRequest,
   savedBannerIdFromPersistResponse,
+  shouldWipeNewDraftIdentity,
 } from '@/lib/banner-persist-request'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 import {
@@ -57,6 +59,12 @@ import {
 import { isJustPaid } from '@/lib/just-paid'
 import { readLastSiteUrl, resolveScanPrefillUrl, writeLastSiteUrl } from '@/lib/scan-url'
 import { shouldShowLayoutProUpsell } from '@/lib/first-banner-upsell'
+import { markHasEverCreatedBanner, readHasEverCreatedBanner } from '@/lib/banner-lifetime'
+import {
+  ensureDefaultBanner,
+  persistWithSharedCreateLock,
+  resetDefaultBannerMintLock,
+} from '@/lib/ensure-default-banner'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -218,7 +226,7 @@ function generateFloatingButtonPreviewContent(config: any): React.ReactNode {
 }
 
 const defaultConfig: BannerConfig = {
-  version: '2.1.0',
+  version: CURRENT_BANNER_VERSION,
   lastUpdated: new Date().toISOString(),
   compliance: {
     framework: 'pipeda',
@@ -565,6 +573,8 @@ function BannerBuilderContent() {
   const createdThisDraftRef = useRef<string | null>(null)
   const lastBuilderUrlKeyRef = useRef<string>('')
   const recoveredDraftRef = useRef(false)
+  const configRef = useRef(config)
+  configRef.current = config
   const [isDirty, setIsDirty] = useState(false)
   const skipTabScrollRef = useRef(true)
 
@@ -574,7 +584,10 @@ function BannerBuilderContent() {
   const builderUrlKey = `${urlId ?? ''}|${urlEdit ?? ''}|${urlNew ?? ''}`
   if (lastBuilderUrlKeyRef.current !== builderUrlKey) {
     lastBuilderUrlKeyRef.current = builderUrlKey
-    if (isNewBuilderDraft({ id: urlId, edit: urlEdit, newDraft: urlNew })) {
+    if (isCreateNewBannerQuery(urlNew)) {
+      createdThisDraftRef.current = null
+      resetDefaultBannerMintLock()
+    } else if (isNewBuilderDraft({ id: urlId, edit: urlEdit, newDraft: urlNew })) {
       createdThisDraftRef.current = null
     }
   }
@@ -599,6 +612,40 @@ function BannerBuilderContent() {
   }, [status, session, router])
 
   useEffect(() => {
+    if (status !== 'authenticated' || !session) return
+    if (urlId || urlEdit || isCreateNewBannerQuery(urlNew)) return
+    if (createdThisDraftRef.current) return
+    if (readHasEverCreatedBanner(session.user?.id)) return
+    // Just-paid draft persist POSTs the pending config — don't race a second create.
+    if (readPendingBannerConfig() && (searchParams.get('from') === 'upgrade' || isJustPaid())) {
+      return
+    }
+
+    const hasConsentBanner =
+      (session.user as { hasConsentBanner?: boolean }).hasConsentBanner ?? true
+    void ensureDefaultBanner({
+      config: configRef.current,
+      hasQueryBannerId: false,
+      hasConsentBanner,
+      isCreateNewBanner: isCreateNewBannerQuery(urlNew),
+      hasInMemoryDraftId: Boolean(createdThisDraftRef.current),
+      hasEverCreatedBanner: readHasEverCreatedBanner(session.user?.id),
+      headers: getPostHogRequestHeaders(),
+    }).then((id) => {
+      if (!id) return
+      if (isCreateNewBannerQuery(searchParams.get('new'))) return
+      // Keep createdThisDraftRef in sync so #36's new-draft reset does not
+      // wipe the minted id before ?id= is in the URL.
+      createdThisDraftRef.current = id
+      loadedBannerRef.current = id
+      markHasEverCreatedBanner(session.user?.id)
+      setBannerId(id)
+      setIsEditing(true)
+      router.replace(`/dashboard/builder?id=${id}`)
+    })
+  }, [status, session, searchParams, urlId, urlEdit, urlNew, router])
+
+  useEffect(() => {
     const editId = searchParams.get('id') || searchParams.get('edit')
     const newDraft = isNewBuilderDraft({
       id: searchParams.get('id'),
@@ -608,8 +655,9 @@ function BannerBuilderContent() {
 
     // Create New Banner is /dashboard/builder (no id) or ?new=1. Clear any
     // identity left over when Next.js reuses this page from a previous ?id=.
+    // Minted ids must set createdThisDraftRef so this reset does not wipe them.
     if (newDraft) {
-      if (loadedBannerRef.current && loadedBannerRef.current !== createdThisDraftRef.current) {
+      if (shouldWipeNewDraftIdentity(loadedBannerRef.current, createdThisDraftRef.current)) {
         loadedBannerRef.current = null
         setBannerId(null)
         setIsEditing(false)
@@ -956,72 +1004,81 @@ function BannerBuilderContent() {
   const persistBanner = async (options?: { silent?: boolean; configOverride?: BannerConfig }): Promise<string> => {
     setIsLoading(true)
     try {
-      // Current draft id decides POST vs PUT — not isEditing, and not how
-      // many other banners this account already has.
-      const { url, method } = resolveBannerPersistRequest(activeBannerId)
-      const creating = method === 'POST'
       const sourceConfig = options?.configOverride ?? config
-      
-      // Add version timestamp to ensure cache invalidation
       const configWithVersion = {
-        ...sourceConfig,
-        version: '2.1.0',
-        lastUpdated: new Date().toISOString()
+        ...withCurrentBannerVersion(sourceConfig),
+        lastUpdated: new Date().toISOString(),
       }
-      
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...getPostHogRequestHeaders(),
-        },
-        body: JSON.stringify({
-          name: sourceConfig.name || 'My Cookie Banner',
-          config: configWithVersion,
-          isActive: true
-        }),
+
+      const runRequest = async (currentId: string | null): Promise<string> => {
+        const { url, method } = resolveBannerPersistRequest(currentId)
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            ...getPostHogRequestHeaders(),
+          },
+          body: JSON.stringify({
+            name: sourceConfig.name || 'My Cookie Banner',
+            config: configWithVersion,
+            isActive: true
+          }),
+        })
+
+        const data = await response.json() as {
+          bannerId?: string
+          banner?: { updatedAt?: string }
+          error?: string
+          upgradeRequired?: boolean
+        }
+
+        if (!response.ok) {
+          console.error('Save/Update error:', data.error)
+          const persistError = new BannerPersistError(
+            data.error || 'Failed to save banner',
+            Boolean(data.upgradeRequired),
+          )
+          toast.error(persistError.message)
+          throw persistError
+        }
+
+        if (data.banner?.updatedAt) {
+          setBannerUpdatedAt(new Date(data.banner.updatedAt))
+        } else {
+          setBannerUpdatedAt(new Date())
+        }
+
+        const savedId = savedBannerIdFromPersistResponse({
+          currentBannerId: currentId,
+          responseBannerId: data.bannerId,
+        })
+        if (!savedId) {
+          throw new BannerPersistError('Save did not return a banner id')
+        }
+        return savedId
+      }
+
+      // Current draft id decides POST vs PUT. Mint and persist share one
+      // create lock so first Copy/Save cannot POST a second row.
+      const startedWithoutId = !activeBannerId
+      const savedId = await persistWithSharedCreateLock({
+        currentBannerId: activeBannerId,
+        create: () => runRequest(null),
+        update: (id) => runRequest(id),
       })
-
-      const data = await response.json() as {
-        bannerId?: string
-        banner?: { updatedAt?: string }
-        error?: string
-        upgradeRequired?: boolean
-      }
-
-      if (!response.ok) {
-        console.error('Save/Update error:', data.error)
-        const persistError = new BannerPersistError(
-          data.error || 'Failed to save banner',
-          Boolean(data.upgradeRequired),
-        )
-        toast.error(persistError.message)
-        throw persistError
-      }
 
       setConfig(configWithVersion)
-      if (data.banner?.updatedAt) {
-        setBannerUpdatedAt(new Date(data.banner.updatedAt))
-      } else {
-        setBannerUpdatedAt(new Date())
-      }
       setIsDirty(false)
       clearPendingBannerConfig()
-      const savedId = savedBannerIdFromPersistResponse({
-        currentBannerId: activeBannerId,
-        responseBannerId: data.bannerId,
-      })
-      if (!savedId) {
-        throw new BannerPersistError('Save did not return a banner id')
-      }
       if (!options?.silent) {
-        toast.success(creating ? 'Banner saved successfully!' : 'Banner updated successfully!')
+        toast.success(startedWithoutId ? 'Banner saved successfully!' : 'Banner updated successfully!')
       }
-      if (creating) {
+      if (startedWithoutId) {
         // For new banners, stay in the builder so users can copy the hosted
         // replacement script and finish switching from their old CMP.
         createdThisDraftRef.current = savedId
         loadedBannerRef.current = savedId
+        markHasEverCreatedBanner(session?.user?.id)
         setBannerId(savedId)
         setIsEditing(true)
         setActiveTab('code')
@@ -1076,8 +1133,7 @@ function BannerBuilderContent() {
     try {
       // First save any pending changes
       const configWithVersion = {
-        ...config,
-        version: '2.1.0',
+        ...withCurrentBannerVersion(config),
         lastUpdated: new Date().toISOString()
       }
       

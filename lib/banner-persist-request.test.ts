@@ -6,6 +6,7 @@ import {
   isNewBuilderDraft,
   resolveBannerPersistRequest,
   savedBannerIdFromPersistResponse,
+  shouldWipeNewDraftIdentity,
 } from './banner-persist-request'
 
 describe('resolveBannerPersistRequest', () => {
@@ -134,5 +135,17 @@ describe('activeBannerIdForBuilder', () => {
         stateBannerId: 'banner-1',
       }),
     ).toBe('banner-1')
+  })
+
+  it('keeps a minted id on a bare builder when createdThisDraftId is set', () => {
+    expect(
+      activeBannerIdForBuilder({
+        urlId: null,
+        urlNew: null,
+        stateBannerId: 'minted-id',
+        createdThisDraftId: 'minted-id',
+      }),
+    ).toBe('minted-id')
+    expect(shouldWipeNewDraftIdentity('minted-id', 'minted-id')).toBe(false)
   })
 })

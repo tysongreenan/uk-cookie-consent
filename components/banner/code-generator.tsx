@@ -14,6 +14,7 @@ import {
   generateConsentInitScript
 } from '@/lib/banner-generator'
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
+import { shouldShowGeneratorUpdateNotice } from '@/lib/banner-migration'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
 import { hostedInstallSnippet } from '@/lib/install-snippet'
@@ -42,10 +43,13 @@ export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, o
 
   useEffect(() => {
     const dismissedVersion = localStorage.getItem('banner_update_dismissed_version')
-    if (!dismissedVersion || parseInt(dismissedVersion) < GENERATOR_VERSION) {
-      setShowUpdateNotice(true)
-    }
-  }, [])
+    const dismissed = Boolean(
+      dismissedVersion && parseInt(dismissedVersion, 10) >= GENERATOR_VERSION,
+    )
+    setShowUpdateNotice(
+      shouldShowGeneratorUpdateNotice({ bannerId, config }) && !dismissed,
+    )
+  }, [bannerId, config])
 
   useEffect(() => {
     if (bannerId) {

@@ -62,6 +62,18 @@ export function activeBannerIdForBuilder(options: {
   return options.stateBannerId || options.urlId || options.urlEdit || null
 }
 
+/**
+ * Create New Banner leftover state must wipe only when the loaded id is not
+ * the one minted/persisted on this draft. Mint must set createdThisDraftId
+ * or this reset clears the minted banner and the next Copy POSTs again.
+ */
+export function shouldWipeNewDraftIdentity(
+  loadedBannerId?: string | null,
+  createdThisDraftId?: string | null,
+): boolean {
+  return Boolean(loadedBannerId && loadedBannerId !== createdThisDraftId)
+}
+
 export class BannerPersistError extends Error {
   readonly upgradeRequired: boolean
 

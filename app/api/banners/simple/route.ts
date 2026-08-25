@@ -104,6 +104,7 @@ function rejectCookies() {
 
     const distinctId = getPostHogDistinctId(request, session.user.id)
     const sessionId = getPostHogSessionId(request)
+    const source = typeof bannerData.source === 'string' ? bannerData.source : undefined
     void captureServerEvent({
       distinctId,
       event: 'banner_created',
@@ -114,6 +115,7 @@ function rejectCookies() {
         user_id: session.user.id,
         is_first_banner: currentCount === 0,
         plan_tier: userTier,
+        ...(source ? { source } : {}),
       },
     })
 
