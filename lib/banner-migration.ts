@@ -408,7 +408,7 @@ export function shouldShowGeneratorUpdateNotice(options: {
   return needsMigration(options.config)
 }
 
-export function withCurrentBannerVersion<T extends { version?: string }>(
+export function withCurrentBannerVersion<T extends object>(
   config: T,
 ): T & { version: string } {
   return { ...config, version: CURRENT_BANNER_VERSION }
