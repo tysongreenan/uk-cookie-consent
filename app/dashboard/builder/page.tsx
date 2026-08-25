@@ -41,6 +41,13 @@ import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import { hasInstallSnippetCopied, hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
+import {
+  BannerPersistError,
+  activeBannerIdForBuilder,
+  isNewBuilderDraft,
+  resolveBannerPersistRequest,
+  savedBannerIdFromPersistResponse,
+} from '@/lib/banner-persist-request'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 import {
   clearPendingBannerConfig,
@@ -555,9 +562,31 @@ function BannerBuilderContent() {
   const [brandDiscoveryError, setBrandDiscoveryError] = useState<string | null>(null)
   const [detectedCmpVendor, setDetectedCmpVendor] = useState<string | null>(null)
   const loadedBannerRef = useRef<string | null>(null)
+  const createdThisDraftRef = useRef<string | null>(null)
+  const lastBuilderUrlKeyRef = useRef<string>('')
   const recoveredDraftRef = useRef(false)
   const [isDirty, setIsDirty] = useState(false)
   const skipTabScrollRef = useRef(true)
+
+  const urlId = searchParams.get('id')
+  const urlEdit = searchParams.get('edit')
+  const urlNew = searchParams.get('new')
+  const builderUrlKey = `${urlId ?? ''}|${urlEdit ?? ''}|${urlNew ?? ''}`
+  if (lastBuilderUrlKeyRef.current !== builderUrlKey) {
+    lastBuilderUrlKeyRef.current = builderUrlKey
+    if (isNewBuilderDraft({ id: urlId, edit: urlEdit, newDraft: urlNew })) {
+      createdThisDraftRef.current = null
+    }
+  }
+  // Create New Banner (?new=1 or bare /dashboard/builder) must persist a new
+  // draft even if Next reused this page with leftover bannerId from ?id=.
+  const activeBannerId = activeBannerIdForBuilder({
+    urlId,
+    urlEdit,
+    urlNew,
+    stateBannerId: bannerId,
+    createdThisDraftId: createdThisDraftRef.current,
+  })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -571,8 +600,23 @@ function BannerBuilderContent() {
 
   useEffect(() => {
     const editId = searchParams.get('id') || searchParams.get('edit')
-    // Only load if we have an ID, session, and haven't already loaded this banner
-    if (editId && session && loadedBannerRef.current !== editId) {
+    const newDraft = isNewBuilderDraft({
+      id: searchParams.get('id'),
+      edit: searchParams.get('edit'),
+      newDraft: searchParams.get('new'),
+    })
+
+    // Create New Banner is /dashboard/builder (no id) or ?new=1. Clear any
+    // identity left over when Next.js reuses this page from a previous ?id=.
+    if (newDraft) {
+      if (loadedBannerRef.current && loadedBannerRef.current !== createdThisDraftRef.current) {
+        loadedBannerRef.current = null
+        setBannerId(null)
+        setIsEditing(false)
+        setConfig(defaultConfig)
+        setIsDirty(false)
+      }
+    } else if (editId && session && loadedBannerRef.current !== editId) {
       loadedBannerRef.current = editId
       loadBannerForEdit(editId)
     }
@@ -909,11 +953,13 @@ function BannerBuilderContent() {
 
   const [isPushing, setIsPushing] = useState(false)
 
-  const persistBanner = async (options?: { silent?: boolean; configOverride?: BannerConfig }): Promise<string | null> => {
+  const persistBanner = async (options?: { silent?: boolean; configOverride?: BannerConfig }): Promise<string> => {
     setIsLoading(true)
     try {
-      const url = isEditing ? `/api/banners/simple/${bannerId}` : '/api/banners/simple'
-      const method = isEditing ? 'PUT' : 'POST'
+      // Current draft id decides POST vs PUT — not isEditing, and not how
+      // many other banners this account already has.
+      const { url, method } = resolveBannerPersistRequest(activeBannerId)
+      const creating = method === 'POST'
       const sourceConfig = options?.configOverride ?? config
       
       // Add version timestamp to ensure cache invalidation
@@ -936,54 +982,76 @@ function BannerBuilderContent() {
         }),
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        // Update local config with the version
-        setConfig(configWithVersion)
-        // Update timestamp for cache-busting
-        if (data.banner?.updatedAt) {
-          setBannerUpdatedAt(new Date(data.banner.updatedAt))
-        } else {
-          setBannerUpdatedAt(new Date())
-        }
-        setIsDirty(false)
-        clearPendingBannerConfig()
-        const savedId = (!isEditing && data.bannerId) ? data.bannerId : bannerId
-        if (!options?.silent) {
-          toast.success(isEditing ? 'Banner updated successfully!' : 'Banner saved successfully!')
-        }
-        if (!isEditing && data.bannerId) {
-          // For new banners, stay in the builder so users can copy the hosted
-          // replacement script and finish switching from their old CMP.
-          setBannerId(data.bannerId)
-          setIsEditing(true)
-          setActiveTab('code')
-          router.replace(`/dashboard/builder?id=${data.bannerId}`)
-        }
-        return savedId
-      } else {
-        console.error('Save/Update error:', data.error)
-        toast.error(data.error || 'Failed to save banner')
-        return null
+      const data = await response.json() as {
+        bannerId?: string
+        banner?: { updatedAt?: string }
+        error?: string
+        upgradeRequired?: boolean
       }
+
+      if (!response.ok) {
+        console.error('Save/Update error:', data.error)
+        const persistError = new BannerPersistError(
+          data.error || 'Failed to save banner',
+          Boolean(data.upgradeRequired),
+        )
+        toast.error(persistError.message)
+        throw persistError
+      }
+
+      setConfig(configWithVersion)
+      if (data.banner?.updatedAt) {
+        setBannerUpdatedAt(new Date(data.banner.updatedAt))
+      } else {
+        setBannerUpdatedAt(new Date())
+      }
+      setIsDirty(false)
+      clearPendingBannerConfig()
+      const savedId = savedBannerIdFromPersistResponse({
+        currentBannerId: activeBannerId,
+        responseBannerId: data.bannerId,
+      })
+      if (!savedId) {
+        throw new BannerPersistError('Save did not return a banner id')
+      }
+      if (!options?.silent) {
+        toast.success(creating ? 'Banner saved successfully!' : 'Banner updated successfully!')
+      }
+      if (creating) {
+        // For new banners, stay in the builder so users can copy the hosted
+        // replacement script and finish switching from their old CMP.
+        createdThisDraftRef.current = savedId
+        loadedBannerRef.current = savedId
+        setBannerId(savedId)
+        setIsEditing(true)
+        setActiveTab('code')
+        router.replace(`/dashboard/builder?id=${savedId}`)
+      }
+      return savedId
     } catch (error) {
+      if (error instanceof BannerPersistError) {
+        throw error
+      }
       console.error('Save error:', error)
       toast.error('Failed to save banner')
-      return null
+      throw new BannerPersistError('Failed to save banner')
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleSave = async () => {
-    await persistBanner()
+    try {
+      await persistBanner()
+    } catch {
+      // persistBanner already toasts the API error
+    }
   }
 
   useEffect(() => {
-    if (bannerId || !isDirty) return
+    if (activeBannerId || !isDirty) return
     writePendingBannerConfig(config)
-  }, [bannerId, isDirty, config])
+  }, [activeBannerId, isDirty, config])
 
   useEffect(() => {
     if (!session || recoveredDraftRef.current) return
@@ -994,12 +1062,12 @@ function BannerBuilderContent() {
     setConfig(draft)
     setIsDirty(true)
     if (searchParams.get('from') === 'upgrade' || isJustPaid()) {
-      void persistBanner({ silent: true, configOverride: draft })
+      void persistBanner({ silent: true, configOverride: draft }).catch(() => {})
     }
   }, [session, searchParams])
 
   const handlePushLive = async () => {
-    if (!isEditing || !bannerId) {
+    if (!isEditing || !activeBannerId) {
       toast.error('Please save the banner first')
       return
     }
@@ -1013,7 +1081,7 @@ function BannerBuilderContent() {
         lastUpdated: new Date().toISOString()
       }
       
-      const response = await fetch(`/api/banners/simple/${bannerId}`, {
+      const response = await fetch(`/api/banners/simple/${activeBannerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1039,7 +1107,7 @@ function BannerBuilderContent() {
         // Force refresh the banner script by hitting it with nocache
         // Use cache: 'no-store' to bypass browser's HTTP cache entirely
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
-        await fetch(`${baseUrl}/api/v1/banner.js?id=${bannerId}&nocache=true`, {
+        await fetch(`${baseUrl}/api/v1/banner.js?id=${activeBannerId}&nocache=true`, {
           cache: 'no-store'
         })
         
@@ -1070,7 +1138,7 @@ function BannerBuilderContent() {
       const planTier = session?.user?.planTier || 'free'
       let showedHelp = false
       const { persisted } = await persistThenCopySnippet({
-        bannerId,
+        bannerId: activeBannerId,
         persist: () => persistBanner({ silent: true }),
         copy: async (idPromise) => {
           await copyToClipboard(() =>
@@ -1097,9 +1165,13 @@ function BannerBuilderContent() {
         )
       }
       setTimeout(() => setSnippetCopied(false), 3000)
-    } catch {
+    } catch (error) {
       setActiveTab('code')
-      toast.error('Could not save and copy. Try Save Draft, then copy again.')
+      toast.error(
+        error instanceof BannerPersistError
+          ? error.message
+          : 'Could not save and copy. Try Save Draft, then copy again.',
+      )
     }
   }
 
@@ -2330,8 +2402,8 @@ function BannerBuilderContent() {
                           </SelectContent>
                         </Select>
                         {!canAccessFeature(userPlan, 'hasCustomLayouts') && shouldShowLayoutProUpsell({
-                          hasSavedBanner: Boolean(bannerId),
-                          hasCopiedInstallSnippet: Boolean(bannerId && hasInstallSnippetCopied(bannerId)),
+                          hasSavedBanner: Boolean(activeBannerId),
+                          hasCopiedInstallSnippet: Boolean(activeBannerId && hasInstallSnippetCopied(activeBannerId)),
                         }) && (
                           <p className="text-xs text-muted-foreground">
                             Modal and slide-in layouts are available on Pro after this first banner is installed.
@@ -4678,7 +4750,7 @@ function BannerBuilderContent() {
                       <Label className="text-sm font-medium mb-2 block">Generated Code Preview</Label>
                       <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
                         <div className="text-green-400 mb-2">// Main Banner Script</div>
-                        <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${bannerId || session?.user?.id}"></script>`}</div>
+                        <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${activeBannerId || session?.user?.id}"></script>`}</div>
                         
                         {config.integrations?.googleAnalytics?.measurementId && (
                           <>
@@ -4742,7 +4814,7 @@ function BannerBuilderContent() {
                   <CardContent>
                     <CodeGenerator
                       config={config}
-                      bannerId={bannerId || undefined}
+                      bannerId={activeBannerId || undefined}
                       planTier={session?.user?.planTier || 'free'}
                       detectedCmpVendor={detectedCmpVendor || undefined}
                       onEnsureSaved={() => persistBanner({ silent: true })}

@@ -29,6 +29,7 @@ import {
 import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 import { isJustPaid, shouldShowUpgradeCta } from '@/lib/just-paid'
+import { CREATE_NEW_BANNER_HREF } from '@/lib/banner-persist-request'
 
 interface Banner {
   id: string
@@ -477,7 +478,7 @@ export function DashboardClient() {
             </p>
           </div>
           <Button asChild size="lg">
-            <Link href="/dashboard/builder">
+            <Link href={CREATE_NEW_BANNER_HREF}>
               <Plus className="w-5 h-5 mr-2" />
               Create New Banner
             </Link>

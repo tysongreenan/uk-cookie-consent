@@ -18,6 +18,7 @@ import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
 import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
+import { BannerPersistError } from '@/lib/banner-persist-request'
 import { copyHostedSnippet } from '@/components/banner/install-help-dialog'
 
 interface CodeGeneratorProps {
@@ -187,11 +188,16 @@ ${generateBannerHTML(config, { showBranding })}
       })
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
-      captureException(err, { context: 'install_snippet_copy' })
+      const persistError = err instanceof BannerPersistError
+      if (!persistError || !err.upgradeRequired) {
+        captureException(err, { context: 'install_snippet_copy' })
+      }
       toast.error(
-        bannerId
-          ? 'Failed to copy code'
-          : 'Save the banner so the snippet is real, then copy again.',
+        persistError
+          ? err.message
+          : bannerId
+            ? 'Failed to copy code'
+            : 'Save the banner so the snippet is real, then copy again.',
       )
     }
   }
