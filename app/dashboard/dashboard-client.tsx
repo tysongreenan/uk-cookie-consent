@@ -26,9 +26,15 @@ import {
   isInstallNudgeDismissed,
   dismissInstallNudge,
 } from '@/lib/install-snippet'
-import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from '@/lib/dashboard-empty'
+import {
+  shouldRedirectZeroBannerToBuilder,
+  shouldShowBannerSearchEmpty,
+  shouldShowZeroBannerEmptyState,
+} from '@/lib/dashboard-empty'
+import { markHasEverCreatedBanner, readHasEverCreatedBanner } from '@/lib/banner-lifetime'
 import { copyHostedSnippet, InstallHelpDialog } from '@/components/banner/install-help-dialog'
 import { isJustPaid, shouldShowUpgradeCta } from '@/lib/just-paid'
+import { CREATE_NEW_BANNER_HREF } from '@/lib/banner-persist-request'
 
 interface Banner {
   id: string
@@ -110,10 +116,14 @@ export function DashboardClient() {
   }, [session])
 
   useEffect(() => {
-    if (isLoading || banners.length > 0) return
-    if (!isJustPaid()) return
-    router.replace('/dashboard/builder?from=upgrade')
-  }, [isLoading, banners.length, router])
+    const hasEverCreatedBanner = readHasEverCreatedBanner(session?.user?.id)
+    if (!shouldRedirectZeroBannerToBuilder({
+      isLoading,
+      bannerCount: banners.length,
+      hasEverCreatedBanner,
+    })) return
+    router.replace(isJustPaid() ? '/dashboard/builder?from=upgrade' : '/dashboard/builder')
+  }, [isLoading, banners.length, router, session?.user?.id])
 
   const fetchBanners = async () => {
     try {
@@ -158,6 +168,9 @@ export function DashboardClient() {
         })
         
         setBanners(parsedBanners)
+        if (parsedBanners.length > 0) {
+          markHasEverCreatedBanner(session?.user?.id)
+        }
         // Check if any banners need migration
         const hasOutdated = parsedBanners.some((banner: Banner) => banner.config && needsMigration(banner.config))
         setHasOutdatedBanners(hasOutdated)
@@ -206,6 +219,7 @@ export function DashboardClient() {
       })
 
       if (response.ok) {
+        markHasEverCreatedBanner(session?.user?.id)
         setBanners(prevBanners => prevBanners.filter(banner => banner.id !== bannerId))
         toast.success('Banner deleted successfully!')
       } else {
@@ -346,15 +360,32 @@ export function DashboardClient() {
     return null // Should redirect via useEffect
   }
 
+  const hasEverCreatedBanner = readHasEverCreatedBanner(session?.user?.id)
+  const redirectZeroBanner = shouldRedirectZeroBannerToBuilder({
+    isLoading,
+    bannerCount: banners.length,
+    hasEverCreatedBanner,
+  })
   const showZeroBannerEmpty = shouldShowZeroBannerEmptyState({
     isLoading,
     bannerCount: banners.length,
+    hasEverCreatedBanner,
   })
   const showSearchEmpty = shouldShowBannerSearchEmpty({
     bannerCount: banners.length,
     filteredCount: filteredBanners.length,
     searchTerm,
   })
+
+  if (redirectZeroBanner) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   if (showZeroBannerEmpty) {
     return (
@@ -366,13 +397,13 @@ export function DashboardClient() {
                 <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Sparkles className="w-8 h-8 text-primary" />
                 </div>
-                <h1 className="text-3xl font-bold mb-2">Create your first banner</h1>
+                <h1 className="text-3xl font-bold mb-2">Create a new banner</h1>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                   You do not have a cookie banner yet. Start here — you can open Analytics, Team, and Docs after this one is saved.
                 </p>
-                <Link href="/dashboard/builder">
+                <Link href={CREATE_NEW_BANNER_HREF}>
                   <Button size="lg" className="h-12 px-8 text-base">
-                    Create your first banner
+                    Create a new banner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -477,7 +508,7 @@ export function DashboardClient() {
             </p>
           </div>
           <Button asChild size="lg">
-            <Link href="/dashboard/builder">
+            <Link href={CREATE_NEW_BANNER_HREF}>
               <Plus className="w-5 h-5 mr-2" />
               Create New Banner
             </Link>

@@ -18,7 +18,7 @@ import {
   identifyUser,
   getPostHogRequestHeaders,
 } from '@/lib/analytics'
-import { getPasswordRuleStates, getSignupFieldErrors } from '@/lib/signup-form'
+import { getPasswordRuleStates, getSignupFieldErrors, resolveSignupCallbackUrl } from '@/lib/signup-form'
 
 function SignUpContent() {
   const searchParams = useSearchParams()
@@ -33,9 +33,9 @@ function SignUpContent() {
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string; terms?: string }>({})
   const [passwordStrength, setPasswordStrength] = useState(0)
   const router = useRouter()
-  const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
-  // Prevent open redirect — only allow relative paths
-  const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
+  const rawCallbackUrl = searchParams.get('callbackUrl')
+  // Prevent open redirect — only allow relative paths. Cookie-banner signups land in the builder.
+  const callbackUrl = resolveSignupCallbackUrl(rawCallbackUrl)
   const isUpgradeFlow = callbackUrl.startsWith('/upgrade')
   // Attribute funnel correctly when returning to free tools after signup
   const product =

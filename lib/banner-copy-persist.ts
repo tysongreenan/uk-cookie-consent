@@ -1,8 +1,15 @@
 /**
  * Copying an install snippet for a banner that was never saved produces a
  * dead snippet (no banner_created, hosted URL has no id). Persist first.
+ *
+ * `existingBannerCount` is accepted so callers can pass it, but it must not
+ * change the result. Create New Banner is an unsaved draft even when the
+ * account already has other banners.
  */
-export function needsBannerPersistBeforeCopy(bannerId?: string | null): boolean {
+export function needsBannerPersistBeforeCopy(
+  bannerId?: string | null,
+  _existingBannerCount?: number,
+): boolean {
   return !bannerId
 }
 

@@ -14,10 +14,12 @@ import {
   generateConsentInitScript
 } from '@/lib/banner-generator'
 import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
+import { shouldShowGeneratorUpdateNotice } from '@/lib/banner-migration'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
 import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
+import { BannerPersistError } from '@/lib/banner-persist-request'
 import { copyHostedSnippet } from '@/components/banner/install-help-dialog'
 
 interface CodeGeneratorProps {
@@ -41,10 +43,13 @@ export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, o
 
   useEffect(() => {
     const dismissedVersion = localStorage.getItem('banner_update_dismissed_version')
-    if (!dismissedVersion || parseInt(dismissedVersion) < GENERATOR_VERSION) {
-      setShowUpdateNotice(true)
-    }
-  }, [])
+    const dismissed = Boolean(
+      dismissedVersion && parseInt(dismissedVersion, 10) >= GENERATOR_VERSION,
+    )
+    setShowUpdateNotice(
+      shouldShowGeneratorUpdateNotice({ bannerId, config }) && !dismissed,
+    )
+  }, [bannerId, config])
 
   useEffect(() => {
     if (bannerId) {
@@ -187,11 +192,16 @@ ${generateBannerHTML(config, { showBranding })}
       })
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
-      captureException(err, { context: 'install_snippet_copy' })
+      const persistError = err instanceof BannerPersistError
+      if (!persistError || !err.upgradeRequired) {
+        captureException(err, { context: 'install_snippet_copy' })
+      }
       toast.error(
-        bannerId
-          ? 'Failed to copy code'
-          : 'Save the banner so the snippet is real, then copy again.',
+        persistError
+          ? err.message
+          : bannerId
+            ? 'Failed to copy code'
+            : 'Save the banner so the snippet is real, then copy again.',
       )
     }
   }

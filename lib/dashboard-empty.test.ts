@@ -1,30 +1,69 @@
 import { describe, expect, it } from 'vitest'
-import { shouldShowBannerSearchEmpty, shouldShowZeroBannerEmptyState } from './dashboard-empty'
+import {
+  shouldRedirectZeroBannerToBuilder,
+  shouldShowBannerSearchEmpty,
+  shouldShowZeroBannerEmptyState,
+} from './dashboard-empty'
 
-describe('shouldShowZeroBannerEmptyState', () => {
-  it('shows the create-first-banner CTA when the user has zero banners', () => {
+describe('shouldRedirectZeroBannerToBuilder', () => {
+  it('redirects first-time empty sessions after the list loads', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
         isLoading: false,
         bannerCount: 0,
+        hasEverCreatedBanner: false,
       }),
     ).toBe(true)
   })
 
-  it('does not hide existing banners', () => {
+  it('does not remint/redirect after the user deleted their last banner', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
+        isLoading: false,
+        bannerCount: 0,
+        hasEverCreatedBanner: true,
+      }),
+    ).toBe(false)
+  })
+
+  it('does not redirect when banners exist', () => {
+    expect(
+      shouldRedirectZeroBannerToBuilder({
         isLoading: false,
         bannerCount: 1,
+        hasEverCreatedBanner: true,
       }),
     ).toBe(false)
   })
 
   it('waits until the banner list has loaded', () => {
     expect(
-      shouldShowZeroBannerEmptyState({
+      shouldRedirectZeroBannerToBuilder({
         isLoading: true,
         bannerCount: 0,
+        hasEverCreatedBanner: false,
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('shouldShowZeroBannerEmptyState', () => {
+  it('shows the empty CTA after delete-last so the user can create again', () => {
+    expect(
+      shouldShowZeroBannerEmptyState({
+        isLoading: false,
+        bannerCount: 0,
+        hasEverCreatedBanner: true,
+      }),
+    ).toBe(true)
+  })
+
+  it('does not show the empty CTA for first-time empty (those redirect)', () => {
+    expect(
+      shouldShowZeroBannerEmptyState({
+        isLoading: false,
+        bannerCount: 0,
+        hasEverCreatedBanner: false,
       }),
     ).toBe(false)
   })
