@@ -137,7 +137,7 @@ function Attack({
 
   return (
     <span
-      className={`pointer-events-none absolute z-[4] whitespace-nowrap rounded border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.06em] text-rose-700 opacity-0 ${animClass} ${className}`}
+      className={`pointer-events-none absolute z-[4] whitespace-nowrap rounded border border-rose-200 bg-rose-50 px-1.5 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.06em] text-rose-700 opacity-0 dark:border-rose-500/30 dark:bg-rose-950 dark:text-rose-300 ${animClass} ${className}`}
     >
       {children}
     </span>
@@ -301,7 +301,7 @@ function GeoCard() {
       </div>
 
       <div aria-hidden="true" className="relative mt-auto pt-3.5">
-        <img src="/world-simple.svg" alt="" className="block h-auto w-full opacity-20" />
+        <img src="/world-simple.svg" alt="" className="block h-auto w-full opacity-20 dark:invert" />
         <svg
           width="16"
           height="18"

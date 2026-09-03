@@ -192,7 +192,7 @@ function PriceCardItem({ card }: { card: PriceCard }) {
                 f.muted
                   ? 'text-muted-foreground'
                   : enterprise
-                    ? 'text-[#6FCDDC]'
+                    ? 'text-[#6FCDDC] dark:text-[#0E768C]'
                     : 'text-primary'
               }`}
             >
