@@ -96,10 +96,14 @@ export function DashboardClient() {
         localStorage.removeItem('pendingBannerConfig')
         try {
           const config = JSON.parse(pendingConfig)
-          fetch('/api/banners', {
+          fetch('/api/banners/simple', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: 'My Cookie Banner', config }),
+            body: JSON.stringify({
+              name: config.name || 'My Cookie Banner',
+              config,
+              isActive: true,
+            }),
           }).then(res => {
             if (res.ok) {
               fetchBanners()
