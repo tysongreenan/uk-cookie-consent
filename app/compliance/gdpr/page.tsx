@@ -205,19 +205,19 @@ export default function GDPRCompliancePage() {
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    GDPR Cookie Consent:
+                    GDPR Cookie Banner Builder:
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    What Your Website Needs
+                    Set Up Consent in Minutes
                   </span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  The GDPR requires explicit opt-in consent before any non-essential cookies load. Here is exactly what you need to do, and how our banner handles it automatically.
+                  Configure a GDPR-ready cookie banner with pre-consent script blocking, granular categories, a visible reject option, and consent records. Use the guide below to implement it on your site.
                 </p>
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mt-3">
-                  Looking for a detailed guide? Read our{' '}
+                  Need the legal requirements and checklist? Read our{' '}
                   <Link href="/blog/gdpr-cookie-consent-requirements" className="underline underline-offset-4 hover:text-foreground transition-colors">
                     Complete GDPR Cookie Consent Requirements Guide
                   </Link>

@@ -113,7 +113,7 @@ export default function CookiebotAlternativePage() {
           title: "Best Cookiebot Alternatives 2026: Free + Pricing Compared",
           description: "Compare Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Full pricing breakdown, feature matrix, and migration guide.",
           datePublished: "2025-01-01",
-          dateModified: "2026-05-20",
+          dateModified: "2026-09-14",
         }}
       />
       <StructuredData type="faq" data={faqData} />
@@ -171,6 +171,9 @@ export default function CookiebotAlternativePage() {
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
                   Stop paying $9-199/month for Cookiebot. Cookie-Banner.ca offers a free plan with GDPR compliance, or go Pro for a one-time $99 payment. Lightweight script under 10KB. See how we compare to Cookiebot, CookieYes, and Complianz.
+                </p>
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+                  Pricing and features reviewed September 14, 2026. Plan limits and prices can change; confirm current vendor pricing before you buy.
                 </p>
               </motion.div>
 
