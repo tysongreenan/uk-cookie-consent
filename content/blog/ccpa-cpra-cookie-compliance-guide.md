@@ -1,7 +1,14 @@
 ---
 title: "CCPA Cookie Compliance: The Complete CCPA & CPRA Cookie Guide (2026)"
-description: "What do CCPA and CPRA require for cookies? Complete guide to California cookie consent, opt-out requirements, Do Not Sell, and cookie banner compliance. Avoid fines up to $7,500 per violation."
+description: "CCPA and CPRA require a Do Not Sell or Share opt-out for tracking cookies. Fines up to $7,500 per violation. Scan your site or start a free cookie banner."
 date: "2026-03-16"
+heroCta:
+  primary:
+    label: "Scan your site"
+    href: "/tools/cookie-scanner"
+  secondary:
+    label: "Start a free banner"
+    href: "/free-cookie-banner"
 author: "cookie-banner-team"
 tags: ["CCPA", "CPRA", "California", "Privacy Law", "Cookie Consent", "Cookie Banner", "Do Not Sell"]
 published: true
@@ -66,12 +73,14 @@ schema:
         text: "GDPR requires opt-in consent before setting non-essential cookies. The CCPA uses an opt-out model, meaning you can set cookies by default but must provide consumers the right to opt out of the sale or sharing of their data. However, for minors under 16, the CCPA requires opt-in consent."
 ---
 
-# CCPA Cookie Compliance: What California Law Requires for Your Website
-
 <div class="direct-answer">
 <strong>Direct Answer:</strong> CCPA cookie compliance requires websites to give California consumers the right to opt out of the sale or sharing of personal information collected through cookies and tracking technologies. Unlike GDPR, the CCPA uses an opt-out model — you can set cookies by default but must provide a "Do Not Sell or Share My Personal Information" link. The CPRA, which amended the CCPA in January 2023, expanded these requirements to cover data "sharing" for cross-context behavioral advertising, not just data "selling." Violations carry fines of up to $7,500 per incident.
+</div>
 
-[Scan your site for tracking cookies →](/tools/cookie-scanner)
+<div class="article-cta">
+<span class="article-cta-note">Find tracking cookies first, then add a Do Not Sell / Share control.</span>
+<a class="article-cta-primary" href="/tools/cookie-scanner">Scan your site</a>
+<a class="article-cta-secondary" href="/free-cookie-banner">Start a free banner</a>
 </div>
 
 ---
@@ -486,7 +495,7 @@ Yes. Under the CPRA's implementing regulations, businesses must treat Global Pri
 
 **Ready to make your website CCPA-compliant?** [Cookie Banner](https://www.cookie-banner.ca) makes it simple with a free plan that includes CCPA and CPRA compliance, GPC signal detection, and automatic cookie blocking. Set up your compliant cookie banner in minutes.
 
-[Create your free cookie banner →](/auth/signup)
+[Create your free cookie banner →](/free-cookie-banner)
 
 ---
 
