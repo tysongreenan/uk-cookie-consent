@@ -1,7 +1,15 @@
 ---
 title: "Law 25 Data Access Requests: How to Respond in 30 Days"
-description: "Learn how to handle Law 25 data access requests (DSARs) for your Quebec operations. Step-by-step guide with identity verification, report generation, and 30-day deadline tracking."
+description: "Law 25 data access requests (DSARs) have a 30-day CAI deadline. Verify identity, generate the report, and respond before Quebec penalties apply."
 date: "2026-03-23"
+updatedDate: "2026-09-15"
+heroCta:
+  primary:
+    label: "See DSAR tools"
+    href: "/upgrade"
+  secondary:
+    label: "Canada cookie guide"
+    href: "/blog/cookie-consent-canada-guide-2026"
 author: "cookie-banner-team"
 tags: ["Law 25", "Quebec", "DSAR", "Privacy Compliance", "Data Access Request", "Canada"]
 published: true
@@ -53,12 +61,16 @@ schema:
         text: "The Commission d'acces a l'information (CAI) can impose administrative monetary penalties of up to $10 million CAD or 2% of worldwide turnover for non-compliance. For more serious violations, penal penalties can reach $25 million CAD or 4% of worldwide turnover."
 ---
 
-# How to Handle a Law 25 Data Access Request in 30 Days
-
 <div class="direct-answer">
 A Law 25 data access request (DSAR) is a formal request from a Quebec resident to see all personal information your organization holds about them. You have exactly **30 calendar days** to respond. Failure to comply can trigger penalties of up to **$25 million CAD** or 4% of worldwide turnover. This guide walks you through the complete process: receiving the request, verifying identity, generating the report, and delivering it on time.
 
 [Handle DSARs automatically with cookie-banner.ca Pro &rarr;](/upgrade)
+</div>
+
+<div class="article-cta">
+<span class="article-cta-note">Track the 30-day deadline, verify identity, and generate the report in one place.</span>
+<a class="article-cta-primary" href="/upgrade">Handle DSARs with Pro</a>
+<a class="article-cta-secondary" href="/blog/cookie-consent-canada-guide-2026">Canada cookie guide</a>
 </div>
 
 ---
