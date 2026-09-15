@@ -2,7 +2,7 @@
 title: "Is Cookie Consent Required in Canada? PIPEDA, CASL & Law 25 (2026)"
 description: "Yes — tracking cookies need opt-in consent in Canada under PIPEDA, CASL, and Law 25. Fines up to $25M. Scan your site or start a free banner."
 date: "2025-01-15"
-updatedDate: "2026-08-15"
+updatedDate: "2026-09-15"
 heroCta:
   primary:
     label: "Scan your site"
@@ -347,7 +347,7 @@ Looking for a simple, affordable solution? [Cookie Banner Generator](https://www
 - ✅ Works on any website (WordPress, Shopify, custom)
 - ✅ First 1,000 accounts are **free forever**
 
-[Create your free cookie banner →](/auth/signup)
+[Create your free cookie banner →](/free-cookie-banner)
 
 ---
 
@@ -366,6 +366,8 @@ Looking for a simple, affordable solution? [Cookie Banner Generator](https://www
 3. Update your privacy policy with detailed cookie information
 4. Test that cookies only load after user consent
 5. Stay informed about evolving privacy laws
+
+[Scan your site](/tools/cookie-scanner) to see what cookies you are setting, then [start a free banner](/free-cookie-banner) you can paste in today.
 
 ---
 
@@ -403,7 +405,7 @@ Even if you only serve Canada, you still need to comply with **PIPEDA** federall
 
 ---
 
-**Ready to make your website compliant?** [Get your free cookie banner →](/auth/signup)
+**Ready to make your website compliant?** [Get your free cookie banner →](/free-cookie-banner)
 
 ---
 
