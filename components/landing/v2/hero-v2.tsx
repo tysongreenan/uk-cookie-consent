@@ -94,8 +94,10 @@ export function HeroV2() {
             </div>
           </div>
 
-          {/* Right: stacked banner stickers + cookie SVG */}
-          <div className="relative h-[480px] lg:h-[540px]" aria-hidden="true">
+          {/* Decorative collage — hidden on small screens so the form and
+              platform logos sit in the first viewport instead of 480px of
+              stickers. aria-hidden already; not required for conversion. */}
+          <div className="relative hidden h-[480px] md:block lg:h-[540px]" aria-hidden="true">
             <Sticker
               className="absolute left-7 top-6 w-[280px] -rotate-3"
               tag="PIPEDA"
