@@ -380,10 +380,13 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Generate a <code className="text-xs bg-muted px-1 py-0.5 rounded">cb_</code> key, set{' '}
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">COOKIE_BANNER_API_KEY</code>, and
-                connect the MCP server from Claude Code, Cursor, or any MCP client. See{' '}
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">packages/mcp</code> in the repo.
+                Generate a <code className="text-xs bg-muted px-1 py-0.5 rounded">cb_</code> key, then
+                connect <code className="text-xs bg-muted px-1 py-0.5 rounded">npx -y @cookie-banner/mcp</code>{' '}
+                from Claude Code, Cursor, Windsurf, or VS Code.{' '}
+                <Link href="/integrations/ai" className="underline underline-offset-2 hover:text-foreground">
+                  Set up with AI
+                </Link>
+                {' '}has copy-paste configs for each agent.
               </p>
 
               {newDevKey && (

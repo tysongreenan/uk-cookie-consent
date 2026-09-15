@@ -1,7 +1,7 @@
 {
   "name": "@cookie-banner/mcp",
-  "version": "0.1.0",
-  "description": "MCP server for managing cookie-banner.ca banners from the terminal or AI coding agents",
+  "version": "1.0.0",
+  "description": "MCP server for cookie-banner.ca — create consent banners, attach tracking scripts, and install the header snippet from Claude Code, Cursor, Windsurf, or any MCP client",
   "type": "module",
   "bin": {
     "cookie-banner-mcp": "./dist/index.js"
@@ -12,9 +12,10 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=18"
@@ -27,12 +28,27 @@
     "tsx": "^4.19.0",
     "typescript": "^5.3.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tysongreenan/uk-cookie-consent.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://www.cookie-banner.ca/integrations/ai",
+  "bugs": {
+    "url": "https://github.com/tysongreenan/uk-cookie-consent/issues"
+  },
   "keywords": [
     "mcp",
     "cookie-banner",
+    "cookie-consent",
     "gdpr",
-    "consent",
-    "cli"
+    "pipeda",
+    "claude",
+    "cursor",
+    "modelcontextprotocol"
   ],
   "license": "MIT"
 }

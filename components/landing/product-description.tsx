@@ -28,7 +28,7 @@ export function ProductDescription() {
                   <strong>Brand-matching customization:</strong> Full control over colors, fonts, style, and positioning so your banner aligns perfectly with your site's appearance.
                 </li>
                 <li itemProp="featureList">
-                  <strong>Cross-platform compatibility:</strong> Works on <Link href="/integrations/wordpress" className="underline hover:text-foreground">WordPress</Link>, <Link href="/integrations/shopify" className="underline hover:text-foreground">Shopify</Link>, <Link href="/integrations/webflow" className="underline hover:text-foreground">Webflow</Link>, <Link href="/integrations/squarespace" className="underline hover:text-foreground">Squarespace</Link>, and custom sites. Integration instructions and code snippets are provided for each platform.
+                  <strong>Cross-platform compatibility:</strong> Works on <Link href="/integrations/wordpress" className="underline hover:text-foreground">WordPress</Link>, <Link href="/integrations/shopify" className="underline hover:text-foreground">Shopify</Link>, <Link href="/integrations/squarespace" className="underline hover:text-foreground">Squarespace</Link>, and custom sites. Integration instructions and code snippets are provided for each platform.
                 </li>
                 <li itemProp="featureList">
                   <strong>Canadian privacy law compliance:</strong> Express opt-in for non-essential cookies, support for bilingual (English/French) to satisfy Quebec's Law 25, and full <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link> and CASL compliance.

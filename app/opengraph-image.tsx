@@ -119,7 +119,7 @@ export default async function Image() {
             textAlign: 'center',
           }}
         >
-          Works on WordPress, Shopify, Webflow & any site — No coding needed
+          Works on WordPress, Shopify & any site — No coding needed
         </p>
       </div>
     ),

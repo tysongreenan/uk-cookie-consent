@@ -26,7 +26,7 @@ const faqData = [
   },
   {
     question: "How do I install the cookie banner?",
-    answer: "Installation is simple — just copy the generated code and paste it into your website's HTML, right before the closing </body> tag. It works on WordPress, Webflow, Shopify, Squarespace, custom HTML sites, and virtually any other platform."
+    answer: "Installation is simple — just copy the generated code and paste it into your website's HTML, right before the closing </body> tag. It works on WordPress, Shopify, Squarespace, custom HTML sites, and virtually any other platform."
   },
   {
     question: "How does pricing work?",
@@ -150,7 +150,6 @@ export function CookieBannerFAQ() {
             </p>
             <ul className="list-disc pl-6 space-y-1">
               <li>WordPress</li>
-              <li>Webflow</li>
               <li>Shopify</li>
               <li>Squarespace</li>
               <li>Custom HTML sites</li>

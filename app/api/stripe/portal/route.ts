@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { isCheckoutSessionId, safePortalReturnPath } from '@/lib/upgrade-success'
 
 const getStripe = () => {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -50,18 +51,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!user.stripeCustomerId) {
+    const body = await request.json().catch(() => ({} as Record<string, unknown>))
+    const stripe = getStripe()
+    let customerId = user.stripeCustomerId as string | null
+
+    // Right after checkout the webhook may not have saved stripeCustomerId yet.
+    if (!customerId && typeof body.sessionId === 'string' && isCheckoutSessionId(body.sessionId)) {
+      const checkout = await stripe.checkout.sessions.retrieve(body.sessionId)
+      if (checkout.metadata?.userId === session.user.id) {
+        customerId =
+          typeof checkout.customer === 'string'
+            ? checkout.customer
+            : checkout.customer?.id || null
+      }
+    }
+
+    if (!customerId) {
       return NextResponse.json(
         { error: 'No payment history found' },
         { status: 404 }
       )
     }
 
-    const stripe = getStripe()
-
+    const returnPath = safePortalReturnPath(body.returnUrl)
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer: user.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}/dashboard/settings`,
+      customer: customerId,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'}${returnPath}`,
     })
 
     return NextResponse.json({ url: portalSession.url })

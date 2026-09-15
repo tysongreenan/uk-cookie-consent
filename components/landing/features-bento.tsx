@@ -81,7 +81,7 @@ export function FeaturesBento() {
     {
       Icon: Smartphone,
       name: "Works on Any Platform",
-      description: "WordPress, Shopify, Webflow, or custom sites. Copy-paste installation works everywhere. No plugins or complex setup required.",
+      description: "WordPress, Shopify, or custom sites. Copy-paste installation works everywhere. No plugins or complex setup required.",
       href: "#",
       cta: "View integrations",
       gradient: "from-slate-500/10 via-gray-500/5 to-zinc-500/10",

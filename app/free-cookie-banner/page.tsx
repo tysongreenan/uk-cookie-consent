@@ -386,7 +386,7 @@ export default function FreeCookieBannerPage() {
                   <span>✓ E-commerce stores</span>
                   <span>✓ SaaS companies</span>
                   <span>✓ Marketing agencies</span>
-                  <span>✓ Webflow designers</span>
+                  <span>✓ Agency teams</span>
                   <span>✓ WordPress developers</span>
                 </div>
               </div>

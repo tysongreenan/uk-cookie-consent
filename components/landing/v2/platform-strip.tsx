@@ -1,4 +1,4 @@
-const PLATFORMS = [
+export const PLATFORMS = [
   {
     name: 'WordPress',
     icon: (
@@ -12,14 +12,6 @@ const PLATFORMS = [
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.138-.192-.233-.192s-1.929-.135-1.929-.135-1.275-1.274-1.439-1.411c-.045-.037-.075-.059-.121-.074l-.914 21.103zm-1.584-18.59s-.677-.352-1.503-.352c-1.216 0-1.278.762-1.278.955 0 1.049 2.737 1.453 2.737 3.924 0 1.94-1.23 3.189-2.895 3.189-1.994 0-3.013-1.243-3.013-1.243l.535-1.764s1.049.901 1.937.901c.579 0 .816-.456.816-.789 0-1.373-2.247-1.434-2.247-3.693 0-1.899 1.362-3.737 4.114-3.737.929 0 1.452.27 1.452.27l-.655 2.339zM13.842 1.478c.098 0 .159.017.236.052-.564.267-1.182.94-1.44 2.283l-1.093.339c.27-1.256.92-2.674 2.297-2.674z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Webflow',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.802 8.56s-1.946 6.023-2.105 6.538c-.047-.404-1.1-6.538-1.1-6.538-2.07 0-3.166 1.462-3.755 3.026 0 0-1.313 3.48-1.412 3.756-.02-.342-.338-3.756-.338-3.756-.19-1.846-1.97-3.026-3.397-3.026l1.636 10.879c2.17-.005 3.317-1.463 3.942-3.027 0 0 1.08-2.79 1.126-2.932.038.328.993 5.959.993 5.959 2.17-.005 3.318-1.348 3.94-2.892L19.847 8.56h-2.045z" />
       </svg>
     ),
   },
@@ -60,7 +52,7 @@ export function PlatformStrip() {
         <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
           Works on every platform you ship to
         </p>
-        <ul className="grid grid-cols-2 items-center justify-items-center gap-6 sm:grid-cols-3 md:grid-cols-6">
+        <ul className="grid grid-cols-2 items-center justify-items-center gap-6 sm:grid-cols-3 md:grid-cols-5">
           {PLATFORMS.map((p) => (
             <li
               key={p.name}

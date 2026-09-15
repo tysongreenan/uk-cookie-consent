@@ -16,7 +16,7 @@ import { FinalCtaV2 } from '@/components/landing/v2/final-cta-v2'
 
 export const metadata: Metadata = {
   title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify, Webflow & any site. No code needed.',
+  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify & any site. No code needed.',
   keywords: [
     'cookie banner',
     'cookie banners',
@@ -33,7 +33,6 @@ export const metadata: Metadata = {
     'CCPA cookie banner',
     'cookie banner WordPress',
     'cookie banner Shopify',
-    'cookie banner Webflow',
     'free cookie consent banner',
     'free cookie banner',
     'cookie consent',

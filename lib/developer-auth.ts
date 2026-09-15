@@ -93,7 +93,7 @@ export async function requireDeveloperApiKey(
       {
         error: 'invalid_api_key',
         message:
-          'Missing or invalid API key. Use Authorization: Bearer cb_xxxxx (generate one in Dashboard → Settings → Developer).',
+          'Missing or invalid API key. Use Authorization: Bearer cb_xxxxx (generate one at https://www.cookie-banner.ca/integrations/ai).',
       },
       { status: 401, headers: CORS_HEADERS }
     )

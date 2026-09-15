@@ -265,7 +265,7 @@ function SignUpContent() {
         <div className="relative z-10 flex justify-between items-center text-zinc-400 text-sm">
           <p className="text-zinc-400">© 2026 Cookie Banner. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="text-zinc-400 hover:text-white transition-colors">Privacy</Link>
+            <Link href="/privacy-policy" className="text-zinc-400 hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="text-zinc-400 hover:text-white transition-colors">Terms</Link>
           </div>
         </div>
@@ -458,7 +458,7 @@ function SignUpContent() {
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" className="text-blue-600 hover:text-blue-500" onClick={(e) => e.stopPropagation()}>
+                  <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-500" onClick={(e) => e.stopPropagation()}>
                     Privacy Policy
                   </Link>
                 </Label>

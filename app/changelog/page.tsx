@@ -104,7 +104,7 @@ const ENTRIES = [
       'Cookie consent banner generator with PIPEDA & Law 25 compliance',
       'Copy-paste installation for any website',
       'English, French, Spanish language support',
-      'WordPress, Shopify, Webflow integration guides',
+      'WordPress, Shopify integration guides',
     ],
   },
 ]

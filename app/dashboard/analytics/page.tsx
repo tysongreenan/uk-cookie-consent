@@ -64,6 +64,10 @@ interface BannerStats {
   decision_count: number
   returning_visitor_impressions: number
   gpc_impressions: number
+  a11y_opens?: number
+  a11y_toggles?: number
+  a11y_resets?: number
+  a11y_profiles?: number
 }
 
 interface BannerOption {
@@ -85,6 +89,10 @@ interface AnalyticsSummary {
   decisionCount: number
   gpcImpressions: number
   gpcRate: string
+  a11yOpens: number
+  a11yToggles: number
+  a11yResets: number
+  a11yProfiles: number
 }
 
 interface DimensionData {
@@ -372,8 +380,12 @@ export default function AnalyticsPage() {
       dismisses: acc.dismisses + day.dismisses,
       totalDecisionTime: acc.totalDecisionTime + day.total_decision_time_ms,
       decisionCount: acc.decisionCount + day.decision_count,
-      gpcImpressions: acc.gpcImpressions + (day.gpc_impressions || 0)
-    }), { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0, gpcImpressions: 0 })
+      gpcImpressions: acc.gpcImpressions + (day.gpc_impressions || 0),
+      a11yOpens: acc.a11yOpens + (day.a11y_opens || 0),
+      a11yToggles: acc.a11yToggles + (day.a11y_toggles || 0),
+      a11yResets: acc.a11yResets + (day.a11y_resets || 0),
+      a11yProfiles: acc.a11yProfiles + (day.a11y_profiles || 0),
+    }), { impressions: 0, accepts: 0, rejects: 0, dismisses: 0, totalDecisionTime: 0, decisionCount: 0, gpcImpressions: 0, a11yOpens: 0, a11yToggles: 0, a11yResets: 0, a11yProfiles: 0 })
 
     const acceptRate = totals.impressions > 0 ? (totals.accepts / totals.impressions * 100).toFixed(1) : '0'
     const rejectRate = totals.impressions > 0 ? (totals.rejects / totals.impressions * 100).toFixed(1) : '0'
@@ -556,6 +568,27 @@ export default function AnalyticsPage() {
               />
             </div>
 
+            <Card>
+              <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Accessibility opens</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary?.a11yOpens?.toLocaleString() || '0'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Adjustments</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary?.a11yToggles?.toLocaleString() || '0'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Profiles</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary?.a11yProfiles?.toLocaleString() || '0'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Resets</p>
+                  <p className="text-lg font-semibold tabular-nums">{summary?.a11yResets?.toLocaleString() || '0'}</p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* GA4 Setup Notice */}
             <AnimatePresence>
               {showGa4Notice && (
@@ -566,7 +599,7 @@ export default function AnalyticsPage() {
                   exit={{ opacity: 0, height: 0, marginTop: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Card className="relative border-l-4 border-l-primary/70 bg-primary/[0.03] overflow-hidden">
+                  <Card className="relative border bg-primary/[0.03] overflow-hidden">
                     <button
                       onClick={() => setGa4NoticeDismissed(true)}
                       className="absolute top-3 right-3 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"

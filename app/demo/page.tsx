@@ -17,7 +17,7 @@ export default function DemoPage() {
               Cookie Banner Generator - Demo
             </h1>
             <p className="text-lg text-gray-600">
-              Watch how easy it is to create GDPR and PIPEDA compliant cookie banners in Webflow
+              Watch how easy it is to create GDPR and PIPEDA compliant cookie banners for any website
             </p>
           </div>
 
@@ -29,7 +29,7 @@ export default function DemoPage() {
                   <div className="text-6xl mb-4">▶️</div>
                   <h3 className="text-2xl font-bold mb-2">Watch the Demo Video</h3>
                   <p className="text-red-100 mb-6">
-                    See how easy it is to create GDPR and PIPEDA compliant cookie banners in Webflow
+                    See how easy it is to create GDPR and PIPEDA compliant cookie banners for any website
                   </p>
                   <a
                     href="https://www.youtube.com/watch?v=6wZ947TgoUE"
@@ -88,13 +88,13 @@ export default function DemoPage() {
 
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-3">
-                  💻 Webflow Integration
+                  💻 One-line install
                 </h3>
                 <ul className="text-gray-600 space-y-2">
-                  <li>• Direct code insertion into elements</li>
-                  <li>• Copy to clipboard functionality</li>
-                  <li>• Seamless Designer workflow</li>
-                  <li>• No external dependencies</li>
+                  <li>• Copy a single script tag</li>
+                  <li>• Paste it into your site header</li>
+                  <li>• Works on WordPress, Shopify, and custom sites</li>
+                  <li>• No plugins or apps required</li>
                 </ul>
               </div>
 
@@ -139,8 +139,8 @@ export default function DemoPage() {
                 <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">💻</span>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Webflow Native</h3>
-                <p className="text-gray-600 text-sm">Direct integration with Webflow Designer workflow</p>
+                <h3 className="font-semibold text-gray-900 mb-2">Copy-paste install</h3>
+                <p className="text-gray-600 text-sm">One script tag. Works on any site that can include JavaScript.</p>
               </div>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function DemoPage() {
               Ready to Get Started?
             </h2>
             <p className="text-lg mb-6 opacity-90">
-              Install the Cookie Banner Generator extension in your Webflow workspace today
+              Create your cookie banner in a few minutes — no coding required
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
@@ -185,7 +185,7 @@ export default function DemoPage() {
                 <strong>Performance:</strong> Lightweight, no external dependencies
               </div>
               <div>
-                <strong>Updates:</strong> Automatic via Webflow
+                <strong>Updates:</strong> Automatic via the hosted script
               </div>
             </div>
           </div>

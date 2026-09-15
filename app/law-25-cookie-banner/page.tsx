@@ -576,7 +576,7 @@ export default function Law25CookieBannerPage() {
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-6">
                       <p className="text-muted-foreground">
-                        Copy a single script tag into your site&apos;s &lt;head&gt; section. Works on WordPress, Shopify, Webflow, Squarespace, Wix, or any custom site.
+                        Copy a single script tag into your site&apos;s &lt;head&gt; section. Works on WordPress, Shopify, Squarespace, Wix, or any custom site.
                       </p>
                       <div className="bg-card border rounded-lg p-4 font-mono text-sm overflow-x-auto">
                         <pre className="text-muted-foreground">{`<!-- Law 25 Cookie Banner -->
@@ -806,10 +806,10 @@ export default function Law25CookieBannerPage() {
                 {[
                   { name: 'WordPress', link: '/integrations/wordpress' },
                   { name: 'Shopify', link: '/integrations/shopify' },
-                  { name: 'Webflow', link: '/integrations/webflow' },
                   { name: 'Squarespace', link: '/integrations/squarespace' },
                   { name: 'Wix', link: '/integrations/wix' },
                   { name: 'React', link: '/integrations/react' },
+                  { name: 'Google Tag Manager', link: '/integrations/google-tag-manager' },
                 ].map((platform) => (
                   <Link key={platform.name} href={platform.link}>
                     <Card className="border-2 hover:border-primary/50 transition-colors text-center">

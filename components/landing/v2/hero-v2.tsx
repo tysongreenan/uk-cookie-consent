@@ -43,9 +43,8 @@ export function HeroV2() {
               </strong>{' '}
               cookie consent banner in 5 minutes. Match your brand. Works on{' '}
               <Link href="/integrations/wordpress" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">WordPress</Link>,{' '}
-              <Link href="/integrations/shopify" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">Shopify</Link>,{' '}
-              <Link href="/integrations/webflow" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">Webflow</Link>{' '}
-              &amp; any platform. Free plan available — Pro from $99/year.
+              <Link href="/integrations/shopify" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">Shopify</Link>
+              {' '}&amp; any platform. Free plan available — Pro from $99/year.
             </p>
 
             <form

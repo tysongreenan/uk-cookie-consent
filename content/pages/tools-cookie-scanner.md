@@ -8,7 +8,7 @@ The interactive scanner on this page needs a browser. This markdown page is the 
 ## How to run a scan
 
 1. Open https://www.cookie-banner.ca/tools/cookie-scanner
-2. Enter a publicly reachable URL (any WordPress, Shopify, Webflow, Wix, or custom site).
+2. Enter a publicly reachable URL (any WordPress, Shopify, Wix, or custom site).
 3. Click Scan.
 4. Review cookies, categories, security flags, and the compliance summary.
 

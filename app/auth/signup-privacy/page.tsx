@@ -175,7 +175,7 @@ function PrivacySignUpContent() {
                 className="mt-0.5 rounded border-slate-300"
               />
               <span className="text-xs text-slate-500">
-                I agree to the <Link href="/terms" className="text-[#0E768C] hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-[#0E768C] hover:underline">Privacy Policy</Link>
+                I agree to the <Link href="/terms" className="text-[#0E768C] hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-[#0E768C] hover:underline">Privacy Policy</Link>
               </span>
             </label>
 

@@ -344,7 +344,7 @@ Looking for a simple, affordable solution? [Cookie Banner Generator](https://www
 - ✅ PIPEDA, CASL, and Law 25 compliant
 - ✅ Blocks cookies until consent
 - ✅ Granular user controls
-- ✅ Works on any website (WordPress, Shopify, Webflow, custom)
+- ✅ Works on any website (WordPress, Shopify, custom)
 - ✅ First 1,000 accounts are **free forever**
 
 [Create your free cookie banner →](/auth/signup)

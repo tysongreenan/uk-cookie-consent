@@ -112,3 +112,11 @@
 4. **Code** — Main Coder (Opus) writes the implementation
 5. **Review** — Send to Code Reviewer (Sonnet) for review
 6. **Fix** — Address any review feedback
+
+---
+
+## To-Do
+
+Canonical list: [`AGENTS.md`](../AGENTS.md). Do not duplicate it here.
+
+- **PIPEDA / Law 25 positioning** — [docs/PIPEDA-COMPLIANCE-PLAN.md](../docs/PIPEDA-COMPLIANCE-PLAN.md). Next: mailbox `privacy@cookie-banner.ca`, Privacy Officer, lawyer review, Terms link, commit the uncommitted `/privacy-policy` PR. Montreal migration is paused (dump/restore only). Never claim "processed in Canada."

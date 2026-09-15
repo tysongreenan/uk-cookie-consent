@@ -1,5 +1,7 @@
 # Implementation plan — ship remaining product & journey work
 
+**Related (company legal / PIPEDA, not this track):** [PIPEDA-COMPLIANCE-PLAN.md](./PIPEDA-COMPLIANCE-PLAN.md) — listed on the [AGENTS.md](../AGENTS.md) to-do.
+
 **Goal:** Finish what we started: privacy policy product quality, honest acquisition SEO, and one consistent homepage.  
 **Winner homepage:** `app/page.tsx` (HeroV2 + builder demo stack).  
 **A/B status:** **Ended** (middleware split removed; `/v2` → `/` 301).

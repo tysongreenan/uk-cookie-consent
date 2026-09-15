@@ -19,7 +19,6 @@ keywords:
   - "consent mode v2"
   - "cookie banner wordpress"
   - "cookie banner shopify"
-  - "cookie banner webflow"
   - "free cookie banner generator"
   - "how to add cookie consent to wordpress"
   - "what is a cookie banner"
@@ -53,11 +52,6 @@ schema:
       acceptedAnswer:
         "@type": "Answer"
         text: "Install a cookie consent app from the Shopify App Store, or paste your CMP snippet into your theme. To add it manually, go to Online Store > Themes > Edit code, open theme.liquid, and paste the snippet just before the closing head tag. Shopify also offers a built-in customer privacy banner you can enable in store settings."
-    - "@type": "Question"
-      name: "How do I add a cookie banner to Webflow?"
-      acceptedAnswer:
-        "@type": "Answer"
-        text: "In Webflow, open Project Settings > Custom Code and paste your CMP snippet into the Head Code field, then save and publish your site. For a single page, you can instead use Page Settings > Custom Code. Webflow also has a native cookie consent feature under Project Settings > Privacy you can use for basic banners."
     - "@type": "Question"
       name: "Do I need a cookie banner if I only use Google Analytics?"
       acceptedAnswer:
@@ -174,13 +168,6 @@ After installing, run a cookie scan and confirm your categories. See our [WordPr
 
 Shopify also has a built-in customer privacy banner you can enable in **Settings → Customer privacy** for basic coverage.
 
-### Webflow
-
-- Open **Project Settings → Custom Code**, paste your snippet into the **Head Code** field, then **Save** and **Publish**.
-- For a single page only, use **Page Settings → Custom Code** instead.
-
-Webflow also offers a native cookie consent feature under **Project Settings → Privacy** for simple banners.
-
 ### Any HTML / other CMS
 
 Paste the snippet immediately before the closing `</head>` tag in your site template. Loading it in the `<head>` matters — it lets the banner block trackers *before* they fire, which is what compliance requires.
@@ -235,10 +222,6 @@ Adding a cookie banner is no longer a coding project — it's a paste-one-snippe
 ### How do I add a cookie banner to Shopify?
 
 **Answer:** Install a cookie consent app from the Shopify App Store, or paste your CMP snippet into your theme. To add it manually, go to Online Store > Themes > Edit code, open theme.liquid, and paste the snippet just before the closing head tag. Shopify also offers a built-in customer privacy banner you can enable in store settings.
-
-### How do I add a cookie banner to Webflow?
-
-**Answer:** In Webflow, open Project Settings > Custom Code and paste your CMP snippet into the Head Code field, then save and publish your site. For a single page, you can instead use Page Settings > Custom Code. Webflow also has a native cookie consent feature under Project Settings > Privacy you can use for basic banners.
 
 ### Do I need a cookie banner if I only use Google Analytics?
 

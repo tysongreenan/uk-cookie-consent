@@ -1037,7 +1037,7 @@ export default function DashboardLayout({
                 {[
                   { name: 'WordPress Cookie Consent', desc: 'Simple plugin installation for WordPress sites', href: '/integrations/wordpress', icon: Globe },
                   { name: 'Shopify Cookie Consent', desc: 'E-commerce focused cookie consent for Shopify stores', href: '/integrations/shopify', icon: Globe },
-                  { name: 'Webflow Cookie Consent', desc: 'No-code integration for Webflow websites', href: '/integrations/webflow', icon: Globe },
+                  { name: 'Squarespace Cookie Consent', desc: 'Code injection setup for Squarespace sites', href: '/integrations/squarespace', icon: Globe },
                   { name: 'Google Tag Manager', desc: 'Integrate with GTM for advanced tracking control', href: '/integrations/google-tag-manager', icon: Globe },
                 ].map((platform, i) => {
                   const PlatformIcon = platform.icon
