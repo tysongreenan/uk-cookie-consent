@@ -1,8 +1,15 @@
 ---
 title: "GDPR Cookie Consent: 6 Requirements, €20M Fines & Free Checklist (2026)"
-description: "The 6 legal requirements for GDPR cookie consent. Which cookies need consent, which are exempt, fines up to €20M, and a free compliance checklist."
+description: "The 6 GDPR cookie consent rules, €20M fines, exemptions, and a free checklist. Scan your site in 30 seconds — no signup."
 date: "2025-01-17"
-updatedDate: "2026-05-26"
+updatedDate: "2026-09-15"
+heroCta:
+  primary:
+    label: "Scan your site"
+    href: "/tools/cookie-scanner"
+  secondary:
+    label: "Start a free banner"
+    href: "/free-cookie-banner"
 author: "cookie-banner-team"
 tags: ["GDPR", "Cookie Consent", "Privacy Law", "Europe", "Compliance", "GDPR 2026", "Cookie Compliance", "Essential Cookies"]
 published: true
@@ -91,12 +98,16 @@ schema:
         text: "Under GDPR, all non-essential cookies require consent. This includes analytics cookies (Google Analytics, Hotjar), marketing cookies (Facebook Pixel, Google Ads), functional cookies (language preferences, theme settings), and any third-party cookies. Only strictly necessary cookies like authentication and security cookies are exempt."
 ---
 
-# GDPR Cookie Consent: 6 Requirements, €20M Fines & Free Checklist (2026)
-
 <div class="direct-answer">
 <strong>What is GDPR cookie consent?</strong> GDPR cookie consent is the legal requirement for websites to obtain explicit, informed permission from visitors before placing non-essential cookies on their devices. Under the General Data Protection Regulation, you must block all analytics, marketing, and tracking cookies until users actively opt in. Consent must be freely given, specific to each cookie category, and easy to withdraw. Non-compliance penalties reach up to 20 million euros or 4% of global annual revenue.
 
 [Scan your site for cookie compliance issues with our free tool](/tools/cookie-scanner)
+</div>
+
+<div class="article-cta">
+<span class="article-cta-note">See which cookies fire before consent, then paste a free banner that blocks them.</span>
+<a class="article-cta-primary" href="/tools/cookie-scanner">Scan your site</a>
+<a class="article-cta-secondary" href="/free-cookie-banner">Start a free banner</a>
 </div>
 
 If your website has visitors from the European Union, GDPR cookie compliance is not optional. Whether you run a personal blog, a SaaS product, a healthcare platform, or an enterprise e-commerce site, the rules apply to you.
@@ -733,7 +744,7 @@ The consequences of non-compliance are real and growing. Enforcement has expande
 - **Keep records** of all consent events to demonstrate compliance.
 - **Audit regularly** to catch new cookies introduced by updated plugins, scripts, or third-party integrations.
 
-Start with a [free cookie scan](/tools/cookie-scanner) to see where your website stands, then implement a compliant consent solution. For GDPR-ready cookie banners with automatic script blocking, consent logging, and full customization, [create your free account](/auth/signup).
+Start with a [free cookie scan](/tools/cookie-scanner) to see where your website stands, then implement a compliant consent solution. For GDPR-ready cookie banners with automatic script blocking, consent logging, and full customization, [create your free account](/free-cookie-banner).
 
 ---
 
@@ -857,7 +868,7 @@ The **only exception** is strictly necessary cookies that are essential for the 
 
 ---
 
-**Ready to make your website GDPR compliant?** [Start with a free cookie scan](/tools/cookie-scanner) | [Create your compliant cookie banner](/auth/signup)
+**Ready to make your website GDPR compliant?** [Start with a free cookie scan](/tools/cookie-scanner) | [Create your compliant cookie banner](/free-cookie-banner)
 
 ---
 
