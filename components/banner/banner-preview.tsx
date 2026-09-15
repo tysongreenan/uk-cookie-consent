@@ -820,16 +820,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
       )
     ) : null
 
-  const a11yMenuPreview = view === 'accessibility' ? (
-    <A11yMenuPreview
-      config={config as any}
-      customization={Boolean(a11yCustomization)}
-      shipping={Boolean((config as any).accessibility?.enabled)}
-      layoutKey={`${view}:${isVisible}:${safeConfig.position}:${safeConfig.branding.footerLink.floatingPosition}:${safeConfig.text.message.length}`}
-    />
-  ) : null
-
-  const a11yTriggerPreview = view !== 'accessibility' && (config as any).accessibility?.enabled ? (
+  const a11yTriggerPreview = (config as any).accessibility?.enabled ? (
     <A11yTriggerPreview
       config={config as any}
       customization={Boolean(a11yCustomization)}
@@ -866,7 +857,6 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
         {isVisible && bannerPanel}
         {floatingPreview}
         {a11yTriggerPreview}
-        {a11yMenuPreview}
         {preferences}
       </div>
     )
@@ -893,7 +883,6 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
         {isVisible && bannerPanel}
         {floatingPreview}
         {a11yTriggerPreview}
-        {a11yMenuPreview}
         {preferences}
       </div>
 
