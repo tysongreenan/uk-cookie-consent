@@ -1,88 +1,77 @@
 # @cookie-banner/mcp
 
-Manage [cookie-banner.ca](https://www.cookie-banner.ca) consent banners from the terminal or any MCP-compatible AI coding agent (Claude Code, Cursor, Windsurf, etc.).
+MCP server for [cookie-banner.ca](https://www.cookie-banner.ca). Connect Claude Code, Cursor, Windsurf, VS Code, or any MCP client and let the agent create the banner, attach tracking scripts, and paste the header snippet.
 
-## What you can do
+Public setup guide: [https://www.cookie-banner.ca/integrations/ai](https://www.cookie-banner.ca/integrations/ai)
 
-| Tool | Purpose |
-|------|---------|
-| `list_banners` | List your banners |
-| `get_banner` | Full config + install snippet |
-| `update_banner` | Change copy, colors, layout, active state |
-| `create_banner` | Create a new banner |
-| `delete_banner` | Delete a banner |
-| `get_install_snippet` | Script tag for your site |
-
-## Setup
-
-### 1. Create a developer API key
-
-1. Sign in at [cookie-banner.ca](https://www.cookie-banner.ca)
-2. Open **Dashboard → Settings → Developer**
-3. Generate an API key (`cb_…`)
-4. Copy it once — it will not be shown again
-
-### 2. Install
+## Install
 
 ```bash
-# From this monorepo
-cd packages/mcp
-npm install
-npm run build
+npx -y @cookie-banner/mcp
 ```
 
-Or point your MCP client at `tsx src/index.ts` for local development.
+You need a developer API key (`cb_…`) from [Set up with AI](https://www.cookie-banner.ca/integrations/ai) or **Dashboard → Settings → Developer**.
 
-### 3. Configure your MCP client
+## Claude Code
 
-**Claude Code / Claude Desktop** (`claude_desktop_config.json` or project MCP config):
+```bash
+claude mcp add cookie-banner -e COOKIE_BANNER_API_KEY=cb_your_key -- npx -y @cookie-banner/mcp
+```
+
+## Cursor / Windsurf / other clients
 
 ```json
 {
   "mcpServers": {
     "cookie-banner": {
-      "command": "node",
-      "args": ["/absolute/path/to/packages/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@cookie-banner/mcp"],
       "env": {
-        "COOKIE_BANNER_API_KEY": "cb_your_key_here"
+        "COOKIE_BANNER_API_KEY": "cb_your_key"
       }
     }
   }
 }
 ```
 
-**Local API (dev):**
+Local API:
 
 ```json
 {
   "env": {
-    "COOKIE_BANNER_API_KEY": "cb_your_key_here",
+    "COOKIE_BANNER_API_KEY": "cb_your_key",
     "COOKIE_BANNER_API_URL": "http://localhost:3000"
   }
 }
 ```
 
-## Example prompts
+## Tools
 
-- “List my cookie banners”
-- “Update banner `<id>` title to We value your privacy and set the accept button to Got it”
-- “Disable banner `<id>`”
-- “Give me the install snippet for banner `<id>`”
+| Tool | Purpose |
+|------|---------|
+| `setup_site` | One-shot: create banner, attach scripts, return header snippet + paste location |
+| `list_script_templates` | GA4, GTM, Meta, Clarity, Hotjar, LinkedIn, TikTok, Google Ads, Intercom |
+| `add_script` / `list_scripts` / `remove_script` | Manage consent-gated tracking scripts |
+| `list_banners` / `get_banner` / `create_banner` / `update_banner` / `delete_banner` | Banner CRUD |
+| `get_install_snippet` | Header `<script>` tag, optional `framework` for paste instructions |
+
+## Example prompt
+
+```
+Set up cookie-banner.ca on this website. Use setup_site. Search the repo
+for GA4 / GTM / Meta IDs, attach them, and paste the snippet in the header.
+Then enable the Accessibility Menu with update_banner and
+config.accessibility.enabled = true. Same snippet, no second script.
+```
+
+Sites that already have a different cookie banner can install just the menu:
+
+```html
+<script src="https://www.cookie-banner.ca/api/v1/a11y.js?id=BANNER_ID" async></script>
+```
 
 ## Auth
 
 - Developer keys use the `cb_` prefix
-- Consumer / extension keys (`ck_`) are **not** accepted
-- Keys can be revoked anytime from Dashboard → Settings → Developer
-
-## REST API (same auth)
-
-The MCP server is a thin wrapper over:
-
-- `GET/POST /api/v1/developer/banners`
-- `GET/PATCH/DELETE /api/v1/developer/banners/:id`
-
-```bash
-curl -H "Authorization: Bearer cb_…" \
-  https://www.cookie-banner.ca/api/v1/developer/banners
-```
+- Consumer / extension keys (`ck_`) are not accepted
+- Revoke keys anytime from Dashboard → Settings → Developer

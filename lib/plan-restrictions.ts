@@ -20,6 +20,10 @@ const PRO_FEATURES_BASE: Omit<PlanFeatures, 'tier' | 'includesNewFeatures' | 'su
   hasPrivacyPolicyGenerator: true,
   hasPrivacyPolicyVersioning: false,
   hasTcfSupport: true,
+  hasAccessibilityMenu: true,
+  // Post-cutoff feature: lifetime users are excluded via FEATURE_RELEASE_DATES
+  // (they get the Free version of the menu — default look + "Powered by").
+  hasAccessibilityCustomization: true,
   maxTeamMembers: 'unlimited',
 }
 
@@ -43,6 +47,10 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     hasPrivacyPolicyGenerator: false,
     hasPrivacyPolicyVersioning: false,
     hasTcfSupport: false,
+    // Visitors' accessibility needs are never gated by the site owner's plan:
+    // Free gets the full menu with the default look and "Powered by" branding.
+    hasAccessibilityMenu: true,
+    hasAccessibilityCustomization: false,
     includesNewFeatures: false,
     maxTeamMembers: 1,
     supportLevel: 'community'
@@ -124,6 +132,10 @@ export function canAccessFeature(userTier: PlanTier, feature: keyof PlanFeatures
       return features.hasPrivacyPolicyVersioning
     case 'hasTcfSupport':
       return features.hasTcfSupport
+    case 'hasAccessibilityMenu':
+      return features.hasAccessibilityMenu
+    case 'hasAccessibilityCustomization':
+      return features.hasAccessibilityCustomization
     case 'includesNewFeatures':
       return features.includesNewFeatures
     case 'maxWebsites':
@@ -148,6 +160,9 @@ export const FEATURE_CUTOFF_DATE = new Date('2026-04-01')
  *  Add new features here as they ship. */
 export const FEATURE_RELEASE_DATES: Record<string, Date> = {
   'hasConsentLogs': new Date('2026-04-15'),
+  // Accessibility Menu customization ships after the cutoff → pro_annual / enterprise only.
+  // (hasAccessibilityMenu itself is deliberately NOT listed: every tier gets the menu.)
+  'hasAccessibilityCustomization': new Date('2026-09-11'),
 }
 
 /** Check feature access considering the lifetime freeze date.

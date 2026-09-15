@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Save, Eye, Code, Copy, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, Monitor, Smartphone, Check } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Code, Copy, Download, Plus, Trash2, Shield, Settings, BarChart3, Target, Palette, Type, Info, Loader2, Upload, X, Image as ImageIcon, PanelTop, SlidersHorizontal, Pencil, Rocket, Globe, Monitor, Smartphone, Check, Accessibility } from 'lucide-react'
 import Link from 'next/link'
 import { BannerPreview } from '@/components/banner/banner-preview'
 import { CodeGenerator } from '@/components/banner/code-generator'
@@ -27,7 +27,8 @@ import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { getComplianceRequirements } from '@/lib/compliance-frameworks'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
-import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
+import { canAccessFeature, canAccessFeatureWithFreeze, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
+import { AccessibilityPanel } from '@/components/builder/accessibility-panel'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { Slider } from '@/components/ui/slider'
@@ -540,7 +541,7 @@ function BannerBuilderContent() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('compliance')
   // null = use auto-derived view from activeTab; otherwise user has clicked a preview tab and wants to lock it
-  const [previewView, setPreviewView] = useState<'banner' | 'preferences' | 'floating' | null>(null)
+  const [previewView, setPreviewView] = useState<'banner' | 'preferences' | 'floating' | 'accessibility' | null>(null)
   // Desktop vs phone frame width for the live preview pane
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop')
   // Reset preview override whenever the user navigates to a different builder tab so auto-derivation kicks back in
@@ -668,8 +669,10 @@ function BannerBuilderContent() {
       loadedBannerRef.current = editId
       loadBannerForEdit(editId)
     }
-    if (searchParams.get('tab') === 'code') {
-      setActiveTab('code')
+    const tab = searchParams.get('tab')
+    const knownTabs = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
+    if (tab && knownTabs.includes(tab)) {
+      setActiveTab(tab)
     }
   }, [searchParams, session])
 
@@ -1261,6 +1264,8 @@ function BannerBuilderContent() {
         )
       case 'cookie-settings':
         return config.branding?.footerLink?.enabled === true
+      case 'accessibility':
+        return config.accessibility?.enabled === true
       case 'behavior':
         return false // Always has defaults, no meaningful completion to show
       case 'analytics':
@@ -1369,7 +1374,7 @@ function BannerBuilderContent() {
                 {/* Progress */}
                 <div className="mb-6">
                   {(() => {
-                    const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','behavior','geo-targeting','analytics','code']
+                    const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
                     const idx = Math.max(0, stepOrder.indexOf(activeTab))
                     const total = stepOrder.length
                     const pct = Math.round(((idx + 1) / total) * 100)
@@ -1385,7 +1390,7 @@ function BannerBuilderContent() {
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{
                         width: `${(() => {
-                          const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','behavior','geo-targeting','analytics','code']
+                          const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
                           const idx = Math.max(0, stepOrder.indexOf(activeTab))
                           return Math.round(((idx + 1) / stepOrder.length) * 100)
                         })()}%`
@@ -1518,6 +1523,24 @@ function BannerBuilderContent() {
                     <span className="flex-1 text-left">Cookie Settings</span>
                     {isStepComplete('cookie-settings') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
+
+                  <button
+                    type="button"
+                    role="tab"
+                    id="accessibility-tab"
+                    aria-selected={activeTab === 'accessibility'}
+                    aria-controls="accessibility-panel"
+                    onClick={() => setActiveTab('accessibility')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      activeTab === 'accessibility'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Accessibility className="h-4 w-4" />
+                    <span className="flex-1 text-left">Accessibility</span>
+                    {isStepComplete('accessibility') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                  </button>
                   
                   <button
                     type="button"
@@ -1603,6 +1626,7 @@ function BannerBuilderContent() {
                    activeTab === 'cookie-settings' ? 'Cookie Settings Management' :
                    activeTab === 'behavior' ? 'Set Banner Behavior' :
                    activeTab === 'geo-targeting' ? 'Geo-Targeting Rules' :
+                   activeTab === 'accessibility' ? 'Accessibility Menu' :
                    activeTab === 'analytics' ? 'Analytics Integration' : 'Get your install snippet'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-prose">
@@ -1615,6 +1639,7 @@ function BannerBuilderContent() {
                    activeTab === 'cookie-settings' ? 'Configure how users can manage their cookie preferences after initial consent.' :
                    activeTab === 'behavior' ? 'Set how your banner behaves and interacts with users.' :
                    activeTab === 'geo-targeting' ? 'Show different consent behavior based on visitor location. Requires Pro plan.' :
+                   activeTab === 'accessibility' ? 'Turn on the visitor menu, then copy it from Install snippet — it rides in the same line as your cookie banner.' :
                    activeTab === 'analytics' ? 'Configure Google Analytics 4 integration and tracking settings.' :
                    'Copy the snippet below and paste it into your website to activate your cookie banner.'}
                 </p>
@@ -3906,7 +3931,16 @@ function BannerBuilderContent() {
                 </Card>
               </TabsContent>
 
-              {/* Behavior Tab */}
+              {/* Accessibility Tab */}
+              <TabsContent value="accessibility" className="space-y-10" id="accessibility-panel" role="tabpanel" aria-labelledby="accessibility-tab">
+                <AccessibilityPanel
+                  config={config}
+                  canCustomize={canAccessFeatureWithFreeze(userPlan, 'hasAccessibilityCustomization')}
+                  onChange={(next) => updateConfig('accessibility', next)}
+                  onGoToInstall={() => setActiveTab('code')}
+                />
+              </TabsContent>
+
               <TabsContent value="behavior" className="space-y-10" id="behavior-panel" role="tabpanel" aria-labelledby="behavior-tab">
                 <Card className="relative">
                   <CardHeader>
@@ -4865,6 +4899,7 @@ function BannerBuilderContent() {
                     </CardTitle>
                     <CardDescription>
                       Copy this snippet and paste it into your website&apos;s head to activate your cookie banner
+                      {config.accessibility?.enabled ? ' and Accessibility Menu' : ''}.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -4921,24 +4956,26 @@ function BannerBuilderContent() {
                       </div>
                     </CardTitle>
                     <p className="text-xs text-muted-foreground">
-                      Mock only — use the chips below to switch Banner, Preferences, or Floating Button.
+                      Mock only — use the chips below to switch Banner, Preferences, Floating Button, or Accessibility.
                     </p>
                     {(() => {
                       // Auto-derive default view from active tab; user can override with the buttons below
-                      const autoView: 'banner' | 'preferences' | 'floating' =
+                      const autoView: 'banner' | 'preferences' | 'floating' | 'accessibility' =
+                        activeTab === 'accessibility' ? 'accessibility' :
                         activeTab === 'cookie-settings' ? 'floating' :
                         activeTab === 'content' && config.behavior.showPreferences ? 'preferences' :
                         'banner'
                       const effective = previewView ?? autoView
                       return (
-                        <div className="inline-flex rounded-md border bg-muted/40 p-0.5 text-xs">
-                          {(['banner', 'preferences', 'floating'] as const).map((v) => (
+                        <div className="inline-flex flex-wrap rounded-md border bg-muted/40 p-0.5 text-xs">
+                          {(['banner', 'preferences', 'floating', 'accessibility'] as const).map((v) => (
                             <button
                               key={v}
                               type="button"
                               onClick={() => {
                                 setPreviewView(v)
                                 if (v === 'floating') setActiveTab('cookie-settings')
+                                if (v === 'accessibility') setActiveTab('accessibility')
                               }}
                               aria-pressed={effective === v}
                               className={`px-3 py-1.5 rounded transition-colors ${
@@ -4947,7 +4984,7 @@ function BannerBuilderContent() {
                                   : 'text-muted-foreground hover:text-foreground'
                               }`}
                             >
-                              {v === 'banner' ? 'Banner' : v === 'preferences' ? 'Preferences' : 'Floating Button'}
+                              {v === 'banner' ? 'Banner' : v === 'preferences' ? 'Preferences' : v === 'floating' ? 'Floating Button' : 'Accessibility'}
                             </button>
                           ))}
                         </div>
@@ -4971,7 +5008,17 @@ function BannerBuilderContent() {
                       <div className={`bg-white rounded-b-lg relative overflow-hidden overscroll-contain transform-gpu ${previewViewport === 'mobile' ? 'h-[700px]' : 'h-[640px]'}`}>
                         <BannerPreview
                           config={config}
+                          a11yCustomization={canAccessFeatureWithFreeze(userPlan, 'hasAccessibilityCustomization')}
+                          fillParent={
+                            (previewView ?? (
+                              activeTab === 'accessibility' ? 'accessibility' :
+                              activeTab === 'cookie-settings' ? 'floating' :
+                              activeTab === 'content' && config.behavior.showPreferences ? 'preferences' :
+                              'banner'
+                            )) === 'accessibility'
+                          }
                           view={previewView ?? (
+                            activeTab === 'accessibility' ? 'accessibility' :
                             activeTab === 'cookie-settings' ? 'floating' :
                             activeTab === 'content' && config.behavior.showPreferences ? 'preferences' :
                             'banner'

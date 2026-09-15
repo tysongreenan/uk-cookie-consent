@@ -13,7 +13,9 @@
     "db:generate": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:smoke": "vitest run --config vitest.config.smoke.ts"
+    "test:smoke": "vitest run --config vitest.config.smoke.ts",
+    "build:a11y": "node packages/a11y-widget/build.mjs",
+    "watch:a11y": "node packages/a11y-widget/build.mjs --watch"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.78",
@@ -97,8 +99,10 @@
     "autoprefixer": "^10.4.16",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
+    "esbuild": "^0.21.5",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.2.5",
+    "jsdom": "^25.0.1",
     "playwright": "^1.49.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",

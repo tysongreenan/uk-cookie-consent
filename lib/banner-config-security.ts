@@ -1,4 +1,5 @@
 import type { BannerConfig } from '@/types'
+import { hardenAccessibilityConfig } from '@/lib/accessibility/harden'
 
 const UNSAFE_CSS_PATTERN = /[;"'<>\\@]|url\s*\(|expression\s*\(/i
 
@@ -177,4 +178,7 @@ export function hardenBannerConfig(config: BannerConfig): void {
         sanitizeImageUrl(footerLink.icons.rejected) || ''
     }
   }
+
+  // Accessibility Menu block (colours, URLs, enums, selector) — see lib/accessibility/harden.ts
+  hardenAccessibilityConfig(config)
 }

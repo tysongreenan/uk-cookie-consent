@@ -17,7 +17,10 @@ import { GENERATOR_VERSION, getLatestUpdate } from '@/lib/banner-version'
 import { shouldShowGeneratorUpdateNotice } from '@/lib/banner-migration'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
-import { hostedInstallSnippet } from '@/lib/install-snippet'
+import { hostedInstallSnippet, a11yInstallSnippet } from '@/lib/install-snippet'
+import { generateA11yHeadTag, resolveA11yRuntimeConfig } from '@/lib/accessibility'
+import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import type { PlanTier } from '@/types'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import { BannerPersistError } from '@/lib/banner-persist-request'
 import { copyHostedSnippet } from '@/components/banner/install-help-dialog'
@@ -37,6 +40,7 @@ export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, o
   const [isGenerating, setIsGenerating] = useState(false)
   const [showUpdateNotice, setShowUpdateNotice] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copiedA11y, setCopiedA11y] = useState(false)
   const [showManualCode, setShowManualCode] = useState(false)
   const [showSwitchChecklist, setShowSwitchChecklist] = useState(true)
   const [manualTab, setManualTab] = useState<'head' | 'body'>('head')
@@ -70,6 +74,24 @@ export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, o
     toast.success('Code regenerated successfully!')
   }
 
+  // Accessibility Menu for copy-paste installs: same plan rules the hosted
+  // script applies server-side (all tiers get the menu; customization is Pro).
+  const generateA11yHeadCode = () => {
+    if (!config.accessibility?.enabled) return ''
+    const tier = (planTier || 'free') as PlanTier
+    if (!canAccessFeatureWithFreeze(tier, 'hasAccessibilityMenu')) return ''
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca').replace(/\/$/, '')
+    const runtime = resolveA11yRuntimeConfig(config, {
+      customization: canAccessFeatureWithFreeze(tier, 'hasAccessibilityCustomization'),
+      baseUrl,
+    })
+    if (!runtime) return ''
+    return `
+
+<!-- Accessibility Menu (visitor display adjustments) -->
+${generateA11yHeadTag(runtime, { baseUrl })}`
+  }
+
   const generateHeadCode = () => {
     return `<!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 Cookie Consent Banner - HEAD CODE (cookie-banner.ca)      🍁 -->
@@ -85,7 +107,7 @@ ${generateBannerCSS(config)}
 
 <script>
 ${generateBannerJS(config)}
-</script>
+</script>${generateA11yHeadCode()}
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->
 <!-- 🍁 End HEAD CODE - Powered by cookie-banner.ca               🍁 -->
 <!-- 🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁🍁 -->`
@@ -206,6 +228,40 @@ ${generateBannerHTML(config, { showBranding })}
     }
   }
 
+  const a11yOn = Boolean(config.accessibility?.enabled)
+
+  const copyA11ySnippet = async () => {
+    try {
+      if (!onEnsureSaved && !bannerId) {
+        toast.error('Save the banner so the snippet is real, then copy again.')
+        return
+      }
+      const { persisted } = await persistThenCopySnippet({
+        bannerId,
+        persist: onEnsureSaved || (async () => bannerId || null),
+        copy: async (idPromise) => {
+          await copyText(() => idPromise.then((id) => a11yInstallSnippet(id)))
+        },
+      })
+      setCopiedA11y(true)
+      toast.success(persisted ? 'Banner saved. Menu-only snippet copied.' : 'Copied to clipboard!')
+      captureEvent('install_snippet_copied', {
+        banner_id: bannerId || null,
+        snippet_type: 'a11y',
+        plan_tier: planTier || 'free',
+        source: 'builder_code_tab',
+      })
+      setTimeout(() => setCopiedA11y(false), 3000)
+    } catch (err) {
+      captureException(err, { context: 'a11y_install_snippet_copy' })
+      toast.error(
+        bannerId
+          ? 'Failed to copy code'
+          : 'Save the banner so the snippet is real, then copy again.',
+      )
+    }
+  }
+
   const downloadCode = () => {
     const code = getCode()
     const filename = `cookie-banner-${activeTab}.html`
@@ -251,6 +307,11 @@ ${generateBannerHTML(config, { showBranding })}
               ? <>Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</>
               : <>Copy saves this banner, then copies a one-line script. Paste that in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section.</>}
           </p>
+          {a11yOn && (
+            <p className="text-sm text-green-800 dark:text-green-300 mt-2">
+              This same line also delivers your Accessibility Menu — nothing extra to install.
+            </p>
+          )}
         </div>
 
         {/* Code block */}
@@ -291,6 +352,26 @@ ${generateBannerHTML(config, { showBranding })}
             <><Copy className="mr-2 h-4 w-4" /> Copy Script Tag</>
           )}
         </Button>
+
+        {a11yOn && (
+          <div className="rounded-lg border p-4 space-y-2">
+            <p className="text-sm font-semibold">Keeping a different cookie banner? Add just the menu.</p>
+            <p className="text-sm text-muted-foreground">
+              One line in your <code className="bg-muted px-1 rounded">&lt;head&gt;</code>. It only loads the
+              Accessibility Menu — no cookie banner, no consent logic — and follows the Accessibility step.
+            </p>
+            <pre className="rounded bg-muted/60 p-3 text-sm overflow-x-auto">
+              <code>{a11yInstallSnippet(bannerId || 'YOUR-BANNER-ID')}</code>
+            </pre>
+            <Button type="button" size="sm" variant="outline" onClick={copyA11ySnippet}>
+              {copiedA11y ? (
+                <><Check className="mr-1 h-3.5 w-3.5" /> Copied</>
+              ) : (
+                <><Copy className="mr-1 h-3.5 w-3.5" /> {bannerId ? 'Copy menu-only snippet' : 'Save & copy menu-only snippet'}</>
+              )}
+            </Button>
+          </div>
+        )}
 
         {/* Platform-specific instructions */}
         <PlatformInstructions />

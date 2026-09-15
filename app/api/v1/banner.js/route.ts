@@ -5,6 +5,7 @@ import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { RateLimit } from '@/lib/rate-limit'
 import { SECURITY_HEADERS } from '@/lib/security-validation'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
+import { generateA11yLoaderScript, resolveA11yRuntimeConfig } from '@/lib/accessibility'
 import { PlanTier } from '@/types'
 // NOTE: In-memory banner cache removed intentionally.
 // On Vercel serverless, each instance has its own memory — invalidating cache
@@ -340,6 +341,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Accessibility Menu (server-side plan enforcement, same pattern as TCF).
+    // Every tier gets the menu; only Pro Annual / Enterprise get customization and
+    // no branding. The freeze policy excludes lifetime from customization.
+    // A11Y_MENU_DISABLED=1 is the global kill switch (no customer-side change).
+    let a11yLoaderJs = ''
+    if (process.env.A11Y_MENU_DISABLED !== '1' && config.accessibility?.enabled) {
+      const hasA11yMenu = canAccessFeatureWithFreeze(ownerPlanTier as PlanTier, 'hasAccessibilityMenu', ownerFeatureFreezeDate)
+      const hasA11yCustomization = canAccessFeatureWithFreeze(
+        ownerPlanTier as PlanTier,
+        'hasAccessibilityCustomization',
+        ownerFeatureFreezeDate
+      )
+      if (hasA11yMenu) {
+        const a11yBaseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca').replace(/\/$/, '')
+        const a11yRuntime = resolveA11yRuntimeConfig(config, { customization: hasA11yCustomization, baseUrl: a11yBaseUrl })
+        if (a11yRuntime) a11yLoaderJs = generateA11yLoaderScript(a11yRuntime, { baseUrl: a11yBaseUrl })
+      }
+    }
+
     // Generate all components
     const html = generateBannerHTML(config, { showBranding })
     const css = generateBannerCSS(config)
@@ -643,6 +663,7 @@ export async function GET(request: NextRequest) {
     injectBannerHTML();
     watchForBannerRemoval();
   }
+${a11yLoaderJs}
 })();
 `
     

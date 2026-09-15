@@ -206,6 +206,104 @@ export interface BannerConfig {
     }
     tcf?: TCFConfig
   }
+
+  // Accessibility Menu (visitor-facing toolbar delivered through the same snippet).
+  // See docs/ACCESSIBILITY-WIDGET-PLAN.md. Optional so existing configs need no migration.
+  accessibility?: AccessibilityConfig
+}
+
+// ── Accessibility Menu ──────────────────────────────────────────────
+
+/** Every visitor-facing adjustment the menu can offer. Site owners on Pro can
+ *  hide individual ones via `features`; visitors always control their own state. */
+export type A11yFeatureKey =
+  // Profiles (bundles of the toggles below)
+  | 'profiles'
+  // Content adjustments
+  | 'fontSize'
+  | 'fontWeight'
+  | 'lineHeight'
+  | 'letterSpacing'
+  | 'dyslexiaFont'
+  | 'highlightLinks'
+  | 'highlightTitles'
+  // Visual & navigation aids
+  | 'superFocus'
+  | 'readAloud'
+  | 'readingGuide'
+  | 'bigCursor'
+  | 'pageStructure'
+  // Colour adjustments
+  | 'monochrome'
+  | 'lowSaturation'
+  | 'highSaturation'
+  | 'highContrast'
+  | 'lightContrast'
+  | 'darkContrast'
+  // Additional tools
+  | 'stopAnimations'
+  | 'hideImages'
+  | 'imageTooltips'
+  | 'muteSounds'
+
+export type A11yTriggerPosition =
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'top-left'
+  | 'top-right'
+  | 'middle-left'
+  | 'middle-right'
+
+export interface AccessibilityConfig {
+  enabled: boolean
+  trigger: {
+    position: A11yTriggerPosition
+    /** Pixel offset from the chosen edges (clamped 0–200 server-side). */
+    offset?: { x: number; y: number }
+    size: 'small' | 'medium' | 'large'
+    shape: 'circle' | 'pill' | 'square'
+    icon: 'universal-access' | 'wheelchair' | 'eye'
+    /** Optional visible label next to the icon, e.g. "Accessibility". */
+    label?: string
+    hideOnMobile?: boolean
+    /** CSS selector (`#id` or `.class`) of a site element that should also open the menu. */
+    customSelector?: string
+    /** Inherit the banner's button colours so both floaters look like one system. */
+    useBannerColors: boolean
+    colors?: { background?: string; icon?: string; border?: string }
+  }
+  panel: {
+    theme: 'light' | 'dark' | 'auto'
+    /**
+     * `accent` = header, Reset, and toggles only (default).
+     * `full` = paint the whole panel from the accent / panel colours.
+     * `match-banner` = cookie-banner background, text, and buttons.
+     */
+    colorMode?: 'accent' | 'full' | 'match-banner'
+    accentColor?: string
+    /**
+     * Title / header-button ink. Empty or omitted = auto white or black
+     * so the title stays readable on the accent.
+     */
+    headerTextColor?: string
+    /** Whole-menu panel background. Empty = use the accent. */
+    backgroundColor?: string
+    /** Whole-menu body text. Empty = auto white or black. */
+    textColor?: string
+    /** Defaults to the banner language. */
+    language?: BannerConfig['language']
+  }
+  /** Allowlist of visitor features. Missing key = shown. Pro only; Free shows everything. */
+  features?: Partial<Record<A11yFeatureKey, boolean>>
+  /** Escape hatch for sites where colour filters break their layout. */
+  disableColorFilters?: boolean
+  shortcut: 'none' | 'alt-shift-a' | 'ctrl-u'
+  /** Link shown in the menu footer to the site's accessibility statement. */
+  statementUrl?: string
+  /** Email for the "Report an accessibility issue" footer link. */
+  feedbackEmail?: string
+  /** Ignored server-side: branding is decided by the owner's plan. */
+  showPoweredBy?: boolean
 }
 
 // Internal config type used at serving time — includes runtime overrides not persisted to DB
@@ -483,6 +581,11 @@ export interface PlanFeatures {
   hasPrivacyPolicyGenerator: boolean
   hasPrivacyPolicyVersioning: boolean
   hasTcfSupport: boolean
+  /** Visitor-facing Accessibility Menu with default look + "Powered by". All tiers. */
+  hasAccessibilityMenu: boolean
+  /** Customize the menu (colours, position, label, feature allowlist, statement link,
+   *  shortcut), remove branding, see usage analytics. Pro Annual / Enterprise. */
+  hasAccessibilityCustomization: boolean
   includesNewFeatures: boolean
   maxTeamMembers: number | 'unlimited'
   supportLevel: 'community' | 'priority' | 'priority_plus' | 'dedicated'

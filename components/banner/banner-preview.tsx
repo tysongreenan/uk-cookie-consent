@@ -3,6 +3,8 @@
 import { useState, useEffect, type CSSProperties } from 'react'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { A11yMenuPreview } from '@/components/banner/a11y-menu-preview'
+import { A11yTriggerPreview } from '@/components/banner/a11y-trigger-preview'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
 
 interface BannerConfig {
@@ -73,7 +75,7 @@ interface BannerConfig {
   }
 }
 
-type PreviewView = 'banner' | 'preferences' | 'floating'
+type PreviewView = 'banner' | 'preferences' | 'floating' | 'accessibility'
 
 interface BannerPreviewProps {
   config: BannerConfig
@@ -86,6 +88,8 @@ interface BannerPreviewProps {
    * gray "fake website" card chrome. Use inside gallery / browser frames.
    */
   fillParent?: boolean
+  /** Owner may customize the Accessibility Menu trigger (Pro Annual / Enterprise). */
+  a11yCustomization?: boolean
 }
 
 // Helper function to generate floating button preview styles
@@ -199,13 +203,13 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   )
 }
 
-export function BannerPreview({ config, view, onViewChange, fillParent = false }: BannerPreviewProps) {
+export function BannerPreview({ config, view, onViewChange, fillParent = false, a11yCustomization = false }: BannerPreviewProps) {
   const [internalIsVisible, setInternalIsVisible] = useState(true)
   const [internalShowPreferences, setInternalShowPreferences] = useState(false)
 
   // When a view prop is supplied, derive state from it; otherwise let user interactions drive it.
-  const isVisible = view === 'floating' ? false : view === 'preferences' ? true : internalIsVisible
-  const showPreferences = view === 'preferences' ? true : view === 'floating' ? false : internalShowPreferences
+  const isVisible = view === 'floating' || view === 'accessibility' ? false : view === 'preferences' ? true : internalIsVisible
+  const showPreferences = view === 'preferences' ? true : view === 'floating' || view === 'accessibility' ? false : internalShowPreferences
   const setIsVisible = setInternalIsVisible
   const setShowPreferences = setInternalShowPreferences
 
@@ -380,6 +384,47 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
     setIsVisible(false)
   }
 
+  if (view === 'accessibility') {
+    const footerEnabled = safeConfig.branding.footerLink.enabled
+    const floatingActive =
+      (safeConfig as any).branding.footerLink.style === 'floating' ||
+      (safeConfig as any).branding.footerLink.style === 'both'
+    const floaterOnRight = safeConfig.branding.footerLink.floatingPosition === 'bottom-right'
+    return (
+      <div className="absolute inset-0 overflow-hidden bg-slate-50 transform-gpu" data-cb-preview-frame>
+        <div className="pointer-events-none p-6 opacity-50">
+          <div className="mb-3 h-3 w-1/3 rounded bg-slate-300/80" />
+          <div className="mb-2 h-2.5 w-full rounded bg-slate-200" />
+          <div className="mb-2 h-2.5 w-5/6 rounded bg-slate-200" />
+          <div className="mb-6 h-2.5 w-2/3 rounded bg-slate-200" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-lg bg-white/80 shadow-sm" />
+            <div className="h-20 rounded-lg bg-white/80 shadow-sm" />
+          </div>
+        </div>
+        {footerEnabled && floatingActive ? (
+          <div
+            data-cb-preview="floater"
+            className="absolute z-20 flex items-center justify-center shadow-lg"
+            style={{
+              ...generateFloatingButtonPreviewStyles(safeConfig),
+              [floaterOnRight ? 'right' : 'left']: '20px',
+              bottom: '20px',
+            }}
+          >
+            {generateFloatingButtonPreviewContent(safeConfig)}
+          </div>
+        ) : null}
+        <A11yMenuPreview
+          config={config as any}
+          customization={Boolean(a11yCustomization)}
+          shipping={Boolean((config as any).accessibility?.enabled)}
+          layoutKey={`accessibility:${safeConfig.branding.footerLink.floatingPosition}`}
+        />
+      </div>
+    )
+  }
+
   if (!isVisible) {
     // When forced to floating view, show the floating button centered in the preview frame.
     if (view === 'floating') {
@@ -538,6 +583,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
 
   const bannerPanel = (
         <div
+          data-cb-preview="banner"
           className={`absolute ${getPositionClasses()} ${getAnimationClasses()} z-50`}
           style={{
             backgroundColor: safeConfig.colors.background,
@@ -746,7 +792,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
     ((safeConfig as any).branding.footerLink.style === 'floating' ||
       (safeConfig as any).branding.footerLink.style === 'both') &&
     !isVisible ? (
-      view === 'floating' || fillParent ? (
+      view === 'floating' ? (
         <div className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none z-40">
           <div
             className="cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
@@ -758,6 +804,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
         </div>
       ) : (
         <div
+          data-cb-preview="floater"
           className="absolute z-20 cursor-pointer shadow-lg transition-all hover:opacity-90 hover:-translate-y-0.5 flex items-center justify-center pointer-events-auto"
           style={{
             ...generateFloatingButtonPreviewStyles(safeConfig),
@@ -772,6 +819,23 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
         </div>
       )
     ) : null
+
+  const a11yMenuPreview = view === 'accessibility' ? (
+    <A11yMenuPreview
+      config={config as any}
+      customization={Boolean(a11yCustomization)}
+      shipping={Boolean((config as any).accessibility?.enabled)}
+      layoutKey={`${view}:${isVisible}:${safeConfig.position}:${safeConfig.branding.footerLink.floatingPosition}:${safeConfig.text.message.length}`}
+    />
+  ) : null
+
+  const a11yTriggerPreview = view !== 'accessibility' && (config as any).accessibility?.enabled ? (
+    <A11yTriggerPreview
+      config={config as any}
+      customization={Boolean(a11yCustomization)}
+      layoutKey={`${view}:${isVisible}:${safeConfig.position}:${safeConfig.branding.footerLink.floatingPosition}:${safeConfig.text.message.length}`}
+    />
+  ) : null
 
   const preferences = (
     <PreferencesModal
@@ -788,7 +852,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
   // Gallery / framed embed: fill parent, no nested chrome or meta dump
   if (fillParent) {
     return (
-      <div className="absolute inset-0 overflow-hidden bg-slate-50 transform-gpu">
+      <div className="absolute inset-0 overflow-hidden bg-slate-50 transform-gpu" data-cb-preview-frame>
         <div className="pointer-events-none p-6 opacity-50">
           <div className="mb-3 h-3 w-1/3 rounded bg-slate-300/80" />
           <div className="mb-2 h-2.5 w-full rounded bg-slate-200" />
@@ -801,6 +865,8 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
         </div>
         {isVisible && bannerPanel}
         {floatingPreview}
+        {a11yTriggerPreview}
+        {a11yMenuPreview}
         {preferences}
       </div>
     )
@@ -809,7 +875,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
   return (
     <div className="relative">
       {/* Website Preview Background */}
-      <div className="bg-gray-100 rounded-lg p-4 mb-4 min-h-[300px] relative overflow-hidden transform-gpu">
+      <div className="bg-gray-100 rounded-lg p-4 mb-4 min-h-[300px] relative overflow-hidden transform-gpu" data-cb-preview-frame>
         <div className="bg-white rounded shadow-sm p-4 h-full">
           <div className="h-4 bg-gray-200 rounded mb-4"></div>
           <div className="space-y-2">
@@ -826,6 +892,8 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false }
 
         {isVisible && bannerPanel}
         {floatingPreview}
+        {a11yTriggerPreview}
+        {a11yMenuPreview}
         {preferences}
       </div>
 

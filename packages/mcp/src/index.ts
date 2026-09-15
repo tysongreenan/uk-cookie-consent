@@ -2,8 +2,7 @@
 /**
  * cookie-banner.ca MCP server
  *
- * Authenticate with a developer API key (Dashboard → Settings → Developer)
- * and manage banners from Claude Code, Cursor, or any MCP-compatible client.
+ * npx -y @cookie-banner/mcp
  *
  * Env:
  *   COOKIE_BANNER_API_KEY  — required (cb_…)
@@ -24,7 +23,7 @@ const BASE_URL = (
 
 if (!API_KEY) {
   console.error(
-    'COOKIE_BANNER_API_KEY is required. Generate one at Dashboard → Settings → Developer.'
+    'COOKIE_BANNER_API_KEY is required. Generate one at https://www.cookie-banner.ca/integrations/ai'
   )
   process.exit(1)
 }
@@ -87,10 +86,43 @@ function errorResult(err: unknown) {
   }
 }
 
+function requiredString(value: unknown, name: string): string {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (!text) throw new Error(`${name} is required`)
+  return text
+}
+
+const SCRIPT_PROPERTIES = {
+  template: {
+    type: 'string',
+    description:
+      'google-analytics-4 | google-tag-manager | facebook-pixel | microsoft-clarity | hotjar | linkedin-insight | tiktok-pixel | google-ads | intercom | custom',
+  },
+  measurementId: { type: 'string', description: 'GA4 id, e.g. G-XXXXXXXX' },
+  containerId: { type: 'string', description: 'GTM container, e.g. GTM-XXXXXXX' },
+  pixelId: { type: 'string', description: 'Meta or TikTok pixel id' },
+  projectId: { type: 'string', description: 'Microsoft Clarity project id' },
+  siteId: { type: 'string', description: 'Hotjar site id' },
+  partnerId: { type: 'string', description: 'LinkedIn partner id' },
+  conversionId: { type: 'string', description: 'Google Ads id, e.g. AW-123456789' },
+  appId: { type: 'string', description: 'Intercom app id' },
+  name: { type: 'string', description: 'Optional display name' },
+  category: {
+    type: 'string',
+    description:
+      'strictly-necessary | functionality | tracking-performance | targeting-advertising',
+  },
+  scriptCode: {
+    type: 'string',
+    description: 'Raw <script> HTML. Required when template is custom.',
+  },
+  enabled: { type: 'boolean' },
+}
+
 const server = new Server(
   {
     name: 'cookie-banner',
-    version: '0.1.0',
+    version: '1.0.0',
   },
   {
     capabilities: {
@@ -102,24 +134,95 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
-      name: 'list_banners',
+      name: 'setup_site',
       description:
-        'List all cookie consent banners for the authenticated account (id, name, active, install URL).',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-      },
-    },
-    {
-      name: 'get_banner',
-      description:
-        'Get full details for a banner including config and install snippet.',
+        'One-shot install: create a consent banner, attach tracking scripts (GA4, GTM, Meta, Clarity, Hotjar, …), and return the header snippet plus where to paste it. Prefer this when setting up cookie-banner.ca on a new website. After setup, enable the visitor Accessibility Menu with update_banner({ config: { accessibility: { enabled: true } } }) — it rides in the same snippet.',
       inputSchema: {
         type: 'object',
         properties: {
-          banner_id: {
+          name: { type: 'string', description: 'Banner name, usually the site name' },
+          site_url: { type: 'string', description: 'Public site URL' },
+          framework: {
             type: 'string',
-            description: 'Banner UUID',
+            description:
+              'nextjs | react | wordpress | shopify | squarespace | wix | gtm | html',
+          },
+          compliance: {
+            type: 'string',
+            description: 'pipeda | gdpr | ccpa | law25. Default pipeda.',
+          },
+          privacy_policy_url: { type: 'string' },
+          scripts: {
+            type: 'array',
+            description: 'Tracking scripts to attach. Each item uses the add_script fields.',
+            items: {
+              type: 'object',
+              properties: SCRIPT_PROPERTIES,
+            },
+          },
+        },
+        required: ['name'],
+      },
+    },
+    {
+      name: 'list_script_templates',
+      description:
+        'List first-class tracking templates (GA4, GTM, Meta Pixel, Clarity, Hotjar, …) and the id field each one needs.',
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'add_script',
+      description:
+        'Attach a tracking template or custom script to an existing banner. Scripts load only after the matching consent category is granted.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          banner_id: { type: 'string', description: 'Banner UUID' },
+          ...SCRIPT_PROPERTIES,
+        },
+        required: ['banner_id', 'template'],
+      },
+    },
+    {
+      name: 'list_scripts',
+      description: 'List tracking scripts and the GA4 integration on a banner.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          banner_id: { type: 'string', description: 'Banner UUID' },
+        },
+        required: ['banner_id'],
+      },
+    },
+    {
+      name: 'remove_script',
+      description: 'Remove a script (or the GA4 integration) from a banner.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          banner_id: { type: 'string', description: 'Banner UUID' },
+          script_id: { type: 'string', description: 'Script id, or ga4-integration' },
+        },
+        required: ['banner_id', 'script_id'],
+      },
+    },
+    {
+      name: 'list_banners',
+      description:
+        'List all cookie consent banners for the authenticated account (id, name, active, install URL).',
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'get_banner',
+      description: 'Get full details for a banner including config and install snippet.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          banner_id: { type: 'string', description: 'Banner UUID' },
+          framework: {
+            type: 'string',
+            description:
+              'Optional. nextjs | react | wordpress | shopify | squarespace | wix | gtm | html — adds paste-here instructions.',
           },
         },
         required: ['banner_id'],
@@ -128,7 +231,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'update_banner',
       description:
-        'Update a banner. Supports name, isActive, and common copy/style fields (title, message, acceptButton, rejectButton, position, primaryColor, backgroundColor, textColor) or a full config object merge.',
+        'Update a banner. Supports name, isActive, and common copy/style fields (title, message, acceptButton, rejectButton, position, primaryColor, backgroundColor, textColor) or a full config object merge. To turn on the visitor Accessibility Menu (font size, contrast, motion, focus aids — delivered through the same snippet), pass config: { accessibility: { enabled: true } }.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -152,7 +255,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           textColor: { type: 'string' },
           config: {
             type: 'object',
-            description: 'Partial config object merged into the existing banner config',
+            description:
+              'Partial config object merged into the existing banner config. Example: { accessibility: { enabled: true } } enables the Accessibility Menu.',
           },
         },
         required: ['banner_id'],
@@ -160,7 +264,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'create_banner',
-      description: 'Create a new cookie consent banner.',
+      description:
+        'Create a new cookie consent banner. Prefer setup_site when installing on a website for the first time.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -187,11 +292,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'get_install_snippet',
       description:
-        'Return the script tag to embed a banner on a website.',
+        'Return the script tag to embed a banner, plus optional framework-specific paste instructions.',
       inputSchema: {
         type: 'object',
         properties: {
           banner_id: { type: 'string', description: 'Banner UUID' },
+          framework: {
+            type: 'string',
+            description:
+              'Optional. nextjs | react | wordpress | shopify | squarespace | wix | gtm | html',
+          },
         },
         required: ['banner_id'],
       },
@@ -205,21 +315,70 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
+      case 'setup_site': {
+        const bannerName = requiredString(a.name, 'name')
+        const data = await api('/api/v1/developer/setup', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: bannerName,
+            site_url: a.site_url,
+            framework: a.framework,
+            compliance: a.compliance,
+            privacy_policy_url: a.privacy_policy_url,
+            scripts: a.scripts || [],
+          }),
+        })
+        return jsonResult(data)
+      }
+
+      case 'list_script_templates': {
+        const data = await api('/api/v1/developer/scripts/templates')
+        return jsonResult(data)
+      }
+
+      case 'add_script': {
+        const id = requiredString(a.banner_id, 'banner_id')
+        const { banner_id: _omit, ...script } = a
+        const data = await api(`/api/v1/developer/banners/${id}/scripts`, {
+          method: 'POST',
+          body: JSON.stringify(script),
+        })
+        return jsonResult(data)
+      }
+
+      case 'list_scripts': {
+        const id = requiredString(a.banner_id, 'banner_id')
+        const data = await api(`/api/v1/developer/banners/${id}/scripts`)
+        return jsonResult(data)
+      }
+
+      case 'remove_script': {
+        const id = requiredString(a.banner_id, 'banner_id')
+        const scriptId = requiredString(a.script_id, 'script_id')
+        const data = await api(`/api/v1/developer/banners/${id}/scripts`, {
+          method: 'DELETE',
+          body: JSON.stringify({ script_id: scriptId }),
+        })
+        return jsonResult(data)
+      }
+
       case 'list_banners': {
         const data = await api('/api/v1/developer/banners')
         return jsonResult(data)
       }
 
       case 'get_banner': {
-        const id = String(a.banner_id || '')
-        if (!id) throw new Error('banner_id is required')
-        const data = await api(`/api/v1/developer/banners/${id}`)
+        const id = requiredString(a.banner_id, 'banner_id')
+        const framework =
+          typeof a.framework === 'string' && a.framework
+            ? `?framework=${encodeURIComponent(a.framework)}`
+            : ''
+        const data = await api(`/api/v1/developer/banners/${id}${framework}`)
         return jsonResult(data)
       }
 
       case 'update_banner': {
-        const id = String(a.banner_id || '')
-        if (!id) throw new Error('banner_id is required')
+        const id = requiredString(a.banner_id, 'banner_id')
         const { banner_id: _omit, ...patch } = a
         const data = await api(`/api/v1/developer/banners/${id}`, {
           method: 'PATCH',
@@ -229,8 +388,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'create_banner': {
-        const bannerName = String(a.name || '').trim()
-        if (!bannerName) throw new Error('name is required')
+        const bannerName = requiredString(a.name, 'name')
         const data = await api('/api/v1/developer/banners', {
           method: 'POST',
           body: JSON.stringify({
@@ -242,8 +400,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'delete_banner': {
-        const id = String(a.banner_id || '')
-        if (!id) throw new Error('banner_id is required')
+        const id = requiredString(a.banner_id, 'banner_id')
         const data = await api(`/api/v1/developer/banners/${id}`, {
           method: 'DELETE',
         })
@@ -251,16 +408,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'get_install_snippet': {
-        const id = String(a.banner_id || '')
-        if (!id) throw new Error('banner_id is required')
-        const data = (await api(`/api/v1/developer/banners/${id}`)) as {
-          banner?: { installSnippet?: string; installUrl?: string }
+        const id = requiredString(a.banner_id, 'banner_id')
+        const framework =
+          typeof a.framework === 'string' && a.framework
+            ? `?framework=${encodeURIComponent(a.framework)}`
+            : ''
+        const data = (await api(`/api/v1/developer/banners/${id}${framework}`)) as {
+          banner?: {
+            installSnippet?: string
+            installUrl?: string
+            installInstructions?: unknown
+          }
         }
         return jsonResult({
           installSnippet:
             data.banner?.installSnippet ||
-            `<script async src="${BASE_URL}/api/v1/banner.js?id=${id}"></script>`,
+            `<script src="${BASE_URL}/api/v1/banner.js?id=${id}" async></script>`,
           installUrl: data.banner?.installUrl,
+          installInstructions: data.banner?.installInstructions,
         })
       }
 

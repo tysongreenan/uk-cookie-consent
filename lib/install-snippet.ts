@@ -101,3 +101,12 @@ export function dismissInstallNudge(): void {
     // ignore
   }
 }
+
+/**
+ * Standalone Accessibility Menu snippet — only for sites that do NOT use the
+ * hosted banner.js (the menu already ships inside that). Same id, own endpoint.
+ */
+export function a11yInstallSnippet(bannerId: string): string {
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca').replace(/\/$/, '')
+  return `<script src="${base}/api/v1/a11y.js?id=${bannerId}" async></script>`
+}

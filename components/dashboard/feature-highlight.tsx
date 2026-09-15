@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { NewBadge } from '@/components/ui/new-badge'
-import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 interface FeatureHighlightProps {
   title: string
@@ -15,6 +15,7 @@ interface FeatureHighlightProps {
   isNew?: boolean
   actionText?: string
   onAction?: () => void
+  onDismiss?: () => void
   delay?: number
 }
 
@@ -26,28 +27,21 @@ export function FeatureHighlight({
   isNew = false,
   actionText = "Learn More",
   onAction,
+  onDismiss,
   delay = 0
 }: FeatureHighlightProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.6, 
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.35,
         delay,
         ease: "easeOut"
       }}
-      whileHover={{ 
-        scale: 1.02,
-        transition: { duration: 0.2 }
-      }}
       className="group"
     >
-      <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-300">
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
-        {/* New badge */}
+      <Card className="relative overflow-hidden border bg-card">
         {isNew && (
           <div className="absolute top-4 right-4 z-10">
             <NewBadge variant="pulse" />
@@ -56,21 +50,15 @@ export function FeatureHighlight({
 
         <CardContent className="relative p-6">
           <div className="flex items-start space-x-4">
-            {/* Icon */}
-            <motion.div 
-              className="flex-shrink-0"
-              whileHover={{ rotate: 5 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-blue-200 transition-colors duration-300">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                 {icon}
               </div>
-            </motion.div>
+            </div>
 
             <div className="flex-1 min-w-0">
-              {/* Title and badge */}
-              <div className="flex items-center space-x-2 mb-2">
-                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-300">
+              <div className="flex items-center space-x-2 mb-2 pr-16">
+                <h3 className="text-lg font-semibold text-foreground">
                   {title}
                 </h3>
                 {badge && (
@@ -80,28 +68,33 @@ export function FeatureHighlight({
                 )}
               </div>
 
-              {/* Description */}
-              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                 {description}
               </p>
 
-              {/* Action button */}
-              {onAction && (
-                <motion.div
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Button 
-                    variant="ghost" 
+              <div className="flex items-center gap-3">
+                {onAction && (
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={onAction}
-                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 p-0 h-auto font-medium"
+                    className="text-primary hover:text-primary hover:bg-primary/10 p-0 h-auto font-medium"
                   >
                     {actionText}
                     <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
-                </motion.div>
-              )}
+                )}
+                {onDismiss && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onDismiss}
+                    className="text-muted-foreground hover:text-foreground p-0 h-auto font-medium"
+                  >
+                    Dismiss
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -110,7 +103,6 @@ export function FeatureHighlight({
   )
 }
 
-// Feature highlights grid component
 interface FeatureHighlightsProps {
   features: Array<{
     title: string
@@ -120,6 +112,7 @@ interface FeatureHighlightsProps {
     isNew?: boolean
     actionText?: string
     onAction?: () => void
+    onDismiss?: () => void
   }>
 }
 
@@ -136,5 +129,3 @@ export function FeatureHighlights({ features }: FeatureHighlightsProps) {
     </div>
   )
 }
-
-

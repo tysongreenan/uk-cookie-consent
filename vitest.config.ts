@@ -10,7 +10,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: false,
-    include: ['lib/**/*.test.ts', 'app/**/*.test.ts'],
+    include: ['lib/**/*.test.ts', 'app/**/*.test.ts', 'packages/a11y-widget/test/**/*.test.ts'],
     // Smoke tests need a real chromium and take seconds, not millis.
     // Run them on demand with `npm run test:smoke`.
     exclude: ['node_modules/**', '.next/**', 'dist/**', '**/*.smoke.test.ts'],

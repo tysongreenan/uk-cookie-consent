@@ -1,0 +1,11 @@
+{
+  "name": "@cookie-banner/a11y-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Visitor-facing Accessibility Menu delivered through the cookie-banner.ca snippet. Vanilla TS, zero runtime deps, Shadow DOM.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  }
+}

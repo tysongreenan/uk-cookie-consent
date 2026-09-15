@@ -12,6 +12,7 @@ import {
   getPostHogDistinctId,
   getPostHogSessionId,
 } from '@/lib/posthog-server'
+import { parseAccessibilityForSave } from '@/lib/accessibility'
 
 const supabase = createClient(
   (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"),
@@ -52,6 +53,10 @@ export async function POST(request: NextRequest) {
     // Extract banner name and config
     const bannerName = bannerData.name || bannerData.config?.name || 'Untitled Banner'
     const bannerConfig = bannerData.config || bannerData
+    const accessibilitySave = parseAccessibilityForSave(bannerConfig)
+    if (!accessibilitySave.ok) {
+      return NextResponse.json({ error: accessibilitySave.error }, { status: 400 })
+    }
 
     // Validate layout/position against user's plan
     const requestedLayout = bannerConfig.position

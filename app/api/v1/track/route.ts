@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { RateLimit } from '@/lib/rate-limit'
+import { isA11yTrackEvent } from '@/lib/accessibility'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -87,11 +88,23 @@ export async function POST(request: NextRequest) {
     const safeBannerId = bannerId && isValidUuid(bannerId) ? bannerId : null
 
     // Build all RPC calls first, then fire in parallel
-    const rpcCalls: PromiseLike<{ event: string; type: 'stat' | 'visitor'; error: any }>[] = []
+    const rpcCalls: PromiseLike<{ event: string; type: 'stat' | 'visitor' | 'a11y'; error: any }>[] = []
 
     for (const event of events) {
-      if (!event.type || !VALID_EVENT_TYPES.includes(event.type)) {
+      if (!event.type || (!VALID_EVENT_TYPES.includes(event.type) && !isA11yTrackEvent(event.type))) {
         console.warn('[TRACK] Skipping invalid event type:', event.type)
+        continue
+      }
+
+      if (isA11yTrackEvent(event.type)) {
+        rpcCalls.push(
+          supabase.rpc('increment_a11y_stat', {
+            p_user_id: userId,
+            p_date: today,
+            p_event_type: event.type,
+            p_banner_id: safeBannerId,
+          }).then(r => ({ event: event.type, type: 'a11y' as const, error: r.error }))
+        )
         continue
       }
 

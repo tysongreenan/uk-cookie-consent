@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Fetch daily stats and dimension data in parallel
     let statsQuery = supabase
       .from('banner_stats')
-      .select('date, banner_id, impressions, accepts, rejects, dismisses, total_decision_time_ms, decision_count, returning_visitor_impressions, gpc_impressions')
+      .select('date, banner_id, impressions, accepts, rejects, dismisses, total_decision_time_ms, decision_count, returning_visitor_impressions, gpc_impressions, a11y_opens, a11y_toggles, a11y_resets, a11y_profiles')
       .eq('user_id', userId)
       .order('date', { ascending: true })
 
@@ -76,6 +76,10 @@ export async function GET(request: NextRequest) {
       avg_decision_time_s: row.decision_count > 0 ? +(row.total_decision_time_ms / row.decision_count / 1000).toFixed(1) : 0,
       returning_visitor_impressions: row.returning_visitor_impressions,
       gpc_impressions: row.gpc_impressions || 0,
+      a11y_opens: row.a11y_opens || 0,
+      a11y_toggles: row.a11y_toggles || 0,
+      a11y_resets: row.a11y_resets || 0,
+      a11y_profiles: row.a11y_profiles || 0,
     }))
 
     const visitorBreakdown = (visitorsResult.data || []).map((row: any) => ({
@@ -108,7 +112,7 @@ export async function GET(request: NextRequest) {
     }
 
     // CSV format — two sheets combined with a separator
-    const statsHeaders = ['date', 'banner', 'impressions', 'accepts', 'rejects', 'dismisses', 'accept_rate_%', 'reject_rate_%', 'dismiss_rate_%', 'avg_decision_time_s', 'returning_visitor_impressions', 'gpc_impressions']
+    const statsHeaders = ['date', 'banner', 'impressions', 'accepts', 'rejects', 'dismisses', 'accept_rate_%', 'reject_rate_%', 'dismiss_rate_%', 'avg_decision_time_s', 'returning_visitor_impressions', 'gpc_impressions', 'a11y_opens', 'a11y_toggles', 'a11y_resets', 'a11y_profiles']
     const visitorHeaders = ['date', 'banner', 'source', 'device', 'country', 'page_path', 'impressions', 'accepts', 'rejects', 'dismisses', 'gpc']
 
     let csv = '# Daily Stats\n'
@@ -118,6 +122,7 @@ export async function GET(request: NextRequest) {
         row.date, csvEscape(row.banner), row.impressions, row.accepts, row.rejects, row.dismisses,
         row.accept_rate, row.reject_rate, row.dismiss_rate, row.avg_decision_time_s,
         row.returning_visitor_impressions, row.gpc_impressions,
+        row.a11y_opens, row.a11y_toggles, row.a11y_resets, row.a11y_profiles,
       ].join(',') + '\n'
     }
 

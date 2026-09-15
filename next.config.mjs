@@ -151,6 +151,16 @@ const nextConfig = {
         headers: [{ key: 'Vary', value: 'Accept' }],
       },
       {
+        // Accessibility Menu static assets are loaded cross-origin by customer
+        // sites: the widget with crossorigin="anonymous" and @font-face fonts
+        // both require CORS. Filenames are versioned, so cache immutably.
+        source: '/a11y/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           {

@@ -7,6 +7,7 @@ import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { getAccessibleUserIds } from '@/lib/banner-access'
 import { invalidateBannerCache } from '@/lib/banner-cache'
+import { parseAccessibilityForSave } from '@/lib/accessibility'
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseClient() {
@@ -139,6 +140,10 @@ export async function PUT(
     // Extract banner name and config for full updates
     const bannerName = bannerData.name || bannerData.config?.name || 'Untitled Banner'
     const bannerConfig = bannerData.config || bannerData
+    const accessibilitySave = parseAccessibilityForSave(bannerConfig)
+    if (!accessibilitySave.ok) {
+      return NextResponse.json({ error: accessibilitySave.error }, { status: 400 })
+    }
 
     // Validate layout/position against user's plan
     const requestedLayout = bannerConfig.position

@@ -69,6 +69,11 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
                 {banner.name}
               </CardTitle>
               {isUpdated && <NewBadge variant="sparkle" size="sm" />}
+              {banner.config?.accessibility?.enabled && (
+                <Badge variant="secondary" className="text-xs font-medium">
+                  Accessibility menu
+                </Badge>
+              )}
             </div>
             <CardDescription className="text-sm">
               Created {formatDate(banner.createdAt)}

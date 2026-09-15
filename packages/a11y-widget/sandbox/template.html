@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Accessibility Menu sandbox — cookie-banner.ca</title>
+<style>
+  :root { --brand: #3b82f6; }
+  body { margin: 0; font-family: Georgia, serif; color: #222; background: #fafafa; line-height: 1.5; }
+  header.site { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; gap: 24px; padding: 0 24px; z-index: 50; }
+  header.site nav a { margin-right: 14px; color: var(--brand); }
+  main { max-width: 760px; margin: 90px auto 120px; padding: 0 20px; }
+  .hero { display: flex; gap: 16px; align-items: center; }
+  .spinner { width: 40px; height: 40px; border: 5px solid #ddd; border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .card { background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); font-size: 14px; }
+  .small { font-size: 12px; color: #666; }
+  .icon { font-family: 'Font Awesome 6 Free'; }
+  aside.sticky { position: sticky; top: 80px; background: #fef3c7; padding: 8px 12px; border-radius: 6px; }
+  /* Mock cookie banner (bottom bar) + floating pill, same DOM ids as banner.js */
+  #cookie-consent-banner { position: fixed; left: 0; right: 0; bottom: 0; background: #1f2937; color: #f9fafb; padding: 18px 24px; z-index: 10000; display: flex; gap: 12px; align-items: center; font-family: system-ui, sans-serif; }
+  body.banner-card #cookie-consent-banner { left: 16px; right: auto; bottom: 16px; max-width: 360px; flex-wrap: wrap; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.3); }
+  body.banner-card.corner-right #cookie-consent-banner { left: auto; right: 16px; }
+  #cookie-consent-banner button { background: var(--brand); color: #fff; border: 0; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+  #cookie-settings-float { position: fixed; bottom: 16px; left: 16px; z-index: 999998; background: var(--brand); color: #fff; border-radius: 999px; padding: 8px 14px; font: 600 13px system-ui, sans-serif; display: none; cursor: pointer; }
+  .controls { position: fixed; top: 70px; right: 12px; z-index: 60; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; font: 12px system-ui, sans-serif; }
+
+  /* CMS chrome — representative obstacles from WordPress / Shopify / Webflow / Wix / Squarespace */
+  #wpadminbar { display: none; position: fixed; top: 0; left: 0; right: 0; height: 32px; background: #1d2327; color: #fff; font: 13px system-ui, sans-serif; z-index: 99999; align-items: center; padding: 0 12px; }
+  body.cms-wordpress #wpadminbar { display: flex; }
+  body.cms-wordpress header.site { top: 32px; }
+  body.cms-shopify #shopify-cart { display: flex; }
+  #shopify-cart { display: none; position: fixed; right: 16px; bottom: 80px; z-index: 9999; background: #111; color: #fff; border-radius: 999px; padding: 12px 16px; font: 600 13px system-ui, sans-serif; }
+  body.cms-webflow header.site { height: 72px; background: #0f172a; color: #fff; }
+  body.cms-webflow header.site nav a { color: #fff; }
+  body.cms-wix #wix-chat { display: flex; }
+  #wix-chat { display: none; position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; background: #116dff; color: #fff; z-index: 9999; align-items: center; justify-content: center; font: 700 18px system-ui, sans-serif; }
+  body.cms-squarespace #sqs-announcement { display: block; }
+  #sqs-announcement { display: none; position: fixed; top: 0; left: 0; right: 0; background: #c4a574; color: #111; text-align: center; padding: 10px; z-index: 80; font: 14px Georgia, serif; }
+  body.cms-squarespace header.site { top: 40px; }
+</style>
+</head>
+<body>
+<div id="wpadminbar">WordPress admin bar</div>
+<div id="sqs-announcement">Free shipping this week — Squarespace announcement bar</div>
+<header class="site">
+  <strong>Acme Dental</strong>
+  <nav aria-label="Main"><a href="#services">Services</a><a href="#team">Team</a><a href="#contact">Contact</a></nav>
+</header>
+
+<div class="controls" aria-label="Sandbox controls">
+  Plan: <a href="?plan=free">free</a> · <a href="?plan=pro">pro</a> · <span id="plan-label"></span>
+  <br>Banner: <a href="?plan=pro&banner=bar">bar</a> · <a href="?plan=pro&banner=card">card</a> · <a href="?plan=pro&banner=card&corner=right">card right</a>
+  <br>Theme: <a href="?plan=pro&theme=light">light</a> · <a href="?plan=pro&theme=dark">dark</a>
+  <br>CMS: <a href="?plan=pro&cms=wordpress">WP</a> · <a href="?plan=pro&cms=shopify">Shopify</a> · <a href="?plan=pro&cms=webflow">Webflow</a> · <a href="?plan=pro&cms=wix">Wix</a> · <a href="?plan=pro&cms=squarespace">SQSP</a>
+  <br><label><input type="checkbox" id="toggle-banner" checked> show cookie banner</label>
+</div>
+
+<main>
+  <div class="hero">
+    <div class="spinner" role="img" aria-label="Loading spinner animation"></div>
+    <h1 id="services">Gentle dentistry for the whole family</h1>
+  </div>
+  <p>We are a <a href="#team">family-run clinic</a> in Ottawa offering cleanings, whitening and emergency care. Our team speaks English and French. <a href="#contact">Book online</a> in under a minute.</p>
+
+  <a href="#whitening-card" id="whitening-card" class="card" style="display:block;max-width:280px;margin:16px 0;text-decoration:none;color:inherit">
+    <h3>Whitening special</h3>
+    <p>Card-sized link — Read aloud should speak this heading, not the whole card.</p>
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='80'><rect width='160' height='80' fill='%23fbbf24'/></svg>" width="160" height="80" alt="Before and after smile">
+  </a>
+  <p class="faint">Low-contrast gray on white — the visually impaired profile must force this to black.</p>
+  <p class="tiny">Tiny 10px caption that must grow to a readable floor.</p>
+
+  <aside class="sticky">Sticky sidebar — must stay stuck when colour filters are on (the CSS <code>filter</code>-on-html bug would break this).</aside>
+
+  <h2>Our services</h2>
+  <div class="cards">
+    <div class="card"><h3>Cleanings</h3><p class="small">Every six months. <i class="icon">★</i></p></div>
+    <div class="card"><h3>Whitening</h3><p class="small">In-office or take-home kits.</p></div>
+    <div class="card"><h3>Emergencies</h3><p class="small">Same-day appointments.</p></div>
+  </div>
+
+  <h2 id="team">Meet the team</h2>
+  <p>
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%2360a5fa'/><text x='20' y='55' fill='white' font-size='16'>Dr. Lee</text></svg>" width="160" height="100" alt="Dr. Lee smiling in the clinic">
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100'><rect width='160' height='100' fill='%23f97316'/><text x='20' y='55' fill='white' font-size='16'>No alt</text></svg>" width="160" height="100">
+  </p>
+  <figure>
+    <video width="240" height="120" muted autoplay loop playsinline poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='120'><rect width='240' height='120' fill='%23111'/><text x='60' y='65' fill='white' font-size='16'>video poster</text></svg>"></video>
+    <figcaption>A tour of the clinic</figcaption>
+  </figure>
+
+  <h2 id="contact">Contact</h2>
+  <form aria-label="Contact form">
+    <label>Email <input type="email" required placeholder="you@example.com"></label>
+    <p id="phone-hint">Include the area code</p>
+    <label>Phone <input type="tel" aria-describedby="phone-hint" aria-invalid="true" value="12"></label>
+    <label><input type="checkbox" checked> Newsletter</label>
+    <button type="button" aria-label="Search"><span aria-hidden="true">🔍</span></button>
+    <button type="button">Send</button>
+  </form>
+  <p class="small">Test characters: × › • — ‘ ’ “ ” … é à ç ü ñ</p>
+  <footer><a id="a11y-link" href="#">Accessibility (opens the menu — Pro custom selector)</a></footer>
+</main>
+
+<div id="cookie-consent-banner" role="dialog" aria-label="Cookie consent">
+  <span style="flex:1">We use cookies to improve your experience.</span>
+  <button type="button" id="mock-accept">Accept</button>
+  <button type="button" id="mock-reject">Reject</button>
+</div>
+<div id="cookie-settings-float">Cookie Settings</div>
+<div id="shopify-cart">Cart (2)</div>
+<div id="wix-chat" aria-label="Wix chat">C</div>
+
+<script>
+  var plan = new URLSearchParams(location.search).get('plan') === 'pro' ? 'pro' : 'free';
+  document.getElementById('plan-label').textContent = plan;
+  window.__cbA11yConfig = plan === 'pro' ? __CONFIG_PRO__ : __CONFIG_FREE__;
+  var q = new URLSearchParams(location.search);
+  if (q.get('theme')) window.__cbA11yConfig.panel.theme = q.get('theme');
+  if (q.get('corner')) window.__cbA11yConfig.trigger.position = 'bottom-' + q.get('corner');
+  if (q.get('banner') === 'card') document.body.classList.add('banner-card');
+  if (q.get('corner') === 'right') document.body.classList.add('corner-right');
+  var cms = q.get('cms');
+  if (cms && /^(wordpress|shopify|webflow|wix|squarespace)$/.test(cms)) document.body.classList.add('cms-' + cms);
+  window.__cbA11yTrack = function (type, extra) { console.log('[a11y track]', type, extra || {}); };
+
+  // Mock banner behaviour: accept/reject hides the bar and shows the floating pill
+  var banner = document.getElementById('cookie-consent-banner');
+  var pill = document.getElementById('cookie-settings-float');
+  function hideBanner() { banner.style.display = 'none'; pill.style.display = 'inline-block'; document.getElementById('toggle-banner').checked = false; }
+  function showBanner() { banner.style.display = 'flex'; pill.style.display = 'none'; document.getElementById('toggle-banner').checked = true; }
+  document.getElementById('mock-accept').onclick = hideBanner;
+  document.getElementById('mock-reject').onclick = hideBanner;
+  pill.onclick = showBanner;
+  document.getElementById('toggle-banner').onchange = function (e) { e.target.checked ? showBanner() : hideBanner(); };
+</script>
+<script id="cb-a11y-script" src="/a11y/widget.v__VERSION__.js?dev=1" async></script>
+</body>
+</html>
