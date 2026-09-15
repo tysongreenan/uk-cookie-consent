@@ -204,17 +204,17 @@ export default function PIPEDACompliancePage() {
                 className="text-center max-w-4xl space-y-4"
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    PIPEDA Cookie Consent:
-                  </span>
+                  PIPEDA Cookie Banner
                   <br />
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Canada&apos;s Cookie Banner Rules
-                  </span>
+                  for Canadian Websites
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  PIPEDA requires meaningful consent for cookies. Quebec&apos;s Law 25 adds GDPR-like opt-in rules. Here is what Canadian websites need to know and what to implement.
+                  PIPEDA requires meaningful consent for cookies. Quebec&apos;s Law 25 adds GDPR-like opt-in. Read the{' '}
+                  <Link href="/blog/cookie-consent-canada-guide-2026" className="underline underline-offset-4 hover:text-foreground transition-colors">
+                    full Canada cookie consent guide
+                  </Link>
+                  {' '}for the legal requirements, then build a banner that matches.
                 </p>
               </motion.div>
 
@@ -232,8 +232,8 @@ export default function PIPEDACompliancePage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
-                  <Link href="#checklist">
-                    View the Checklist
+                  <Link href="/tools/cookie-scanner">
+                    Scan your site first
                   </Link>
                 </Button>
               </motion.div>
@@ -491,6 +491,73 @@ export default function PIPEDACompliancePage() {
           </div>
         </section>
 
+        {/* Related Guides */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="container max-w-7xl px-4 sm:px-6 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="font-heading text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                Related Guides
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Canada cookie consent, Law 25 access requests, and a free scan of your site.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+              {[
+                {
+                  title: 'Is cookie consent required in Canada?',
+                  desc: 'PIPEDA, Law 25, and what Canadian websites must do before setting cookies.',
+                  href: '/blog/cookie-consent-canada-guide-2026',
+                  cta: 'Read the guide',
+                },
+                {
+                  title: 'Law 25 data access requests',
+                  desc: 'How to handle DSARs under Quebec Law 25, including timelines and what to disclose.',
+                  href: '/blog/law-25-data-access-request-dsar-guide',
+                  cta: 'Read the DSAR guide',
+                },
+                {
+                  title: 'Free cookie scanner',
+                  desc: 'Find the cookies on your site, then build a PIPEDA-ready banner around them.',
+                  href: '/tools/cookie-scanner',
+                  cta: 'Scan your site',
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
+                  <Link href={item.href} className="group block h-full">
+                    <div className="rounded-xl border border-border bg-background p-6 h-full transition-all duration-300 hover:border-primary/30">
+                      <h3 className="font-heading text-base font-semibold text-foreground mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                        {item.desc}
+                      </p>
+                      <span className="inline-flex items-center text-sm font-medium text-primary">
+                        {item.cta}
+                        <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA */}
         <section className="relative overflow-hidden bg-muted border-t border-border px-4 py-16 sm:px-6 sm:py-20">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e0_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:14px_24px] opacity-60 dark:opacity-20" />
@@ -509,12 +576,19 @@ export default function PIPEDACompliancePage() {
                 Our banner is designed to help you comply with PIPEDA and Quebec Law 25 cookie requirements. Meaningful consent, bilingual support, and provincial law detection are all built in.
               </p>
 
-              <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
-                <Link href="/builder">
-                  Build Your Canadian Banner
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button asChild size="lg" className="h-14 px-8 text-base font-semibold">
+                  <Link href="/builder">
+                    Build Your Canadian Banner
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-14 px-8 text-base">
+                  <Link href="/tools/cookie-scanner">
+                    Scan your site
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

@@ -8,11 +8,11 @@ import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
-  description: 'Verify your cookie banner is working with consent logs, cookie blocking verification, monitoring tools, and compliance testing. Step-by-step guide to ensure proper functionality.',
+  description: 'Verify your cookie banner is working with consent logs, DevTools blocking, and a free 30-second scan. Confirm tracking cookies stay blocked until consent.',
   keywords: 'how to verify cookie banner is working, cookie consent verification, check if cookie banner is blocking cookies, cookie banner testing, cookie consent logs, verify cookie compliance',
   openGraph: {
     title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
-    description: 'Verify your cookie banner is working with consent logs, cookie blocking verification, monitoring tools, and compliance testing.',
+    description: 'Verify your cookie banner is working with consent logs, DevTools blocking, and a free 30-second scan. Confirm tracking cookies stay blocked until consent.',
     type: 'article',
   },
   alternates: {
@@ -129,6 +129,7 @@ export default function HowItWorksPage() {
         ctaText="Build Your Banner Free"
         ctaHref="/builder"
         relatedLinks={[
+          { href: "/tools/cookie-scanner", text: "Free cookie scanner" },
           { href: "/features/will-this-keep-me-compliant", text: "Will This Keep Me Compliant?" },
           { href: "/features/privacy-laws", text: "What Privacy Laws Does This Cover?" },
           { href: "/features/what-you-get", text: "What Else Do I Get?" },

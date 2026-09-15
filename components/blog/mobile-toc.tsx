@@ -24,7 +24,7 @@ export function MobileTableOfContents() {
 
         <DrawerFooter>
           <div className="p-4">
-            <BlogCTA />
+            <BlogCTA compact />
           </div>
         </DrawerFooter>
       </DrawerContent>

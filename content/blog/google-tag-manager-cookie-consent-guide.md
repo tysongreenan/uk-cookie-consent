@@ -1,7 +1,14 @@
 ---
 title: "Google Tag Manager Cookie Consent: Complete Setup Guide (2026)"
-description: "Learn how to set up cookie consent with Google Tag Manager. Step-by-step GTM tutorial covering Consent Mode v2, GDPR compliance, and tag configuration."
+description: "Set up Google Tag Manager cookie consent with Consent Mode v2. Step-by-step GDPR setup — start a free banner in 5 minutes."
 date: "2026-03-16"
+heroCta:
+  primary:
+    label: "Start a free banner"
+    href: "/free-cookie-banner"
+  secondary:
+    label: "Scan your tags"
+    href: "/tools/cookie-scanner"
 author: "cookie-banner-team"
 tags: ["Google Tag Manager", "Cookie Consent", "Consent Mode v2", "GTM", "GDPR", "Google Analytics", "Tutorial"]
 published: true
@@ -73,12 +80,16 @@ schema:
         text: "Yes. Google Analytics 4 fully supports Consent Mode v2. When analytics_storage is denied, GA4 sends cookieless pings instead of setting cookies, and uses conversion modelling to fill data gaps. When consent is granted, GA4 operates normally with full cookie-based tracking."
 ---
 
-# Google Tag Manager Cookie Consent: How to Set It Up the Right Way
-
 <div class="direct-answer">
 <strong>Direct Answer:</strong> To set up cookie consent with Google Tag Manager, you need two things: a cookie consent banner on your website and a Consent Mode v2 template in GTM. The banner collects user consent. The GTM template sets default consent states (denied for GDPR regions), waits for the banner to load, and forwards consent signals to all Google tags. This ensures tags like Google Analytics and Google Ads only fire after users grant permission, keeping you compliant with GDPR, CCPA, and other privacy laws.
 
-[Set up GTM cookie consent in 5 minutes →](https://cookie-banner.ca/signup)
+[Set up GTM cookie consent in 5 minutes →](/free-cookie-banner)
+</div>
+
+<div class="article-cta">
+<span class="article-cta-note">Build the banner first — then wire Consent Mode v2 in GTM. No signup.</span>
+<a class="article-cta-primary" href="/free-cookie-banner">Start a free banner</a>
+<a class="article-cta-secondary" href="/integrations/google-tag-manager">GTM install steps</a>
 </div>
 
 ---
@@ -168,7 +179,7 @@ Tags send **cookieless pings** even when consent is denied. No cookies are set, 
 
 ## How to Set Up Cookie Consent in Google Tag Manager (Step by Step)
 
-This GTM cookie consent tutorial walks you through the complete setup. You will need a Google Tag Manager account and a cookie consent banner. If you do not have a banner yet, [create one free with Cookie Banner Generator](https://cookie-banner.ca/signup).
+This GTM cookie consent tutorial walks you through the complete setup. You will need a Google Tag Manager account and a cookie consent banner. If you do not have a banner yet, [create one free with Cookie Banner Generator](/free-cookie-banner).
 
 ### Step 1: Install a Consent Mode Template
 
@@ -453,7 +464,7 @@ Setting up Google Tag Manager cookie consent correctly requires three components
 
 **Next Steps:**
 
-1. [Create a free Cookie Banner Generator account](https://cookie-banner.ca/signup)
+1. [Create a free Cookie Banner Generator account](/free-cookie-banner)
 2. Build your banner using the [cookie banner builder](/builder)
 3. Install the GTM Community Template following the [steps above](#how-to-set-up-cookie-consent-in-google-tag-manager-step-by-step)
 4. Test in Preview Mode and publish
@@ -502,4 +513,4 @@ The entire setup takes under 10 minutes and ensures your GTM tags fire compliant
 
 ---
 
-**Ready to set up GTM cookie consent?** [Create your free Cookie Banner Generator account](https://cookie-banner.ca/signup) and have Consent Mode v2 running in under 10 minutes.
+**Ready to set up GTM cookie consent?** [Create your free Cookie Banner Generator account](/free-cookie-banner) and have Consent Mode v2 running in under 10 minutes.

@@ -1,7 +1,15 @@
 ---
 title: "Cookie Scanner: The Complete Guide to Auditing Your Website's Cookies"
-description: "Learn how to use a cookie scanner to audit your website for compliance. Compare free and paid cookie scanning tools, understand scan results, and fix issues fast."
+description: "Use a cookie scanner to audit your website for compliance. Compare free and paid cookie scanning tools, understand scan results, and fix issues fast."
 date: "2026-03-16"
+updatedDate: "2026-09-15"
+heroCta:
+  primary:
+    label: "Scan your site"
+    href: "/tools/cookie-scanner"
+  secondary:
+    label: "Start a free banner"
+    href: "/free-cookie-banner"
 author: "cookie-banner-team"
 tags: ["Cookie Scanner", "Cookie Audit", "Privacy Compliance", "GDPR", "PIPEDA", "Cookie Scanning"]
 published: true
@@ -66,12 +74,16 @@ schema:
         text: "A cookie scan is the automated process of detecting cookies on your website using a scanning tool. A cookie audit is the broader compliance exercise that includes scanning, categorizing cookies, reviewing your cookie policy, verifying consent mechanisms, and documenting everything."
 ---
 
-# Cookie Scanner: The Complete Guide to Auditing Your Website's Cookies
-
 <div class="direct-answer">
 <strong>Direct Answer:</strong> A cookie scanner is a tool that automatically crawls your website, detects every cookie and tracking technology in use, and categorizes them for privacy compliance. Running a cookie scan is the essential first step to meeting GDPR, PIPEDA, CCPA, and other privacy law requirements — because you cannot disclose or manage cookies you do not know about. Most websites have between 15 and 80 cookies, and many site owners are unaware of more than half of them.
 
 [Scan your website for free →](/tools/cookie-scanner)
+</div>
+
+<div class="article-cta">
+<span class="article-cta-note">Paste any URL. Get cookies, categories, and GDPR / PIPEDA / CCPA notes in about 30 seconds.</span>
+<a class="article-cta-primary" href="/tools/cookie-scanner">Scan your site free</a>
+<a class="article-cta-secondary" href="/free-cookie-banner">Start a free banner</a>
 </div>
 
 ---

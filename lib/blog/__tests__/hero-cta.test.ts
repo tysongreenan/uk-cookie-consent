@@ -48,3 +48,27 @@ describe('canada guide hero CTA', () => {
     expect(post?.content).toContain('Frequently Asked Questions')
   })
 })
+
+// Other agents own these markdown files. Only assert conversion chrome when
+// frontmatter is already present so this PR still passes on current develop.
+const CONVERSION_POST_SLUGS = [
+  'gdpr-cookie-consent-requirements',
+  'google-tag-manager-cookie-consent-guide',
+  'ccpa-cpra-cookie-compliance-guide',
+  'how-to-add-cookie-banner-wordpress',
+  'cookie-scanner-audit-guide',
+  'law-25-data-access-request-dsar-guide',
+] as const
+
+describe('conversion posts hero CTA', () => {
+  it('uses an internal primary href, in-article CTA, and no content H1 when frontmatter exists', async () => {
+    for (const slug of CONVERSION_POST_SLUGS) {
+      const post = await getPostBySlug(slug)
+      if (!post?.heroCta) continue
+
+      expect(post.heroCta.primary.href.startsWith('/')).toBe(true)
+      expect(post.content).toContain('article-cta')
+      expect(post.content).not.toMatch(/<h1/)
+    }
+  })
+})

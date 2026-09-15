@@ -107,6 +107,12 @@ const nextConfig = {
         permanent: true,
       },
       {
+        // Older posts linked /signup; the live route is /auth/signup.
+        source: '/signup',
+        destination: '/auth/signup',
+        permanent: true,
+      },
+      {
         source: '/compliance/canada',
         destination: '/compliance/pipeda',
         permanent: true,
