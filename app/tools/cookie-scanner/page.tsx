@@ -175,39 +175,12 @@ export default function CookieScannerPage() {
     ]
   }
 
-  const howToSchema = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    "name": "How to Scan a Website for Cookies",
-    "description": "Use our free cookie scanner to audit any website for cookies in 30 seconds",
-    "totalTime": "PT30S",
-    "tool": { "@type": "HowToTool", "name": "Cookie Scanner" },
-    "step": [
-      {
-        "@type": "HowToStep",
-        "name": "Enter your website URL",
-        "text": "Type or paste your website URL into the scanner input field"
-      },
-      {
-        "@type": "HowToStep",
-        "name": "Click Scan",
-        "text": "Click the Scan button to start the cookie audit"
-      },
-      {
-        "@type": "HowToStep",
-        "name": "Review results",
-        "text": "Review the detected cookies, categories, security assessment, and compliance score"
-      }
-    ]
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Static JSON-LD structured data for SEO - all content is hardcoded, no user input */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
 
       <Header />
 
@@ -220,10 +193,10 @@ export default function CookieScannerPage() {
                 Free &mdash; No Signup Required
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold tracking-tight mb-2">
-                Scan any website for cookies
+                Free Cookie Scanner — Any URL in 30s
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6">
-                Cookies, categories, and GDPR, CCPA, PIPEDA &amp; Law 25 — about 30 seconds
+                Paste a public URL. Get cookies, categories, and GDPR, CCPA, PIPEDA &amp; Law 25 notes. No signup.
               </p>
 
               <CookieScanner />
@@ -539,7 +512,12 @@ export default function CookieScannerPage() {
                   requires businesses to disclose the categories of personal information they collect, including data gathered through cookies. If your cookie scanner reveals marketing or advertising cookies, you must provide a &quot;Do Not Sell or Share My Personal Information&quot; link on your website.
                 </p>
                 <p>
-                  Canada&apos;s PIPEDA and Quebec&apos;s Law 25 impose similar requirements, with fines for non-compliance reaching up to CAD $10 million. Regular cookie audits using a <strong>cookie scanning tool</strong> help you stay compliant as your website evolves and third-party scripts change.
+                  Canada&apos;s{' '}
+                  <Link href="/compliance/pipeda" className="text-primary hover:underline font-medium">PIPEDA</Link>{' '}
+                  and Quebec&apos;s Law 25 impose similar requirements. Law 25 penalties can reach{' '}
+                  <strong>$25 million CAD</strong> or 4% of worldwide turnover. See the{' '}
+                  <Link href="/blog/cookie-consent-canada-guide-2026" className="text-primary hover:underline font-medium">Canada cookie consent guide</Link>{' '}
+                  for federal and provincial rules. Regular cookie audits using a <strong>cookie scanning tool</strong> help you stay compliant as your website evolves and third-party scripts change.
                 </p>
 
                 <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Hidden Cookies You Do Not Know About</h3>
@@ -702,8 +680,8 @@ export default function CookieScannerPage() {
                   <p className="text-muted-foreground">
                     Our cookie scanning tool checks compliance against{' '}
                     <Link href="/compliance/gdpr" className="text-primary hover:underline">GDPR</Link> (European Union),{' '}
-                    <Link href="/compliance/ccpa" className="text-primary hover:underline">CCPA/CPRA</Link> (California),
-                    PIPEDA (Canada), and Quebec&apos;s Law 25.
+                    <Link href="/compliance/ccpa" className="text-primary hover:underline">CCPA/CPRA</Link> (California),{' '}
+                    <Link href="/compliance/pipeda" className="text-primary hover:underline">PIPEDA</Link> (Canada), and Quebec&apos;s Law 25.
                   </p>
                 </div>
 
@@ -761,8 +739,111 @@ export default function CookieScannerPage() {
           </div>
         </section>
 
-        {/* Related Resources */}
+        {/* What to Do After Your Cookie Scan */}
         <section className="py-12 md:py-16 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                What to Do After Your Cookie Scan
+              </h2>
+              <p className="text-xl text-muted-foreground mb-10">
+                A scan is an inventory. These five steps turn it into a consent setup that matches the cookies on your site.
+              </p>
+
+              <ol className="space-y-6 list-none pl-0">
+                <li className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Block non-essential cookies until opt-in</h3>
+                    <p className="text-muted-foreground">
+                      Analytics, marketing, and most functional cookies should not fire until a visitor accepts.{' '}
+                      <Link href="/free-cookie-banner" className="text-primary hover:underline font-medium">
+                        Start a free cookie banner
+                      </Link>{' '}
+                      that holds those scripts until consent.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Match the banner to cookies the scanner found</h3>
+                    <p className="text-muted-foreground">
+                      Map each cookie to necessary, functional, analytics, or marketing. Your banner categories should match this inventory — not a generic list of cookies you hoped were there.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Update your cookie and privacy policy</h3>
+                    <p className="text-muted-foreground">
+                      List every cookie the scanner returned: name, provider, purpose, and expiry. Start from a{' '}
+                      <Link href="/cookie-policy-template" className="text-primary hover:underline font-medium">
+                        cookie policy template
+                      </Link>{' '}
+                      and fill in what you actually use.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    4
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Wire Google tags to Consent Mode v2</h3>
+                    <p className="text-muted-foreground">
+                      If you use Google Analytics or Ads, send consent signals so tags wait for the visitor&apos;s choice. Follow the{' '}
+                      <Link href="/blog/google-tag-manager-cookie-consent-guide" className="text-primary hover:underline font-medium">
+                        Google Tag Manager cookie consent guide
+                      </Link>.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    5
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Re-scan after shipping</h3>
+                    <p className="text-muted-foreground">
+                      After the banner is live, scan again without clicking Accept to confirm non-essential cookies stay blocked. See{' '}
+                      <Link href="/features/how-it-works" className="text-primary hover:underline font-medium">
+                        how verification works
+                      </Link>.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+
+              <Card className="mt-10 border-2 border-primary/20">
+                <CardHeader>
+                  <CardTitle>Ready to fix what the scanner found?</CardTitle>
+                  <CardDescription>
+                    Build a banner that blocks non-essential cookies until visitors opt in. Free, no signup.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link href="/free-cookie-banner">
+                    <Button size="lg">
+                      Start a free banner
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Related Resources */}
+        <section className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
@@ -791,13 +872,13 @@ export default function CookieScannerPage() {
 
                 <Card className="border-2 hover:border-green-500 transition-colors">
                   <CardHeader>
-                    <CardTitle className="text-lg">CCPA Compliance</CardTitle>
-                    <CardDescription>California Consumer Privacy Act cookie requirements</CardDescription>
+                    <CardTitle className="text-lg">PIPEDA Cookie Banner</CardTitle>
+                    <CardDescription>Canadian PIPEDA cookie consent requirements</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Link href="/compliance/ccpa">
+                    <Link href="/compliance/pipeda">
                       <Button variant="outline" className="w-full">
-                        CCPA Guide <ArrowRight className="ml-2 h-4 w-4" />
+                        PIPEDA Guide <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   </CardContent>
@@ -805,13 +886,13 @@ export default function CookieScannerPage() {
 
                 <Card className="border-2 hover:border-purple-500 transition-colors">
                   <CardHeader>
-                    <CardTitle className="text-lg">Cookie Policy Template</CardTitle>
-                    <CardDescription>Generate a compliant cookie policy for your website</CardDescription>
+                    <CardTitle className="text-lg">Canada Cookie Guide</CardTitle>
+                    <CardDescription>Federal and provincial cookie rules for Canadian sites</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Link href="/cookie-policy-template">
+                    <Link href="/blog/cookie-consent-canada-guide-2026">
                       <Button variant="outline" className="w-full">
-                        Get Template <ArrowRight className="ml-2 h-4 w-4" />
+                        Read Guide <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   </CardContent>
@@ -819,13 +900,13 @@ export default function CookieScannerPage() {
 
                 <Card className="border-2 hover:border-orange-500 transition-colors">
                   <CardHeader>
-                    <CardTitle className="text-lg">Cookiebot Alternative</CardTitle>
-                    <CardDescription>Compare our solution vs Cookiebot pricing</CardDescription>
+                    <CardTitle className="text-lg">Cookie Audit Playbook</CardTitle>
+                    <CardDescription>Step-by-step cookie scan and remediation process</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Link href="/compare/cookiebot-alternative">
+                    <Link href="/blog/cookie-scanner-audit-guide">
                       <Button variant="outline" className="w-full">
-                        Compare Now <ArrowRight className="ml-2 h-4 w-4" />
+                        Read Playbook <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   </CardContent>

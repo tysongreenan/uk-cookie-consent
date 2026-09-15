@@ -598,11 +598,19 @@ export function CookieScanner() {
                 {new Date(result.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}
               </p>
               {result.cookies.some((cookie) => cookie.category !== 'necessary') ? (
-                <p className="text-sm mt-3">
-                  <Link href="/free-cookie-banner" className="text-primary font-medium hover:underline">
-                    Create a free cookie banner for these cookies
-                  </Link>
-                </p>
+                <div className="mt-4">
+                  <Button asChild>
+                    <Link
+                      href={`/builder?url=${encodeURIComponent(result.url.replace(/^https?:\/\//, ''))}`}
+                      onClick={() => captureEvent('scanner_fix_cta_clicked', { grade: result.overallGrade })}
+                    >
+                      Fix these cookies with a free banner
+                    </Link>
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Blocks non-essential cookies until visitors opt in.
+                  </p>
+                </div>
               ) : null}
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs font-mono">
