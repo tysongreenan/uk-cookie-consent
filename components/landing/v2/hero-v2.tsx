@@ -77,6 +77,13 @@ export function HeroV2() {
               <span><span className="mr-1 font-bold text-emerald-600">✓</span>Copy-paste install</span>
             </div>
 
+            <p className="mt-3 text-sm text-muted-foreground">
+              Not sure what you&apos;re setting?{' '}
+              <Link href="/tools/cookie-scanner" className="font-medium text-foreground underline">
+                Scan your cookies first
+              </Link>
+            </p>
+
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground shadow-sm whitespace-nowrap">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
