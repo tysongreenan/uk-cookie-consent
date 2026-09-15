@@ -1,8 +1,15 @@
 ---
 title: "How to Add a Cookie Banner to WordPress (Free, No Plugin)"
-description: "Add a GDPR-compliant cookie banner to WordPress in under 5 minutes — no plugin required. Free setup guide with screenshots. Works with any WordPress theme."
+description: "Add a GDPR-compliant cookie banner to WordPress in under 5 minutes — no plugin required. Generate the snippet, paste it in, and Start free today."
 date: "2025-01-16"
-updatedDate: "2026-03-16"
+updatedDate: "2026-09-15"
+heroCta:
+  primary:
+    label: "Start a free banner"
+    href: "/free-cookie-banner"
+  secondary:
+    label: "WordPress install guide"
+    href: "/integrations/wordpress"
 author: "cookie-banner-team"
 tags: ["WordPress", "Cookie Banner", "GDPR", "PIPEDA", "Tutorial", "How-To"]
 published: true
@@ -19,12 +26,16 @@ keywords:
   - "wordpress cookiebanner"
 ---
 
-# How Do I Add a Cookie Banner to WordPress?
-
 <div class="direct-answer">
 <strong>Direct Answer:</strong> To add a cookie banner to WordPress, you can use a cookie consent platform (like Cookie Banner Generator), install a WordPress plugin, or build a custom solution. The fastest method is using a cookie consent platform: create your banner, copy the generated code, and paste it into your WordPress theme's header.php file or use a code injection plugin. The entire process takes about 10 minutes and requires no coding knowledge.
 
-[Get started with Cookie Banner Generator →](https://www.cookie-banner.ca/auth/signup)
+[Get started with Cookie Banner Generator →](/free-cookie-banner)
+</div>
+
+<div class="article-cta">
+<span class="article-cta-note">Generate the snippet, then paste it into WordPress. No plugin, no signup.</span>
+<a class="article-cta-primary" href="/free-cookie-banner">Start a free banner</a>
+<a class="article-cta-secondary" href="/integrations/wordpress">WordPress install guide</a>
 </div>
 
 ---
@@ -357,7 +368,7 @@ Use this checklist to ensure your setup is complete:
 
 ### Option 1: Cookie Banner Generator (Recommended)
 
-1. [Create your free account](https://www.cookie-banner.ca/auth/signup)
+1. [Create your free account](/free-cookie-banner)
 2. Customize your banner in 5 minutes
 3. Copy the code and paste it into WordPress
 4. You're done!
@@ -451,4 +462,4 @@ If they load immediately, your banner isn't blocking cookies properly.
 
 ---
 
-**Ready to make your WordPress site compliant?** [Get your free cookie banner →](https://www.cookie-banner.ca/auth/signup)
+**Ready to make your WordPress site compliant?** [Get your free cookie banner →](/free-cookie-banner)
