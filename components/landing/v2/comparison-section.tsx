@@ -8,12 +8,21 @@ type Cell =
 
 const ROWS: { label: string; cells: [Cell, Cell, Cell, Cell] }[] = [
   {
-    label: 'Free tier with no watermark',
+    label: 'Free plan',
     cells: [
-      { kind: 'check', text: 'Yes' },
+      { kind: 'check', text: 'Yes (branded)' },
       { kind: 'x', text: 'Watermarked' },
       { kind: 'x', text: 'No free tier' },
       { kind: 'x', text: 'Watermarked' },
+    ],
+  },
+  {
+    label: 'Remove branding',
+    cells: [
+      { kind: 'check', text: 'Pro' },
+      { kind: 'text', text: 'Paid' },
+      { kind: 'text', text: 'Enterprise' },
+      { kind: 'text', text: 'Paid' },
     ],
   },
   {
@@ -98,7 +107,7 @@ export function ComparisonSection() {
               <div className="flex items-center gap-2 px-5 py-5 text-xs font-semibold uppercase tracking-[0.06em] text-primary">
                 cookie-banner.ca
                 <span className="rotate-[2deg] rounded bg-primary px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-[0.12em] text-primary-foreground">
-                  YOU
+                  US
                 </span>
               </div>
               <div className="px-5 py-5 text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
