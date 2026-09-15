@@ -10,80 +10,78 @@ const ROWS: { label: string; cells: [Cell, Cell, Cell, Cell] }[] = [
   {
     label: 'Free plan',
     cells: [
-      { kind: 'check', text: 'Yes (branded)' },
-      { kind: 'x', text: 'Watermarked' },
-      { kind: 'x', text: 'No free tier' },
-      { kind: 'x', text: 'Watermarked' },
+      { kind: 'check', text: 'Yes' },
+      { kind: 'check', text: 'Yes' },
+      { kind: 'x', text: 'No' },
+      { kind: 'check', text: 'Yes' },
     ],
   },
   {
-    label: 'Remove branding',
+    label: 'No name on banner',
     cells: [
-      { kind: 'check', text: 'Pro' },
+      { kind: 'check', text: '$99 once' },
       { kind: 'text', text: 'Paid' },
       { kind: 'text', text: 'Enterprise' },
       { kind: 'text', text: 'Paid' },
     ],
   },
   {
-    label: 'Configure before signup',
+    label: 'No account needed',
     cells: [
-      { kind: 'check', text: 'In-page builder' },
-      { kind: 'x', text: 'Trial signup' },
+      { kind: 'check', text: 'Yes' },
+      { kind: 'x', text: 'No' },
       { kind: 'x', text: 'Sales call' },
-      { kind: 'x', text: 'Account required' },
+      { kind: 'x', text: 'No' },
     ],
   },
   {
-    label: 'Pro plan starting at',
+    label: 'Price',
     cells: [
       { kind: 'price', text: '$99 once' },
-      { kind: 'price', text: '$11/mo per domain' },
-      { kind: 'price', text: '$30+ /mo, custom' },
-      { kind: 'price', text: '$10/mo per domain' },
+      { kind: 'price', text: '$11/mo per site' },
+      { kind: 'price', text: '$30+/mo' },
+      { kind: 'price', text: '$10/mo per site' },
     ],
   },
   {
-    label: '5-year cost (1 site)',
+    label: '5 years, 1 site',
     cells: [
       { kind: 'price', text: '$99' },
-      { kind: 'price', text: '~$660' },
-      { kind: 'price', text: '~$1,800+' },
-      { kind: 'price', text: '~$600' },
+      { kind: 'price', text: '$660' },
+      { kind: 'price', text: '$1,800+' },
+      { kind: 'price', text: '$600' },
     ],
   },
   {
-    label: 'Unlimited domains',
+    label: 'Extra sites',
     cells: [
-      { kind: 'check', text: 'Yes (Pro)' },
-      { kind: 'x', text: 'Per-domain pricing' },
-      { kind: 'x', text: 'Per-domain pricing' },
-      { kind: 'x', text: 'Per-domain pricing' },
+      { kind: 'check', text: 'Included' },
+      { kind: 'x', text: 'Extra' },
+      { kind: 'x', text: 'Extra' },
+      { kind: 'x', text: 'Extra' },
     ],
   },
   {
-    label: 'Setup time',
+    label: 'Install time',
     cells: [
-      { kind: 'check', text: '~5 min' },
-      { kind: 'text', text: '~30 min' },
-      { kind: 'text', text: 'Days, sales-led' },
-      { kind: 'text', text: '~20 min' },
+      { kind: 'check', text: '5 min' },
+      { kind: 'text', text: '30 min' },
+      { kind: 'text', text: 'Days' },
+      { kind: 'text', text: '20 min' },
     ],
   },
 ]
 
 const DIFFERENT_LEFT = [
-  ['No subscription, ever.', 'One $99 charge replaces $40/month — no auto-renewal, no card on file.'],
-  ['Unlimited domains on Pro.', 'Run it on every site you own without per-domain math.'],
-  ['Canadian-first compliance.', 'PIPEDA + CASL + Quebec Law 25 are defaults, not bolt-ons.'],
-  ['Bilingual EN/FR by default.', 'Plus 14 other languages with auto-detect.'],
+  ['PIPEDA, CASL, Law 25.', 'Included.'],
+  ['English and French.', 'Plus 14 languages.'],
+  ['WordPress, Shopify, and more.', 'Webflow, Squarespace, Wix.'],
 ] as const
 
 const DIFFERENT_RIGHT = [
-  ['9.3 KB, async, zero CWV impact.', "Won't slow your LCP or your sales pages."],
-  ['No signup wall.', 'Build the banner first, decide later.'],
-  ['Lifetime updates & same-day support', 'on every plan, free included.'],
-  ['You own your consent logs.', 'Export the audit trail anytime — no lock-in.'],
+  ['About 9 KB.', 'Loads in the background.'],
+  ['Same-day support.', 'Free and Pro.'],
+  ['Consent records.', 'Download anytime.'],
 ] as const
 
 export function ComparisonSection() {
@@ -94,9 +92,9 @@ export function ComparisonSection() {
     >
       <div className="container mx-auto max-w-7xl px-6">
         <SectionHead
-          eyebrow="The honest comparison"
-          title={<>$99 once. Or $40<br />every month, forever.</>}
-          lede="Most CMPs charge a monthly subscription per domain. We charge once. Here's the receipt."
+          eyebrow="Compare"
+          title={<>$99 once.<br />They bill every month.</>}
+          lede="They charge every month, per website. We charge $99 once."
         />
 
         <div className="overflow-x-auto rounded-[20px] border border-border bg-background shadow-md">
@@ -145,13 +143,13 @@ export function ComparisonSection() {
         </div>
 
         <p className="mt-4 text-center font-mono text-[12.5px] text-muted-foreground">
-          Pricing as of Apr 2026, public list prices. Comparison is our reading of public pages — verify before switching.
+          Prices from April 2026. Check their sites.
         </p>
 
         {/* What's different strip */}
         <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 rounded-[18px] border border-border bg-muted/40 p-7 lg:grid-cols-2 lg:px-8">
           <h3 className="col-span-full border-b border-border pb-2 font-heading text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground">
-            And the things a price table can't show.
+            Also
           </h3>
           <ul className="flex flex-col gap-2.5">
             {DIFFERENT_LEFT.map(([head, rest]) => (
