@@ -2,10 +2,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { getPostBySlug, getAllPostSlugs, isValidBlogSlug } from '@/lib/blog/blog'
-import { ArrowLeft, Calendar, Clock } from 'lucide-react'
+import { ArrowLeft, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { TableOfContents } from '@/components/blog/table-of-contents'
 import { MobileTableOfContents } from '@/components/blog/mobile-toc'
 import { AuthorCard } from '@/components/blog/author-card'
@@ -17,6 +16,7 @@ import { Footer } from '@/components/landing/footer'
 import { StructuredData } from '@/components/seo/structured-data'
 import { BlogAssistant } from '@/components/blog/blog-assistant'
 import { BlogHeroCta } from '@/components/blog/blog-hero-cta'
+import { BlogCTA } from '@/components/blog/blog-cta'
 import { getAuthor } from '@/lib/authors'
 import { formatDate } from '@/lib/utils'
 
@@ -256,6 +256,9 @@ export default async function BlogPostPage({
                 {/* Blog content rendered from markdown — trusted source, not user input */}
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
               </div>
+              <div className="not-prose mt-10">
+                <BlogCTA />
+              </div>
             </div>
             <div className="mt-10">
               <ReadMoreSection
@@ -271,6 +274,7 @@ export default async function BlogPostPage({
               <div className="border border-border rounded-lg p-6 bg-card">
                 <TableOfContents />
               </div>
+              <BlogCTA compact />
             </div>
           </aside>
         </div>

@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button'
 import type { BlogHeroCta as BlogHeroCtaData } from '@/lib/blog/blog'
 
 export function BlogHeroCta({ primary, secondary }: BlogHeroCtaData) {
+  const primaryIsScanner = primary.href.includes('cookie-scanner')
+
   return (
     <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 pt-1">
       <Button asChild>
         <Link href={primary.href}>
-          <Search className="mr-2 h-4 w-4" aria-hidden="true" />
+          {primaryIsScanner && (
+            <Search className="mr-2 h-4 w-4" aria-hidden="true" />
+          )}
           {primary.label}
+          {!primaryIsScanner && (
+            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+          )}
         </Link>
       </Button>
       {secondary && (
