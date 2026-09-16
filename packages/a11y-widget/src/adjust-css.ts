@@ -78,9 +78,13 @@ html.cb-a11y-darkContrast [data-cb-a11y-speaking]{outline-color:#ffe600!importan
 html.cb-a11y-bigCursor, html.cb-a11y-bigCursor body *${H}{cursor:${CURSOR_ARROW}!important}
 html.cb-a11y-bigCursor body :is(a,button,[role="button"],input[type="submit"],input[type="button"],label,select,summary)${H}, html.cb-a11y-bigCursor body :is(a,button,[role="button"])${H} *{cursor:${CURSOR_HAND}!important}
 
-/* Stop animations */
-html.cb-a11y-stopAnimations body *${H}, html.cb-a11y-stopAnimations body *${H}::before, html.cb-a11y-stopAnimations body *${H}::after{animation-play-state:paused!important;animation-duration:0s!important;transition-duration:0s!important;scroll-behavior:auto!important}
+/* Stop animations.
+   Pause playback only. Do NOT zero animation-duration on every node — that
+   completes every running animation at once (animationend storms) and freezes
+   style recalc on GSAP/Lottie/Framer pages. ::before/::after still need a match
+   because their animations live on the pseudo, not the host. */
 html.cb-a11y-stopAnimations{scroll-behavior:auto!important}
+html.cb-a11y-stopAnimations body *${H}, html.cb-a11y-stopAnimations body *${H}::before, html.cb-a11y-stopAnimations body *${H}::after{animation-play-state:paused!important}
 
 /* Hide images (alt text is surfaced by the widget's tooltip feature).
    Icon SVGs inside links/buttons stay: hiding them removes the only visible
