@@ -41,6 +41,7 @@ import { FONT_PRESETS } from '@/lib/font-presets'
 import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import { hasInstallSnippetCopied, hostedInstallSnippet } from '@/lib/install-snippet'
+import { customCookieDomainError, hostnameFromUrl } from '@/lib/cookie-domain'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import {
   BannerPersistError,
@@ -1284,6 +1285,12 @@ function BannerBuilderContent() {
   // status here, since next-auth's UseSessionResult is a discriminated
   // union — `!session` already implies `status !== 'authenticated'`, and
   // combining both checks errors as "no overlap" under production tsc.)
+  const cookieDomainSiteHost = hostnameFromUrl(config.branding?.privacyPolicy?.url)
+  const cookieDomainCustomError = customCookieDomainError(
+    config.behavior.cookieDomain || '',
+    cookieDomainSiteHost,
+  )
+
   if (status !== 'authenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -3995,6 +4002,81 @@ function BannerBuilderContent() {
                         min="1"
                         max="365"
                       />
+                    </div>
+
+                    <div className="space-y-3 pt-2">
+                      <div>
+                        <Label>Consent across subdomains</Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          One Accept on www.example.com also covers shop.example.com and other subdomains. This is the default for every banner.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            (config.behavior.cookieDomainMode || 'auto') === 'auto'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'auto', cookieDomain: undefined })}
+                        >
+                          <div className="font-medium text-sm">Share across subdomains</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Recommended. Stores the consent cookie on your root domain (example.com).</div>
+                        </button>
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            config.behavior.cookieDomainMode === 'host'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'host', cookieDomain: undefined })}
+                        >
+                          <div className="font-medium text-sm">This hostname only</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Use when each subdomain should ask for consent separately.</div>
+                          {config.behavior.cookieDomainMode === 'host' && (
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
+                              Saving a new choice here clears the shared cookie on sibling subdomains, so those hosts will ask again.
+                            </p>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            config.behavior.cookieDomainMode === 'custom'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'custom' })}
+                        >
+                          <div className="font-medium text-sm">Custom parent domain</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Set the Domain attribute yourself (must be a parent of the current host).</div>
+                        </button>
+                      </div>
+                      {config.behavior.cookieDomainMode === 'custom' && (
+                        <div>
+                          <Label htmlFor="cookie-domain">Parent domain</Label>
+                          <Input
+                            id="cookie-domain"
+                            type="text"
+                            placeholder="example.com"
+                            value={config.behavior.cookieDomain || ''}
+                            onChange={(e) => updateConfig('behavior', { cookieDomain: e.target.value })}
+                            aria-invalid={Boolean(cookieDomainCustomError)}
+                            aria-describedby="cookie-domain-hint cookie-domain-error"
+                          />
+                          {cookieDomainCustomError && (
+                            <p id="cookie-domain-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+                              {cookieDomainCustomError}
+                            </p>
+                          )}
+                          <p id="cookie-domain-hint" className="text-xs text-muted-foreground mt-1">
+                            Optional. Auto already shares across subdomains. To pin a parent in GTM:{' '}
+                            <code className="text-[11px]">{`window.CookieBannerOptions = { domain: 'example.com' }`}</code>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

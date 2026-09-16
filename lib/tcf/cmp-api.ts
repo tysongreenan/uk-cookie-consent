@@ -350,8 +350,16 @@ export function generateTcfCmpApiCode(config: TCFConfig): string {
       try {
         var maxAge = 365 * 24 * 60 * 60; // 1 year
         var sameSite = STORE_GLOBALLY ? 'None; Secure' : 'Lax';
+        var domainAttr = '';
+        try {
+          if (window.__cbExpireCookieCopies) window.__cbExpireCookieCopies(TC_COOKIE);
+          if (window.__cbGetCookieDomain) {
+            var tcfDomain = window.__cbGetCookieDomain();
+            if (tcfDomain) domainAttr = '; Domain=' + tcfDomain;
+          }
+        } catch (domainErr) {}
         document.cookie = TC_COOKIE + '=' + encodeURIComponent(tcString) +
-          '; path=/; max-age=' + maxAge + '; SameSite=' + sameSite;
+          '; path=/; max-age=' + maxAge + '; SameSite=' + sameSite + domainAttr;
       } catch(e) {}
     }
 

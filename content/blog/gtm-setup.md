@@ -239,6 +239,17 @@ Replace `YOUR_SITE_ID` with the site ID from your dashboard.
 
 **Important:** Do NOT add the banner script through GTM. The banner must load independently of Tag Manager so it can display the consent UI before GTM processes consent states. Add it directly to your site's HTML `<head>` section, your CMS header injection, or through a server-side integration.
 
+If the banner is already loading through a Custom HTML tag (common on AEM and other CMS setups), that still works. Consent is stored on your root domain by default, so `www.example.com` and `shop.example.com` share one choice. You do not need a domain override for that.
+
+To pin a parent domain yourself (optional), set it before the banner script:
+
+```html
+<script>
+  window.CookieBannerOptions = { domain: 'example.com' };
+</script>
+<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"></script>
+```
+
 ---
 
 ## How the Consent Flow Works

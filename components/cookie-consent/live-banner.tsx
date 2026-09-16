@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { cookieDomainProbeCandidates, resolveCookieDomain } from '@/lib/cookie-domain'
 
 export function LiveCookieBanner() {
   useEffect(() => {
@@ -102,7 +103,30 @@ export function LiveCookieBanner() {
       const expires = new Date()
       expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000))
       const secure = location.protocol === 'https:' ? '; Secure' : ''
-      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure
+      const runtimeDomain = (window as Window & { CookieBannerOptions?: { domain?: string } }).CookieBannerOptions?.domain
+      const candidates = cookieDomainProbeCandidates(location.hostname).filter((domain) => {
+        const probe = '__cb_dom_t'
+        try {
+          document.cookie = probe + '=1; Domain=' + domain + '; Path=/; SameSite=Lax' + secure
+          const ok = document.cookie.indexOf(probe + '=') !== -1
+          document.cookie = probe + '=; Domain=' + domain + '; Path=/; SameSite=Lax; expires=Thu, 01 Jan 1970 00:00:00 GMT' + secure
+          return ok
+        } catch {
+          return false
+        }
+      })
+      const domain = resolveCookieDomain({
+        hostname: location.hostname,
+        runtimeDomain,
+        settableDomains: candidates,
+      })
+      const domainPart = domain ? '; Domain=' + domain : ''
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + secure
+      for (const candidate of cookieDomainProbeCandidates(location.hostname)) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; Domain=' + candidate + secure
+      }
+      if (days < 0 && !value) return
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/' + domainPart + '; SameSite=Lax' + secure
     }
 
     function getConsent() {
