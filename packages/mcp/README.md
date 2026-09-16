@@ -64,6 +64,8 @@ URL, pass the logo and brand colors into setup_site, attach GA4 / GTM /
 Meta IDs from the repo, and paste the snippet in the header.
 Then enable the Accessibility Menu with update_banner and
 config.accessibility.enabled = true. Same snippet, no second script.
+The menu lets visitors adjust display. It does not make the site
+WCAG, AODA, or ADA compliant.
 ```
 
 Sites that already have a different cookie banner can install just the menu:

@@ -4899,7 +4899,9 @@ function BannerBuilderContent() {
                     </CardTitle>
                     <CardDescription>
                       Copy this snippet and paste it into your website&apos;s head to activate your cookie banner
-                      {config.accessibility?.enabled ? ' and Accessibility Menu' : ''}.
+                      {config.accessibility?.enabled
+                        ? ' and Accessibility Menu. The menu does not make a website WCAG, AODA or ADA compliant.'
+                        : '.'}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

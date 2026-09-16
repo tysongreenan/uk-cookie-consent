@@ -13,6 +13,7 @@ import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import type { A11yFeatureKey, A11yTriggerPosition, AccessibilityConfig, BannerConfig } from '@/types'
 import {
   A11Y_FEATURE_GROUPS,
+  A11Y_OWNER_DISCLAIMER,
   A11Y_TRANSLATIONS,
   contrast,
   cookieFloaterCorner,
@@ -119,9 +120,7 @@ export function AccessibilityPanel({ config, onChange, canCustomize, onGoToInsta
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              This menu is built to WCAG 2.2 AA as a component. It does not make a website
-              WCAG, AODA or ADA compliant on its own — your content, forms and images still need to be built
-              accessibly. Use it alongside an accessibility statement and real remediation.
+              {A11Y_OWNER_DISCLAIMER} Use it alongside an accessibility statement and real remediation.
             </AlertDescription>
           </Alert>
 

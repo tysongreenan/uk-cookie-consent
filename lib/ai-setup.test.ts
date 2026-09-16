@@ -71,5 +71,6 @@ describe('ai setup', () => {
   it('tells the agent the menu rides in the same snippet', () => {
     expect(SETUP_AGENT_HINT).toMatch(/accessibility\.enabled/)
     expect(SETUP_AGENT_HINT).toMatch(/a11y\.js/)
+    expect(SETUP_AGENT_HINT).toMatch(/does not make the site WCAG, AODA, or ADA compliant/)
   })
 })

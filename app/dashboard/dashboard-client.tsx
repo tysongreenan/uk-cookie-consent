@@ -485,7 +485,7 @@ export function DashboardClient() {
         {!a11yHighlightDismissed && banners.some((b) => !b.config?.accessibility?.enabled) && (
           <FeatureHighlight
             title="Accessibility Menu"
-            description="Give visitors font size, contrast, and motion controls from the same snippet they already have. Turn it on in the builder — nothing extra to paste."
+            description="Give visitors font size, contrast, and motion controls from the same snippet they already have. Turn it on in the builder — nothing extra to paste. Does not make a website WCAG, AODA or ADA compliant."
             icon={<Accessibility className="h-6 w-6" />}
             badge="Included"
             isNew

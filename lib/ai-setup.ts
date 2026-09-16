@@ -231,4 +231,4 @@ export function getInstallInstructions(
 }
 
 export const SETUP_AGENT_HINT =
-  'Paste the install snippet in the site header before other tracking tags. Then delete duplicate GA4/GTM/Meta tags from the repo so they only load through the banner after consent. The same snippet delivers the Accessibility Menu once the banner has config.accessibility.enabled; enable it with update_banner({ config: { accessibility: { enabled: true } } }). Sites that keep a different cookie banner can install the menu alone via GET /api/v1/a11y.js?id=BANNER_ID.'
+  'Paste the install snippet in the site header before other tracking tags. Then delete duplicate GA4/GTM/Meta tags from the repo so they only load through the banner after consent. The same snippet delivers the Accessibility Menu once the banner has config.accessibility.enabled; enable it with update_banner({ config: { accessibility: { enabled: true } } }). The menu lets visitors adjust display; it does not make the site WCAG, AODA, or ADA compliant. Sites that keep a different cookie banner can install the menu alone via GET /api/v1/a11y.js?id=BANNER_ID.'

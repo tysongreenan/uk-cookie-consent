@@ -4,6 +4,8 @@ import { canAccessFeatureWithFreeze, PLAN_FEATURES } from '@/lib/plan-restrictio
 import { hardenBannerConfig } from '@/lib/banner-config-security'
 import {
   A11Y_ALL_FEATURES,
+  A11Y_OWNER_DISCLAIMER,
+  A11Y_OWNER_DISCLAIMER_SHORT,
   A11Y_TRANSLATIONS,
   A11Y_WIDGET_VERSION,
   a11yWidgetUrl,
@@ -39,6 +41,15 @@ function banner(overrides: Partial<BannerConfig> = {}): BannerConfig {
     ...overrides,
   }
 }
+
+describe('compliance copy', () => {
+  it('never claims the menu makes a site ADA/AODA/WCAG compliant', () => {
+    expect(A11Y_OWNER_DISCLAIMER).toMatch(/does not make a website WCAG, AODA or ADA compliant/i)
+    expect(A11Y_OWNER_DISCLAIMER_SHORT).toMatch(/does not make a website WCAG, AODA or ADA compliant/i)
+    expect(A11Y_TRANSLATIONS.en.disclaimer).toMatch(/does not make the site accessible/i)
+    expect(A11Y_TRANSLATIONS.fr.disclaimer).toMatch(/ne rend pas le site accessible/i)
+  })
+})
 
 describe('plan gating', () => {
   it('every tier gets the menu; only annual/enterprise get customization', () => {

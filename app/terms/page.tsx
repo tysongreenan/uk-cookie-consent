@@ -163,9 +163,15 @@ export default function TermsPage() {
                   Our services are provided "as is" and "as available" without warranties of any kind. While we strive 
                   to provide accurate compliance guidance, we cannot guarantee that our tools will ensure full legal compliance.
                 </p>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-4">
                   You are responsible for consulting with legal professionals to ensure your website meets all applicable 
                   legal requirements in your jurisdiction.
+                </p>
+                <p className="text-gray-600">
+                  The Accessibility Menu lets visitors adjust how a page is displayed (for example font size, contrast, and motion).
+                  It does not make a website WCAG, AODA, or ADA compliant, and it is not a substitute for accessible content,
+                  forms, images, or an accessibility statement. We do not warrant that enabling the menu will satisfy any
+                  accessibility law or protect you from claims.
                 </p>
               </section>
 

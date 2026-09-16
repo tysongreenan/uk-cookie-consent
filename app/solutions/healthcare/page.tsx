@@ -727,7 +727,7 @@ export default function HealthcareSolutionPage() {
                       'Use clear, non-technical language for patients',
                       'Provide detailed information about data use',
                       'Enable easy consent withdrawal',
-                      'Ensure accessibility compliance (ADA/WCAG)',
+                      'Use clear language and readable contrast on consent choices',
                     ],
                   },
                   {

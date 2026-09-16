@@ -187,7 +187,7 @@ const en: A11yStrings = {
   statementLink: 'Accessibility statement',
   feedbackLink: 'Report an accessibility issue',
   poweredBy: 'Accessibility menu by cookie-banner.ca',
-  disclaimer: 'This menu adjusts how the page is displayed for you. It does not change the site\u2019s underlying content.',
+  disclaimer: 'This menu adjusts how the page is displayed for you. It does not make the site accessible or change its content.',
 
   turnedOn: '{name} on',
   turnedOff: '{name} off',
@@ -280,7 +280,7 @@ const fr: A11yStrings = {
   statementLink: 'D\u00e9claration d\u2019accessibilit\u00e9',
   feedbackLink: 'Signaler un probl\u00e8me d\u2019accessibilit\u00e9',
   poweredBy: 'Menu d\u2019accessibilit\u00e9 par cookie-banner.ca',
-  disclaimer: 'Ce menu ajuste l\u2019affichage de la page pour vous. Il ne modifie pas le contenu du site.',
+  disclaimer: 'Ce menu ajuste l\u2019affichage de la page pour vous. Il ne rend pas le site accessible et ne modifie pas son contenu.',
 
   turnedOn: '{name} activ\u00e9',
   turnedOff: '{name} d\u00e9sactiv\u00e9',

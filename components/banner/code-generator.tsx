@@ -18,7 +18,7 @@ import { shouldShowGeneratorUpdateNotice } from '@/lib/banner-migration'
 import { captureEvent, captureException } from '@/lib/analytics'
 import { copyToClipboard as copyText } from '@/lib/utils'
 import { hostedInstallSnippet, a11yInstallSnippet } from '@/lib/install-snippet'
-import { generateA11yHeadTag, resolveA11yRuntimeConfig } from '@/lib/accessibility'
+import { A11Y_OWNER_DISCLAIMER_SHORT, generateA11yHeadTag, resolveA11yRuntimeConfig } from '@/lib/accessibility'
 import { canAccessFeatureWithFreeze } from '@/lib/plan-restrictions'
 import type { PlanTier } from '@/types'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
@@ -88,7 +88,7 @@ export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, o
     if (!runtime) return ''
     return `
 
-<!-- Accessibility Menu (visitor display adjustments) -->
+<!-- Accessibility Menu (visitor display adjustments; does not make the site WCAG/AODA/ADA compliant) -->
 ${generateA11yHeadTag(runtime, { baseUrl })}`
   }
 
@@ -309,7 +309,8 @@ ${generateBannerHTML(config, { showBranding })}
           </p>
           {a11yOn && (
             <p className="text-sm text-green-800 dark:text-green-300 mt-2">
-              This same line also delivers your Accessibility Menu — nothing extra to install.
+              This same line also delivers your Accessibility Menu — nothing extra to install.{' '}
+              {A11Y_OWNER_DISCLAIMER_SHORT}
             </p>
           )}
         </div>
@@ -358,7 +359,8 @@ ${generateBannerHTML(config, { showBranding })}
             <p className="text-sm font-semibold">Keeping a different cookie banner? Add just the menu.</p>
             <p className="text-sm text-muted-foreground">
               One line in your <code className="bg-muted px-1 rounded">&lt;head&gt;</code>. It only loads the
-              Accessibility Menu — no cookie banner, no consent logic — and follows the Accessibility step.
+              Accessibility Menu — no cookie banner, no consent logic — and follows the Accessibility step.{' '}
+              {A11Y_OWNER_DISCLAIMER_SHORT}
             </p>
             <pre className="rounded bg-muted/60 p-3 text-sm overflow-x-auto">
               <code>{a11yInstallSnippet(bannerId || 'YOUR-BANNER-ID')}</code>

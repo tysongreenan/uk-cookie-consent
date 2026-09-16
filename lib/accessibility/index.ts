@@ -1,3 +1,4 @@
+export * from './copy'
 export * from './config'
 export * from './contrast'
 export * from './palette'
