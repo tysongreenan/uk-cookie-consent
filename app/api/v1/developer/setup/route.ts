@@ -12,6 +12,7 @@ import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { ScriptSnippetError } from '@/lib/script-snippets'
 import { parseScriptInput } from '@/lib/developer-scripts'
 import {
+  applyBrandToConfig,
   applyScriptsToConfig,
   cloneBannerTemplate,
   getInstallInstructions,
@@ -20,6 +21,7 @@ import {
   SETUP_AGENT_HINT,
   type SiteFramework,
 } from '@/lib/ai-setup'
+import { discoverBrand } from '@/lib/brand/discover'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -83,6 +85,46 @@ export async function POST(request: NextRequest) {
     (typeof body.siteUrl === 'string' && body.siteUrl) ||
     (typeof body.site_url === 'string' && body.site_url) ||
     undefined
+  let logoUrl =
+    (typeof body.logoUrl === 'string' && body.logoUrl) ||
+    (typeof body.logo_url === 'string' && body.logo_url) ||
+    undefined
+  let brandColors: {
+    background?: string
+    text?: string
+    button?: string
+    buttonText?: string
+    link?: string
+  } | undefined
+  const colorPatch = {
+    background:
+      (typeof body.backgroundColor === 'string' && body.backgroundColor) ||
+      undefined,
+    text: (typeof body.textColor === 'string' && body.textColor) || undefined,
+    button:
+      (typeof body.primaryColor === 'string' && body.primaryColor) ||
+      (typeof body.buttonColor === 'string' && body.buttonColor) ||
+      undefined,
+    buttonText:
+      (typeof body.buttonTextColor === 'string' && body.buttonTextColor) ||
+      undefined,
+    link: (typeof body.linkColor === 'string' && body.linkColor) || undefined,
+  }
+  if (Object.values(colorPatch).some(Boolean)) {
+    brandColors = colorPatch
+  }
+
+  if (siteUrl && (!logoUrl || !brandColors)) {
+    try {
+      const discovered = await discoverBrand(siteUrl)
+      if (!logoUrl && discovered.logo?.url) logoUrl = discovered.logo.url
+      if (!brandColors && discovered.suggestions) {
+        brandColors = discovered.suggestions
+      }
+    } catch {
+      // Setup still succeeds without a logo if the live site cannot be fetched.
+    }
+  }
 
   const scriptInputs = Array.isArray(body.scripts)
     ? body.scripts
@@ -92,11 +134,18 @@ export async function POST(request: NextRequest) {
 
   let config: Record<string, unknown>
   let added
+  let appliedLogo: string | null = null
   try {
     const cloned = cloneBannerTemplate(compliance, name, privacyPolicyUrl)
     if (siteUrl && !privacyPolicyUrl) {
       cloned.branding.privacyPolicy.url = `${siteUrl.replace(/\/$/, '')}/privacy`
     }
+    applyBrandToConfig(cloned, {
+      logoUrl,
+      siteUrl,
+      colors: brandColors,
+    })
+    appliedLogo = cloned.branding.logo.enabled ? cloned.branding.logo.url : null
     const applied = applyScriptsToConfig(
       cloned as unknown as Record<string, unknown>,
       scriptInputs,
@@ -148,6 +197,7 @@ export async function POST(request: NextRequest) {
         compliance,
       },
       scripts: added,
+      logo: appliedLogo,
       installSnippet,
       installUrl: `https://www.cookie-banner.ca/api/v1/banner.js?id=${bannerId}`,
       installInstructions: getInstallInstructions(framework, bannerId, installSnippet),

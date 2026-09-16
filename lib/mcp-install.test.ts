@@ -3,10 +3,12 @@ import {
   API_KEY_PLACEHOLDER,
   agentInstallSnippet,
   claudeMcpCommand,
-  cursorDeeplink,
+  grokMcpCommand,
   mcpJsonConfig,
+  MCP_AGENTS,
+  maskDeveloperKeyPrefix,
+  oneShotPrompt,
   SETUP_PROMPT,
-  vscodeDeeplink,
 } from './mcp-install'
 
 describe('mcp install snippets', () => {
@@ -20,15 +22,32 @@ describe('mcp install snippets', () => {
   it('uses a placeholder when no key is provided', () => {
     expect(agentInstallSnippet('other')).toContain(API_KEY_PLACEHOLDER)
     expect(claudeMcpCommand()).toContain(API_KEY_PLACEHOLDER)
+    expect(grokMcpCommand()).toContain(API_KEY_PLACEHOLDER)
   })
 
-  it('builds Cursor and VS Code deeplinks', () => {
-    expect(cursorDeeplink('cb_testkey')).toContain('cursor://anysphere.cursor-deeplink/mcp/install')
-    expect(vscodeDeeplink('cb_testkey')).toContain('vscode:mcp/install?')
+  it('lists Claude, Cursor, Grok, ChatGPT, then Other', () => {
+    expect(MCP_AGENTS.map((a) => a.id)).toEqual([
+      'claude-code',
+      'cursor',
+      'grok',
+      'chatgpt',
+      'other',
+    ])
   })
 
-  it('tells the agent to prefer setup_site and remove duplicate tags', () => {
+  it('masks a stored prefix as a secret key', () => {
+    expect(maskDeveloperKeyPrefix('cb_abcdefgh')).toBe('cb_••••efgh')
+  })
+
+  it('packs install + key + setup_site into one prompt', () => {
+    const prompt = oneShotPrompt('claude-code', 'cb_testkey')
+    expect(prompt).toContain('cb_testkey')
+    expect(prompt).toContain('claude mcp add')
+    expect(prompt).toContain('setup_site')
+    expect(prompt).toContain('search_domain')
+    expect(prompt).toContain('logo_url')
+    expect(prompt).toContain('Remove duplicate tracker tags')
     expect(SETUP_PROMPT).toContain('setup_site')
-    expect(SETUP_PROMPT).toContain('Remove duplicate tracker tags')
+    expect(SETUP_PROMPT).toContain('search_domain')
   })
 })

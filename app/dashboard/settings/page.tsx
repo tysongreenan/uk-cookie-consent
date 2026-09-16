@@ -17,9 +17,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown, FileText, Download, Terminal, Key, Copy, Check } from 'lucide-react'
+import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink, Crown, FileText, Download, Key, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import { maskDeveloperKeyPrefix } from '@/lib/mcp-install'
 
 type DeveloperKey = {
   id: string
@@ -113,7 +114,7 @@ export default function SettingsPage() {
       const res = await fetch('/api/developer/api-keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'MCP Server' }),
+        body: JSON.stringify({ name: 'Secret key' }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -367,53 +368,52 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Developer / MCP */}
-          <Card id="developer">
+          {/* Secret keys / MCP */}
+          <Card id="developer" className="scroll-mt-24">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Terminal className="mr-2 h-5 w-5" />
-                Developer &amp; MCP
+                <Key className="mr-2 h-5 w-5" />
+                Secret keys
               </CardTitle>
               <CardDescription>
-                API keys for terminal and AI coding agents — list and update banners without the dashboard
+                Keys that let Claude Code, Cursor, Grok, or ChatGPT act as you. They stay on this account until you revoke them. The full secret is shown once at mint — after that you only see a mask.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Generate a <code className="text-xs bg-muted px-1 py-0.5 rounded">cb_</code> key, then
-                connect <code className="text-xs bg-muted px-1 py-0.5 rounded">npx -y @cookie-banner/mcp</code>{' '}
-                from Claude Code, Cursor, Windsurf, or VS Code.{' '}
-                <Link href="/integrations/ai" className="underline underline-offset-2 hover:text-foreground">
+              <p className="text-sm text-muted-foreground text-pretty">
+                Copying a prompt from{' '}
+                <Link href="/integrations/ai" className="font-medium text-foreground underline-offset-4 hover:underline">
                   Set up with AI
-                </Link>
-                {' '}has copy-paste configs for each agent.
+                </Link>{' '}
+                mints a secret key onto this account and puts it in the prompt.
               </p>
 
               {newDevKey && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
-                  <p className="text-sm font-medium text-amber-900 flex items-center gap-2">
+                <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2">
+                  <p className="text-sm font-medium flex items-center gap-2">
                     <Key className="h-4 w-4" />
-                    Save this key now — it won&apos;t be shown again
+                    Your secret key — copy it now. It won&apos;t be shown again.
                   </p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 text-xs break-all bg-white border rounded px-2 py-1.5">
+                    <code className="flex-1 min-w-0 text-xs break-all rounded-lg border border-border bg-background px-3 py-2.5 font-mono">
                       {newDevKey}
                     </code>
-                    <Button type="button" size="sm" variant="outline" onClick={handleCopyDevKey}>
+                    <Button type="button" size="sm" variant="outline" onClick={handleCopyDevKey} className="h-10">
                       {copiedKey ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      <span className="sr-only">Copy secret key</span>
                     </Button>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Active keys</h4>
+              <div className="flex items-center justify-between gap-3">
+                <h4 className="text-sm font-medium">On this account</h4>
                 <Button
                   size="sm"
                   onClick={handleCreateDevKey}
                   disabled={isCreatingDevKey}
                 >
-                  {isCreatingDevKey ? 'Creating…' : 'Generate API key'}
+                  {isCreatingDevKey ? 'Creating…' : 'Mint secret key'}
                 </Button>
               </div>
 
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground">Loading keys…</p>
               ) : devKeys.filter((k) => !k.revoked_at).length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  No developer keys yet. Generate one to use the MCP server from your terminal.
+                  No secret keys yet. They appear here as soon as you copy a prompt from Set up with AI, and they stay until you revoke them.
                 </p>
               ) : (
                 <ul className="space-y-2">
@@ -430,26 +430,47 @@ export default function SettingsPage() {
                     .map((k) => (
                       <li
                         key={k.id}
-                        className="flex items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3"
+                        className="flex items-center justify-between gap-3 rounded-xl border border-border p-3"
                       >
                         <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{k.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {k.prefix}… · created{' '}
+                          <p className="text-xs font-medium text-muted-foreground">Secret key</p>
+                          <code className="text-sm font-mono tracking-wide">
+                            {maskDeveloperKeyPrefix(k.prefix)}
+                          </code>
+                          <p className="text-xs text-muted-foreground mt-1 truncate">
+                            {k.name}
+                            {' · '}
                             {new Date(k.created_at).toLocaleDateString()}
                             {k.last_used_at
                               ? ` · last used ${new Date(k.last_used_at).toLocaleDateString()}`
                               : ' · never used'}
                           </p>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => handleRevokeDevKey(k.id)}
-                        >
-                          Revoke
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              Revoke
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Revoke this secret key?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Agents using {maskDeveloperKeyPrefix(k.prefix)} will stop working. This cannot be undone — mint a new key if you still need access.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleRevokeDevKey(k.id)}>
+                                Revoke
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </li>
                     ))}
                 </ul>

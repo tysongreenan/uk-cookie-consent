@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  applyBrandToConfig,
   applyScriptsToConfig,
   cloneBannerTemplate,
   getInstallInstructions,
   resolveComplianceFramework,
+  resolveLogoUrl,
   SETUP_AGENT_HINT,
 } from './ai-setup'
 
@@ -40,6 +42,30 @@ describe('ai setup', () => {
     expect(instructions.example).toContain('strategy="beforeInteractive"')
     expect(instructions.example).toContain('banner-123')
     expect(instructions.after).toMatch(/Remove any raw/i)
+  })
+
+  it('puts a discovered logo and colors onto the banner config', () => {
+    const config = cloneBannerTemplate('pipeda', 'Acme')
+    applyBrandToConfig(config, {
+      logoUrl: 'https://acme.test/logo.svg',
+      colors: {
+        background: '#111111',
+        text: '#fafafa',
+        button: '#0e768c',
+        buttonText: '#ffffff',
+        link: '#0e768c',
+      },
+    })
+    expect(config.branding.logo.enabled).toBe(true)
+    expect(config.branding.logo.url).toBe('https://acme.test/logo.svg')
+    expect(config.colors.button).toBe('#0e768c')
+    expect(config.theme).toBe('custom')
+  })
+
+  it('resolves a root-relative logo against the site URL', () => {
+    expect(resolveLogoUrl('/favicon.svg', 'https://acme.test')).toBe(
+      'https://acme.test/favicon.svg'
+    )
   })
 
   it('tells the agent the menu rides in the same snippet', () => {

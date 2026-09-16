@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => ({}))
   const name =
-    (typeof body.name === 'string' && body.name.trim()) || 'MCP Server'
+    (typeof body.name === 'string' && body.name.trim()) || 'Secret key'
 
   const supabase = getSupabase()
 

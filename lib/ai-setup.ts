@@ -3,6 +3,7 @@ import { getBannerTemplate } from '@/lib/banner-templates'
 import { hostedInstallSnippet } from '@/lib/install-snippet'
 import { addScriptToConfig, emptyScriptBuckets } from '@/lib/developer-scripts'
 import type { BuildScriptInput } from '@/lib/script-snippets'
+import { sanitizeCssColor, sanitizeImageUrl } from '@/lib/banner-config-security'
 
 export type SiteFramework =
   | 'nextjs'
@@ -66,6 +67,57 @@ export function cloneBannerTemplate(
     }
   }
   return template
+}
+
+export function resolveLogoUrl(logoUrl?: string, siteUrl?: string): string {
+  if (!logoUrl || typeof logoUrl !== 'string') return ''
+  const trimmed = logoUrl.trim()
+  const absolute = sanitizeImageUrl(trimmed)
+  if (absolute) return absolute
+  if (siteUrl && trimmed.startsWith('/')) {
+    try {
+      return sanitizeImageUrl(new URL(trimmed, siteUrl).href)
+    } catch {
+      return ''
+    }
+  }
+  return ''
+}
+
+export function applyBrandToConfig(
+  config: BannerConfig,
+  brand: {
+    logoUrl?: string
+    siteUrl?: string
+    colors?: Partial<BannerConfig['colors']>
+  }
+): BannerConfig {
+  const logoUrl = resolveLogoUrl(brand.logoUrl, brand.siteUrl)
+  if (logoUrl) {
+    config.branding = {
+      ...config.branding,
+      logo: {
+        ...config.branding.logo,
+        enabled: true,
+        url: logoUrl,
+      },
+    }
+  }
+
+  if (brand.colors) {
+    const current = config.colors
+    config.colors = {
+      ...current,
+      background: sanitizeCssColor(brand.colors.background, current.background),
+      text: sanitizeCssColor(brand.colors.text, current.text),
+      button: sanitizeCssColor(brand.colors.button, current.button),
+      buttonText: sanitizeCssColor(brand.colors.buttonText, current.buttonText),
+      link: sanitizeCssColor(brand.colors.link, current.link),
+    }
+    config.theme = 'custom'
+  }
+
+  return config
 }
 
 export function applyScriptsToConfig(

@@ -49,7 +49,8 @@ Local API:
 
 | Tool | Purpose |
 |------|---------|
-| `setup_site` | One-shot: create banner, attach scripts, return header snippet + paste location |
+| `search_domain` | Fetch a live site and return its logo, brand colors, and fonts |
+| `setup_site` | One-shot: create banner, attach scripts, apply logo/colors, return header snippet + paste location |
 | `list_script_templates` | GA4, GTM, Meta, Clarity, Hotjar, LinkedIn, TikTok, Google Ads, Intercom |
 | `add_script` / `list_scripts` / `remove_script` | Manage consent-gated tracking scripts |
 | `list_banners` / `get_banner` / `create_banner` / `update_banner` / `delete_banner` | Banner CRUD |
@@ -58,8 +59,9 @@ Local API:
 ## Example prompt
 
 ```
-Set up cookie-banner.ca on this website. Use setup_site. Search the repo
-for GA4 / GTM / Meta IDs, attach them, and paste the snippet in the header.
+Set up cookie-banner.ca on this website. Call search_domain on the live
+URL, pass the logo and brand colors into setup_site, attach GA4 / GTM /
+Meta IDs from the repo, and paste the snippet in the header.
 Then enable the Accessibility Menu with update_banner and
 config.accessibility.enabled = true. Same snippet, no second script.
 ```

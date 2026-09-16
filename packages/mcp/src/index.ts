@@ -136,7 +136,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'setup_site',
       description:
-        'One-shot install: create a consent banner, attach tracking scripts (GA4, GTM, Meta, Clarity, Hotjar, …), and return the header snippet plus where to paste it. Prefer this when setting up cookie-banner.ca on a new website. After setup, enable the visitor Accessibility Menu with update_banner({ config: { accessibility: { enabled: true } } }) — it rides in the same snippet.',
+        'One-shot install: create a consent banner, attach tracking scripts (GA4, GTM, Meta, Clarity, Hotjar, …), apply a logo and brand colors, and return the header snippet plus where to paste it. Call search_domain first and pass logo_url plus colors. Prefer this when setting up cookie-banner.ca on a new website. After setup, enable the visitor Accessibility Menu with update_banner({ config: { accessibility: { enabled: true } } }) — it rides in the same snippet.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -152,6 +152,23 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             description: 'pipeda | gdpr | ccpa | law25. Default pipeda.',
           },
           privacy_policy_url: { type: 'string' },
+          logo_url: {
+            type: 'string',
+            description:
+              'Public URL of the site logo. Call search_domain first and pass logo.url here.',
+          },
+          primaryColor: {
+            type: 'string',
+            description: 'Accept-button color from search_domain.colors.button',
+          },
+          backgroundColor: {
+            type: 'string',
+            description: 'Banner background from search_domain.colors.background',
+          },
+          textColor: {
+            type: 'string',
+            description: 'Banner text color from search_domain.colors.text',
+          },
           scripts: {
             type: 'array',
             description: 'Tracking scripts to attach. Each item uses the add_script fields.',
@@ -162,6 +179,21 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
         },
         required: ['name'],
+      },
+    },
+    {
+      name: 'search_domain',
+      description:
+        'Fetch a live website and return its logo URL, brand colors, and fonts. Call this before setup_site and pass logo.url as logo_url plus the color suggestions so the banner matches the site.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'Public site URL, e.g. https://example.com',
+          },
+        },
+        required: ['url'],
       },
     },
     {
@@ -325,8 +357,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             framework: a.framework,
             compliance: a.compliance,
             privacy_policy_url: a.privacy_policy_url,
+            logo_url: a.logo_url,
+            primaryColor: a.primaryColor,
+            backgroundColor: a.backgroundColor,
+            textColor: a.textColor,
             scripts: a.scripts || [],
           }),
+        })
+        return jsonResult(data)
+      }
+
+      case 'search_domain': {
+        const url = requiredString(a.url, 'url')
+        const data = await api('/api/v1/developer/search-domain', {
+          method: 'POST',
+          body: JSON.stringify({ url }),
         })
         return jsonResult(data)
       }
