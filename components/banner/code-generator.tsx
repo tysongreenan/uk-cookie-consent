@@ -307,6 +307,11 @@ ${generateBannerHTML(config, { showBranding })}
               ? <>Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</>
               : <>Copy saves this banner, then copies a one-line script. Paste that in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section.</>}
           </p>
+          <p className="text-sm text-green-800 dark:text-green-300 mt-2">
+            Consent is stored on your root domain by default, so www and other subdomains share one choice. Override in Behavior, or set{' '}
+            <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">{`window.CookieBannerOptions = { domain: 'example.com' }`}</code>
+            {' '}before this script.
+          </p>
           {a11yOn && (
             <p className="text-sm text-green-800 dark:text-green-300 mt-2">
               This same line also delivers your Accessibility Menu — nothing extra to install.{' '}

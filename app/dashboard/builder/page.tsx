@@ -3996,6 +3996,69 @@ function BannerBuilderContent() {
                         max="365"
                       />
                     </div>
+
+                    <div className="space-y-3 pt-2">
+                      <div>
+                        <Label>Consent across subdomains</Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          One Accept on www.example.com also covers shop.example.com and other subdomains. This is the default for every banner.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            (config.behavior.cookieDomainMode || 'auto') === 'auto'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'auto', cookieDomain: undefined })}
+                        >
+                          <div className="font-medium text-sm">Share across subdomains</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Recommended. Stores the consent cookie on your root domain (example.com).</div>
+                        </button>
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            config.behavior.cookieDomainMode === 'host'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'host', cookieDomain: undefined })}
+                        >
+                          <div className="font-medium text-sm">This hostname only</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Use when each subdomain should ask for consent separately.</div>
+                        </button>
+                        <button
+                          type="button"
+                          className={`text-left p-3 rounded-lg border transition-all ${
+                            config.behavior.cookieDomainMode === 'custom'
+                              ? 'border-primary ring-1 ring-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground/40'
+                          }`}
+                          onClick={() => updateConfig('behavior', { cookieDomainMode: 'custom' })}
+                        >
+                          <div className="font-medium text-sm">Custom parent domain</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Set the Domain attribute yourself (must be a parent of the current host).</div>
+                        </button>
+                      </div>
+                      {config.behavior.cookieDomainMode === 'custom' && (
+                        <div>
+                          <Label htmlFor="cookie-domain">Parent domain</Label>
+                          <Input
+                            id="cookie-domain"
+                            type="text"
+                            placeholder="dal.ca"
+                            value={config.behavior.cookieDomain || ''}
+                            onChange={(e) => updateConfig('behavior', { cookieDomain: e.target.value })}
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            You can also set this in GTM before the banner script:{' '}
+                            <code className="text-[11px]">{`window.CookieBannerOptions = { domain: 'dal.ca' }`}</code>
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>

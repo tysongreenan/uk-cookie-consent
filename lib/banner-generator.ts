@@ -1,5 +1,6 @@
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
+import { cookieDomainRuntimeJs, serializeCookieDomainConfig } from '@/lib/cookie-domain'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {
@@ -1603,12 +1604,14 @@ function trackConsentEvent(action, consentCategories) {
 
   const cookieAcceptedIconSerialized = JSON.stringify(acceptedIconMarkup)
   const cookieRejectedIconSerialized = JSON.stringify(rejectedIconMarkup)
+  const cookieDomain = serializeCookieDomainConfig(config.behavior)
 
   return `(function() {
 'use strict';
 
 var COOKIE_NAME = 'cookie_consent';
 var COOKIE_EXPIRY = ${Number(config.behavior.cookieExpiry) || 182};
+${cookieDomainRuntimeJs(cookieDomain.mode, cookieDomain.custom)}
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
 var GEO_REQUIRES_OPT_IN = ${Boolean(config._geoRequiresOptIn)};
@@ -2374,18 +2377,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 ` : ''}
 
-function getCookie(name) {
-  var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : null;
-}
-
-function setCookie(name, value, days) {
-  var expires = new Date();
-  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-  var secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
-}
-
 function getConsent() {
   var cookie = getCookie(COOKIE_NAME);
   if (cookie) {
@@ -3045,6 +3036,12 @@ function init() {
   // Initialize toggles
   setupToggleSwitches();
   if (TCF_ENABLED) setupTcfToggleSwitches();
+
+  // Promote a leftover host-only cookie onto the shared parent domain once
+  if (existingConsent && getCookieDomain() && existingConsent._dom !== getCookieDomain()) {
+    existingConsent._dom = getCookieDomain();
+    setCookie(COOKIE_NAME, JSON.stringify(existingConsent), COOKIE_EXPIRY);
+  }
 
   // GPC reconciliation — MUST run BEFORE any loadScripts call
   if (existingConsent && GPC_ACTIVE) {

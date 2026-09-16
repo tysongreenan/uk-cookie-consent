@@ -1,5 +1,6 @@
 import type { BannerConfig } from '@/types'
 import { hardenAccessibilityConfig } from '@/lib/accessibility/harden'
+import { serializeCookieDomainConfig } from '@/lib/cookie-domain'
 
 const UNSAFE_CSS_PATTERN = /[;"'<>\\@]|url\s*\(|expression\s*\(/i
 
@@ -181,4 +182,10 @@ export function hardenBannerConfig(config: BannerConfig): void {
 
   // Accessibility Menu block (colours, URLs, enums, selector) — see lib/accessibility/harden.ts
   hardenAccessibilityConfig(config)
+
+  if (config.behavior) {
+    const cookieDomain = serializeCookieDomainConfig(config.behavior)
+    config.behavior.cookieDomainMode = cookieDomain.mode
+    config.behavior.cookieDomain = cookieDomain.custom || undefined
+  }
 }

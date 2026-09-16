@@ -107,6 +107,12 @@ export interface BannerConfig {
     buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'
     showRejectButton?: boolean // Granular control - defaults to true for backward compatibility
     gpc?: { enabled: boolean; mode: 'auto' | 'off' }
+    // Consent cookie Domain. Default 'auto' shares one choice across subdomains
+    // (www.dal.ca + medicine.dal.ca). 'host' keeps a host-only cookie. 'custom'
+    // uses cookieDomain (must be a suffix of the page hostname). Runtime
+    // window.CookieBannerOptions.domain overrides this when it is valid.
+    cookieDomainMode?: 'auto' | 'host' | 'custom'
+    cookieDomain?: string
   }
   
   // Branding

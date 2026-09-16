@@ -1,6 +1,10 @@
 /**
  * One-line hosted install snippet shown after a banner is saved.
  * Keep this in one place so dashboard, builder, and the code tab stay in sync.
+ *
+ * Consent cookies default to the site's root domain (auto), so subdomains share
+ * one choice. Optional runtime override before this tag:
+ *   window.CookieBannerOptions = { domain: 'example.com' }
  */
 export function hostedInstallSnippet(
   bannerId: string,
