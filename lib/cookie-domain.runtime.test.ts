@@ -61,6 +61,7 @@ class CookieJar {
   store: Stored[] = []
   host = 'www.dal.ca'
   protocol = 'https:'
+  probeSets = 0
 
   visible(): Stored[] {
     const now = Date.now()
@@ -84,6 +85,7 @@ class CookieJar {
     const host = this.host.replace(/\.+$/, '').toLowerCase()
     let hostOnly = true
     let domain = host
+    if (parsed.name === '__cb_dom_t' && parsed.value === '1') this.probeSets += 1
     if (parsed.domain) {
       if (PUBLIC_SUFFIXES.has(parsed.domain)) return
       if (!(host === parsed.domain || host.endsWith('.' + parsed.domain))) return
@@ -159,6 +161,13 @@ function boot(options: {
 
 const CONSENT = JSON.stringify({ essential: true, analytics: true, marketing: false })
 
+function consentBody(raw: string | null) {
+  if (!raw) return null
+  const parsed = JSON.parse(raw) as Record<string, unknown>
+  const { _dom: _ignored, ...rest } = parsed
+  return rest
+}
+
 describe('runtime cookie jar (Hugh / Dalhousie)', () => {
   it('accepts on www.dal.ca and is already granted on medicine and libraries', () => {
     const www = boot({ host: 'www.dal.ca', runtimeDomain: 'dal.ca' })
@@ -172,11 +181,11 @@ describe('runtime cookie jar (Hugh / Dalhousie)', () => {
 
     const medicine = boot({ host: 'medicine.dal.ca', runtimeDomain: 'dal.ca' })
     medicine.jar.store = www.jar.store
-    expect(medicine.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(medicine.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
 
     const libraries = boot({ host: 'libraries.dal.ca' })
     libraries.jar.store = www.jar.store
-    expect(libraries.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(libraries.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
     expect(libraries.getCookieDomain()).toBe('dal.ca')
   })
 
@@ -185,7 +194,20 @@ describe('runtime cookie jar (Hugh / Dalhousie)', () => {
     www.setCookie('cookie_consent', CONSENT, 182)
     const medicine = boot({ host: 'medicine.dal.ca' })
     medicine.jar.store = www.jar.store
-    expect(medicine.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(medicine.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
+  })
+
+  it('skips the domain probe on later loads when _dom is already stored', () => {
+    const first = boot({ host: 'www.example.com' })
+    first.setCookie('cookie_consent', CONSENT, 182)
+    expect(JSON.parse(first.getCookie('cookie_consent')!)._dom).toBe('example.com')
+    expect(first.jar.probeSets).toBeGreaterThan(0)
+
+    const second = boot({ host: 'shop.example.com' })
+    second.jar.store = first.jar.store
+    second.jar.probeSets = 0
+    expect(second.getCookieDomain()).toBe('example.com')
+    expect(second.jar.probeSets).toBe(0)
   })
 })
 
@@ -259,7 +281,7 @@ describe('runtime cookie jar (mode + leftovers)', () => {
     expect(copies).toHaveLength(1)
     expect(copies[0].hostOnly).toBe(false)
     expect(copies[0].domain).toBe('dal.ca')
-    expect(www.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(www.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
   })
 
   it('clears the shared cookie on both hostnames when deleted', () => {
@@ -284,7 +306,7 @@ describe('runtime cookie jar (mode + leftovers)', () => {
     const medicine = boot({ host: 'medicine.dal.ca', mode: 'host' })
     medicine.jar.store = hostOnly.jar.store
     expect(medicine.getCookie('cookie_consent')).toBeNull()
-    expect(hostOnly.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(hostOnly.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
   })
 })
 
@@ -300,7 +322,7 @@ describe('runtime cookie jar (weird hosts)', () => {
     apex.setCookie('cookie_consent', CONSENT, 182)
     const www = boot({ host: 'www.dal.ca' })
     www.jar.store = apex.jar.store
-    expect(www.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(www.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
   })
 
   it('lowercases the hostname before probing', () => {
@@ -331,7 +353,7 @@ describe('runtime cookie jar (weird hosts)', () => {
     www.setCookie('cookie_consent', CONSENT, 182)
     const medicine = boot({ host: 'medicine.dal.ca', protocol: 'http:' })
     medicine.jar.store = www.jar.store
-    expect(medicine.getCookie('cookie_consent')).toBe(CONSENT)
+    expect(consentBody(medicine.getCookie('cookie_consent'))).toEqual(JSON.parse(CONSENT))
   })
 
   it('shares a tree of subdomains under example.com', () => {
@@ -342,7 +364,7 @@ describe('runtime cookie jar (weird hosts)', () => {
     for (const host of hosts.slice(1)) {
       const page = boot({ host })
       page.jar.store = first.jar.store
-      expect(page.getCookie('cookie_consent'), host).toBe(CONSENT)
+      expect(consentBody(page.getCookie('cookie_consent')), host).toEqual(JSON.parse(CONSENT))
     }
   })
 })

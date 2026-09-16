@@ -2,9 +2,9 @@
  * Consent-cookie Domain attribute.
  *
  * Default is GA-style "auto": write cookie_consent on the highest domain the
- * browser will accept (dal.ca from medicine.dal.ca / www.dal.ca) so one
- * Accept covers every subdomain. Customers can force host-only, set a custom
- * parent, or override at runtime with window.CookieBannerOptions.domain.
+ * browser will accept (example.com from www.example.com / shop.example.com)
+ * so one Accept covers every subdomain. Customers can force host-only, set a
+ * custom parent, or override at runtime with window.CookieBannerOptions.domain.
  */
 
 export type CookieDomainMode = 'auto' | 'host' | 'custom'
@@ -62,6 +62,40 @@ export function serializeCookieDomainConfig(behavior?: {
     return { mode: 'auto', custom: '' }
   }
   return { mode, custom }
+}
+
+export function hostnameFromUrl(input: unknown): string | null {
+  if (typeof input !== 'string') return null
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  try {
+    const url = new URL(trimmed.includes('://') ? trimmed : `https://${trimmed}`)
+    const host = url.hostname.replace(/\.+$/, '').toLowerCase()
+    if (!host || host === 'localhost' || isIpHostname(host)) return null
+    return host
+  } catch {
+    return normalizeCookieDomain(trimmed)
+  }
+}
+
+/**
+ * Builder validation for custom mode. Empty is not an error (the field is
+ * optional until they type). Invalid values are ignored at runtime (auto).
+ */
+export function customCookieDomainError(
+  raw: string,
+  siteHostname?: string | null,
+): string | null {
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+  const domain = normalizeCookieDomain(trimmed)
+  if (!domain) {
+    return 'Enter a domain like example.com. Public suffixes (com, ca) and invalid values are ignored.'
+  }
+  if (siteHostname && !isCookieDomainAllowed(domain, siteHostname)) {
+    return `Must be a parent of ${siteHostname}. Until this is valid, consent uses the shared root domain.`
+  }
+  return null
 }
 
 /**
@@ -169,14 +203,31 @@ function _cbExpireVisibleCopies(name) {
   }
 }
 
+function _cbRememberedDomain(host) {
+  try {
+    var cookieName = typeof COOKIE_NAME === 'string' ? COOKIE_NAME : 'cookie_consent';
+    var raw = getCookie(cookieName);
+    if (!raw) return '';
+    var parsed = JSON.parse(raw);
+    var remembered = _cbNormalizeDomain(parsed && parsed._dom);
+    if (!remembered || !_cbDomainAllowed(remembered, host)) return '';
+    return remembered;
+  } catch (e) {
+    return '';
+  }
+}
+
 function getCookieDomain() {
   if (_cbCookieDomain !== undefined) return _cbCookieDomain;
   var host = _cbNormalizedHost();
+  var remembered = _cbRememberedDomain(host);
   var opts = window.CookieBannerOptions || {};
   var runtime = _cbNormalizeDomain(opts.domain);
-  if (runtime && _cbDomainAllowed(runtime, host) && _cbCanSetDomain(runtime)) {
-    _cbCookieDomain = runtime;
-    return _cbCookieDomain;
+  if (runtime && _cbDomainAllowed(runtime, host)) {
+    if (remembered === runtime || _cbCanSetDomain(runtime)) {
+      _cbCookieDomain = runtime;
+      return _cbCookieDomain;
+    }
   }
   if (COOKIE_DOMAIN_MODE === 'host') {
     _cbCookieDomain = '';
@@ -184,10 +235,16 @@ function getCookieDomain() {
   }
   if (COOKIE_DOMAIN_MODE === 'custom') {
     var custom = _cbNormalizeDomain(COOKIE_DOMAIN_CUSTOM);
-    if (custom && _cbDomainAllowed(custom, host) && _cbCanSetDomain(custom)) {
-      _cbCookieDomain = custom;
-      return _cbCookieDomain;
+    if (custom && _cbDomainAllowed(custom, host)) {
+      if (remembered === custom || _cbCanSetDomain(custom)) {
+        _cbCookieDomain = custom;
+        return _cbCookieDomain;
+      }
     }
+  }
+  if (remembered) {
+    _cbCookieDomain = remembered;
+    return _cbCookieDomain;
   }
   _cbCookieDomain = '';
   if (host && host !== 'localhost' && host.indexOf('.') !== -1 && !/^\\d{1,3}(\\.\\d{1,3}){3}$/.test(host) && host.indexOf(':') === -1) {
@@ -213,6 +270,15 @@ function setCookie(name, value, days) {
   expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
   var secure = _cbSecureAttr();
   var domain = getCookieDomain();
+  if (domain && value && days >= 0) {
+    try {
+      var parsed = JSON.parse(value);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsed._dom = domain;
+        value = JSON.stringify(parsed);
+      }
+    } catch (e) {}
+  }
   _cbExpireVisibleCopies(name);
   if (days < 0 && !value) return;
   var domainPart = domain ? '; Domain=' + domain : '';

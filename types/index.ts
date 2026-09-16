@@ -108,9 +108,9 @@ export interface BannerConfig {
     showRejectButton?: boolean // Granular control - defaults to true for backward compatibility
     gpc?: { enabled: boolean; mode: 'auto' | 'off' }
     // Consent cookie Domain. Default 'auto' shares one choice across subdomains
-    // (www.dal.ca + medicine.dal.ca). 'host' keeps a host-only cookie. 'custom'
-    // uses cookieDomain (must be a suffix of the page hostname). Runtime
-    // window.CookieBannerOptions.domain overrides this when it is valid.
+    // (www.example.com + shop.example.com). 'host' keeps a host-only cookie.
+    // 'custom' uses cookieDomain (must be a suffix of the page hostname).
+    // Runtime window.CookieBannerOptions.domain overrides this when it is valid.
     cookieDomainMode?: 'auto' | 'host' | 'custom'
     cookieDomain?: string
   }

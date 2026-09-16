@@ -5,6 +5,8 @@ import { generateTcfCmpApiCode } from '@/lib/tcf/cmp-api'
 import {
   cookieDomainProbeCandidates,
   cookieDomainRuntimeJs,
+  customCookieDomainError,
+  hostnameFromUrl,
   isCookieDomainAllowed,
   normalizeCookieDomain,
   resolveCookieDomain,
@@ -148,6 +150,27 @@ describe('resolveCookieDomain', () => {
         settableDomains: ['dal.ca', 'b.dal.ca', 'a.b.dal.ca'],
       }),
     ).toBe('dal.ca')
+  })
+})
+
+describe('customCookieDomainError', () => {
+  it('is silent while the field is empty', () => {
+    expect(customCookieDomainError('')).toBeNull()
+    expect(customCookieDomainError('   ')).toBeNull()
+  })
+
+  it('rejects public suffixes and junk', () => {
+    expect(customCookieDomainError('ca')).toMatch(/ignored/i)
+    expect(customCookieDomainError("example.com'; alert(1)")).toMatch(/ignored/i)
+  })
+
+  it('rejects a domain that is not a parent of the site', () => {
+    expect(customCookieDomainError('example.com', 'www.other.org')).toMatch(/parent of www.other.org/)
+  })
+
+  it('accepts a parent of the privacy-policy host', () => {
+    expect(customCookieDomainError('example.com', 'shop.example.com')).toBeNull()
+    expect(hostnameFromUrl('https://www.example.com/privacy')).toBe('www.example.com')
   })
 })
 

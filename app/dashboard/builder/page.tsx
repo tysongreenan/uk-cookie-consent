@@ -41,6 +41,7 @@ import { FONT_PRESETS } from '@/lib/font-presets'
 import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import { hasInstallSnippetCopied, hostedInstallSnippet } from '@/lib/install-snippet'
+import { customCookieDomainError, hostnameFromUrl } from '@/lib/cookie-domain'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import {
   BannerPersistError,
@@ -1284,6 +1285,12 @@ function BannerBuilderContent() {
   // status here, since next-auth's UseSessionResult is a discriminated
   // union — `!session` already implies `status !== 'authenticated'`, and
   // combining both checks errors as "no overlap" under production tsc.)
+  const cookieDomainSiteHost = hostnameFromUrl(config.branding?.privacyPolicy?.url)
+  const cookieDomainCustomError = customCookieDomainError(
+    config.behavior.cookieDomain || '',
+    cookieDomainSiteHost,
+  )
+
   if (status !== 'authenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -4028,6 +4035,11 @@ function BannerBuilderContent() {
                         >
                           <div className="font-medium text-sm">This hostname only</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Use when each subdomain should ask for consent separately.</div>
+                          {config.behavior.cookieDomainMode === 'host' && (
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
+                              Saving a new choice here clears the shared cookie on sibling subdomains, so those hosts will ask again.
+                            </p>
+                          )}
                         </button>
                         <button
                           type="button"
@@ -4048,13 +4060,20 @@ function BannerBuilderContent() {
                           <Input
                             id="cookie-domain"
                             type="text"
-                            placeholder="dal.ca"
+                            placeholder="example.com"
                             value={config.behavior.cookieDomain || ''}
                             onChange={(e) => updateConfig('behavior', { cookieDomain: e.target.value })}
+                            aria-invalid={Boolean(cookieDomainCustomError)}
+                            aria-describedby="cookie-domain-hint cookie-domain-error"
                           />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            You can also set this in GTM before the banner script:{' '}
-                            <code className="text-[11px]">{`window.CookieBannerOptions = { domain: 'dal.ca' }`}</code>
+                          {cookieDomainCustomError && (
+                            <p id="cookie-domain-error" role="alert" className="text-xs text-red-600 dark:text-red-400 mt-1">
+                              {cookieDomainCustomError}
+                            </p>
+                          )}
+                          <p id="cookie-domain-hint" className="text-xs text-muted-foreground mt-1">
+                            Optional. Auto already shares across subdomains. To pin a parent in GTM:{' '}
+                            <code className="text-[11px]">{`window.CookieBannerOptions = { domain: 'example.com' }`}</code>
                           </p>
                         </div>
                       )}
