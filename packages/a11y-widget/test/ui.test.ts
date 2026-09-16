@@ -179,6 +179,7 @@ describe('menu content', () => {
     const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('.cb-a11y-links a')).map((a) => a.href)
     expect(links[0]).toBe('https://example.com/accessibility')
     expect(links[1]).toMatch(/^mailto:access@example.com/)
+    expect(root.querySelector('.cb-a11y-fine')!.textContent).toContain('does not make the site accessible')
     expect(root.querySelector('.cb-a11y-fine')!.textContent).toContain('Accessibility menu by cookie-banner.ca')
   })
 
