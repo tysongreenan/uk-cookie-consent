@@ -277,6 +277,7 @@ button:focus-visible, a:focus-visible, select:focus-visible {
   transition: border-color 120ms, background 120ms;
 }
 .cb-a11y-tile svg { width: 28px; height: 28px; }
+.cb-a11y-tile .tx { display: flex; flex-direction: column; align-items: center; min-width: 0; }
 .cb-a11y-tile.is-read-aloud {
   grid-column: 1 / -1;
   flex-direction: row;
@@ -311,9 +312,35 @@ button:focus-visible, a:focus-visible, select:focus-visible {
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px 12px no-repeat;
 }
 .cb-a11y-tile:disabled { opacity: 0.45; cursor: not-allowed; }
-.cb-a11y-tile .lv { display: flex; gap: 4px; }
-.cb-a11y-tile .lv i { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
-.cb-a11y-tile .lv i.on { background: var(--accent); }
+.cb-a11y-tile .tx .lv-cap {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.cb-a11y-tile .lv {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 14px;
+}
+.cb-a11y-tile .lv i {
+  width: 7px;
+  box-sizing: border-box;
+  border: 2px solid var(--text);
+  border-radius: 2px;
+  background: transparent;
+}
+.cb-a11y-tile .lv i:nth-child(1) { height: 6px; }
+.cb-a11y-tile .lv i:nth-child(2) { height: 10px; }
+.cb-a11y-tile .lv i:nth-child(3) { height: 14px; }
+.cb-a11y-tile .lv i.on {
+  background: var(--text);
+  border-color: var(--text);
+}
 
 /* Footer */
 .cb-a11y-footer { flex: none; padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--border); background: var(--bg); }
@@ -423,6 +450,8 @@ button:focus-visible, a:focus-visible, select:focus-visible {
   .cb-a11y-switch { background: GrayText; }
   .cb-a11y-profile[aria-checked='true'] .cb-a11y-switch,
   .cb-a11y-tile[aria-checked='true']::after { background: Highlight; }
+  .cb-a11y-tile .lv i { border-color: ButtonText; background: Canvas; }
+  .cb-a11y-tile .lv i.on { background: ButtonText; border-color: ButtonText; }
 }
 @media (max-width: 480px) {
   /* Phones: the trigger sits over content people are reading — icon only, never larger than 48px */

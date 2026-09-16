@@ -240,6 +240,10 @@ describe('adjustments reach the page and fully reverse', () => {
     click('lineHeight')
     click('lineHeight')
     expect(html.classList.contains('cb-a11y-lh-2')).toBe(true)
+    const lh = root.querySelector('[data-key="lineHeight"]')!
+    expect(lh.querySelectorAll('.lv i.on')).toHaveLength(2)
+    expect(lh.querySelector('.lv-cap')!.textContent).toBe('Level 2')
+    expect(lh.getAttribute('aria-label')).toContain('Level 2')
     expect(document.getElementById('cb-a11y-adjust')).not.toBeNull()
 
     root.querySelector<HTMLButtonElement>('.cb-a11y-reset')!.click()

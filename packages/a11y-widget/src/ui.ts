@@ -299,7 +299,13 @@ export function mountUi(ctx: Ctx): Ui {
         : key === 'pageStructure'
           ? name
           : `${name}, ${on ? s.speakOn : s.speakOff}`,
-    }, [svg(ICONS[key]), h('span', { class: 'tx' }, [h('b', { text: name })])])
+    }, [
+      svg(ICONS[key]),
+      h('span', { class: 'tx' }, [
+        h('b', { text: name }),
+        isLevel ? h('span', { class: 'lv-cap', text: s.levelLabels[level] || s.levelOff }) : null,
+      ]),
+    ])
     if (key === 'readAloud') {
       tile.querySelector('.tx')?.appendChild(h('span', { text: s.readAloudShort }))
     }
