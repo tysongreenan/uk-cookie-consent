@@ -13,6 +13,18 @@ export function UpdateAnnouncement() {
   const [showParticles, setShowParticles] = useState(false)
   const pathname = usePathname()
 
+  // Hooks must run in the same order on every render. This used to live below
+  // the cookie-scanner early return, so leaving /tools/cookie-scanner (Signup
+  // CTA, Pricing, etc.) added a hook and crashed the client tree to a white screen.
+  useEffect(() => {
+    if (!isVisible) return
+    setShowParticles(true)
+    const particleTimer = setTimeout(() => {
+      setShowParticles(false)
+    }, 4000)
+    return () => clearTimeout(particleTimer)
+  }, [isVisible])
+
   // Hosted privacy policies (/p/…) should look like clean legal documents —
   // never show the marketing announcement banner on those pages.
   // The cookie scanner first screen is a single job (start a scan). A site-wide
@@ -20,17 +32,6 @@ export function UpdateAnnouncement() {
   if (pathname?.startsWith('/p/') || pathname?.startsWith('/tools/cookie-scanner')) {
     return null
   }
-
-  useEffect(() => {
-    if (isVisible) {
-      setShowParticles(true)
-      // Hide particles after 4 seconds
-      const particleTimer = setTimeout(() => {
-        setShowParticles(false)
-      }, 4000)
-      return () => clearTimeout(particleTimer)
-    }
-  }, [isVisible])
 
   const handleDismiss = () => {
     setIsVisible(false)

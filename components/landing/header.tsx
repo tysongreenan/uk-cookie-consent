@@ -2,20 +2,30 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
+import { buildSignupHref, handleSignupCtaClick } from '@/lib/signup-navigation'
 
 export function Header() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname() || '/'
   const authCallback =
     pathname.startsWith('/tools/') || pathname.startsWith('/integrations/ai')
       ? `?callbackUrl=${encodeURIComponent(pathname)}`
       : ''
+  const signupHref = buildSignupHref(pathname)
+
+  const onSignupClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    setMobileMenuOpen(false)
+    handleSignupCtaClick(event, signupHref, {
+      navigate: (href) => router.push(href),
+    })
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
@@ -86,7 +96,7 @@ export function Header() {
                   <Link href={`/auth/signin${authCallback}`}>Sign In</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href={`/auth/signup${authCallback}`}>Sign up for free</Link>
+                  <Link href={signupHref} onClick={onSignupClick}>Sign up for free</Link>
                 </Button>
               </>
             )}
@@ -151,7 +161,7 @@ export function Header() {
               ) : (
                 <>
                   <Button asChild size="lg" className="w-full">
-                    <Link href={`/auth/signup${authCallback}`}>Sign up for free</Link>
+                    <Link href={signupHref} onClick={onSignupClick}>Sign up for free</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full">
                     <Link href={`/auth/signin${authCallback}`}>Sign In</Link>
