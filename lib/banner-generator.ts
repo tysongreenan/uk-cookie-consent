@@ -2702,14 +2702,20 @@ ${marketingLoaders || '      // No marketing scripts configured'}
     });
   }
   
-  // Also update dataLayer for GTM compatibility
+  // Also update dataLayer for GTM compatibility.
+  // Include Consent Mode strings (for Google tags) and boolean flags
+  // (consent_analytics / consent_marketing) for Custom Event triggers
+  // on non-Google tags (Meta, LinkedIn, TikTok, etc.).
   if (window.dataLayer) {
     window.dataLayer.push({
       'event': 'cookie_consent_update',
       'analytics_storage': consent.analytics ? 'granted' : 'denied',
       'ad_storage': consent.marketing ? 'granted' : 'denied',
       'ad_user_data': consent.marketing ? 'granted' : 'denied',
-      'ad_personalization': consent.marketing ? 'granted' : 'denied'
+      'ad_personalization': consent.marketing ? 'granted' : 'denied',
+      'consent_analytics': !!consent.analytics,
+      'consent_marketing': !!consent.marketing,
+      'consent_preferences': !!consent.functionality
     });
   }
 }

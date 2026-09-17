@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
         userVoted: false,
         priority: 1,
         voters: [],
+        shippedAt: null as string | null,
+        featureUrl: null as string | null,
       },
     ]
 
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
       // votes and duplicates rows when an item has multiple voters.
       const { data: roadmapItems, error: itemsError } = await supabase
         .from('RoadmapItem')
-        .select('id, title, description, category, status, priority, createdAt, updatedAt')
+        .select('id, title, description, category, status, priority, createdAt, updatedAt, shippedAt, featureUrl')
         .order('priority', { ascending: true })
 
       if (itemsError) {

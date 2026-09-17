@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -93,6 +94,24 @@ interface RoadmapItem {
   userVoted: boolean
   priority: number
   voters: Voter[]
+  shippedAt?: string | null
+  featureUrl?: string | null
+}
+
+function formatShipDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+function featureHref(url: string): string {
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+    return url
+  }
+  return `/${url}`
 }
 
 interface SearchResult {
@@ -405,7 +424,19 @@ function RoadmapCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h4 className="font-semibold text-sm leading-snug text-foreground font-heading">
-              {item.title}
+              {item.featureUrl ? (
+                <Link
+                  href={featureHref(item.featureUrl)}
+                  target={item.featureUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={item.featureUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="hover:text-primary transition-colors inline-flex items-center gap-1"
+                >
+                  {item.title}
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
+                </Link>
+              ) : (
+                item.title
+              )}
             </h4>
             <div
               className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -422,12 +453,30 @@ function RoadmapCard({
 
           {isBuilding && <BuildingIndicator />}
 
-          <div className={`flex items-center justify-between gap-2 flex-wrap ${isBuilding ? 'mt-3' : ''}`}>
+          {isCompleted && item.shippedAt && (
+            <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-700">
+              <CalendarCheck className="w-3 h-3" />
+              <span>Shipped {formatShipDate(item.shippedAt)}</span>
+            </div>
+          )}
+
+          <div className={`flex items-center justify-between gap-2 flex-wrap ${isBuilding || (isCompleted && item.shippedAt) ? 'mt-3' : ''}`}>
             <div className="flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={`text-[10px] px-2 py-0.5 rounded-lg ${catInfo.color}`}>
                 {catInfo.label}
               </Badge>
               {isExclusive && <AnnualExclusiveBadge />}
+              {item.featureUrl && (
+                <Link
+                  href={featureHref(item.featureUrl)}
+                  target={item.featureUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={item.featureUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline underline-offset-2"
+                >
+                  View feature
+                  <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              )}
             </div>
             <button
               onClick={() => onToggleComments(item.id)}
@@ -874,7 +923,12 @@ export default function RoadmapPage() {
 
   const planned = [...items].filter((i) => i.status === 'planned').sort((a, b) => b.vote_count - a.vote_count)
   const inProgress = [...items].filter((i) => i.status === 'in-progress').sort((a, b) => b.vote_count - a.vote_count)
-  const completed = [...items].filter((i) => i.status === 'completed').sort((a, b) => b.vote_count - a.vote_count)
+  const completed = [...items].filter((i) => i.status === 'completed').sort((a, b) => {
+    const aTime = a.shippedAt ? new Date(a.shippedAt).getTime() : 0
+    const bTime = b.shippedAt ? new Date(b.shippedAt).getTime() : 0
+    if (aTime !== bTime) return bTime - aTime
+    return b.vote_count - a.vote_count
+  })
 
   const sharedCardProps = {
     voting,

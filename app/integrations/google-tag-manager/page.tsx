@@ -57,15 +57,15 @@ export default function GTMIntegrationPage() {
     },
     {
       question: "How do I set up cookie consent in Google Tag Manager?",
-      answer: "Add our cookie banner script as a Custom HTML tag in GTM, set it to fire on 'All Pages' with the highest priority. Our script automatically pushes consent events to the dataLayer and sends gtag consent updates. Then configure your analytics and advertising tags to use the built-in consent checks. The full step-by-step guide is on this page."
+      answer: "Install our Consent Mode v2 template on the Consent Initialization trigger with defaults set to denied, and add the banner script to your site head (or as Custom HTML on Consent Initialization). Google tags then follow Consent Mode; non-Google tags use the cookie_consent_update dataLayer event. Full step-by-step is on this page and in our blog guide."
     },
     {
       question: "Does this work with GA4, Google Ads, and Facebook Pixel in GTM?",
-      answer: "Yes. Our banner automatically manages consent for all tags in your GTM container. Google tags (GA4, Google Ads, Floodlight) use native Consent Mode V2 signals. Non-Google tags (Facebook Pixel, TikTok, LinkedIn) are controlled via dataLayer events and trigger conditions. You set the trigger once, and consent is enforced automatically."
+      answer: "Yes. Our banner manages Consent Mode for Google tags (GA4, Google Ads). Non-Google tags (Facebook Pixel, TikTok, LinkedIn) should use a Custom Event trigger on cookie_consent_update with consent_marketing or consent_analytics equals true."
     },
     {
       question: "Can I deploy the cookie banner through GTM instead of adding a script tag?",
-      answer: "Yes. You can deploy our cookie banner as a Custom HTML tag inside GTM. Create a new tag, paste the script, set the trigger to 'All Pages', and give it the highest tag firing priority. This means you do not need to touch your website code at all -- everything is managed through GTM."
+      answer: "Yes. Add the banner as a Custom HTML tag on Consent Initialization with high priority. Still install the Consent Mode v2 template so defaults are set synchronously before other tags. Prefer adding the script to the site head when you can."
     },
     {
       question: "What happens to my Google Ads data if users deny consent?",
@@ -81,7 +81,7 @@ export default function GTMIntegrationPage() {
     title: "Google Tag Manager Cookie Consent: Consent Mode V2 Setup Guide",
     description: "Complete guide to setting up cookie consent with Google Tag Manager. Covers Consent Mode V2, dataLayer events, tag firing rules, and GDPR compliance.",
     datePublished: "2025-02-01",
-    dateModified: "2026-03-16"
+    dateModified: "2026-09-17"
   }
 
   const breadcrumbData = [
@@ -131,13 +131,9 @@ export default function GTMIntegrationPage() {
                 className="text-center max-w-4xl space-y-4"
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/80">
-                    Google Tag Manager
-                  </span>
+                  Google Tag Manager
                   <br />
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    Cookie Consent Setup
-                  </span>
+                  Cookie Consent Setup
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -201,8 +197,8 @@ export default function GTMIntegrationPage() {
                 },
                 {
                   icon: Users,
-                  title: 'Deploy via GTM',
-                  desc: 'Add our cookie banner as a Custom HTML tag in GTM. No need to touch your website code -- marketing teams can deploy and manage consent independently.',
+                  title: 'Works via Head or GTM',
+                  desc: 'Best: paste the banner in your site head, then add our Consent Mode v2 template. No site access? Load the banner as Custom HTML on Consent Initialization instead.',
                 },
                 {
                   icon: BarChart3,
@@ -376,6 +372,10 @@ gtag('consent', 'update', {
 // 3. Pushes a consent event to the dataLayer for non-Google tags:
 window.dataLayer.push({
   'event': 'cookie_consent_update',
+  'analytics_storage': 'granted',
+  'ad_storage': 'granted',
+  'ad_user_data': 'granted',
+  'ad_personalization': 'granted',
   'consent_analytics': true,
   'consent_marketing': true,
   'consent_preferences': true
@@ -408,12 +408,13 @@ window.dataLayer.push({
                   How Do You Set Up GTM Cookie Consent?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Two options: deploy our script via GTM (recommended for marketing teams) or add the script directly to your site.
+                  Complete setup = banner script + Consent Mode v2 tag on Consent Initialization.
+                  Prefer the head install; use GTM Custom HTML only if you cannot edit the site.
                 </p>
               </motion.div>
 
               <div className="space-y-8">
-                {/* Option A: Deploy via GTM */}
+                {/* Option A: Add script before GTM */}
                 <motion.div custom={0} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card className="border border-primary/30 bg-background">
                     <CardHeader>
@@ -422,56 +423,18 @@ window.dataLayer.push({
                           <span className="font-heading font-semibold text-foreground">A</span>
                         </div>
                         <div>
-                          <CardTitle className="font-heading text-xl">Option A: Deploy Cookie Banner via GTM</CardTitle>
-                          <CardDescription>Recommended -- no code changes to your website needed</CardDescription>
+                          <CardTitle className="font-heading text-xl">Option A: Add Script Before GTM Snippet</CardTitle>
+                          <CardDescription>Recommended — banner in head, then Consent Mode template in GTM</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground mb-4">
-                        Add our cookie banner as a Custom HTML tag in GTM. This is ideal for marketing teams who manage GTM but do not have access to the website code.
-                      </p>
-                      <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto mb-4">
-                        <pre>{`<!-- GTM Custom HTML Tag -->
-<script
-  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
-  async
-></script>`}</pre>
-                      </div>
-                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-4">
-                        <li>In GTM, go to <strong className="text-foreground">Tags</strong> &rarr; <strong className="text-foreground">New</strong></li>
-                        <li>Choose <strong className="text-foreground">Custom HTML</strong> tag type</li>
-                        <li>Paste the script above (replace YOUR_BANNER_ID with your actual ID)</li>
-                        <li>Set trigger to <strong className="text-foreground">Consent Initialization - All Pages</strong></li>
-                        <li>Set tag firing priority to <strong className="text-foreground">highest</strong> (e.g., 9999)</li>
-                        <li>Save, preview, and publish</li>
-                      </ol>
-                      <div className="bg-muted border border-border rounded-lg p-4">
-                        <p className="text-sm text-muted-foreground">
-                          <strong className="text-foreground">Why Consent Initialization trigger?</strong> This fires before any other tags, ensuring consent defaults are set before GA4, Google Ads, or any other tag loads. This is critical for Consent Mode V2 compliance.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Option B: Script Tag */}
-                <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
-                  <Card className="border border-border bg-background">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-muted border border-border">
-                          <span className="font-heading font-semibold text-foreground">B</span>
-                        </div>
-                        <div>
-                          <CardTitle className="font-heading text-xl">Option B: Add Script Before GTM Snippet</CardTitle>
-                          <CardDescription>For developers who have access to the site HTML</CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">
-                        Place our cookie banner script before the GTM container snippet in your HTML head. This ensures consent defaults are set before GTM loads any tags.
+                        Place our cookie banner script before the GTM container snippet in your HTML head. Then install the{' '}
+                        <Link href="/blog/google-tag-manager-cookie-consent-guide" className="text-foreground underline underline-offset-2">
+                          Consent Mode v2 template
+                        </Link>{' '}
+                        on Consent Initialization with defaults set to Denied.
                       </p>
                       <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto mb-4">
                         <pre>{`<head>
@@ -494,7 +457,49 @@ window.dataLayer.push({
                       </div>
                       <div className="bg-muted border border-border rounded-lg p-4">
                         <p className="text-sm text-muted-foreground">
-                          <strong className="text-foreground">Order matters.</strong> Our script must be placed before the GTM snippet. This ensures consent defaults are set before GTM initializes and fires any tags.
+                          <strong className="text-foreground">Order matters.</strong> Banner before GTM. Still add the Consent Mode template so defaults are set on Consent Initialization before GA4/Ads fire.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* Option B: Deploy via GTM */}
+                <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
+                  <Card className="border border-border bg-background">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-muted border border-border">
+                          <span className="font-heading font-semibold text-foreground">B</span>
+                        </div>
+                        <div>
+                          <CardTitle className="font-heading text-xl">Option B: Deploy Cookie Banner via GTM</CardTitle>
+                          <CardDescription>When you cannot edit the website code</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground mb-4">
+                        Add our cookie banner as a Custom HTML tag on Consent Initialization. Also install the Consent Mode v2 template (defaults Denied) so consent is set synchronously before other tags.
+                      </p>
+                      <div className="bg-foreground/95 text-background font-mono p-6 rounded-lg text-sm overflow-x-auto mb-4">
+                        <pre>{`<!-- GTM Custom HTML Tag -->
+<script
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  async
+></script>`}</pre>
+                      </div>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground mb-4">
+                        <li>In GTM, go to <strong className="text-foreground">Tags</strong> &rarr; <strong className="text-foreground">New</strong></li>
+                        <li>Choose <strong className="text-foreground">Custom HTML</strong> tag type</li>
+                        <li>Paste the script above (replace YOUR_BANNER_ID with your actual ID)</li>
+                        <li>Set trigger to <strong className="text-foreground">Consent Initialization - All Pages</strong></li>
+                        <li>Set tag firing priority (e.g. 50). Keep the Consent Mode template at a higher priority (e.g. 100)</li>
+                        <li>Save, preview, and publish</li>
+                      </ol>
+                      <div className="bg-muted border border-border rounded-lg p-4">
+                        <p className="text-sm text-muted-foreground">
+                          <strong className="text-foreground">Why Consent Initialization?</strong> It fires before other tags. Pair with the Consent Mode template — do not use All Pages alone.
                         </p>
                       </div>
                     </CardContent>
@@ -543,7 +548,8 @@ export default function RootLayout({
       <body>{children}</body>
     </html>
   )
-}`}</pre>
+}`}
+                        </pre>
                       </div>
                     </CardContent>
                   </Card>

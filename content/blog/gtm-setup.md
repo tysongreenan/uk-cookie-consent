@@ -232,10 +232,10 @@ If you have not already added the Cookie Banner Generator script to your website
 Add this script to your website's `<head>` tag (you will find your personalized script in your [Cookie Banner Generator dashboard](https://cookie-banner.ca/dashboard)):
 
 ```html
-<script src="https://cdn.cookie-banner.ca/banner.js?id=YOUR_SITE_ID" async></script>
+<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>
 ```
 
-Replace `YOUR_SITE_ID` with the site ID from your dashboard.
+Replace `YOUR_BANNER_ID` with the banner ID from your dashboard.
 
 **Important:** Do NOT add the banner script through GTM. The banner must load independently of Tag Manager so it can display the consent UI before GTM processes consent states. Add it directly to your site's HTML `<head>` section, your CMS header injection, or through a server-side integration.
 

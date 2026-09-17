@@ -177,7 +177,10 @@ export function LiveCookieBanner() {
           'analytics_storage': consent.analytics ? 'granted' : 'denied',
           'ad_storage': consent.marketing ? 'granted' : 'denied',
           'ad_user_data': consent.marketing ? 'granted' : 'denied',
-          'ad_personalization': consent.marketing ? 'granted' : 'denied'
+          'ad_personalization': consent.marketing ? 'granted' : 'denied',
+          'consent_analytics': !!consent.analytics,
+          'consent_marketing': !!consent.marketing,
+          'consent_preferences': !!consent.functionality
         })
         console.log('✅ GTM consent updated:', consent)
       }
