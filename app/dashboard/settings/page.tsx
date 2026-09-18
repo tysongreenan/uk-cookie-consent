@@ -47,7 +47,7 @@ export default function SettingsPage() {
     pdf: string | null
     hosted_url: string | null
   }>>([])
-  const [isLoadingInvoices, setIsLoadingInvoices] = useState(false)
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState(true)
   const [invoiceError, setInvoiceError] = useState(false)
   const [devKeys, setDevKeys] = useState<DeveloperKey[]>([])
   const [isLoadingDevKeys, setIsLoadingDevKeys] = useState(false)
@@ -56,6 +56,7 @@ export default function SettingsPage() {
   const [copiedKey, setCopiedKey] = useState(false)
 
   const planTier = session?.user?.planTier || 'free'
+  const userId = session?.user?.id
 
   const loadDevKeys = () => {
     setIsLoadingDevKeys(true)
@@ -70,7 +71,7 @@ export default function SettingsPage() {
   }
 
   useEffect(() => {
-    if (planTier !== 'free') {
+    if (userId) {
       setIsLoadingInvoices(true)
       setInvoiceError(false)
       fetch('/api/stripe/invoices')
@@ -82,7 +83,13 @@ export default function SettingsPage() {
         .catch(() => setInvoiceError(true))
         .finally(() => setIsLoadingInvoices(false))
     }
-  }, [planTier])
+  }, [userId])
+
+  useEffect(() => {
+    if (userId && window.location.hash === '#billing') {
+      document.getElementById('billing')?.scrollIntoView()
+    }
+  }, [userId])
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -228,6 +235,12 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <Button variant="outline" asChild>
+                <Link href="#billing">
+                  <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Billing & receipts
+                </Link>
+              </Button>
               <div>
                 <Label htmlFor="name">Name</Label>
                 <Input
@@ -250,18 +263,18 @@ export default function SettingsPage() {
           </Card>
 
           {/* Plan & Billing */}
-          <Card>
+          <Card id="billing" className="scroll-mt-6">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
-                Plan & Billing
+                Billing & receipts
               </CardTitle>
               <CardDescription>
-                Manage your subscription and view invoices
+                Download paid invoices for your records and manage your plan.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg border bg-muted/30">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-lg capitalize">{planTier} Plan</span>
@@ -280,7 +293,7 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              {planTier !== 'free' && (
+              {(planTier !== 'free' || invoices.length > 0) && (
                 <Button
                   variant="outline"
                   onClick={handleManageBilling}
@@ -290,7 +303,7 @@ export default function SettingsPage() {
                     'Opening...'
                   ) : (
                     <>
-                      Manage Billing & Invoices
+                      Open billing portal
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </>
                   )}
@@ -298,73 +311,75 @@ export default function SettingsPage() {
               )}
 
               {/* Invoices */}
-              {planTier !== 'free' && (
-                <div className="pt-2">
-                  <h4 className="font-medium text-sm flex items-center gap-2 mb-3">
-                    <FileText className="h-4 w-4" />
-                    Invoices & Receipts
-                  </h4>
-                  {isLoadingInvoices ? (
-                    <div className="text-sm text-muted-foreground">Loading invoices...</div>
-                  ) : invoiceError ? (
-                    <div className="text-sm text-red-600">Failed to load invoices. You can view them in the billing portal above.</div>
-                  ) : invoices.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">No invoices yet</div>
-                  ) : (
-                    <div className="space-y-2">
-                      {invoices.map((inv) => (
-                        <div
-                          key={inv.id}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/20"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">
-                                {inv.number || 'Invoice'}
-                              </span>
-                              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                                inv.status === 'paid'
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-yellow-100 text-yellow-700'
-                              }`}>
-                                {inv.status || 'pending'}
-                              </span>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              {new Date(inv.created * 1000).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                              {' · '}
-                              {new Intl.NumberFormat('en-US', {
-                                style: 'currency',
-                                currency: inv.currency,
-                              }).format(inv.amount / 100)}
-                            </div>
+              <div className="pt-2" aria-live="polite" aria-busy={isLoadingInvoices}>
+                <h4 className="font-medium text-sm flex items-center gap-2 mb-3">
+                  <FileText className="h-4 w-4" />
+                  Invoices & Receipts
+                </h4>
+                {isLoadingInvoices ? (
+                  <div className="text-sm text-muted-foreground">Loading invoices...</div>
+                ) : invoiceError ? (
+                  <div className="text-sm text-destructive">We couldn&apos;t load your invoices. Refresh the page to try again{planTier !== 'free' ? ', or open the billing portal above.' : '.'}</div>
+                ) : invoices.length === 0 ? (
+                  <div className="text-sm text-muted-foreground">No paid invoices were found for this account. If you purchased using a different account, sign in with that email to find your receipt.</div>
+                ) : (
+                  <div className="space-y-2">
+                    {invoices.map((inv) => (
+                      <div
+                        key={inv.id}
+                        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg border bg-muted/20"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-medium break-all">
+                              {inv.number || 'Invoice'}
+                            </span>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                              inv.status === 'paid'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {inv.status || 'pending'}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1 ml-2">
-                            {inv.hosted_url && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={inv.hosted_url} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-3.5 w-3.5" />
-                                </a>
-                              </Button>
-                            )}
-                            {inv.pdf && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={inv.pdf} target="_blank" rel="noopener noreferrer">
-                                  <Download className="h-3.5 w-3.5" />
-                                </a>
-                              </Button>
-                            )}
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {new Date(inv.created * 1000).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                            {' · '}
+                            {new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: inv.currency,
+                            }).format(inv.amount / 100)}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {inv.hosted_url && (
+                            <Button variant="ghost" size="sm" asChild>
+                              <a href={inv.hosted_url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+                                View invoice
+                                <span className="sr-only"> {inv.number || ''} (opens in a new tab)</span>
+                              </a>
+                            </Button>
+                          )}
+                          {inv.pdf && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={inv.pdf} target="_blank" rel="noopener noreferrer">
+                                <Download className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+                                Download PDF
+                                <span className="sr-only"> {inv.number || 'invoice'} (opens in a new tab)</span>
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

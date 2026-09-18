@@ -10,6 +10,7 @@ import {
   Sun, 
   User, 
   Settings, 
+  FileText,
   LogOut, 
   ChevronDown,
   UserPlus
@@ -95,7 +96,7 @@ export function DashboardHeader({}: HeaderProps) {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2 px-2">
+              <Button variant="ghost" className="flex items-center space-x-2 px-2" aria-label="My account">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-primary-foreground" />
                 </div>
@@ -117,6 +118,12 @@ export function DashboardHeader({}: HeaderProps) {
                 <Link href="/dashboard/settings">
                   <User className="mr-2 h-4 w-4" />
                   Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings#billing">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Billing & receipts
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
