@@ -6,11 +6,11 @@ import { ModernFeaturesSection, ComplianceSkeleton } from '@/components/landing/
 
 export const metadata: Metadata = {
   title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
-  description: 'Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent. Learn how to verify compliance.',
+  description: 'What the banner does, and what it does not. Consent tools for GDPR, UK PECR, PIPEDA, and Quebec Law 25. A banner is not a legal opinion and does not make a site compliant by itself.',
   keywords: 'will cookie banner keep me compliant, cookie consent compliance verification, how to know if cookie banner is compliant, cookie banner compliance check, GDPR compliance verification, PIPEDA compliance check',
   openGraph: {
     title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
-    description: 'Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent.',
+    description: 'What the banner does for GDPR, UK PECR, PIPEDA, and Quebec Law 25, and what still sits with you.',
     type: 'article',
   },
   alternates: {
@@ -21,11 +21,11 @@ export const metadata: Metadata = {
 const faqData = [
   {
     question: "Will this cookie banner keep me compliant with GDPR?",
-    answer: "Yes. Our cookie banner automatically blocks all non-essential cookies until users provide explicit opt-in consent, which meets GDPR requirements. The banner also provides granular consent controls, logs all consent decisions, and allows users to withdraw consent at any time."
+    answer: "For visitors in the EU, the banner can block non-essential cookies until someone opts in, offer choices by category, record the choice, and let them change it later. Those are GDPR and ePrivacy consent tools. They do not, by themselves, make a site GDPR compliant. You still need a privacy notice, a lawful basis for each use, and a check that the scripts actually wait for consent."
   },
   {
     question: "Does this work for PIPEDA compliance in Canada?",
-    answer: "Yes. Our banner meets PIPEDA requirements by obtaining meaningful consent before collecting personal information through cookies. It blocks tracking cookies until users consent and provides clear information about data collection purposes."
+    answer: "PIPEDA is still the federal law. Bill C-36, introduced on 15 June 2026, is not in force. The banner can present a clear notice and collect consent before tracking cookies run. Meaningful consent also depends on the words you show and on whether the information is sensitive. Implied consent can be enough for non-sensitive analytics when the notice is clear. Quebec visitors are under Law 25, which is stricter."
   },
   {
     question: "How do I verify my cookie banner is compliant?",
@@ -33,23 +33,23 @@ const faqData = [
   },
   {
     question: "What happens if privacy laws change?",
-    answer: "We automatically update our cookie banner solution when privacy laws change. You'll receive notifications about updates, and new compliance features are added automatically. This ensures your banner remains compliant without manual intervention."
+    answer: "Privacy law changes, and a banner does not update itself into compliance. UK PECR changed on 5 February 2026: low-risk statistics and appearance cookies can use an opt-out, while advertising still needs consent. EU law did not make that change. When a rule changes, review the banner settings and the copy against the current rule. The Terms say the tools do not guarantee full legal compliance."
   },
   {
     question: "Does this cover Quebec Law 25 requirements?",
-    answer: "Yes. Our banner fully supports Quebec Law 25 requirements including explicit consent (not implied), opt-in behavior, bilingual support (English and French), and granular cookie controls. All Quebec-specific requirements are built-in."
+    answer: "Law 25 has been fully in force since September 2024. The banner can require opt-in before non-essential identification or profiling technologies run, and it can be shown in English and French. Law 25 also requires a published privacy officer, privacy impact assessments in the cases the Act lists, and a contract with service providers. The banner does not do those."
   },
   {
     question: "How does this compare to other cookie banner solutions?",
-    answer: "Unlike many cookie banner solutions that require manual configuration, our banner automatically implements all compliance requirements. It blocks cookies by default, requires explicit consent, logs all decisions, and updates automatically when laws change. Most competitors require you to manually configure these features."
+    answer: "The banner can block non-essential cookies by default, ask for a choice by category, and keep a record of that choice. It does not read a statute and reconfigure itself when the law changes. UK PECR and EU GDPR diverged on 5 February 2026, so a single worldwide opt-in is a stricter setting, not a statement that every country requires it."
   },
   {
     question: "Do I need to configure anything for compliance?",
-    answer: "No. Compliance features are enabled by default. The banner automatically blocks non-essential cookies, requires explicit consent, and implements all required privacy law features. You only need to customize the design and text to match your brand."
+    answer: "You choose the consent model for the visitors you serve. EU visitors need opt-in before non-essential cookies. UK advertising cookies still need prior consent. UK statistics can use the February 2026 opt-out only if the use stays inside that exception and people can object for free. Quebec visitors need Law 25 opt-in. The words on the banner are part of the notice, so they need to match what the site actually does."
   },
   {
     question: "What if I have users in multiple countries?",
-    answer: "Our banner automatically detects user location and applies the appropriate privacy law requirements. For example, EU users get GDPR-compliant behavior, Canadian users get PIPEDA-compliant behavior, and Quebec users get Law 25-compliant behavior—all from one banner."
+    answer: "The banner can vary behaviour by location: opt-in for the EU, Law 25 opt-in for Quebec, meaningful consent for the rest of Canada, and an opt-out of sale or sharing for California, including Global Privacy Control. UK visitors are not EU visitors. Since 5 February 2026, PECR allows an opt-out for low-risk statistics and appearance cookies. Advertising still needs consent. Location detection does not replace a decision about which rule you are following."
   }
 ]
 
@@ -60,7 +60,7 @@ const breadcrumbData = [
 ]
 
 export default function WillThisKeepMeCompliantPage() {
-  const updatedDate = '2026-07-20'
+  const updatedDate = '2026-09-21'
   const publishedDate = '2025-01-15'
 
   // Article structured data
@@ -68,7 +68,7 @@ export default function WillThisKeepMeCompliantPage() {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "Will This Cookie Banner Keep Me Compliant?",
-    "description": "Yes. Our cookie banner automatically ensures GDPR, PIPEDA, CASL, and Quebec Law 25 compliance by blocking non-essential cookies until users consent.",
+    "description": "What the banner does for GDPR, UK PECR, PIPEDA, and Quebec Law 25, and what still sits with the website owner.",
     "author": {
       "@type": "Organization",
       "name": "Cookie Banner Team"
@@ -89,22 +89,22 @@ export default function WillThisKeepMeCompliantPage() {
     }
   }
 
-  const directAnswer = "Yes. Our cookie banner automatically ensures compliance with GDPR, PIPEDA, CASL, and Quebec Law 25 by blocking all non-essential cookies until users provide explicit opt-in consent. The banner implements all required compliance mechanisms including cookie blocking, consent logging, granular controls, and automatic updates when privacy laws change. You can verify compliance through our dashboard's built-in verification tools."
+  const directAnswer = "The banner is a consent tool, not a guarantee. It can block non-essential cookies until someone opts in, record the choice, and let them change it. That matches EU GDPR and Quebec Law 25 for cookies. PIPEDA is still the federal Canadian law, and Bill C-36 is not in force. In the UK, since 5 February 2026, low-risk statistics and appearance cookies can use a simple opt-out, while advertising still needs consent. You still need a privacy notice, a check that scripts wait for the choice, and, in Quebec, a privacy officer. The Terms say the tools do not guarantee full legal compliance."
 
   const complianceFeatures = [
     {
-      title: "GDPR Compliant",
-      description: "Full compliance with EU's General Data Protection Regulation",
+      title: "EU consent tools",
+      description: "Opt-in before non-essential cookies, by category, with a record of the choice",
       className: "col-span-1 lg:col-span-2 border-b lg:border-r border-border",
     },
     {
-      title: "PIPEDA Compliant",
-      description: "Meets Canadian federal privacy law requirements",
+      title: "PIPEDA notice and consent",
+      description: "Clear notice before tracking. Federal PIPEDA is still in force.",
       className: "col-span-1 lg:col-span-2 border-b border-border",
     },
     {
-      title: "Quebec Law 25",
-      description: "Explicit consent and bilingual support built-in",
+      title: "Quebec Law 25 consent",
+      description: "Opt-in for non-essential tracking, with English and French",
       className: "col-span-1 lg:col-span-2 border-border",
     },
   ]
@@ -145,14 +145,14 @@ export default function WillThisKeepMeCompliantPage() {
         {/* Features Section */}
         <ModernFeaturesSection
           title="Comprehensive Compliance Coverage"
-          description="Our banner automatically ensures compliance with all major privacy laws"
+          description="Consent tools for the laws that actually apply. The banner does not make a site compliant by itself."
           features={complianceFeatures}
         />
 
-        <h2 id="how-does-our-banner-automatically-ensure-compliance">How Does Our Banner Automatically Ensure Compliance?</h2>
+        <h2 id="how-does-our-banner-automatically-ensure-compliance">What the banner actually does</h2>
         
         <p>
-          Our cookie banner ensures compliance through multiple automatic mechanisms that work together to meet privacy law requirements without manual configuration.
+          The banner can block non-essential cookies until a visitor chooses, store that choice, and show the notice in more than one language. Those are tools. They do not replace a privacy notice, a privacy officer, or a check that your scripts wait for the choice.
         </p>
 
         <h3>Automatic Cookie Blocking</h3>
@@ -287,7 +287,7 @@ export default function WillThisKeepMeCompliantPage() {
         </ul>
 
         <p>
-          Our solution handles all of this automatically. Compliance features are enabled by default, and updates are applied automatically.
+          Blocking, a record of the choice, and more than one language can be turned on in the banner. The legal setting still has to match the visitors you serve, and it has to be reviewed when the law changes.
         </p>
 
         <h3>Built-in Compliance vs. Add-ons</h3>
@@ -304,15 +304,15 @@ export default function WillThisKeepMeCompliantPage() {
         <h2 id="ready-to-get-compliant">Ready to Get Compliant?</h2>
         
         <p>
-          Our cookie banner automatically ensures compliance with all major privacy laws. Get started in minutes:
+          Set the banner to the rule that applies to each visitor. Then confirm the scripts follow that choice.
         </p>
 
         <ul>
-          <li>✓ Automatic cookie blocking until consent</li>
-          <li>✓ Compliance with GDPR, PIPEDA, CASL, Quebec Law 25, and more</li>
-          <li>✓ Built-in consent logging and verification tools</li>
-          <li>✓ Automatic updates when privacy laws change</li>
-          <li>✓ Zero manual configuration required</li>
+          <li>✓ Block non-essential cookies until consent, where the law requires opt-in</li>
+          <li>✓ EU GDPR and Quebec Law 25 still require that opt-in. UK statistics can use an opt-out since 5 February 2026. PIPEDA is still the federal Canadian law.</li>
+          <li>✓ A record of the choice, so you can show what was asked and what was answered</li>
+          <li>✓ English and French for Quebec</li>
+          <li>✓ You still write the notice, name a privacy officer where Law 25 requires one, and review the setup when the law changes</li>
         </ul>
 
         <h2 id="conclusion">Conclusion / TL;DR</h2>

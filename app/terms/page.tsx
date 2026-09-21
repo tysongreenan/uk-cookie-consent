@@ -16,7 +16,7 @@ export default function TermsPage() {
               Terms of Service
             </h1>
             <p className="text-lg text-gray-600">
-              Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              Last updated: September 21, 2026
             </p>
           </div>
 
@@ -42,7 +42,8 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Acceptance of Terms</h2>
                 <p className="text-gray-600 mb-4">
                   By creating an account, using our services, or accessing our website, you acknowledge that you have read, understood, 
-                  and agree to be bound by these Terms and our Privacy Policy.
+                  and agree to be bound by these Terms and our{' '}
+                  <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a>.
                 </p>
                 <p className="text-gray-600">
                   These Terms apply to all visitors, users, and others who access or use the service.
@@ -121,8 +122,10 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Privacy and Data Protection</h2>
                 <p className="text-gray-600 mb-4">
-                  Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your information. 
-                  By using our services, you agree to the collection and use of information in accordance with our Privacy Policy.
+                  Your privacy is important to us. Our{' '}
+                  <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a>{' '}
+                  explains how we collect, use, and protect your information.
+                  By using our services, you agree to the collection and use of information in accordance with that policy.
                 </p>
                 <p className="text-gray-600">
                   We are committed to helping you comply with privacy laws, but you are ultimately responsible for ensuring 

@@ -98,7 +98,7 @@ const frameworks = [
       'Canada\'s federal privacy law requires meaningful consent for collecting personal information through cookies. Quebec\'s Law 25 adds GDPR-like opt-in requirements for Quebec residents.',
     consentModel: 'Meaningful consent',
     consentDetail: 'Users must understand what they are consenting to. Implied consent is acceptable for non-sensitive data with clear notice.',
-    fines: 'Up to $100K per violation (PIPEDA) / $25M or 4% (Quebec Law 25)',
+    fines: 'PIPEDA: up to $100K for specified offences. Quebec Law 25: up to $10M or 2% (administrative), or $25M or 4% (penal)',
     appliesWhen: 'Commercial activities across Canada',
     highlights: [
       'Meaningful consent required (not just a click)',
@@ -144,7 +144,7 @@ const comparisonRows = [
     label: 'Maximum Fines',
     gdpr: 'Up to \u20AC20M / 4%',
     ccpa: 'Up to $7,500/violation',
-    pipeda: 'Up to $100K / $25M (QC)',
+    pipeda: '$100K offence cap / QC up to $25M or 4%',
   },
   {
     label: 'Applies To',
@@ -163,7 +163,7 @@ const faqData = [
   {
     question: 'Do I need a cookie banner if my website only uses analytics?',
     answer:
-      'Under GDPR, yes. Analytics cookies like Google Analytics are non-essential and require explicit opt-in consent before loading. Under CCPA, analytics cookies generally do not trigger the "Do Not Sell" requirement unless the data is shared with third parties. Under PIPEDA, implied consent with clear notice may be sufficient for basic analytics.',
+      'In the EU, yes. Analytics cookies are non-essential under the GDPR and the ePrivacy Directive, so they need opt-in consent before they load. In the UK, PECR changed on 5 February 2026: cookies used only for statistics about that site, and cookies that only adapt how the site looks or works, can run without prior consent if people have a simple, free way to object. Advertising and any analytics tool that shares identifiers with a third party still need consent. Under CCPA, analytics cookies generally do not trigger the "Do Not Sell or Share" duty unless the data is sold or shared. Under PIPEDA, implied consent with clear notice may be enough for basic analytics. Quebec Law 25 still requires opt-in before non-essential identification or profiling technologies load.',
   },
   {
     question: 'Can one cookie banner comply with all three laws?',
@@ -173,12 +173,12 @@ const faqData = [
   {
     question: 'What happens if I do not have a cookie banner?',
     answer:
-      'The consequences depend on the law. GDPR fines can reach 20 million euros or 4% of global revenue. CCPA penalties are up to $7,500 per intentional violation, and each consumer interaction can be a separate violation. PIPEDA violations can result in $100,000 CAD fines, and Quebec Law 25 penalties reach $25 million CAD. Beyond fines, non-compliance creates legal liability and damages trust.',
+      'The consequences depend on the law. EU GDPR fines can reach 20 million euros or 4% of global annual turnover. UK PECR fines, including for cookies, have matched that scale since 5 February 2026: up to £17.5 million or 4% of global annual turnover. CCPA penalties are $2,500 per violation and $7,500 per intentional violation, and each consumer can be a separate count. PIPEDA does not fine per cookie. Specified offences, such as failing to report a breach that creates a real risk of significant harm, can draw a fine of up to $100,000. Quebec Law 25 administrative penalties can reach $10 million or 2% of worldwide turnover, and penal fines can reach $25 million or 4%.',
   },
   {
     question: 'Are essential cookies exempt from consent requirements?',
     answer:
-      'Yes, across all three frameworks. Cookies that are strictly necessary for the website to function (session cookies, shopping cart cookies, security tokens, load balancers) do not require consent. However, you must still disclose them in your cookie policy. Analytics, marketing, and advertising cookies are never considered strictly necessary.',
+      'Yes. Cookies that are strictly necessary for the site to function, such as session cookies, shopping-cart cookies, security tokens, and load balancers, do not require consent. You still disclose them in your cookie policy. Analytics and advertising cookies are not strictly necessary. In the EU they need opt-in consent. In the UK, since 5 February 2026, low-risk statistical cookies and appearance cookies have a separate exception, with a simple free opt-out. Advertising cookies do not.',
   },
 ]
 
@@ -236,7 +236,7 @@ export default function CompliancePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Three major privacy laws govern how websites use cookies. GDPR requires opt-in. CCPA requires opt-out. PIPEDA requires meaningful consent. Here is what each one means for your website.
+                  GDPR requires opt-in. CCPA requires opt-out. PIPEDA requires meaningful consent. UK PECR is separate: since 5 February 2026, low-risk statistics can use an opt-out, and advertising still needs consent. Here is what each rule means for your website.
                 </p>
               </motion.div>
 

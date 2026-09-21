@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
               Privacy Policy
             </h1>
             <p className="text-lg text-gray-600">
-              Last updated: August 22, 2026
+              Last updated: September 21, 2026
             </p>
           </div>
 
@@ -45,6 +45,9 @@ export default function PrivacyPolicyPage() {
                   who we share it with, and the rights you have over it. It is written to meet the requirements of
                   Canada&apos;s Personal Information Protection and Electronic Documents Act (PIPEDA) and Quebec&apos;s
                   Act respecting the protection of personal information in the private sector (as amended by Law 25).
+                  PIPEDA remains the federal law. A bill to replace Part 1 of PIPEDA was introduced in June 2026 and
+                  is not in force. When we offer the service to people in the EEA, the EU GDPR applies to their
+                  personal information. When we offer it to people in the United Kingdom, the UK GDPR applies to theirs.
                 </p>
               </section>
 
@@ -220,7 +223,10 @@ export default function PrivacyPolicyPage() {
                   </a>
                   . We respond to requests within 30 days. If you are not satisfied with our response, you may
                   complain to the Office of the Privacy Commissioner of Canada (priv.gc.ca) or, in Quebec, the
-                  Commission d&apos;accès à l&apos;information (cai.gouv.qc.ca).
+                  Commission d&apos;accès à l&apos;information (cai.gouv.qc.ca). If you are in the United Kingdom,
+                  raise the complaint with us first. UK law, since 19 June 2026, expects that step before a
+                  complaint to the Information Commissioner&apos;s Office (ico.org.uk). If you are in the EEA, you
+                  may also complain to the supervisory authority where you live or work.
                 </p>
               </section>
 

@@ -67,7 +67,7 @@ const requirements = [
   {
     title: 'Quebec Law 25: stricter opt-in requirements',
     description:
-      'Quebec\'s privacy modernization law (Law 25, fully in force since September 2024) imposes GDPR-like requirements including explicit opt-in consent for cookies, mandatory privacy impact assessments, and fines up to $25 million CAD or 4% of worldwide turnover.',
+      'Quebec\'s Law 25 has been fully in force since September 2024. It requires opt-in consent before non-essential identification or profiling technologies are activated, a published privacy officer, and privacy impact assessments in the cases the Act lists. Administrative penalties can reach $10 million or 2% of worldwide turnover. Penal fines can reach $25 million or 4%, whichever is greater.',
   },
   {
     title: 'Accountability and transparency',
@@ -105,7 +105,7 @@ const faqData = [
   {
     question: 'What are the fines for PIPEDA cookie violations?',
     answer:
-      'Under federal PIPEDA, the Privacy Commissioner can issue findings and recommendations, and violations can result in fines of up to $100,000 CAD per violation through Federal Court action. Quebec Law 25 has significantly higher penalties: up to $25 million CAD or 4% of worldwide turnover, whichever is greater. British Columbia and Alberta have their own provincial privacy laws with separate enforcement mechanisms.',
+      'PIPEDA is still the federal private-sector law. Bill C-27 died on the Order Paper in January 2025. Bill C-36, which would replace Part 1 of PIPEDA, was introduced on 15 June 2026 and is not in force. The Commissioner can investigate and make findings. A fine of up to $100,000 is for specified offences, such as knowingly failing to report a breach that creates a real risk of significant harm, failing to keep breach records, or obstructing an investigation. It is not a per-cookie penalty. Quebec Law 25 administrative penalties can reach $10 million or 2% of worldwide turnover, and penal fines can reach $25 million or 4%, whichever is greater. British Columbia and Alberta have their own private-sector statutes.',
   },
   {
     question: 'Do I need bilingual cookie consent for a Canadian website?',

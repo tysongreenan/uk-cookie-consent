@@ -476,7 +476,7 @@ export default function CookieScannerPage() {
 
                 <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Analytics Cookies</h3>
                 <p>
-                  Analytics cookies track how visitors interact with your website — page views, scroll depth, click patterns, and session duration. Google Analytics (_ga, _gid), Hotjar, Mixpanel, and similar tools use these cookies. Under GDPR, analytics cookies require explicit opt-in consent. Under CCPA, they generally do not trigger the &quot;Do Not Sell&quot; requirement unless the data is shared with third parties for cross-context advertising.
+                  Analytics cookies track how visitors interact with your website — page views, scroll depth, click patterns, and session duration. Google Analytics (_ga, _gid), Hotjar, Mixpanel, and similar tools use these cookies. Under the EU GDPR they need opt-in consent before they load. In the UK, since 5 February 2026, cookies used only to collect statistics about that site can run without prior consent if people have a simple, free way to object. A tool that shares identifiers with an advertising network is outside that exception. Under CCPA, analytics cookies generally do not trigger the &quot;Do Not Sell or Share&quot; duty unless the data is sold or shared for cross-context advertising.
                 </p>
 
                 <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Marketing &amp; Advertising Cookies</h3>

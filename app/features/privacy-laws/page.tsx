@@ -189,7 +189,7 @@ export default function PrivacyLawsPage() {
           <li>Easy consent withdrawal</li>
         </ul>
         <p>
-          Quebec Law 25 includes significant fines (up to $25 million or 4% of global revenue) for non-compliance. Our banner ensures you meet all requirements automatically.
+          Quebec Law 25 has been fully in force since September 2024. Administrative penalties can reach $10 million or 2% of worldwide turnover. Penal fines can reach $25 million or 4%, whichever is greater. A banner can collect opt-in consent and offer French. It does not appoint your privacy officer, complete a privacy impact assessment, or write your privacy policy.
         </p>
 
         <h3>Alberta PIPA (Personal Information Protection Act)</h3>
@@ -245,10 +245,11 @@ export default function PrivacyLawsPage() {
           Our intelligent cookie banner automatically detects the geographic location of your website visitors. Based on their location, it dynamically applies the specific privacy law requirements relevant to that region.
         </p>
         <ul>
-          <li><strong>EU Visitors:</strong> Automatically applies GDPR-compliant behavior (explicit opt-in, granular controls).</li>
-          <li><strong>Canadian Visitors:</strong> Applies PIPEDA and CASL requirements.</li>
-          <li><strong>Quebec Visitors:</strong> Applies Quebec Law 25 requirements (explicit opt-in, bilingual support).</li>
-          <li><strong>California Visitors:</strong> Applies CCPA requirements (opt-out, "Do Not Sell" link).</li>
+          <li><strong>EU Visitors:</strong> Opt-in before non-essential cookies, with granular controls. EU law did not adopt the UK&apos;s 2026 statistics exception.</li>
+          <li><strong>UK Visitors:</strong> Advertising and cross-site tracking still need prior consent under PECR. Since 5 February 2026, cookies used only for that site&apos;s statistics, and cookies that only adapt appearance, can run with a simple, free opt-out. An opt-in banner is still valid.</li>
+          <li><strong>Canadian Visitors:</strong> PIPEDA still applies. The federal replacement bill introduced in June 2026 is not in force. Meaningful consent, with implied consent only where the information is not sensitive and the notice is clear.</li>
+          <li><strong>Quebec Visitors:</strong> Law 25 opt-in before non-essential identification or profiling technologies, with English and French available.</li>
+          <li><strong>California Visitors:</strong> Opt-out of sale and sharing, including a way to honour Global Privacy Control. A banner by itself is not the opt-out of sale.</li>
         </ul>
         <p>
           This means you install one banner code, and it handles the complexity of multi-jurisdictional compliance for you.

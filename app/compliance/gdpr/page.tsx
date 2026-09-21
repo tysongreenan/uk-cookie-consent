@@ -314,7 +314,7 @@ export default function GDPRCompliancePage() {
                     If your website uses any cookies beyond what is strictly necessary for the site to function, you need a GDPR-compliant cookie consent banner. This includes analytics cookies (Google Analytics, Plausible with cookies enabled), marketing pixels (Meta Pixel, Google Ads), social media embeds, and most third-party scripts. Not sure what cookies your site sets? <Link href="/tools/cookie-scanner" className="text-primary underline hover:no-underline">Run a free cookie scan</Link> to find out in 30 seconds.
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
-                    The only cookies exempt from consent are those that are strictly necessary for the website to work, such as session cookies for shopping carts, login authentication tokens, and security cookies. Even these must be disclosed in your cookie policy.
+                    The only cookies exempt from consent under EU law are those that are strictly necessary for the website to work, such as session cookies for shopping carts, login authentication tokens, and security cookies. Even these must be disclosed in your cookie policy. This page is about the EU GDPR. The United Kingdom changed PECR on 5 February 2026: low-risk statistics and appearance cookies can use a simple opt-out there. That exception does not apply to people in the EU. See the <Link href="/locations/uk" className="text-primary underline hover:no-underline">UK guide</Link>.
                   </p>
                 </div>
 
