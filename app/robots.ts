@@ -28,8 +28,7 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           // Block auth pages (no SEO value, can cause duplicate content)
           '/auth/',
-          // Block test/development pages
-          '/test-analytics/',
+          // Block leftover demo pages
           '/demo/',
           // Block builder page (requires auth, no SEO value)
           '/builder/',
@@ -50,7 +49,6 @@ export default function robots(): MetadataRoute.Robots {
           '/dashboard/',
           '/api/',
           '/auth/',
-          '/test-analytics/',
           '/demo/',
           '/builder/',
           '/invite/',
