@@ -1,6 +1,7 @@
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { cookieDomainRuntimeJs, serializeCookieDomainConfig } from '@/lib/cookie-domain'
+import { resolveButtonPlacement } from '@/lib/banner-placement'
 
 // Helper function to safely encode script code for embedding
 const encodeScriptCode = (scriptCode: string): string => {
@@ -256,6 +257,34 @@ const generateScriptLoaders = (
   }).join('\n\n')
 }
 
+/** Short labels for the categories bar. Visitor language picks a row; the
+ *  site owner's language uses their button text instead. */
+const CATEGORY_BAR_COPY: Record<string, {
+  necessary: string
+  preferences: string
+  statistics: string
+  marketing: string
+  selection: string
+  details: string
+}> = {
+  en: { necessary: 'Necessary', preferences: 'Preferences', statistics: 'Statistics', marketing: 'Marketing', selection: 'Allow selection', details: 'Show details' },
+  fr: { necessary: 'Nécessaires', preferences: 'Préférences', statistics: 'Statistiques', marketing: 'Marketing', selection: 'Autoriser la sélection', details: 'Afficher les détails' },
+  es: { necessary: 'Necesarias', preferences: 'Preferencias', statistics: 'Estadísticas', marketing: 'Marketing', selection: 'Permitir selección', details: 'Mostrar detalles' },
+  de: { necessary: 'Notwendig', preferences: 'Präferenzen', statistics: 'Statistiken', marketing: 'Marketing', selection: 'Auswahl erlauben', details: 'Details anzeigen' },
+  pt: { necessary: 'Necessários', preferences: 'Preferências', statistics: 'Estatísticas', marketing: 'Marketing', selection: 'Permitir seleção', details: 'Mostrar detalhes' },
+  ja: { necessary: '必須', preferences: '設定', statistics: '統計', marketing: 'マーケティング', selection: '選択を許可', details: '詳細を表示' },
+  zh: { necessary: '必要', preferences: '偏好', statistics: '统计', marketing: '营销', selection: '允许所选', details: '显示详情' },
+  ko: { necessary: '필수', preferences: '환경설정', statistics: '통계', marketing: '마케팅', selection: '선택 허용', details: '세부정보 보기' },
+  ar: { necessary: 'ضرورية', preferences: 'التفضيلات', statistics: 'الإحصاءات', marketing: 'التسويق', selection: 'السماح بالمحدد', details: 'عرض التفاصيل' },
+  hi: { necessary: 'आवश्यक', preferences: 'प्राथमिकताएँ', statistics: 'आँकड़े', marketing: 'मार्केटिंग', selection: 'चयन की अनुमति दें', details: 'विवरण दिखाएँ' },
+  nl: { necessary: 'Noodzakelijk', preferences: 'Voorkeuren', statistics: 'Statistieken', marketing: 'Marketing', selection: 'Selectie toestaan', details: 'Details tonen' },
+  sv: { necessary: 'Nödvändiga', preferences: 'Inställningar', statistics: 'Statistik', marketing: 'Marknadsföring', selection: 'Tillåt urval', details: 'Visa detaljer' },
+  nb: { necessary: 'Nødvendige', preferences: 'Preferanser', statistics: 'Statistikk', marketing: 'Markedsføring', selection: 'Tillat utvalg', details: 'Vis detaljer' },
+  da: { necessary: 'Nødvendige', preferences: 'Præferencer', statistics: 'Statistik', marketing: 'Marketing', selection: 'Tillad valg', details: 'Vis detaljer' },
+  it: { necessary: 'Necessari', preferences: 'Preferenze', statistics: 'Statistiche', marketing: 'Marketing', selection: 'Consenti selezione', details: 'Mostra dettagli' },
+  fi: { necessary: 'Välttämättömät', preferences: 'Asetukset', statistics: 'Tilastot', marketing: 'Markkinointi', selection: 'Salli valinta', details: 'Näytä tiedot' },
+}
+
 export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
   hardenBannerConfig(config)
 
@@ -488,10 +517,33 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   const messageHtml = `<p id="cookie-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: ${escapeHtml(config.colors.text)} !important; text-align: ${copyAlign}; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; opacity: 0.92;">${escapeHtml(config.text.message)}${privacyPolicyLink ? ` ${privacyPolicyLink}` : ''}</p>`
 
-  // Bars can stack the actions in a right-hand column (TrustArc-style:
-  // preferences on top, then accept/reject). Older configs lack the field —
-  // default to the classic inline row.
-  const stackedActions = isFullWidthBar && config.layout?.buttonPlacement === 'stacked-right'
+  // Categories and stacked buttons render only when that placement is saved.
+  const buttonPlacement = resolveButtonPlacement(config.position, config.layout?.buttonPlacement)
+  const stackedActions = buttonPlacement === 'stacked-right'
+  const categoriesLayout = buttonPlacement === 'categories'
+  const ownerLang = config.language === 'auto' ? 'en' : (config.language || 'en')
+  const barCopy = CATEGORY_BAR_COPY[ownerLang] || CATEGORY_BAR_COPY.en
+  const genericPrefs = new Set(['Preferences', 'Customize', 'Cookie Settings'])
+  const selectionLabel = config.text.selectionButton?.trim() || barCopy.selection
+  const detailsLabel = genericPrefs.has((config.text.preferencesButton || '').trim())
+    ? barCopy.details
+    : (config.text.preferencesButton || barCopy.details)
+  // Opt-in laws start the optional switches off. Others match the common
+  // declaration bar, where every category begins on.
+  const optionalOn = !(config.compliance?.requiresOptIn || config.compliance?.requiresExplicitConsent)
+
+  const catSwitch = (id: string, labelId: string, label: string, checked: boolean, disabled = false) => {
+    const onColor = escapeHtml(config.colors.button)
+    const offColor = config.theme === 'dark' ? 'rgba(255,255,255,0.28)' : '#d1d5db'
+    return `<label style="display:inline-flex;align-items:center;gap:8px;margin:0;cursor:${disabled ? 'default' : 'pointer'};user-select:none;">
+      <span id="${labelId}" style="font-size:13px;font-weight:600;line-height:1;color:${escapeHtml(config.colors.text)};">${escapeHtml(label)}</span>
+      <span style="position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;">
+        <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} aria-label="${escapeHtml(label)}" style="opacity:0;width:0;height:0;position:absolute;margin:0;" />
+        <span id="${id}-slider" style="position:absolute;inset:0;background:${checked ? onColor : offColor};border-radius:20px;transition:background-color .2s;"></span>
+        <span id="${id}-thumb" style="position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;transform:translateX(${checked ? 16 : 0}px);pointer-events:none;box-shadow:0 1px 2px rgba(0,0,0,.18);"></span>
+      </span>
+    </label>`
+  }
 
   const acceptBtnHtml = `<button id="cookie-accept-btn" type="button" style="${btnBase} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: none;">${escapeHtml(config.text.acceptButton)}</button>`
   const rejectBtnHtml = showReject ? `<button id="cookie-reject-btn" type="button" style="${btnBase} background-color: ${rejectBg}; color: ${rejectFg} !important; border: 1.5px solid ${rejectBorder} !important;">${escapeHtml(config.text.rejectButton)}</button>` : ''
@@ -503,7 +555,18 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
       : `<button id="cookie-preferences-btn" type="button" style="${btnBase} background-color: transparent; color: ${escapeHtml(config.colors.link)} !important; border: none; font-weight: 500; min-height: 40px; padding: 8px 12px;">${escapeHtml(config.text.preferencesButton)}</button>`)
     : ''
 
-  const actionsHtml = stackedActions
+  const catBtn =
+    'display:flex;align-items:center;justify-content:center;width:100%;border-radius:4px;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;min-height:40px;padding:9px 16px;font-family:inherit;box-sizing:border-box;-webkit-tap-highlight-color:transparent;'
+  const catOutline = `${catBtn} background-color: ${escapeHtml(config.colors.background)}; color: ${escapeHtml(config.colors.text)} !important; border: 1.5px solid ${escapeHtml(config.colors.button)} !important;`
+  const catFill = `${catBtn} background-color: ${escapeHtml(config.colors.button)} !important; color: ${escapeHtml(config.colors.buttonText)} !important; border: 1.5px solid ${escapeHtml(config.colors.button)} !important;`
+
+  const actionsHtml = categoriesLayout
+    ? `<div id="cookie-banner-actions" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;flex:0 0 auto;width:auto;min-width:188px;max-width:260px;margin-left:auto;">
+          <button id="cookie-accept-btn" type="button" style="${catFill}">${escapeHtml(config.text.acceptButton)}</button>
+          <button id="cookie-selection-btn" type="button" style="${catOutline}">${escapeHtml(selectionLabel)}</button>
+          ${showReject ? `<button id="cookie-reject-btn" type="button" style="${catOutline}">${escapeHtml(config.text.rejectButton)}</button>` : ''}
+        </div>`
+    : stackedActions
     ? `<div id="cookie-banner-actions" style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; flex-shrink: 0; min-width: 180px; max-width: 240px;">
           ${prefsBtnHtml}
           ${acceptBtnHtml}
@@ -579,7 +642,29 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
     </div>`
   }
 
-  const bodyHtml = isFullWidthBar
+  const categoriesBody = `<div class="cb-banner-body cb-banner-body--categories" style="display:flex;align-items:center;justify-content:flex-start;gap:20px 28px;flex-wrap:nowrap;min-width:0;height:auto;text-align:left;">
+      ${logoElement ? `<div class="cb-banner-logo-col" style="display:flex;align-items:center;justify-content:flex-start;flex:0 0 auto;align-self:center;min-width:72px;">${logoElement}</div>` : ''}
+      <div class="cb-banner-copy" style="flex:1 1 280px;min-width:min(100%,220px);max-width:100%;height:auto;text-align:left;">
+        ${titleHtml}
+        ${messageHtml}
+        <div id="cb-cat-row" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:12px;">
+          ${catSwitch('cb-cat-necessary', 'cb-label-necessary', barCopy.necessary, true, true)}
+          ${catSwitch('cb-cat-preferences', 'cb-label-preferences', barCopy.preferences, optionalOn)}
+          ${catSwitch('cb-cat-statistics', 'cb-label-statistics', barCopy.statistics, optionalOn)}
+          ${catSwitch('cb-cat-marketing', 'cb-label-marketing', barCopy.marketing, optionalOn)}
+          <button id="cookie-preferences-btn" type="button" style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:none;padding:8px 2px;margin:0;cursor:pointer;color:${escapeHtml(config.colors.button)} !important;font-weight:700;font-size:13px;font-family:inherit;line-height:1;min-height:44px;white-space:nowrap;">
+            <span id="cb-details-label">${escapeHtml(detailsLabel)}</span>
+            <span aria-hidden="true">&gt;</span>
+          </button>
+        </div>
+        ${brandingHtml}
+      </div>
+      ${actionsHtml}
+    </div>`
+
+  const bodyHtml = categoriesLayout
+    ? categoriesBody
+    : isFullWidthBar
     ? `<div class="cb-banner-body" style="display: flex; align-items: center; justify-content: flex-start; gap: 16px 24px; flex-wrap: wrap; min-width: 0; height: auto; text-align: left;">
       ${brandBlock({ bar: true })}
       ${actionsHtml}
@@ -596,9 +681,10 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // when content exceeds the viewport (see CSS below).
   // height:auto is explicit so host themes (and old flex-basis bugs) cannot
   // stretch the banner to nearly full viewport with a void between copy and buttons.
-  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${isFullWidthBar ? 'bar' : 'card'}" data-cb-logo="${escapeHtml(logoPos)}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; height: auto; max-height: min(90vh, 100dvh); text-align: left;">
-  <div style="position: relative; padding-right: 36px; box-sizing: border-box; min-width: 0; height: auto; overflow: visible; text-align: left;">
-    <button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>
+  const layoutAttr = categoriesLayout ? 'categories' : (isFullWidthBar ? 'bar' : 'card')
+  const mainBanner = `<div id="cookie-consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent" aria-modal="false" data-cb-layout="${layoutAttr}" data-cb-logo="${escapeHtml(logoPos)}" style="position: fixed; ${getPositionStyles()} background-color: ${escapeHtml(config.colors.background)} !important; color: ${escapeHtml(config.colors.text)} !important; ${getLayoutStyles()} z-index: 10000; font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; ${getAnimationStyles()} display: none; box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow: hidden; height: auto; max-height: min(90vh, 100dvh); text-align: left;">
+  <div style="position: relative; padding-right: ${categoriesLayout ? '0' : '36px'}; box-sizing: border-box; min-width: 0; height: auto; overflow: visible; text-align: left;">
+    ${categoriesLayout ? '' : `<button id="cookie-close-btn" type="button" style="position: absolute; top: -2px; right: -6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 10px; color: ${escapeHtml(config.colors.text)}; font-size: 22px; cursor: pointer; padding: 0; line-height: 1; opacity: 0.55; z-index: 2;" aria-label="Close">&times;</button>`}
     ${bodyHtml}
   </div>
 </div>`
@@ -606,7 +692,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   // Preferences modal HTML
   // Generate modal whenever something can open it: the in-banner preferences button,
   // or any enabled footer link (inline link, floating button, or both — all call window.showCookiePreferences()).
-  const needsPreferencesModal = config.behavior.showPreferences || config.branding.footerLink.enabled
+  const needsPreferencesModal = config.behavior.showPreferences || config.branding.footerLink.enabled || categoriesLayout
   const tcfEnabled = config.integrations?.tcf?.enabled === true
 
   // TCF purpose toggle HTML helper
@@ -1036,6 +1122,43 @@ export const generateBannerCSS = (config: BannerConfig) => {
   margin-left: auto;
 }
 
+#cookie-consent-banner[data-cb-layout="categories"] .cb-banner-body--categories {
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] .cb-banner-logo-col,
+#cookie-consent-banner[data-cb-layout="categories"] .cb-banner-logo {
+  align-self: center !important;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 188px !important;
+  max-width: 260px !important;
+  margin-left: auto !important;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions button {
+  white-space: normal !important;
+  text-align: center !important;
+  min-height: 40px !important;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] #cb-cat-row {
+  flex-wrap: wrap !important;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] #cookie-preferences-btn {
+  text-decoration: none;
+}
+
+#cookie-consent-banner[data-cb-layout="categories"] #cookie-preferences-btn:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
 @keyframes cookieFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1317,6 +1440,52 @@ input:checked + span:before {
     font-size: 14px !important;
   }
 
+  #cookie-consent-banner[data-cb-layout="categories"] > div {
+    padding-right: 0 !important;
+  }
+
+  /* Tablet: copy and switches on top, three equal actions in one row */
+  #cookie-consent-banner[data-cb-layout="categories"] .cb-banner-logo-col,
+  #cookie-consent-banner[data-cb-layout="categories"] .cb-banner-logo {
+    align-self: flex-start !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    flex: 1 1 auto !important;
+    gap: 8px !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    border-radius: 4px !important;
+    min-height: 48px !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cb-cat-row label,
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-preferences-btn {
+    min-height: 44px !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-preferences-btn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 8px 2px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 13px !important;
+  }
+
   #cookie-consent-banner .cb-banner-copy #cookie-message {
     margin-bottom: 0 !important;
   }
@@ -1341,6 +1510,24 @@ input:checked + span:before {
   #cookie-consent-banner #cookie-preferences-btn {
     flex: none !important;
     width: 100% !important;
+  }
+
+  /* Phone: stack the three actions. Keep Show details beside the switches. */
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions {
+    flex-direction: column !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-banner-actions button {
+    width: 100% !important;
+    flex: none !important;
+    min-height: 48px !important;
+  }
+
+  #cookie-consent-banner[data-cb-layout="categories"] #cookie-preferences-btn {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-height: 44px !important;
+    padding: 8px 2px !important;
   }
 }
 
@@ -2254,6 +2441,22 @@ var TRANSLATIONS = {
   }
 };
 
+var CATEGORY_SHORT = ${JSON.stringify(CATEGORY_BAR_COPY)};
+var CATEGORY_OWNER_LANG = ${JSON.stringify(config.language === 'auto' ? 'en' : (config.language || 'en'))};
+var CATEGORY_OWNER_DETAILS = ${JSON.stringify((() => {
+  const lang = config.language === 'auto' ? 'en' : (config.language || 'en')
+  const copy = CATEGORY_BAR_COPY[lang] || CATEGORY_BAR_COPY.en
+  const generic = new Set(['Preferences', 'Customize', 'Cookie Settings'])
+  return generic.has((config.text.preferencesButton || '').trim())
+    ? copy.details
+    : (config.text.preferencesButton || copy.details)
+})())};
+var CATEGORY_OWNER_SELECTION = ${JSON.stringify((() => {
+  const lang = config.language === 'auto' ? 'en' : (config.language || 'en')
+  const copy = CATEGORY_BAR_COPY[lang] || CATEGORY_BAR_COPY.en
+  return config.text.selectionButton?.trim() || copy.selection
+})())};
+
 function detectLanguage() {
   ${config.language === 'auto' ? `
   var htmlLang = (document.documentElement.lang || '').toLowerCase();
@@ -2330,7 +2533,17 @@ function applyTranslations() {
   }
   setText('cookie-accept-btn', trans.acceptButton);
   setText('cookie-reject-btn', trans.rejectButton);
-  setText('cookie-preferences-btn', trans.preferencesButton);
+  if (document.getElementById('cb-details-label')) {
+    var shortLabels = CATEGORY_SHORT[lang] || CATEGORY_SHORT.en;
+    setText('cb-label-necessary', shortLabels.necessary);
+    setText('cb-label-preferences', shortLabels.preferences);
+    setText('cb-label-statistics', shortLabels.statistics);
+    setText('cb-label-marketing', shortLabels.marketing);
+    setText('cb-details-label', lang === CATEGORY_OWNER_LANG ? CATEGORY_OWNER_DETAILS : shortLabels.details);
+    setText('cookie-selection-btn', lang === CATEGORY_OWNER_LANG ? CATEGORY_OWNER_SELECTION : shortLabels.selection);
+  } else {
+    setText('cookie-preferences-btn', trans.preferencesButton);
+  }
 
   // Floating button - only update the text span, not the whole element (preserves icon)
   var floatBtn = document.getElementById('cookie-settings-float');
@@ -2436,21 +2649,26 @@ function setupToggleSwitches() {
   var inactiveColor = ${JSON.stringify(config.theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : '#9ca3af')};
 
   var toggles = [
-    { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb' },
-    { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb' },
-    { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb' },
-    { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb' }
+    { input: 'cookie-func-toggle-modal', slider: 'cookie-func-toggle-slider', thumb: 'cookie-func-toggle-thumb', travel: 20 },
+    { input: 'cookie-performance-toggle-modal', slider: 'cookie-performance-toggle-slider', thumb: 'cookie-performance-toggle-thumb', travel: 20 },
+    { input: 'cookie-targeting-toggle-modal', slider: 'cookie-targeting-toggle-slider', thumb: 'cookie-targeting-toggle-thumb', travel: 20 },
+    { input: 'cookie-social-toggle-modal', slider: 'cookie-social-toggle-slider', thumb: 'cookie-social-toggle-thumb', travel: 20 },
+    { input: 'cb-cat-necessary', slider: 'cb-cat-necessary-slider', thumb: 'cb-cat-necessary-thumb', travel: 16 },
+    { input: 'cb-cat-preferences', slider: 'cb-cat-preferences-slider', thumb: 'cb-cat-preferences-thumb', travel: 16 },
+    { input: 'cb-cat-statistics', slider: 'cb-cat-statistics-slider', thumb: 'cb-cat-statistics-thumb', travel: 16 },
+    { input: 'cb-cat-marketing', slider: 'cb-cat-marketing-slider', thumb: 'cb-cat-marketing-thumb', travel: 16 }
   ];
 
   toggles.forEach(function(toggle) {
     var input = document.getElementById(toggle.input);
     var slider = document.getElementById(toggle.slider);
     var thumb = document.getElementById(toggle.thumb);
+    var travel = toggle.travel || 20;
 
     if (input && slider && thumb) {
       if (input.checked) {
         slider.style.backgroundColor = buttonColor;
-        thumb.style.transform = 'translateX(20px)';
+        thumb.style.transform = 'translateX(' + travel + 'px)';
       } else {
         slider.style.backgroundColor = inactiveColor;
         thumb.style.transform = 'translateX(0)';
@@ -2458,19 +2676,70 @@ function setupToggleSwitches() {
 
       if (!input.dataset.listenerAttached) {
         input.addEventListener('change', function() {
-          if (this.checked) {
-            slider.style.backgroundColor = buttonColor;
-            thumb.style.transform = 'translateX(20px)';
-          } else {
-            slider.style.backgroundColor = inactiveColor;
-            thumb.style.transform = 'translateX(0)';
-          }
+          mirrorCategoryToggle(this.id, this.checked);
+          setupToggleSwitches();
         });
 
         input.dataset.listenerAttached = 'true';
       }
     }
   });
+}
+
+function mirrorCategoryToggle(inputId, checked) {
+  function setChecked(id, value) {
+    var el = document.getElementById(id);
+    if (!el || el.disabled || el.id === inputId) return;
+    el.checked = value;
+  }
+  if (inputId === 'cb-cat-preferences') setChecked('cookie-func-toggle-modal', checked);
+  if (inputId === 'cookie-func-toggle-modal') setChecked('cb-cat-preferences', checked);
+  if (inputId === 'cb-cat-statistics') setChecked('cookie-performance-toggle-modal', checked);
+  if (inputId === 'cookie-performance-toggle-modal') setChecked('cb-cat-statistics', checked);
+  if (inputId === 'cb-cat-marketing') {
+    setChecked('cookie-targeting-toggle-modal', checked);
+    setChecked('cookie-social-toggle-modal', checked);
+  }
+  if (inputId === 'cookie-targeting-toggle-modal' || inputId === 'cookie-social-toggle-modal') {
+    var targeting = document.getElementById('cookie-targeting-toggle-modal');
+    var social = document.getElementById('cookie-social-toggle-modal');
+    setChecked('cb-cat-marketing', !!((targeting && targeting.checked) || (social && social.checked)));
+  }
+}
+
+function bannerSelectionConsent() {
+  var prefs = document.getElementById('cb-cat-preferences');
+  var stats = document.getElementById('cb-cat-statistics');
+  var mkt = document.getElementById('cb-cat-marketing');
+  if (!prefs && !stats && !mkt) return null;
+  var marketing = mkt ? !!mkt.checked : false;
+  if (GPC_ACTIVE) marketing = false;
+  var consent = {
+    essential: true,
+    functionality: prefs ? !!prefs.checked : false,
+    analytics: stats ? !!stats.checked : false,
+    marketing: marketing
+  };
+  if (GPC_ACTIVE) consent.gpc_auto = true;
+  return consent;
+}
+
+function bannerSelectionTcf(consent) {
+  if (!TCF_ENABLED || !consent) return null;
+  var purposes = {};
+  for (var i = 1; i <= 11; i++) purposes[i] = false;
+  if (consent.functionality) purposes[1] = true;
+  if (consent.analytics) {
+    purposes[7] = true;
+    purposes[8] = true;
+    purposes[9] = true;
+  }
+  if (consent.marketing) {
+    purposes[2] = true;
+    purposes[3] = true;
+    purposes[4] = true;
+  }
+  return purposes;
 }
 
 function setupTcfToggleSwitches() {
@@ -2597,8 +2866,11 @@ function showPreferencesModal() {
   }
 
   var currentConsent = getConsent();
+  var bannerConsent = bannerSelectionConsent();
   if (currentConsent) {
     loadConsentIntoModal(currentConsent);
+  } else if (bannerConsent) {
+    loadConsentIntoModal(bannerConsent);
   } else {
     loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
   }
@@ -2793,6 +3065,11 @@ function applyGpcModalState() {
   var socialSlider = document.getElementById('cookie-social-toggle-slider');
   if (targetSlider) targetSlider.style.opacity = '0.4';
   if (socialSlider) socialSlider.style.opacity = '0.4';
+  var bannerMarketing = document.getElementById('cb-cat-marketing');
+  if (bannerMarketing) { bannerMarketing.checked = false; bannerMarketing.disabled = true; }
+  var bannerMarketingSlider = document.getElementById('cb-cat-marketing-slider');
+  if (bannerMarketingSlider) bannerMarketingSlider.style.opacity = '0.4';
+  if (typeof setupToggleSwitches === 'function') setupToggleSwitches();
 }
 
 function init() {
@@ -2909,14 +3186,23 @@ function init() {
     closeBtn.dataset.handlerAttached = 'true';
   }
 
-  ${config.behavior.showPreferences ? `
   if (prefsBtn && !prefsBtn.dataset.handlerAttached) {
     prefsBtn.addEventListener('click', function() {
       showPreferencesModal();
     });
     prefsBtn.dataset.handlerAttached = 'true';
   }
-  ` : ''}
+
+  var selectionBtn = document.getElementById('cookie-selection-btn');
+  if (selectionBtn && !selectionBtn.dataset.handlerAttached) {
+    selectionBtn.addEventListener('click', function() {
+      var consent = bannerSelectionConsent() || { essential: true, functionality: false, analytics: false, marketing: false };
+      trackConsentEvent('custom', consent);
+      saveConsent(consent, bannerSelectionTcf(consent));
+      banner.style.display = 'none';
+    });
+    selectionBtn.dataset.handlerAttached = 'true';
+  }
 
   // Floating cookie settings button click handler
   // Must be inside init() because the element is injected dynamically

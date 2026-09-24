@@ -23,6 +23,7 @@ import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
 import { migrateBannerConfig, needsMigration, getMigrationNotes, CURRENT_BANNER_VERSION, withCurrentBannerVersion } from '@/lib/banner-migration'
+import { resolveButtonPlacement } from '@/lib/banner-placement'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { getComplianceRequirements } from '@/lib/compliance-frameworks'
@@ -539,6 +540,7 @@ function BannerBuilderContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [config, setConfig] = useState<BannerConfig>(defaultConfig)
+  const buttonPlacement = resolveButtonPlacement(config.position, config.layout?.buttonPlacement)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('compliance')
   // null = use auto-derived view from activeTab; otherwise user has clicked a preview tab and wants to lock it
@@ -2601,19 +2603,53 @@ function BannerBuilderContent() {
                       <div className="space-y-3">
                         <Label htmlFor="button-placement" className="text-sm font-medium">Button Placement</Label>
                         <Select
-                          value={config.layout.buttonPlacement || 'inline'}
-                          onValueChange={(value: any) => updateConfig('layout', { ...config.layout, buttonPlacement: value })}
+                          value={buttonPlacement}
+                          onValueChange={(value: 'inline' | 'stacked-right' | 'categories') => {
+                            setConfig(prev => {
+                              const text = { ...prev.text }
+                              if (value === 'categories') {
+                                if (['Accept All', 'Accept all', 'Accept'].includes(text.acceptButton)) {
+                                  text.acceptButton = 'Allow all'
+                                }
+                                if (['Reject', 'Reject All', 'Reject all', 'Reject Non-Essential'].includes(text.rejectButton)) {
+                                  text.rejectButton = 'Deny'
+                                }
+                                if (['Preferences', 'Customize', 'Cookie Settings'].includes(text.preferencesButton)) {
+                                  text.preferencesButton = 'Show details'
+                                }
+                                if (!text.selectionButton?.trim()) {
+                                  text.selectionButton = 'Allow selection'
+                                }
+                              }
+                              return {
+                                ...prev,
+                                text,
+                                behavior: value === 'categories'
+                                  ? {
+                                      ...prev.behavior,
+                                      showPreferences: true,
+                                      showRejectButton: true,
+                                      buttonLayout: 'standard',
+                                    }
+                                  : prev.behavior,
+                                layout: { ...prev.layout, buttonPlacement: value },
+                              }
+                            })
+                          }}
                         >
                           <SelectTrigger id="button-placement">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="inline">Inline row (default)</SelectItem>
+                            <SelectItem value="inline">Inline row</SelectItem>
                             <SelectItem value="stacked-right">Stacked on the right</SelectItem>
+                            <SelectItem value="categories">Categories bar</SelectItem>
                           </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground">
-                          Stacked places Preferences, Accept, and Reject in a vertical column on the right edge of the bar — a common enterprise CMP look.
+                          {buttonPlacement === 'categories'
+                            ? 'Logo on the left, category switches under the message, and Allow all, Allow selection, and Deny stacked on the right.'
+                            : 'Stacked places Preferences, Accept, and Reject in a vertical column on the right edge of the bar.'}
                         </p>
                       </div>
                     )}
@@ -2794,17 +2830,31 @@ function BannerBuilderContent() {
                         </div>
                         <div className="relative">
                           <div className="flex items-center space-x-1 mb-1">
-                            <Label htmlFor="preferences-text" className="text-xs">Preferences Button</Label>
+                            <Label htmlFor="preferences-text" className="text-xs">
+                              {buttonPlacement === 'categories' ? 'Show details link' : 'Preferences Button'}
+                            </Label>
                           </div>
                           <Input
                             id="preferences-text"
                             value={config.text.preferencesButton}
                             onChange={(e) => updateConfig('text', { preferencesButton: e.target.value })}
-                            placeholder="Preferences"
+                            placeholder={buttonPlacement === 'categories' ? 'Show details' : 'Preferences'}
                             className="mt-1 border-purple-200 focus:border-purple-400 focus:ring-purple-200"
                           />
                         </div>
                       </div>
+                      {buttonPlacement === 'categories' && (
+                        <div className="max-w-xs">
+                          <Label htmlFor="selection-text" className="text-xs">Allow selection button</Label>
+                          <Input
+                            id="selection-text"
+                            value={config.text.selectionButton || ''}
+                            onChange={(e) => updateConfig('text', { selectionButton: e.target.value })}
+                            placeholder="Allow selection"
+                            className="mt-1"
+                          />
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

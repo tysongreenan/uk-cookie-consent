@@ -6,6 +6,7 @@ import { X } from 'lucide-react'
 import { A11yMenuPreview } from '@/components/banner/a11y-menu-preview'
 import { A11yTriggerPreview } from '@/components/banner/a11y-trigger-preview'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
+import { resolveButtonPlacement } from '@/lib/banner-placement'
 
 interface BannerConfig {
   name: string
@@ -28,6 +29,7 @@ interface BannerConfig {
     acceptButton: string
     rejectButton: string
     preferencesButton: string
+    selectionButton?: string
   }
   behavior: {
     autoShow: boolean
@@ -67,6 +69,7 @@ interface BannerConfig {
     margin: number
     shadow: 'none' | 'small' | 'medium' | 'large'
     animation: 'none' | 'fade' | 'slide' | 'bounce' | 'pulse'
+    buttonPlacement?: 'inline' | 'stacked-right' | 'categories'
   }
   advanced: {
     googleConsentMode: boolean
@@ -203,9 +206,79 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   )
 }
 
+function PreviewCategorySwitch({
+  label,
+  checked,
+  disabled,
+  color,
+  onChange,
+}: {
+  label: string
+  checked: boolean
+  disabled?: boolean
+  color: string
+  onChange: (next: boolean) => void
+}) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ fontSize: 13, fontWeight: 600, lineHeight: 1 }}>{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) onChange(!checked)
+        }}
+        style={{
+          width: 36,
+          height: 20,
+          borderRadius: 20,
+          border: 'none',
+          padding: 0,
+          background: checked ? color : '#d1d5db',
+          position: 'relative',
+          cursor: disabled ? 'default' : 'pointer',
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            position: 'absolute',
+            top: 3,
+            left: 3,
+            width: 14,
+            height: 14,
+            borderRadius: '50%',
+            background: '#fff',
+            transform: checked ? 'translateX(16px)' : 'none',
+            boxShadow: '0 1px 2px rgba(0,0,0,.18)',
+            transition: 'transform .2s',
+          }}
+        />
+      </button>
+    </span>
+  )
+}
+
 export function BannerPreview({ config, view, onViewChange, fillParent = false, a11yCustomization = false }: BannerPreviewProps) {
+  const optionalDefault = !((config as any).compliance?.requiresOptIn || (config as any).compliance?.requiresExplicitConsent)
   const [internalIsVisible, setInternalIsVisible] = useState(true)
   const [internalShowPreferences, setInternalShowPreferences] = useState(false)
+  const [categoryOn, setCategoryOn] = useState({
+    preferences: optionalDefault,
+    statistics: optionalDefault,
+    marketing: optionalDefault,
+  })
+
+  useEffect(() => {
+    setCategoryOn({
+      preferences: optionalDefault,
+      statistics: optionalDefault,
+      marketing: optionalDefault,
+    })
+  }, [optionalDefault])
 
   // When a view prop is supplied, derive state from it; otherwise let user interactions drive it.
   const isVisible = view === 'floating' || view === 'accessibility' ? false : view === 'preferences' ? true : internalIsVisible
@@ -274,7 +347,8 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
       message: config.text?.message || 'We use cookies to improve your experience.',
       acceptButton: config.text?.acceptButton || 'Accept All',
       rejectButton: config.text?.rejectButton || 'Reject All',
-      preferencesButton: config.text?.preferencesButton || 'Preferences'
+      preferencesButton: config.text?.preferencesButton || 'Preferences',
+      selectionButton: config.text?.selectionButton || 'Allow selection',
     },
     behavior: {
       autoShow: config.behavior?.autoShow ?? true,
@@ -316,7 +390,8 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
       width: config.layout?.width || 'full',
       maxWidth: config.layout?.maxWidth,
       customWidth: config.layout?.customWidth,
-      shadow: config.layout?.shadow || 'medium'
+      shadow: config.layout?.shadow || 'medium',
+      buttonPlacement: resolveButtonPlacement(config.position, config.layout?.buttonPlacement),
     },
     advanced: {
       googleConsentMode: config.advanced?.googleConsentMode ?? false,
@@ -581,6 +656,10 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
   }
 
 
+  const categoriesBar =
+    (safeConfig.position === 'top' || safeConfig.position === 'bottom') &&
+    safeConfig.layout.buttonPlacement === 'categories'
+
   const bannerPanel = (
         <div
           data-cb-preview="banner"
@@ -594,9 +673,10 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
             ...getLayoutStyles(),
           }}
         >
-          <div className="relative min-w-0 box-border" style={{ paddingRight: 36 }}>
-            {/* Mirror production: compact close control that does not cover copy */}
-            <button
+          <div className="relative min-w-0 box-border" style={{ paddingRight: categoriesBar ? 0 : 36 }}>
+            {/* Mirror production: compact close control that does not cover copy.
+                The categories bar has no dismiss control — the three actions are the choice. */}
+            {!categoriesBar && <button
               onClick={handleClose}
               aria-label="Close"
               type="button"
@@ -617,7 +697,7 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
               }}
             >
               ×
-            </button>
+            </button>}
 
             {(() => {
               const isBar =
@@ -634,6 +714,125 @@ export function BannerPreview({ config, view, onViewChange, fillParent = false, 
                 safeConfig.branding.logo.position === 'center' &&
                 safeConfig.branding.logo.enabled &&
                 safeConfig.branding.logo.url
+              const showLogo = Boolean(safeConfig.branding.logo.enabled && safeConfig.branding.logo.url)
+
+              if (categoriesBar) {
+                const outline: CSSProperties = {
+                  backgroundColor: safeConfig.colors.background,
+                  color: safeConfig.colors.text,
+                  border: `1.5px solid ${safeConfig.colors.button}`,
+                  borderRadius: 4,
+                  minHeight: 40,
+                  width: '100%',
+                  fontWeight: 600,
+                  fontSize: 14,
+                }
+                return (
+                  <div className="cb-cat-frame" style={{ containerType: 'inline-size', width: '100%' }}>
+                  <div className="cb-cat-body">
+                    <style>{`
+                      .cb-cat-body { display: flex; align-items: center; gap: 20px 28px; flex-wrap: nowrap; min-width: 0; }
+                      .cb-cat-actions { display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; width: auto; min-width: 188px; max-width: 260px; margin-left: auto; }
+                      .cb-cat-actions button { white-space: normal; text-align: center; }
+                      @container (max-width: 1024px) {
+                        .cb-cat-body { flex-direction: column; align-items: stretch; gap: 14px; }
+                        .cb-cat-logo { align-self: flex-start; }
+                        .cb-cat-actions { flex-direction: row; width: 100%; min-width: 0; max-width: none; margin-left: 0; }
+                        .cb-cat-actions button { flex: 1 1 0; min-height: 48px; }
+                      }
+                      @container (max-width: 640px) {
+                        .cb-cat-actions { flex-direction: column; }
+                        .cb-cat-actions button { width: 100%; flex: none; min-height: 48px; }
+                      }
+                    `}</style>
+                    {showLogo && (
+                      <div className="cb-cat-logo flex shrink-0 items-center self-center">
+                        <img
+                          src={safeConfig.branding.logo.url}
+                          alt="Logo"
+                          className="object-contain"
+                          style={{
+                            maxWidth: `${safeConfig.branding.logo.maxWidth}px`,
+                            maxHeight: `${safeConfig.branding.logo.maxHeight}px`,
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-[min(100%,220px)] flex-1 basis-[280px]">
+                      {safeConfig.text.title?.trim() ? (
+                        <h3 className="mb-1.5 text-[15px] font-bold leading-snug" style={{ color: safeConfig.colors.text }}>
+                          {safeConfig.text.title}
+                        </h3>
+                      ) : null}
+                      <p className="text-[13.5px] leading-relaxed" style={{ opacity: 0.92 }}>
+                        {safeConfig.text.message}
+                        {safeConfig.branding.privacyPolicy.url && (
+                          <>
+                            {' '}
+                            <a
+                              href={safeConfig.branding.privacyPolicy.url}
+                              className="underline"
+                              style={{ color: safeConfig.colors.link }}
+                            >
+                              {safeConfig.branding.privacyPolicy.text}
+                            </a>
+                          </>
+                        )}
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                        <PreviewCategorySwitch label="Necessary" checked disabled color={safeConfig.colors.button} onChange={() => {}} />
+                        <PreviewCategorySwitch
+                          label="Preferences"
+                          checked={categoryOn.preferences}
+                          color={safeConfig.colors.button}
+                          onChange={(next) => setCategoryOn((prev) => ({ ...prev, preferences: next }))}
+                        />
+                        <PreviewCategorySwitch
+                          label="Statistics"
+                          checked={categoryOn.statistics}
+                          color={safeConfig.colors.button}
+                          onChange={(next) => setCategoryOn((prev) => ({ ...prev, statistics: next }))}
+                        />
+                        <PreviewCategorySwitch
+                          label="Marketing"
+                          checked={categoryOn.marketing}
+                          color={safeConfig.colors.button}
+                          onChange={(next) => setCategoryOn((prev) => ({ ...prev, marketing: next }))}
+                        />
+                        <button
+                          type="button"
+                          onClick={handlePreferences}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            color: safeConfig.colors.button,
+                            fontWeight: 700,
+                            fontSize: 13,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {safeConfig.text.preferencesButton} &gt;
+                        </button>
+                      </div>
+                    </div>
+                    <div className="cb-cat-actions">
+                      <button type="button" onClick={handleAccept} style={{ ...outline, backgroundColor: safeConfig.colors.button, color: safeConfig.colors.buttonText, borderColor: safeConfig.colors.button }}>
+                        {safeConfig.text.acceptButton}
+                      </button>
+                      <button type="button" onClick={handleAccept} style={outline}>
+                        {safeConfig.text.selectionButton || 'Allow selection'}
+                      </button>
+                      {safeConfig.behavior.showRejectButton !== false && (
+                        <button type="button" onClick={handleReject} style={outline}>
+                          {safeConfig.text.rejectButton}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  </div>
+                )
+              }
 
               const logoEl = (side: 'left' | 'right' | 'center') => {
                 const show =

@@ -95,6 +95,8 @@ export interface BannerConfig {
     acceptButton: string
     rejectButton: string
     preferencesButton: string
+    /** Categories bar only: the middle button that saves the inline toggles. */
+    selectionButton?: string
   }
   
   // Behavior
@@ -172,9 +174,10 @@ export interface BannerConfig {
     margin: number
     shadow: 'none' | 'small' | 'medium' | 'large'
     animation: 'none' | 'fade' | 'slide' | 'bounce' | 'pulse'
-    /** Top/bottom bars only: inline button row (default) or a vertically
-     *  stacked column on the right (TrustArc-style). */
-    buttonPlacement?: 'inline' | 'stacked-right'
+    /** Top/bottom bars only: inline button row (default), a vertically
+     *  stacked column on the right, or a categories bar (logo, inline
+     *  toggles, three stacked actions). */
+    buttonPlacement?: 'inline' | 'stacked-right' | 'categories'
   }
   
   // Scripts
