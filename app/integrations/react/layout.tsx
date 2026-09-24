@@ -1,13 +1,21 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'React Cookie Banner — Free, No npm Install, Under 10KB (2026)',
-  description: 'Add a cookie consent banner to React or Next.js in 5 minutes. No npm package needed — just a script tag. Under 10KB, async loading, GDPR & PIPEDA compliant. Works with App Router, Vite & CRA.',
+  title: 'React Cookie Banner: Free Copy-Paste Example (2026)',
+  description:
+    'Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, under 10KB. App Router, Vite, and CRA examples. GDPR and PIPEDA.',
   keywords: 'react cookie banner, react cookie consent, react-cookie-consent, nextjs cookie banner, nextjs cookie consent, react cookie consent nextjs, lightweight cookie consent react, react gdpr cookie banner, cookie consent npm, npm cookie consent, react-cookie-consent npm, best react cookie consent library 2026, cookie banner react, next js cookie banner, next js cookie consent, cookie banner nextjs',
   openGraph: {
-    title: 'React Cookie Banner — Free, No npm Install, Under 10KB (2026)',
-    description: 'Add a cookie consent banner to React or Next.js in 5 minutes. No npm package — just a script tag. Under 10KB, async loading, GDPR & PIPEDA compliant. Free plan.',
+    title: 'React Cookie Banner: Free Copy-Paste Example (2026)',
+    description:
+      'Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, under 10KB. App Router, Vite, and CRA examples. GDPR and PIPEDA.',
     type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'React Cookie Banner: Free Copy-Paste Example (2026)',
+    description:
+      'Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, under 10KB. App Router, Vite, and CRA examples. GDPR and PIPEDA.',
   },
   alternates: {
     canonical: '/integrations/react',
