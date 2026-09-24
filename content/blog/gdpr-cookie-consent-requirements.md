@@ -1,6 +1,6 @@
 ---
-title: "GDPR Cookie Consent: 6 Requirements, €20M Fines & Free Checklist (2026)"
-description: "The 6 GDPR cookie consent rules, €20M fines, exemptions, and a free checklist. Scan your site in 30 seconds — no signup."
+title: "GDPR Cookie Consent Requirements: The 6 Rules (2026)"
+description: "Six GDPR cookie rules — freely given, specific, informed, unambiguous, prior, and easy to withdraw — plus a free checklist. Fines can reach €20 million."
 date: "2025-01-17"
 updatedDate: "2026-09-15"
 heroCta:

@@ -1,6 +1,6 @@
 ---
-title: "Chrome Blocking Third-Party Cookies: Do You Still Need a Cookie Banner?"
-description: "Chrome's Tracking Protection now blocks third-party cookies by default. Learn what this means for your website, why you still need a cookie consent banner, and how to stay GDPR compliant."
+title: "Chrome Tracking Protection: Cookie Banner Still Needed?"
+description: "Yes — you still need one. Chrome blocks third-party cookies, not first-party analytics. GDPR consent still applies. Eye icon and Consent Mode v2 explained."
 date: "2026-03-16"
 author: "cookie-banner-team"
 tags: ["Chrome", "Tracking Protection", "Third-Party Cookies", "Cookie Consent", "GDPR", "Google Consent Mode", "Privacy"]
@@ -55,7 +55,7 @@ schema:
         text: "No. Even as browsers block third-party cookies, privacy regulations like GDPR, PECR, and ePrivacy require informed consent for all non-essential cookies, including first-party analytics and preference cookies. Cookie consent banners will remain a legal requirement for the foreseeable future."
 ---
 
-# Chrome Blocking Third-Party Cookies: Do You Still Need a Cookie Banner?
+# Chrome Tracking Protection: Cookie Banner Still Needed?
 
 <div class="direct-answer">
 <strong>Direct Answer:</strong> Yes, you absolutely still need a cookie consent banner. Chrome's Tracking Protection blocks third-party cookies at the browser level, but privacy laws like GDPR, PECR, and the ePrivacy Directive still require you to get informed consent before setting any non-essential cookies — including first-party analytics and marketing cookies that Chrome does not block.

@@ -110,8 +110,9 @@ export default function CookiebotAlternativePage() {
       <StructuredData
         type="article"
         data={{
-          title: "Best Cookiebot Alternatives 2026: Free + Pricing Compared",
-          description: "Compare Cookiebot vs CookieYes vs Complianz vs Cookie-Banner.ca. Full pricing breakdown, feature matrix, and migration guide.",
+          title: "Cookiebot Alternative: Free Plan or $99 Once (2026)",
+          description:
+            "Drop Cookiebot's $9–$199/mo plans. Free PIPEDA banner for Canada, or $99 once. Law 25 geo-targeting on Pro. One script under 10KB, about 5 minutes.",
           datePublished: "2025-01-01",
           dateModified: "2026-09-14",
         }}

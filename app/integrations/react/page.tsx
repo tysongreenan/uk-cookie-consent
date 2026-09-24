@@ -80,8 +80,9 @@ export default function ReactIntegrationPage() {
   ]
 
   const articleData = {
-    title: "React Cookie Banner: Complete Integration Guide for 2026",
-    description: "Learn how to add a lightweight, GDPR-compliant cookie consent banner to your React or Next.js application. Covers installation, Google Analytics integration, and best practices.",
+    title: "React Cookie Banner: Free Copy-Paste Example (2026)",
+    description:
+      "Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, under 10KB. App Router, Vite, and CRA examples. GDPR and PIPEDA.",
     datePublished: "2025-01-15",
     dateModified: "2026-03-16"
   }
