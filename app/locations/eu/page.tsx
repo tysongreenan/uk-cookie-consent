@@ -79,7 +79,7 @@ export default function EUCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    General Data Protection Regulation - EU's comprehensive data protection law governing personal data processing across all member states.
+                    General Data Protection Regulation - EU&apos;s comprehensive data protection law governing personal data processing across all member states.
                   </p>
                 </CardContent>
               </Card>
@@ -135,7 +135,7 @@ export default function EUCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Cookie consent must be provided in the user's language, with support for all 24 official EU languages across member states.
+                    Cookie consent must be provided in the user&apos;s language, with support for all 24 official EU languages across member states.
                   </p>
                 </CardContent>
               </Card>
@@ -149,7 +149,7 @@ export default function EUCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    GDPR's One-Stop-Shop mechanism allows cross-border data protection enforcement through lead supervisory authorities.
+                    GDPR&apos;s One-Stop-Shop mechanism allows cross-border data protection enforcement through lead supervisory authorities.
                   </p>
                 </CardContent>
               </Card>
@@ -167,7 +167,7 @@ export default function EUCompliancePage() {
                 GDPR Cookie Consent Requirements
               </h2>
               <p className="text-xl text-gray-600">
-                Understanding GDPR's comprehensive approach to cookie consent and data protection
+                Understanding GDPR&apos;s comprehensive approach to cookie consent and data protection
               </p>
             </div>
 
@@ -191,7 +191,7 @@ export default function EUCompliancePage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Data Minimization</h4>
-                      <p className="text-sm text-gray-600">Personal data must be adequate, relevant, and limited to what's necessary</p>
+                      <p className="text-sm text-gray-600">Personal data must be adequate, relevant, and limited to what&apos;s necessary</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Accuracy</h4>
@@ -293,7 +293,7 @@ export default function EUCompliancePage() {
                 Multi-Language Cookie Consent
               </h2>
               <p className="text-xl text-gray-600">
-                Meeting EU's 24 official language requirements for cookie consent
+                Meeting EU&apos;s 24 official language requirements for cookie consent
               </p>
             </div>
 
@@ -321,7 +321,7 @@ export default function EUCompliancePage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Accessibility</h4>
-                      <p className="text-sm text-gray-600">Consent must be understandable in the user's language</p>
+                      <p className="text-sm text-gray-600">Consent must be understandable in the user&apos;s language</p>
                     </div>
                   </div>
                 </CardContent>

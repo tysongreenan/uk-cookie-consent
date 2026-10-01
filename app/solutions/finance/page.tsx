@@ -210,11 +210,11 @@ export default function FinanceSolutionPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">PDPA (Personal Data Protection Act)</h4>
-                      <p className="text-sm text-gray-600">Singapore's comprehensive data protection law</p>
+                      <p className="text-sm text-gray-600">Singapore&apos;s comprehensive data protection law</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">PDPA (Personal Data Protection Act)</h4>
-                      <p className="text-sm text-gray-600">Malaysia's data protection and privacy law</p>
+                      <p className="text-sm text-gray-600">Malaysia&apos;s data protection and privacy law</p>
                     </div>
                   </div>
                 </CardContent>

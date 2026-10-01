@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
             Forgot your password?
           </h2>
           <p className="text-zinc-300 text-lg mb-8">
-            No worries — it happens to the best of us. Enter your email and we'll send you a link to reset it.
+            No worries — it happens to the best of us. Enter your email and we&apos;ll send you a link to reset it.
           </p>
 
           <div className="space-y-4">
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
               Reset your password
             </h1>
             <p className="mt-2 text-gray-600">
-              Enter your email address and we'll send you a reset link.
+              Enter your email address and we&apos;ll send you a reset link.
             </p>
           </div>
 
@@ -114,13 +114,13 @@ export default function ForgotPasswordPage() {
                 <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-4" />
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">Check your email</h2>
                 <p className="text-gray-600 text-sm">
-                  If an account exists for <strong>{email}</strong>, you'll receive a password reset link shortly. The link expires in 1 hour.
+                  If an account exists for <strong>{email}</strong>, you&apos;ll receive a password reset link shortly. The link expires in 1 hour.
                 </p>
               </div>
 
               <div className="text-center space-y-3">
                 <p className="text-sm text-gray-500">
-                  Didn't receive an email? Check your spam folder or try again.
+                  Didn&apos;t receive an email? Check your spam folder or try again.
                 </p>
                 <Button
                   variant="outline"

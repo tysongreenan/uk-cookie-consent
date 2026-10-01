@@ -157,17 +157,17 @@ export default function WillThisKeepMeCompliantPage() {
 
         <h3>Automatic Cookie Blocking</h3>
         <p>
-          The banner automatically blocks all non-essential cookies (analytics, marketing, advertising) until users provide explicit consent. This means tracking scripts like Google Analytics, Facebook Pixel, and other marketing tools won't load until users click "Accept" or select specific cookie categories.
+          The banner automatically blocks all non-essential cookies (analytics, marketing, advertising) until users provide explicit consent. This means tracking scripts like Google Analytics, Facebook Pixel, and other marketing tools won&apos;t load until users click &quot;Accept&quot; or select specific cookie categories.
         </p>
 
         <h3>Explicit Consent Requirements</h3>
         <p>
-          Unlike opt-out mechanisms that assume consent, our banner requires users to actively opt-in. This meets the strictest privacy law requirements including GDPR's explicit consent standard and Quebec Law 25's opt-in requirements. Users cannot be tracked without taking a clear action.
+          Unlike opt-out mechanisms that assume consent, our banner requires users to actively opt-in. This meets the strictest privacy law requirements including GDPR&apos;s explicit consent standard and Quebec Law 25&apos;s opt-in requirements. Users cannot be tracked without taking a clear action.
         </p>
 
         <h3>Consent Logging and Records</h3>
         <p>
-          Every consent decision is automatically logged with a timestamp, user choice, and IP address (anonymized). This creates an audit trail that demonstrates compliance if you're ever questioned by privacy regulators. You can access these logs through your dashboard at any time.
+          Every consent decision is automatically logged with a timestamp, user choice, and IP address (anonymized). This creates an audit trail that demonstrates compliance if you&apos;re ever questioned by privacy regulators. You can access these logs through your dashboard at any time.
         </p>
 
         <h2 id="what-compliance-mechanisms-are-built-into-the-banner">What Compliance Mechanisms Are Built Into the Banner?</h2>
@@ -179,10 +179,10 @@ export default function WillThisKeepMeCompliantPage() {
         <ul>
           <li><strong>Cookie Blocking by Default:</strong> All non-essential cookies are blocked until consent is given</li>
           <li><strong>Granular Consent Controls:</strong> Users can choose specific cookie categories (analytics, marketing, functionality)</li>
-          <li><strong>Consent Withdrawal:</strong> Users can change their preferences at any time through a persistent "Cookie Settings" link</li>
+          <li><strong>Consent Withdrawal:</strong> Users can change their preferences at any time through a persistent &quot;Cookie Settings&quot; link</li>
           <li><strong>Bilingual Support:</strong> Full English and French support for Quebec Law 25 compliance</li>
           <li><strong>Automatic Updates:</strong> When privacy laws change, our banner is updated automatically</li>
-          <li><strong>Consent Expiry Handling:</strong> Consent is automatically renewed according to each law's requirements (12 months for GDPR, 24 months for PIPEDA)</li>
+          <li><strong>Consent Expiry Handling:</strong> Consent is automatically renewed according to each law&apos;s requirements (12 months for GDPR, 24 months for PIPEDA)</li>
         </ul>
 
         <h2 id="which-privacy-laws-does-this-banner-cover">Which Privacy Laws Does This Banner Cover?</h2>
@@ -194,16 +194,16 @@ export default function WillThisKeepMeCompliantPage() {
         <h3>Canadian Privacy Laws</h3>
         <ul>
           <li><strong>PIPEDA (Personal Information Protection and Electronic Documents Act):</strong> Federal Canadian privacy law requiring meaningful consent</li>
-          <li><strong>CASL (Canada's Anti-Spam Legislation):</strong> Requires consent before installing tracking software</li>
-          <li><strong>Quebec Law 25:</strong> Quebec's strict privacy law requiring explicit consent and bilingual support</li>
-          <li><strong>Alberta PIPA:</strong> Alberta's Personal Information Protection Act</li>
-          <li><strong>BC PIPA:</strong> British Columbia's Personal Information Protection Act</li>
+          <li><strong>CASL (Canada&apos;s Anti-Spam Legislation):</strong> Requires consent before installing tracking software</li>
+          <li><strong>Quebec Law 25:</strong> Quebec&apos;s strict privacy law requiring explicit consent and bilingual support</li>
+          <li><strong>Alberta PIPA:</strong> Alberta&apos;s Personal Information Protection Act</li>
+          <li><strong>BC PIPA:</strong> British Columbia&apos;s Personal Information Protection Act</li>
         </ul>
 
         <h3>International Privacy Laws</h3>
         <ul>
-          <li><strong>GDPR (General Data Protection Regulation):</strong> EU's comprehensive data protection law</li>
-          <li><strong>CCPA (California Consumer Privacy Act):</strong> California's privacy law with opt-out requirements</li>
+          <li><strong>GDPR (General Data Protection Regulation):</strong> EU&apos;s comprehensive data protection law</li>
+          <li><strong>CCPA (California Consumer Privacy Act):</strong> California&apos;s privacy law with opt-out requirements</li>
         </ul>
 
         <p>
@@ -234,9 +234,9 @@ export default function WillThisKeepMeCompliantPage() {
         <ol>
           <li>Open your website in a browser</li>
           <li>Open DevTools (F12) and go to the Application/Storage tab</li>
-          <li>Check that no tracking cookies are present before clicking "Accept"</li>
-          <li>Click "Accept" and verify cookies are now set</li>
-          <li>Click "Reject" and verify cookies are removed</li>
+          <li>Check that no tracking cookies are present before clicking &quot;Accept&quot;</li>
+          <li>Click &quot;Accept&quot; and verify cookies are now set</li>
+          <li>Click &quot;Reject&quot; and verify cookies are removed</li>
         </ol>
 
         <h3>Consent Log Review</h3>
@@ -256,7 +256,7 @@ export default function WillThisKeepMeCompliantPage() {
         <h2 id="what-happens-if-privacy-laws-change">What Happens If Privacy Laws Change?</h2>
         
         <p>
-          When privacy laws change or new requirements are introduced, we automatically update our cookie banner solution. You'll receive email notifications about:
+          When privacy laws change or new requirements are introduced, we automatically update our cookie banner solution. You&apos;ll receive email notifications about:
         </p>
         <ul>
           <li>New compliance features being added</li>
@@ -266,7 +266,7 @@ export default function WillThisKeepMeCompliantPage() {
         </ul>
 
         <p>
-          These updates are applied automatically—you don't need to reconfigure your banner. This ensures your website remains compliant without ongoing maintenance.
+          These updates are applied automatically—you don&apos;t need to reconfigure your banner. This ensures your website remains compliant without ongoing maintenance.
         </p>
 
         <h2 id="how-does-this-compare-to-other-cookie-banner-solutions">How Does This Compare to Other Cookie Banner Solutions?</h2>

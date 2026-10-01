@@ -96,7 +96,7 @@ export default CookieConsent;`,
           Copy & Paste Integration
         </h3>
         <p className="text-muted-foreground">
-          Choose your platform and copy the code. It's that simple.
+          Choose your platform and copy the code. It&apos;s that simple.
         </p>
       </div>
 
@@ -179,7 +179,7 @@ export default CookieConsent;`,
           </div>
           <h4 className="font-semibold text-foreground mb-2">Paste Code</h4>
           <p className="text-sm text-muted-foreground">
-            Add to your website's head section
+            Add to your website&apos;s head section
           </p>
         </div>
 

@@ -416,18 +416,18 @@ export default function FreeCookieBannerPage() {
                     <p className="text-gray-600">
                       Yes! Our free solution includes the same GDPR compliance features as $200/month tools: 
                       granular consent, audit trails, cookie categorization, and proper legal documentation. 
-                      The main difference is we don't charge for basic compliance features.
+                      The main difference is we don&apos;t charge for basic compliance features.
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>What's the catch with your free solution?</CardTitle>
+                    <CardTitle>What&apos;s the catch with your free solution?</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600">
-                      There's no catch. We offer free cookie banners to build trust and showcase our technology. 
+                      There&apos;s no catch. We offer free cookie banners to build trust and showcase our technology. 
                       Advanced features like analytics, team collaboration, and additional layouts are available in paid plans,
                       but basic compliance is free on our free plan.
                     </p>
@@ -465,7 +465,7 @@ export default function FreeCookieBannerPage() {
                   <CardContent>
                     <p className="text-gray-600">
                       Free users get community support and documentation. Paid services often charge extra for priority support anyway. 
-                      Our solution is designed to be simple enough that most users don't need extensive support.
+                      Our solution is designed to be simple enough that most users don&apos;t need extensive support.
                     </p>
                   </CardContent>
                 </Card>

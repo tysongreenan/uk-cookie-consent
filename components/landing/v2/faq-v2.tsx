@@ -103,7 +103,7 @@ export function FaqV2() {
               asked.
             </h2>
             <p className="mt-3.5 max-w-[300px] text-[15.5px] leading-relaxed text-muted-foreground">
-              Don't see yours? Email{' '}
+              Don&apos;t see yours? Email{' '}
               <Link
                 href="mailto:hi@cookie-banner.ca"
                 className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"

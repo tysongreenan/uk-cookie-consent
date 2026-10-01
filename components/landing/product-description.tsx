@@ -25,13 +25,13 @@ export function ProductDescription() {
               <h3 className="text-2xl font-semibold mb-4">Key Features</h3>
               <ul className="space-y-3">
                 <li itemProp="featureList">
-                  <strong>Brand-matching customization:</strong> Full control over colors, fonts, style, and positioning so your banner aligns perfectly with your site's appearance.
+                  <strong>Brand-matching customization:</strong> Full control over colors, fonts, style, and positioning so your banner aligns perfectly with your site&apos;s appearance.
                 </li>
                 <li itemProp="featureList">
                   <strong>Cross-platform compatibility:</strong> Works on <Link href="/integrations/wordpress" className="underline hover:text-foreground">WordPress</Link>, <Link href="/integrations/shopify" className="underline hover:text-foreground">Shopify</Link>, <Link href="/integrations/squarespace" className="underline hover:text-foreground">Squarespace</Link>, and custom sites. Integration instructions and code snippets are provided for each platform.
                 </li>
                 <li itemProp="featureList">
-                  <strong>Canadian privacy law compliance:</strong> Express opt-in for non-essential cookies, support for bilingual (English/French) to satisfy Quebec's Law 25, and full <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link> and CASL compliance.
+                  <strong>Canadian privacy law compliance:</strong> Express opt-in for non-essential cookies, support for bilingual (English/French) to satisfy Quebec&apos;s Law 25, and full <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link> and CASL compliance.
                 </li>
                 <li itemProp="featureList">
                   <strong>Granular consent & blocking behavior:</strong> The tool blocks all non-essential cookies until users provide explicit consent. This includes analytics, marketing, and preference cookies.
@@ -46,7 +46,7 @@ export function ProductDescription() {
                   <strong>Tag management integration:</strong> Integrates smoothly with <Link href="/integrations/google-tag-manager" className="underline hover:text-foreground">Google Tag Manager</Link>, custom scripts, and other tag management systems. Non-essential tags are automatically gated by consent.
                 </li>
                 <li itemProp="featureList">
-                  <strong>Zero performance impact:</strong> Lightweight code (under 10KB) loads in milliseconds. Doesn't affect Core Web Vitals or page speed.
+                  <strong>Zero performance impact:</strong> Lightweight code (under 10KB) loads in milliseconds. Doesn&apos;t affect Core Web Vitals or page speed.
                 </li>
               </ul>
             </section>
@@ -54,7 +54,7 @@ export function ProductDescription() {
             <section className="mb-8">
               <h3 className="text-2xl font-semibold mb-4">Pricing Model</h3>
               <p>
-                Cookie-Banner.ca offers a <strong>free plan</strong> to get started with no credit card required. When you're ready for advanced features like analytics, team collaboration, and custom branding, upgrade to <strong>Pro for a <Link href="/pricing" className="underline hover:text-foreground">one-time payment of $99</Link></strong> — no subscriptions, no recurring fees, and lifetime updates included.
+                Cookie-Banner.ca offers a <strong>free plan</strong> to get started with no credit card required. When you&apos;re ready for advanced features like analytics, team collaboration, and custom branding, upgrade to <strong>Pro for a <Link href="/pricing" className="underline hover:text-foreground">one-time payment of $99</Link></strong> — no subscriptions, no recurring fees, and lifetime updates included.
               </p>
             </section>
 
@@ -68,7 +68,7 @@ export function ProductDescription() {
                 <li>Customize your banner (colors, fonts, text, position, logo)</li>
                 <li>Add tracking scripts if needed (Google Analytics, Facebook Pixel, etc.)</li>
                 <li>Copy the generated HTML/JavaScript code</li>
-                <li>Paste the code into your website's HTML, right before the closing <code>&lt;/body&gt;</code> tag</li>
+                <li>Paste the code into your website&apos;s HTML, right before the closing <code>&lt;/body&gt;</code> tag</li>
               </ol>
               <p className="mt-4">
                 No coding knowledge is required. The installation works on virtually any platform or website.
@@ -134,7 +134,7 @@ export function ProductDescription() {
                 <li>Verify that non-essential cookies are blocked until consent is given</li>
               </ol>
               <p className="mt-4">
-                Not sure what cookies your site uses? Try our free <Link href="/tools/cookie-scanner" className="underline hover:text-foreground">cookie scanner</Link> first. Start free and upgrade to Pro when you're ready for advanced features, analytics, and team collaboration.
+                Not sure what cookies your site uses? Try our free <Link href="/tools/cookie-scanner" className="underline hover:text-foreground">cookie scanner</Link> first. Start free and upgrade to Pro when you&apos;re ready for advanced features, analytics, and team collaboration.
               </p>
             </section>
           </div>

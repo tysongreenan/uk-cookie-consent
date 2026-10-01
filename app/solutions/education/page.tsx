@@ -83,7 +83,7 @@ export default function EducationSolutionPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Children's Online Privacy Protection Act requires verifiable parental consent for children under 13, with special restrictions on data collection.
+                    Children&apos;s Online Privacy Protection Act requires verifiable parental consent for children under 13, with special restrictions on data collection.
                   </p>
                 </CardContent>
               </Card>
@@ -210,11 +210,11 @@ export default function EducationSolutionPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Parental Access</h4>
-                      <p className="text-sm text-gray-600">Parents must be able to review and delete their child's information</p>
+                      <p className="text-sm text-gray-600">Parents must be able to review and delete their child&apos;s information</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Data Security</h4>
-                      <p className="text-sm text-gray-600">Implement reasonable security measures to protect children's data</p>
+                      <p className="text-sm text-gray-600">Implement reasonable security measures to protect children&apos;s data</p>
                     </div>
                   </div>
                 </CardContent>
@@ -237,7 +237,7 @@ export default function EducationSolutionPage() {
                       <UserCheck className="h-8 w-8 text-blue-600" />
                     </div>
                     <h4 className="font-semibold text-gray-900 mb-2">COPPA Protection</h4>
-                    <p className="text-sm text-gray-600">Children's online privacy and parental consent</p>
+                    <p className="text-sm text-gray-600">Children&apos;s online privacy and parental consent</p>
                   </div>
                   <div className="text-center">
                     <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -451,7 +451,7 @@ export default function EducationSolutionPage() {
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="font-semibold text-gray-900">Parental Access Controls</h4>
-                        <p className="text-sm text-gray-600">Parents can review, modify, and delete child's data</p>
+                        <p className="text-sm text-gray-600">Parents can review, modify, and delete child&apos;s data</p>
                       </div>
                     </div>
                   </div>
@@ -553,7 +553,7 @@ export default function EducationSolutionPage() {
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="font-semibold text-gray-900">Multi-Jurisdictional Compliance</h4>
-                        <p className="text-sm text-gray-600">Compliance with privacy laws from students' home countries</p>
+                        <p className="text-sm text-gray-600">Compliance with privacy laws from students&apos; home countries</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">

@@ -142,7 +142,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Personal Information Protection and Electronic Documents Act - Canada's federal privacy law governing private sector organizations.
+                    Personal Information Protection and Electronic Documents Act - Canada&apos;s federal privacy law governing private sector organizations.
                   </p>
                 </CardContent>
               </Card>
@@ -156,7 +156,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Quebec's modern privacy law with strict consent requirements, data protection obligations, and French-language requirements.
+                    Quebec&apos;s modern privacy law with strict consent requirements, data protection obligations, and French-language requirements.
                   </p>
                 </CardContent>
               </Card>
@@ -170,7 +170,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Alberta's Personal Information Protection Act with specific requirements for consent, data breaches, and privacy management programs.
+                    Alberta&apos;s Personal Information Protection Act with specific requirements for consent, data breaches, and privacy management programs.
                   </p>
                 </CardContent>
               </Card>
@@ -184,7 +184,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    British Columbia's Personal Information Protection Act with requirements for consent, data protection, and privacy policies.
+                    British Columbia&apos;s Personal Information Protection Act with requirements for consent, data protection, and privacy policies.
                   </p>
                 </CardContent>
               </Card>
@@ -198,7 +198,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Canada's Anti-Spam Legislation affecting electronic communications and marketing consent requirements.
+                    Canada&apos;s Anti-Spam Legislation affecting electronic communications and marketing consent requirements.
                   </p>
                 </CardContent>
               </Card>
@@ -230,7 +230,7 @@ export default function CanadaCompliancePage() {
                 PIPEDA Compliance Requirements
               </h2>
               <p className="text-xl text-gray-600">
-                Understanding Canada's federal privacy law and cookie consent obligations
+                Understanding Canada&apos;s federal privacy law and cookie consent obligations
               </p>
             </div>
 
@@ -426,7 +426,7 @@ export default function CanadaCompliancePage() {
                     <Users className="h-5 w-5" />
                     Alberta PIPA (Personal Information Protection Act)
                   </CardTitle>
-                  <CardDescription>Alberta's comprehensive privacy law</CardDescription>
+                  <CardDescription>Alberta&apos;s comprehensive privacy law</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-6">
@@ -482,7 +482,7 @@ export default function CanadaCompliancePage() {
                     <Globe className="h-5 w-5" />
                     British Columbia PIPA
                   </CardTitle>
-                  <CardDescription>BC's privacy protection framework</CardDescription>
+                  <CardDescription>BC&apos;s privacy protection framework</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-6">
@@ -545,7 +545,7 @@ export default function CanadaCompliancePage() {
                 French Language Requirements
               </h2>
               <p className="text-xl text-gray-600">
-                Meeting Quebec's French language obligations for cookie consent
+                Meeting Quebec&apos;s French language obligations for cookie consent
               </p>
             </div>
 

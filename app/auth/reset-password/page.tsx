@@ -216,7 +216,7 @@ export default function ResetPasswordPage() {
             Almost there
           </h2>
           <p className="text-zinc-300 text-lg mb-8">
-            Choose a strong password to keep your account secure. You'll be back in your dashboard in no time.
+            Choose a strong password to keep your account secure. You&apos;ll be back in your dashboard in no time.
           </p>
 
           <div className="space-y-4">

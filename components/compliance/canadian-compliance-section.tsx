@@ -108,7 +108,7 @@ export function CanadianComplianceSection() {
                 </p>
                 <div className="grid md:grid-cols-2 gap-6 text-sm">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">What's Included:</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">What&apos;s Included:</h4>
                     <ul className="space-y-1 text-gray-600">
                       <li>• Express consent mechanisms</li>
                       <li>• Granular cookie controls</li>

@@ -150,7 +150,7 @@ export default function WhatYouGetPage() {
         <h3>Visual Customization</h3>
         <ul>
           <li><strong>Colors:</strong> Customize background, text, button, and link colors to match your brand</li>
-          <li><strong>Fonts:</strong> Choose from a wide range of modern fonts to fit your website's aesthetic</li>
+          <li><strong>Fonts:</strong> Choose from a wide range of modern fonts to fit your website&apos;s aesthetic</li>
           <li><strong>Styles:</strong> Adjust border radius, shadows, animations, and banner positions (top, bottom, center)</li>
           <li><strong>Layouts:</strong> Select from various banner layouts (e.g., bar, box, full-screen) to best suit your design</li>
         </ul>
@@ -167,7 +167,7 @@ export default function WhatYouGetPage() {
         <h3>Supported Platforms</h3>
         <ul>
           <li><strong>WordPress:</strong> Simple plugin installation or code snippet integration</li>
-          <li><strong>Shopify:</strong> Easy integration into your store's theme files</li>
+          <li><strong>Shopify:</strong> Easy integration into your store&apos;s theme files</li>
           <li><strong>Squarespace & Wix:</strong> Add the code via custom code injection features</li>
           <li><strong>Custom HTML/React/Vue/Angular Sites:</strong> Integrate with a single JavaScript snippet</li>
         </ul>
@@ -178,13 +178,13 @@ export default function WhatYouGetPage() {
         <h2 id="zero-performance-impact">Zero Performance Impact</h2>
 
         <p>
-          We understand the importance of website speed. Our cookie banner is engineered for minimal impact on your site's performance.
+          We understand the importance of website speed. Our cookie banner is engineered for minimal impact on your site&apos;s performance.
         </p>
 
         <h3>Lightweight and Asynchronous</h3>
         <ul>
           <li><strong>Small File Size:</strong> The banner code is under 10KB, ensuring fast download times.</li>
-          <li><strong>Asynchronous Loading:</strong> The script loads in the background without blocking your page's rendering.</li>
+          <li><strong>Asynchronous Loading:</strong> The script loads in the background without blocking your page&apos;s rendering.</li>
           <li><strong>No Render Blocking:</strong> Your website content appears instantly, with the banner loading gracefully afterwards.</li>
         </ul>
         <p>
@@ -194,14 +194,14 @@ export default function WhatYouGetPage() {
         <h2 id="automatic-compliance-updates">Automatic Compliance Updates</h2>
 
         <p>
-          Privacy laws are constantly evolving. Our solution ensures you're always up-to-date without manual effort.
+          Privacy laws are constantly evolving. Our solution ensures you&apos;re always up-to-date without manual effort.
         </p>
 
         <h3>Continuous Monitoring and Updates</h3>
         <ul>
           <li><strong>Law Changes:</strong> When new privacy laws are introduced or existing ones are updated (e.g., GDPR, PIPEDA, Quebec Law 25), our banner is automatically updated to reflect the new requirements.</li>
           <li><strong>Feature Enhancements:</strong> We regularly release new features and improvements based on user feedback and industry best practices.</li>
-          <li><strong>Notifications:</strong> You'll receive email notifications about significant updates, new compliance features, and recommended text changes.</li>
+          <li><strong>Notifications:</strong> You&apos;ll receive email notifications about significant updates, new compliance features, and recommended text changes.</li>
         </ul>
         <p>
           You never need to manually update your banner code on your website; all changes are applied automatically.

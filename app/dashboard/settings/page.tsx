@@ -538,7 +538,7 @@ export default function SettingsPage() {
                 <div className="space-y-3">
                   <div>
                     <Label htmlFor="delete-confirm" className="text-red-800">
-                      Type "DELETE" to confirm:
+                      Type &quot;DELETE&quot; to confirm:
                     </Label>
                     <Input
                       id="delete-confirm"

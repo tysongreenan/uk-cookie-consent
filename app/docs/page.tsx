@@ -185,7 +185,7 @@ export default function DocsPage() {
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">Integration Example</h2>
               <p className="text-muted-foreground">
-                Here's how to add your cookie banner to your website
+                Here&apos;s how to add your cookie banner to your website
               </p>
             </div>
 
@@ -196,7 +196,7 @@ export default function DocsPage() {
                   HTML Integration
                 </CardTitle>
                 <CardDescription>
-                  Copy and paste this code into your website's body section (before closing &lt;/body&gt; tag)
+                  Copy and paste this code into your website&apos;s body section (before closing &lt;/body&gt; tag)
                 </CardDescription>
               </CardHeader>
               <CardContent>

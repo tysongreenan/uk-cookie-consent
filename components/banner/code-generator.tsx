@@ -301,11 +301,11 @@ ${generateBannerHTML(config, { showBranding })}
 
         {/* Instructions */}
         <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">One line of code. That's it.</p>
+          <p className="text-sm font-semibold text-green-900 dark:text-green-300 mb-2">One line of code. That&apos;s it.</p>
           <p className="text-sm text-green-800 dark:text-green-300">
             {bannerId
-              ? <>Copy the script tag below and paste it in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</>
-              : <>Copy saves this banner, then copies a one-line script. Paste that in your website's <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section.</>}
+              ? <>Copy the script tag below and paste it in your website&apos;s <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section. Your banner will appear automatically and stay up to date.</>
+              : <>Copy saves this banner, then copies a one-line script. Paste that in your website&apos;s <code className="bg-green-100 dark:bg-green-900/50 px-1 rounded">&lt;head&gt;</code> section.</>}
           </p>
           <p className="text-sm text-green-800 dark:text-green-300 mt-2">
             Consent is stored on your root domain by default, so www and other subdomains share one choice. You do not need extra GTM options.
@@ -383,7 +383,7 @@ ${generateBannerHTML(config, { showBranding })}
 
         {/* What's Next? */}
         <div className="p-4 bg-muted/50 border rounded-lg">
-          <p className="text-sm font-semibold mb-3">What's Next?</p>
+          <p className="text-sm font-semibold mb-3">What&apos;s Next?</p>
           <ol className="text-sm text-muted-foreground space-y-2 ml-4 list-decimal">
             <li className="flex items-start gap-2"><span>Paste the code on your website using the instructions above</span></li>
             <li className="flex items-start gap-2"><span>Visit your site to verify the banner appears</span></li>
@@ -554,8 +554,8 @@ ${generateBannerHTML(config, { showBranding })}
       <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
         <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Manual Installation:</p>
         <ol className="text-sm text-blue-800 dark:text-blue-300 space-y-1 ml-4 list-decimal">
-          <li><strong>Copy "Head Code"</strong> and paste it in your <code>&lt;head&gt;</code> section</li>
-          <li><strong>Copy "Body Code"</strong> and paste it just before the closing <code>&lt;/body&gt;</code> tag</li>
+          <li><strong>Copy &quot;Head Code&quot;</strong> and paste it in your <code>&lt;head&gt;</code> section</li>
+          <li><strong>Copy &quot;Body Code&quot;</strong> and paste it just before the closing <code>&lt;/body&gt;</code> tag</li>
           <li><strong>Save and refresh</strong> your website to see the banner</li>
         </ol>
         {bannerId && (
@@ -638,7 +638,7 @@ ${generateBannerHTML(config, { showBranding })}
 
       {/* What's Next? */}
       <div className="p-4 bg-muted/50 border rounded-lg">
-        <p className="text-sm font-semibold mb-3">What's Next?</p>
+        <p className="text-sm font-semibold mb-3">What&apos;s Next?</p>
         <ol className="text-sm text-muted-foreground space-y-2 ml-4 list-decimal">
           <li>Paste both Head and Body code on your website</li>
           <li>Visit your site to verify the banner appears</li>

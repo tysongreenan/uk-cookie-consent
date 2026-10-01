@@ -39,7 +39,7 @@ export default function PricingPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-muted-foreground">
-            Start free. Upgrade when you're ready. No surprises.
+            Start free. Upgrade when you&apos;re ready. No surprises.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             All prices in US dollars (USD).
@@ -281,7 +281,7 @@ export default function PricingPage() {
             <div className="text-center">
               <h3 className="font-semibold mb-2">Under 10KB</h3>
               <p className="text-sm text-muted-foreground">
-                Our banner script won't slow your site. No impact on page load speed or Core Web Vitals.
+                Our banner script won&apos;t slow your site. No impact on page load speed or Core Web Vitals.
               </p>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function PricingPage() {
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">What currency are prices in?</h3>
               <p className="text-sm text-muted-foreground">
-                All prices are in US dollars (USD). We're a Canadian company, but we bill in USD — if you pay with a Canadian card, your bank will convert the charge to CAD at its exchange rate.
+                All prices are in US dollars (USD). We&apos;re a Canadian company, but we bill in USD — if you pay with a Canadian card, your bank will convert the charge to CAD at its exchange rate.
               </p>
             </div>
             <div className="border rounded-lg p-6">
@@ -310,13 +310,13 @@ export default function PricingPage() {
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">What happens if I cancel my annual plan?</h3>
               <p className="text-sm text-muted-foreground">
-                You keep access to all features through the end of your paid period. After that, you keep everything you had at the time of cancellation — just like a one-time purchase. You never lose access to features you've already paid for.
+                You keep access to all features through the end of your paid period. After that, you keep everything you had at the time of cancellation — just like a one-time purchase. You never lose access to features you&apos;ve already paid for.
               </p>
             </div>
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">Is there a money-back guarantee?</h3>
               <p className="text-sm text-muted-foreground">
-                Yes — 30-day money-back guarantee on both plans. If you're not satisfied, contact us for a full refund.
+                Yes — 30-day money-back guarantee on both plans. If you&apos;re not satisfied, contact us for a full refund.
               </p>
             </div>
             <div className="border rounded-lg p-6">
@@ -328,7 +328,7 @@ export default function PricingPage() {
             <div className="border rounded-lg p-6">
               <h3 className="font-semibold mb-2">Is there a free trial?</h3>
               <p className="text-sm text-muted-foreground">
-                The Free plan is your trial. Build a banner, install it on your site, and see how it works. Upgrade to Pro whenever you're ready.
+                The Free plan is your trial. Build a banner, install it on your site, and see how it works. Upgrade to Pro whenever you&apos;re ready.
               </p>
             </div>
             <div className="border rounded-lg p-6">

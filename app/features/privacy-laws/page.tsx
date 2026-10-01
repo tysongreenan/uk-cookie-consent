@@ -155,7 +155,7 @@ export default function PrivacyLawsPage() {
 
         <h3>PIPEDA (Personal Information Protection and Electronic Documents Act)</h3>
         <p>
-          PIPEDA is Canada's federal privacy law that applies to private-sector organizations. Our banner meets PIPEDA requirements by:
+          PIPEDA is Canada&apos;s federal privacy law that applies to private-sector organizations. Our banner meets PIPEDA requirements by:
         </p>
         <ul>
           <li>Obtaining meaningful consent before collecting personal information through cookies</li>
@@ -167,9 +167,9 @@ export default function PrivacyLawsPage() {
           Learn more about <Link href="/compliance/pipeda" className="text-foreground underline">PIPEDA compliance requirements</Link>.
         </p>
 
-        <h3>CASL (Canada's Anti-Spam Legislation)</h3>
+        <h3>CASL (Canada&apos;s Anti-Spam Legislation)</h3>
         <p>
-          CASL requires consent before installing software (including tracking scripts) on someone's device. Our banner ensures CASL compliance by:
+          CASL requires consent before installing software (including tracking scripts) on someone&apos;s device. Our banner ensures CASL compliance by:
         </p>
         <ul>
           <li>Blocking tracking scripts until users provide consent</li>
@@ -179,7 +179,7 @@ export default function PrivacyLawsPage() {
 
         <h3>Quebec Law 25 (Bill 64)</h3>
         <p>
-          Quebec has its own privacy law that's stricter than PIPEDA. Our banner fully supports Quebec Law 25 with:
+          Quebec has its own privacy law that&apos;s stricter than PIPEDA. Our banner fully supports Quebec Law 25 with:
         </p>
         <ul>
           <li>Explicit consent requirements (not implied consent)</li>
@@ -194,12 +194,12 @@ export default function PrivacyLawsPage() {
 
         <h3>Alberta PIPA (Personal Information Protection Act)</h3>
         <p>
-          Alberta's privacy law requires consent before collecting personal information. Our banner ensures compliance by blocking cookies until users consent and providing clear information about data collection.
+          Alberta&apos;s privacy law requires consent before collecting personal information. Our banner ensures compliance by blocking cookies until users consent and providing clear information about data collection.
         </p>
 
         <h3>BC PIPA (British Columbia Personal Information Protection Act)</h3>
         <p>
-          British Columbia's privacy law is similar to Alberta's. Our banner ensures compliance by:
+          British Columbia&apos;s privacy law is similar to Alberta&apos;s. Our banner ensures compliance by:
         </p>
         <ul>
           <li>Requiring consent for personal information collection</li>
@@ -230,10 +230,10 @@ export default function PrivacyLawsPage() {
 
         <h3>CCPA (California Consumer Privacy Act)</h3>
         <p>
-          The CCPA is California's privacy law, which focuses on consumer rights regarding personal information. Our banner supports CCPA by:
+          The CCPA is California&apos;s privacy law, which focuses on consumer rights regarding personal information. Our banner supports CCPA by:
         </p>
         <ul>
-          <li>Providing an opt-out mechanism for the "sale" of personal information</li>
+          <li>Providing an opt-out mechanism for the &quot;sale&quot; of personal information</li>
           <li>Offering granular control over data sharing</li>
           <li>Ensuring transparency about data collection practices</li>
           <li>Allowing users to request access to or deletion of their personal information</li>

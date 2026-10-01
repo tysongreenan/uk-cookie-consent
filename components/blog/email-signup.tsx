@@ -32,7 +32,7 @@ export function EmailSignup() {
           <Check className="h-8 w-8 text-green-600 mx-auto mb-3" />
           <h3 className="font-semibold text-green-800 mb-2">Thanks for subscribing!</h3>
           <p className="text-green-700 text-sm">
-            We'll send you updates on Canadian privacy law changes and cookie banner best practices.
+            We&apos;ll send you updates on Canadian privacy law changes and cookie banner best practices.
           </p>
         </CardContent>
       </Card>
