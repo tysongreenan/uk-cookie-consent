@@ -1,6 +1,7 @@
 'use client'
 
 import { Component, type ReactNode } from 'react'
+import { captureException } from '@/lib/analytics'
 
 type Props = { children: ReactNode }
 type State = { hasError: boolean }
@@ -11,6 +12,12 @@ export class AnnouncementErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(): State {
     return { hasError: true }
+  }
+
+  componentDidCatch(error: Error): void {
+    // This boundary returns null, so app/error.tsx never mounts and PostHog
+    // autocapture never sees the render crash (e.g. React #310).
+    captureException(error, { context: 'announcement_error_boundary' })
   }
 
   render() {
