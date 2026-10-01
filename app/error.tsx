@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
+import { captureException } from '@/lib/analytics'
 
 export default function Error({
   error,
@@ -14,6 +15,12 @@ export default function Error({
 }) {
   useEffect(() => {
     Sentry.captureException(error)
+    // React error boundaries swallow render crashes, so PostHog exception
+    // autocapture never sees them. Report explicitly (consent-gated).
+    captureException(error, {
+      context: 'app_error_boundary',
+      ...(error.digest ? { digest: error.digest } : {}),
+    })
   }, [error])
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
