@@ -14,11 +14,13 @@ import { RateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { generatePolicyFromInputs } from '@/lib/privacy-policy/generator'
 import {
-  captureServerEvent,
+  capturePlanned,
   captureServerException,
   getPostHogDistinctId,
   getPostHogSessionId,
+  identityForUser,
 } from '@/lib/posthog-server'
+import { planServerCapture } from '@/lib/posthog-identity'
 
 // Unauthenticated: 10 requests per hour per IP
 const unauthRateLimit = new RateLimit({
@@ -126,22 +128,25 @@ export async function POST(request: NextRequest) {
 
     const policyOutput = await generatePolicyFromInputs(parsed.data)
 
-    const distinctId = getPostHogDistinctId(request, session?.user?.id || 'anonymous')
-    const sessionId = getPostHogSessionId(request)
-    void captureServerEvent({
-      distinctId,
-      event: 'privacy_policy_generated',
-      sessionId,
-      properties: {
-        source: 'api',
-        format: 'html',
-        language: parsed.data.language,
-        business_type: parsed.data.businessType,
-        jurisdiction_count: parsed.data.jurisdictions?.length ?? 0,
-        plan_tier: session?.user?.planTier || (session?.user?.id ? 'free' : 'anonymous'),
-        authenticated: Boolean(session?.user?.id),
-      },
-    })
+    const userId = session?.user?.id
+    const identity = userId ? identityForUser(userId, request) : null
+    void capturePlanned(
+      planServerCapture({
+        distinctId: identity?.distinctId || getPostHogDistinctId(request, 'anonymous'),
+        anonDistinctId: identity?.anonDistinctId,
+        sessionId: identity?.sessionId || getPostHogSessionId(request),
+        event: 'privacy_policy_generated',
+        properties: {
+          source: 'api',
+          format: 'html',
+          language: parsed.data.language,
+          business_type: parsed.data.businessType,
+          jurisdiction_count: parsed.data.jurisdictions?.length ?? 0,
+          plan_tier: session?.user?.planTier || (userId ? 'free' : 'anonymous'),
+          authenticated: Boolean(userId),
+        },
+      })
+    )
 
     return NextResponse.json(policyOutput)
   } catch (error) {

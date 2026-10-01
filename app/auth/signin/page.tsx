@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Eye, EyeOff, Loader2, Lock, Mail, ArrowRight, Shield, CheckCircle2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
-import { captureException } from '@/lib/analytics'
+import { captureException, identifyUser, stashPostHogIdentity } from '@/lib/analytics'
 
 function SignInContent() {
   const [email, setEmail] = useState('')
@@ -40,6 +40,7 @@ function SignInContent() {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true)
+    stashPostHogIdentity()
     try {
       await signIn('google', { callbackUrl })
     } catch (error) {
@@ -54,6 +55,7 @@ function SignInContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    stashPostHogIdentity()
 
     try {
       const result = await signIn('credentials', {
@@ -74,8 +76,14 @@ function SignInContent() {
         }
       } else if (result?.ok) {
         toast.success('Welcome back!')
-        // login_completed is captured server-side in NextAuth authorize();
-        // PostHogIdentify calls identify(user.id) once session hydrates
+        const session = await getSession()
+        if (session?.user?.id) {
+          identifyUser(session.user.id, {
+            email: session.user.email,
+            name: session.user.name,
+            plan: session.user.planTier || 'free',
+          })
+        }
         router.push(callbackUrl)
         router.refresh()
       }

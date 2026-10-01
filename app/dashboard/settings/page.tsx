@@ -21,6 +21,7 @@ import { ArrowLeft, User, Mail, Trash2, AlertTriangle, CreditCard, ExternalLink,
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { maskDeveloperKeyPrefix } from '@/lib/mcp-install'
+import { resetPostHogIdentity } from '@/lib/analytics'
 
 type DeveloperKey = {
   id: string
@@ -180,6 +181,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         toast.success('Account deleted successfully')
+        resetPostHogIdentity()
         signOut({ callbackUrl: '/' })
       } else {
         toast.error(data.error || 'Failed to delete account')
@@ -505,7 +507,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" onClick={() => signOut()}>
+              <Button variant="outline" onClick={() => { resetPostHogIdentity(); signOut() }}>
                 Sign Out
               </Button>
             </CardContent>

@@ -6,12 +6,8 @@ import { canCreateBanner, getBannerLimit, canUseLayout } from '@/lib/plan-restri
 import { PlanTier } from '@/types'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { getBannerAccessScope } from '@/lib/banner-access'
-import {
-  captureServerEvent,
-  captureServerException,
-  getPostHogDistinctId,
-  getPostHogSessionId,
-} from '@/lib/posthog-server'
+import { capturePlanned, captureServerException, identityForUser } from '@/lib/posthog-server'
+import { planServerCapture } from '@/lib/posthog-identity'
 import { parseAccessibilityForSave } from '@/lib/accessibility'
 
 const supabase = createClient(
@@ -107,22 +103,24 @@ function rejectCookies() {
     console.log('✅ Simple Save: Banner created successfully:', bannerId)
     logActivity(session.user.id, AuditAction.BANNER_CREATE, request, { bannerId, bannerName })
 
-    const distinctId = getPostHogDistinctId(request, session.user.id)
-    const sessionId = getPostHogSessionId(request)
+    const identity = identityForUser(session.user.id, request)
     const source = typeof bannerData.source === 'string' ? bannerData.source : undefined
-    void captureServerEvent({
-      distinctId,
-      event: 'banner_created',
-      sessionId,
-      properties: {
-        banner_id: bannerId,
-        banner_name: bannerName,
-        user_id: session.user.id,
-        is_first_banner: currentCount === 0,
-        plan_tier: userTier,
-        ...(source ? { source } : {}),
-      },
-    })
+    void capturePlanned(
+      planServerCapture({
+        distinctId: identity.distinctId,
+        anonDistinctId: identity.anonDistinctId,
+        sessionId: identity.sessionId,
+        event: 'banner_created',
+        properties: {
+          banner_id: bannerId,
+          banner_name: bannerName,
+          user_id: session.user.id,
+          is_first_banner: currentCount === 0,
+          plan_tier: userTier,
+          ...(source ? { source } : {}),
+        },
+      })
+    )
 
     return NextResponse.json({
       success: true,

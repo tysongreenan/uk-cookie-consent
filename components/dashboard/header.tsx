@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { InviteMemberModal } from './invite-member-modal'
+import { resetPostHogIdentity } from '@/lib/analytics'
 import { canAccessFeature } from '@/lib/plan-restrictions'
 import { PlanTier } from '@/types'
 
@@ -39,6 +40,7 @@ export function DashboardHeader({}: HeaderProps) {
   const canInvite = canAccessFeature(userPlan, 'hasTeamCollaboration')
 
   const handleSignOut = async () => {
+    resetPostHogIdentity()
     await signOut({ callbackUrl: '/' })
   }
 

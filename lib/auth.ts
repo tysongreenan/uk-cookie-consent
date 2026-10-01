@@ -19,7 +19,25 @@ import bcrypt from 'bcryptjs'
 import { logActivity, AuditAction } from '@/lib/audit-log'
 import { resolveEffectivePlan } from '@/lib/team-permissions'
 import { sanitizeEmail } from '@/lib/sanitize'
-import { captureServerEvent } from '@/lib/posthog-server'
+import { capturePlanned, identityForUser } from '@/lib/posthog-server'
+import { planServerCapture, planSignupFunnelCaptures } from '@/lib/posthog-identity'
+
+function captureAuthEvent(
+  userId: string,
+  event: string,
+  properties: Record<string, unknown>
+) {
+  const identity = identityForUser(userId)
+  void capturePlanned(
+    planServerCapture({
+      distinctId: identity.distinctId,
+      event,
+      properties,
+      sessionId: identity.sessionId,
+      anonDistinctId: identity.anonDistinctId,
+    })
+  )
+}
 
 // Lazy initialization to avoid build-time errors
 // Use service role key for server-side operations (bypasses RLS)
@@ -146,13 +164,9 @@ export const authOptions: NextAuthOptions = {
 
           // Log successful login (no request object available in authorize callback)
           logActivity(user.id, AuditAction.LOGIN, null, { email: user.email, provider: 'credentials' })
-          void captureServerEvent({
-            distinctId: user.id,
-            event: 'login_completed',
-            properties: {
-              method: 'credentials',
-              email: user.email,
-            },
+          captureAuthEvent(user.id, 'login_completed', {
+            method: 'credentials',
+            email: user.email,
           })
 
           return {
@@ -276,13 +290,9 @@ export const authOptions: NextAuthOptions = {
           ;(user as any).hasCommentTool = existingUser.hasCommentTool ?? false
 
           logActivity(existingUser.id, AuditAction.LOGIN, null, { email, provider: 'google' })
-          void captureServerEvent({
-            distinctId: existingUser.id,
-            event: 'login_completed',
-            properties: {
-              method: 'google',
-              email,
-            },
+          captureAuthEvent(existingUser.id, 'login_completed', {
+            method: 'google',
+            email,
           })
           console.log('✅ Google OAuth: Linked to existing account:', email)
           return true
@@ -355,16 +365,15 @@ export const authOptions: NextAuthOptions = {
         ;(user as any).planTier = 'free'
 
         logActivity(userId, AuditAction.REGISTER, null, { email, provider: 'google' })
-        void captureServerEvent({
-          distinctId: userId,
-          event: 'signup_completed',
-          properties: {
+        void capturePlanned(
+          planSignupFunnelCaptures({
+            identity: identityForUser(userId),
             method: 'google',
             product: 'banner',
-            user_id: userId,
-            email,
-          },
-        })
+            userId,
+            completedProperties: { email },
+          })
+        )
         console.log('✅ Google OAuth: Created user + workspace for:', email)
         return true
       } catch (error) {

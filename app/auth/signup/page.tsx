@@ -17,6 +17,7 @@ import {
   captureException,
   identifyUser,
   getPostHogRequestHeaders,
+  stashPostHogIdentity,
 } from '@/lib/analytics'
 import { getPasswordRuleStates, getSignupFieldErrors, resolveSignupCallbackUrl } from '@/lib/signup-form'
 
@@ -76,7 +77,8 @@ function SignUpContent() {
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true)
-    captureEvent('signup_started', { method: 'google', product })
+    captureEvent('signup_started', { method: 'google', product }, { sendInstantly: true })
+    stashPostHogIdentity()
     try {
       await signIn('google', { callbackUrl })
     } catch (error) {
@@ -91,7 +93,8 @@ function SignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-    captureEvent('signup_started', { method: 'credentials', product })
+    captureEvent('signup_started', { method: 'credentials', product }, { sendInstantly: true })
+    stashPostHogIdentity()
 
     const nextFieldErrors = getSignupFieldErrors({ name, email, password, agreeToTerms })
     if (Object.keys(nextFieldErrors).length > 0) {

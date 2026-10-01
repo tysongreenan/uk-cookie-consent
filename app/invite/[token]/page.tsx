@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle, XCircle, Loader2, Users, Calendar, Shield, LogIn, AlertTriangle } from 'lucide-react'
+import { resetPostHogIdentity } from '@/lib/analytics'
 
 interface InvitationData {
   id: string
@@ -107,6 +108,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   }
 
   const handleSignOutAndRetry = async () => {
+    resetPostHogIdentity()
     await signOut({ callbackUrl: `/invite/${params.token}` })
   }
 

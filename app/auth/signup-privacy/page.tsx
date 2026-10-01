@@ -11,6 +11,7 @@ import {
   captureException,
   identifyUser,
   getPostHogRequestHeaders,
+  stashPostHogIdentity,
 } from '@/lib/analytics'
 
 function PrivacySignUpContent() {
@@ -26,7 +27,8 @@ function PrivacySignUpContent() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-    captureEvent('signup_started', { method: 'credentials', product: 'privacy' })
+    captureEvent('signup_started', { method: 'credentials', product: 'privacy' }, { sendInstantly: true })
+    stashPostHogIdentity()
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters long')
