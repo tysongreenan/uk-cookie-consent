@@ -129,11 +129,17 @@ function validateUrl(inputUrl: string): boolean {
   return true
 }
 
+const INCOMPLETE_SCAN_MESSAGE = "Scan incomplete, we couldn't fully load this site"
+
+type ScanFetch =
+  | { kind: 'complete'; result: ScanResult }
+  | { kind: 'incomplete'; message: string; reason: string }
+  | { kind: 'error'; message: string; reason: string }
+
 // Calls the real backend scanner. The endpoint loads the page in a headless
-// browser, observes the cookies and tracking scripts that actually fire, and
-// returns per-regulation compliance scores. Falls back to a static HTML scan
-// server-side when a full browser scan is unavailable.
-async function performScan(targetUrl: string): Promise<ScanResult> {
+// browser and returns per-regulation grades only when the page actually
+// loaded. A blocked, timed-out, or empty load comes back as incomplete.
+async function performScan(targetUrl: string): Promise<ScanFetch> {
   const domain = new URL(targetUrl).hostname
 
   const response = await fetch('/api/tools/cookie-scanner', {
@@ -144,8 +150,28 @@ async function performScan(targetUrl: string): Promise<ScanResult> {
 
   const data = await response.json().catch(() => ({}))
 
+  if (data?.scanStatus === 'incomplete') {
+    return {
+      kind: 'incomplete',
+      message: typeof data.error === 'string' ? data.error : INCOMPLETE_SCAN_MESSAGE,
+      reason: typeof data.reason === 'string' ? data.reason : 'browser_failed',
+    }
+  }
+
+  if (response.status === 429) {
+    return {
+      kind: 'error',
+      reason: 'rate_limited',
+      message: data?.error || 'Too many scans from your IP. Please wait an hour before scanning another site.',
+    }
+  }
+
   if (!response.ok) {
-    throw new Error(data?.error || 'Scan failed. Please try again.')
+    return {
+      kind: 'error',
+      reason: 'error',
+      message: data?.error || 'Scan failed. Please try again.',
+    }
   }
 
   const cookies: CookieData[] = (data.cookies ?? []).map((c: any) => ({
@@ -161,13 +187,16 @@ async function performScan(targetUrl: string): Promise<ScanResult> {
   }))
 
   return {
-    url: targetUrl,
-    cookies,
-    overallGrade: data.overallGrade,
-    overallScore: data.overallScore,
-    compliance: data.compliance,
-    recommendations: data.recommendations ?? [],
-    timestamp: data.fetchedAt ?? new Date().toISOString(),
+    kind: 'complete',
+    result: {
+      url: targetUrl,
+      cookies,
+      overallGrade: data.overallGrade,
+      overallScore: data.overallScore,
+      compliance: data.compliance,
+      recommendations: data.recommendations ?? [],
+      timestamp: data.fetchedAt ?? new Date().toISOString(),
+    },
   }
 }
 
@@ -265,6 +294,7 @@ export function CookieScanner() {
   const [isScanning, setIsScanning] = useState(false)
   const [currentStep, setCurrentStep] = useState(-1)
   const [result, setResult] = useState<ScanResult | null>(null)
+  const [incomplete, setIncomplete] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [activeFilter, setActiveFilter] = useState<string>('all')
   const [expandedCookie, setExpandedCookie] = useState<number | null>(null)
@@ -313,6 +343,7 @@ export function CookieScanner() {
     setIsScanning(true)
     setError('')
     setResult(null)
+    setIncomplete(null)
     setCurrentStep(0)
     setActiveFilter('all')
     setExpandedCookie(null)
@@ -328,25 +359,49 @@ export function CookieScanner() {
 
     try {
       const targetUrl = `https://${domain}`
-      const scanResult = await performScan(targetUrl)
-      setResult(scanResult)
-      captureEvent('cookie_scan_completed', {
-        cookie_count: scanResult.cookies.length,
-        duration_ms: Date.now() - scanStartedAt,
-        issue_count: Object.values(scanResult.compliance).reduce(
-          (total, regulation) => total + regulation.issues.length,
-          0
-        ),
-        overall_grade: scanResult.overallGrade,
-        overall_score: scanResult.overallScore,
-        target_domain: domain,
-      })
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 200)
+      const outcome = await performScan(targetUrl)
+      if (outcome.kind === 'incomplete') {
+        setIncomplete(outcome.message)
+        captureEvent('cookie_scan_failed', {
+          duration_ms: Date.now() - scanStartedAt,
+          failure_reason: outcome.reason,
+          scan_outcome: 'incomplete',
+          target_domain: domain,
+        })
+      } else if (outcome.kind === 'error') {
+        captureEvent('cookie_scan_failed', {
+          duration_ms: Date.now() - scanStartedAt,
+          failure_reason: outcome.reason,
+          scan_outcome: 'error',
+          target_domain: domain,
+        })
+        setError(outcome.message)
+      } else {
+        const scanResult = outcome.result
+        setResult(scanResult)
+        captureEvent('cookie_scan_completed', {
+          cookie_count: scanResult.cookies.length,
+          duration_ms: Date.now() - scanStartedAt,
+          issue_count: Object.values(scanResult.compliance).reduce(
+            (total, regulation) => total + regulation.issues.length,
+            0
+          ),
+          overall_grade: scanResult.overallGrade,
+          overall_score: scanResult.overallScore,
+          scan_outcome: 'complete',
+          target_domain: domain,
+        })
+      }
+      if (outcome.kind !== 'error') {
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 200)
+      }
     } catch {
       captureEvent('cookie_scan_failed', {
         duration_ms: Date.now() - scanStartedAt,
+        failure_reason: 'error',
+        scan_outcome: 'error',
         target_domain: domain,
       })
       setError('Failed to scan website. Please try again.')
@@ -539,8 +594,29 @@ export function CookieScanner() {
         )}
       </AnimatePresence>
 
+      {incomplete && !isScanning && (
+        <div
+          ref={resultsRef}
+          role="status"
+          className="mt-8 bg-card border-2 border-border rounded-xl p-6 sm:p-8 text-left"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">{incomplete}</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                No grade was assigned. The site may be blocking automated scans, or the page did not finish loading.
+              </p>
+              <Button className="mt-4" onClick={() => handleScan()}>
+                Try again
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Trust Signals & Examples (only when no results and not scanning) ── */}
-      {!result && !isScanning && (
+      {!result && !incomplete && !isScanning && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
             <span>Try it:</span>

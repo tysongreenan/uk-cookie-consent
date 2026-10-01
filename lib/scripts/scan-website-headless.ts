@@ -16,6 +16,7 @@
 // Locally we use the full `playwright` package (devDependency, ships a
 // regular Chromium via `npx playwright install`).
 
+import { isBlockedInterstitial } from '@/lib/scripts/scan-completion'
 import { validatePublicUrl } from '@/lib/url-validation'
 
 // Wait past initial load so consent banners and trackers that fire on
@@ -200,6 +201,40 @@ export interface HeadlessScanResult {
   frenchLanguage: FrenchLanguageCheck
   finalUrl: string
   ourBannerId: string | null
+  /** HTTP status of the main document. 403/429 here means the site blocked the browser. */
+  httpStatus: number
+  pageTitle: string
+  /** Visible text length after load. Tiny documents are not enough to grade. */
+  visibleTextLength: number
+}
+
+async function readPageProbe(page: any): Promise<{ title: string; textLength: number }> {
+  return page.evaluate(() => ({
+    title: document.title || '',
+    textLength: (document.body?.innerText || '').replace(/\s+/g, ' ').trim().length,
+  })).catch(() => ({ title: '', textLength: 0 }))
+}
+
+function unloadedResult(partial: {
+  httpStatus: number
+  pageTitle: string
+  visibleTextLength: number
+  finalUrl: string
+}): HeadlessScanResult {
+  return {
+    cookies: [],
+    loadedScripts: [],
+    thirdPartyRequests: [],
+    consentBanner: { detected: false, vendor: null },
+    consentAccepted: { vendor: null, attempted: false },
+    privacyPolicyUrl: null,
+    frenchLanguage: { available: false, signals: [] },
+    finalUrl: partial.finalUrl,
+    ourBannerId: null,
+    httpStatus: partial.httpStatus,
+    pageTitle: partial.pageTitle,
+    visibleTextLength: partial.visibleTextLength,
+  }
 }
 
 export async function launchBrowser(): Promise<any> {
@@ -352,13 +387,19 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
     })
 
     // Hard cap the whole operation — a slow site shouldn't blow our Vercel
-    // function budget.
+    // function budget. Closing the page makes the in-flight navigation reject;
+    // we rethrow that as a timeout so the caller does not grade a partial page.
+    let timedOut = false
     const overall = setTimeout(() => {
+      timedOut = true
       page.close().catch(() => {})
     }, TOTAL_TIMEOUT_MS)
 
     let consentAccepted: { vendor: string | null; attempted: boolean } = { vendor: null, attempted: false }
     let requestsBeforeConsent = 0
+    let httpStatus = 0
+    let pageTitle = ''
+    let visibleTextLength = 0
 
     try {
       const response = await page.goto(targetUrl, {
@@ -370,7 +411,33 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
         throw new Error('No response from target site')
       }
 
+      httpStatus = response.status()
+
+      // A deny/challenge response is already the whole document. Waiting out
+      // the settle timer and then scoring it produced the fake grade D.
+      if (httpStatus >= 400) {
+        const probe = await readPageProbe(page)
+        return unloadedResult({
+          httpStatus,
+          pageTitle: probe.title,
+          visibleTextLength: probe.textLength,
+          finalUrl: page.url(),
+        })
+      }
+
       await page.waitForTimeout(POST_LOAD_SETTLE_MS)
+
+      const probe = await readPageProbe(page)
+      pageTitle = probe.title
+      visibleTextLength = probe.textLength
+      if (isBlockedInterstitial(probe.title)) {
+        return unloadedResult({
+          httpStatus,
+          pageTitle: probe.title,
+          visibleTextLength: probe.textLength,
+          finalUrl: page.url(),
+        })
+      }
 
       // Snapshot how many requests we've seen pre-consent — used later to
       // compute what was newly fired AFTER we clicked accept.
@@ -387,6 +454,11 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
         // Wait for downstream tags to fire after consent.
         await page.waitForTimeout(POST_CONSENT_SETTLE_MS)
       }
+    } catch (err) {
+      if (timedOut) {
+        throw new Error('Scan timed out before the page finished loading')
+      }
+      throw err
     } finally {
       clearTimeout(overall)
     }
@@ -703,6 +775,9 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       frenchLanguage,
       finalUrl: page.url(),
       ourBannerId,
+      httpStatus,
+      pageTitle,
+      visibleTextLength,
     }
   } finally {
     await browser.close().catch(() => {})

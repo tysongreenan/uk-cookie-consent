@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
 import { RateLimit } from '@/lib/rate-limit'
-import { scanWebsite } from '@/lib/scripts/scan-website'
+import { isIncompleteScan, scanWebsite } from '@/lib/scripts/scan-website'
 import { discoverScripts } from '@/lib/scripts/discover'
 import { toImportCandidates, type BuilderScannerResult } from '@/lib/scripts/import-candidates'
 
@@ -77,6 +77,20 @@ export async function POST(request: NextRequest) {
       scanWebsite(targetUrl),
       discoverScripts(targetUrl),
     ])
+
+    if (isIncompleteScan(scanResult)) {
+      return NextResponse.json(
+        { error: scanResult.message, scanStatus: 'incomplete', reason: scanResult.reason },
+        {
+          status: 422,
+          headers: {
+            'X-RateLimit-Limit': '20',
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+          },
+        },
+      )
+    }
 
     const result: BuilderScannerResult = {
       url: scanResult.url,
