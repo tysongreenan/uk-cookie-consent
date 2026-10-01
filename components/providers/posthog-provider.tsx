@@ -5,6 +5,7 @@ import { PostHogProvider as PHProvider } from 'posthog-js/react'
 import { useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { identifyUser } from '@/lib/analytics'
 
 /**
  * PostHog Provider — consent-aware analytics
@@ -105,22 +106,60 @@ export function PostHogPageView() {
   return null
 }
 
-// Identify user after NextAuth sign-in (only if opted in)
+// Identify user after NextAuth sign-in (only if opted in).
+// Session often exists before PostHog's loaded() callback opts in. Identifying
+// only in that first effect used to no-op, then a later page load called
+// identify against a new anonymous id and never merged the pre-signup person.
 export function PostHogIdentify() {
   const { data: session } = useSession()
+  const userId = session?.user?.id
+  const email = session?.user?.email
+  const name = session?.user?.name
+  const plan = session?.user?.planTier || 'free'
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return
-    if (!posthog.has_opted_in_capturing()) return
-    if (!session?.user) return
+    if (!process.env.NEXT_PUBLIC_POSTHOG_KEY || !userId) return
+    let stopped = false
 
-    const user = session.user as any
-    posthog.identify(user.id, {
-      email: user.email,
-      name: user.name,
-      plan: user.planTier || 'free',
-    })
-  }, [session])
+    const tryIdentify = () => {
+      if (stopped) return false
+      try {
+        if (!posthog.has_opted_in_capturing()) return false
+      } catch {
+        return false
+      }
+      return identifyUser(userId, { email, name, plan })
+    }
+
+    let interval = 0
+    let timeout = 0
+    const stopTimers = () => {
+      window.clearInterval(interval)
+      window.clearTimeout(timeout)
+    }
+
+    if (!tryIdentify()) {
+      interval = window.setInterval(() => {
+        if (tryIdentify()) stopTimers()
+      }, 200)
+      timeout = window.setTimeout(stopTimers, 10000)
+    }
+
+    const onConsent = () => {
+      tryIdentify()
+    }
+    window.__cbConsentCallbacks = window.__cbConsentCallbacks || []
+    window.__cbConsentCallbacks.push(onConsent)
+
+    return () => {
+      stopped = true
+      stopTimers()
+      const callbacks = window.__cbConsentCallbacks
+      if (callbacks) {
+        window.__cbConsentCallbacks = callbacks.filter((cb) => cb !== onConsent)
+      }
+    }
+  }, [userId, email, name, plan])
 
   return null
 }

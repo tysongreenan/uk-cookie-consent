@@ -1,5 +1,17 @@
 import { PostHog } from 'posthog-node'
+import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
+import {
+  POSTHOG_DISTINCT_COOKIE,
+  POSTHOG_SESSION_COOKIE,
+  planServerCapture,
+  resolvePostHogIdentity,
+  type PlannedCapture,
+  type PostHogIdentity,
+} from '@/lib/posthog-identity'
+
+export { planServerCapture, planSignupFunnelCaptures, resolvePostHogIdentity } from '@/lib/posthog-identity'
+export type { PlannedCapture, PostHogIdentity } from '@/lib/posthog-identity'
 
 /**
  * Server-side PostHog client for API routes / auth callbacks.
@@ -16,6 +28,52 @@ export function getPostHogServer(): PostHog | null {
   })
 }
 
+type HeaderSource = { headers: { get(name: string): string | null } }
+
+function readCookie(name: string): string | undefined {
+  try {
+    const raw = cookies().get(name)?.value
+    if (!raw) return undefined
+    return decodeURIComponent(raw).trim() || undefined
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Anonymous id from the consented browser. Header wins; the short-lived cookie
+ * covers OAuth and NextAuth callbacks that cannot set custom headers.
+ */
+export function readBrowserPostHogContext(request?: HeaderSource | null): {
+  browserDistinctId?: string
+  browserSessionId?: string
+} {
+  const headerDistinct = request?.headers.get('x-posthog-distinct-id')?.trim() || undefined
+  const headerSession = request?.headers.get('x-posthog-session-id')?.trim() || undefined
+
+  return {
+    browserDistinctId: headerDistinct || readCookie(POSTHOG_DISTINCT_COOKIE),
+    browserSessionId: headerSession || readCookie(POSTHOG_SESSION_COOKIE),
+  }
+}
+
+/** Canonical person for a signed-in user: DB id, plus the anonymous id to merge. */
+export function identityForUser(
+  userId: string,
+  request?: HeaderSource | NextRequest | null
+): PostHogIdentity {
+  const browser = readBrowserPostHogContext(request)
+  return resolvePostHogIdentity({
+    userId,
+    browserDistinctId: browser.browserDistinctId,
+    browserSessionId: browser.browserSessionId,
+  })
+}
+
+/**
+ * Prefer the browser distinct id only when there is no user yet.
+ * Authenticated events must use identityForUser so they match posthog.identify.
+ */
 export function getPostHogDistinctId(
   request: NextRequest | null | undefined,
   fallbackDistinctId: string
@@ -35,30 +93,22 @@ type CaptureArgs = {
   event: string
   properties?: Record<string, unknown>
   sessionId?: string
+  anonDistinctId?: string
 }
 
-/**
- * Fire-and-forget server capture. Never throws into the request path.
- */
-export async function captureServerEvent({
-  distinctId,
-  event,
-  properties,
-  sessionId,
-}: CaptureArgs): Promise<void> {
+export async function capturePlanned(events: PlannedCapture[]): Promise<void> {
+  if (events.length === 0) return
   const client = getPostHogServer()
   if (!client) return
 
   try {
-    client.capture({
-      distinctId,
-      event,
-      properties: {
-        ...properties,
-        ...(sessionId ? { $session_id: sessionId } : {}),
-        $lib: 'posthog-node',
-      },
-    })
+    for (const planned of events) {
+      client.capture({
+        distinctId: planned.distinctId,
+        event: planned.event,
+        properties: planned.properties,
+      })
+    }
     await client.shutdown()
   } catch (error) {
     console.error('PostHog server capture failed:', error)
@@ -68,6 +118,14 @@ export async function captureServerEvent({
       // ignore shutdown errors
     }
   }
+}
+
+/**
+ * Fire-and-forget server capture. Never throws into the request path.
+ * Pass anonDistinctId to merge the pre-signup browser into distinctId.
+ */
+export async function captureServerEvent(args: CaptureArgs): Promise<void> {
+  await capturePlanned(planServerCapture(args))
 }
 
 /**
