@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { scanWebsite } from '@/lib/scripts/scan-website'
+import { isIncompleteScan, scanWebsite } from '@/lib/scripts/scan-website'
 import { RateLimit } from '@/lib/rate-limit'
 
 // Headless Chromium needs the Node.js runtime, not Edge.
@@ -59,14 +59,25 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await scanWebsite(`https://${domain}`)
+    const rateHeaders = {
+      'X-RateLimit-Limit': '10',
+      'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+      'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+    }
 
-    return NextResponse.json(result, {
-      headers: {
-        'X-RateLimit-Limit': '10',
-        'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-        'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-      },
-    })
+    if (isIncompleteScan(result)) {
+      return NextResponse.json(
+        {
+          scanStatus: 'incomplete',
+          reason: result.reason,
+          error: result.message,
+          url: result.url,
+        },
+        { status: 422, headers: rateHeaders },
+      )
+    }
+
+    return NextResponse.json(result, { headers: rateHeaders })
   } catch (error) {
     console.error('Public cookie scanner error:', error)
     const message = error instanceof Error ? error.message : 'Unexpected error'

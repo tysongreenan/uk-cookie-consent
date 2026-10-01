@@ -1,13 +1,17 @@
-// Orchestrator: tries a headless browser scan first (real cookies, real
-// network requests, post-JS DOM). Falls back to the cheerio HTML scan when
-// the headless launch fails (e.g., cold-start binary download error) or
-// times out, so the public tool never returns a hard failure for a normal
-// site.
+// Orchestrator: grades a site only after a headless browser actually loads it.
+// A blocked, timed-out, or near-empty document is returned as an incomplete
+// scan. Scoring that document used to emit a fake grade D (0 cookies, 7
+// issues) because the old static-HTML fallback still ran the grader.
 
-import { discoverScripts } from '@/lib/scripts/discover'
-import { SCRIPT_COOKIE_MAP, resolveCookieDomain, type InferredCookie } from '@/lib/scripts/known-cookies'
+import type { InferredCookie } from '@/lib/scripts/known-cookies'
 import { scanWithBrowser, type HeadlessScanResult, type FrenchLanguageCheck } from '@/lib/scripts/scan-website-headless'
 import { classifyCookies, type ClassifiedCookie } from '@/lib/scripts/cookie-classifier'
+import {
+  INCOMPLETE_SCAN_MESSAGE,
+  classifyPageLoad,
+  classifyScanError,
+  type IncompleteReason,
+} from '@/lib/scripts/scan-completion'
 import type { BannerConfig } from '@/types'
 
 export interface ScannedCookie extends InferredCookie {
@@ -57,6 +61,30 @@ export interface WebsiteScanResult {
   scanMethod: 'headless' | 'static-html'
   frenchLanguage?: FrenchLanguageCheck
   productAdvice?: ProductAdvice
+}
+
+export interface IncompleteWebsiteScan {
+  url: string
+  fetchedAt: string
+  scanStatus: 'incomplete'
+  reason: IncompleteReason
+  message: string
+}
+
+export type WebsiteScanOutcome = WebsiteScanResult | IncompleteWebsiteScan
+
+export function isIncompleteScan(result: WebsiteScanOutcome): result is IncompleteWebsiteScan {
+  return 'scanStatus' in result && result.scanStatus === 'incomplete'
+}
+
+function incompleteScan(url: string, reason: IncompleteReason): IncompleteWebsiteScan {
+  return {
+    url,
+    fetchedAt: new Date().toISOString(),
+    scanStatus: 'incomplete',
+    reason,
+    message: INCOMPLETE_SCAN_MESSAGE,
+  }
 }
 
 function getGrade(score: number): string {
@@ -476,52 +504,23 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
   }
 }
 
-async function buildFromCheerio(targetUrl: string, hostname: string): Promise<WebsiteScanResult> {
-  const discovery = await discoverScripts(targetUrl)
-  const scriptsDetected = discovery.scripts.map(s => ({ name: s.name, category: s.category }))
-  // PR #8's discoverScripts returns cmpDetected (string name) and no
-  // privacyPolicyUrl — that's the headless path's job. We adapt to the
-  // older WebsiteScanResult shape here.
-  const consentBanner = discovery.cmpDetected
-    ? { detected: true, vendor: discovery.cmpDetected }
-    : { detected: false, vendor: null }
-  const privacyPolicyUrl = null
-
-  const cookies: ScannedCookie[] = []
-  for (const script of discovery.scripts) {
-    const mapped = SCRIPT_COOKIE_MAP[script.name]
-    if (!mapped) continue
-    for (const c of mapped) {
-      cookies.push({
-        ...c,
-        domain: resolveCookieDomain(c.domain, hostname),
-        source: script.name,
-      })
-    }
-  }
-
-  const scored = scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl })
-
-  return {
-    url: targetUrl,
-    fetchedAt: discovery.fetchedAt,
-    scriptsDetected,
-    consentBanner,
-    privacyPolicyUrl,
-    cookies,
-    ...scored,
-    warnings: discovery.fetchError ? [discovery.fetchError, ...discovery.warnings] : discovery.warnings,
-    note: 'Cookie list inferred from tracking scripts found in the page HTML. A static scan cannot observe cookies set at runtime by single-page apps; this is the fallback when a full browser scan is unavailable.',
-    scanMethod: 'static-html',
-  }
-}
-
-export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult> {
+export async function scanWebsite(targetUrl: string): Promise<WebsiteScanOutcome> {
   const hostname = new URL(targetUrl).hostname
 
-  // Try the headless browser scan first — it sees the post-JS world.
   try {
     const headless = await scanWithBrowser(targetUrl)
+    const load = classifyPageLoad({
+      httpStatus: headless.httpStatus,
+      title: headless.pageTitle,
+      textLength: headless.visibleTextLength,
+      cookieCount: headless.cookies.length,
+      scriptCount: headless.loadedScripts.length,
+      bannerDetected: headless.consentBanner.detected,
+      privacyPolicyUrl: headless.privacyPolicyUrl,
+    })
+    if (!load.complete) {
+      return incompleteScan(targetUrl, load.reason)
+    }
 
     let productAdvice: ProductAdvice | undefined
     const isOurBanner = headless.consentBanner.vendor === 'UK Cookie Consent'
@@ -560,20 +559,7 @@ export async function scanWebsite(targetUrl: string): Promise<WebsiteScanResult>
     }
     return { ...result, productAdvice }
   } catch (err) {
-    console.warn('Headless scan failed, falling back to static HTML scan:', err instanceof Error ? err.message : err)
-    const fallback = await buildFromCheerio(targetUrl, hostname)
-    fallback.warnings = [
-      ...fallback.warnings,
-      'Full-browser scan was unavailable; results are based on static HTML only and may miss scripts loaded dynamically.',
-    ]
-    fallback.productAdvice = {
-      isOurBanner: false,
-      recommendations: generateCompetitorAdvice(
-        fallback.cookies,
-        fallback.consentBanner,
-        fallback.privacyPolicyUrl,
-      ),
-    }
-    return fallback
+    console.warn('Headless scan did not finish:', err instanceof Error ? err.message : err)
+    return incompleteScan(targetUrl, classifyScanError(err))
   }
 }
