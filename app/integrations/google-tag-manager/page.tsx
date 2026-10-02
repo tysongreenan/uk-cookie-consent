@@ -20,6 +20,7 @@ import {
   Circle,
   Tag,
   Download,
+  ExternalLink,
 } from 'lucide-react'
 
 const fadeUpVariants = {
@@ -60,7 +61,7 @@ export default function GTMIntegrationPage() {
     },
     {
       question: "Does this work with GA4, Google Ads, and Facebook Pixel in GTM?",
-      answer: "Yes. GA4 and Google Ads follow the Consent Mode template on this page. For Facebook Pixel, TikTok, and LinkedIn, open the tag and set Require additional consent to ad storage for marketing or analytics storage for analytics. You can also fire those tags on the cookie_consent_update event when consent_marketing or consent_analytics equals true."
+      answer: "Yes. Leave the Consent Mode template and the banner tag alone. On every other tag, open Advanced Settings, then Consent Settings, and choose Require additional consent for tag to fire. Tick analytics storage for GA4. Tick ad storage, ad user data, and ad personalization for Google Ads. Tick ad storage for Facebook, TikTok, and LinkedIn."
     },
     {
       question: "Can I deploy the cookie banner through GTM instead of adding a script tag?",
@@ -179,7 +180,7 @@ export default function GTMIntegrationPage() {
                   Set this up in order
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Four steps. Import the template, add the banner, hold the other tags, then preview. Background is further down the page.
+                  Four steps. Import the template, add the banner, tell the other tags to wait, then preview. Background is further down the page.
                 </p>
               </motion.div>
 
@@ -187,7 +188,7 @@ export default function GTMIntegrationPage() {
                 {[
                   ['1', 'Import the template', '#consent-template'],
                   ['2', 'Add the banner', '#add-banner'],
-                  ['3', 'Hold other tags', '#other-tags'],
+                  ['3', 'Check your other tags', '#other-tags'],
                   ['4', 'Preview', '#preview'],
                 ].map(([n, label, href]) => (
                   <li key={n}>
@@ -242,9 +243,15 @@ export default function GTMIntegrationPage() {
                   <Card id="add-banner" className="border border-border bg-background scroll-mt-24">
                     <CardHeader>
                       <CardTitle className="font-heading text-xl">2. Add the banner. Pick one.</CardTitle>
-                      <CardDescription>Use the snippet from your dashboard. Replace YOUR_BANNER_ID.</CardDescription>
+                      <CardDescription>Copy your real snippet, then paste it into one of the options below.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                      <Button asChild>
+                        <Link href="/dashboard" target="_blank" rel="noopener noreferrer">
+                          Grab your banner
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
                       <div>
                         <h3 className="font-heading text-base font-semibold text-foreground mb-2">You can edit the site</h3>
                         <p className="text-sm text-muted-foreground mb-3">Paste this in the head, before the Google Tag Manager snippet.</p>
@@ -284,23 +291,30 @@ export default function GTMIntegrationPage() {
                 className="text-center mb-8"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  3. Hold every other tag
+                  3. Tell each other tag to wait
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Open each tag. Under Consent settings, choose Require additional consent. One setting per tag.
+                  This is inside Google Tag Manager, on the tags you already have. Leave the Consent Mode template and the banner tag alone. Those two have to run first.
                 </p>
               </motion.div>
 
               <Card className="border border-border bg-background">
-                <CardContent className="pt-6">
-                  <ul className="space-y-4 text-sm text-muted-foreground">
-                    <li><strong className="text-foreground">GA4.</strong> Require <code className="font-mono text-xs">analytics_storage</code>.</li>
-                    <li><strong className="text-foreground">Google Ads.</strong> Require <code className="font-mono text-xs">ad_storage</code>, <code className="font-mono text-xs">ad_user_data</code>, and <code className="font-mono text-xs">ad_personalization</code>.</li>
-                    <li><strong className="text-foreground">Meta, LinkedIn, TikTok, and other marketing pixels.</strong> Require <code className="font-mono text-xs">ad_storage</code>.</li>
-                    <li><strong className="text-foreground">Other analytics tools</strong> such as Hotjar. Require <code className="font-mono text-xs">analytics_storage</code>.</li>
+                <CardContent className="pt-6 space-y-6">
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    <li>Go to <strong className="text-foreground">Tags</strong> and open one tag, such as GA4 or a Meta pixel.</li>
+                    <li>Open <strong className="text-foreground">Advanced Settings</strong>, then <strong className="text-foreground">Consent Settings</strong>.</li>
+                    <li>Choose <strong className="text-foreground">Require additional consent for tag to fire</strong>.</li>
+                    <li>Tick the box for that tag, using the list below. Save.</li>
+                    <li>Repeat for every other tag in the container.</li>
+                  </ol>
+                  <ul className="space-y-3 text-sm text-muted-foreground border-t border-border pt-4">
+                    <li><strong className="text-foreground">GA4.</strong> Tick analytics storage.</li>
+                    <li><strong className="text-foreground">Google Ads.</strong> Tick ad storage, ad user data, and ad personalization.</li>
+                    <li><strong className="text-foreground">Meta, LinkedIn, TikTok, and other ad pixels.</strong> Tick ad storage.</li>
+                    <li><strong className="text-foreground">Hotjar and other analytics tools.</strong> Tick analytics storage.</li>
                   </ul>
-                  <p className="mt-6 text-sm text-muted-foreground">
-                    A tag with no consent settings can use a Custom Event trigger named <code className="font-mono text-xs">cookie_consent_update</code>, firing when <code className="font-mono text-xs">consent_marketing</code> or <code className="font-mono text-xs">consent_analytics</code> equals true. The consent setting above is the one to use when the tag has it.
+                  <p className="text-sm text-muted-foreground">
+                    Some Custom HTML tags have no Consent Settings. On those, change the trigger to the custom event <code className="font-mono text-xs">cookie_consent_update</code>, and fire only when <code className="font-mono text-xs">consent_marketing</code> or <code className="font-mono text-xs">consent_analytics</code> equals true.
                   </p>
                 </CardContent>
               </Card>

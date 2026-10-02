@@ -102,7 +102,7 @@ The same steps, with the download button, are on the [GTM install page](/integra
 
 ## Do these four steps
 
-[Create a free banner](/free-cookie-banner) first if you do not have one. Copy the snippet from the dashboard. You need that banner and the template below. The banner is the choice visitors see. The template tells Google tags to wait.
+[Create a free banner](/free-cookie-banner) first if you do not have one. [Grab your banner](/dashboard) from the dashboard and copy the snippet there. You need that banner and the template below. The banner is the choice visitors see. The template tells Google tags to wait.
 
 ### 1. Import the template
 
@@ -131,18 +131,24 @@ Subdomains share one consent cookie. A domain pin is optional:
 <script>window.CookieBannerOptions = { domain: 'example.com' };</script>
 ```
 
-### 3. Hold every other tag
+### 3. Tell each other tag to wait
 
-Open each tag → **Consent settings** → **Require additional consent**.
+This is inside Google Tag Manager, on the tags already in the container. Leave the Consent Mode template and the banner tag alone. Those two have to run first.
 
-| Tag | Require |
+1. Go to **Tags** and open one tag, such as GA4 or a Meta pixel.
+2. Open **Advanced Settings**, then **Consent Settings**.
+3. Choose **Require additional consent for tag to fire**.
+4. Tick the box for that tag. Save.
+5. Repeat for every other tag.
+
+| Tag | Tick |
 |---|---|
-| GA4 | `analytics_storage` |
-| Google Ads | `ad_storage`, `ad_user_data`, `ad_personalization` |
-| Meta, LinkedIn, TikTok, other marketing | `ad_storage` |
-| Other analytics, such as Hotjar | `analytics_storage` |
+| GA4 | Analytics storage |
+| Google Ads | Ad storage, ad user data, ad personalization |
+| Meta, LinkedIn, TikTok, other ad pixels | Ad storage |
+| Hotjar and other analytics | Analytics storage |
 
-A tag with no consent settings can use a Custom Event trigger named `cookie_consent_update`, firing when `consent_marketing` or `consent_analytics` equals true.
+Some Custom HTML tags have no Consent Settings. On those, change the trigger to the custom event `cookie_consent_update`, and fire only when `consent_marketing` or `consent_analytics` equals true.
 
 ### 4. Preview, then publish
 
