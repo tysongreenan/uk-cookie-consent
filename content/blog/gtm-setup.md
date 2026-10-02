@@ -60,7 +60,7 @@ schema:
 # How to Set Up Cookie Banner Generator with Google Tag Manager (Consent Mode v2)
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> Install Cookie Banner Generator's free GTM Community Template to integrate your cookie banner with Google Consent Mode v2. The template sets default consent states, restores saved user preferences from cookies, supports regional overrides for GDPR compliance, and forwards real-time consent updates to all your Google tags. Setup takes about 5 minutes.
+<strong>Direct Answer:</strong> Download the Consent Mode template, import it into GTM, and fire it on Consent Initialization with every type set to denied. Then add the banner. The short version of these steps is on the [GTM install page](/integrations/google-tag-manager#implementation).
 
 [Get started with Cookie Banner Generator →](https://cookie-banner.ca/signup)
 </div>
@@ -71,7 +71,7 @@ schema:
 
 - [Why You Need Consent Mode v2 with Google Tag Manager](#why-you-need-consent-mode-v2-with-google-tag-manager)
 - [What You Need Before Starting](#what-you-need-before-starting)
-- [Step 1: Install the GTM Community Template](#step-1-install-the-gtm-community-template)
+- [Step 1: Install the GTM template](#step-1-install-the-gtm-template)
 - [Step 2: Configure Default Consent Settings](#step-2-configure-default-consent-settings)
 - [Step 3: Set Up Regional Overrides](#step-3-set-up-regional-overrides)
 - [Step 4: Configure Advanced Settings](#step-4-configure-advanced-settings)
@@ -111,15 +111,15 @@ If you do not have a Cookie Banner Generator account yet, [sign up free at cooki
 
 ---
 
-## Step 1: Install the GTM Community Template
+## Step 1: Install the GTM template
+
+Download [cookie-banner-consent-mode.tpl](/gtm/cookie-banner-consent-mode.tpl) and import that file.
 
 1. Open your **Google Tag Manager** workspace
 2. Click **Templates** in the left sidebar
-3. In the **Tag Templates** section, click **Search Gallery**
-4. Search for **"Cookie Banner Generator"**
-5. Select **Cookie Banner Generator — Consent Mode v2**
-6. Click **Add to workspace**
-7. Confirm by clicking **Add**
+3. In **Tag Templates**, click **New**
+4. Open the three-dot menu and click **Import**
+5. Choose the file you downloaded
 
 The template is now available in your workspace. Next, you need to create a tag using it.
 
@@ -237,9 +237,9 @@ Add this script to your website's `<head>` tag (you will find your personalized 
 
 Replace `YOUR_BANNER_ID` with the banner ID from your dashboard.
 
-**Important:** Do NOT add the banner script through GTM. The banner must load independently of Tag Manager so it can display the consent UI before GTM processes consent states. Add it directly to your site's HTML `<head>` section, your CMS header injection, or through a server-side integration.
+If you can edit the site, put that script in the head before the GTM snippet.
 
-If the banner is already loading through a Custom HTML tag (common on AEM and other CMS setups), that still works. Consent is stored on your root domain by default, so `www.example.com` and `shop.example.com` share one choice. You do not need a domain override for that.
+If you cannot edit the site, add the same script as a Custom HTML tag on **Consent Initialization — All Pages** with firing priority **50**. The Consent Mode tag from step 5 stays at priority **1000**. Consent is stored on your root domain by default, so `www.example.com` and `shop.example.com` share one choice. You do not need a domain override for that.
 
 To pin a parent domain yourself (optional), set it before the banner script:
 
