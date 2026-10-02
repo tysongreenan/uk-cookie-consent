@@ -102,62 +102,69 @@ The same steps, with the download button, are on the [GTM install page](/integra
 
 ## Do these four steps
 
-[Create a free banner](/free-cookie-banner) first if you do not have one. [Grab your banner](/dashboard) from the dashboard and copy the snippet there. You need that banner and the template below. The banner is the choice visitors see. The template tells Google tags to wait.
+[Create a free banner](/free-cookie-banner) first if you do not have one. The same clicks, with a download button, are on the [GTM install page](/integrations/google-tag-manager#implementation).
 
 ### 1. Import the template
 
 [Download cookie-banner-consent-mode.tpl](/gtm/cookie-banner-consent-mode.tpl).
 
-1. GTM → **Templates** → **Tag Templates** → **New** → the three-dot menu → **Import**. Choose that file.
-2. **Tags** → **New**. Name it `Cookie Banner Generator — Consent Mode` and choose the template.
-3. Leave **Region** blank. Set Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization to **Denied**.
-4. Trigger: **Consent Initialization — All Pages**. Firing priority: **1000**.
+1. In Google Tag Manager, click **Templates** in the left menu.
+2. In the **Tag Templates** box, click **New**.
+3. Click the three dots at the top right, then **Import**. Choose `cookie-banner-consent-mode.tpl`. Click **Save**.
+4. Click **Tags**, then **New**.
+5. Name the tag `Cookie Banner Generator — Consent Mode`.
+6. Click **Tag Configuration** and choose **Cookie Banner Generator — Consent Mode v2**.
+7. In **Default Consent Settings**, leave **Region** empty. Set Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization to **Denied**. If the table is empty, click **Add Region Override** and do the same.
+8. Click **Triggering** and choose **Consent Initialization - All Pages**.
+9. Below the trigger, open **Advanced Settings**, then **Tag firing priority**, and type `1000`.
+10. Click **Save**.
 
-Leave Wait for Update at 500 and the cookie name at `cookie_consent`. Turn on Ads Data Redaction. Turn on URL Passthrough if you run Google Ads.
+Leave the template’s own Advanced Settings closed. Wait for Update stays at 500, and the cookie name stays `cookie_consent`.
 
-### 2. Add the banner. Pick one.
+### 2. Add the banner
 
-**You can edit the site.** Paste this in the head, before the GTM snippet. Use your banner ID.
+[Grab your banner](/dashboard) and click **Copy snippet** on the banner.
 
-```html
-<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>
-```
+**If GTM is how you install things:**
 
-**You only have GTM.** New Custom HTML tag with that same script. Trigger: **Consent Initialization — All Pages**. Firing priority: **50**. The template stays at 1000. Raising this tag’s priority does not hold other tags, because the banner file still loads after the tag starts.
+1. In GTM, click **Tags**, then **New**.
+2. Name the tag `Cookie Banner`.
+3. Click **Tag Configuration**, choose **Custom HTML**, and paste the snippet.
+4. Click **Triggering** and choose **Consent Initialization - All Pages**.
+5. Open **Advanced Settings**, then **Tag firing priority**, and type `50`.
+6. Click **Save**.
 
-Subdomains share one consent cookie. A domain pin is optional:
-
-```html
-<script>window.CookieBannerOptions = { domain: 'example.com' };</script>
-```
+**If you can edit the site HTML:** paste that same snippet in the head, above the Google Tag Manager snippet. You still need the template from step 1.
 
 ### 3. Tell each other tag to wait
 
-This is inside Google Tag Manager, on the tags already in the container. Leave the Consent Mode template and the banner tag alone. Those two have to run first.
+Skip **Cookie Banner Generator — Consent Mode** and **Cookie Banner**. Do the rest.
 
-1. Go to **Tags** and open one tag, such as GA4 or a Meta pixel.
-2. Open **Advanced Settings**, then **Consent Settings**.
-3. Choose **Require additional consent for tag to fire**.
-4. Tick the box for that tag. Save.
-5. Repeat for every other tag.
+1. Click **Tags**, then click a tag name, such as GA4 or a Meta pixel.
+2. Scroll down and open **Advanced Settings**.
+3. Open **Consent Settings**.
+4. Select **Require additional consent for tag to fire**.
+5. Check the boxes below for that kind of tag.
+6. Click **Save**.
+7. Repeat until every other tag is saved.
 
-| Tag | Tick |
+| Tag | Check |
 |---|---|
-| GA4 | Analytics storage |
-| Google Ads | Ad storage, ad user data, ad personalization |
-| Meta, LinkedIn, TikTok, other ad pixels | Ad storage |
-| Hotjar and other analytics | Analytics storage |
+| GA4 | Analytics Storage |
+| Google Ads | Ad Storage, Ad User Data, Ad Personalization |
+| Meta, LinkedIn, TikTok, other ad pixels | Ad Storage |
+| Hotjar and other analytics | Analytics Storage |
 
-Some Custom HTML tags have no Consent Settings. On those, change the trigger to the custom event `cookie_consent_update`, and fire only when `consent_marketing` or `consent_analytics` equals true.
+If Consent Settings is missing, the tag is usually Custom HTML. Open **Triggering**, remove All Pages, and add a Custom Event trigger named `cookie_consent_update`. Fire it when `consent_marketing` equals true for an ad pixel, or `consent_analytics` equals true for an analytics tool.
 
 ### 4. Preview, then publish
 
-1. GTM → **Preview** → open your site.
-2. Before a choice, the Consent tab shows all four types **denied**, and marketing tags are blocked.
-3. **Accept All**. Those tags fire.
-4. **Reject All** on a fresh visit. They stay blocked, including after a refresh.
-5. Reload after Accept. They stay granted.
-6. **Submit** → name the version → **Publish**.
+1. Click **Preview** at the top right. Enter your site address and click **Connect**.
+2. Leave the banner sitting there. In Tag Assistant, open the **Consent** tab. Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization should say **Denied**.
+3. Click a GA4 or ads tag. It should say it has not fired, or that consent blocked it. Refresh. It should still be blocked.
+4. On the banner, click **Accept All**. Those tags should say **Fired**.
+5. Refresh. The tags should fire again, and the banner should stay hidden.
+6. In GTM, click **Submit**, name the version, and click **Publish**.
 
 ---
 
