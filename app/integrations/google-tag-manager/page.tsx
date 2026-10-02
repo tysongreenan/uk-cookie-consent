@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
@@ -21,6 +22,7 @@ import {
   Tag,
   Download,
   ExternalLink,
+  Info,
 } from 'lucide-react'
 
 const fadeUpVariants = {
@@ -34,6 +36,27 @@ const fadeUpVariants = {
       ease: [0.25, 0.4, 0.25, 1],
     },
   }),
+}
+
+function Slug({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-md border border-border bg-muted px-1.5 py-0.5 align-baseline text-[13px] font-medium leading-5 text-foreground">
+      {children}
+    </span>
+  )
+}
+
+function GtmLink() {
+  return (
+    <a
+      href="https://tagmanager.google.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center rounded-md border border-primary/30 bg-primary/5 px-1.5 py-0.5 align-baseline text-[13px] font-medium leading-5 text-foreground underline decoration-foreground/40 underline-offset-2"
+    >
+      Google Tag Manager
+    </a>
+  )
 }
 
 const cardVariants = {
@@ -57,7 +80,7 @@ export default function GTMIntegrationPage() {
     },
     {
       question: "How do I set up cookie consent in Google Tag Manager?",
-      answer: "Download the Consent Mode v2 template on this page and import it into Google Tag Manager. Fire it on Consent Initialization — All Pages with ad storage, analytics storage, ad user data, and ad personalization set to denied. Add the banner script in the site head, or as Custom HTML on the same trigger at a lower priority. On each non-Google pixel, set Require additional consent: ad storage for marketing, analytics storage for other analytics."
+      answer: "Download the Consent Mode v2 template on this page and import it into Google Tag Manager. Fire it on Consent Initialization — All Pages with ad storage, analytics storage, ad user data, and ad personalization set to denied, and set its priority to 1000. Add the banner as a Custom HTML tag on the same trigger at priority 50. On every other tag, open Advanced Settings, then Consent Settings, and choose Require additional consent for tag to fire. Tick analytics storage for GA4. Tick ad storage, ad user data, and ad personalization for Google Ads. Tick ad storage for Meta, LinkedIn, and the other ad pixels. Leave the template tag and the banner tag without that requirement."
     },
     {
       question: "Does this work with GA4, Google Ads, and Facebook Pixel in GTM?",
@@ -150,12 +173,6 @@ export default function GTMIntegrationPage() {
                 className="flex flex-col sm:flex-row items-center gap-3"
               >
                 <Button asChild size="lg" className="h-12 px-8 text-base font-semibold">
-                  <Link href="/builder">
-                    Build Your Banner Free
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
                   <Link href="#implementation">
                     Start the setup
                   </Link>
@@ -177,10 +194,10 @@ export default function GTMIntegrationPage() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Set this up in order
+                  Set up in this order
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Four steps. Import the template, add the banner, tell the other tags to wait, then preview. Background is further down the page.
+                  Import the template, add the banner, stop existing tags that were already on the site, then preview.
                 </p>
               </motion.div>
 
@@ -188,7 +205,7 @@ export default function GTMIntegrationPage() {
                 {[
                   ['1', 'Import the template', '#consent-template'],
                   ['2', 'Add the banner', '#add-banner'],
-                  ['3', 'Check your other tags', '#other-tags'],
+                  ['3', 'Existing tags', '#other-tags'],
                   ['4', 'Preview', '#preview'],
                 ].map(([n, label, href]) => (
                   <li key={n}>
@@ -215,23 +232,29 @@ export default function GTMIntegrationPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <Button asChild className="mb-6">
-                        <a href="/gtm/cookie-banner-consent-mode.tpl" download="cookie-banner-consent-mode.tpl">
-                          <Download className="mr-2 h-4 w-4" />
-                          Download cookie-banner-consent-mode.tpl
-                        </a>
-                      </Button>
                       <ol className="space-y-3 text-sm text-muted-foreground">
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In Google Tag Manager, click <strong className="text-foreground">Templates</strong> in the left menu.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>In the <strong className="text-foreground">Tag Templates</strong> box, click <strong className="text-foreground">New</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Click the three dots at the top right, then <strong className="text-foreground">Import</strong>. Choose <strong className="text-foreground">cookie-banner-consent-mode.tpl</strong>. Click <strong className="text-foreground">Save</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <strong className="text-foreground">Tags</strong> in the left menu, then <strong className="text-foreground">New</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click the name at the top and type <strong className="text-foreground">Cookie Banner Generator — Consent Mode</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <strong className="text-foreground">Tag Configuration</strong> and choose <strong className="text-foreground">Cookie Banner Generator — Consent Mode v2</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>In <strong className="text-foreground">Default Consent Settings</strong>, leave <strong className="text-foreground">Region</strong> empty. Set Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization to <strong className="text-foreground">Denied</strong>. If the table is empty, click <strong className="text-foreground">Add Region Override</strong> and do the same.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <strong className="text-foreground">Triggering</strong>. Choose <strong className="text-foreground">Consent Initialization - All Pages</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Below the trigger, open <strong className="text-foreground">Advanced Settings</strong>. Open <strong className="text-foreground">Tag firing priority</strong> and type <strong className="text-foreground">1000</strong>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">10.</span><span>Click <strong className="text-foreground">Save</strong>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In <GtmLink />, click <Slug>Templates</Slug> in the left menu.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>In the <Slug>Tag Templates</Slug> box, click <Slug>New</Slug>.</span></li>
+                        <li className="flex gap-3">
+                          <span className="font-semibold text-foreground">3.</span>
+                          <span className="min-w-0">
+                            Click the three dots at the top right, then <Slug>Import</Slug>. Choose <Slug>cookie-banner-consent-mode.tpl</Slug>.
+                            <Button asChild className="my-3 h-auto max-w-full whitespace-normal">
+                              <a href="/gtm/cookie-banner-consent-mode.tpl" download="cookie-banner-consent-mode.tpl">
+                                <Download className="mr-2 h-4 w-4" />
+                                Download cookie-banner-consent-mode.tpl
+                              </a>
+                            </Button>
+                            <span className="block">Click <Slug>Save</Slug>.</span>
+                          </span>
+                        </li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Tags</Slug> in the left menu, then <Slug>New</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click the name at the top and type <Slug>Cookie Banner Generator — Consent Mode</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <Slug>Tag Configuration</Slug> and choose <Slug>Cookie Banner Generator — Consent Mode v2</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>In <Slug>Default Consent Settings</Slug>, leave <Slug>Region</Slug> empty. Set <Slug>Ad Storage</Slug>, <Slug>Analytics Storage</Slug>, <Slug>Ad User Data</Slug>, and <Slug>Ad Personalization</Slug> to <Slug>Denied</Slug>. If the table is empty, click <Slug>Add Region Override</Slug> and do the same.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <Slug>Triggering</Slug>. Choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Below the trigger, open <Slug>Advanced Settings</Slug>. Open <Slug>Tag firing priority</Slug> and type <Slug>1000</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">10.</span><span>Click <Slug>Save</Slug>.</span></li>
                       </ol>
                       <p className="mt-4 text-sm text-muted-foreground">The priority field is under the trigger. Leave the Advanced Settings box inside the template form closed. Wait for Update stays at 500, and the cookie name stays cookie_consent.</p>
                     </CardContent>
@@ -241,36 +264,31 @@ export default function GTMIntegrationPage() {
                 <motion.div custom={1} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
                   <Card id="add-banner" className="border border-border bg-background scroll-mt-24">
                     <CardHeader>
-                      <CardTitle className="font-heading text-xl">2. Add the banner. Pick one.</CardTitle>
-                      <CardDescription>Copy your real snippet, then paste it into one of the options below.</CardDescription>
+                      <CardTitle className="font-heading text-xl">2. Add the banner</CardTitle>
+                      <CardDescription>Grab your real banner and paste it into the tag.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-8">
-                      <div>
-                        <h3 className="font-heading text-base font-semibold text-foreground mb-3">If GTM is how you install things</h3>
-                        <Button asChild className="mb-4">
-                          <Link href="/dashboard" target="_blank" rel="noopener noreferrer">
-                            Grab your banner
-                            <ExternalLink className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <ol className="space-y-3 text-sm text-muted-foreground">
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>Click <strong className="text-foreground">Grab your banner</strong>. On the dashboard, click <strong className="text-foreground">Copy snippet</strong> on your banner.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Back in GTM, click <strong className="text-foreground">Tags</strong>, then <strong className="text-foreground">New</strong>.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Name the tag <strong className="text-foreground">Cookie Banner</strong>.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <strong className="text-foreground">Tag Configuration</strong> and choose <strong className="text-foreground">Custom HTML</strong>. Paste the snippet.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <strong className="text-foreground">Triggering</strong> and choose <strong className="text-foreground">Consent Initialization - All Pages</strong>.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Open <strong className="text-foreground">Advanced Settings</strong>, then <strong className="text-foreground">Tag firing priority</strong>, and type <strong className="text-foreground">50</strong>.</span></li>
-                          <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Click <strong className="text-foreground">Save</strong>.</span></li>
-                        </ol>
-                      </div>
-                      <div>
-                        <h3 className="font-heading text-base font-semibold text-foreground mb-2">If you can edit the site HTML</h3>
-                        <p className="text-sm text-muted-foreground mb-3">Paste the snippet you copied into the head, above the Google Tag Manager snippet. The example below still says YOUR_BANNER_ID. Yours will already have the real ID. You still need the template from step 1.</p>
-                        <CodeBlock language="html">{`<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}</CodeBlock>
-                      </div>
+                    <CardContent className="space-y-6">
+                      <Button asChild>
+                        <Link href="/dashboard" target="_blank" rel="noopener noreferrer">
+                          Grab your banner
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <ol className="space-y-3 text-sm text-muted-foreground">
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>Click <Slug>Grab your banner</Slug>. On the dashboard, click <Slug>Copy snippet</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click <Slug>Tags</Slug> in the left menu, then <Slug>New</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Name the tag <Slug>Cookie Banner</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Tag Configuration</Slug> and choose <Slug>Custom HTML</Slug>. Paste the snippet.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <Slug>Triggering</Slug> and choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Open <Slug>Advanced Settings</Slug>, then <Slug>Tag firing priority</Slug>, and type <Slug>50</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Click <Slug>Save</Slug>.</span></li>
+                      </ol>
                       <details className="rounded-lg border border-border bg-muted/40 px-4 py-3">
-                        <summary className="cursor-pointer font-medium text-foreground">Next.js</summary>
-                        <p className="mt-3 text-sm text-muted-foreground mb-3">Load the banner with <code className="font-mono text-xs">strategy=&quot;beforeInteractive&quot;</code>. Keep the GTM snippet on <code className="font-mono text-xs">afterInteractive</code>. Still import the template in step 1.</p>
+                        <summary className="cursor-pointer font-medium text-foreground">Only if you can edit the site, and you did not paste the banner into the GTM tag above</summary>
+                        <p className="mt-3 text-sm text-muted-foreground mb-3">Paste the copied snippet into the head, above the Google Tag Manager snippet. The example still says YOUR_BANNER_ID. Yours will already have the real ID. You still need the template from step 1.</p>
+                        <CodeBlock language="html">{`<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}</CodeBlock>
+                        <p className="mt-4 text-sm font-medium text-foreground">Next.js sites only</p>
+                        <p className="mt-1 text-sm text-muted-foreground mb-3">Use this when the site is a Next.js app. Load the banner with <code className="font-mono text-xs">strategy=&quot;beforeInteractive&quot;</code>. Keep the GTM snippet on <code className="font-mono text-xs">afterInteractive</code>.</p>
                         <CodeBlock language="tsx">{`<Script
   src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
   strategy="beforeInteractive"
@@ -296,34 +314,42 @@ export default function GTMIntegrationPage() {
                 className="text-center mb-8"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  3. Tell each other tag to wait
+                  3. Stop existing tags that were already on the site
                 </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Stay in the same Google Tag Manager container. This is the list of tags that were already firing on the site.
-                </p>
               </motion.div>
+
+              <aside className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-5 text-left">
+                <div className="flex gap-3">
+                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                  <div className="space-y-2 text-sm">
+                    <p className="text-muted-foreground">
+                      After steps 1 and 2 are saved, inside <GtmLink />, <strong className="text-foreground">this is for every tag that was already in the account,</strong> such as <strong className="text-foreground">Google Analytics, Google Ads, or a Meta pixel</strong>.
+                    </p>
+                    <p className="text-muted-foreground">
+                      If <Slug>Cookie Banner Generator — Consent Mode</Slug> and <Slug>Cookie Banner</Slug> are the only tags in your account, skip this and go to step 4.
+                    </p>
+                  </div>
+                </div>
+              </aside>
 
               <Card className="border border-border bg-background">
                 <CardContent className="pt-6 space-y-6">
-                  <p className="text-sm text-foreground">
-                    Where: Google Tag Manager, left menu, <strong>Tags</strong>. Open a tag that was already there, such as Google Analytics or a Meta pixel. Leave <strong>Cookie Banner Generator — Consent Mode</strong> and <strong>Cookie Banner</strong> as you saved them.
-                  </p>
                   <ol className="space-y-3 text-sm text-muted-foreground">
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In the left menu, click <strong className="text-foreground">Tags</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click the name of an existing tag. Skip the two tags from steps 1 and 2.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>The tag editor opens. Scroll past <strong className="text-foreground">Tag Configuration</strong> and <strong className="text-foreground">Triggering</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <strong className="text-foreground">Advanced Settings</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <strong className="text-foreground">Consent Settings</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Select <strong className="text-foreground">Require additional consent for tag to fire</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In the left menu, click <Slug>Tags</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click the name of an existing tag. Skip <Slug>Cookie Banner Generator — Consent Mode</Slug> and <Slug>Cookie Banner</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>The tag editor opens. Scroll past <Slug>Tag Configuration</Slug> and <Slug>Triggering</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Advanced Settings</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <Slug>Consent Settings</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Select <Slug>Require additional consent for tag to fire</Slug>.</span></li>
                     <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Check the boxes for that tag, using the list under these steps.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <strong className="text-foreground">Save</strong> at the top right.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Click <strong className="text-foreground">Tags</strong> in the left menu and open the next existing tag. Stop when the only tags you have not changed are the two from steps 1 and 2.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <Slug>Save</Slug> at the top right.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Click <Slug>Tags</Slug> in the left menu and open the next existing tag. Stop when the only tags you have not changed are <Slug>Cookie Banner Generator — Consent Mode</Slug> and <Slug>Cookie Banner</Slug>.</span></li>
                   </ol>
                   <ul className="space-y-3 text-sm text-muted-foreground border-t border-border pt-4">
-                    <li><strong className="text-foreground">GA4.</strong> Check Analytics Storage.</li>
-                    <li><strong className="text-foreground">Google Ads.</strong> Check Ad Storage, Ad User Data, and Ad Personalization.</li>
-                    <li><strong className="text-foreground">Meta, LinkedIn, TikTok, and other ad pixels.</strong> Check Ad Storage.</li>
-                    <li><strong className="text-foreground">Hotjar and other analytics tools.</strong> Check Analytics Storage.</li>
+                    <li><strong className="text-foreground">GA4.</strong> Check <Slug>Analytics Storage</Slug>.</li>
+                    <li><strong className="text-foreground">Google Ads.</strong> Check <Slug>Ad Storage</Slug>, <Slug>Ad User Data</Slug>, and <Slug>Ad Personalization</Slug>.</li>
+                    <li><strong className="text-foreground">Meta, LinkedIn, TikTok, and other ad pixels.</strong> Check <Slug>Ad Storage</Slug>.</li>
+                    <li><strong className="text-foreground">Hotjar and other analytics tools.</strong> Check <Slug>Analytics Storage</Slug>.</li>
                   </ul>
                   <p className="text-sm text-muted-foreground">
                     If Consent Settings is missing, the tag is usually Custom HTML. Open <strong className="text-foreground">Triggering</strong>, remove All Pages, and add a Custom Event trigger named <code className="font-mono text-xs">cookie_consent_update</code>. Set it to fire when <code className="font-mono text-xs">consent_marketing</code> equals true for an ad pixel, or <code className="font-mono text-xs">consent_analytics</code> equals true for an analytics tool.
