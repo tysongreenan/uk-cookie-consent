@@ -299,20 +299,25 @@ export default function GTMIntegrationPage() {
                   3. Tell each other tag to wait
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Do this on every tag except Cookie Banner Generator — Consent Mode and Cookie Banner. Those two stay as you saved them in steps 1 and 2.
+                  Stay in the same Google Tag Manager container. This is the list of tags that were already firing on the site.
                 </p>
               </motion.div>
 
               <Card className="border border-border bg-background">
                 <CardContent className="pt-6 space-y-6">
+                  <p className="text-sm text-foreground">
+                    Where: Google Tag Manager, left menu, <strong>Tags</strong>. Open a tag that was already there, such as Google Analytics or a Meta pixel. Leave <strong>Cookie Banner Generator — Consent Mode</strong> and <strong>Cookie Banner</strong> as you saved them.
+                  </p>
                   <ol className="space-y-3 text-sm text-muted-foreground">
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>Click <strong className="text-foreground">Tags</strong>. Click a tag name, such as your GA4 tag or Meta pixel.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Scroll down and open <strong className="text-foreground">Advanced Settings</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Open <strong className="text-foreground">Consent Settings</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Select <strong className="text-foreground">Require additional consent for tag to fire</strong>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Check the boxes in the list below for that kind of tag.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <strong className="text-foreground">Save</strong> at the top right.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Repeat for the next tag, until every tag except the two from steps 1 and 2 has been saved.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In the left menu, click <strong className="text-foreground">Tags</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click the name of an existing tag. Skip the two tags from steps 1 and 2.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>The tag editor opens. Scroll past <strong className="text-foreground">Tag Configuration</strong> and <strong className="text-foreground">Triggering</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <strong className="text-foreground">Advanced Settings</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <strong className="text-foreground">Consent Settings</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Select <strong className="text-foreground">Require additional consent for tag to fire</strong>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Check the boxes for that tag, using the list under these steps.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <strong className="text-foreground">Save</strong> at the top right.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Click <strong className="text-foreground">Tags</strong> in the left menu and open the next existing tag. Stop when the only tags you have not changed are the two from steps 1 and 2.</span></li>
                   </ol>
                   <ul className="space-y-3 text-sm text-muted-foreground border-t border-border pt-4">
                     <li><strong className="text-foreground">GA4.</strong> Check Analytics Storage.</li>

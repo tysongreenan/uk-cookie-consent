@@ -138,15 +138,19 @@ Leave the template’s own Advanced Settings closed. Wait for Update stays at 50
 
 ### 3. Tell each other tag to wait
 
-Skip **Cookie Banner Generator — Consent Mode** and **Cookie Banner**. Do the rest.
+Stay in the same Google Tag Manager container. In the left menu, click **Tags**. That list is the tags that were already firing on the site, plus the two you just created.
 
-1. Click **Tags**, then click a tag name, such as GA4 or a Meta pixel.
-2. Scroll down and open **Advanced Settings**.
-3. Open **Consent Settings**.
-4. Select **Require additional consent for tag to fire**.
-5. Check the boxes below for that kind of tag.
-6. Click **Save**.
-7. Repeat until every other tag is saved.
+Open a tag that was already there, such as Google Analytics or a Meta pixel. Leave **Cookie Banner Generator — Consent Mode** and **Cookie Banner** as you saved them.
+
+1. In the left menu, click **Tags**.
+2. Click the name of an existing tag. Skip the two tags from steps 1 and 2.
+3. The tag editor opens. Scroll past **Tag Configuration** and **Triggering**.
+4. Click **Advanced Settings**.
+5. Click **Consent Settings**.
+6. Select **Require additional consent for tag to fire**.
+7. Check the boxes below for that kind of tag.
+8. Click **Save** at the top right.
+9. Click **Tags** again and open the next existing tag. Stop when the only tags you have not changed are the two from steps 1 and 2.
 
 | Tag | Check |
 |---|---|
