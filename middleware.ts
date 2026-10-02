@@ -143,6 +143,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Run on pages and APIs so crawler hits are logged. Skip static assets.
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2|tpl)$).*)',
   ],
 }

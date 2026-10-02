@@ -13,7 +13,7 @@ author: "cookie-banner-team"
 tags: ["Google Tag Manager", "Cookie Consent", "Consent Mode v2", "GTM", "GDPR", "Google Analytics", "Tutorial"]
 published: true
 canonical: "/blog/google-tag-manager-cookie-consent-guide"
-updatedDate: "2026-09-17"
+updatedDate: "2026-10-02"
 keywords:
   - "google tag manager cookie consent"
   - "gtm cookie consent"
@@ -67,7 +67,7 @@ schema:
       name: "Can I load the cookie banner through GTM?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "Yes, as a Custom HTML tag on Consent Initialization with high priority, if you cannot edit the site head. Still install the Consent Mode template so defaults are set synchronously before other tags. Prefer the head install when you can."
+        text: "Yes. Import the Consent Mode template, fire it on Consent Initialization with defaults denied and priority 1000, then add the banner as a Custom HTML tag on the same trigger at priority 50. If you can edit the site, put the banner script in the head before GTM instead."
     - "@type": "Question"
       name: "Does this work with Google Analytics 4?"
       acceptedAnswer:
@@ -91,140 +91,79 @@ schema:
 
 ## Table of Contents
 
-- [What you need](#what-you-need)
-- [Step-by-step setup](#step-by-step-setup)
-- [Non-Google tags (Meta, LinkedIn, TikTok)](#non-google-tags-meta-linkedin-tiktok)
-- [Test in GTM Preview](#test-in-gtm-preview)
+- [Do these four steps](#do-these-four-steps)
 - [Common mistakes](#common-mistakes)
-- [Background: why this matters](#background-why-this-matters)
+- [Background](#background-why-this-matters)
 - [FAQ](#frequently-asked-questions)
 
----
-
-## What you need
-
-| Piece | Role |
-|---|---|
-| **Banner script** | Shows the banner, saves `cookie_consent`, fires `gtag('consent', 'update')` + `cookie_consent_update` |
-| **GTM Consent Mode tag** | Sets default **denied** on Consent Initialization, restores returning visitors, forwards updates to Google tags |
-
-You need **both**. Banner alone is too late if GTM tags race it. Template alone has no UI.
-
-[Create a free banner](/free-cookie-banner) first if you do not have one yet. Copy the install snippet from the dashboard (it looks like the one below).
+The same steps, with the download button, are on the [GTM install page](/integrations/google-tag-manager#implementation).
 
 ---
 
-## Step-by-step setup
+## Do these four steps
 
-### Step 1 — Add the banner to your site `<head>`
+[Create a free banner](/free-cookie-banner) first if you do not have one. Copy the snippet from the dashboard. You need that banner and the template below. The banner is the choice visitors see. The template tells Google tags to wait.
 
-Paste this **before** the GTM container snippet. Use your real banner ID from the dashboard:
+### 1. Import the template
+
+[Download cookie-banner-consent-mode.tpl](/gtm/cookie-banner-consent-mode.tpl).
+
+1. GTM → **Templates** → **Tag Templates** → **New** → the three-dot menu → **Import**. Choose that file.
+2. **Tags** → **New**. Name it `Cookie Banner Generator — Consent Mode` and choose the template.
+3. Leave **Region** blank. Set Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization to **Denied**.
+4. Trigger: **Consent Initialization — All Pages**. Firing priority: **1000**.
+
+Leave Wait for Update at 500 and the cookie name at `cookie_consent`. Turn on Ads Data Redaction. Turn on URL Passthrough if you run Google Ads.
+
+### 2. Add the banner. Pick one.
+
+**You can edit the site.** Paste this in the head, before the GTM snippet. Use your banner ID.
 
 ```html
 <script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>
 ```
 
-**Do not** put this only as a normal “All Pages” Custom HTML tag. That fires too late. If you cannot edit the site head, see [Option: load banner via GTM](#option-load-banner-via-gtm) below.
+**You only have GTM.** New Custom HTML tag with that same script. Trigger: **Consent Initialization — All Pages**. Firing priority: **50**. The template stays at 1000. Raising this tag’s priority does not hold other tags, because the banner file still loads after the tag starts.
 
-Subdomains share one consent cookie by default. Optional pin (rare):
+Subdomains share one consent cookie. A domain pin is optional:
 
 ```html
 <script>window.CookieBannerOptions = { domain: 'example.com' };</script>
-<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>
 ```
 
-### Step 2 — Install the Consent Mode v2 template in GTM
+### 3. Hold every other tag
 
-1. GTM → **Templates** → Tag Templates → **Search Gallery**
-2. Search **Cookie Banner Generator**
-3. Add **Cookie Banner Generator — Consent Mode v2** to the workspace
-4. **Tags** → **New** → name it `Cookie Banner Generator — Consent Mode`
-5. Tag Configuration → pick that template
+Open each tag → **Consent settings** → **Require additional consent**.
 
-### Step 3 — Defaults: all Denied
-
-In **Default Consent Settings**:
-
-1. Leave **Region** blank (global default)
-2. Set Ad Storage, Analytics Storage, Ad User Data, Ad Personalization → **Denied**
-
-Optional region rows (ISO codes, comma-separated), e.g. stricter for `GB,DE,FR,...` / `US-CA`. One global Denied row is enough for most sites.
-
-### Step 4 — Advanced settings
-
-| Setting | Value |
+| Tag | Require |
 |---|---|
-| Wait for Update | `500` (raise to 700–1000 only if the site is slow) |
-| Consent Cookie Name | `cookie_consent` (unless you changed it) |
-| Ads Data Redaction | **On** |
-| URL Passthrough | **On** if you run Google Ads |
+| GA4 | `analytics_storage` |
+| Google Ads | `ad_storage`, `ad_user_data`, `ad_personalization` |
+| Meta, LinkedIn, TikTok, other marketing | `ad_storage` |
+| Other analytics, such as Hotjar | `analytics_storage` |
 
-### Step 5 — Trigger: Consent Initialization — All Pages
+A tag with no consent settings can use a Custom Event trigger named `cookie_consent_update`, firing when `consent_marketing` or `consent_analytics` equals true.
 
-1. **Triggering** → **Consent Initialization — All Pages**
-2. Save
+### 4. Preview, then publish
 
-Not “All Pages.” Consent Initialization runs **before** GA4 / Ads tags. Wrong trigger = unconsented firing.
-
-### Step 6 — Publish
-
-**Submit** → version name e.g. `Consent Mode v2` → **Publish**.
-
----
-
-### Option: load banner via GTM
-
-Only if you cannot edit HTML. Still keep the Consent Mode template from Steps 2–5.
-
-1. **Tags** → **New** → Custom HTML
-2. Paste the banner `<script src="…banner.js?id=…">` snippet
-3. Trigger: **Consent Initialization — All Pages**
-4. Tag firing priority: **9999** (Consent Mode template should still fire; use a lower priority on the banner tag if both share the trigger, e.g. template `100`, banner `50`)
-5. Preview → Publish
-
-Head install (Step 1) is still the more reliable path.
-
----
-
-## Non-Google tags (Meta, LinkedIn, TikTok)
-
-Google tags (GA4, Google Ads) read Consent Mode automatically — no custom trigger required. Prefer GTM **Consent Settings** on those tags (`analytics_storage` / `ad_storage` as needed).
-
-For Meta, LinkedIn, TikTok, Hotjar, etc.:
-
-1. Create a **Custom Event** trigger: event name `cookie_consent_update`
-2. Add Data Layer Variables: `consent_analytics`, `consent_marketing` (booleans)
-3. Fire marketing pixels when `consent_marketing` equals `true`; analytics tools when `consent_analytics` equals `true`
-
-The banner also pushes Consent Mode strings (`analytics_storage`, `ad_storage`, …) on the same event for debugging.
-
----
-
-## Test in GTM Preview
-
-1. GTM → **Preview** → open your site
-2. **Consent** tab on Consent Initialization: all four types **denied**
-3. Confirm the Consent Mode tag fired
-4. **Accept All** on the banner → consent flips to **granted** → GA4 / Ads fire
-5. Clear cookies → **Reject All** → stays **denied**; no marketing cookies in DevTools
-6. Return visit after Accept: consent restores within `wait_for_update` without showing the banner again
-
-Console check:
-
-```js
-dataLayer.filter(e => e && e.event === 'cookie_consent_update')
-```
+1. GTM → **Preview** → open your site.
+2. Before a choice, the Consent tab shows all four types **denied**, and marketing tags are blocked.
+3. **Accept All**. Those tags fire.
+4. **Reject All** on a fresh visit. They stay blocked, including after a refresh.
+5. Reload after Accept. They stay granted.
+6. **Submit** → name the version → **Publish**.
 
 ---
 
 ## Common mistakes
 
-1. **Wrong trigger** — Use Consent Initialization, not All Pages.
-2. **Banner only as All Pages Custom HTML** — Defaults never set in time.
-3. **No default Denied row** — GTM treats unset consent as granted.
-4. **`wait_for_update` at 0** — Returning visitors look like new denials every load.
-5. **Non-Google tags with no consent gate** — Consent Mode does not block Meta/LinkedIn by itself.
-6. **Wrong script URL** — Use `https://www.cookie-banner.ca/api/v1/banner.js?id=…` from the dashboard (not a stale CDN path).
+1. **Searching the Community Gallery** for this template. Download the file in step 1 and import it.
+2. **Wrong trigger.** Use Consent Initialization, not All Pages.
+3. **Banner only, on All Pages.** The default is set too late. Import the template.
+4. **No Denied row.** GTM treats a missing default as granted.
+5. **Priority 9999 on the banner tag.** That starts the tag earlier. It does not wait for the banner file.
+6. **Meta or LinkedIn with no consent setting.** Consent Mode does not block those tags by itself.
+7. **Wrong script URL.** Use `https://www.cookie-banner.ca/api/v1/banner.js?id=…` from the dashboard.
 
 ---
 
@@ -262,7 +201,7 @@ Without v2 signals in the EEA/UK you lose remarketing lists, modelled conversion
 2. Template reads `cookie_consent` for returning visitors and updates immediately
 3. Banner loads → UI for new visitors
 4. User chooses → banner updates `gtag`, pushes `cookie_consent_update`, notifies the GTM template callback
-5. Google tags follow Consent Mode; other tags follow your Custom Event triggers
+5. Google tags follow Consent Mode. Other tags follow the consent setting from step 3.
 
 Full install reference: [/integrations/google-tag-manager](/integrations/google-tag-manager).
 
@@ -292,7 +231,7 @@ Full install reference: [/integrations/google-tag-manager](/integrations/google-
 
 ### Can I load the cookie banner through GTM?
 
-**Answer:** Yes on Consent Initialization with high priority if you cannot edit the head. Still install the Consent Mode template. Prefer the head script when possible.
+**Answer:** Yes. Import the template first (priority 1000, defaults denied, Consent Initialization). Add the banner as Custom HTML on that same trigger at priority 50. If you can edit the site, put the banner script in the head before GTM instead.
 
 ### Does this work with Google Analytics 4?
 
