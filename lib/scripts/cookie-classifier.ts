@@ -87,6 +87,37 @@ const RULES: CookieRule[] = [
   { match: n => /^_pk_/.test(n), category: 'analytics', purpose: 'Matomo — privacy-focused analytics', source: 'Matomo' },
   { match: n => n === '_dc_gtm' || /^_dc_gtm_/.test(n), category: 'analytics', purpose: 'Google Tag Manager — container load tracking', source: 'Google Tag Manager' },
 
+  // ─── News / publisher analytics ──────────────────────────────────────
+  { match: n => n === '_chartbeat2' || n === '_cb' || /^_chartbeat/.test(n), category: 'analytics', purpose: 'Chartbeat — real-time publisher analytics', source: 'Chartbeat' },
+  { match: n => n === '_pcid' || n === '_pctx' || n === '__utp' || n === 'cX_P', category: 'analytics', purpose: 'Piano — content analytics and paywall', source: 'Piano' },
+  { match: n => n === 'permutive-id' || /^permutive/.test(n) || n === '_pbjs_userid_consent_data', category: 'marketing', purpose: 'Permutive — cohort-based advertising', source: 'Permutive' },
+
+  // ─── Experimentation / personalization ───────────────────────────────
+  { match: n => n === 'optimizelyEndUserId' || /^optimizely/.test(n), category: 'analytics', purpose: 'Optimizely — A/B testing and feature flags', source: 'Optimizely' },
+  { match: n => /^_vis_opt_/.test(n) || n === '_vwo_uuid' || /^_vwo/.test(n), category: 'analytics', purpose: 'VWO — A/B testing and personalization', source: 'VWO' },
+  { match: n => /^abTasty/.test(n) || n === 'ABTasty', category: 'analytics', purpose: 'AB Tasty — experimentation and personalization', source: 'AB Tasty' },
+
+  // ─── Adobe / marketing clouds ────────────────────────────────────────
+  { match: n => /^AMCV_/.test(n) || n === 's_cc' || n === 's_sq' || n === 's_vi' || n === 'mbox' || n === 'demdex', category: 'marketing', purpose: 'Adobe Experience Cloud — visitor identification and advertising', source: 'Adobe' },
+
+  // ─── Ad exchanges / identity ─────────────────────────────────────────
+  { match: n => n === 'cto_bundle' || n === 'cto_bidid' || /^criteo/.test(n), category: 'marketing', purpose: 'Criteo — retargeting and ad delivery', source: 'Criteo' },
+  { match: n => n === 't_gid' || n === 'taboola_session_id' || /^taboola/.test(n), category: 'marketing', purpose: 'Taboola — native advertising', source: 'Taboola' },
+  { match: n => n === 'obuid' || /^outbrain/.test(n), category: 'marketing', purpose: 'Outbrain — native advertising', source: 'Outbrain' },
+  { match: n => n === '__qca', category: 'marketing', purpose: 'Quantcast — audience measurement and advertising', source: 'Quantcast' },
+  { match: n => n === 'idl_env' || /^_lr_/.test(n), category: 'marketing', purpose: 'LiveRamp — identity resolution for advertising', source: 'LiveRamp' },
+  { match: n => n === 'id5id' || n === 'id5id_last' || /^id5/.test(n), category: 'marketing', purpose: 'ID5 — shared identity for advertising', source: 'ID5' },
+  { match: n => n === 'KADUSERCOOKIE' || n === 'KTPCACOOKIE', category: 'marketing', purpose: 'PubMatic — programmatic advertising', source: 'PubMatic' },
+  { match: n => n === 'khaos' || n === 'audit', category: 'marketing', purpose: 'Magnite / Rubicon — programmatic advertising', source: 'Magnite' },
+
+  // ─── Product analytics / session replay ──────────────────────────────
+  { match: n => /^_sp_/.test(n) || n === 'sp', category: 'analytics', purpose: 'Snowplow — event analytics', source: 'Snowplow' },
+  { match: n => /^_hp2_/.test(n), category: 'analytics', purpose: 'Heap — product analytics', source: 'Heap' },
+  { match: n => n === 'fs_uid' || /^_fs_/.test(n), category: 'analytics', purpose: 'FullStory — session replay', source: 'FullStory' },
+  { match: n => /^_ce\.(s|c)/.test(n) || n === '_ceg.s' || n === '_ceg.u', category: 'analytics', purpose: 'Crazy Egg — heatmaps and recordings', source: 'Crazy Egg' },
+  { match: n => n === 'mf_user' || /^mf_/.test(n), category: 'analytics', purpose: 'Mouseflow — session replay', source: 'Mouseflow' },
+  { match: n => /^_dd_s/.test(n), category: 'analytics', purpose: 'Datadog — RUM session', source: 'Datadog' },
+
   // ─── Payments & infrastructure (usually necessary) ───────────────────
   { match: n => /^__stripe/.test(n), category: 'necessary', purpose: 'Stripe — fraud detection and payment session', source: 'Stripe' },
   { match: n => /^__cf_bm$|^cf_clearance$|^__cflb$/.test(n), category: 'necessary', purpose: 'Cloudflare — bot management and security', source: 'Cloudflare' },

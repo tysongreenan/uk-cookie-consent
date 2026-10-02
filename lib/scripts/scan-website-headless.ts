@@ -197,6 +197,8 @@ export interface HeadlessScanResult {
   /** Whether we successfully clicked an Accept-All button. */
   consentAccepted: { attempted: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  /** CCPA / CPRA "Do Not Sell or Share" or "Your Privacy Choices" control. */
+  doNotSellUrl: string | null
   frenchLanguage: FrenchLanguageCheck
   finalUrl: string
   ourBannerId: string | null
@@ -580,6 +582,36 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       return match ? match.href : null
     })
 
+    // CCPA / CPRA opt-out control. Matches footer "Do Not Sell or Share"
+    // links, "Your Privacy Choices" (often with the blue GPC icon), and
+    // common slug patterns. Does not match a generic privacy policy.
+    const doNotSellUrl: string | null = await page.evaluate(() => {
+      const textRx = /do not sell|do not share|your privacy choices|limit the use of my|california consumer privacy|ccpa opt-?out|dnsmpi/i
+      const hrefRx = /do-not-sell|do-not-share|dnsmpi|privacy-choices|your-privacy-choices|ccpa-opt-?out/i
+      const nodes = Array.from(
+        document.querySelectorAll('a[href], button, [role="link"], [role="button"]')
+      ) as HTMLElement[]
+      for (const el of nodes) {
+        const text = (el.textContent || '').replace(/\s+/g, ' ').trim()
+        const label = (el.getAttribute('aria-label') || '').trim()
+        const href = (el.getAttribute('href') || '').trim()
+        const alt = Array.from(el.querySelectorAll('img'))
+          .map(img => img.getAttribute('alt') || '')
+          .join(' ')
+        if (textRx.test(text) || textRx.test(label) || textRx.test(alt) || hrefRx.test(href)) {
+          if (href) {
+            try {
+              return new URL(href, document.baseURI).href
+            } catch {
+              return href
+            }
+          }
+          return window.location.href
+        }
+      }
+      return null
+    })
+
     // French language availability check (Law 25 requirement for Quebec).
     // We check the current page for signals, then optionally follow a French
     // hreflang or language-switcher link to verify it actually works.
@@ -700,6 +732,7 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       consentBanner,
       consentAccepted,
       privacyPolicyUrl,
+      doNotSellUrl,
       frenchLanguage,
       finalUrl: page.url(),
       ourBannerId,

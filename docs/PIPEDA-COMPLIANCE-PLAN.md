@@ -94,23 +94,18 @@ Customers need these for *their* Law 25 compliance. They are also a sales asset.
 
 Suggested public URLs (do not invent until written): `/dpa` and `/subprocessors`, linked from `/privacy-policy` §8 and from the sales/docs path.
 
-### Phase D — Montreal migration (paused — do not resume blindly)
+### Phase D — Montreal migration
 
-Supabase MCP was not authorized in the session that produced this plan, so production schema was **not** re-checked. Two hard constraints before any cutover:
+**Runbook:** [MONTREAL-CUTOVER-ROADMAP.md](./MONTREAL-CUTOVER-ROADMAP.md). Do not copy live data except in that weekend window.
 
-1. **Production has hand-applied SQL that does not live in Prisma migrations.** If the new Montreal project is rebuilt from Prisma migrations instead of a full `pg_dump` / restore, consent logging breaks again silently. Known extras:
-   - partitioned `consent_records` tables
-   - dashboard RPCs
-   - snake_case `updated_at` trigger function
-   - RLS fixes from the shared-DB incident
-2. **websitefeedback.ca shares this database.** The migration moves its data too. Shared tenancy weakens any "your data is isolated in Canada" claim. Decide whether to split projects as part of the move.
+Cookie Banner moves to `cookie-banner-ca` (`ca-central-1`). websitefeedback.ca / comment-tool **stays on Ohio**. Cookie-only dump/restore — not Prisma-only, not a mixed restore.
 
 | # | Task | Why | Owner | Status |
 |---|------|-----|-------|--------|
-| D1 | Re-authorize Supabase MCP (`/mcp` in an interactive session) and snapshot production schema vs Prisma migrations | Know exactly what dump/restore must carry | eng | **open** |
-| D2 | Write a Montreal cutover runbook: dump/restore **or** a checklist of the hand-applied SQL; rollback; DNS/env cutover | Prevent silent consent-log breakage | eng | **open** |
-| D3 | Decide: split websitefeedback.ca onto its own Supabase project, or accept shared tenancy and do not over-claim isolation | Protects the Canadian-residency claim | founder | **open** |
-| D4 | Execute migration via dump/restore (not Prisma-only rebuild) | Constraint 1 | eng | **blocked on D1–D3** |
+| D1 | Re-authorize Supabase MCP and apply missing cookie schema on Montreal (consent_logs RPC, a11y_banner_stats) | Schema must match before data copy | eng | **open** (Phase 0 of roadmap) |
+| D2 | Cutover runbook: allowlist, rollback, env flip | Prevent silent consent-log breakage | eng | **done** — see MONTREAL-CUTOVER-ROADMAP.md |
+| D3 | Split websitefeedback.ca onto Ohio; cookie on Montreal | Isolation claim | founder | **done** — split |
+| D4 | Weekend execute: cookie data + storage copy, prod env flip, yul1, delta catch-up, smoke | Live cutover | eng | **blocked on D1 + weekend window** |
 | D5 | After cutover: update privacy policy **§7** — migration is no longer "underway"; state storage region as AWS Canada (Montreal) | Policy currently says the move is in progress | eng | **blocked on D4** |
 
 ### Phase E — Marketing copy (only after D4 is live)

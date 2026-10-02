@@ -42,6 +42,7 @@ export interface WebsiteScanResult {
   scriptsDetected: { name: string; category: string; url?: string }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  doNotSellUrl?: string | null
   cookies: ScannedCookie[]
   overallScore: number
   overallGrade: string
@@ -76,6 +77,7 @@ interface ScoringInput {
   scriptsDetected: { name: string; category: string; url?: string }[]
   consentBanner: { detected: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  doNotSellUrl?: string | null
   frenchLanguage?: FrenchLanguageCheck
 }
 
@@ -86,12 +88,13 @@ interface ScoringOutput {
   recommendations: WebsiteScanResult['recommendations']
 }
 
-function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl, frenchLanguage }: ScoringInput): ScoringOutput {
+function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl, doNotSellUrl, frenchLanguage }: ScoringInput): ScoringOutput {
   const marketingCount = cookies.filter(c => c.category === 'marketing').length
   const analyticsCount = cookies.filter(c => c.category === 'analytics').length
   const thirdPartyCount = cookies.filter(c => c.thirdParty).length
   const hasBanner = consentBanner.detected
   const hasPolicy = !!privacyPolicyUrl
+  const hasDoNotSell = !!doNotSellUrl
   const hasTrackingScripts = scriptsDetected.some(
     s => s.category === 'tracking-performance' || s.category === 'targeting-advertising',
   )
@@ -151,21 +154,26 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
 
   // CCPA — opt-out regime focused on the "sale" of personal information.
   // Unlike GDPR, having marketing cookies isn't inherently wrong — what
-  // matters is whether users can opt out. A consent banner counts as an
-  // opt-out mechanism.
+  // matters is whether users can opt out. A consent banner or a "Do Not
+  // Sell or Share" / "Your Privacy Choices" control both count.
   const ccpaIssues: string[] = []
   let ccpa = 100
+  const hasCcpaOptOut = hasBanner || hasDoNotSell
   if (marketingCount > 0) {
-    if (!hasBanner) {
+    if (!hasCcpaOptOut) {
       ccpa -= Math.min(40, marketingCount * 10)
       ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} likely constitute a "sale" or "sharing" of personal information under CCPA.`)
       ccpaIssues.push('A "Do Not Sell or Share My Personal Information" link or opt-out mechanism is required when ad-tech cookies are present.')
     } else {
       ccpa -= Math.min(10, marketingCount * 3)
-      ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} detected — verify your consent banner includes a clear opt-out for the sale/sharing of personal information.`)
+      if (hasDoNotSell) {
+        ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} detected — "Do Not Sell or Share" control found. Verify it actually opts the visitor out of sale/sharing.`)
+      } else {
+        ccpaIssues.push(`${marketingCount} advertising cookie${marketingCount > 1 ? 's' : ''} detected — verify your consent banner includes a clear opt-out for the sale/sharing of personal information.`)
+      }
     }
   }
-  if (!hasBanner && (marketingCount > 0 || analyticsCount > 0)) {
+  if (!hasCcpaOptOut && (marketingCount > 0 || analyticsCount > 0)) {
     ccpa -= 15
     ccpaIssues.push('No opt-out mechanism detected for tracking cookies.')
   }
@@ -215,7 +223,7 @@ function scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolic
       regulation: 'GDPR, Law 25',
     })
   }
-  if (marketingCount > 0) {
+  if (marketingCount > 0 && !hasDoNotSell) {
     recommendations.push({
       text: 'Add a "Do Not Sell or Share My Personal Information" link in your footer to comply with CCPA when advertising cookies are present.',
       regulation: 'CCPA',
@@ -457,6 +465,7 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
     scriptsDetected,
     consentBanner: headless.consentBanner,
     privacyPolicyUrl: headless.privacyPolicyUrl,
+    doNotSellUrl: headless.doNotSellUrl,
     frenchLanguage: headless.frenchLanguage,
   })
 
@@ -466,6 +475,7 @@ function buildFromHeadless(targetUrl: string, headless: HeadlessScanResult, host
     scriptsDetected,
     consentBanner: headless.consentBanner,
     privacyPolicyUrl: headless.privacyPolicyUrl,
+    doNotSellUrl: headless.doNotSellUrl,
     frenchLanguage: headless.frenchLanguage,
     cookies,
     ...scored,
@@ -486,6 +496,7 @@ async function buildFromCheerio(targetUrl: string, hostname: string): Promise<We
     ? { detected: true, vendor: discovery.cmpDetected }
     : { detected: false, vendor: null }
   const privacyPolicyUrl = null
+  const doNotSellUrl = null
 
   const cookies: ScannedCookie[] = []
   for (const script of discovery.scripts) {
@@ -500,7 +511,7 @@ async function buildFromCheerio(targetUrl: string, hostname: string): Promise<We
     }
   }
 
-  const scored = scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl })
+  const scored = scoreCompliance({ cookies, scriptsDetected, consentBanner, privacyPolicyUrl, doNotSellUrl })
 
   return {
     url: targetUrl,
@@ -508,6 +519,7 @@ async function buildFromCheerio(targetUrl: string, hostname: string): Promise<We
     scriptsDetected,
     consentBanner,
     privacyPolicyUrl,
+    doNotSellUrl,
     cookies,
     ...scored,
     warnings: discovery.fetchError ? [discovery.fetchError, ...discovery.warnings] : discovery.warnings,
