@@ -207,7 +207,7 @@ function ConsentAnalyticsCard() {
       <div>
         <CardEyebrow>Consent analytics</CardEyebrow>
         <h3 className="mt-2 font-heading text-[22px] font-semibold leading-[1.18] tracking-[-0.02em] text-foreground">
-          See what's working.
+          See what&apos;s working.
         </h3>
         <p className="mt-2 max-w-[380px] text-sm leading-relaxed text-muted-foreground">
           Live counts of accepts, rejects, and partial consents — broken down by region, device, and banner variant.

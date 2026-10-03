@@ -392,7 +392,7 @@ export function HowItWorksDemo() {
                         Consent Saved
                       </h3>
                       <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                        The visitor's choice is stored in a cookie and synced to Google Consent Mode v2. The banner won't show again until consent expires.
+                        The visitor&apos;s choice is stored in a cookie and synced to Google Consent Mode v2. The banner won&apos;t show again until consent expires.
                       </p>
                       <div className="flex flex-wrap justify-center gap-2 pt-2">
                         <div className="inline-flex items-center gap-1.5 rounded-full bg-green-100 dark:bg-green-900/30 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-400">

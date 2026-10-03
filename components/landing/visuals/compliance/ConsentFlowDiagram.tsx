@@ -191,7 +191,7 @@ export function ConsentFlowDiagram() {
           <h5 className="font-semibold text-red-800 mb-2">❌ Common Mistakes</h5>
           <ul className="text-sm text-red-600 space-y-1">
             <li>• Pre-checked consent boxes</li>
-            <li>• "Accept or leave" approach</li>
+            <li>• &quot;Accept or leave&quot; approach</li>
             <li>• No granular controls</li>
             <li>• Hard to find withdrawal option</li>
           </ul>

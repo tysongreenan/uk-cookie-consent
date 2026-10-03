@@ -98,7 +98,7 @@ export function RoadmapPreview() {
               Product Roadmap
             </Badge>
             <h2 className="text-3xl font-bold mb-4">
-              What We're Building Next
+              What We&apos;re Building Next
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
               See the most requested features and vote on what matters to you
@@ -150,7 +150,7 @@ export function RoadmapPreview() {
                   Canadian Compliance Features Coming Soon
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  We're working on advanced compliance features for Canadian privacy laws
+                  We&apos;re working on advanced compliance features for Canadian privacy laws
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <Badge className="bg-red-100 text-red-800">Server-side Consent Logging</Badge>

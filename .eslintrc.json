@@ -1,0 +1,15 @@
+{
+  "extends": "next/core-web-vitals",
+  // Skip generated and vendored output. next lint already skips node_modules
+  // and .next; these patterns cover build folders and the esbuild a11y bundle.
+  "ignorePatterns": [
+    ".next/**",
+    "node_modules/**",
+    "out/**",
+    "build/**",
+    "dist/**",
+    "coverage/**",
+    "public/a11y/widget.v*.js",
+    "public/a11y/widget.v*.js.map"
+  ]
+}

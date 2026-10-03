@@ -194,19 +194,19 @@ export function BannerTextPreview() {
         <div className="p-4 bg-red-50 rounded-lg border border-red-200">
           <h5 className="font-semibold text-red-800 mb-2">❌ Avoid These</h5>
           <ul className="text-sm text-red-600 space-y-1">
-            <li>• "In accordance with applicable legislation"</li>
-            <li>• "By continuing to use this site..."</li>
-            <li>• "We reserve the right to..."</li>
-            <li>• Technical jargon users don't understand</li>
+            <li>• &quot;In accordance with applicable legislation&quot;</li>
+            <li>• &quot;By continuing to use this site...&quot;</li>
+            <li>• &quot;We reserve the right to...&quot;</li>
+            <li>• Technical jargon users don&apos;t understand</li>
           </ul>
         </div>
         
         <div className="p-4 bg-green-50 rounded-lg border border-green-200">
           <h5 className="font-semibold text-green-800 mb-2">✅ Use These Instead</h5>
           <ul className="text-sm text-green-600 space-y-1">
-            <li>• "We use cookies to..."</li>
-            <li>• "You can choose which cookies..."</li>
-            <li>• "This helps us..."</li>
+            <li>• &quot;We use cookies to...&quot;</li>
+            <li>• &quot;You can choose which cookies...&quot;</li>
+            <li>• &quot;This helps us...&quot;</li>
             <li>• Simple, friendly language</li>
           </ul>
         </div>

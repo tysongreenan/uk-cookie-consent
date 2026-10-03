@@ -55,7 +55,7 @@ export function BlogRecap() {
         
         <div className="pt-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            <strong>Next Steps:</strong> Choose a cookie banner solution that's designed specifically 
+            <strong>Next Steps:</strong> Choose a cookie banner solution that&apos;s designed specifically 
             for Canadian compliance, or build your own following the guidelines above.
           </p>
         </div>
