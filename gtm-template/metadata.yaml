@@ -1,5 +1,5 @@
 displayName: "Cookie Banner Generator — Consent Mode v2"
-description: "Integrates Cookie Banner Generator (cookie-banner.ca) with Google Consent Mode v2. Sets default consent states, restores saved preferences, and listens for real-time consent updates. Supports regional defaults for GDPR/PECR/ePrivacy compliance."
+description: "Connects Cookie Banner Generator (cookie-banner.ca) to Google Consent Mode v2. Sets default consent, restores saved choices, and updates consent when visitors use the banner."
 categories:
   - TAG_MANAGEMENT
   - ANALYTICS
