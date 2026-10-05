@@ -1,3 +1,11 @@
+___TERMS_OF_SERVICE___
+
+By creating or modifying this file you agree to Google Tag Manager's Community
+Template Gallery Developer Terms of Service available at
+https://developers.google.com/tag-manager/gallery-tos (or such other URL as
+Google may provide), as modified from time to time.
+
+
 ___INFO___
 
 {
@@ -12,8 +20,14 @@ ___INFO___
     "thumbnail": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
   },
   "description": "Integrates Cookie Banner Generator (cookie-banner.ca) with Google Consent Mode v2. Sets default consent states, restores saved preferences from cookies, and listens for real-time consent updates when users interact with the banner. Supports regional consent defaults for GDPR/PECR compliance.",
-  "categories": ["TAG_MANAGEMENT", "ANALYTICS", "ADVERTISING"],
-  "containerContexts": ["WEB"]
+  "categories": [
+    "TAG_MANAGEMENT",
+    "ANALYTICS",
+    "ADVERTISING"
+  ],
+  "containerContexts": [
+    "WEB"
+  ]
 }
 
 
@@ -35,7 +49,8 @@ ___TEMPLATE_PARAMETERS___
         "param": {
           "type": "TEXT",
           "name": "region",
-          "displayName": "Region (ISO codes)"
+          "displayName": "Region (ISO codes)",
+          "simpleValueType": true
         }
       },
       {
@@ -44,10 +59,17 @@ ___TEMPLATE_PARAMETERS___
           "name": "ad_storage",
           "displayName": "Ad Storage",
           "selectItems": [
-            { "value": "denied", "displayValue": "Denied" },
-            { "value": "granted", "displayValue": "Granted" }
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            }
           ],
-          "defaultValue": "denied"
+          "defaultValue": "denied",
+          "simpleValueType": true
         }
       },
       {
@@ -56,10 +78,17 @@ ___TEMPLATE_PARAMETERS___
           "name": "analytics_storage",
           "displayName": "Analytics Storage",
           "selectItems": [
-            { "value": "denied", "displayValue": "Denied" },
-            { "value": "granted", "displayValue": "Granted" }
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            }
           ],
-          "defaultValue": "denied"
+          "defaultValue": "denied",
+          "simpleValueType": true
         }
       },
       {
@@ -68,10 +97,17 @@ ___TEMPLATE_PARAMETERS___
           "name": "ad_user_data",
           "displayName": "Ad User Data",
           "selectItems": [
-            { "value": "denied", "displayValue": "Denied" },
-            { "value": "granted", "displayValue": "Granted" }
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            }
           ],
-          "defaultValue": "denied"
+          "defaultValue": "denied",
+          "simpleValueType": true
         }
       },
       {
@@ -80,10 +116,17 @@ ___TEMPLATE_PARAMETERS___
           "name": "ad_personalization",
           "displayName": "Ad Personalization",
           "selectItems": [
-            { "value": "denied", "displayValue": "Denied" },
-            { "value": "granted", "displayValue": "Granted" }
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            }
           ],
-          "defaultValue": "denied"
+          "defaultValue": "denied",
+          "simpleValueType": true
         }
       }
     ],
@@ -100,25 +143,33 @@ ___TEMPLATE_PARAMETERS___
         "name": "waitForUpdate",
         "displayName": "Wait for Update (ms)",
         "defaultValue": "500",
-        "valueValidators": [{ "type": "POSITIVE_NUMBER" }]
+        "valueValidators": [
+          {
+            "type": "POSITIVE_NUMBER"
+          }
+        ],
+        "simpleValueType": true
       },
       {
         "type": "TEXT",
         "name": "consentCookieName",
         "displayName": "Consent Cookie Name",
-        "defaultValue": "cookie_consent"
+        "defaultValue": "cookie_consent",
+        "simpleValueType": true
       },
       {
         "type": "CHECKBOX",
         "name": "ads_data_redaction",
         "checkboxText": "Enable Ads Data Redaction",
-        "defaultValue": false
+        "defaultValue": false,
+        "simpleValueType": true
       },
       {
         "type": "CHECKBOX",
         "name": "url_passthrough",
         "checkboxText": "Enable URL Passthrough",
-        "defaultValue": false
+        "defaultValue": false,
+        "simpleValueType": true
       }
     ]
   }
@@ -135,8 +186,16 @@ const callInWindow = require('callInWindow');
 const getCookieValues = require('getCookieValues');
 const JSON = require('JSON');
 const makeInteger = require('makeInteger');
+const getType = require('getType');
 
-try {
+const toConsentState = function(consent) {
+  return {
+    'analytics_storage': consent.analytics ? 'granted' : 'denied',
+    'ad_storage': consent.marketing ? 'granted' : 'denied',
+    'ad_user_data': consent.marketing ? 'granted' : 'denied',
+    'ad_personalization': consent.marketing ? 'granted' : 'denied'
+  };
+};
 
 // 1. SET DEFAULT CONSENT STATE
 const waitMs = makeInteger(data.waitForUpdate) || 500;
@@ -179,20 +238,16 @@ if (data.url_passthrough) {
 }
 
 // 3. RESTORE CONSENT FROM COOKIE
+// getCookieValues URI-decodes by default, matching how the banner writes the cookie.
 const cookieName = data.consentCookieName || 'cookie_consent';
 const existingConsent = getCookieValues(cookieName);
 
 if (existingConsent && existingConsent.length > 0) {
-  try {
-    const savedConsent = JSON.parse(existingConsent[0]);
-    updateConsentState({
-      'analytics_storage': savedConsent.analytics ? 'granted' : 'denied',
-      'ad_storage': savedConsent.marketing ? 'granted' : 'denied',
-      'ad_user_data': savedConsent.marketing ? 'granted' : 'denied',
-      'ad_personalization': savedConsent.marketing ? 'granted' : 'denied'
-    });
+  const savedConsent = JSON.parse(existingConsent[0]);
+  if (getType(savedConsent) === 'object') {
+    updateConsentState(toConsentState(savedConsent));
     log('Cookie Banner Generator: Consent restored from cookie');
-  } catch (e) {
+  } else {
     log('Cookie Banner Generator: Could not parse consent cookie, using defaults');
   }
 }
@@ -203,50 +258,294 @@ if (existingConsent && existingConsent.length > 0) {
 // In that case, the banner will still call gtag('consent', 'update', ...) directly,
 // which GTM picks up via the dataLayer — so consent updates still work.
 callInWindow('__cbRegisterConsentCallback', function(consent) {
-  updateConsentState({
-    'analytics_storage': consent.analytics ? 'granted' : 'denied',
-    'ad_storage': consent.marketing ? 'granted' : 'denied',
-    'ad_user_data': consent.marketing ? 'granted' : 'denied',
-    'ad_personalization': consent.marketing ? 'granted' : 'denied'
-  });
+  updateConsentState(toConsentState(consent));
   log('Cookie Banner Generator: Consent updated by user');
 });
 
 data.gtmOnSuccess();
-
-} catch (e) {
-  log('Cookie Banner Generator: Template error', e);
-  data.gtmOnFailure();
-}
 
 
 ___WEB_PERMISSIONS___
 
 [
   {
-    "type": "set_consent",
-    "commandName": "setDefaultConsentState",
-    "requiredAccess": "write",
-    "consentTypes": ["ad_storage", "analytics_storage", "ad_user_data", "ad_personalization"]
+    "instance": {
+      "key": {
+        "publicId": "logging",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "environments",
+          "value": {
+            "type": 1,
+            "string": "debug"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   },
   {
-    "type": "set_consent",
-    "commandName": "updateConsentState",
-    "requiredAccess": "write",
-    "consentTypes": ["ad_storage", "analytics_storage", "ad_user_data", "ad_personalization"]
+    "instance": {
+      "key": {
+        "publicId": "access_consent",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "consentTypes",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "analytics_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_user_data"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_personalization"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   },
   {
-    "type": "access_globals",
-    "allowedKeys": [
-      { "key": "__cbConsentCallbacks", "access": "read" },
-      { "key": "__cbRegisterConsentCallback", "access": "execute" }
-    ]
+    "instance": {
+      "key": {
+        "publicId": "write_data_layer",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "ads_data_redaction"
+              },
+              {
+                "type": 1,
+                "string": "url_passthrough"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   },
   {
-    "type": "get_cookies",
-    "allowedCookies": [
-      { "name": "cookie_consent" }
-    ]
+    "instance": {
+      "key": {
+        "publicId": "access_globals",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keys",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "__cbRegisterConsentCallback"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "get_cookies",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "cookieAccess",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   }
 ]
 
@@ -254,58 +553,80 @@ ___WEB_PERMISSIONS___
 ___TESTS___
 
 scenarios:
-  - name: "Sets default consent to denied when no settings configured"
-    code: |
-      mock('logToConsole', function(){});
-      mock('getCookieValues', function(){ return []; });
-      mock('callInWindow', function(){});
+- name: Sets default consent to denied when no settings configured
+  code: |-
+    mock('getCookieValues', function() { return []; });
+    mock('callInWindow', function() {});
 
-      let defaultState;
-      mock('setDefaultConsentState', function(state) { defaultState = state; });
+    let defaultState;
+    mock('setDefaultConsentState', function(state) { defaultState = state; });
 
-      runCode({});
+    runCode({});
 
-      assertThat(defaultState.ad_storage).isEqualTo('denied');
-      assertThat(defaultState.analytics_storage).isEqualTo('denied');
-      assertThat(defaultState.ad_user_data).isEqualTo('denied');
-      assertThat(defaultState.ad_personalization).isEqualTo('denied');
+    assertThat(defaultState.ad_storage).isEqualTo('denied');
+    assertThat(defaultState.analytics_storage).isEqualTo('denied');
+    assertThat(defaultState.ad_user_data).isEqualTo('denied');
+    assertThat(defaultState.ad_personalization).isEqualTo('denied');
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Restores consent from existing cookie
+  code: |-
+    mock('callInWindow', function() {});
+    mock('setDefaultConsentState', function() {});
+    mock('getCookieValues', function(name) {
+      if (name === 'cookie_consent') {
+        return ['{"analytics":true,"marketing":true,"functionality":true}'];
+      }
+      return [];
+    });
 
-  - name: "Restores consent from existing cookie"
-    code: |
-      mock('logToConsole', function(){});
-      mock('callInWindow', function(){});
-      mock('setDefaultConsentState', function(){});
-      mock('getCookieValues', function(name) {
-        if (name === 'cookie_consent') {
-          return ['{"analytics":true,"marketing":true,"functionality":true}'];
-        }
-        return [];
-      });
+    let updatedState;
+    mock('updateConsentState', function(state) { updatedState = state; });
 
-      let updatedState;
-      mock('updateConsentState', function(state) { updatedState = state; });
+    runCode({ consentCookieName: 'cookie_consent' });
 
-      runCode({ consentCookieName: 'cookie_consent' });
+    assertThat(updatedState.ad_storage).isEqualTo('granted');
+    assertThat(updatedState.analytics_storage).isEqualTo('granted');
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Ignores an unreadable consent cookie
+  code: |-
+    mock('callInWindow', function() {});
+    mock('setDefaultConsentState', function() {});
+    mock('getCookieValues', function() { return ['not json']; });
 
-      assertThat(updatedState.ad_storage).isEqualTo('granted');
-      assertThat(updatedState.analytics_storage).isEqualTo('granted');
+    runCode({});
 
-  - name: "Applies regional defaults"
-    code: |
-      mock('logToConsole', function(){});
-      mock('getCookieValues', function(){ return []; });
-      mock('callInWindow', function(){});
+    assertApi('updateConsentState').wasNotCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Ignores a null consent cookie
+  code: |-
+    mock('callInWindow', function() {});
+    mock('setDefaultConsentState', function() {});
+    mock('getCookieValues', function() { return ['null']; });
 
-      let states = [];
-      mock('setDefaultConsentState', function(state) { states.push(state); });
+    runCode({});
 
-      runCode({
-        defaultSettings: [
-          { region: 'GB,DE', ad_storage: 'denied', analytics_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' },
-          { region: '', ad_storage: 'granted', analytics_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' }
-        ]
-      });
+    assertApi('updateConsentState').wasNotCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Applies regional defaults
+  code: |-
+    mock('getCookieValues', function() { return []; });
+    mock('callInWindow', function() {});
 
-      assertThat(states.length).isEqualTo(2);
-      assertThat(states[0].region).contains('GB');
-      assertThat(states[1].region).isUndefined();
+    let states = [];
+    mock('setDefaultConsentState', function(state) { states.push(state); });
+
+    runCode({
+      defaultSettings: [
+        { region: 'GB,DE', ad_storage: 'denied', analytics_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' },
+        { region: '', ad_storage: 'granted', analytics_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' }
+      ]
+    });
+
+    assertThat(states.length).isEqualTo(2);
+    assertThat(states[0].region).contains('GB');
+    assertThat(states[1].region).isUndefined();
+
+
+___NOTES___
+
+Created on 2026-10-05
