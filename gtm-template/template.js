@@ -14,6 +14,7 @@ const log = require('logToConsole');
 const callInWindow = require('callInWindow');
 const getCookieValues = require('getCookieValues');
 const JSON = require('JSON');
+const makeInteger = require('makeInteger');
 
 try {
 
@@ -24,7 +25,7 @@ try {
 // Uses regional overrides from the template's "Default Settings" param table.
 // If no region is specified, the setting applies globally.
 
-const waitMs = parseInt(data.waitForUpdate, 10) || 500;
+const waitMs = makeInteger(data.waitForUpdate) || 500;
 
 if (data.defaultSettings && data.defaultSettings.length > 0) {
   data.defaultSettings.forEach(function(setting) {
@@ -87,7 +88,7 @@ const existingConsent = getCookieValues(cookieName);
 
 if (existingConsent && existingConsent.length > 0) {
   try {
-    const savedConsent = JSON.parse(decodeURIComponent(existingConsent[0]));
+    const savedConsent = JSON.parse(existingConsent[0]);
     log('Cookie Banner Generator: Found existing consent cookie', savedConsent);
 
     const updatedState = {

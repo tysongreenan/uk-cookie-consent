@@ -134,11 +134,12 @@ const log = require('logToConsole');
 const callInWindow = require('callInWindow');
 const getCookieValues = require('getCookieValues');
 const JSON = require('JSON');
+const makeInteger = require('makeInteger');
 
 try {
 
 // 1. SET DEFAULT CONSENT STATE
-const waitMs = parseInt(data.waitForUpdate, 10) || 500;
+const waitMs = makeInteger(data.waitForUpdate) || 500;
 
 if (data.defaultSettings && data.defaultSettings.length > 0) {
   data.defaultSettings.forEach(function(setting) {
@@ -183,7 +184,7 @@ const existingConsent = getCookieValues(cookieName);
 
 if (existingConsent && existingConsent.length > 0) {
   try {
-    const savedConsent = JSON.parse(decodeURIComponent(existingConsent[0]));
+    const savedConsent = JSON.parse(existingConsent[0]);
     updateConsentState({
       'analytics_storage': savedConsent.analytics ? 'granted' : 'denied',
       'ad_storage': savedConsent.marketing ? 'granted' : 'denied',
@@ -276,7 +277,7 @@ scenarios:
       mock('setDefaultConsentState', function(){});
       mock('getCookieValues', function(name) {
         if (name === 'cookie_consent') {
-          return [encodeURIComponent(JSON.stringify({ analytics: true, marketing: true, functionality: true }))];
+          return ['{"analytics":true,"marketing":true,"functionality":true}'];
         }
         return [];
       });
