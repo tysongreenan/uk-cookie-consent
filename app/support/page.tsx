@@ -25,7 +25,7 @@ export default function SupportPage() {
               Support Center
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight mb-6">
-              We're Here to Help
+              We&apos;re Here to Help
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Get personalized help from our support team. We typically respond within 24 hours.
@@ -156,7 +156,7 @@ export default function SupportPage() {
                   </h3>
                   <p className="text-muted-foreground">
                     Our support team can help you implement the banner on your specific platform (WordPress, Shopify, custom sites, etc.). 
-                    Just email us with your website details and we'll provide personalized guidance.
+                    Just email us with your website details and we&apos;ll provide personalized guidance.
                   </p>
                 </div>
 
@@ -204,7 +204,7 @@ export default function SupportPage() {
             <CardHeader>
               <CardTitle className="text-center">Get in Touch</CardTitle>
               <CardDescription className="text-center">
-                For any questions, issues, or feedback, we're here to help
+                For any questions, issues, or feedback, we&apos;re here to help
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">

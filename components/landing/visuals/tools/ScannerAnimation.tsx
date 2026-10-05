@@ -131,7 +131,7 @@ export function ScannerAnimation() {
     <div className="w-full max-w-6xl mx-auto">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-          Free Cookie Scanner — See What's Tracking Your Visitors
+          Free Cookie Scanner — See What&apos;s Tracking Your Visitors
         </h3>
         <p className="text-gray-600">
           Instant scan reveals all cookies, their purposes, and compliance risks
@@ -228,7 +228,7 @@ export function ScannerAnimation() {
                 Ready to Scan
               </h4>
               <p className="text-gray-600">
-                Enter your website URL and click "Start Free Scan" to see what cookies are tracking your visitors
+                Enter your website URL and click &quot;Start Free Scan&quot; to see what cookies are tracking your visitors
               </p>
             </div>
           ) : (

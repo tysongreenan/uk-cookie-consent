@@ -1753,7 +1753,7 @@ function BannerBuilderContent() {
                     <Alert>
                       <Info className="h-4 w-4" />
                       <AlertDescription>
-                        GDPR requires an easy way to reject cookies. Consider using "Standard" layout for full compliance.
+                        GDPR requires an easy way to reject cookies. Consider using &quot;Standard&quot; layout for full compliance.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -4548,7 +4548,7 @@ function BannerBuilderContent() {
                     <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                       <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Performance Benefits</h4>
                       <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                        <li>• <strong>Faster LCP:</strong> Deferred scripts don't block page rendering</li>
+                        <li>• <strong>Faster LCP:</strong> Deferred scripts don&apos;t block page rendering</li>
                         <li>• <strong>Better INP:</strong> Scripts load during idle time</li>
                         <li>• <strong>Reduced CLS:</strong> Inline CSS prevents layout shifts</li>
                         <li>• <strong>Improved TTFB:</strong> Non-blocking script loading</li>
@@ -4971,12 +4971,12 @@ function BannerBuilderContent() {
                     <div>
                       <Label className="text-sm font-medium mb-2 block">Generated Code Preview</Label>
                       <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                        <div className="text-green-400 mb-2">// Main Banner Script</div>
+                        <div className="text-green-400 mb-2">{"// Main Banner Script"}</div>
                         <div className="text-blue-400">{`<script src="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/v1/banner.js?id=${activeBannerId || session?.user?.id}"></script>`}</div>
                         
                         {config.integrations?.googleAnalytics?.measurementId && (
                           <>
-                            <div className="text-green-400 mt-4 mb-2">// Google Analytics 4 Integration</div>
+                            <div className="text-green-400 mt-4 mb-2">{"// Google Analytics 4 Integration"}</div>
                             <div className="text-yellow-400">{`<script async src="https://www.googletagmanager.com/gtag/js?id=${config.integrations.googleAnalytics.measurementId}"></script>`}</div>
                             <div className="text-purple-400">{`<script>gtag('config', '${config.integrations.googleAnalytics.measurementId}');</script>`}</div>
                           </>
@@ -4984,18 +4984,18 @@ function BannerBuilderContent() {
                         
                         {config.scripts && (
                           <>
-                            <div className="text-green-400 mt-4 mb-2">// Custom Scripts</div>
+                            <div className="text-green-400 mt-4 mb-2">{"// Custom Scripts"}</div>
                             {config.scripts.strictlyNecessary?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
-                              <div className="text-blue-400">// Strictly Necessary: {config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                              <div className="text-blue-400">{"// Strictly Necessary: "}{config.scripts.strictlyNecessary.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
                             )}
                             {config.scripts.trackingPerformance?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
-                              <div className="text-yellow-400">// Tracking/Performance: {config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                              <div className="text-yellow-400">{"// Tracking/Performance: "}{config.scripts.trackingPerformance.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
                             )}
                             {config.scripts.functionality?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
-                              <div className="text-purple-400">// Functionality: {config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                              <div className="text-purple-400">{"// Functionality: "}{config.scripts.functionality.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
                             )}
                             {config.scripts.targetingAdvertising?.filter(s => s.enabled && s.scriptCode.trim()).length > 0 && (
-                              <div className="text-red-400">// Targeting/Advertising: {config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
+                              <div className="text-red-400">{"// Targeting/Advertising: "}{config.scripts.targetingAdvertising.filter(s => s.enabled && s.scriptCode.trim()).length} scripts</div>
                             )}
                           </>
                         )}

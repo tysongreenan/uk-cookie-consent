@@ -28,7 +28,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
                 <p className="text-gray-600 mb-4">
-                  Welcome to Cookie Banner Generator ("we," "our," or "us"). These Terms of Service ("Terms") govern your use of our website, 
+                  Welcome to Cookie Banner Generator (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). These Terms of Service (&quot;Terms&quot;) govern your use of our website, 
                   services, and products, including but not limited to our cookie consent banner generation tools.
                 </p>
                 <p className="text-gray-600">
@@ -129,7 +129,7 @@ export default function TermsPage() {
                 </p>
                 <p className="text-gray-600">
                   We are committed to helping you comply with privacy laws, but you are ultimately responsible for ensuring 
-                  your website's compliance with applicable regulations.
+                  your website&apos;s compliance with applicable regulations.
                 </p>
               </section>
 
@@ -163,7 +163,7 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Disclaimer</h2>
                 <p className="text-gray-600 mb-4">
-                  Our services are provided "as is" and "as available" without warranties of any kind. While we strive 
+                  Our services are provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind. While we strive 
                   to provide accurate compliance guidance, we cannot guarantee that our tools will ensure full legal compliance.
                 </p>
                 <p className="text-gray-600 mb-4">

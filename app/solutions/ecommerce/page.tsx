@@ -682,7 +682,7 @@ export default function EcommerceSolutionPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">
-                    Match your cookie banner to your store's design:
+                    Match your cookie banner to your store&apos;s design:
                   </p>
                   <ul className="list-disc list-inside space-y-2 text-gray-600">
                     <li>Choose colors that match your brand</li>

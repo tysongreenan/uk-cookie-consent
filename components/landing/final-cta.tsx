@@ -90,7 +90,7 @@ export function FinalCTA() {
                   </p>
                 </form>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Start free, upgrade when you're ready.{' '}
+                  Start free, upgrade when you&apos;re ready.{' '}
                   <Link href="/pricing" className="text-foreground underline underline-offset-2 hover:text-primary transition-colors">
                     See pricing details
                   </Link>

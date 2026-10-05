@@ -363,7 +363,7 @@ export default function IntegrationsPage() {
                 <h3 className="font-semibold mb-2">Consent Events</h3>
                 <p className="text-sm text-muted-foreground">
                   Track user consent decisions as custom events in GA4, helping you understand 
-                  your banner's effectiveness and user behavior.
+                  your banner&apos;s effectiveness and user behavior.
                 </p>
               </div>
             </div>

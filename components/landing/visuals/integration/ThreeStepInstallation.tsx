@@ -250,14 +250,14 @@ export function ThreeStepInstallation() {
         <div className="p-4 bg-muted rounded-lg">
           <h5 className="font-semibold text-foreground mb-2">WordPress</h5>
           <p className="text-sm text-muted-foreground">
-            Add to your theme's functions.php or use a plugin
+            Add to your theme&apos;s functions.php or use a plugin
           </p>
         </div>
 
         <div className="p-4 bg-muted rounded-lg">
           <h5 className="font-semibold text-foreground mb-2">HTML/CSS</h5>
           <p className="text-sm text-muted-foreground">
-            Paste directly into your website's head section
+            Paste directly into your website&apos;s head section
           </p>
         </div>
 

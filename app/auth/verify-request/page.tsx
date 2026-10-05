@@ -15,7 +15,7 @@ export default function VerifyRequestPage() {
           </div>
           <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
           <CardDescription>
-            We've sent you a sign-in link
+            We&apos;ve sent you a sign-in link
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-center">

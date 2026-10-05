@@ -146,22 +146,22 @@ export default function HowItWorksPage() {
         <h2 id="how-can-i-verify-cookies-are-being-blocked">How Can I Verify Cookies Are Being Blocked?</h2>
         
         <p>
-          Verifying that cookies are being blocked before consent is the most important compliance check. Here's how to do it:
+          Verifying that cookies are being blocked before consent is the most important compliance check. Here&apos;s how to do it:
                 </p>
 
                 <h3>Step 1: Open Your Website</h3>
                 <p>
-                  Visit your website in a browser (we recommend Chrome or Firefox for testing). Make sure you're using a private/incognito window or have cleared your cookies to start fresh.
+                  Visit your website in a browser (we recommend Chrome or Firefox for testing). Make sure you&apos;re using a private/incognito window or have cleared your cookies to start fresh.
                 </p>
 
                 <h3>Step 2: Open Browser DevTools</h3>
                 <p>
-                  Press F12 (or right-click and select "Inspect") to open browser DevTools. Navigate to the "Application" tab (Chrome) or "Storage" tab (Firefox).
+                  Press F12 (or right-click and select &quot;Inspect&quot;) to open browser DevTools. Navigate to the &quot;Application&quot; tab (Chrome) or &quot;Storage&quot; tab (Firefox).
                 </p>
 
                 <h3>Step 3: Check Cookies Before Consent</h3>
                 <p>
-                  Before clicking "Accept" on the cookie banner, check the Cookies section in DevTools. You should see:
+                  Before clicking &quot;Accept&quot; on the cookie banner, check the Cookies section in DevTools. You should see:
                 </p>
                 <ul>
                   <li><strong>No tracking cookies:</strong> Cookies from Google Analytics, Facebook Pixel, or other tracking tools should not be present</li>
@@ -170,7 +170,7 @@ export default function HowItWorksPage() {
 
                 <h3>Step 4: Accept Cookies and Verify</h3>
                 <p>
-                  Click "Accept" on the cookie banner, then check DevTools again. You should now see:
+                  Click &quot;Accept&quot; on the cookie banner, then check DevTools again. You should now see:
                 </p>
                 <ul>
                   <li>Tracking cookies are now present (Google Analytics, Facebook Pixel, etc.)</li>
@@ -179,18 +179,18 @@ export default function HowItWorksPage() {
 
                 <h3>Step 5: Reject Cookies and Verify</h3>
                 <p>
-                  Click "Reject" or change your preferences to reject cookies, then check DevTools again. Tracking cookies should be removed or blocked again.
+                  Click &quot;Reject&quot; or change your preferences to reject cookies, then check DevTools again. Tracking cookies should be removed or blocked again.
                 </p>
 
                 <h2 id="how-do-i-check-consent-logs-and-records">How Do I Check Consent Logs and Records?</h2>
                 
                 <p>
-                  Consent logs provide an audit trail that demonstrates compliance. Here's how to access and review them:
+                  Consent logs provide an audit trail that demonstrates compliance. Here&apos;s how to access and review them:
                 </p>
 
                 <h3>Accessing Consent Logs</h3>
                 <p>
-                  Log in to your dashboard and navigate to the Analytics section. You'll see a "Consent Logs" tab that shows all consent decisions.
+                  Log in to your dashboard and navigate to the Analytics section. You&apos;ll see a &quot;Consent Logs&quot; tab that shows all consent decisions.
                 </p>
 
                 <h3>What Information Is Logged?</h3>
@@ -210,7 +210,7 @@ export default function HowItWorksPage() {
                   Consent logs are essential for:
                 </p>
                 <ul>
-                  <li><strong>Compliance audits:</strong> Demonstrating to regulators that you're obtaining proper consent</li>
+                  <li><strong>Compliance audits:</strong> Demonstrating to regulators that you&apos;re obtaining proper consent</li>
                   <li><strong>Dispute resolution:</strong> Proving that users consented to cookie usage</li>
                   <li><strong>Analytics:</strong> Understanding user consent patterns and preferences</li>
                 </ul>
@@ -218,7 +218,7 @@ export default function HowItWorksPage() {
                 <h2 id="what-monitoring-tools-are-available">What Monitoring Tools Are Available?</h2>
                 
                 <p>
-                  Our dashboard includes comprehensive monitoring tools that continuously check your cookie banner's functionality:
+                  Our dashboard includes comprehensive monitoring tools that continuously check your cookie banner&apos;s functionality:
                 </p>
 
                 <h3>Real-Time Compliance Monitoring</h3>
@@ -263,7 +263,7 @@ export default function HowItWorksPage() {
 
                 <h3>Running Compliance Tests</h3>
                 <p>
-                  In your dashboard, navigate to the "Compliance" section and click "Run Compliance Test". The tool will automatically check:
+                  In your dashboard, navigate to the &quot;Compliance&quot; section and click &quot;Run Compliance Test&quot;. The tool will automatically check:
                 </p>
                 <ul>
                   <li><strong>Cookie Blocking:</strong> Verifies that cookies are blocked before consent</li>
@@ -275,7 +275,7 @@ export default function HowItWorksPage() {
 
                 <h3>Test Results</h3>
                 <p>
-                  After running the test, you'll receive a detailed report showing:
+                  After running the test, you&apos;ll receive a detailed report showing:
                 </p>
                 <ul>
                   <li>Which compliance features are working correctly</li>
@@ -287,7 +287,7 @@ export default function HowItWorksPage() {
                 <h2 id="what-should-i-look-for-in-browser-devtools">What Should I Look For in Browser DevTools?</h2>
                 
                 <p>
-                  Browser DevTools provide detailed information about how your cookie banner is working. Here's what to check:
+                  Browser DevTools provide detailed information about how your cookie banner is working. Here&apos;s what to check:
                 </p>
 
                 <h3>Application/Storage Tab</h3>
@@ -336,7 +336,7 @@ export default function HowItWorksPage() {
 
                 <h3>Automated Monitoring</h3>
                 <p>
-                  Our dashboard provides automated monitoring that runs continuously, so you don't need to manually check every day. You'll receive notifications if any issues are detected.
+                  Our dashboard provides automated monitoring that runs continuously, so you don&apos;t need to manually check every day. You&apos;ll receive notifications if any issues are detected.
                 </p>
 
                 <h2 id="ready-to-verify-your-banner">Ready to Verify Your Banner?</h2>
