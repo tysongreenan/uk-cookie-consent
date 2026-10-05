@@ -232,31 +232,24 @@ export default function GTMIntegrationPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
+                      <Button asChild className="mb-5 h-auto max-w-full whitespace-normal">
+                        <a href="/gtm/cookie-banner-consent-mode.tpl" download="cookie-banner-consent-mode.tpl">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download the template first
+                        </a>
+                      </Button>
                       <ol className="space-y-3 text-sm text-muted-foreground">
                         <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In <GtmLink />, click <Slug>Templates</Slug> in the left menu.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>In the <Slug>Tag Templates</Slug> box, click <Slug>New</Slug>.</span></li>
-                        <li className="flex gap-3">
-                          <span className="font-semibold text-foreground">3.</span>
-                          <span className="min-w-0">
-                            Click the three dots at the top right, then <Slug>Import</Slug>. Choose <Slug>cookie-banner-consent-mode.tpl</Slug>.
-                            <Button asChild className="my-3 h-auto max-w-full whitespace-normal">
-                              <a href="/gtm/cookie-banner-consent-mode.tpl" download="cookie-banner-consent-mode.tpl">
-                                <Download className="mr-2 h-4 w-4" />
-                                Download cookie-banner-consent-mode.tpl
-                              </a>
-                            </Button>
-                            <span className="block">Click <Slug>Save</Slug>.</span>
-                          </span>
-                        </li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Tags</Slug> in the left menu, then <Slug>New</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click the name at the top and type <Slug>Cookie Banner Generator — Consent Mode</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <Slug>Tag Configuration</Slug> and choose <Slug>Cookie Banner Generator — Consent Mode v2</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>In <Slug>Default Consent Settings</Slug>, leave <Slug>Region</Slug> empty. Set <Slug>Ad Storage</Slug>, <Slug>Analytics Storage</Slug>, <Slug>Ad User Data</Slug>, and <Slug>Ad Personalization</Slug> to <Slug>Denied</Slug>. If the table is empty, click <Slug>Add Region Override</Slug> and do the same.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <Slug>Triggering</Slug>. Choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Below the trigger, open <Slug>Advanced Settings</Slug>. Open <Slug>Tag firing priority</Slug> and type <Slug>1000</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">10.</span><span>Click <Slug>Save</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>In the <Slug>Tag Templates</Slug> box, click <Slug>New</Slug>. A blank editor opens.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Click the three dots at the top right, next to <Slug>Save</Slug>. Click <Slug>Import</Slug> and pick <Slug>cookie-banner-consent-mode.tpl</Slug> from your Downloads folder.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>The name changes to <Slug>Cookie Banner Generator — Consent Mode v2</Slug> and you see <Slug>Template created</Slug>. If <Slug>Save</Slug> is blue, click it. Close the editor with the X at the top left.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <Slug>Tags</Slug> in the left menu, then <Slug>New</Slug>. Name it <Slug>Cookie Banner Generator — Consent Mode</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <Slug>Tag Configuration</Slug> and choose <Slug>Cookie Banner Generator — Consent Mode v2</Slug>. Leave every field as it is. An empty table means everything starts as denied.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>At the bottom of the Tag Configuration box, click <Slug>Advanced Settings</Slug>, then <Slug>Tag firing priority</Slug>. Type <Slug>1000</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">8.</span><span>Click <Slug>Triggering</Slug> and choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">9.</span><span>Click <Slug>Save</Slug>.</span></li>
                       </ol>
-                      <p className="mt-4 text-sm text-muted-foreground">The priority field is under the trigger. Leave the Advanced Settings box inside the template form closed. Wait for Update stays at 500, and the cookie name stays cookie_consent.</p>
+                      <p className="mt-4 text-sm text-muted-foreground">If you see a red error after importing, stop and email support@cookie-banner.ca with a screenshot.</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -279,8 +272,8 @@ export default function GTMIntegrationPage() {
                         <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click <Slug>Tags</Slug> in the left menu, then <Slug>New</Slug>.</span></li>
                         <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Name the tag <Slug>Cookie Banner</Slug>.</span></li>
                         <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Tag Configuration</Slug> and choose <Slug>Custom HTML</Slug>. Paste the snippet.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <Slug>Triggering</Slug> and choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
-                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Open <Slug>Advanced Settings</Slug>, then <Slug>Tag firing priority</Slug>, and type <Slug>50</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>At the bottom of the Tag Configuration box, click <Slug>Advanced Settings</Slug>, then <Slug>Tag firing priority</Slug>. Type <Slug>50</Slug>.</span></li>
+                        <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Click <Slug>Triggering</Slug> and choose <Slug>Consent Initialization - All Pages</Slug>.</span></li>
                         <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Click <Slug>Save</Slug>.</span></li>
                       </ol>
                       <details className="rounded-lg border border-border bg-muted/40 px-4 py-3">
@@ -337,8 +330,8 @@ export default function GTMIntegrationPage() {
                   <ol className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex gap-3"><span className="font-semibold text-foreground">1.</span><span>In the left menu, click <Slug>Tags</Slug>.</span></li>
                     <li className="flex gap-3"><span className="font-semibold text-foreground">2.</span><span>Click the name of an existing tag. Skip <Slug>Cookie Banner Generator — Consent Mode</Slug> and <Slug>Cookie Banner</Slug>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>The tag editor opens. Scroll past <Slug>Tag Configuration</Slug> and <Slug>Triggering</Slug>.</span></li>
-                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>Click <Slug>Advanced Settings</Slug>.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">3.</span><span>Click inside the <Slug>Tag Configuration</Slug> box to edit it.</span></li>
+                    <li className="flex gap-3"><span className="font-semibold text-foreground">4.</span><span>At the bottom of that box, click <Slug>Advanced Settings</Slug>.</span></li>
                     <li className="flex gap-3"><span className="font-semibold text-foreground">5.</span><span>Click <Slug>Consent Settings</Slug>.</span></li>
                     <li className="flex gap-3"><span className="font-semibold text-foreground">6.</span><span>Select <Slug>Require additional consent for tag to fire</Slug>.</span></li>
                     <li className="flex gap-3"><span className="font-semibold text-foreground">7.</span><span>Check the boxes for that tag, using the list under these steps.</span></li>

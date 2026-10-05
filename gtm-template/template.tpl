@@ -135,7 +135,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "GROUP",
     "name": "advancedSettings",
-    "displayName": "Advanced Settings",
+    "displayName": "Optional settings",
     "groupStyle": "ZIPPY_CLOSED",
     "subParams": [
       {

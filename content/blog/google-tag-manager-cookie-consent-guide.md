@@ -106,20 +106,19 @@ The same steps, with the download button, are on the [GTM install page](/integra
 
 ### 1. Import the template
 
-[Download cookie-banner-consent-mode.tpl](/gtm/cookie-banner-consent-mode.tpl).
+[Download cookie-banner-consent-mode.tpl](/gtm/cookie-banner-consent-mode.tpl) first.
 
 1. In Google Tag Manager, click **Templates** in the left menu.
-2. In the **Tag Templates** box, click **New**.
-3. Click the three dots at the top right, then **Import**. Choose `cookie-banner-consent-mode.tpl`. Click **Save**.
-4. Click **Tags**, then **New**.
-5. Name the tag `Cookie Banner Generator — Consent Mode`.
-6. Click **Tag Configuration** and choose **Cookie Banner Generator — Consent Mode v2**.
-7. In **Default Consent Settings**, leave **Region** empty. Set Ad Storage, Analytics Storage, Ad User Data, and Ad Personalization to **Denied**. If the table is empty, click **Add Region Override** and do the same.
+2. In the **Tag Templates** box, click **New**. A blank editor opens.
+3. Click the three dots at the top right, next to **Save**. Click **Import** and pick `cookie-banner-consent-mode.tpl` from your Downloads folder.
+4. The name changes to **Cookie Banner Generator — Consent Mode v2** and you see **Template created**. If **Save** is blue, click it. Close the editor with the X at the top left.
+5. Click **Tags**, then **New**. Name it `Cookie Banner Generator — Consent Mode`.
+6. Click **Tag Configuration** and choose **Cookie Banner Generator — Consent Mode v2**. Leave every field as it is. An empty table means everything starts as denied.
+7. At the bottom of the Tag Configuration box, click **Advanced Settings**, then **Tag firing priority**. Type `1000`.
 8. Click **Triggering** and choose **Consent Initialization - All Pages**.
-9. Below the trigger, open **Advanced Settings**, then **Tag firing priority**, and type `1000`.
-10. Click **Save**.
+9. Click **Save**.
 
-Leave the template’s own Advanced Settings closed. Wait for Update stays at 500, and the cookie name stays `cookie_consent`.
+If you see a red error after importing, stop and email support@cookie-banner.ca with a screenshot.
 
 ### 2. Add the banner
 
@@ -130,8 +129,8 @@ Leave the template’s own Advanced Settings closed. Wait for Update stays at 50
 1. In GTM, click **Tags**, then **New**.
 2. Name the tag `Cookie Banner`.
 3. Click **Tag Configuration**, choose **Custom HTML**, and paste the snippet.
-4. Click **Triggering** and choose **Consent Initialization - All Pages**.
-5. Open **Advanced Settings**, then **Tag firing priority**, and type `50`.
+4. At the bottom of the Tag Configuration box, click **Advanced Settings**, then **Tag firing priority**. Type `50`.
+5. Click **Triggering** and choose **Consent Initialization - All Pages**.
 6. Click **Save**.
 
 **If you can edit the site HTML:** paste that same snippet in the head, above the Google Tag Manager snippet. You still need the template from step 1.
@@ -144,8 +143,8 @@ Open a tag that was already there, such as Google Analytics or a Meta pixel. Lea
 
 1. In the left menu, click **Tags**.
 2. Click the name of an existing tag. Skip the two tags from steps 1 and 2.
-3. The tag editor opens. Scroll past **Tag Configuration** and **Triggering**.
-4. Click **Advanced Settings**.
+3. Click inside the **Tag Configuration** box to edit it.
+4. At the bottom of that box, click **Advanced Settings**.
 5. Click **Consent Settings**.
 6. Select **Require additional consent for tag to fire**.
 7. Check the boxes below for that kind of tag.
