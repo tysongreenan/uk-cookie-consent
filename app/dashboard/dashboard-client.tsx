@@ -7,17 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Copy, X, Accessibility } from 'lucide-react'
+import { Plus, Search, Grid, List, Users, Crown, Shield, Edit, Eye, Sparkles, ArrowRight, Copy, X } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
-import { UpdateNotification } from '@/components/dashboard/update-notification'
-import { needsMigration } from '@/lib/banner-migration'
-import { NewBadge } from '@/components/ui/new-badge'
-import { CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { BannerCard } from '@/components/dashboard/banner-card'
-import { FeatureHighlight } from '@/components/dashboard/feature-highlight'
 import { captureEvent } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import {
@@ -61,10 +56,8 @@ export function DashboardClient() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid') // 'grid' or 'list'
-  const [hasOutdatedBanners, setHasOutdatedBanners] = useState(false)
   const [teamInfo, setTeamInfo] = useState<{ name: string; memberCount: number; userRole: string } | null>(null)
   const [showInstallNudge, setShowInstallNudge] = useState(false)
-  const [a11yHighlightDismissed, setA11yHighlightDismissed] = useState(true)
   const sessionRefreshed = useRef(false)
 
   useEffect(() => {
@@ -72,14 +65,6 @@ export function DashboardClient() {
       router.push('/auth/signin')
     }
   }, [status, router])
-
-  useEffect(() => {
-    try {
-      setA11yHighlightDismissed(localStorage.getItem('cb-a11y-feature-highlight-dismissed') === '1')
-    } catch {
-      setA11yHighlightDismissed(false)
-    }
-  }, [])
 
   useEffect(() => {
     if (status === 'authenticated' && !sessionRefreshed.current) {
@@ -181,9 +166,6 @@ export function DashboardClient() {
         if (parsedBanners.length > 0) {
           markHasEverCreatedBanner(session?.user?.id)
         }
-        // Check if any banners need migration
-        const hasOutdated = parsedBanners.some((banner: Banner) => banner.config && needsMigration(banner.config))
-        setHasOutdatedBanners(hasOutdated)
         const ids = parsedBanners.map((b: Banner) => b.id)
         setShowInstallNudge(
           ids.length > 0 && !isInstallNudgeDismissed() && !anyInstallSnippetCopied(ids),
@@ -440,13 +422,6 @@ export function DashboardClient() {
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Cookie Banner' }]} />
 
-        {hasOutdatedBanners && (
-          <UpdateNotification 
-            isVisible={hasOutdatedBanners}
-            onDismiss={() => setHasOutdatedBanners(false)}
-          />
-        )}
-
         {showInstallNudge && banners[0] && (
           <Card className="border border-primary/40 bg-primary/[0.03]">
             <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -482,41 +457,17 @@ export function DashboardClient() {
           </Card>
         )}
 
-        {!a11yHighlightDismissed && banners.some((b) => !b.config?.accessibility?.enabled) && (
-          <FeatureHighlight
-            title="Accessibility Menu"
-            description="Give visitors font size, contrast, and motion controls from the same snippet they already have. Turn it on in the builder — nothing extra to paste. Does not make a website WCAG, AODA or ADA compliant."
-            icon={<Accessibility className="h-6 w-6" />}
-            badge="Included"
-            isNew
-            actionText="Open Accessibility step"
-            onAction={() => {
-              const target = banners.find((b) => !b.config?.accessibility?.enabled) || banners[0]
-              router.push(`/dashboard/builder?id=${target.id}&tab=accessibility`)
-            }}
-            onDismiss={() => {
-              try {
-                localStorage.setItem('cb-a11y-feature-highlight-dismissed', '1')
-              } catch {
-                /* ignore */
-              }
-              setA11yHighlightDismissed(true)
-            }}
-          />
-        )}
-
-        {/* Team Context */}
         {teamInfo && (
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <Card className="border border-border bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="h-5 w-5 text-blue-600" />
+                  <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Users className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-blue-900">{teamInfo.name}</h3>
-                    <p className="text-sm text-blue-700">
+                    <h3 className="font-semibold text-foreground">{teamInfo.name}</h3>
+                    <p className="text-sm text-muted-foreground">
                       {teamInfo.memberCount} {teamInfo.memberCount === 1 ? 'member' : 'members'}
                     </p>
                   </div>

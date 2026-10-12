@@ -25,7 +25,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { NewBadge } from '@/components/ui/new-badge'
 import { WorkspaceSwitcher } from '@/components/dashboard/workspace-switcher'
 import { shouldShowUpgradeCta } from '@/lib/just-paid'
 
@@ -33,7 +32,6 @@ interface NavItem {
   title: string
   href?: string
   icon: React.ComponentType<{ className?: string }>
-  badge?: 'new'
   children?: NavItem[]
 }
 
@@ -120,13 +118,11 @@ export function Sidebar({ className }: SidebarProps) {
             <Link href={item.href} className="flex items-center space-x-3 flex-1">
               <item.icon className="h-4 w-4" />
               <span>{item.title}</span>
-              {item.badge === 'new' && <NewBadge variant="glow" size="sm" />}
             </Link>
           ) : (
             <div className="flex items-center space-x-3 flex-1">
               <item.icon className="h-4 w-4" />
               <span>{item.title}</span>
-              {item.badge === 'new' && <NewBadge variant="glow" size="sm" />}
             </div>
           )}
           
@@ -192,8 +188,8 @@ export function Sidebar({ className }: SidebarProps) {
             {[
               { title: 'Privacy Policy', href: '/dashboard/privacy-policy', icon: FileText },
               ...(isPro ? [
-                { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch, badge: 'new' as const },
-                { title: 'Consent Logs', href: '/dashboard/consent-logs', icon: FileText, badge: 'new' as const },
+                { title: 'Data Requests', href: '/dashboard/data-requests', icon: FileSearch },
+                { title: 'Consent Logs', href: '/dashboard/consent-logs', icon: FileText },
               ] : []),
             ].map(item => renderNavItem(item))}
           </div>
@@ -201,9 +197,8 @@ export function Sidebar({ className }: SidebarProps) {
 
         {hasPrivacy && (
           <div className="space-y-0.5 pt-4">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 border-l-2 border-[#0E768C] pl-2 flex items-center gap-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 border-l-2 border-[#0E768C] pl-2">
               My Privacy
-              {hasBanner && <NewBadge variant="glow" size="sm" />}
             </p>
             {[
               { title: 'Overview', href: '/dashboard/privacy', icon: Shield },

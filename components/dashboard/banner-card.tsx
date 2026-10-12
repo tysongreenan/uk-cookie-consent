@@ -20,8 +20,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
-import { NewBadge } from '@/components/ui/new-badge'
-import { needsMigration } from '@/lib/banner-migration'
 import { BannerPreview } from '@/components/banner/banner-preview'
 
 interface Banner {
@@ -42,7 +40,6 @@ interface BannerCardProps {
 }
 
 export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: BannerCardProps) {
-  const isUpdated = needsMigration(banner.config)
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -68,7 +65,6 @@ export function BannerCard({ banner, onToggle, onDelete, onCopy, onCopyEmbed }: 
               <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">
                 {banner.name}
               </CardTitle>
-              {isUpdated && <NewBadge variant="sparkle" size="sm" />}
               {banner.config?.accessibility?.enabled && (
                 <Badge variant="secondary" className="text-xs font-medium">
                   Accessibility menu

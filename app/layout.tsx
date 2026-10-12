@@ -12,9 +12,6 @@ const bricolage = Bricolage_Grotesque({
 })
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
-import { UpdateAnnouncement } from '@/components/landing/update-announcement'
-import { AnnouncementErrorBoundary } from '@/components/landing/announcement-error-boundary'
-import { AnnouncementProvider } from '@/lib/announcement-context'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const metadata: Metadata = {
@@ -180,12 +177,8 @@ export default function RootLayout({
           />
         </noscript>
         
-        <AnnouncementProvider>
-          <Providers>
+        <Providers>
             <TooltipProvider>
-            <AnnouncementErrorBoundary>
-            <UpdateAnnouncement />
-            </AnnouncementErrorBoundary>
             {children}
             <Toaster
               position="bottom-right"
@@ -199,8 +192,7 @@ export default function RootLayout({
               }}
             />
             </TooltipProvider>
-          </Providers>
-        </AnnouncementProvider>
+        </Providers>
       </body>
     </html>
   )

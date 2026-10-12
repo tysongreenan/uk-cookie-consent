@@ -22,12 +22,13 @@ import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule, PlanTier } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
-import { migrateBannerConfig, needsMigration, getMigrationNotes, CURRENT_BANNER_VERSION, withCurrentBannerVersion } from '@/lib/banner-migration'
+import { migrateBannerConfig, needsMigration, CURRENT_BANNER_VERSION, withCurrentBannerVersion } from '@/lib/banner-migration'
 import { resolveButtonPlacement } from '@/lib/banner-placement'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
 import { getComplianceRequirements } from '@/lib/compliance-frameworks'
 import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
+import { FirstSignInNotice } from '@/components/dashboard/first-sign-in-notice'
 import { canAccessFeature, canAccessFeatureWithFreeze, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { AccessibilityPanel } from '@/components/builder/accessibility-panel'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -728,15 +729,7 @@ function BannerBuilderContent() {
         let bannerConfig = originalConfig
         
         if (needsUpdate) {
-          // Migrate to latest version
           bannerConfig = migrateBannerConfig(originalConfig)
-          const migrationNotes = getMigrationNotes(originalConfig.version || '1.0.0', bannerConfig.version!)
-          
-          // Show migration notification
-          toast.success(
-            `🎉 Banner updated with new features! ${migrationNotes.length > 0 ? migrationNotes[0] : 'Enhanced preferences modal added.'}`,
-            { duration: 6000 }
-          )
           
           // Auto-save the migrated configuration
           try {
@@ -1317,6 +1310,7 @@ function BannerBuilderContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      <FirstSignInNotice />
       <InstallHelpDialog />
       {/* Header */}
       <header className="border-b bg-background">
@@ -4024,21 +4018,17 @@ function BannerBuilderContent() {
                       <Label htmlFor="dismiss-scroll">Dismiss on scroll</Label>
                     </div>
 
-                    <div className="relative p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 border border-purple-100 dark:border-purple-800">
-                      <div className="absolute top-2 right-2">
-                      </div>
-                      <div className="flex items-center space-x-2 pr-16">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
                         <Switch
                           id="show-preferences"
                           checked={config.behavior.showPreferences}
                           onCheckedChange={(checked) => updateConfig('behavior', { showPreferences: checked })}
                         />
-                        <Label htmlFor="show-preferences" className="font-medium">
-                          Show preferences button
-                        </Label>
+                        <Label htmlFor="show-preferences">Show preferences button</Label>
                       </div>
-                      <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 ml-6">
-                        ✨ Enables the advanced preferences modal with cookie category toggles
+                      <p className="text-xs text-muted-foreground ml-11">
+                        Opens the preferences modal with cookie category toggles.
                       </p>
                     </div>
 

@@ -2,6 +2,7 @@
 
 import { Sidebar } from './sidebar'
 import { DashboardHeader } from './header'
+import { FirstSignInNotice } from './first-sign-in-notice'
 import { cn } from '@/lib/utils'
 
 interface DashboardLayoutProps {
@@ -22,6 +23,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
       <div className="flex-1 flex flex-col">
         <DashboardHeader />
         <main className={cn('flex-1', className)}>
+          <FirstSignInNotice />
           {children}
         </main>
       </div>
