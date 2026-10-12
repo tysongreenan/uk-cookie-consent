@@ -100,10 +100,10 @@ const FeatureDescription = ({ children }: { children?: React.ReactNode }) => {
 // Skeleton components for visual interest
 export const ComplianceSkeleton = () => {
   const items = [
-    { icon: Shield, text: "GDPR Compliant" },
-    { icon: CheckCircle, text: "PIPEDA Compliant" },
-    { icon: FileText, text: "CASL Compliant" },
-    { icon: Globe, text: "Quebec Law 25" },
+    { icon: Shield, text: "EU opt-in mode" },
+    { icon: CheckCircle, text: "Canada mode" },
+    { icon: FileText, text: "16 languages" },
+    { icon: Globe, text: "Quebec French" },
   ]
 
   return (

@@ -10,18 +10,18 @@ import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from '
 
 export const metadata: Metadata = {
   title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-  description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
+  description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance. Paste a URL. No signup.',
   keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner, website cookie checker, cookie scanning',
   openGraph: {
     title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-    description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
+    description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-    description: 'Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup.',
+    description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.',
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
@@ -49,16 +49,13 @@ export default function CookieScannerPage() {
       "name": "Cookie Banner",
       "url": "https://www.cookie-banner.ca"
     },
-    "description": "Free cookie scanner and checker. Paste any public URL to list cookies and categories, then check GDPR, PIPEDA, CCPA, and Law 25. About 30 seconds. No signup.",
+    "description": "A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.",
     "featureList": [
-      "Instant website cookie scanning",
-      "GDPR compliance analysis",
-      "CCPA compliance check",
-      "PIPEDA compliance check",
-      "Law 25 compliance check",
-      "Cookie categorization",
-      "Security assessment",
-      "Free cookie audit reports"
+      "Lists cookies a public page sets",
+      "Sorts cookies into categories",
+      "Does not block cookies",
+      "Does not decide compliance",
+      "Free, no signup"
     ]
   }
 
@@ -71,7 +68,7 @@ export default function CookieScannerPage() {
         "name": "What is a cookie scanner?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "A cookie scanner is a tool that automatically crawls and analyzes a website to detect all cookies and tracking technologies in use. It categorizes cookies (necessary, analytics, marketing, functional), evaluates their security settings, and checks compliance with privacy laws like GDPR, CCPA, and PIPEDA."
+          "text": "A cookie audit tool lists the cookies a public page sets and sorts them into categories such as necessary, analytics, marketing, and functional. This scanner does that. It does not block cookies and it does not decide whether the site is compliant."
         }
       },
       {
@@ -87,7 +84,7 @@ export default function CookieScannerPage() {
         "name": "How long does a cookie scan take?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most cookie scans complete in under 30 seconds. The scanner loads your website in a real browser environment, detects all cookies and tracking scripts, and generates a comprehensive compliance report instantly."
+          "text": "Most scans finish in under 30 seconds. The scanner loads the public page and lists the cookies it finds. It does not produce a compliance grade."
         }
       },
       {
@@ -95,7 +92,7 @@ export default function CookieScannerPage() {
         "name": "What privacy laws does the cookie scanner check against?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Our cookie scanning tool checks compliance against GDPR (European Union), CCPA/CPRA (California), PIPEDA (Canada), and Quebec Law 25. It identifies cookies that require user consent under each regulation."
+          "text": "The scan does not decide compliance with GDPR, CCPA, PIPEDA, or Law 25. It lists cookies and can show notes. Whether a cookie needs consent depends on the law and the visitor."
         }
       },
       {
@@ -103,7 +100,7 @@ export default function CookieScannerPage() {
         "name": "Do I need a cookie banner if the scanner finds tracking cookies?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. If your website cookie scanner reveals non-essential cookies (analytics, marketing, or advertising cookies), you need a cookie consent banner that blocks these cookies until users explicitly opt in."
+          "text": "The scan does not answer that. A list of analytics or marketing cookies is a reason to read the rule for those visitors. The scanner does not block those cookies."
         }
       },
       {
@@ -119,7 +116,7 @@ export default function CookieScannerPage() {
         "name": "What is the difference between free and paid cookie scanning tools?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Free cookie scanners provide on-demand website scanning, cookie detection, categorization, and compliance analysis. Paid tools add automated scheduled scans, continuous monitoring, consent management platforms, audit logs, and multi-site management."
+          "text": "This free scan lists cookies and categories on demand. It does not block cookies, schedule scans, or decide compliance."
         }
       },
       {
@@ -151,7 +148,7 @@ export default function CookieScannerPage() {
         "name": "How do I fix compliance issues found by the cookie scanner?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "After identifying compliance issues, you should: (1) install a cookie consent banner that blocks non-essential cookies until consent is given, (2) update your privacy policy to accurately list all cookies, (3) remove any unnecessary tracking scripts, and (4) configure Google Consent Mode v2 for proper analytics handling. Our free cookie banner generator can help with step 1."
+          "text": "The scan does not find a compliance grade. If you want scripts you add to wait for a choice, start a banner. It cannot block cookies other code sets. Update the cookie policy so it lists what the scan found."
         }
       },
       {
@@ -196,7 +193,7 @@ export default function CookieScannerPage() {
                 Free Cookie Scanner — Any URL in 30s
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6">
-                Paste a public URL. Get cookies, categories, and GDPR, CCPA, PIPEDA &amp; Law 25 notes. No signup.
+                A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.
               </p>
 
               <CookieScanner />
@@ -280,7 +277,7 @@ export default function CookieScannerPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
-                    <span><strong>Cookie categories</strong> -- each cookie classified as necessary, functional, analytics, or marketing, helping you understand which require consent.</span>
+                    <span><strong>Cookie categories</strong> -- each cookie sorted as necessary, functional, analytics, or marketing. The category is not a legal decision.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
@@ -292,7 +289,7 @@ export default function CookieScannerPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
-                    <span><strong>Compliance gaps</strong> -- specific issues with your cookie implementation that could violate GDPR, CCPA, PIPEDA, or Law 25 requirements.</span>
+                    <span><strong>Notes, not a grade</strong> -- the list can include notes. It does not decide whether the site meets GDPR, CCPA, PIPEDA, or Law 25.</span>
                   </li>
                 </ul>
               </div>
@@ -567,7 +564,7 @@ export default function CookieScannerPage() {
                     <ul className="space-y-3 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>On-demand website scanning at no cost</span></li>
                       <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Cookie detection and categorization</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Compliance scoring for GDPR, CCPA, PIPEDA</span></li>
+                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>A list and categories. No compliance score</span></li>
                       <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>No account or signup required</span></li>
                       <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Instant results in under 30 seconds</span></li>
                       <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Downloadable audit reports</span></li>
@@ -642,7 +639,9 @@ export default function CookieScannerPage() {
 
                 <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">5. Verify Your Consent Banner Blocks Cookies</h3>
                 <p>
-                  Simply having a cookie consent banner is not enough -- you need to verify that non-essential cookies are actually blocked until the user provides consent. After configuring your banner, run a <strong>cookie scan</strong> without interacting with the consent prompt to confirm it works.
+                  This scan lists cookies a public page sets. It does not block them, and a scan does not prove a banner is holding scripts. To check a banner, open the site and confirm scripts you added have not run before a choice. The{' '}
+                  <Link href="/features/how-it-works" className="text-primary hover:underline">verification guide</Link>{' '}
+                  explains that check.
                 </p>
               </div>
             </div>
@@ -664,7 +663,7 @@ export default function CookieScannerPage() {
                 <div className="border-2 rounded-xl p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-3">What is a cookie scanner?</h3>
                   <p className="text-muted-foreground">
-                    A cookie scanner is a tool that automatically crawls and analyzes a website to detect all cookies and tracking technologies in use. It categorizes cookies (necessary, analytics, marketing, functional), evaluates their security settings, and checks compliance with privacy laws like GDPR, CCPA, and PIPEDA.
+                    A cookie audit tool lists the cookies a public page sets and sorts them into categories such as necessary, analytics, marketing, and functional. This scanner does that. It does not block cookies and it does not decide whether the site is compliant.
                   </p>
                 </div>
 
@@ -678,19 +677,20 @@ export default function CookieScannerPage() {
                 <div className="border-2 rounded-xl p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-3">What privacy laws does the cookie scanner check against?</h3>
                   <p className="text-muted-foreground">
-                    Our cookie scanning tool checks compliance against{' '}
-                    <Link href="/compliance/gdpr" className="text-primary hover:underline">GDPR</Link> (European Union),{' '}
-                    <Link href="/compliance/ccpa" className="text-primary hover:underline">CCPA/CPRA</Link> (California),{' '}
-                    <Link href="/compliance/pipeda" className="text-primary hover:underline">PIPEDA</Link> (Canada), and Quebec&apos;s Law 25.
+                    The scan does not decide compliance with{' '}
+                    <Link href="/blog/gdpr-cookie-consent-requirements" className="text-primary hover:underline">GDPR</Link>,{' '}
+                    <Link href="/compliance/ccpa" className="text-primary hover:underline">CCPA</Link>, or{' '}
+                    <Link href="/compliance/pipeda" className="text-primary hover:underline">PIPEDA</Link>.
+                    It lists cookies and can show notes. Whether a cookie needs consent depends on the law and the visitor.
                   </p>
                 </div>
 
                 <div className="border-2 rounded-xl p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-3">Do I need a cookie banner if the scanner finds tracking cookies?</h3>
                   <p className="text-muted-foreground">
-                    Yes. If your website cookie scanner reveals non-essential cookies, you are legally required to implement a cookie consent banner that blocks these cookies until users explicitly opt in. You can{' '}
-                    <Link href="/free-cookie-banner-generator" className="text-primary hover:underline">create a free cookie banner</Link>{' '}
-                    using our platform.
+                    The scan does not answer that. A list of analytics or marketing cookies is a reason to read the rule for those visitors. The scanner does not block those cookies. You can{' '}
+                    <Link href="/free-cookie-banner" className="text-primary hover:underline">start a free banner</Link>{' '}
+                    after you decide which scripts should wait for a choice.
                   </p>
                 </div>
 
@@ -722,9 +722,9 @@ export default function CookieScannerPage() {
                 <div className="border-2 rounded-xl p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-3">How do I fix compliance issues found by the cookie scanner?</h3>
                   <p className="text-muted-foreground">
-                    After identifying compliance issues: (1) install a{' '}
-                    <Link href="/free-cookie-banner-generator" className="text-primary hover:underline">cookie consent banner</Link>{' '}
-                    that blocks non-essential cookies until consent is given, (2) update your privacy policy to accurately list all cookies, (3) remove unnecessary tracking scripts, and (4) configure Google Consent Mode v2 for proper analytics handling.
+                    The scan does not find a compliance grade. If you want scripts you add to wait for a choice, start a{' '}
+                    <Link href="/free-cookie-banner" className="text-primary hover:underline">banner</Link>.
+                    It cannot block cookies other code sets. Update the cookie policy so it lists what the scan found.
                   </p>
                 </div>
 
@@ -813,7 +813,7 @@ export default function CookieScannerPage() {
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Re-scan after shipping</h3>
                     <p className="text-muted-foreground">
-                      After the banner is live, scan again without clicking Accept to confirm non-essential cookies stay blocked. See{' '}
+                      A second scan lists cookies. It does not prove the banner blocked them. See{' '}
                       <Link href="/features/how-it-works" className="text-primary hover:underline font-medium">
                         how verification works
                       </Link>.
@@ -826,7 +826,7 @@ export default function CookieScannerPage() {
                 <CardHeader>
                   <CardTitle>Ready to fix what the scanner found?</CardTitle>
                   <CardDescription>
-                    Build a banner that blocks non-essential cookies until visitors opt in. Free, no signup.
+                    Scripts you add can stay off until a choice. The free plan is one banner. The banner cannot block cookies other code sets.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

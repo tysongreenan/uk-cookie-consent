@@ -5,11 +5,11 @@ import { FeaturePageLayout } from '@/components/features/feature-page-layout'
 import { ModernFeaturesSection, ComplianceSkeleton } from '@/components/landing/modern-features-section'
 
 export const metadata: Metadata = {
-  title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
+  title: 'Will This Cookie Banner Keep Me Compliant?',
   description: 'What the banner does, and what it does not. Consent tools for GDPR, UK PECR, PIPEDA, and Quebec Law 25. A banner is not a legal opinion and does not make a site compliant by itself.',
   keywords: 'will cookie banner keep me compliant, cookie consent compliance verification, how to know if cookie banner is compliant, cookie banner compliance check, GDPR compliance verification, PIPEDA compliance check',
   openGraph: {
-    title: 'Will This Cookie Banner Keep Me Compliant? | Automatic Compliance Verification',
+    title: 'Will This Cookie Banner Keep Me Compliant?',
     description: 'What the banner does for GDPR, UK PECR, PIPEDA, and Quebec Law 25, and what still sits with you.',
     type: 'article',
   },
@@ -29,7 +29,7 @@ const faqData = [
   },
   {
     question: "How do I verify my cookie banner is compliant?",
-    answer: "You can verify compliance by checking that cookies are blocked before consent, reviewing consent logs in your dashboard, testing the banner's behavior in browser DevTools, and ensuring all required privacy law features are enabled. Our dashboard provides compliance verification tools."
+    answer: "Open the site and use the browser storage panel. Before a choice, scripts you added in the builder should not have run. Consent logs exist on Pro Annual and Enterprise. The dashboard does not grade the banner against a statute."
   },
   {
     question: "What happens if privacy laws change?",
@@ -122,16 +122,16 @@ export default function WillThisKeepMeCompliantPage() {
       <FeaturePageLayout
         hero={{
           title: "Will This Cookie Banner Keep Me Compliant?",
-          description: "Automatic compliance verification for GDPR, PIPEDA, CASL, and Quebec Law 25",
-          badge: "Compliance Assurance",
+          description: "What the banner can do for GDPR, PIPEDA, and Quebec Law 25 consent, and what it cannot do.",
+          badge: "Consent tool",
           updatedDate: updatedDate,
-          ctaText: "Get Compliant Now",
+          ctaText: "Open the builder",
           ctaHref: "/builder",
           directAnswer: directAnswer,
           directAnswerLink: "/builder",
-          directAnswerLinkText: "Get compliant now"
+          directAnswerLinkText: "Open the builder"
         }}
-        ctaText="Get Compliant Now"
+        ctaText="Open the builder"
         ctaHref="/builder"
         relatedLinks={[
           { href: "/features/privacy-laws", text: "What Privacy Laws Does This Cover?" },
@@ -144,7 +144,7 @@ export default function WillThisKeepMeCompliantPage() {
       >
         {/* Features Section */}
         <ModernFeaturesSection
-          title="Comprehensive Compliance Coverage"
+          title="Consent modes"
           description="Consent tools for the laws that actually apply. The banner does not make a site compliant by itself."
           features={complianceFeatures}
         />
@@ -155,183 +155,103 @@ export default function WillThisKeepMeCompliantPage() {
           The banner can block non-essential cookies until a visitor chooses, store that choice, and show the notice in more than one language. Those are tools. They do not replace a privacy notice, a privacy officer, or a check that your scripts wait for the choice.
         </p>
 
-        <h3>Automatic Cookie Blocking</h3>
+        <h3>Scripts you add can stay off until opt-in</h3>
         <p>
-          The banner automatically blocks all non-essential cookies (analytics, marketing, advertising) until users provide explicit consent. This means tracking scripts like Google Analytics, Facebook Pixel, and other marketing tools won't load until users click "Accept" or select specific cookie categories.
+          Scripts you add in the builder as analytics or marketing stay off until the visitor opts in.
+          The banner cannot block cookies set by other code on the page. A tag that loads first, or a
+          script you did not add here, can still set a cookie.
         </p>
 
-        <h3>Explicit Consent Requirements</h3>
+        <h3>Opt-in is a setting, not every law</h3>
         <p>
-          Unlike opt-out mechanisms that assume consent, our banner requires users to actively opt-in. This meets the strictest privacy law requirements including GDPR's explicit consent standard and Quebec Law 25's opt-in requirements. Users cannot be tracked without taking a clear action.
+          EU mode waits for opt-in before non-essential cookies. Quebec can use a Pro geo rule for the same idea.
+          PIPEDA can allow implied consent for non-sensitive analytics when the notice is clear. California mode
+          is an opt-out of sale or sharing, not the EU opt-in. You pick the mode. The product does not decide
+          the lawful basis for you.
         </p>
 
-        <h3>Consent Logging and Records</h3>
+        <h3>Consent logs are not on every plan</h3>
         <p>
-          Every consent decision is automatically logged with a timestamp, user choice, and IP address (anonymized). This creates an audit trail that demonstrates compliance if you're ever questioned by privacy regulators. You can access these logs through your dashboard at any time.
+          Pro Annual and Enterprise can store a consent log. The free plan and one-time Pro do not.
+          A log is a record of the choice. It is not a filing with a regulator, and it does not prove
+          the rest of the site is compliant.
         </p>
 
-        <h2 id="what-compliance-mechanisms-are-built-into-the-banner">What Compliance Mechanisms Are Built Into the Banner?</h2>
-        
-        <p>
-          Our banner includes multiple built-in compliance mechanisms that work automatically:
-        </p>
-
+        <h2 id="what-compliance-mechanisms-are-built-into-the-banner">What is built in</h2>
         <ul>
-          <li><strong>Cookie Blocking by Default:</strong> All non-essential cookies are blocked until consent is given</li>
-          <li><strong>Granular Consent Controls:</strong> Users can choose specific cookie categories (analytics, marketing, functionality)</li>
-          <li><strong>Consent Withdrawal:</strong> Users can change their preferences at any time through a persistent "Cookie Settings" link</li>
-          <li><strong>Bilingual Support:</strong> Full English and French support for Quebec Law 25 compliance</li>
-          <li><strong>Automatic Updates:</strong> When privacy laws change, our banner is updated automatically</li>
-          <li><strong>Consent Expiry Handling:</strong> Consent is automatically renewed according to each law's requirements (12 months for GDPR, 24 months for PIPEDA)</li>
+          <li><strong>Scripts you add:</strong> Analytics and marketing scripts added in the builder stay off until opt-in.</li>
+          <li><strong>Categories:</strong> Essential, functionality, analytics, and marketing.</li>
+          <li><strong>Change of mind:</strong> The visitor can reopen the choices.</li>
+          <li><strong>Languages:</strong> English, French, and 14 other languages. French text is not Law 25 compliance by itself.</li>
+          <li><strong>Expiry:</strong> You set how long the choice is stored. It is not a 12-month GDPR timer or a 24-month PIPEDA timer.</li>
+          <li><strong>Hosted script:</strong> Design changes publish from the dashboard. A statute change does not rewrite the banner.</li>
         </ul>
 
-        <h2 id="which-privacy-laws-does-this-banner-cover">Which Privacy Laws Does This Banner Cover?</h2>
-        
-        <p>
-          Our cookie banner covers all major privacy laws that require cookie consent:
-        </p>
-
-        <h3>Canadian Privacy Laws</h3>
+        <h2 id="which-privacy-laws-does-this-banner-cover">Which laws have a mode</h2>
+        <p>A mode is default copy and a default opt-in or opt-out. It is not a legal opinion.</p>
         <ul>
-          <li><strong>PIPEDA (Personal Information Protection and Electronic Documents Act):</strong> Federal Canadian privacy law requiring meaningful consent</li>
-          <li><strong>CASL (Canada's Anti-Spam Legislation):</strong> Requires consent before installing tracking software</li>
-          <li><strong>Quebec Law 25:</strong> Quebec's strict privacy law requiring explicit consent and bilingual support</li>
-          <li><strong>Alberta PIPA:</strong> Alberta's Personal Information Protection Act</li>
-          <li><strong>BC PIPA:</strong> British Columbia's Personal Information Protection Act</li>
+          <li><strong>Canada:</strong> A PIPEDA-style notice. There is no Alberta PIPA mode and no BC PIPA mode.</li>
+          <li><strong>CASL:</strong> Canada's anti-spam law. This product does not send email and has no CASL mode.</li>
+          <li><strong>Quebec Law 25:</strong> Pro can force opt-in for visitors in Quebec, and the banner can be in French. The banner does not appoint a privacy officer.</li>
+          <li><strong>EU:</strong> Opt-in before non-essential cookies.</li>
+          <li><strong>California:</strong> Opt-out of sale or sharing. Not a full CCPA program.</li>
         </ul>
-
-        <h3>International Privacy Laws</h3>
-        <ul>
-          <li><strong>GDPR (General Data Protection Regulation):</strong> EU's comprehensive data protection law</li>
-          <li><strong>CCPA (California Consumer Privacy Act):</strong> California's privacy law with opt-out requirements</li>
-        </ul>
-
         <p>
-          Learn more about <Link href="/features/privacy-laws" className="text-foreground underline">all privacy laws covered by our banner</Link>.
+          More on the modes: <Link href="/features/privacy-laws" className="text-foreground underline">privacy laws and this banner</Link>.
         </p>
 
-        <h2 id="how-do-i-verify-my-cookie-banner-is-compliant">How Do I Verify My Cookie Banner Is Compliant?</h2>
-        
-        <p>
-          You can verify compliance through multiple methods:
-        </p>
-
-        <h3>Dashboard Verification Tools</h3>
-        <p>
-          Our dashboard includes built-in compliance verification tools that check:
-        </p>
-        <ul>
-          <li>Whether cookies are being blocked before consent</li>
-          <li>If consent logging is working correctly</li>
-          <li>Whether all required privacy law features are enabled</li>
-          <li>If your banner text meets legal requirements</li>
-        </ul>
-
-        <h3>Browser DevTools Testing</h3>
-        <p>
-          You can verify cookie blocking manually:
-        </p>
+        <h2 id="how-do-i-verify-my-cookie-banner-is-compliant">How do I check the banner?</h2>
+        <p>There is no compliance certificate in the dashboard. You can check the behaviour yourself:</p>
         <ol>
-          <li>Open your website in a browser</li>
-          <li>Open DevTools (F12) and go to the Application/Storage tab</li>
-          <li>Check that no tracking cookies are present before clicking "Accept"</li>
-          <li>Click "Accept" and verify cookies are now set</li>
-          <li>Click "Reject" and verify cookies are removed</li>
+          <li>Open the site in a browser with DevTools.</li>
+          <li>Before a choice, confirm the scripts you added have not run.</li>
+          <li>Accept, and confirm those scripts run.</li>
+          <li>Reject, and confirm they stay off.</li>
         </ol>
-
-        <h3>Consent Log Review</h3>
         <p>
-          Review your consent logs in the dashboard to ensure:
+          On Pro Annual or Enterprise, the consent log shows the choice that was stored. It does not grade your banner text.
+          See <Link href="/features/how-it-works" className="text-foreground underline">how the banner works</Link>.
+        </p>
+
+        <h2 id="what-happens-if-privacy-laws-change">If the law changes</h2>
+        <p>
+          The hosted script can change when we ship a product update. That is not a legal update.
+          One-time Pro does not include features shipped later. Annual does. Neither plan rewrites
+          the banner when a statute changes. Review the mode and the words on the banner yourself.
+          The Terms say the tool does not guarantee full legal compliance.
+        </p>
+
+        <h2 id="how-does-this-compare-to-other-cookie-banner-solutions">What this is not</h2>
+        <p>
+          This is a banner you configure. It is not a tenant API, a scanner that blocks every cookie on the page,
+          or a service that files with a regulator.
+        </p>
+
+        <h2 id="ready-to-get-compliant">Next</h2>
+        <p>
+          Set the mode for the visitors you serve, then confirm the scripts you added follow that choice.
         </p>
         <ul>
-          <li>All consent decisions are being recorded</li>
-          <li>Timestamps are accurate</li>
-          <li>User choices are logged correctly</li>
+          <li>Block the scripts you added until opt-in, where you chose an opt-in mode</li>
+          <li>EU and a Quebec geo rule wait for opt-in. California is an opt-out. PIPEDA is a notice, not CASL</li>
+          <li>Consent logs are on Pro Annual and Enterprise</li>
+          <li>English and French, plus 14 other languages</li>
+          <li>You still write the privacy notice and review the setup when the law changes</li>
         </ul>
 
-        <p>
-          For detailed verification steps, see our guide on <Link href="/features/how-it-works" className="text-foreground underline">how to verify your cookie banner is working</Link>.
-        </p>
-
-        <h2 id="what-happens-if-privacy-laws-change">What Happens If Privacy Laws Change?</h2>
-        
-        <p>
-          When privacy laws change or new requirements are introduced, we automatically update our cookie banner solution. You'll receive email notifications about:
-        </p>
+        <h2 id="conclusion">Conclusion</h2>
         <ul>
-          <li>New compliance features being added</li>
-          <li>Changes to existing features</li>
-          <li>Recommended updates to your banner text</li>
-          <li>New privacy law coverage</li>
+          <li><strong>A banner does not keep you compliant.</strong> It can record a choice and hold back scripts you added.</li>
+          <li><strong>Modes, not every statute.</strong> Canada, the EU, and California. No Alberta mode, no BC mode, no CASL mode.</li>
+          <li><strong>No automatic legal updates.</strong> A statute change does not rewrite the banner.</li>
+          <li><strong>Check it in the browser.</strong> The dashboard does not grade the banner against a law.</li>
         </ul>
-
-        <p>
-          These updates are applied automatically—you don't need to reconfigure your banner. This ensures your website remains compliant without ongoing maintenance.
-        </p>
-
-        <h2 id="how-does-this-compare-to-other-cookie-banner-solutions">How Does This Compare to Other Cookie Banner Solutions?</h2>
-        
-        <p>
-          Unlike many cookie banner solutions, ours is designed for automatic compliance:
-        </p>
-
-        <h3>Automatic vs. Manual Configuration</h3>
-        <p>
-          Most cookie banner solutions require you to manually configure compliance features. You must:
-        </p>
-        <ul>
-          <li>Research which privacy laws apply to your website</li>
-          <li>Configure cookie blocking rules manually</li>
-          <li>Set up consent logging yourself</li>
-          <li>Update your banner when laws change</li>
-        </ul>
-
-        <p>
-          Blocking, a record of the choice, and more than one language can be turned on in the banner. The legal setting still has to match the visitors you serve, and it has to be reviewed when the law changes.
-        </p>
-
-        <h3>Built-in Compliance vs. Add-ons</h3>
-        <p>
-          Many solutions require additional plugins or configurations for full compliance. Our banner includes all compliance features built-in:
-        </p>
-        <ul>
-          <li>Cookie blocking (no additional scripts needed)</li>
-          <li>Consent logging (included in dashboard)</li>
-          <li>Multi-law support (automatic detection)</li>
-          <li>Bilingual support (built-in)</li>
-        </ul>
-
-        <h2 id="ready-to-get-compliant">Ready to Get Compliant?</h2>
-        
-        <p>
-          Set the banner to the rule that applies to each visitor. Then confirm the scripts follow that choice.
-        </p>
-
-        <ul>
-          <li>✓ Block non-essential cookies until consent, where the law requires opt-in</li>
-          <li>✓ EU GDPR and Quebec Law 25 still require that opt-in. UK statistics can use an opt-out since 5 February 2026. PIPEDA is still the federal Canadian law.</li>
-          <li>✓ A record of the choice, so you can show what was asked and what was answered</li>
-          <li>✓ English and French for Quebec</li>
-          <li>✓ You still write the notice, name a privacy officer where Law 25 requires one, and review the setup when the law changes</li>
-        </ul>
-
-        <h2 id="conclusion">Conclusion / TL;DR</h2>
-        
-        <p><strong>Key Takeaways:</strong></p>
-        <ul>
-          <li><strong>Yes, our cookie banner keeps you compliant:</strong> It automatically blocks cookies until consent, implements all required privacy law features, and updates automatically when laws change.</li>
-          <li><strong>Multiple compliance mechanisms:</strong> Cookie blocking, explicit consent, consent logging, granular controls, and automatic updates all work together to ensure compliance.</li>
-          <li><strong>Covers all major privacy laws:</strong> GDPR, PIPEDA, CASL, Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA are all covered automatically.</li>
-          <li><strong>Easy verification:</strong> Use dashboard tools, browser DevTools, or consent logs to verify your banner is working correctly.</li>
-          <li><strong>Automatic updates:</strong> When privacy laws change, your banner is updated automatically—no manual configuration needed.</li>
-        </ul>
-
-        <p><strong>Next Steps:</strong></p>
+        <p><strong>Next steps:</strong></p>
         <ol>
-          <li>Create your compliant cookie banner in our dashboard</li>
-          <li>Customize the design to match your brand</li>
-          <li>Install the code on your website</li>
-          <li>Verify compliance using our built-in tools</li>
+          <li>Create a banner in the dashboard</li>
+          <li>Match the design to the site</li>
+          <li>Paste the async script</li>
+          <li>Check in the browser that the scripts you added wait for the choice</li>
         </ol>
 
         <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>

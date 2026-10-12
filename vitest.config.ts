@@ -15,6 +15,13 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: false,
+    // Node 26 exposes a broken global localStorage unless --localstorage-file
+    // is set. That getter shadows jsdom, so a11y widget tests see undefined.
+    poolOptions: {
+      forks: {
+        execArgv: ['--no-experimental-webstorage'],
+      },
+    },
     include: ['lib/**/*.test.ts', 'app/**/*.test.ts', 'packages/a11y-widget/test/**/*.test.ts'],
     // Smoke tests need a real chromium and take seconds, not millis.
     // Run them on demand with `npm run test:smoke`.

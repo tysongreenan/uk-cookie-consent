@@ -65,9 +65,9 @@ const requirements = [
       'Users must be able to withdraw consent at any time. The process for withdrawing must be as straightforward as the process for giving consent. You must inform users of the consequences of withdrawal.',
   },
   {
-    title: 'Quebec Law 25: stricter opt-in requirements',
+    title: 'Quebec Law 25 is a different page',
     description:
-      'Quebec\'s Law 25 has been fully in force since September 2024. It requires opt-in consent before non-essential identification or profiling technologies are activated, a published privacy officer, and privacy impact assessments in the cases the Act lists. Administrative penalties can reach $10 million or 2% of worldwide turnover. Penal fines can reach $25 million or 4%, whichever is greater.',
+      'Law 25 expects express consent before non-essential tracking. That answer is on the Canada cookie consent guide. This page covers the federal PIPEDA rule only.',
   },
   {
     title: 'Accountability and transparency',
@@ -83,7 +83,7 @@ const checklistItems = [
   'Users can withdraw consent as easily as they gave it',
   'Cookie purposes are specific, not vague or bundled together',
   'Privacy policy includes detailed cookie information and contact details',
-  'Quebec visitors get GDPR-like opt-in consent (Law 25 compliance)',
+  'Quebec Law 25 is covered on the Canada cookie consent guide, not on this page',
   'Bilingual support available (English and French) for Quebec compliance',
   'Consent records are maintained for Privacy Commissioner inquiries',
   'Third-party cookies are disclosed with recipient information',
@@ -93,9 +93,9 @@ const checklistItems = [
 
 const faqData = [
   {
-    question: 'Does Canada require a cookie consent banner?',
+    question: 'What does PIPEDA require for cookies?',
     answer:
-      'Yes, in most cases. Under PIPEDA, you must obtain meaningful consent before collecting personal information through cookies. For non-sensitive cookies like basic analytics, implied consent with clear notice may be sufficient. However, for marketing, profiling, and tracking cookies, explicit consent is recommended. Quebec\'s Law 25 explicitly requires opt-in consent similar to GDPR, making a cookie banner essential for any website with Quebec visitors.',
+      'PIPEDA expects meaningful consent. Non-sensitive analytics can use implied consent when the notice is clear. Sensitive data and marketing cookies need a clearer yes. Quebec Law 25, and whether cookie consent is required in Canada, are answered on the Canada cookie consent guide.',
   },
   {
     question: 'What is the difference between PIPEDA and Quebec Law 25 for cookies?',
@@ -204,17 +204,15 @@ export default function PIPEDACompliancePage() {
                 className="text-center max-w-4xl space-y-4"
               >
                 <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-                  PIPEDA Cookie Banner
-                  <br />
-                  for Canadian Websites
+                  What Does PIPEDA Require for Cookies?
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  PIPEDA requires meaningful consent for cookies. Quebec&apos;s Law 25 adds GDPR-like opt-in. Read the{' '}
+                  PIPEDA expects meaningful consent. Non-sensitive analytics can use implied consent when the notice is clear. Sensitive data and marketing cookies need a clearer yes. Quebec Law 25 and whether cookie consent is required in Canada are on the{' '}
                   <Link href="/blog/cookie-consent-canada-guide-2026" className="underline underline-offset-4 hover:text-foreground transition-colors">
-                    full Canada cookie consent guide
+                    Canada cookie consent guide
                   </Link>
-                  {' '}for the legal requirements, then build a banner that matches.
+                  .
                 </p>
               </motion.div>
 
@@ -255,7 +253,7 @@ export default function PIPEDACompliancePage() {
                 What Does PIPEDA Require for Cookies?
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Canada&apos;s Personal Information Protection and Electronic Documents Act (PIPEDA) applies to all commercial activities across Canada. Provincial laws in Quebec, BC, and Alberta add additional requirements.
+                PIPEDA is the federal private-sector law. Meaningful consent is the cookie rule on this page. Quebec Law 25 is answered on the Canada guide.
               </p>
             </motion.div>
 

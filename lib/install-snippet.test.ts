@@ -15,7 +15,7 @@ function createMemoryStorage(): Storage {
     removeItem: (key: string) => {
       map.delete(key)
     },
-    key: (index: number) => [...map.keys()][index] ?? null,
+    key: (index: number) => Array.from(map.keys())[index] ?? null,
   }
 }
 

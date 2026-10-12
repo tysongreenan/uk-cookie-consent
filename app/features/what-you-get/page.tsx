@@ -6,11 +6,11 @@ import { ModernFeaturesSection, FeaturesListSkeleton } from '@/components/landin
 
 export const metadata: Metadata = {
   title: 'What Else Do I Get With This Cookie Banner? | Complete Feature List',
-  description: 'Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates. Complete feature list for cookie consent solution.',
+  description: 'Free plan is one banner. Pro is $99 once or $99 per year. Consent modes for PIPEDA, Law 25, GDPR, and CCPA. A banner does not make a site compliant.',
   keywords: 'cookie banner features, cookie consent tool features, what\'s included in cookie banner, cookie banner customization options, cookie consent solution features',
   openGraph: {
     title: 'What Else Do I Get With This Cookie Banner? | Complete Feature List',
-    description: 'Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates.',
+    description: 'Free plan is one banner. Pro is $99 once or $99 per year. A banner does not make a site compliant.',
     type: 'article',
   },
   alternates: {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const faqData = [
   {
     question: "What features are included with this cookie banner?",
-    answer: "Our cookie banner includes unlimited banners, brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, custom sites), zero performance impact, automatic compliance updates, consent logging, granular controls, and bilingual support. All features are included with your account."
+    answer: "The free plan is one banner, seven layouts, and a powered-by badge. Pro adds unlimited banners, analytics, geo rules you configure, branding removal, and team roles. Consent logs are on Pro Annual and Enterprise. One-time Pro does not include features shipped later. There is no CASL mode."
   },
   {
     question: "What customization options are available?",
@@ -33,15 +33,15 @@ const faqData = [
   },
   {
     question: "What about performance and page speed impact?",
-    answer: "Our cookie banner has zero performance impact. The code is lightweight (under 10KB), loads asynchronously, and doesn't block page rendering. It loads in milliseconds and has no impact on your website's Core Web Vitals or page speed scores."
+    answer: "A standard banner is about 28 KB gzipped and loads from an async script tag, so it does not block HTML parsing. That is not a Core Web Vitals promise."
   },
   {
     question: "How often are features and compliance updates released?",
-    answer: "We release new features and compliance updates regularly. When privacy laws change, we update the banner automatically. New features are added monthly based on user feedback. You'll receive email notifications about major updates and new features."
+    answer: "The script is hosted, so a design change can publish without pasting a new tag. A statute change does not rewrite the banner. One-time Pro does not include features shipped later. Annual does. We do not promise a monthly release or an email for every law change."
   },
   {
     question: "Can I use this on multiple websites?",
-    answer: "Yes. You can create unlimited cookie banners for unlimited websites. Each banner can be customized independently, and you can manage all banners from one dashboard. There are no limits on the number of websites or banners you can create."
+    answer: "The free plan is one banner. You can point that banner at more than one site, but it is still one configuration. Pro is unlimited banners. Each banner is configured on its own."
   },
   {
     question: "What support and documentation is available?",
@@ -68,7 +68,7 @@ export default function WhatYouGetPage() {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "What Else Do I Get With This Cookie Banner?",
-    "description": "Get unlimited banners, brand customization, multi-platform support, zero performance impact, and automatic compliance updates.",
+    "description": "The free plan is one banner. Pro is $99 once or $99 a year. The script is about 28 KB gzipped and loads async. A banner does not make a site compliant.",
     "author": {
       "@type": "Organization",
       "name": "Cookie Banner Team"
@@ -89,12 +89,12 @@ export default function WhatYouGetPage() {
     }
   }
 
-  const directAnswer = "With our cookie banner, you get unlimited banners across unlimited websites, complete brand customization (colors, fonts, styles), multi-platform support (WordPress, Shopify, custom sites), zero performance impact, automatic compliance updates, consent logging, granular cookie controls, and bilingual support. All features are included—no additional fees or premium tiers. You can customize everything to match your brand perfectly and use it on as many websites as you need."
+  const directAnswer = "The free plan is one banner. Pro is $99 once or $99 a year, with unlimited banners, analytics, geo rules you set, and branding removal. Consent logs are on Pro Annual and Enterprise. The script is about 28 KB gzipped and loads async, which is not a Core Web Vitals promise. A banner does not make a site compliant."
 
   const featuresList = [
     {
-      title: "Unlimited Banners",
-      description: "Create and manage unlimited cookie banners for unlimited websites",
+      title: "One banner on Free",
+      description: "The free plan is one banner. Pro is unlimited banners.",
       className: "col-span-1 lg:col-span-3 border-b lg:border-r border-border",
     },
     {
@@ -175,36 +175,36 @@ export default function WhatYouGetPage() {
           The installation process is straightforward, typically involving copying and pasting a single line of code.
         </p>
 
-        <h2 id="zero-performance-impact">Zero Performance Impact</h2>
+        <h2 id="zero-performance-impact">About 28 KB, loaded async</h2>
 
         <p>
-          We understand the importance of website speed. Our cookie banner is engineered for minimal impact on your site's performance.
+          A standard banner is about 28 KB gzipped. The script uses async, so it does not block HTML parsing.
         </p>
 
         <h3>Lightweight and Asynchronous</h3>
         <ul>
-          <li><strong>Small File Size:</strong> The banner code is under 10KB, ensuring fast download times.</li>
-          <li><strong>Asynchronous Loading:</strong> The script loads in the background without blocking your page's rendering.</li>
-          <li><strong>No Render Blocking:</strong> Your website content appears instantly, with the banner loading gracefully afterwards.</li>
+          <li><strong>Size:</strong> About 28 KB gzipped for a standard banner.</li>
+          <li><strong>Async:</strong> The script tag uses async, so it does not block HTML parsing.</li>
+          <li><strong>Not a score:</strong> This is not a Core Web Vitals or ranking promise.</li>
         </ul>
         <p>
-          This means our banner will not negatively affect your Core Web Vitals, SEO, or user experience.
+          That is not a Core Web Vitals, SEO, or ranking promise.
         </p>
 
-        <h2 id="automatic-compliance-updates">Automatic Compliance Updates</h2>
+        <h2 id="automatic-compliance-updates">What a hosted script updates</h2>
 
         <p>
-          Privacy laws are constantly evolving. Our solution ensures you're always up-to-date without manual effort.
+          A design change can publish without pasting a new tag. A statute change does not rewrite the banner.
         </p>
 
         <h3>Continuous Monitoring and Updates</h3>
         <ul>
-          <li><strong>Law Changes:</strong> When new privacy laws are introduced or existing ones are updated (e.g., GDPR, PIPEDA, Quebec Law 25), our banner is automatically updated to reflect the new requirements.</li>
-          <li><strong>Feature Enhancements:</strong> We regularly release new features and improvements based on user feedback and industry best practices.</li>
-          <li><strong>Notifications:</strong> You'll receive email notifications about significant updates, new compliance features, and recommended text changes.</li>
+          <li><strong>Law changes:</strong> A statute change does not rewrite the banner. Review the mode and the words yourself.</li>
+          <li><strong>Later features:</strong> One-time Pro does not include features shipped later. Annual does, including consent logs.</li>
+          <li><strong>No law-change email:</strong> We do not promise an email every time a statute changes.</li>
         </ul>
         <p>
-          You never need to manually update your banner code on your website; all changes are applied automatically.
+          You do not re-paste the script for a design change. You do review the mode and the words when the law changes.
         </p>
 
         <h2 id="comprehensive-support-and-documentation">Comprehensive Support and Documentation</h2>
@@ -227,20 +227,20 @@ export default function WhatYouGetPage() {
           Experience the full power of our cookie banner solution.
         </p>
         <ul>
-          <li>✓ Unlimited banners for all your websites</li>
-          <li>✓ Full brand customization and multi-platform support</li>
-          <li>✓ Zero performance impact and automatic compliance updates</li>
-          <li>✓ Comprehensive support and documentation</li>
+          <li>Free plan: one banner and a powered-by badge</li>
+          <li>Pro: unlimited banners, analytics, geo rules you set, branding removal</li>
+          <li>About 28 KB gzipped, loaded async. That is not a Core Web Vitals promise</li>
+          <li>A banner does not make a site compliant</li>
         </ul>
 
         <h2 id="conclusion">Conclusion / TL;DR</h2>
 
         <p><strong>Key Takeaways:</strong></p>
         <ul>
-          <li><strong>All-Inclusive:</strong> Get unlimited banners, full customization, multi-platform support, zero performance impact, and automatic compliance updates.</li>
-          <li><strong>Effortless Compliance:</strong> Our solution handles the complexities of privacy laws, keeping you compliant without manual effort.</li>
-          <li><strong>User-Friendly:</strong> Intuitive visual editor and comprehensive support make managing your banner easy.</li>
-          <li><strong>Future-Proof:</strong> Automatic updates ensure your banner evolves with privacy regulations and new features.</li>
+          <li><strong>Free is one banner.</strong> Pro is $99 once or $99 a year, with unlimited banners.</li>
+          <li><strong>Consent logs</strong> are on Pro Annual and Enterprise. One-time Pro does not include features shipped later.</li>
+          <li><strong>The script</strong> is about 28 KB gzipped and loads async. That is not a Core Web Vitals promise.</li>
+          <li><strong>A banner does not make a site compliant,</strong> and nothing here updates the law for you.</li>
         </ul>
 
         <p><strong>Next Steps:</strong></p>

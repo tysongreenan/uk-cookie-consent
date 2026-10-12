@@ -37,14 +37,14 @@ export function HeroV2() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Generate a{' '}
+              Build a cookie banner for{' '}
               <strong className="font-medium text-foreground">
-                PIPEDA, Law&nbsp;25, GDPR &amp; CCPA compliant
+                PIPEDA, Quebec Law&nbsp;25, GDPR, and CCPA
               </strong>{' '}
-              cookie consent banner in 5 minutes. Match your brand. Works on{' '}
+              consent choices. Match your brand, then paste one script on{' '}
               <Link href="/integrations/wordpress" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">WordPress</Link>,{' '}
               <Link href="/integrations/shopify" className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary">Shopify</Link>
-              {' '}&amp; any platform. Free plan available — Pro from $99/year.
+              , or any site. Free for one banner. Pro is $99 once, or $99/year.
             </p>
 
             <form
@@ -89,8 +89,7 @@ export function HeroV2() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
-              Used by{' '}
-              <strong className="font-semibold text-foreground">1,000+</strong> Canadian websites
+              Built in Canada · 16 banner languages
             </div>
           </div>
 

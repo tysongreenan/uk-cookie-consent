@@ -19,10 +19,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
+    default: 'Free Cookie Banner Generator for Canada | PIPEDA & Law 25',
     template: '%s'
   },
-  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify & any site. No code needed.',
+  description: 'Build a free cookie banner for Canadian sites. Set PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices, then paste one script on WordPress, Shopify, or any site.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cookie-banner.ca'),
   icons: {
     icon: '/favicon.svg',
@@ -52,15 +52,15 @@ export const metadata: Metadata = {
     google: 'A3HHfv-cqaYqh6td64AMTu4v8TT8xuLZmpBQh2zWvBY',
   },
   openGraph: {
-    title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-    description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site. No code needed.',
+    title: 'Free Cookie Banner Generator for Canada | PIPEDA & Law 25',
+    description: 'Build a free cookie banner for Canadian sites. PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices. Paste one script on any site.',
     type: 'website',
     locale: 'en_CA',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-    description: 'Create a free cookie consent banner in 5 minutes. GDPR, CCPA, PIPEDA & Law 25 compliant. Used by 1,000+ websites.',
+    title: 'Free Cookie Banner Generator for Canada | PIPEDA & Law 25',
+    description: 'Build a free cookie banner for Canadian sites. PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices. Paste one script on any site.',
   },
   robots: {
     index: true,

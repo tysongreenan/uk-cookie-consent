@@ -170,7 +170,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Alberta's Personal Information Protection Act with specific requirements for consent, data breaches, and privacy management programs.
+                    Alberta has its own private-sector privacy statute. This banner has no Alberta mode. Canada mode is a PIPEDA-style notice.
                   </p>
                 </CardContent>
               </Card>
@@ -184,7 +184,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    British Columbia's Personal Information Protection Act with requirements for consent, data protection, and privacy policies.
+                    British Columbia has its own private-sector privacy statute. This banner has no BC mode.
                   </p>
                 </CardContent>
               </Card>
@@ -198,7 +198,7 @@ export default function CanadaCompliancePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Canada's Anti-Spam Legislation affecting electronic communications and marketing consent requirements.
+                    CASL is Canada's anti-spam law. This product does not send email and has no CASL mode.
                   </p>
                 </CardContent>
               </Card>
@@ -956,7 +956,7 @@ export default function CanadaCompliancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Join 1,000+ Canadian Websites Already Protected
+              Join Built in Canada Already Protected
             </h2>
             <div className="text-xl text-red-100 mb-8 space-y-2">
               <div>✓ Avoid $100K+ PIPEDA fines automatically</div>

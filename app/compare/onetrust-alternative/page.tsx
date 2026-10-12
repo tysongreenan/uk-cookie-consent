@@ -60,7 +60,7 @@ const faqData = [
   },
   {
     question: "Does OneTrust have a free plan?",
-    answer: "OneTrust previously offered a free cookie consent tool called 'OneTrust Free', but it was discontinued. They now offer limited trials through their sales team. Cookie-Banner.ca offers a permanent free plan with 1 cookie banner, 4 layouts, GDPR and CCPA compliance, Google Consent Mode v2, and unlimited pages. The free plan includes 'Powered by' branding, which is removed on the $99 one-time Pro plan."
+    answer: "OneTrust previously offered a free cookie consent tool called 'OneTrust Free', but it was discontinued. They now offer limited trials through their sales team. Cookie-Banner.ca offers a permanent free plan with 1 cookie banner, 7 layouts, GDPR and CCPA compliance, Google Consent Mode v2, and unlimited pages. The free plan includes 'Powered by' branding, which is removed on the $99 one-time Pro plan."
   },
   {
     question: "Is OneTrust overkill for a single website?",
@@ -68,7 +68,7 @@ const faqData = [
   },
   {
     question: "How do I migrate from OneTrust to Cookie-Banner.ca?",
-    answer: "Migrating from OneTrust takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design, colors, and consent categories, 3) Replace the OneTrust script tags with our lightweight embed code (under 10KB), 4) Remove the old OneTrust scripts. Existing visitors will see your new banner and provide fresh consent. No data migration is needed."
+    answer: "Migrating from OneTrust takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design, colors, and consent categories, 3) Replace the OneTrust script tags with our lightweight embed code (about 28 KB gzipped), 4) Remove the old OneTrust scripts. Existing visitors will see your new banner and provide fresh consent. No data migration is needed."
   },
   {
     question: "Can Cookie-Banner.ca handle enterprise compliance requirements?",
@@ -76,11 +76,11 @@ const faqData = [
   },
   {
     question: "OneTrust vs Cookiebot: which is cheaper?",
-    answer: "Cookiebot is significantly cheaper than OneTrust. Cookiebot starts at $9/month ($108/year) for a single domain, while OneTrust typically costs $10,000+/year. However, both use recurring subscriptions that add up over time. Cookie-Banner.ca offers a free plan or a one-time $99 Pro payment -- no monthly or annual fees ever."
+    answer: "Cookiebot is significantly cheaper than OneTrust. Cookiebot starts at $9/month ($108/year) for a single domain, while OneTrust typically costs $10,000+/year. However, both use recurring subscriptions that add up over time. Cookie-Banner.ca offers a free plan, Pro at $99 once, or Pro at $99 per year. The one-time plan does not include features shipped later."
   },
   {
     question: "Does OneTrust slow down website performance?",
-    answer: "OneTrust's cookie consent script is one of the heavier options on the market, typically weighing 80KB+ with additional configuration files. This can noticeably impact page load times and Core Web Vitals scores, which directly affect SEO rankings. Cookie-Banner.ca's script is under 10KB and loads asynchronously, minimizing performance impact."
+    answer: "OneTrust's cookie consent script is one of the heavier options on the market, typically weighing 80KB+ with additional configuration files. This can noticeably impact page load times and Core Web Vitals scores, which directly affect SEO rankings. Cookie-Banner.ca's script is about 28 KB gzipped and loads asynchronously, minimizing performance impact."
   },
   {
     question: "Is OneTrust required for GDPR compliance?",
@@ -158,7 +158,7 @@ export default function OneTrustAlternativePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Stop paying $10,000+/year for cookie consent. Cookie-Banner.ca delivers GDPR, CCPA, and PIPEDA compliance with a free plan or a one-time $99 Pro upgrade. Lightweight script under 10KB. No sales calls, no enterprise contracts.
+                  Stop paying $10,000+/year for cookie consent. Cookie-Banner.ca delivers GDPR, CCPA, and PIPEDA compliance with a free plan or a one-time $99 Pro upgrade. Lightweight script about 28 KB gzipped. No sales calls, no enterprise contracts.
                 </p>
               </motion.div>
 
@@ -351,7 +351,7 @@ export default function OneTrustAlternativePage() {
               </div>
 
               <p className="text-sm text-muted-foreground text-center">
-                OneTrust pricing is estimated based on industry reports and G2/Gartner reviews (April 2026). Actual pricing may vary. The free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
+                OneTrust pricing is estimated based on industry reports and G2/Gartner reviews (April 2026). Actual pricing may vary. The free plan includes 1 banner, 7 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
               </p>
             </div>
           </div>
@@ -402,8 +402,8 @@ export default function OneTrustAlternativePage() {
                     { feature: "Free Plan Available", onetrust: false, ours: "1 banner, unlimited pages" },
                     { feature: "Self-Serve Signup", onetrust: false, ours: true },
                     { feature: "Setup Time", onetrust: "Weeks to months", ours: "5 minutes" },
-                    { feature: "Custom Banner Design", onetrust: "Template-based", ours: "11 layouts (Pro)" },
-                    { feature: "Script Size", onetrust: "~80KB+", ours: "Under 10KB" },
+                    { feature: "Custom Banner Design", onetrust: "Template-based", ours: "14 layouts (Pro)" },
+                    { feature: "Script Size", onetrust: "~80KB+", ours: "About 28 KB gzipped" },
                     { feature: "Consent Analytics", onetrust: true, ours: "Pro" },
                     { feature: "Data Mapping", onetrust: true, ours: false },
                     { feature: "Vendor Management", onetrust: true, ours: false },
@@ -481,7 +481,7 @@ export default function OneTrustAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Script Performance</h3>
                 <p>
-                  OneTrust&apos;s consent script is one of the heaviest in the industry at <strong className="text-foreground">80KB+</strong>, often loading additional configuration and categorization files. For websites where Core Web Vitals matter, this overhead can push Largest Contentful Paint and First Input Delay outside Google&apos;s recommended thresholds. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously.
+                  OneTrust&apos;s consent script is one of the heaviest in the industry at <strong className="text-foreground">80KB+</strong>, often loading additional configuration and categorization files. For websites where Core Web Vitals matter, this overhead can push Largest Contentful Paint and First Input Delay outside Google&apos;s recommended thresholds. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">about 28 KB gzipped</strong> and loads asynchronously.
                 </p>
 
                 <h3 className="font-heading text-foreground">When OneTrust Makes Sense</h3>
@@ -512,7 +512,7 @@ export default function OneTrustAlternativePage() {
                       { category: "3-Year Total Cost", onetrust: "$30,000-$300,000+", ours: "$99" },
                       { category: "Setup Time", onetrust: "Weeks to months", ours: "5 minutes" },
                       { category: "Sales Demo Required", onetrust: "Yes", ours: "No" },
-                      { category: "Script Size", onetrust: "~80KB+", ours: "Under 10KB" },
+                      { category: "Script Size", onetrust: "~80KB+", ours: "About 28 KB gzipped" },
                       { category: "Loading", onetrust: "Synchronous", ours: "Async (non-blocking)" },
                       { category: "Free Tier", onetrust: "Discontinued", ours: "1 banner, unlimited pages" },
                       { category: "PIPEDA / Law 25", onetrust: "Supported", ours: "Native support" },
@@ -581,7 +581,7 @@ export default function OneTrustAlternativePage() {
                   {
                     icon: Zap,
                     title: '8x Lighter Script',
-                    desc: 'OneTrust\'s 80KB+ script becomes our under-10KB async script. Better Core Web Vitals, faster page loads, and improved SEO performance.',
+                    desc: 'Our script is about 28 KB gzipped and loads async. That is not a Core Web Vitals or ranking promise. We have not published a measurement of OneTrust\'s script.',
                   },
                   {
                     icon: Rocket,
@@ -643,7 +643,7 @@ export default function OneTrustAlternativePage() {
                 className="text-center mb-12"
               >
                 <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
-                  Trusted by 1,000+ Websites
+                  Trusted by Free to start
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                   Businesses of all sizes are choosing simpler, more affordable cookie consent
@@ -691,7 +691,7 @@ export default function OneTrustAlternativePage() {
                         'Free plan or $99 one-time Pro payment',
                         'Instant self-serve signup, no demos',
                         '5-minute setup with visual builder',
-                        'Under 10KB async script for fast pages',
+                        'About 28 KB gzipped async script for fast pages',
                         'Pay only for what you need',
                       ].map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -712,7 +712,7 @@ export default function OneTrustAlternativePage() {
                 className="mt-8 grid md:grid-cols-3 gap-4"
               >
                 {[
-                  { value: '1,000+', label: 'Websites using Cookie-Banner.ca' },
+                  { value: '$99', label: 'Pro, once or per year' },
                   { value: '< 10KB', label: 'Script size, async loading' },
                   { value: '5 min', label: 'Average setup time' },
                 ].map((stat, i) => (
@@ -763,7 +763,7 @@ export default function OneTrustAlternativePage() {
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">03</span>
-                    <span><strong className="text-foreground">Replace the OneTrust scripts</strong> -- remove the OneTrust &lt;script&gt; tags and optconsent attributes from your pages. Paste our single lightweight embed code (under 10KB).</span>
+                    <span><strong className="text-foreground">Replace the OneTrust scripts</strong> -- remove the OneTrust &lt;script&gt; tags and optconsent attributes from your pages. Paste our single lightweight embed code (about 28 KB gzipped).</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">04</span>

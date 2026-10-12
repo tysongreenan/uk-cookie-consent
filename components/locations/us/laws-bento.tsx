@@ -258,7 +258,7 @@ function PerformanceCard() {
     const animate = () => {
       if (started) return
       started = true
-      const target = 9.3
+      const target = 28
       const dur = 1400
       const t0 = performance.now()
       const ease = (t: number) => 1 - Math.pow(1 - t, 3)
@@ -290,16 +290,16 @@ function PerformanceCard() {
       <div>
         <CardEyebrow>Performance</CardEyebrow>
         <h3 className="mt-2 font-heading text-[22px] font-semibold leading-[1.18] tracking-[-0.02em] text-foreground">
-          Under 10 KB,
+          About 28 KB gzipped,
           <br />
           loads async.
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Zero impact on Core Web Vitals. Scripts gated by consent.
+          Does not block HTML parsing. Scripts gated by consent.
         </p>
       </div>
       <div className="mt-auto flex items-baseline gap-1 pt-2 font-heading text-[64px] font-bold leading-none tracking-[-0.04em] text-foreground">
-        <span>{n.toFixed(1)}</span>
+        <span>{Math.round(n)}</span>
         <span className="text-xl font-medium text-muted-foreground">kb</span>
       </div>
     </article>

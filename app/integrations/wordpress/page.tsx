@@ -66,12 +66,12 @@ const faqData = [
   {
     question: 'Is a cookie banner required on WordPress sites?',
     answer:
-      'Yes. If your WordPress site uses Google Analytics, Facebook Pixel, WooCommerce tracking, or any tool that sets cookies, GDPR (EU), PIPEDA (Canada), and CCPA (California) all require you to collect consent before setting non-essential cookies. Fines can reach 4% of annual revenue.',
+      'If the site sets non-essential cookies, EU GDPR expects opt-in, Quebec Law 25 expects express consent, and PIPEDA expects meaningful consent. California CCPA is an opt-out of sale or sharing, not the same opt-in. A banner does not make the site compliant. The GDPR fine ceiling is a matter of EU law, not a result this product prevents.',
   },
   {
     question: 'Will this slow down my WordPress site?',
     answer:
-      'No. The script is under 10 KB gzipped and loads asynchronously with the defer attribute. That is roughly 20x smaller than popular cookie plugins like CookieYes or Complianz, which bundle entire admin panels, database tables, and stylesheets.',
+      'The install is one async script tag, so it does not block HTML parsing. A standard banner is about 28 KB gzipped. That is not a promise about Core Web Vitals or rankings.',
   },
   {
     question: 'Does it work with caching plugins like WP Rocket or W3 Total Cache?',
@@ -81,7 +81,7 @@ const faqData = [
   {
     question: 'What is the difference between this and a WordPress cookie plugin?',
     answer:
-      'Cookie plugins install PHP code, create database tables, add admin menus, and load their own CSS and JavaScript on every page. Our approach is a single self-contained script tag — no PHP, no database, no admin UI overhead. You get the same GDPR compliance at a fraction of the page weight.',
+      'Cookie plugins install PHP, database tables, and an admin screen. This product is one async script tag. It can set consent choices for GDPR, PIPEDA, and CCPA. It does not make a site compliant, and it does not block cookies set by other code.',
   },
 ]
 
@@ -208,7 +208,7 @@ export default function WordPressIntegrationPage() {
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
                   Most WordPress cookie plugins add 200+ KB and slow every page load.
-                  Ours is 1 script tag, under 10 KB, and takes 5 minutes to install.
+                  Ours is 1 script tag, about 28 KB gzipped, and takes 5 minutes to install.
                 </p>
               </motion.div>
 
@@ -243,7 +243,7 @@ export default function WordPressIntegrationPage() {
               >
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="h-4 w-4 text-foreground" />
-                  Under 10 KB
+                  About 28 KB gzipped
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="h-4 w-4 text-foreground" />
@@ -627,7 +627,7 @@ style-src: https://fonts.googleapis.com`}</pre>
                   </thead>
                   <tbody>
                     {[
-                      { label: 'Script size', ours: 'Under 10 KB', a: '~180 KB', b: '~220 KB' },
+                      { label: 'Script size', ours: 'About 28 KB gzipped', a: '~180 KB', b: '~220 KB' },
                       { label: 'Database tables', ours: '0', a: '3+', b: '5+' },
                       { label: 'Admin UI overhead', ours: 'None', a: 'Full dashboard', b: 'Wizard + settings' },
                       { label: 'GDPR + PIPEDA + CCPA', ours: 'Yes', a: 'Yes', b: 'Yes' },
@@ -689,7 +689,7 @@ style-src: https://fonts.googleapis.com`}</pre>
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                One script tag. Under 10 KB. Works with every WordPress theme, caching plugin, and CDN.
+                One script tag. About 28 KB gzipped. Works with every WordPress theme, caching plugin, and CDN.
                 Build your banner in the visual editor and paste it into your site.
               </p>
 

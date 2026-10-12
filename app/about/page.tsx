@@ -177,7 +177,7 @@ export default function AboutPage() {
               </div>
               
               <p className="rounded-lg bg-brand-teal/10 p-6 font-semibold">
-                And we believe Canada deserves tools made for its own standards — like <strong>PIPEDA</strong> and <strong>CASL</strong>, not just EU-centric GDPR clones.
+                Canada mode is a PIPEDA-style notice, with English and French. CASL is an anti-spam law, and this product does not send email.
               </p>
             </div>
           </section>
@@ -190,7 +190,7 @@ export default function AboutPage() {
               <p className="font-semibold">We&apos;re doing the opposite.</p>
 
               <p>
-                Start free — no credit card, no time limits. When you&apos;re ready for Pro features, it&apos;s a one-time $99 payment. No subscriptions. No recurring fees. Lifetime updates included.
+                Start free — no credit card. The free plan is one banner. Pro is $99 once, or $99 per year. The one-time plan does not include features we ship later. Annual does, including consent logs.
               </p>
 
               <p className="text-xl font-semibold">Why?</p>

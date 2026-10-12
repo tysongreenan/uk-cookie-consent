@@ -23,8 +23,8 @@ import {
 import { StructuredData } from '@/components/seo/structured-data'
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy Template — Free GDPR, CCPA & PIPEDA Compliant',
-  description: 'Free cookie policy templates for GDPR, CCPA, PIPEDA & Quebec Law 25. Copy-paste ready. Covers what cookies you use, why, and how users can manage them.',
+  title: 'What Goes in a Canadian Cookie Policy?',
+  description: 'A Canadian cookie policy lists the cookies you set, why, and how a visitor changes the choice. It is not the banner. PIPEDA expects that notice.',
   keywords: [
     'cookie policy template',
     'gdpr compliant cookie policy template',
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
     'pipeda cookie policy',
   ],
   openGraph: {
-    title: 'Cookie Policy Template — Free GDPR, CCPA & PIPEDA Compliant',
-    description: 'Free cookie policy templates for GDPR, CCPA, PIPEDA & Quebec Law 25. Copy-paste ready. Covers what cookies you use, why, and how users can manage them.',
+    title: 'What Goes in a Canadian Cookie Policy?',
+    description: 'A Canadian cookie policy lists the cookies you set, why, and how a visitor changes the choice. It is not the banner. PIPEDA expects that notice.',
     type: 'website',
   },
   alternates: {
@@ -94,9 +94,9 @@ export default function CookiePolicyTemplatePage() {
           badge={{
             text: "Free Templates — Ready to Use",
           }}
-          title="Cookie Policy Template"
-          title2="GDPR, CCPA & Canadian Compliant"
-          description="Free cookie policy templates you can copy and customize. Covers GDPR, CCPA, PIPEDA & Quebec Law 25."
+          title="What Goes in a Canadian Cookie Policy?"
+          title2="It Is Not the Banner"
+          description="A Canadian cookie policy lists the cookies you set, why, and how a visitor changes the choice. It is not the banner. PIPEDA expects that notice."
           emailCapture={false}
           useGeometricBackground={true}
         />
@@ -450,7 +450,7 @@ export default function CookiePolicyTemplatePage() {
                 A cookie policy without a cookie banner is incomplete — you need both. Your cookie policy explains what cookies you use, but a cookie banner is what actually collects consent from your visitors.
               </p>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
-                Our free cookie banner generator automatically creates a compliant banner that links to your cookie policy, blocks non-essential cookies until consent is given, and logs every consent transaction for your records. It works with GDPR, CCPA, PIPEDA, and Law 25 out of the box.
+                A banner can link to this policy. Scripts you add in the builder can stay off until a choice. The banner cannot block cookies other code sets, and it does not make the site compliant. Consent logs are on Pro Annual and Enterprise.
               </p>
               <Link href="/auth/signup">
                 <Button size="lg" className="px-8">

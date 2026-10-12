@@ -218,7 +218,7 @@ export default function ComparePage() {
                     <td className="py-3 px-4 font-semibold text-primary">Cookie-Banner.ca</td>
                     <td className="py-3 px-4 text-primary font-bold">Free / $99 once</td>
                     <td className="py-3 px-4 text-primary font-bold">$0 -- $99 total</td>
-                    <td className="py-3 px-4 text-foreground font-semibold">Under 10KB</td>
+                    <td className="py-3 px-4 text-foreground font-semibold">About 28 KB gzipped</td>
                     <td className="py-3 px-4 text-foreground font-semibold">1 banner, unlimited pages</td>
                   </tr>
                 </tbody>

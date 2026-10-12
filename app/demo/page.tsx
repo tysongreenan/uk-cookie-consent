@@ -103,10 +103,10 @@ export default function DemoPage() {
                   ⚖️ Legal Compliance
                 </h3>
                 <ul className="text-gray-600 space-y-2">
-                  <li>• GDPR compliant for Europe</li>
-                  <li>• PIPEDA/CASL compliant for Canada</li>
-                  <li>• Quebec Law 25 compliant</li>
-                  <li>• Professional privacy integration</li>
+                  <li>• EU mode waits for opt-in</li>
+                  <li>• Canada mode is a PIPEDA-style notice. Not CASL</li>
+                  <li>• Quebec opt-in is a Pro geo rule, plus French</li>
+                  <li>• A banner does not make a site compliant</li>
                 </ul>
               </div>
             </div>
@@ -132,7 +132,7 @@ export default function DemoPage() {
                   <span className="text-2xl">⚖️</span>
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Legal Compliance</h3>
-                <p className="text-gray-600 text-sm">Built-in GDPR, PIPEDA, CASL, and Quebec Law 25 compliance</p>
+                <p className="text-gray-600 text-sm">Modes for GDPR, PIPEDA, and CCPA. Not CASL, and not a compliance guarantee</p>
               </div>
 
               <div className="text-center">

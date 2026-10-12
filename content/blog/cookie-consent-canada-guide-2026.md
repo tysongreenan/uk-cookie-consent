@@ -1,8 +1,8 @@
 ---
-title: "Is Cookie Consent Required in Canada? PIPEDA, CASL & Law 25 (2026)"
-description: "Yes — tracking cookies need opt-in consent in Canada under PIPEDA, CASL, and Law 25. Fines up to $25M. Scan your site or start a free banner."
+title: "Is Cookie Consent Required in Canada? PIPEDA and Law 25 (2026)"
+description: "Canada has no single cookie statute. PIPEDA expects meaningful consent. Quebec Law 25 expects express consent. CASL is the anti-spam law, not a cookie-banner rule."
 date: "2025-01-15"
-updatedDate: "2026-09-15"
+updatedDate: "2026-10-11"
 heroCta:
   primary:
     label: "Scan your site"
@@ -17,7 +17,7 @@ canonical: "/blog/cookie-consent-canada-guide-2026"
 keywords:
   - "cookie consent canada"
   - "pipeda cookie requirements"
-  - "casl cookie consent"
+  - "cookie consent canada"
   - "quebec law 25 cookies"
   - "law 25 cookie banner"
   - "canadian privacy law cookies"
@@ -32,7 +32,7 @@ schema:
       name: "Do I need a cookie banner if I only use Google Analytics?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "Yes. Google Analytics collects personal information (IP addresses, device IDs, browsing behavior) and requires explicit consent under PIPEDA and CASL."
+        text: "PIPEDA can allow implied consent for non-sensitive analytics when the notice is clear. Quebec Law 25 expects express consent before non-essential tracking. CASL does not set the cookie rule. A banner does not make the site compliant."
     - "@type": "Question"
       name: "What's the difference between PIPEDA and GDPR?"
       acceptedAnswer:
@@ -42,12 +42,12 @@ schema:
       name: "Can I use implied consent for cookies in Canada?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "No. Implied consent (continuing to browse = consent) is not sufficient for tracking cookies under PIPEDA. You need explicit, opt-in consent."
+        text: "For non-sensitive analytics, PIPEDA can allow implied consent if the notice explains the purpose before the cookie is set. Continuing to browse is not enough when the cookie is sensitive, used for marketing, or the visitor is in Quebec. Law 25 expects express consent."
     - "@type": "Question"
       name: "Do I need consent for first-party cookies?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "It depends on the cookie's purpose. Session cookies don't require consent. Preference cookies are best practice to get consent. Analytics cookies require consent."
+        text: "It depends on the purpose. A session cookie that keeps someone logged in does not need consent, but you still disclose it. Non-sensitive analytics can use implied consent under PIPEDA when the notice is clear. Quebec Law 25 expects express consent before non-essential tracking."
     - "@type": "Question"
       name: "How often should I update my cookie policy?"
       acceptedAnswer:
@@ -62,7 +62,7 @@ schema:
 
 ## The short answer
 
-Yes. If your site uses analytics, advertising, or marketing cookies, Canadian law requires **explicit opt-in consent** before those cookies are set. PIPEDA, CASL, and Quebec's Law 25 all apply. Law 25 fines can reach **$25 million** or 4% of global revenue.
+Yes, for many cookies, and the rule depends on where the visitor is. Canada has no single cookie statute. PIPEDA expects meaningful consent, and non-sensitive analytics can use implied consent when the notice is clear. Quebec's Law 25 expects express consent before non-essential tracking. CASL is Canada's anti-spam law. It is not a cookie-banner rule. Law 25 fines can reach **$25 million** or 4% of worldwide turnover. A banner does not make the site compliant.
 
 <div class="article-cta">
 <span class="article-cta-note">Scan your site to see what you're setting, or start a free banner you can paste in today.</span>
@@ -88,13 +88,13 @@ Yes. If your site uses analytics, advertising, or marketing cookies, Canadian la
 
 ## What Is Cookie Consent in Canada?
 
-Cookie consent in Canada is the legal requirement for websites to obtain user permission before collecting personal data through cookies. Under PIPEDA, CASL, and Quebec's Law 25, you need explicit, opt-in consent for tracking cookies used for analytics, advertising, or marketing. Strictly necessary cookies (login, security, checkout) can run without consent, but you still have to disclose them. [PIPEDA compliance details →](/compliance/pipeda)
+Cookie consent in Canada means telling people what a cookie does and getting the kind of consent that law requires. PIPEDA is the federal private-sector law. Quebec's Law 25 is stricter. Strictly necessary cookies, such as login, security, and checkout, can run without consent, and you still disclose them. The [PIPEDA cookie banner page](/compliance/pipeda) answers only the federal question.
 
 ---
 
 ## What Canadian Privacy Laws Require Cookie Consent?
 
-Canadian websites must comply with three main privacy laws that require cookie consent: **PIPEDA** (federal), **CASL** (anti-spam), and **Quebec's Law 25** (provincial, strictest of the three). Here's what each one requires.
+Two privacy laws set the cookie choice. **PIPEDA** is federal. **Quebec's Law 25** is stricter. **CASL** is the anti-spam law, listed here so it is not confused with a cookie statute.
 
 ### What Is PIPEDA and How Does It Apply to Cookies?
 
@@ -105,17 +105,11 @@ PIPEDA (Personal Information Protection and Electronic Documents Act) is Canada'
 - Give users control over their data
 - Protect personal information with appropriate safeguards
 
-**What this means for cookies:** If your cookies collect personal information (like IP addresses, device IDs, or browsing behavior), you need explicit consent. Learn more about [PIPEDA requirements from the Office of the Privacy Commissioner of Canada](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/).
+**What this means for cookies:** If a cookie collects personal information, you need meaningful consent. For non-sensitive analytics, clear notice can be enough. Sensitive tracking and marketing need a clearer yes. Read [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/) from the Office of the Privacy Commissioner of Canada.
 
 ### What Is CASL and How Does It Apply to Cookies?
 
-CASL (Canada's Anti-Spam Legislation) primarily deals with email marketing, but it also applies to tracking technologies. Key requirements:
-
-- Get consent before installing software (including tracking scripts) on someone's device
-- Clearly identify your organization
-- Provide an easy way to opt-out
-
-**What this means for cookies:** Marketing and advertising cookies fall under CASL's "software" definition. Read the [official CASL guidance](https://www.ic.gc.ca/eic/site/030.nsf/eng/home).
+CASL regulates commercial electronic messages and, in some cases, installing a computer program. It is not the statute that tells you whether a cookie banner must be opt-in. This product does not send email and has no CASL mode. Use PIPEDA, and Law 25 for Quebec visitors, for the cookie choice. CRTC guidance is on the [CASL site](https://crtc.gc.ca/eng/internet/anti.htm).
 
 ### What Is Quebec's Law 25 and How Is It Different?
 
@@ -127,9 +121,7 @@ Quebec has its own privacy law, Bill 64 (Law 25), which is the **strictest priva
 - Gives individuals the **right to access their personal data** — if someone requests it, you must provide all the data you hold about them within **30 calendar days**
 - Requires a **designated privacy officer** and breach notification
 
-**The right of access is particularly important for websites using cookie banners.** If a Quebec resident asks for their data, you need to be able to pull their consent records, IP addresses, and analytics data into a report and deliver it on time. Failure to respond within 30 days can result in a formal complaint to the [Commission d'accès à l'information (CAI)](https://www.cai.gouv.qc.ca/).
-
-cookie-banner.ca includes a [built-in data access request tool](/blog/law-25-data-access-request-dsar-guide) that handles the entire process: identity verification, report generation, deadline tracking, and audit trail — so you're ready when a request comes in.
+A Quebec access request is a separate job from the banner. The 30-day response is explained in the [Law 25 data access guide](/blog/law-25-data-access-request-dsar-guide). Pro can help produce a report. The banner does not answer the request for you. Complaints go to the [Commission d'accès à l'information (CAI)](https://www.cai.gouv.qc.ca/).
 
 If you have users in Quebec, you need to follow the stricter standard. Learn more about [Quebec's Law 25 requirements](https://www.quebec.ca/en/government/departments-and-agencies/justice/access-to-information-and-privacy).
 
@@ -137,7 +129,7 @@ If you have users in Quebec, you need to follow the stricter standard. Learn mor
 
 ## What Types of Cookies Require Consent in Canada?
 
-Understanding cookie categories is crucial for Canadian compliance. Here's a breakdown of what requires consent and what doesn't:
+The category decides which rule applies. Strictly necessary cookies are disclosed. Analytics depend on the visitor. Marketing needs a clearer yes.
 
 ### Do Strictly Necessary Cookies Require Consent?
 
@@ -166,7 +158,7 @@ Understanding cookie categories is crucial for Canadian compliance. Here's a bre
 
 ### Do Analytics Cookies Require Consent?
 
-**Yes.** These track user behavior and always require explicit consent:
+**It depends on the visitor.** Under PIPEDA, non-sensitive analytics can use implied consent when the notice explains the purpose before the cookie is set. Quebec Law 25 expects express consent before non-essential tracking, including analytics.
 
 **Examples:**
 - Google Analytics (page views, user behavior)
@@ -174,11 +166,11 @@ Understanding cookie categories is crucial for Canadian compliance. Here's a bre
 - Microsoft Clarity (session recordings)
 - Custom analytics (conversion tracking)
 
-**Important:** Even "anonymized" analytics typically require consent under Canadian law. See [Google's guidance on consent mode](https://support.google.com/analytics/answer/9976101).
+**Important:** Calling a cookie "anonymized" does not by itself make it exempt. Session recordings and marketing are not the non-sensitive case. See [Google's guidance on consent mode](https://support.google.com/analytics/answer/9976101).
 
 ### Do Marketing Cookies Require Consent?
 
-**Yes.** These are used for targeting and advertising and always require consent:
+**Yes.** Marketing and advertising cookies need a clearer yes. PIPEDA treats that as more than a notice. Law 25 expects express consent before non-essential tracking.
 
 **Examples:**
 - Google Ads (conversion tracking, remarketing)
@@ -261,7 +253,7 @@ Many websites load Google Analytics or Facebook Pixel immediately, then show a c
 
 **Not recommended.** US websites often have weaker cookie consent requirements. EU banners (GDPR) are closer but still different from Canadian requirements.
 
-**Solution:** Build a banner specifically designed for Canadian compliance.
+**Solution:** Match the banner to the visitor. PIPEDA can use a clear notice for non-sensitive analytics. Quebec and marketing need express consent.
 
 ---
 
@@ -296,8 +288,8 @@ Under Bill 64:
 ### Should I Use a Canadian-Focused Tool?
 
 **Yes, for most businesses.** Look for cookie banner tools that:
-- Are designed for **Canadian compliance** (PIPEDA, CASL, Law 25)
-- Block cookies until consent is given
+- Can be set for PIPEDA meaningful consent, and a stricter choice for Quebec visitors. There is no CASL mode.
+- Can keep scripts you add in the builder off until the visitor opts in. It cannot block cookies that other code sets.
 - Offer granular controls
 - Are easy to customize and brand
 
@@ -339,13 +331,13 @@ If your website targets Canadian users (or you're located in Canada), cookie com
 
 ### Get Started with a Compliant Cookie Banner
 
-Looking for a simple, affordable solution? [Cookie Banner Generator](https://www.cookie-banner.ca) offers unlimited, fully branded cookie banners designed specifically for Canadian compliance.
+[Cookie Banner](https://www.cookie-banner.ca) has a free plan with one banner, and Pro at $99 once or $99 a year. Scripts you add in the builder can stay off until the visitor chooses. The banner cannot block cookies that other code sets. A banner does not make the site compliant.
 
-- ✅ PIPEDA, CASL, and Law 25 compliant
-- ✅ Blocks cookies until consent
-- ✅ Granular user controls
-- ✅ Works on any website (WordPress, Shopify, custom)
-- ✅ First 1,000 accounts are **free forever**
+- Free plan: one banner and a powered-by badge
+- Pro: unlimited banners and branding removal
+- One async script, about 28 KB gzipped
+- Works on WordPress, Shopify, and custom sites
+- A banner does not make the site legally compliant
 
 [Create your free cookie banner →](/free-cookie-banner)
 
@@ -354,18 +346,18 @@ Looking for a simple, affordable solution? [Cookie Banner Generator](https://www
 ## Conclusion / TL;DR
 
 **Key Takeaways:**
-- **Cookie consent is required in Canada** under PIPEDA, CASL, and Quebec's Law 25
-- **Explicit opt-in consent** is required for analytics, marketing, and advertising cookies
-- **Penalties can be severe** — up to $25 million or 4% of revenue under Law 25
-- **A compliant cookie banner** must block cookies until consent, offer granular controls, and make it easy to withdraw consent
-- **Most businesses should use a specialized tool** rather than building their own
+- **Canada has no single cookie statute.** PIPEDA expects meaningful consent. Quebec Law 25 expects express consent before non-essential tracking. CASL is the anti-spam law, not the cookie rule.
+- **Analytics depend on the visitor.** Non-sensitive analytics can use implied consent under PIPEDA when the notice is clear. Quebec visitors need express consent. Marketing needs a clearer yes.
+- **Law 25 fines can be severe** — up to $25 million or 4% of worldwide turnover
+- **A banner records a choice.** It does not make the site compliant, and it cannot block cookies that other code sets.
+- **You still need a notice** that lists the cookies, why they are set, and how to change the choice
 
 **Next Steps:**
-1. Audit your current cookie setup
-2. Choose a Canadian-compliant cookie banner solution
-3. Update your privacy policy with detailed cookie information
-4. Test that cookies only load after user consent
-5. Stay informed about evolving privacy laws
+1. List the cookies the site sets
+2. Write the notice before non-essential cookies run
+3. Use implied consent only for non-sensitive analytics outside Quebec
+4. Use express consent for Quebec visitors and for marketing
+5. Read the current OPC and CAI guidance when the tools change
 
 [Scan your site](/tools/cookie-scanner) to see what cookies you are setting, then [start a free banner](/free-cookie-banner) you can paste in today.
 
@@ -375,7 +367,7 @@ Looking for a simple, affordable solution? [Cookie Banner Generator](https://www
 
 ### Do I need a cookie banner if I only use Google Analytics?
 
-**Yes.** Google Analytics collects personal information (IP addresses, device IDs, browsing behavior) and requires explicit consent under PIPEDA and CASL.
+PIPEDA can allow implied consent for non-sensitive analytics when the notice is clear. Quebec Law 25 expects express consent before non-essential tracking. CASL does not set the cookie rule. A banner does not make the site compliant.
 
 ### What's the difference between PIPEDA and GDPR?
 
@@ -383,14 +375,11 @@ While both require consent for cookies, **GDPR** (Europe) is more prescriptive a
 
 ### Can I use implied consent for cookies?
 
-**No.** Implied consent (continuing to browse = consent) is **not sufficient** for tracking cookies under PIPEDA. You need explicit, opt-in consent.
+For non-sensitive analytics, PIPEDA can allow implied consent if the notice explains the purpose before the cookie is set. Continuing to browse is not enough when the cookie is sensitive, used for marketing, or the visitor is in Quebec. Law 25 expects express consent.
 
 ### Do I need consent for first-party cookies?
 
-It depends on the cookie's purpose:
-- **Session cookies:** No consent required
-- **Preference cookies:** Best practice to get consent
-- **Analytics cookies:** Consent required
+It depends on the purpose. A session cookie that keeps someone logged in does not need consent, but you still disclose it. Non-sensitive analytics can use implied consent under PIPEDA when the notice is clear. Quebec Law 25 expects express consent before non-essential tracking.
 
 ### How often should I update my cookie policy?
 

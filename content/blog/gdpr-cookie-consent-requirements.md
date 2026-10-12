@@ -2,7 +2,7 @@
 title: "GDPR Cookie Consent Requirements: The 6 Rules (2026)"
 description: "Six GDPR cookie rules — freely given, specific, informed, unambiguous, prior, and easy to withdraw — plus a free checklist. Fines can reach €20 million."
 date: "2025-01-17"
-updatedDate: "2026-09-15"
+updatedDate: "2026-10-11"
 heroCta:
   primary:
     label: "Scan your site"
@@ -75,7 +75,7 @@ schema:
       name: "What's the difference between GDPR and CCPA cookie consent?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "GDPR (Europe) requires opt-in consent before setting cookies and applies to all EU visitors. CCPA (California) uses an opt-out model and is less restrictive. GDPR requires granular category-level consent while CCPA focuses on the right to opt out of data selling. If you comply with GDPR, you generally meet CCPA requirements too."
+        text: "GDPR uses opt-in before non-essential cookies. CCPA uses opt-out of sale or share. Meeting the EU rule does not automatically meet CCPA, and the reverse is also not true."
     - "@type": "Question"
       name: "How long can I store GDPR cookie consent?"
       acceptedAnswer:
@@ -99,7 +99,7 @@ schema:
 ---
 
 <div class="direct-answer">
-<strong>What is GDPR cookie consent?</strong> GDPR cookie consent is the legal requirement for websites to obtain explicit, informed permission from visitors before placing non-essential cookies on their devices. Under the General Data Protection Regulation, you must block all analytics, marketing, and tracking cookies until users actively opt in. Consent must be freely given, specific to each cookie category, and easy to withdraw. Non-compliance penalties reach up to 20 million euros or 4% of global annual revenue.
+<strong>What is GDPR cookie consent?</strong> The EU cookie rule is the ePrivacy Directive. GDPR sets the consent standard: explicit, informed permission before non-essential cookies are stored or read. Analytics, marketing, and tracking stay off until the visitor opts in. Consent must be freely given, specific to each cookie category, and easy to withdraw. Fines can reach 20 million euros or 4% of global annual revenue. The <a href="/locations/eu">EU cookie law</a> page covers the directive. The six rules are below.
 
 [Scan your site for cookie compliance issues with our free tool](/tools/cookie-scanner)
 </div>

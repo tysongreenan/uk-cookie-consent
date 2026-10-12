@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Crown, Star, Shield, Map, ArrowRight } from 'lucide-react'
+import { Check, Zap, Crown, Star, Shield, Map, ArrowRight, Clock } from 'lucide-react'
 import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import { useSession } from 'next-auth/react'
@@ -17,7 +17,7 @@ export default function PricingPage() {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Cookie Banner Generator",
-    "description": "Cookie consent banner generator with PIPEDA, Law 25, GDPR & CCPA compliance.",
+    "description": "Cookie banner generator with modes for PIPEDA, Quebec Law 25, GDPR, and CCPA. A banner does not make a site legally compliant. Not a Google-certified CMP.",
     // Google Merchant listings require image and expect brand to be a Brand.
     "image": "https://www.cookie-banner.ca/opengraph-image",
     "brand": { "@type": "Brand", "name": "Cookie-Banner.ca" },
@@ -198,14 +198,13 @@ export default function PricingPage() {
 
               <ul className="space-y-3">
                 {[
-                  'Auto Cookie Categorization',
-                  'A/B Testing for Banners',
-                  'IAB TCF 2.2 Support',
-                  'Google CMP Certification',
+                  'Auto cookie categorization',
+                  'A/B testing for banner copy',
+                  'Google-certified CMP',
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                    <span>{feature}</span>
+                  <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>Not shipped: {feature}</span>
                   </li>
                 ))}
               </ul>
@@ -247,7 +246,7 @@ export default function PricingPage() {
                 'Everything in Pro',
                 'Dedicated Support Contact',
                 'Custom Onboarding & Setup',
-                'SLA & Uptime Guarantee',
+                'Support agreement on request',
                 'Annual Support Agreement',
               ].map((feature, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm">
@@ -275,13 +274,13 @@ export default function PricingPage() {
             <div className="text-center">
               <h3 className="font-semibold mb-2">Multi-Law Compliance</h3>
               <p className="text-sm text-muted-foreground">
-                GDPR, PIPEDA, CCPA, and Quebec Law 25 built in. Automatic geo-targeting on Pro.
+                Modes for GDPR, PIPEDA, CCPA, and Quebec Law 25. Geo-targeting is a Pro setting you configure.
               </p>
             </div>
             <div className="text-center">
-              <h3 className="font-semibold mb-2">Under 10KB</h3>
+              <h3 className="font-semibold mb-2">About 28 KB gzipped</h3>
               <p className="text-sm text-muted-foreground">
-                Our banner script won't slow your site. No impact on page load speed or Core Web Vitals.
+                A standard banner is about 28 KB gzipped and loads from an async script tag. It does not block HTML parsing.
               </p>
             </div>
           </div>

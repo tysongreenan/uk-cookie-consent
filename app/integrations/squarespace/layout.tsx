@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Squarespace Cookie Banner | Code Injection Setup',
   description:
-    'Add cookie consent to Squarespace in under 5 minutes using Code Injection. No developer needed. GDPR, CCPA, and PIPEDA compliant. $99 one-time, under 10KB.',
+    'Add cookie consent to Squarespace in under 5 minutes using Code Injection. No developer needed. GDPR, CCPA, and PIPEDA compliant. $99 one-time, about 28 KB gzipped.',
   keywords: [
     'squarespace cookie banner',
     'squarespace cookie consent',

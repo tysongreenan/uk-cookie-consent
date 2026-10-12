@@ -8,11 +8,11 @@ import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
-  description: 'Verify your cookie banner is working with consent logs, DevTools blocking, and a free 30-second scan. Confirm tracking cookies stay blocked until consent.',
+  description: 'Open the site and confirm scripts you added have not run before a choice, then confirm they run after accept. Consent logs are on Pro Annual and Enterprise. There is no compliance grade.',
   keywords: 'how to verify cookie banner is working, cookie consent verification, check if cookie banner is blocking cookies, cookie banner testing, cookie consent logs, verify cookie compliance',
   openGraph: {
     title: 'How to Verify Your Cookie Banner Is Working (2026 Guide)',
-    description: 'Verify your cookie banner is working with consent logs, DevTools blocking, and a free 30-second scan. Confirm tracking cookies stay blocked until consent.',
+    description: 'Open the site and confirm scripts you added have not run before a choice, then confirm they run after accept. There is no compliance grade.',
     type: 'article',
   },
   alternates: {
@@ -23,31 +23,31 @@ export const metadata: Metadata = {
 const faqData = [
   {
     question: "How can I verify my cookie banner is working?",
-    answer: "You can verify your cookie banner is working by checking consent logs in your dashboard, testing cookie blocking in browser DevTools, reviewing the banner's behavior on your website, and using our built-in compliance verification tools. All verification methods are available in your dashboard."
+    answer: "Open the site in a private window. Confirm scripts you added in the builder have not run before a choice. Accept, then confirm those scripts run. Reject, then confirm they do not. The banner cannot block cookies that other code sets."
   },
   {
     question: "How do I check if cookies are being blocked?",
-    answer: "Open your website in a browser, open DevTools (F12), go to the Application/Storage tab, and check that no tracking cookies are present before clicking 'Accept'. After clicking 'Accept', verify cookies are set. After clicking 'Reject', verify cookies are removed."
+    answer: "Open the site, then DevTools. On the Network tab, confirm scripts you added have not run before a choice. After accept, those requests should run. Cookies set by other code can still appear. The banner does not block those."
   },
   {
     question: "Where can I see consent logs?",
-    answer: "Consent logs are available in your dashboard under the Analytics section. You can see all consent decisions with timestamps, user choices, and anonymized IP addresses. This creates an audit trail for compliance verification."
+    answer: "Consent logs are on Pro Annual and Enterprise. They show the stored choice. The free plan and one-time Pro do not include them. There is no compliance grade."
   },
   {
     question: "What monitoring tools are available?",
-    answer: "Our dashboard includes built-in monitoring tools that check cookie blocking status, consent logging functionality, compliance feature status, and banner behavior. You can also set up email notifications for consent decisions and compliance issues."
+    answer: "There is no continuous monitor and no email alert when consent changes. Check the page yourself, or run the cookie scanner to list cookies a public URL sets. The scanner does not decide compliance."
   },
   {
     question: "How do I test compliance features?",
-    answer: "Use our dashboard's compliance verification tool to automatically test all compliance features. The tool checks cookie blocking, consent logging, granular controls, consent withdrawal, and all privacy law requirements. You'll get a detailed report of any issues."
+    answer: "There is no compliance test and no grade. Test the choice: scripts you added stay off until accept, then run after accept. A banner does not make the site compliant."
   },
   {
     question: "What should I look for in browser DevTools?",
-    answer: "In browser DevTools, check the Application/Storage tab for cookies, the Network tab to see if tracking scripts are blocked, and the Console for any error messages. Before consent, you should see no tracking cookies and blocked tracking scripts."
+    answer: "On the Network tab, scripts you added in the builder should not run before a choice, and should run after accept. Cookies set by other code can still appear in Application or Storage."
   },
   {
     question: "How often should I verify my cookie banner?",
-    answer: "We recommend verifying your cookie banner monthly or whenever you make changes to your website. Our dashboard provides automated compliance checks that run continuously, so you'll be notified of any issues automatically."
+    answer: "Check again when you add a script, change the banner, or ship a site update. Nothing runs a check for you in the background."
   },
   {
     question: "What if my cookie banner isn't working correctly?",
@@ -62,14 +62,14 @@ const breadcrumbData = [
 ]
 
 export default function HowItWorksPage() {
-  const updatedDate = '2026-07-19'
+  const updatedDate = '2026-10-11'
   const publishedDate = '2025-01-15'
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "How Do I Know My Cookie Banner Is Working?",
-    "description": "Verify your cookie banner is working with consent logs, cookie blocking verification, monitoring tools, and compliance testing.",
+    "description": "Open the site and confirm scripts you added have not run before a choice, then confirm they run after accept. Consent logs are on Pro Annual and Enterprise. There is no compliance grade.",
     "author": {
       "@type": "Organization",
       "name": "Cookie Banner Team"
@@ -90,17 +90,17 @@ export default function HowItWorksPage() {
     }
   }
 
-  const directAnswer = "You can verify your cookie banner is working through consent logs in your dashboard, cookie blocking verification in browser DevTools, built-in monitoring tools, and automated compliance testing. Our dashboard provides real-time verification that checks cookie blocking status, consent logging functionality, and all compliance features. You can also manually test by checking that cookies are blocked before consent and set after consent."
+  const directAnswer = "Open the site and confirm scripts you added have not run before a choice, then confirm they run after accept. Consent logs are on Pro Annual and Enterprise and show the stored choice. There is no compliance grade."
 
   const verificationFeatures = [
     {
       title: "Consent Logs",
-      description: "View all consent decisions with timestamps and user choices",
+      description: "Pro Annual and Enterprise show the stored choice",
       className: "col-span-1 lg:col-span-3 border-b lg:border-r border-border",
     },
     {
       title: "Cookie Blocking",
-      description: "Verify cookies are blocked before consent in DevTools",
+      description: "Confirm scripts you added have not run before a choice",
       className: "col-span-1 lg:col-span-3 border-border",
     },
   ]
@@ -143,11 +143,11 @@ export default function HowItWorksPage() {
           features={verificationFeatures}
         />
 
-        <h2 id="how-can-i-verify-cookies-are-being-blocked">How Can I Verify Cookies Are Being Blocked?</h2>
-        
+        <h2 id="how-can-i-verify-cookies-are-being-blocked">How Can I Verify Scripts Stay Off Until a Choice?</h2>
+
         <p>
-          Verifying that cookies are being blocked before consent is the most important compliance check. Here's how to do it:
-                </p>
+          Open the site and confirm scripts you added have not run before a choice, then confirm they run after accept. The banner cannot block cookies that other code sets.
+        </p>
 
                 <h3>Step 1: Open Your Website</h3>
                 <p>
@@ -159,130 +159,38 @@ export default function HowItWorksPage() {
                   Press F12 (or right-click and select "Inspect") to open browser DevTools. Navigate to the "Application" tab (Chrome) or "Storage" tab (Firefox).
                 </p>
 
-                <h3>Step 3: Check Cookies Before Consent</h3>
+                <h3>Step 3: Check Scripts Before a Choice</h3>
                 <p>
-                  Before clicking "Accept" on the cookie banner, check the Cookies section in DevTools. You should see:
+                  Before a choice, look at the Network tab. Scripts you added in the builder should not have run. Cookies set by other code can still appear.
                 </p>
-                <ul>
-                  <li><strong>No tracking cookies:</strong> Cookies from Google Analytics, Facebook Pixel, or other tracking tools should not be present</li>
-                  <li><strong>Only essential cookies:</strong> Only strictly necessary cookies (like session cookies) should be present</li>
-                </ul>
 
-                <h3>Step 4: Accept Cookies and Verify</h3>
+                <h3>Step 4: Accept and Check Again</h3>
                 <p>
-                  Click "Accept" on the cookie banner, then check DevTools again. You should now see:
+                  Accept, then reload the Network tab. The scripts you added should run after that choice.
                 </p>
-                <ul>
-                  <li>Tracking cookies are now present (Google Analytics, Facebook Pixel, etc.)</li>
-                  <li>All cookie categories you accepted are now active</li>
-                </ul>
 
-                <h3>Step 5: Reject Cookies and Verify</h3>
+                <h3>Step 5: Reject and Check Again</h3>
                 <p>
-                  Click "Reject" or change your preferences to reject cookies, then check DevTools again. Tracking cookies should be removed or blocked again.
+                  Reject, or change the choice, and confirm those same scripts do not run. The banner cannot remove cookies that other code already set.
                 </p>
 
                 <h2 id="how-do-i-check-consent-logs-and-records">How Do I Check Consent Logs and Records?</h2>
-                
-                <p>
-                  Consent logs provide an audit trail that demonstrates compliance. Here's how to access and review them:
-                </p>
 
-                <h3>Accessing Consent Logs</h3>
                 <p>
-                  Log in to your dashboard and navigate to the Analytics section. You'll see a "Consent Logs" tab that shows all consent decisions.
+                  Consent logs are on Pro Annual and Enterprise. They show the stored choice. The free plan and one-time Pro do not include them. There is no compliance grade.
                 </p>
-
-                <h3>What Information Is Logged?</h3>
-                <p>
-                  Each consent decision is logged with:
-                </p>
-                <ul>
-                  <li><strong>Timestamp:</strong> Exact date and time of the consent decision</li>
-                  <li><strong>User Choice:</strong> Whether the user accepted, rejected, or selected specific cookie categories</li>
-                  <li><strong>IP Address:</strong> Anonymized IP address for compliance records</li>
-                  <li><strong>User Agent:</strong> Browser and device information</li>
-                  <li><strong>Cookie Categories:</strong> Which specific cookie categories were accepted or rejected</li>
-                </ul>
-
-                <h3>Why Consent Logs Matter</h3>
-                <p>
-                  Consent logs are essential for:
-                </p>
-                <ul>
-                  <li><strong>Compliance audits:</strong> Demonstrating to regulators that you're obtaining proper consent</li>
-                  <li><strong>Dispute resolution:</strong> Proving that users consented to cookie usage</li>
-                  <li><strong>Analytics:</strong> Understanding user consent patterns and preferences</li>
-                </ul>
 
                 <h2 id="what-monitoring-tools-are-available">What Monitoring Tools Are Available?</h2>
-                
-                <p>
-                  Our dashboard includes comprehensive monitoring tools that continuously check your cookie banner's functionality:
-                </p>
 
-                <h3>Real-Time Compliance Monitoring</h3>
                 <p>
-                  The dashboard continuously monitors:
+                  There is no continuous monitor and no email alert when consent changes. Check the page yourself, or run the cookie scanner to list cookies a public URL sets. The scanner does not decide compliance.
                 </p>
-                <ul>
-                  <li><strong>Cookie Blocking Status:</strong> Whether cookies are being blocked before consent</li>
-                  <li><strong>Consent Logging:</strong> Whether consent decisions are being recorded</li>
-                  <li><strong>Banner Display:</strong> Whether the banner is appearing correctly on your website</li>
-                  <li><strong>Compliance Features:</strong> Whether all required privacy law features are enabled</li>
-                </ul>
-
-                <h3>Automated Compliance Checks</h3>
-                <p>
-                  Our system automatically runs compliance checks that verify:
-                </p>
-                <ul>
-                  <li>Cookie blocking is working correctly</li>
-                  <li>Consent logging is functioning</li>
-                  <li>All privacy law requirements are met</li>
-                  <li>Banner text meets legal requirements</li>
-                  <li>Privacy policy links are working</li>
-                </ul>
-
-                <h3>Email Notifications</h3>
-                <p>
-                  You can set up email notifications for:
-                </p>
-                <ul>
-                  <li>Compliance issues or errors</li>
-                  <li>Consent decision summaries (daily or weekly)</li>
-                  <li>Banner configuration changes</li>
-                  <li>New compliance features or updates</li>
-                </ul>
 
                 <h2 id="how-do-i-test-compliance-features">How Do I Test Compliance Features?</h2>
-                
-                <p>
-                  Our dashboard includes a built-in compliance testing tool that automatically verifies all compliance features:
-                </p>
 
-                <h3>Running Compliance Tests</h3>
                 <p>
-                  In your dashboard, navigate to the "Compliance" section and click "Run Compliance Test". The tool will automatically check:
+                  There is no compliance test and no grade. Test the choice: scripts you added stay off until accept, then run after accept. A banner does not make the site compliant.
                 </p>
-                <ul>
-                  <li><strong>Cookie Blocking:</strong> Verifies that cookies are blocked before consent</li>
-                  <li><strong>Consent Logging:</strong> Tests that consent decisions are being recorded</li>
-                  <li><strong>Granular Controls:</strong> Verifies that users can select specific cookie categories</li>
-                  <li><strong>Consent Withdrawal:</strong> Tests that users can change their preferences</li>
-                  <li><strong>Privacy Law Requirements:</strong> Checks that all required features are enabled</li>
-                </ul>
-
-                <h3>Test Results</h3>
-                <p>
-                  After running the test, you'll receive a detailed report showing:
-                </p>
-                <ul>
-                  <li>Which compliance features are working correctly</li>
-                  <li>Any issues or errors that need attention</li>
-                  <li>Recommendations for improving compliance</li>
-                  <li>Specific steps to fix any problems</li>
-                </ul>
 
                 <h2 id="what-should-i-look-for-in-browser-devtools">What Should I Look For in Browser DevTools?</h2>
                 
@@ -295,7 +203,7 @@ export default function HowItWorksPage() {
                   In the Application tab (Chrome) or Storage tab (Firefox), check:
                 </p>
                 <ul>
-                  <li><strong>Cookies:</strong> Before consent, you should see no tracking cookies. After consent, tracking cookies should appear.</li>
+                  <li><strong>Cookies:</strong> Scripts you added should not have set cookies before a choice. Cookies set by other code can still appear.</li>
                   <li><strong>Local Storage:</strong> Consent decisions are stored here. Check that consent preferences are being saved.</li>
                   <li><strong>Session Storage:</strong> Temporary banner state is stored here.</li>
                 </ul>
@@ -305,8 +213,8 @@ export default function HowItWorksPage() {
                   In the Network tab, check:
                 </p>
                 <ul>
-                  <li><strong>Blocked Requests:</strong> Before consent, tracking script requests (Google Analytics, Facebook Pixel) should be blocked</li>
-                  <li><strong>Allowed Requests:</strong> After consent, tracking scripts should load normally</li>
+                  <li><strong>Before a choice:</strong> Scripts you added in the builder should not have run</li>
+                  <li><strong>After accept:</strong> Those same scripts should run</li>
                   <li><strong>Banner Script:</strong> The cookie banner script should load successfully</li>
                 </ul>
 
@@ -316,8 +224,7 @@ export default function HowItWorksPage() {
                 </p>
                 <ul>
                   <li><strong>Error Messages:</strong> Any errors related to the cookie banner</li>
-                  <li><strong>Consent Logs:</strong> Console messages showing consent decisions (if enabled)</li>
-                  <li><strong>Script Loading:</strong> Confirmation that the banner script loaded correctly</li>
+                  <li><strong>Banner script:</strong> The banner script should load. That load is not proof that other cookies were blocked.</li>
                 </ul>
 
                 <h2 id="how-often-should-i-verify-my-cookie-banner">How Often Should I Verify My Cookie Banner?</h2>
@@ -326,31 +233,29 @@ export default function HowItWorksPage() {
                   Regular verification ensures your cookie banner continues to work correctly:
                 </p>
 
-                <h3>Recommended Verification Schedule</h3>
+                <h3>When to Check Again</h3>
                 <ul>
-                  <li><strong>Monthly:</strong> Run a full compliance test at least once per month</li>
-                  <li><strong>After Changes:</strong> Verify whenever you make changes to your website or banner configuration</li>
-                  <li><strong>After Updates:</strong> Check after we release updates to ensure everything still works</li>
-                  <li><strong>Before Audits:</strong> Verify before any compliance audits or reviews</li>
+                  <li><strong>After a new script:</strong> Confirm it stays off until a choice</li>
+                  <li><strong>After a banner change:</strong> Accept and reject once in a private window</li>
+                  <li><strong>After a site update:</strong> Confirm other code did not start setting cookies on its own</li>
                 </ul>
 
-                <h3>Automated Monitoring</h3>
+                <h3>No Background Check</h3>
                 <p>
-                  Our dashboard provides automated monitoring that runs continuously, so you don't need to manually check every day. You'll receive notifications if any issues are detected.
+                  Nothing runs a check for you in the background. Check again when you add a script, change the banner, or ship a site update.
                 </p>
 
                 <h2 id="ready-to-verify-your-banner">Ready to Verify Your Banner?</h2>
                 
                 <p>
-                  Use our comprehensive verification tools to ensure your cookie banner is working correctly:
+                  The check is the choice itself:
                 </p>
 
                 <ul>
-                  <li>✓ Real-time compliance monitoring</li>
-                  <li>✓ Automated compliance testing</li>
-                  <li>✓ Consent logs and audit trails</li>
-                  <li>✓ Browser DevTools testing guides</li>
-                  <li>✓ Email notifications for issues</li>
+                  <li>Scripts you added stay off until a choice</li>
+                  <li>Those scripts run after accept</li>
+                  <li>Consent logs on Pro Annual and Enterprise show the stored choice</li>
+                  <li>There is no compliance grade and no email alert</li>
                 </ul>
 
                 <div className="not-prose my-12 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
@@ -358,7 +263,7 @@ export default function HowItWorksPage() {
                     Not Sure If Your Banner Is Working?
                   </h3>
                   <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-                    Run our free cookie scanner on your website. It checks for tracking cookies, consent issues, and compliance gaps in under 30 seconds — no signup required.
+                    The cookie scanner lists cookies a public page sets. It does not block them and it does not decide compliance.
                   </p>
                   <Link
                     href="/tools/cookie-scanner"
@@ -372,20 +277,18 @@ export default function HowItWorksPage() {
                 
                 <p><strong>Key Takeaways:</strong></p>
                 <ul>
-                  <li><strong>Multiple verification methods:</strong> Use dashboard tools, browser DevTools, consent logs, and automated tests to verify your banner is working.</li>
-                  <li><strong>Cookie blocking verification:</strong> Check that tracking cookies are blocked before consent and set after consent using browser DevTools.</li>
-                  <li><strong>Consent logs:</strong> Review consent logs in your dashboard to see all consent decisions and create an audit trail.</li>
-                  <li><strong>Automated monitoring:</strong> Our dashboard continuously monitors your banner and notifies you of any issues.</li>
-                  <li><strong>Regular testing:</strong> Run compliance tests monthly or after making changes to ensure everything works correctly.</li>
+                  <li><strong>Check the scripts you added.</strong> They should not run before a choice, and they should run after accept.</li>
+                  <li><strong>Other code is separate.</strong> The banner cannot block cookies that other code sets.</li>
+                  <li><strong>Consent logs</strong> are on Pro Annual and Enterprise and show the stored choice. There is no compliance grade.</li>
+                  <li><strong>Check again</strong> when you add a script, change the banner, or ship a site update.</li>
                 </ul>
 
                 <p><strong>Next Steps:</strong></p>
                 <ol>
-                  <li>Log in to your dashboard</li>
-                  <li>Run the compliance verification test</li>
-                  <li>Review consent logs to see user decisions</li>
-                  <li>Test cookie blocking in browser DevTools</li>
-                  <li>Set up email notifications for monitoring</li>
+                  <li>Open the site in a private window</li>
+                  <li>Confirm scripts you added have not run</li>
+                  <li>Accept, and confirm those scripts run</li>
+                  <li>Reject, and confirm they do not</li>
                 </ol>
 
                 <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>

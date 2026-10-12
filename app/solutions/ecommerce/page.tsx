@@ -729,7 +729,7 @@ export default function EcommerceSolutionPage() {
                   <ul className="list-disc list-inside space-y-2 text-gray-600">
                     <li>Monitor consent acceptance rates</li>
                     <li>Track conversion rate impact</li>
-                    <li>A/B test banner variations</li>
+                    <li>Review accept and reject counts on Pro. There is no banner A/B test</li>
                     <li>Optimize for mobile performance</li>
                     <li>Review and update cookie categories</li>
                   </ul>
@@ -823,7 +823,7 @@ export default function EcommerceSolutionPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Join 1,000+ E-commerce Stores Already Protected
+              Paste one script on a store that can edit theme code
             </h2>
             <div className="text-xl text-purple-100 mb-8 space-y-2">
               <div>✓ Maintain conversion rates while staying compliant</div>

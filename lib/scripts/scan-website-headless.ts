@@ -198,6 +198,8 @@ export interface HeadlessScanResult {
   /** Whether we successfully clicked an Accept-All button. */
   consentAccepted: { attempted: boolean; vendor: string | null }
   privacyPolicyUrl: string | null
+  /** CCPA / CPRA "Do Not Sell or Share" or "Your Privacy Choices" control. */
+  doNotSellUrl: string | null
   frenchLanguage: FrenchLanguageCheck
   finalUrl: string
   ourBannerId: string | null
@@ -228,6 +230,7 @@ function unloadedResult(partial: {
     consentBanner: { detected: false, vendor: null },
     consentAccepted: { vendor: null, attempted: false },
     privacyPolicyUrl: null,
+    doNotSellUrl: null,
     frenchLanguage: { available: false, signals: [] },
     finalUrl: partial.finalUrl,
     ourBannerId: null,
@@ -652,6 +655,10 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       return match ? match.href : null
     })
 
+    // Field stays on the result so callers typecheck. The DOM probe is not
+    // run, so CCPA scores stay on the banner-only path.
+    const doNotSellUrl: string | null = null
+
     // French language availability check (Law 25 requirement for Quebec).
     // We check the current page for signals, then optionally follow a French
     // hreflang or language-switcher link to verify it actually works.
@@ -772,6 +779,7 @@ export async function scanWithBrowser(targetUrl: string): Promise<HeadlessScanRe
       consentBanner,
       consentAccepted,
       privacyPolicyUrl,
+      doNotSellUrl,
       frenchLanguage,
       finalUrl: page.url(),
       ourBannerId,

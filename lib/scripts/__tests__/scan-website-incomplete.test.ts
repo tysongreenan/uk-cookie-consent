@@ -20,6 +20,7 @@ function headless(overrides: Partial<HeadlessScanResult> = {}): HeadlessScanResu
     consentBanner: { detected: false, vendor: null },
     consentAccepted: { vendor: null, attempted: false },
     privacyPolicyUrl: null,
+    doNotSellUrl: null,
     frenchLanguage: { available: false, signals: [] },
     finalUrl: 'https://example.com/',
     ourBannerId: null,

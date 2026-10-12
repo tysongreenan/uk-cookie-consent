@@ -59,7 +59,7 @@ export default function TermsPage() {
                 </p>
                 <ul className="list-disc list-inside text-gray-600 mb-4 space-y-2">
                   <li>Cookie banner generation tools and templates</li>
-                  <li>GDPR, PIPEDA, CASL, and Quebec Law 25 compliance guidance</li>
+                  <li>Consent modes for Canada, the EU, and California. Not legal advice, and not a CASL email tool</li>
                   <li>Account management and banner storage</li>
                   <li>Code generation and customization tools</li>
                 </ul>
@@ -128,8 +128,8 @@ export default function TermsPage() {
                   By using our services, you agree to the collection and use of information in accordance with that policy.
                 </p>
                 <p className="text-gray-600">
-                  We are committed to helping you comply with privacy laws, but you are ultimately responsible for ensuring 
-                  your website's compliance with applicable regulations.
+                  We are committed to helping you set a consent banner, but you are responsible for your own legal compliance.
+                  Pro plans include a 30-day money-back guarantee: email support@cookie-banner.ca within 30 days of the charge for a refund of that charge.
                 </p>
               </section>
 

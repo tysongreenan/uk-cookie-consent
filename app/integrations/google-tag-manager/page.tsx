@@ -160,7 +160,7 @@ export default function GTMIntegrationPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Set up GTM cookie consent with Consent Mode V2 in under 5 minutes. Control exactly which tags fire based on user consent. Under 10KB, async loading, $99 one-time.
+                  Set up GTM cookie consent with Consent Mode V2 in under 5 minutes. Control exactly which tags fire based on user consent. About 28 KB gzipped, async loading, $99 one-time.
                 </p>
               </motion.div>
 
@@ -430,12 +430,12 @@ export default function GTMIntegrationPage() {
                 {
                   icon: Shield,
                   title: 'GDPR + CCPA Compliant',
-                  desc: 'Automatic compliance with GDPR (EU), CCPA (California), PIPEDA (Canada), and LGPD (Brazil). The banner adjusts opt-in vs. opt-out behavior by region.',
+                  desc: 'Modes for Canada, the EU, and California. Pro can show a different mode to a country you pick. There is no Brazil mode. Not a Google-certified CMP.',
                 },
                 {
                   icon: Globe,
-                  title: 'Under 10KB, Async',
-                  desc: 'Our script is under 10KB gzipped and loads asynchronously. Zero impact on your Core Web Vitals. No CLS, no render blocking, no performance penalty.',
+                  title: 'About 28 KB gzipped, Async',
+                  desc: 'About 28 KB gzipped. One async script tag, so it does not block HTML parsing. That is not a Core Web Vitals or ranking promise.',
                 },
               ].map((item, i) => {
                 const ItemIcon = item.icon
@@ -672,7 +672,7 @@ window.dataLayer.push({
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                Build your cookie banner in the visual builder, deploy via GTM or a script tag, and your site has full Consent Mode V2 compliance. Under 10KB, async loading, works with every GTM setup.
+                Build your cookie banner in the visual builder, deploy via GTM or a script tag, and your site has full Consent Mode V2 compliance. About 28 KB gzipped, async loading, works with every GTM setup.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

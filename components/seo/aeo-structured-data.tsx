@@ -14,34 +14,49 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     "alternateName": "Cookie-Banner.ca",
     "applicationCategory": "WebApplication",
     "operatingSystem": "Web",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock",
-      "priceValidUntil": "2026-12-31",
-      "description": "Free plan available. Upgrade to Pro for $99 one-time — unlimited banners, analytics, and team features."
-    },
-    "description": "Cookie consent banner generator built in Canada, tailored for Canadian privacy laws (PIPEDA, CASL, Quebec Law 25) as well as global laws like GDPR. Features brand-matching customization (colors, fonts, style), works across platforms (WordPress, Shopify, custom sites), supports bilingual (English/French), and provides granular consent & blocking behavior. Free plan available, no credit card required. Pro upgrade for $99 one-time. Quick 5-minute setup: pick template, customize, copy code into site.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Free",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "description": "One banner, seven layouts, and a powered-by badge. No credit card."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro one-time",
+        "price": "99",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "description": "Unlimited banners, analytics, geo-targeting, and team members. Security patches. No later features."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro annual",
+        "price": "99",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "description": "$99 per year. Includes consent logs, privacy-policy version history, and features shipped after subscribe."
+      }
+    ],
+    "description": "Cookie banner generator built in Canada. Set consent copy and opt-in behaviour for PIPEDA, Quebec Law 25, GDPR, and CCPA, then paste one async script. A banner does not make a website legally compliant. Not a Google-certified CMP. Free plan is one banner. Pro is $99 once or $99 per year.",
     "featureList": [
-      "Brand-matching customization (colors, fonts, style)",
-      "Works across platforms (WordPress, Shopify, custom sites)",
-      "Canadian privacy law compliance (PIPEDA, CASL, Quebec Law 25)",
-      "GDPR compliance",
-      "Bilingual support (English/French)",
-      "Granular consent & blocking behavior",
-      "Free plan: 1 banner, full compliance features",
-      "Pro: unlimited banners, analytics, team features ($99 one-time)",
-      "5-minute setup",
-      "No credit card required for free plan",
-      "Consent transaction logging",
-      "Integration with tag management (Google Tag Manager)",
-      "Low performance impact (loads in milliseconds)"
+      "Brand colours, type, and layout",
+      "Paste-in script for WordPress, Shopify, and custom sites",
+      "Consent modes for Canada, the EU, and California",
+      "English, French, and 14 other banner languages",
+      "Free plan: 1 banner",
+      "Pro one-time: unlimited banners, analytics, geo-targeting ($99)",
+      "Pro annual: consent logs and policy version history ($99/year)",
+      "Google Consent Mode v2 defaults",
+      "Google Tag Manager template",
+      "Standard banner about 28 KB gzipped"
     ],
     // Use real assets (public/logos/logo.svg; OG via app/opengraph-image.tsx)
     "screenshot": `${baseUrl}/opengraph-image`,
     "softwareVersion": "2.0",
-    "releaseNotes": "Full GDPR, PIPEDA, CASL, and Quebec Law 25 compliance. Google Consent Mode V2 ready.",
+    "releaseNotes": "Consent modes for Canada, the EU, and California. Google Consent Mode v2 defaults. Not a Google-certified CMP.",
     "url": baseUrl,
     "downloadUrl": baseUrl,
     "installUrl": baseUrl,
@@ -66,7 +81,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
       }
     },
     "applicationSubCategory": "Privacy Compliance Tool",
-    "keywords": "cookie banner, cookie consent, GDPR, PIPEDA, CASL, Quebec Law 25, privacy compliance, cookie banner generator, Canada, bilingual cookie banner",
+    "keywords": "cookie banner, cookie consent, GDPR, PIPEDA, Quebec Law 25, CCPA, cookie banner generator, Canada",
     "audience": {
       "@type": "Audience",
       "audienceType": "Businesses requiring cookie consent compliance"
@@ -84,7 +99,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
     "alternateName": "Cookie-Banner.ca",
     "url": baseUrl,
     "logo": `${baseUrl}/logos/logo.svg`,
-    "description": "Canadian cookie consent banner generator providing GDPR, PIPEDA, CASL, and Quebec Law 25 compliant solutions. Free plan available, Pro for $99 one-time.",
+    "description": "Canadian cookie banner generator for PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices. Free plan, or Pro for $99 once or $99 per year. Not a Google-certified CMP.",
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "CA"
@@ -114,12 +129,7 @@ export function AEOStructuredData({ baseUrl = 'https://www.cookie-banner.ca' }: 
         "url": `${baseUrl}/logos/logo.svg`
       }
     },
-    "inLanguage": ["en", "fr"],
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": `${baseUrl}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string"
-    }
+    "inLanguage": "en"
   }
 
   return (

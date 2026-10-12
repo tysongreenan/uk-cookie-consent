@@ -74,7 +74,7 @@ schema:
 ---
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> CCPA cookie compliance requires websites to give California consumers the right to opt out of the sale or sharing of personal information collected through cookies and tracking technologies. Unlike GDPR, the CCPA uses an opt-out model — you can set cookies by default but must provide a "Do Not Sell or Share My Personal Information" link. The CPRA, which amended the CCPA in January 2023, expanded these requirements to cover data "sharing" for cross-context behavioral advertising, not just data "selling." Violations carry fines of up to $7,500 per incident.
+<strong>Direct Answer:</strong> CCPA cookie compliance means an opt-out of sale or share, plus a Do Not Sell or Share link. It is not the EU opt-in. The CPRA expanded this to sharing for cross-context advertising. Fines can reach $7,500 per violation. Whether you need a banner is answered on the <a href="/compliance/ccpa">CCPA cookie compliance page</a>.
 </div>
 
 <div class="article-cta">

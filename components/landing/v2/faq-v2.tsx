@@ -10,12 +10,12 @@ const FAQ_DATA = [
   {
     question: 'Do I need a cookie banner in Canada?',
     answer:
-      'Yes. Under PIPEDA and CASL, Canadian websites must disclose and gain consent for tracking cookies — just like under GDPR. If you collect any personal information through cookies or track user behavior, you need to inform visitors and get their consent first.',
+      'If cookies or similar tools collect personal information, PIPEDA expects meaningful consent, and Quebec Law 25 expects express consent before non-essential tracking. CASL is Canada’s anti-spam law. It does not require a cookie banner, and this product does not send email or make a site CASL-compliant.',
   },
   {
     question: 'Is this tool compliant with GDPR?',
     answer:
-      'Yes. Our cookie banner generator supports proper cookie consent, opt-in logic, and legal language that meets GDPR standards. You can customize the banner to include all required elements like granular consent options, easy opt-out, and clear cookie descriptions.',
+      'The banner can show equal accept and reject buttons, keep scripts you add turned off until someone opts in, and remember that choice. That is the pattern GDPR sites usually need for cookies. It does not audit your vendors, sign a DPA, or make the rest of the site compliant.',
   },
   {
     question: "Will it match my site's design?",
@@ -30,22 +30,22 @@ const FAQ_DATA = [
   {
     question: "What's the difference between Pro One-Time and Pro Annual?",
     answer:
-      "One-Time freezes today's feature set forever — you'll get security patches but no new features. Annual gets every future feature we ship (consent logs, A/B testing, IAB TCF 2.2, the policy generator, anything new). If you want to set-and-forget, pick One-Time. If you want it to keep getting better, pick Annual.",
+      'One-time Pro keeps the Pro features shipping today, plus security patches. It does not include later features. Annual includes consent logs, privacy-policy version history, and features we ship after you subscribe. Neither plan is a Google-certified CMP.',
   },
   {
     question: 'Does it support Quebec Law 25 (bilingual)?',
     answer:
-      'Yes. Full bilingual EN/FR with automatic locale detection, plus 14 other languages. Law 25-specific consent expiry and granular preferences are wired in by default for the QC framework.',
+      'You can write the banner in English and French, and the visitor’s browser language can pick among 16 languages. Quebec geo-targeting, which forces a stricter opt-in for visitors in Quebec, is a Pro feature. French text and a reject button do not, by themselves, satisfy Law 25.',
   },
   {
     question: 'What about PIPEDA, CASL, GDPR, and CCPA?',
     answer:
-      'All four are first-class frameworks. Switch the banner\'s compliance mode and we rewrite the legal copy, set the right consent expiry, and adjust opt-in/opt-out behaviour: Canada (PIPEDA federal + CASL anti-spam + Quebec Law 25), EU (GDPR), US (CCPA, California). Most other jurisdictions are covered by adapting one of these.',
+      'The builder has modes for Canada, the EU, and California, plus a custom mode. Those modes change the default copy and whether the banner waits for opt-in. CASL is not a mode. Google Consent Mode v2 can start denied until the visitor chooses. We are not a Google-certified CMP.',
   },
   {
     question: 'Will it slow down my site?',
     answer:
-      'No. The script is under 10 KB, loads asynchronously, and won\'t affect Core Web Vitals or LCP. Tracking scripts (Google Analytics, pixels) are blocked by default and only load after consent.',
+      'The install is one async script tag, so it does not block HTML parsing. A standard banner is about 28 KB gzipped. Scripts you add as analytics or marketing stay off until the visitor opts in. That is not a promise that Core Web Vitals stay the same.',
   },
   {
     question: 'Can I manage my tracking scripts through the banner?',
@@ -55,22 +55,22 @@ const FAQ_DATA = [
   {
     question: 'Does the tool block non-essential cookies until consent is given?',
     answer:
-      'Yes. According to Canadian standards and GDPR requirements, our cookie banner automatically blocks all non-essential cookies (analytics, marketing, preferences) until users provide explicit opt-in consent.',
+      'Scripts you add in the builder stay off until the visitor opts in to that category. The banner cannot see or block cookies set by other code you did not add.',
   },
   {
     question: 'Does the tool provide audit / records of consent?',
     answer:
-      'Yes. Our tool provides consent transaction logging and records. You can access consent logs through our dashboard for compliance purposes and internal auditing.',
+      'Consent logs and data-access exports are on Pro Annual and Enterprise. The free plan and the one-time Pro plan do not include that archive.',
   },
   {
     question: 'Does it integrate with Google Tag Manager?',
     answer:
-      'Yes. The banner integrates smoothly with Google Tag Manager, custom scripts, and other tag management systems. Non-essential tags are automatically gated by consent.',
+      'There is a Google Tag Manager template, and Consent Mode can start denied. Tags you already installed without a consent check still fire. The banner does not edit an existing container for you.',
   },
   {
     question: 'Can I use it on multiple websites?',
     answer:
-      'Yes — unlike other tools, we give you unlimited banners. No domain limits. No per-site fees. Create as many custom cookie banners as you need.',
+      'The free plan includes one banner, and you can paste that snippet on the sites you run. Pro removes the one-banner limit and does not charge per domain.',
   },
   {
     question: 'Do you offer support?',
@@ -109,8 +109,8 @@ export function FaqV2() {
                 className="text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
               >
                 hi@cookie-banner.ca
-              </Link>{' '}
-              — we reply same-day.
+              </Link>
+              . We read every note. We do not promise a same-day reply.
             </p>
           </div>
 

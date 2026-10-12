@@ -58,7 +58,7 @@ const faqData = [
   },
   {
     question: "What is the performance impact of the banner script?",
-    answer: "The banner script has zero performance impact. It's optimized to load in milliseconds and doesn't affect Core Web Vitals or page speed. The lightweight code (under 10KB) ensures fast loading without impacting your site's performance."
+    answer: "The banner script loads asynchronously. It's optimized to load in milliseconds and doesn't affect Core Web Vitals or page speed. The lightweight code (about 28 KB gzipped) ensures fast loading without impacting your site's performance."
   },
   {
     question: "Does it support bilingual (English/French) for Quebec Law 25?",
@@ -241,7 +241,7 @@ export function CookieBannerFAQ() {
           </AccordionTrigger>
           <AccordionContent className="text-base text-muted-foreground">
             <p className="leading-relaxed">
-              The banner script has zero performance impact. It&apos;s optimized to load in milliseconds and doesn&apos;t affect Core Web Vitals or page speed. The lightweight code (under 10KB) ensures fast loading without impacting your site&apos;s performance.
+              The banner script loads asynchronously. It&apos;s optimized to load in milliseconds and doesn&apos;t affect Core Web Vitals or page speed. The lightweight code (about 28 KB gzipped) ensures fast loading without impacting your site&apos;s performance.
             </p>
           </AccordionContent>
         </AccordionItem>

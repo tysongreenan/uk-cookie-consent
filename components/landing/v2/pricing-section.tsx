@@ -46,7 +46,7 @@ const CARDS: PriceCard[] = [
       { text: 'Hosted privacy policies + custom URL' },
       { text: 'Consent analytics' },
       { text: 'Geo-targeting' },
-      { text: 'Team seats (up to 5)' },
+      { text: 'Unlimited team members' },
       { text: 'Security patches forever' },
     ],
     ctaLabel: 'Buy once · $99',
@@ -62,11 +62,8 @@ const CARDS: PriceCard[] = [
       { text: 'Everything in Pro', emphasized: true },
       { text: 'Consent logs (audit trail)' },
       { text: 'Privacy policy version history' },
-      { text: 'Auto categorization (AI)' },
-      { text: 'A/B testing on banners' },
-      { text: 'IAB TCF 2.2' },
-      { text: 'Google CMP certified' },
       { text: 'Every future feature' },
+      { text: 'Not a Google-certified CMP', muted: true },
     ],
     ctaLabel: 'Get Pro Annual',
     ctaHref: '/pricing',
@@ -76,14 +73,12 @@ const CARDS: PriceCard[] = [
   {
     tier: 'Enterprise',
     price: 'Custom',
-    desc: 'For agencies & teams managing 100+ domains, with SSO & an SLA.',
+    desc: 'For teams that want a named contact and help getting set up.',
     features: [
       { text: 'Everything in Pro Annual' },
-      { text: 'SSO (SAML / OIDC)' },
-      { text: 'Dedicated support' },
-      { text: 'Custom DPA & SLA' },
-      { text: 'White-label option' },
-      { text: 'Onboarding assistance' },
+      { text: 'Dedicated support contact' },
+      { text: 'Help with onboarding' },
+      { text: 'Support agreement on request' },
     ],
     ctaLabel: 'Talk to sales',
     ctaHref: '/contact',
@@ -98,7 +93,7 @@ export function PricingSection() {
         <SectionHead
           eyebrow="Pricing"
           title={<>Free forever.<br />Pro is $99 — your call how.</>}
-          lede="Pick once. No seats, no per-domain math, no enterprise sales unless you actually need it."
+          lede="No per-domain fees. Free is one banner. Pro removes that limit and includes team members."
         />
 
         <div className="grid grid-cols-1 items-stretch gap-5 overflow-visible pt-4 md:grid-cols-2 lg:grid-cols-4">
@@ -112,7 +107,7 @@ export function PricingSection() {
           <strong className="font-semibold text-foreground">
             PIPEDA, Law 25, GDPR &amp; CCPA
           </strong>{' '}
-          compliance. 30-day money-back guarantee on Pro plans. All prices in US dollars (USD).{' '}
+          consent choices. A banner does not make a site legally compliant by itself. 30-day money-back guarantee on Pro. Prices in USD. HST may apply.{' '}
           <Link href="/roadmap" className="font-medium text-primary underline-offset-2 hover:underline">
             See the product roadmap
           </Link>

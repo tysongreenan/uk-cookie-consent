@@ -59,7 +59,7 @@ const faqData = [
   },
   {
     question: "Why not use a cookie consent app from the Wix App Market?",
-    answer: "Most Wix App Market cookie consent apps charge $5-15 per month and add heavy scripts that slow down your site. Our solution costs $99 one-time with no recurring fees. The script is under 10KB and loads from a global CDN. You also get full customization control that marketplace apps restrict behind premium tiers."
+    answer: "Most Wix App Market cookie consent apps charge $5-15 per month and add heavy scripts that slow down your site. Our solution costs $99 one-time with no recurring fees. The script is about 28 KB gzipped and loads from a global CDN. You also get full customization control that marketplace apps restrict behind premium tiers."
   },
   {
     question: "Is this Wix cookie banner GDPR and PIPEDA compliant?",
@@ -92,7 +92,7 @@ const features = [
   },
   {
     icon: Zap,
-    title: 'Under 10KB, Async Loading',
+    title: 'About 28 KB gzipped, Async Loading',
     description: 'Loads from a global CDN without blocking your page. No performance hit. Your Wix site stays fast on every device.',
   },
   {
@@ -165,7 +165,7 @@ export default function WixIntegrationPage() {
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
                   Wix App Market cookie apps charge monthly and slow down your site. Add a GDPR-compliant cookie banner
-                  with 1 script tag instead — under 10KB, $99 one-time, works with every Wix template.
+                  with 1 script tag instead — about 28 KB gzipped, $99 one-time, works with every Wix template.
                 </p>
               </motion.div>
 
@@ -225,7 +225,7 @@ export default function WixIntegrationPage() {
                   The Wix App Market offers cookie consent apps, but most charge $5-15 per month and inject large scripts that slow your site down. That monthly fee adds up: $60-180 per year, every year, for a problem you can solve once.
                 </p>
                 <p>
-                  Our approach: <strong className="text-foreground">paste 1 script tag via Wix custom code or HTML embed, pay $99 once, and never think about it again.</strong> Under 10KB. No App Market dependency.
+                  Our approach: <strong className="text-foreground">paste 1 script tag via Wix custom code or HTML embed, pay $99 once, and never think about it again.</strong> About 28 KB gzipped. No App Market dependency.
                 </p>
               </motion.div>
             </div>

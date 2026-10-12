@@ -23,7 +23,7 @@ const locations = [
     path: '/locations/canada',
     description: 'PIPEDA compliance for Canadian businesses',
     icon: MapPin,
-    requirements: ['PIPEDA', 'CASL', 'Provincial laws'],
+    requirements: ['PIPEDA', 'Quebec Law 25', 'No CASL mode'],
     color: 'text-red-600',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200'

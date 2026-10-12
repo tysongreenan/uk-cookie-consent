@@ -52,7 +52,7 @@ const cardVariants = {
 const faqData = [
   {
     question: "What is the best free CookieYes alternative in 2026?",
-    answer: "Cookie-Banner.ca is a strong free CookieYes alternative. The free plan includes 1 cookie banner, 4 layouts, GDPR and CCPA compliance, Google Consent Mode v2 support, and unlimited pages. The free plan includes \"Powered by\" branding. For unlimited banners, 11 layouts, analytics, and branding removal, the Pro plan is a one-time $99 payment."
+    answer: "Cookie-Banner.ca is a strong free CookieYes alternative. The free plan includes 1 cookie banner, 7 layouts, GDPR and CCPA compliance, Google Consent Mode v2 support, and unlimited pages. The free plan includes \"Powered by\" branding. For unlimited banners, 14 layouts, analytics, and branding removal, the Pro plan is a one-time $99 payment."
   },
   {
     question: "How much does CookieYes cost per year?",
@@ -60,15 +60,15 @@ const faqData = [
   },
   {
     question: "Is CookieYes really free?",
-    answer: "CookieYes offers a limited free tier for websites with fewer than 100 pages and a single domain. It includes basic banner customization and limited compliance features. For any growing website, you will need a paid plan. Cookie-Banner.ca offers a free plan with unlimited pages -- though it includes \"Powered by\" branding. The Pro plan ($99 one-time) removes branding and adds unlimited banners, 11 layouts, analytics, and team features."
+    answer: "CookieYes offers a limited free tier for websites with fewer than 100 pages and a single domain. It includes basic banner customization and limited compliance features. For any growing website, you will need a paid plan. Cookie-Banner.ca offers a free plan with unlimited pages -- though it includes \"Powered by\" branding. The Pro plan ($99 one-time) removes branding and adds unlimited banners, 14 layouts, analytics, and team features."
   },
   {
     question: "How do I migrate from CookieYes to Cookie-Banner.ca?",
-    answer: "Migrating from CookieYes takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the CookieYes script tag with our lightweight embed code (under 10KB), 4) Remove the old CookieYes script. No data migration is needed -- visitors will simply see your new banner."
+    answer: "Migrating from CookieYes takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the CookieYes script tag with our lightweight embed code (about 28 KB gzipped), 4) Remove the old CookieYes script. No data migration is needed -- visitors will simply see your new banner."
   },
   {
     question: "Does CookieYes work with Shopify?",
-    answer: "Yes, CookieYes offers Shopify integration through a script embed. However, the CookieYes script is heavier than lightweight alternatives, which can impact your store's loading speed and conversion rates. Cookie-Banner.ca also works with Shopify with a script under 10KB that loads asynchronously, and setup takes under 5 minutes."
+    answer: "Yes, CookieYes offers Shopify integration through a script embed. However, the CookieYes script is heavier than lightweight alternatives, which can impact your store's loading speed and conversion rates. Cookie-Banner.ca also works with Shopify with a script about 28 KB gzipped that loads asynchronously, and setup takes under 5 minutes."
   },
   {
     question: "CookieYes vs Cookiebot: which is cheaper?",
@@ -80,7 +80,7 @@ const faqData = [
   },
   {
     question: "Can I customize the CookieYes banner design?",
-    answer: "CookieYes offers basic banner customization -- you can change colors, text, and choose from a few layout options. However, advanced customization is limited to higher-priced plans. Cookie-Banner.ca offers 4 layouts on the free plan and 11 layouts on Pro, with a full visual builder that lets you customize colors, fonts, positioning, and text in real time."
+    answer: "CookieYes offers basic banner customization -- you can change colors, text, and choose from a few layout options. However, advanced customization is limited to higher-priced plans. Cookie-Banner.ca offers 7 layouts on the free plan and 14 layouts on Pro, with a full visual builder that lets you customize colors, fonts, positioning, and text in real time."
   },
   {
     question: "Is CookieYes GDPR and PIPEDA compliant?",
@@ -158,7 +158,7 @@ export default function CookieYesAlternativePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Stop paying $10/month for CookieYes. Cookie-Banner.ca offers a free plan with unlimited pages and GDPR compliance, or go Pro for a one-time $99 payment. Lightweight script under 10KB. No subscriptions, ever.
+                  Stop paying $10/month for CookieYes. Cookie-Banner.ca offers a free plan with unlimited pages and GDPR compliance, or go Pro for a one-time $99 payment. Lightweight script about 28 KB gzipped. Pro is $99 once, or $99 per year.
                 </p>
               </motion.div>
 
@@ -364,7 +364,7 @@ export default function CookieYesAlternativePage() {
               </div>
 
               <p className="text-sm text-muted-foreground text-center">
-                The free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
+                The free plan includes 1 banner, 7 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
               </p>
             </div>
           </div>
@@ -417,7 +417,7 @@ export default function CookieYesAlternativePage() {
                     { feature: "No Monthly Subscription", cookieyes: false, ours: "$99 one-time Pro" },
                     { feature: "Banner Layouts", cookieyes: "3-4 options", ours: "4 free / 11 Pro" },
                     { feature: "Visual Banner Builder", cookieyes: "Basic", ours: "Full builder + live preview" },
-                    { feature: "Script Size", cookieyes: "~40KB+", ours: "Under 10KB" },
+                    { feature: "Script Size", cookieyes: "~40KB+", ours: "About 28 KB gzipped" },
                     { feature: "Async Loading", cookieyes: false, ours: true },
                     { feature: "Consent Analytics", cookieyes: "Paid only", ours: "Pro" },
                     { feature: "Multi-Language Support", cookieyes: "30+", ours: "20+ (10 auto-translate)" },
@@ -447,7 +447,7 @@ export default function CookieYesAlternativePage() {
             </motion.div>
 
             <p className="text-sm text-muted-foreground text-center max-w-4xl mx-auto">
-              Feature data as of April 2026. &quot;Pro&quot; features require the $99 one-time Cookie-Banner.ca Pro plan. Free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. Check each provider&apos;s website for the latest pricing.
+              Feature data as of April 2026. &quot;Pro&quot; features require the $99 one-time Cookie-Banner.ca Pro plan. Free plan includes 1 banner, 7 layouts, and &quot;Powered by&quot; branding. Check each provider&apos;s website for the latest pricing.
             </p>
           </div>
         </section>
@@ -582,7 +582,7 @@ export default function CookieYesAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Script Performance</h3>
                 <p>
-                  CookieYes&apos;s script bundle weighs approximately 40KB+ and can delay page rendering on slower connections. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning it never blocks your page from rendering. For websites where Core Web Vitals matter -- especially ecommerce and ad-supported sites -- this difference can directly affect Google rankings.
+                  Cookie-Banner.ca&apos;s script is <strong className="text-foreground">about 28 KB gzipped</strong> and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals or ranking promise. We have not published a measurement of CookieYes&apos;s script.
                 </p>
 
                 <h3 className="font-heading text-foreground">Canada-Specific Compliance</h3>
@@ -592,7 +592,7 @@ export default function CookieYesAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Auto-Translation</h3>
                 <p>
-                  Cookie-Banner.ca includes <strong className="text-foreground">10-language auto-translate</strong> on Pro, meaning your cookie banner automatically displays in your visitor&apos;s language. CookieYes supports multiple languages but requires manual translation setup on most plans.
+                  Cookie-Banner.ca includes <strong className="text-foreground">16 languages</strong> on Pro, meaning your cookie banner automatically displays in your visitor&apos;s language. CookieYes supports multiple languages but requires manual translation setup on most plans.
                 </p>
               </motion.div>
 
@@ -637,10 +637,10 @@ export default function CookieYesAlternativePage() {
                       {[
                         'Free forever, or $99 one-time Pro',
                         'Unlimited pages on every plan',
-                        'Under 10KB, async loading',
+                        'About 28 KB gzipped, async loading',
                         'Native PIPEDA + Law 25 compliance',
-                        '11 layouts with visual builder (Pro)',
-                        '10-language auto-translate (Pro)',
+                        '14 layouts with visual builder (Pro)',
+                        '16 languages (Pro)',
                       ].map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
@@ -688,7 +688,7 @@ export default function CookieYesAlternativePage() {
                   What Makes Cookie-Banner.ca a Good CookieYes Alternative?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  A closer look at what 1,000+ websites get when they switch
+                  A closer look at what you get when you switch
                 </p>
               </motion.div>
 
@@ -697,17 +697,17 @@ export default function CookieYesAlternativePage() {
                   {
                     icon: DollarSign,
                     title: 'Free Plan + $99 Pro',
-                    desc: 'The free plan includes 1 banner, 4 layouts, GDPR/CCPA compliance, and unlimited pages with "Powered by" branding. Pro ($99 one-time) removes branding and adds unlimited banners, 11 layouts, analytics, and team features.',
+                    desc: 'The free plan includes 1 banner, 7 layouts, GDPR/CCPA compliance, and unlimited pages with "Powered by" branding. Pro ($99 one-time) removes branding and adds unlimited banners, 14 layouts, analytics, and team features.',
                   },
                   {
                     icon: Zap,
-                    title: 'Lightweight Script (Under 10KB)',
-                    desc: 'Our script is under 10KB and loads asynchronously. CookieYes loads 40KB+ that can block rendering. Lighter scripts mean better Core Web Vitals and higher Google rankings.',
+                    title: 'Lightweight Script (About 28 KB gzipped)',
+                    desc: 'Our script is about 28 KB gzipped and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals or ranking promise. We have not published a measurement of CookieYes.',
                   },
                   {
                     icon: Shield,
                     title: 'Complete Compliance',
-                    desc: 'Full GDPR, CCPA/CPRA, PIPEDA, and Law 25 compliance. Google Consent Mode v2 and IAB TCF 2.2 support built in -- even on the free plan.',
+                    desc: 'Modes for GDPR, CCPA, PIPEDA, and a Pro geo rule for Quebec Law 25. Google Consent Mode v2 can start denied. An IAB TCF v2.2 toggle exists on Pro, not on the free plan. Not a Google-certified CMP.',
                   },
                   {
                     icon: Rocket,
@@ -722,7 +722,7 @@ export default function CookieYesAlternativePage() {
                   {
                     icon: Users,
                     title: 'Analytics & Team (Pro)',
-                    desc: 'Pro plan includes consent rate analytics, A/B testing insights, and unlimited team members with role-based permissions.',
+                    desc: 'Pro includes consent analytics and team roles (owner, admin, editor, viewer). There is no banner A/B test. Consent logs are on Pro Annual and Enterprise.',
                   },
                 ].map((item, i) => {
                   const Icon = item.icon
@@ -789,7 +789,7 @@ export default function CookieYesAlternativePage() {
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">03</span>
-                    <span><strong className="text-foreground">Replace the script</strong> -- remove CookieYes&apos;s script tag and paste our lightweight embed code (under 10KB)</span>
+                    <span><strong className="text-foreground">Replace the script</strong> -- remove CookieYes&apos;s script tag and paste our lightweight embed code (about 28 KB gzipped)</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">04</span>

@@ -73,15 +73,15 @@ const ROWS: { label: string; cells: [Cell, Cell, Cell, Cell] }[] = [
 ]
 
 const DIFFERENT_LEFT = [
-  ['PIPEDA, CASL, Law 25.', 'Included.'],
+  ['PIPEDA and Law 25.', 'Copy and opt-in controls.'],
   ['English and French.', 'Plus 14 languages.'],
   ['WordPress, Shopify, and more.', 'Webflow, Squarespace, Wix.'],
 ] as const
 
 const DIFFERENT_RIGHT = [
-  ['About 9 KB.', 'Loads in the background.'],
-  ['Same-day support.', 'Free and Pro.'],
-  ['Consent records.', 'Download anytime.'],
+  ['About 28 KB gzipped.', 'One async script tag.'],
+  ['Email support.', 'Free and Pro.'],
+  ['Consent logs.', 'Pro Annual.'],
 ] as const
 
 export function ComparisonSection() {

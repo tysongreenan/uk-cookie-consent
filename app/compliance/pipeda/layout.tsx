@@ -3,15 +3,15 @@ import { Metadata } from 'next'
 // Intentionally NOT targeting "is cookie consent required in Canada" — that
 // query belongs to /blog/cookie-consent-canada-guide-2026 (SEO pillar).
 export const metadata: Metadata = {
-  title: 'PIPEDA Cookie Banner for Canadian Websites | Free & Compliant',
+  title: 'What Does PIPEDA Require for Cookies?',
   description:
-    'Install a PIPEDA-ready cookie banner for Canadian sites. Opt-in for analytics and ads, Law 25 bilingual support, and simple setup on any platform.',
+    'PIPEDA expects meaningful consent. Non-sensitive analytics can use implied consent with clear notice. Sensitive and marketing cookies need a clearer yes. Law 25 is on the Canada guide.',
   keywords:
     'pipeda cookie banner, pipeda compliance tool, canadian cookie banner software, law 25 cookie banner tool, pipeda consent management',
   openGraph: {
-    title: 'PIPEDA Cookie Banner for Canadian Websites | Free & Compliant',
+    title: 'What Does PIPEDA Require for Cookies?',
     description:
-      'Install a PIPEDA-ready cookie banner for Canadian sites. Opt-in consent, Law 25 support, works on any platform.',
+      'PIPEDA expects meaningful consent. Non-sensitive analytics can use implied consent with clear notice. Sensitive and marketing cookies need a clearer yes.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/compliance/pipeda',
   },

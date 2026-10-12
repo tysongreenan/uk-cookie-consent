@@ -362,7 +362,7 @@ export default function CCPACompliancePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Everything you need to know about CCPA cookie requirements, opt-out obligations, GPC signals, and how to implement compliance. Includes step-by-step guide, enforcement examples, and a comparison with GDPR and PIPEDA.
+                  Do you need a cookie banner for CCPA? CCPA is an opt-out of sale or share, plus a Do Not Sell or Share link and support for Global Privacy Control. It is not the EU opt-in. Advertising cookies often count as a sale or a share.
                 </p>
               </motion.div>
 

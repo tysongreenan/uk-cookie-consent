@@ -67,7 +67,7 @@ type ScanStep = {
 const SCAN_STEPS: ScanStep[] = [
   { label: 'Loading page', description: 'Rendering your website in a real browser' },
   { label: 'Detecting cookies', description: 'Scanning HTTP headers, JavaScript, and third-party scripts' },
-  { label: 'Analyzing compliance', description: 'Checking against GDPR, CCPA, PIPEDA & Law 25' },
+  { label: 'Sorting categories', description: 'Grouping cookies into necessary, analytics, marketing, and functional' },
   { label: 'Generating report', description: 'Compiling results and recommendations' },
 ]
 

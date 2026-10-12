@@ -140,7 +140,7 @@ export default function FreeCookieBannerPage() {
               </div>
 
               <p className="text-sm text-muted-foreground">
-                ✓ Join 1,000+ websites that chose free over paid ✓ No vendor lock-in ✓ Same features as $200/month tools
+                ✓ Start on the free plan ✓ No vendor lock-in ✓ Same features as $200/month tools
               </p>
             </div>
           </div>
@@ -353,7 +353,7 @@ export default function FreeCookieBannerPage() {
                     <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                       <Users className="h-6 w-6 text-indigo-600" />
                     </div>
-                    <CardTitle>Proven by 1,000+ Sites</CardTitle>
+                    <CardTitle>Free plan, one banner</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600">
@@ -373,7 +373,7 @@ export default function FreeCookieBannerPage() {
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <Users className="h-6 w-6 text-green-600" />
-                  <span className="text-2xl font-bold text-green-800">1,000+ Websites</span>
+                  <span className="text-2xl font-bold text-green-800">Free to start</span>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Chose Free Over Paid Solutions
@@ -482,7 +482,7 @@ export default function FreeCookieBannerPage() {
                 Stop Paying for Basic Compliance
               </h2>
               <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
-                Join 1,000+ smart businesses that chose our free solution over expensive alternatives. 
+                Start on the free plan. 
                 Same GDPR compliance, zero cost, no vendor lock-in.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">

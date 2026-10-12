@@ -54,7 +54,7 @@ const cardVariants = {
 const sellingPoints = [
   { text: 'Works via Code Injection -- No Plugins' },
   { text: '$99 One-Time, Not Another Monthly Bill' },
-  { text: 'Under 10KB -- Your PageSpeed Score Stays High' },
+  { text: 'About 28 KB gzipped -- Loaded async' },
 ]
 
 const painPoints = [
@@ -101,9 +101,8 @@ const steps = [
     icon: Copy,
     code: `<!-- Settings > Advanced > Code Injection > Header -->
 <script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  async>
 </script>`,
   },
   {
@@ -179,7 +178,7 @@ export default function SquarespaceIntegrationPage() {
     {
       question: 'Will this slow down my Squarespace site?',
       answer:
-        'No. Our script is under 10KB and loads with the defer attribute, meaning it does not block your page from rendering. Compare that to third-party consent platforms that add 300-800KB of JavaScript. On Squarespace, where you have limited performance control, keeping scripts small matters even more.',
+        'The script is about 28 KB gzipped and uses the async attribute, so it does not block HTML parsing. That is not a Core Web Vitals promise.',
     },
     {
       question: 'Does this work with Squarespace Commerce and member areas?',
@@ -460,7 +459,7 @@ export default function SquarespaceIntegrationPage() {
                 },
                 {
                   icon: Zap,
-                  title: 'Under 10KB',
+                  title: 'About 28 KB gzipped',
                   desc: 'Lighter than a single Squarespace image',
                 },
               ].map((item, i) => {

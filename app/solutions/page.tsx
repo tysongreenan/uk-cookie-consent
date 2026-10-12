@@ -263,7 +263,7 @@ export default function SolutionsPage() {
                 },
                 {
                   icon: Zap,
-                  title: 'Under 10KB',
+                  title: 'About 28 KB gzipped',
                   desc: 'No impact on page load speed',
                 },
               ].map((item, i) => {

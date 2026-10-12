@@ -6,11 +6,11 @@ import { ModernFeaturesSection, ComplianceSkeleton } from '@/components/landing/
 
 export const metadata: Metadata = {
   title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
-  description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location and applies the right rules. Free plan.',
+  description: 'Cookie banner modes for GDPR, PIPEDA, Quebec Law 25, and CCPA. Pro can vary the banner by country. Not a Google-certified CMP, and not a CASL email tool.',
   keywords: 'cookie consent laws, cookie banner privacy laws, GDPR PIPEDA cookie banner, multi-jurisdiction cookie consent, cookie consent compliance, cookie compliance, eu cookie compliance',
   openGraph: {
     title: 'Privacy Laws Covered: GDPR, CCPA, PIPEDA & More',
-    description: 'One cookie banner for every privacy law. GDPR, PIPEDA, CASL, Quebec Law 25, CCPA & more. Auto-detects user location.',
+    description: 'Cookie banner modes for GDPR, PIPEDA, Quebec Law 25, and CCPA. A banner does not make a site legally compliant.',
     type: 'article',
   },
   alternates: {
@@ -21,35 +21,35 @@ export const metadata: Metadata = {
 const faqData = [
   {
     question: "What privacy laws does this cookie banner cover?",
-    answer: "Our cookie banner covers GDPR (EU), PIPEDA (Canada), CASL (Canada), Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California). It automatically detects user location and applies the appropriate privacy law requirements."
+    answer: "The builder has modes for Canada, the EU, and California, plus custom copy. Pro can show a different mode to visitors from a country you pick. It does not detect Alberta PIPA or BC PIPA, and CASL is not a mode."
   },
   {
     question: "Does this work for Canadian privacy laws?",
-    answer: "Yes. Our banner fully supports all Canadian privacy laws including PIPEDA (federal), CASL, Quebec Law 25, Alberta PIPA, and BC PIPA. It includes bilingual support (English/French) required for Quebec Law 25 compliance."
+    answer: "Canada mode is written for a PIPEDA-style notice. French is available, and Pro can force opt-in for visitors in Quebec. There is no Alberta PIPA mode, no BC PIPA mode, and no CASL email feature."
   },
   {
     question: "Is this GDPR compliant?",
-    answer: "Yes. Our banner is fully GDPR compliant with explicit consent requirements, cookie blocking until consent, granular consent controls, consent logging, and easy consent withdrawal. All GDPR requirements are built-in and automatic."
+    answer: "EU mode can wait for opt-in and offer category choices. Consent logs are on Pro Annual, not on the free plan. The banner does not make a site GDPR compliant."
   },
   {
     question: "How does one banner cover multiple privacy laws?",
-    answer: "Our banner automatically detects user location and applies the appropriate privacy law requirements. For example, EU users get GDPR-compliant behavior, Canadian users get PIPEDA-compliant behavior, and Quebec users get Law 25-compliant behavior—all from one banner installation."
+    answer: "You pick the default mode. On Pro, a geo rule can override that mode for a country or region you select, such as Quebec. Location detection does not choose the law for you."
   },
   {
     question: "What about future privacy laws?",
-    answer: "When new privacy laws are introduced or existing laws change, we automatically update our cookie banner solution. You'll receive notifications about updates, and new compliance features are added automatically to ensure ongoing compliance."
+    answer: "The banner does not update itself when a statute changes. Annual subscribers get features we ship later. One-time Pro keeps the feature set from the day you bought it, plus security patches."
   },
   {
     question: "How do I know which laws apply to my website?",
-    answer: "If you have visitors from the EU, you need GDPR compliance. If you have Canadian visitors, you need PIPEDA compliance. If you have Quebec visitors, you need Quebec Law 25 compliance. Our banner automatically handles all of these based on user location."
+    answer: "If you have visitors in the EU, the UK, Canada, Quebec, or California, read the rule that applies to that visit and set the banner to match. The product will not decide that for you."
   },
   {
     question: "Does this cover CCPA (California)?",
-    answer: "Yes. Our banner includes CCPA compliance features including opt-out mechanisms, \"Do Not Sell My Personal Information\" options, and granular consent controls required by California's privacy law."
+    answer: "California mode uses opt-out copy. It does not file anything with a regulator, and a banner alone is not an opt-out of sale."
   },
   {
     question: "What if I only have Canadian visitors?",
-    answer: "Our banner still works perfectly for Canadian-only websites. It will apply PIPEDA, CASL, and provincial privacy law requirements (Quebec Law 25, Alberta PIPA, BC PIPA) based on user location. You get full Canadian compliance automatically."
+    answer: "A Canadian site can use Canada mode, and Pro can add a Quebec override. That is not automatic compliance with every provincial statute."
   }
 ]
 
@@ -68,7 +68,7 @@ export default function PrivacyLawsPage() {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "What Privacy Laws Does This Cookie Banner Cover?",
-    "description": "Our cookie banner covers GDPR (EU), PIPEDA, CASL, Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California). One banner, full multi-jurisdiction compliance.",
+    "description": "Modes for Canada, the EU, and California. Pro can vary the banner by country. Not a CASL tool, and not automatic compliance with Alberta or BC law.",
     "author": {
       "@type": "Organization",
       "name": "Cookie Banner Team"
@@ -89,22 +89,22 @@ export default function PrivacyLawsPage() {
     }
   }
 
-  const directAnswer = "Our cookie banner covers GDPR (EU), PIPEDA (Canada), CASL (Canada), Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California). One banner installation automatically detects user location and applies the appropriate privacy law requirements. Whether your visitors are from the EU, Canada, Quebec, or California, our banner ensures full compliance with all applicable privacy laws."
+  const directAnswer = "The builder has modes for Canada, the EU, and California. Pro can show a different mode to visitors from a country you pick, including Quebec. It does not detect Alberta PIPA or BC PIPA, and a banner does not make a site legally compliant."
 
   const privacyLawsFeatures = [
     {
       title: "GDPR (EU)",
-      description: "Full compliance with European Union's General Data Protection Regulation",
+      description: "Opt-in mode for EU-style cookie consent. Not a legal certification.",
       className: "col-span-1 lg:col-span-2 border-b lg:border-r border-border",
     },
     {
       title: "Canadian Laws",
-      description: "PIPEDA, CASL, Quebec Law 25, Alberta PIPA, BC PIPA",
+      description: "Canada mode for a PIPEDA-style notice. French, and an optional Quebec opt-in on Pro.",
       className: "col-span-1 lg:col-span-2 border-b border-border",
     },
     {
       title: "CCPA (California)",
-      description: "California Consumer Privacy Act compliance built-in",
+      description: "Opt-out copy for California. A banner is not an opt-out of sale.",
       className: "col-span-1 lg:col-span-2 border-border",
     },
   ]
@@ -122,16 +122,16 @@ export default function PrivacyLawsPage() {
       <FeaturePageLayout
         hero={{
           title: "What Privacy Laws Does This Cookie Banner Cover?",
-          description: "Multi-jurisdiction compliance for GDPR, PIPEDA, CASL, Quebec Law 25, and CCPA",
+          description: "Modes for GDPR, PIPEDA, Quebec Law 25, and CCPA. Not a CASL email tool.",
           badge: "Global Compliance",
           updatedDate: updatedDate,
-          ctaText: "Achieve Global Compliance",
+          ctaText: "Build a banner",
           ctaHref: "/builder",
           directAnswer: directAnswer,
           directAnswerLink: "/builder",
-          directAnswerLinkText: "Get compliant now"
+          directAnswerLinkText: "Open the builder"
         }}
-        ctaText="Achieve Global Compliance"
+        ctaText="Build a banner"
         ctaHref="/builder"
         relatedLinks={[
           { href: "/features/will-this-keep-me-compliant", text: "Will This Keep Me Compliant?" },
@@ -143,14 +143,14 @@ export default function PrivacyLawsPage() {
         {/* Features Section */}
         <ModernFeaturesSection
           title="Comprehensive Privacy Law Coverage"
-          description="One banner automatically handles all major privacy regulations worldwide"
+          description="The modes we ship. You still choose which rule to follow."
           features={privacyLawsFeatures}
         />
 
         <h2 id="which-canadian-privacy-laws-are-covered">Which Canadian Privacy Laws Are Covered?</h2>
         
         <p>
-          Our cookie banner provides comprehensive coverage for all Canadian privacy laws:
+          What the Canada mode does, and what it does not:
         </p>
 
         <h3>PIPEDA (Personal Information Protection and Electronic Documents Act)</h3>
@@ -167,9 +167,9 @@ export default function PrivacyLawsPage() {
           Learn more about <Link href="/compliance/pipeda" className="text-foreground underline">PIPEDA compliance requirements</Link>.
         </p>
 
-        <h3>CASL (Canada's Anti-Spam Legislation)</h3>
+        <h3>CASL is not this product</h3>
         <p>
-          CASL requires consent before installing software (including tracking scripts) on someone's device. Our banner ensures CASL compliance by:
+          CASL is Canada's anti-spam law. A narrow software-install rule exists, and it is not the same as a cookie banner. This product does not send email. Scripts you add can stay off until opt-in. That is not CASL compliance.
         </p>
         <ul>
           <li>Blocking tracking scripts until users provide consent</li>
@@ -179,7 +179,7 @@ export default function PrivacyLawsPage() {
 
         <h3>Quebec Law 25 (Bill 64)</h3>
         <p>
-          Quebec has its own privacy law that's stricter than PIPEDA. Our banner fully supports Quebec Law 25 with:
+          Quebec Law 25 is stricter than PIPEDA for tracking technologies. The banner can do this:
         </p>
         <ul>
           <li>Explicit consent requirements (not implied consent)</li>
@@ -194,12 +194,12 @@ export default function PrivacyLawsPage() {
 
         <h3>Alberta PIPA (Personal Information Protection Act)</h3>
         <p>
-          Alberta's privacy law requires consent before collecting personal information. Our banner ensures compliance by blocking cookies until users consent and providing clear information about data collection.
+          Alberta has its own private-sector privacy statute. This product has no Alberta mode. Canada mode is a PIPEDA-style notice, not a provincial compliance program.
         </p>
 
         <h3>BC PIPA (British Columbia Personal Information Protection Act)</h3>
         <p>
-          British Columbia's privacy law is similar to Alberta's. Our banner ensures compliance by:
+          British Columbia has its own private-sector privacy statute. There is no BC mode. The banner does not do any of the following for you:
         </p>
         <ul>
           <li>Requiring consent for personal information collection</li>
@@ -252,37 +252,37 @@ export default function PrivacyLawsPage() {
           <li><strong>California Visitors:</strong> Opt-out of sale and sharing, including a way to honour Global Privacy Control. A banner by itself is not the opt-out of sale.</li>
         </ul>
         <p>
-          This means you install one banner code, and it handles the complexity of multi-jurisdictional compliance for you.
+          You install one snippet. You still choose the mode. Pro geo-rules only apply the override you configured.
         </p>
 
-        <h2 id="ready-to-achieve-global-compliance">Ready to Achieve Global Compliance?</h2>
+        <h2 id="ready-to-achieve-global-compliance">Ready to Build a banner?</h2>
 
         <p>
-          Ensure your website is compliant with privacy laws worldwide.
+          Use the modes that match the visitors you actually have.
         </p>
         <ul>
-          <li>✓ Automatic detection of user location</li>
-          <li>✓ Dynamic application of relevant privacy laws</li>
-          <li>✓ Comprehensive coverage for GDPR, PIPEDA, CASL, Quebec Law 25, and CCPA</li>
-          <li>✓ Simplified compliance for global audiences</li>
+          <li>✓ Optional geo rules on Pro, for countries you select</li>
+          <li>✓ You pick Canada, the EU, California, or custom</li>
+          <li>✓ Not CASL, and not a Google-certified CMP</li>
+          <li>✓ One snippet, about 28 KB gzipped</li>
         </ul>
 
         <h2 id="conclusion">Conclusion / TL;DR</h2>
 
         <p><strong>Key Takeaways:</strong></p>
         <ul>
-          <li><strong>Comprehensive Coverage:</strong> Our banner covers GDPR (EU), PIPEDA (Canada), CASL (Canada), Quebec Law 25, Alberta PIPA, BC PIPA, and CCPA (California).</li>
-          <li><strong>Automatic Geo-Detection:</strong> The banner automatically detects user location and applies the correct privacy law requirements.</li>
-          <li><strong>Simplified Compliance:</strong> One solution for all your global privacy needs, reducing complexity and ensuring peace of mind.</li>
-          <li><strong>Future-Proof:</strong> Automatic updates ensure compliance with new and changing privacy laws.</li>
+          <li><strong>Comprehensive Coverage:</strong> Modes for Canada, the EU, and California. French is included. Pro can add a Quebec override.</li>
+          <li><strong>Automatic Geo-Detection:</strong> Location detection does not choose the statute. You set the mode.</li>
+          <li><strong>Simplified Compliance:</strong> One banner for the modes we ship. It does not replace a privacy program.</li>
+          <li><strong>Future-Proof:</strong> Annual plans get features shipped later. The banner does not rewrite itself when a statute changes.</li>
         </ul>
 
         <p><strong>Next Steps:</strong></p>
         <ol>
-          <li>Create your compliant cookie banner in our dashboard</li>
+          <li>Create a banner in the builder</li>
           <li>Customize the design to match your brand</li>
           <li>Install the code on your website</li>
-          <li>Verify compliance using our built-in tools</li>
+          <li>Check that the scripts you added stay off until consent</li>
         </ol>
 
         <h2 id="frequently-asked-questions">Frequently Asked Questions</h2>

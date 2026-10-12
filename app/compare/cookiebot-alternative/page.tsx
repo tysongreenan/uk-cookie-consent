@@ -52,7 +52,7 @@ const cardVariants = {
 const faqData = [
   {
     question: "What is the best free Cookiebot alternative in 2026?",
-    answer: "Cookie-Banner.ca is a strong free Cookiebot alternative. The free plan includes 1 cookie banner, 4 layouts, GDPR and CCPA compliance, and Google Consent Mode v2 support. The free plan includes \"Powered by\" branding. For unlimited banners, 11 layouts, analytics, and branding removal, the Pro plan is a one-time $99 payment. Over 1,000 websites use Cookie-Banner.ca."
+    answer: "Cookie-Banner.ca is a strong free Cookiebot alternative. The free plan includes 1 cookie banner, 7 layouts, GDPR and CCPA compliance, and Google Consent Mode v2 support. The free plan includes \"Powered by\" branding. For unlimited banners, 14 layouts, analytics, and branding removal, the Pro plan is a one-time $99 payment."
   },
   {
     question: "How much does Cookiebot cost per year?",
@@ -60,19 +60,19 @@ const faqData = [
   },
   {
     question: "Does Cookiebot work with Shopify?",
-    answer: "Yes, Cookiebot offers a Shopify integration, but it requires their paid plan and can add noticeable load time to your Shopify store. Cookie-Banner.ca also works with Shopify and loads asynchronously at under 10KB, with no monthly fees. Our Shopify integration guide walks you through setup in under 5 minutes."
+    answer: "Yes, Cookiebot offers a Shopify integration, but it requires their paid plan and can add noticeable load time to your Shopify store. Cookie-Banner.ca also works with Shopify and loads asynchronously at about 28 KB gzipped, with no monthly fees. Our Shopify integration guide walks you through setup in under 5 minutes."
   },
   {
     question: "Is Cookiebot really free?",
-    answer: "Cookiebot offers a limited free tier for websites with fewer than 100 subpages and very basic features. For any real website, you will need a paid plan starting at $9/month. Cookie-Banner.ca offers a free plan that includes 1 banner, 4 layouts, and unlimited pages — though it includes \"Powered by\" branding. The Pro plan ($99 one-time) removes branding and adds unlimited banners, 11 layouts, analytics, and team features."
+    answer: "Cookiebot offers a limited free tier for websites with fewer than 100 subpages and very basic features. For any real website, you will need a paid plan starting at $9/month. Cookie-Banner.ca offers a free plan that includes 1 banner, 7 layouts, and unlimited pages — though it includes \"Powered by\" branding. The Pro plan ($99 one-time) removes branding and adds unlimited banners, 14 layouts, analytics, and team features."
   },
   {
     question: "How do I migrate from Cookiebot to Cookie-Banner.ca?",
-    answer: "Migrating from Cookiebot takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the Cookiebot script tag with our lightweight embed code (under 10KB), 4) Remove the old Cookiebot script. No data migration is needed."
+    answer: "Migrating from Cookiebot takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the Cookiebot script tag with our lightweight embed code (about 28 KB gzipped), 4) Remove the old Cookiebot script. No data migration is needed."
   },
   {
     question: "What is the difference between Cookiebot and CookieYes?",
-    answer: "Cookiebot and CookieYes are both paid cookie consent platforms. CookieYes is slightly cheaper (starting at $10/month vs $9/month) and offers a slightly more generous free tier. However, both have limitations on domains and pageviews on paid plans. Cookie-Banner.ca offers a free plan with 1 banner and 4 layouts, or a $99 one-time Pro plan with unlimited banners and advanced features."
+    answer: "Cookiebot and CookieYes are both paid cookie consent platforms. CookieYes is slightly cheaper (starting at $10/month vs $9/month) and offers a slightly more generous free tier. However, both have limitations on domains and pageviews on paid plans. Cookie-Banner.ca offers a free plan with 1 banner and 7 layouts, or a $99 one-time Pro plan with unlimited banners and advanced features."
   },
   {
     question: "Is Complianz better than Cookiebot?",
@@ -80,7 +80,7 @@ const faqData = [
   },
   {
     question: "Does Cookiebot slow down my website?",
-    answer: "Cookiebot's script bundle is heavier than some alternatives and can add noticeable load time to your pages, which may affect Core Web Vitals and SEO. Cookie-Banner.ca's script is under 10KB and loads asynchronously, so it has minimal impact on page performance."
+    answer: "Cookiebot's script bundle is heavier than some alternatives and can add noticeable load time to your pages, which may affect Core Web Vitals and SEO. Cookie-Banner.ca's script is about 28 KB gzipped and loads asynchronously, so it has minimal impact on page performance."
   },
   {
     question: "Cookiebot vs OneTrust: which is better for small businesses?",
@@ -112,7 +112,7 @@ export default function CookiebotAlternativePage() {
         data={{
           title: "Cookiebot Alternative: Free Plan or $99 Once (2026)",
           description:
-            "Drop Cookiebot's $9–$199/mo plans. Free PIPEDA banner for Canada, or $99 once. Law 25 geo-targeting on Pro. One script under 10KB, about 5 minutes.",
+            "Drop Cookiebot's $9–$199/mo plans. Free PIPEDA banner for Canada, or $99 once. Law 25 geo-targeting on Pro. One script about 28 KB gzipped, about 5 minutes.",
           datePublished: "2025-01-01",
           dateModified: "2026-09-14",
         }}
@@ -171,7 +171,7 @@ export default function CookiebotAlternativePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Stop paying $9-199/month for Cookiebot. Cookie-Banner.ca offers a free plan with GDPR compliance, or go Pro for a one-time $99 payment. Lightweight script under 10KB. See how we compare to Cookiebot, CookieYes, and Complianz.
+                  Cookiebot&apos;s paid plans shown on this page run about $9 to $199 per month. A free tier is limited to small sites. Check Cookiebot for the current price. This page compares that with a free banner or $99 once.
                 </p>
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
                   Pricing and features reviewed September 14, 2026. Plan limits and prices can change; confirm current vendor pricing before you buy.
@@ -246,7 +246,7 @@ export default function CookiebotAlternativePage() {
                     { feature: "CCPA compliant", ours: true, cookiebot: true, cookieyes: true, complianz: true },
                     { feature: "PIPEDA / Law 25", ours: true, cookiebot: "Limited", cookieyes: false, complianz: false },
                     { feature: "Google Consent Mode v2", ours: true, cookiebot: true, cookieyes: true, complianz: "Partial" },
-                    { feature: "Script size", ours: "Under 10KB", cookiebot: "~50KB+", cookieyes: "~40KB+", complianz: "Plugin-based" },
+                    { feature: "Script size", ours: "About 28 KB gzipped", cookiebot: "~50KB+", cookieyes: "~40KB+", complianz: "Plugin-based" },
                     { feature: "Platform", ours: "Any website", cookiebot: "Any website", cookieyes: "Any website", complianz: "WordPress only" },
                   ].map((row, i) => (
                     <tr key={i} className={`border-b border-border ${i % 2 === 1 ? 'bg-muted/30' : ''}`}>
@@ -572,7 +572,7 @@ export default function CookiebotAlternativePage() {
               </motion.div>
 
               <p className="text-sm text-muted-foreground text-center">
-                The free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
+                The free plan includes 1 banner, 7 layouts, and &quot;Powered by&quot; branding. See our full <Link href="/pricing" className="text-primary underline hover:no-underline font-medium">pricing page</Link> for details.
               </p>
             </div>
           </div>
@@ -622,8 +622,8 @@ export default function CookiebotAlternativePage() {
                     { feature: "Automatic Cookie Scanning", cookiebot: true, cookieyes: true, complianz: "WP only", ours: true },
                     { feature: "Free Plan Available", cookiebot: "100 pages", cookieyes: "100 pages", complianz: false, ours: "1 banner, unlimited pages" },
                     { feature: "No Monthly Subscription", cookiebot: false, cookieyes: false, complianz: "Annual", ours: "$99 one-time Pro" },
-                    { feature: "Custom Banner Design", cookiebot: "Limited", cookieyes: "Basic", complianz: "Good", ours: "11 layouts (Pro)" },
-                    { feature: "Script Size", cookiebot: "~50KB+", cookieyes: "~40KB+", complianz: "WP plugin", ours: "Under 10KB" },
+                    { feature: "Custom Banner Design", cookiebot: "Limited", cookieyes: "Basic", complianz: "Good", ours: "14 layouts (Pro)" },
+                    { feature: "Script Size", cookiebot: "~50KB+", cookieyes: "~40KB+", complianz: "WP plugin", ours: "About 28 KB gzipped" },
                     { feature: "Consent Analytics", cookiebot: true, cookieyes: true, complianz: "Basic", ours: "Pro" },
                     { feature: "Shopify Integration", cookiebot: true, cookieyes: true, complianz: false, ours: true },
                     { feature: "WordPress Support", cookiebot: true, cookieyes: true, complianz: true, ours: true },
@@ -652,7 +652,7 @@ export default function CookiebotAlternativePage() {
             </motion.div>
 
             <p className="text-sm text-muted-foreground text-center max-w-4xl mx-auto">
-              Feature data as of March 2026. &quot;Pro&quot; features require the $99 one-time Cookie-Banner.ca Pro plan. Free plan includes 1 banner, 4 layouts, and &quot;Powered by&quot; branding. Check each provider&apos;s website for the latest pricing.
+              Feature data as of March 2026. &quot;Pro&quot; features require the $99 one-time Cookie-Banner.ca Pro plan. Free plan includes 1 banner, 7 layouts, and &quot;Powered by&quot; branding. Check each provider&apos;s website for the latest pricing.
             </p>
           </div>
         </section>
@@ -697,7 +697,7 @@ export default function CookiebotAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Performance</h3>
                 <p>
-                  Both Cookiebot and CookieYes load heavier script bundles than lightweight alternatives. Cookie-Banner.ca&apos;s script is under 10KB and loads asynchronously, resulting in minimal impact on Core Web Vitals and page speed.
+                  Cookie-Banner.ca&apos;s script is about 28 KB gzipped and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals promise. We have not published a measurement of Cookiebot or CookieYes.
                 </p>
 
                 <h3 className="font-heading text-foreground">Platform Support</h3>
@@ -774,7 +774,7 @@ export default function CookiebotAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Performance</h3>
                 <p>
-                  Because Complianz runs as a WordPress plugin (server-side), it generally loads faster than Cookiebot&apos;s external JavaScript. However, Cookie-Banner.ca&apos;s script is under 10KB and loads asynchronously, keeping page impact minimal on any platform.
+                  Because Complianz runs as a WordPress plugin (server-side), it generally loads faster than Cookiebot&apos;s external JavaScript. However, Cookie-Banner.ca&apos;s script is about 28 KB gzipped and loads asynchronously, keeping page impact minimal on any platform.
                 </p>
               </motion.div>
 
@@ -836,7 +836,7 @@ export default function CookiebotAlternativePage() {
 
                 <h3 className="font-heading text-foreground">Script Performance</h3>
                 <p>
-                  Cookiebot&apos;s JavaScript bundle weighs 50KB+ and can delay page rendering on slower connections. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning it never blocks your page from rendering. For websites where Core Web Vitals matter — especially ecommerce and ad-supported sites — this difference can directly affect Google rankings.
+                  Cookie-Banner.ca&apos;s script is <strong className="text-foreground">about 28 KB gzipped</strong> and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals or ranking promise. We have not published a measurement of Cookiebot&apos;s script.
                 </p>
 
                 <h3 className="font-heading text-foreground">Canada-Specific Compliance</h3>
@@ -870,7 +870,7 @@ export default function CookiebotAlternativePage() {
                       { category: "Starting Price", cookiebot: "$9/month", ours: "Free (forever)" },
                       { category: "Paid Plan", cookiebot: "$9-$199/month", ours: "$99 one-time" },
                       { category: "3-Year Total Cost", cookiebot: "$324-$7,164", ours: "$99" },
-                      { category: "Script Size", cookiebot: "~50KB+", ours: "Under 10KB" },
+                      { category: "Script Size", cookiebot: "~50KB+", ours: "About 28 KB gzipped" },
                       { category: "Loading", cookiebot: "Synchronous", ours: "Async (non-blocking)" },
                       { category: "Free Tier Pages", cookiebot: "100 subpages", ours: "Unlimited" },
                       { category: "PIPEDA / Law 25", cookiebot: "Manual config", ours: "Native support" },
@@ -948,7 +948,7 @@ export default function CookiebotAlternativePage() {
                 </ul>
 
                 <p>
-                  Cookie-Banner.ca offers a <Link href="/integrations/shopify" className="text-primary underline hover:no-underline">Shopify integration</Link> that installs in under 3 minutes. The script is under 10KB and loads asynchronously. The free plan works for a single banner, or upgrade to Pro for $99 one-time to get unlimited banners and analytics.
+                  Cookie-Banner.ca offers a <Link href="/integrations/shopify" className="text-primary underline hover:no-underline">Shopify integration</Link> that installs in under 3 minutes. The script is about 28 KB gzipped and loads asynchronously. The free plan works for a single banner, or upgrade to Pro for $99 one-time to get unlimited banners and analytics.
                 </p>
               </motion.div>
 
@@ -990,7 +990,7 @@ export default function CookiebotAlternativePage() {
                     <ul className="space-y-3">
                       {[
                         'Free plan available, or $99 one-time Pro',
-                        'Under 10KB, loads asynchronously',
+                        'About 28 KB gzipped, loads asynchronously',
                         'Shopify integration guide included',
                         'Handles Shopify default cookies',
                       ].map((item) => (
@@ -1022,7 +1022,7 @@ export default function CookiebotAlternativePage() {
                   What Makes Cookie-Banner.ca a Good Cookiebot Alternative?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  A closer look at what 1,000+ websites get when they switch
+                  A closer look at what you get when you switch
                 </p>
               </motion.div>
 
@@ -1031,17 +1031,17 @@ export default function CookiebotAlternativePage() {
                   {
                     icon: DollarSign,
                     title: 'Free Plan + $99 Pro',
-                    desc: 'The free plan includes 1 banner, 4 layouts, GDPR/CCPA compliance, and unlimited pages. It does include "Powered by" branding. Pro ($99 one-time) removes branding and adds unlimited banners, 11 layouts, analytics, and team features.',
+                    desc: 'The free plan includes 1 banner, 7 layouts, GDPR/CCPA compliance, and unlimited pages. It does include "Powered by" branding. Pro ($99 one-time) removes branding and adds unlimited banners, 14 layouts, analytics, and team features.',
                   },
                   {
                     icon: Zap,
-                    title: 'Lightweight Script (Under 10KB)',
-                    desc: 'Our script is under 10KB and loads asynchronously, so it has minimal impact on your Core Web Vitals, bounce rate, and Google rankings.',
+                    title: 'Lightweight Script (About 28 KB gzipped)',
+                    desc: 'Our script is about 28 KB gzipped and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals or ranking promise.',
                   },
                   {
                     icon: Shield,
                     title: 'Complete Compliance',
-                    desc: 'Full GDPR, CCPA/CPRA, and PIPEDA compliance. Google Consent Mode v2 and IAB TCF 2.2 support built in. Stay compliant with major privacy regulations.',
+                    desc: 'Modes for GDPR, CCPA, and PIPEDA. Google Consent Mode v2 can start denied. An IAB TCF v2.2 toggle exists on Pro, not on the free plan. Not a Google-certified CMP.',
                   },
                   {
                     icon: Rocket,
@@ -1056,7 +1056,7 @@ export default function CookiebotAlternativePage() {
                   {
                     icon: Users,
                     title: 'Analytics & Team (Pro)',
-                    desc: 'Pro plan includes consent rate analytics, A/B testing insights, and unlimited team members with role-based permissions.',
+                    desc: 'Pro includes consent analytics and team roles (owner, admin, editor, viewer). There is no banner A/B test. Consent logs are on Pro Annual and Enterprise.',
                   },
                 ].map((item, i) => {
                   const Icon = item.icon

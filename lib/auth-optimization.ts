@@ -1,8 +1,6 @@
 // Authentication Performance Optimization
 // Implements caching, preloading, and performance monitoring
 
-import { NextRequest } from 'next/server';
-
 interface AuthCacheEntry {
   user: any;
   timestamp: number;
@@ -144,61 +142,3 @@ class AuthOptimizer {
 
 // Singleton instance
 export const authOptimizer = new AuthOptimizer();
-
-// Helper function to measure request performance
-export const measurePerformance = async <T>(
-  operation: () => Promise<T>,
-  operationName: string
-): Promise<T> => {
-  const startTime = performance.now();
-  
-  try {
-    const result = await operation();
-    const endTime = performance.now();
-    const responseTime = endTime - startTime;
-    
-    authOptimizer.recordAuthRequest(responseTime);
-    
-    console.log(`[PERF] ${operationName}: ${responseTime.toFixed(2)}ms`);
-    return result;
-  } catch (error) {
-    const endTime = performance.now();
-    const responseTime = endTime - startTime;
-    
-    authOptimizer.recordAuthRequest(responseTime);
-    
-    console.error(`[PERF] ${operationName} failed: ${responseTime.toFixed(2)}ms`, error);
-    throw error;
-  }
-};
-
-// Request optimization helpers
-export const optimizeRequest = (request: NextRequest): {
-  ip: string;
-  userAgent: string;
-  fingerprint: string;
-} => {
-  // Extract IP from various headers
-  const forwarded = request.headers.get('x-forwarded-for');
-  const realIp = request.headers.get('x-real-ip');
-  const cfConnectingIp = request.headers.get('cf-connecting-ip');
-  const ip = forwarded?.split(',')[0] || realIp || cfConnectingIp || 'unknown';
-  
-  const userAgent = request.headers.get('user-agent') || 'unknown';
-  
-  // Create a simple fingerprint for request optimization
-  const fingerprint = `${ip}-${userAgent.slice(0, 50)}`;
-  
-  return { ip, userAgent, fingerprint };
-};
-
-// Session preloading for better UX
-export const preloadUserSession = async (userId: string): Promise<void> => {
-  try {
-    // This could preload user data, permissions, etc.
-    // For now, we'll just ensure the user cache is warmed up
-    console.log(`[PRELOAD] Preloading session for user: ${userId}`);
-  } catch (error) {
-    console.error(`[PRELOAD] Failed to preload session for user ${userId}:`, error);
-  }
-};

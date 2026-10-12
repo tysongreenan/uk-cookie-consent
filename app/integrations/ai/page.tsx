@@ -259,7 +259,7 @@ function MiniSnippet() {
     <div className="flex min-h-[6.75rem] flex-col justify-center rounded-xl bg-background p-3 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.18)]">
       <p className="text-[11px] font-medium text-foreground">app/layout.tsx</p>
       <code className="mt-2 block truncate text-[11px] font-mono text-muted-foreground">
-        {'<script src="https://cdn.cookie-banner.ca/b.js">'}
+        {'<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID">'}
       </code>
     </div>
   )

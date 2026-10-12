@@ -16,7 +16,7 @@ export function ProductDescription() {
               What is Cookie-Banner.ca?
             </h2>
             <p className="text-lg text-muted-foreground" itemProp="description">
-              Cookie-Banner.ca is a cookie consent banner generator built in Canada, tailored for Canadian privacy laws (<Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link>, CASL, Quebec Law 25) as well as global laws like <Link href="/compliance/gdpr" className="underline hover:text-foreground">GDPR</Link>. It helps businesses create compliant cookie banners that match their brand and work across all platforms.
+              Cookie-Banner.ca is a cookie consent banner generator built in Canada, with modes for <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link>, Quebec Law 25, <Link href="/compliance/gdpr" className="underline hover:text-foreground">GDPR</Link>, and CCPA. CASL is not a mode. A banner does not make a site legally compliant.
             </p>
           </header>
 
@@ -31,7 +31,7 @@ export function ProductDescription() {
                   <strong>Cross-platform compatibility:</strong> Works on <Link href="/integrations/wordpress" className="underline hover:text-foreground">WordPress</Link>, <Link href="/integrations/shopify" className="underline hover:text-foreground">Shopify</Link>, <Link href="/integrations/squarespace" className="underline hover:text-foreground">Squarespace</Link>, and custom sites. Integration instructions and code snippets are provided for each platform.
                 </li>
                 <li itemProp="featureList">
-                  <strong>Canadian privacy law compliance:</strong> Express opt-in for non-essential cookies, support for bilingual (English/French) to satisfy Quebec's Law 25, and full <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link> and CASL compliance.
+                  <strong>Canadian consent copy:</strong> Opt-in controls, English and French, and a <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link>-style notice. This is not CASL, and French text alone does not satisfy Law 25.
                 </li>
                 <li itemProp="featureList">
                   <strong>Granular consent & blocking behavior:</strong> The tool blocks all non-essential cookies until users provide explicit consent. This includes analytics, marketing, and preference cookies.
@@ -46,7 +46,7 @@ export function ProductDescription() {
                   <strong>Tag management integration:</strong> Integrates smoothly with <Link href="/integrations/google-tag-manager" className="underline hover:text-foreground">Google Tag Manager</Link>, custom scripts, and other tag management systems. Non-essential tags are automatically gated by consent.
                 </li>
                 <li itemProp="featureList">
-                  <strong>Zero performance impact:</strong> Lightweight code (under 10KB) loads in milliseconds. Doesn't affect Core Web Vitals or page speed.
+                  <strong>About 28 KB gzipped:</strong> One async script tag, so it does not block HTML parsing. That is not a Core Web Vitals promise.
                 </li>
               </ul>
             </section>
@@ -54,7 +54,7 @@ export function ProductDescription() {
             <section className="mb-8">
               <h3 className="text-2xl font-semibold mb-4">Pricing Model</h3>
               <p>
-                Cookie-Banner.ca offers a <strong>free plan</strong> to get started with no credit card required. When you're ready for advanced features like analytics, team collaboration, and custom branding, upgrade to <strong>Pro for a <Link href="/pricing" className="underline hover:text-foreground">one-time payment of $99</Link></strong> — no subscriptions, no recurring fees, and lifetime updates included.
+                Cookie-Banner.ca offers a <strong>free plan</strong> to get started with no credit card required. The free plan is one banner. <strong>Pro is <Link href="/pricing" className="underline hover:text-foreground">$99 once or $99 per year</Link></strong>. The one-time plan does not include features shipped later. Annual includes consent logs and later features.
               </p>
             </section>
 
@@ -67,8 +67,8 @@ export function ProductDescription() {
                 <li>Pick a template from the visual builder</li>
                 <li>Customize your banner (colors, fonts, text, position, logo)</li>
                 <li>Add tracking scripts if needed (Google Analytics, Facebook Pixel, etc.)</li>
-                <li>Copy the generated HTML/JavaScript code</li>
-                <li>Paste the code into your website's HTML, right before the closing <code>&lt;/body&gt;</code> tag</li>
+                <li>Copy the install snippet</li>
+                <li>Paste <code>&lt;script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async&gt;&lt;/script&gt;</code></li>
               </ol>
               <p className="mt-4">
                 No coding knowledge is required. The installation works on virtually any platform or website.
@@ -81,13 +81,13 @@ export function ProductDescription() {
                 Cookie-Banner.ca is designed to meet the latest legal requirements for:
               </p>
               <ul className="list-disc list-inside space-y-2 mt-4">
-                <li><strong>Canadian provinces:</strong> <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link> (federal), CASL (anti-spam), and Quebec Law 25</li>
+                <li><strong>Canada:</strong> a <Link href="/compliance/pipeda" className="underline hover:text-foreground">PIPEDA</Link>-style notice, plus a Pro geo rule for Quebec Law 25. Not CASL.</li>
                 <li><strong>European Union:</strong> <Link href="/compliance/gdpr" className="underline hover:text-foreground">GDPR</Link> (General Data Protection Regulation)</li>
                 <li><strong>United States:</strong> <Link href="/compliance/ccpa" className="underline hover:text-foreground">CCPA</Link> (California Consumer Privacy Act)</li>
                 <li><strong>Other jurisdictions:</strong> Adaptable to various privacy regulations worldwide</li>
               </ul>
               <p className="mt-4">
-                The tool automatically implements required compliance mechanisms including cookie blocking, consent logging, granular controls, and updates when privacy laws change.
+                Scripts you add can stay off until opt-in. Consent logs are on Pro Annual and Enterprise. A statute change does not rewrite the banner.
               </p>
             </section>
 
@@ -98,11 +98,11 @@ export function ProductDescription() {
               </p>
               <ul className="list-disc list-inside space-y-2 mt-4">
                 <li>Free plan with no credit card required</li>
-                <li>Pro upgrade for a one-time $99 payment — no subscriptions</li>
+                <li>Pro is $99 once, or $99 per year</li>
                 <li>Unlimited cookie banners and websites on Pro</li>
                 <li>Canadian-first compliance with bilingual support</li>
-                <li>Zero performance impact on your website</li>
-                <li>Lifetime updates and support included</li>
+                <li>About 28 KB gzipped, loaded async. Not a Core Web Vitals promise</li>
+                <li>One-time Pro does not include features shipped later</li>
               </ul>
             </section>
 
@@ -112,13 +112,12 @@ export function ProductDescription() {
                 Cookie-Banner.ca is ideal for:
               </p>
               <ul className="list-disc list-inside space-y-2 mt-4">
-                <li>Canadian businesses requiring PIPEDA, CASL, or Quebec Law 25 compliance</li>
+                <li>Sites that need a PIPEDA-style notice, French, or a Quebec opt-in rule</li>
                 <li>International businesses needing GDPR compliance</li>
                 <li>Marketing teams managing multiple websites</li>
                 <li>Businesses that want branded cookie banners without custom development</li>
                 <li>Organizations needing consent audit trails for compliance</li>
-                <li>Anyone who wants to avoid $20K+ privacy law fines</li>
-              </ul>
+                              </ul>
             </section>
 
             <section>

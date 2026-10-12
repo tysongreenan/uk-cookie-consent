@@ -461,23 +461,23 @@ export default function FinanceSolutionPage() {
                   <ul className="space-y-3 text-gray-600">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>SOC 2 Type II certification</span>
+                      <span>HTTPS script delivery</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>ISO 27001 compliance</span>
+                      <span>Consent choice stored in the visitor’s browser</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Comprehensive audit trails</span>
+                      <span>Consent logs on Pro Annual and Enterprise</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Regulatory reporting capabilities</span>
+                      <span>No regulator filing from this product</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Penetration testing and vulnerability assessments</span>
+                      <span>Scripts you add can stay off until opt-in</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -494,23 +494,23 @@ export default function FinanceSolutionPage() {
                   <ul className="space-y-3 text-gray-600">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Role-based access control (RBAC)</span>
+                      <span>Team roles on Pro: owner, admin, editor, viewer</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Privileged access management</span>
+                      <span>No privileged-access product</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Single sign-on (SSO) integration</span>
+                      <span>Team members on Pro. No SSO</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Session management and timeout</span>
+                      <span>No SSO</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Anomaly detection and monitoring</span>
+                      <span>No anomaly detection</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -527,23 +527,23 @@ export default function FinanceSolutionPage() {
                   <ul className="space-y-3 text-gray-600">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Multi-region data centers</span>
+                      <span>No region picker for stored data</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Data sovereignty controls</span>
+                      <span>No data-sovereignty control</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Cross-border data transfer compliance</span>
+                      <span>No cross-border transfer program</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Local data processing options</span>
+                      <span>Choice stored in the visitor's browser</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Regulatory reporting by jurisdiction</span>
+                      <span>No regulatory report from this product</span>
                     </li>
                   </ul>
                 </CardContent>

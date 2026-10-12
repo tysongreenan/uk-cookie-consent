@@ -15,8 +15,8 @@ import { FaqV2 } from '@/components/landing/v2/faq-v2'
 import { FinalCtaV2 } from '@/components/landing/v2/final-cta-v2'
 
 export const metadata: Metadata = {
-  title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-  description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on WordPress, Shopify & any site. No code needed.',
+  title: 'Free Cookie Banner Generator for Canada | PIPEDA & Law 25',
+  description: 'Build a free cookie banner for Canadian sites. Set PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices, then paste one script on WordPress, Shopify, or any site.',
   keywords: [
     'cookie banner',
     'cookie banners',
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     'no code cookie banner',
   ],
   openGraph: {
-    title: 'Free Cookie Banner Generator for Canada — PIPEDA & Law 25 Compliant (2026)',
-    description: 'Create a free cookie consent banner in 5 minutes. PIPEDA, Law 25, GDPR & CCPA compliant. Works on any site. No code needed.',
+    title: 'Free Cookie Banner Generator for Canada | PIPEDA & Law 25',
+    description: 'Build a free cookie banner for Canadian sites. PIPEDA, Quebec Law 25, GDPR, and CCPA consent choices. Paste one script on any site.',
     type: 'website',
     locale: 'en_CA',
   },

@@ -53,7 +53,7 @@ const cardVariants = {
 const sellingPoints = [
   { text: 'No Shopify App Required' },
   { text: '$99 One-Time vs $300+/Year App Subscriptions' },
-  { text: 'Under 10KB -- Zero Impact on Store Speed' },
+  { text: 'About 28 KB gzipped -- Loaded async' },
 ]
 
 const painPoints = [
@@ -100,9 +100,8 @@ const steps = [
     icon: Copy,
     code: `<!-- In theme.liquid, before </head> -->
 <script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  async>
 </script>`,
   },
   {
@@ -117,7 +116,7 @@ const steps = [
 
 const comparisonData = [
   { feature: 'Monthly cost', us: '$0 (one-time $99)', them: '$5-30/month' },
-  { feature: 'Script size', us: 'Under 10KB', them: '200-500KB' },
+  { feature: 'Script size', us: 'About 28 KB gzipped', them: '200-500KB' },
   { feature: 'Requires Shopify app install', us: 'No', them: 'Yes' },
   { feature: 'GDPR + CCPA + PIPEDA', us: 'Yes', them: 'Varies' },
   { feature: 'Google Consent Mode V2', us: 'Yes', them: 'Some' },
@@ -183,7 +182,7 @@ export default function ShopifyIntegrationPage() {
     {
       question: 'How does this compare to Shopify cookie consent apps like Pandectes or Consentmo?',
       answer:
-        'Shopify cookie consent apps typically cost $5-30/month, load 200-500KB of JavaScript, and require app permissions to your store data. Our solution is a $99 one-time purchase, loads under 10KB, requires no app install, and no ongoing subscription. You get the same GDPR, CCPA, and PIPEDA compliance without the recurring cost or performance hit.',
+        'This is not a Shopify app. Paste one async script into theme.liquid. A standard banner is about 28 KB gzipped. Pro is $99 once or $99 per year. The banner can set consent choices for GDPR, CCPA, and PIPEDA. It does not make a store compliant.',
     },
     {
       question: 'Does this work with Shopify Plus and Hydrogen?',
@@ -193,7 +192,7 @@ export default function ShopifyIntegrationPage() {
     {
       question: 'Will a cookie banner slow down my Shopify store?',
       answer:
-        'Not with our solution. The script is under 10KB and loads asynchronously with the defer attribute. It does not block page rendering or affect your Core Web Vitals. Most Shopify cookie apps load 200-500KB and can add 200-500ms to your page load time, which directly impacts conversion rates.',
+        'The script is about 28 KB gzipped and uses the async attribute, so it does not block HTML parsing. That is not a Core Web Vitals or conversion promise.',
     },
   ]
 
@@ -534,12 +533,12 @@ export default function ShopifyIntegrationPage() {
                 {
                   icon: Shield,
                   title: 'GDPR, CCPA & PIPEDA',
-                  desc: 'Automatic geo-targeted compliance',
+                  desc: 'Modes for those laws. Geo rules are a Pro setting you configure.',
                 },
                 {
                   icon: Zap,
-                  title: 'Under 10KB',
-                  desc: 'Zero impact on store load speed',
+                  title: 'About 28 KB gzipped',
+                  desc: 'Loads async. Not a Core Web Vitals promise.',
                 },
               ].map((item, i) => {
                 const ItemIcon = item.icon

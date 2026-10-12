@@ -59,7 +59,7 @@ export default function ReactIntegrationPage() {
     },
     {
       question: "Will this cookie consent solution affect my Core Web Vitals?",
-      answer: "No. Unlike npm cookie consent packages that add 15-50KB to your bundle, our script loads asynchronously from a CDN. It does not block your page rendering or negatively impact your Largest Contentful Paint (LCP), Interaction to Next Paint (INP), or Cumulative Layout Shift (CLS) scores. The external script is under 10KB gzipped and adds zero bytes to your JavaScript bundle."
+      answer: "The banner is a hosted script, so it is not inside your app bundle. It is about 28 KB gzipped and uses async, so it does not block HTML parsing. That is not a promise about LCP, INP, or CLS."
     },
     {
       question: "Do I need to redeploy my React app to update the cookie banner?",
@@ -75,14 +75,14 @@ export default function ReactIntegrationPage() {
     },
     {
       question: "Is this react cookie banner GDPR, PIPEDA, and CCPA compliant?",
-      answer: "Yes. Our cookie consent banner supports GDPR (EU), PIPEDA (Canada), CCPA/CPRA (California), LGPD (Brazil), and other global privacy regulations. Configure the compliance mode in the dashboard based on your audience location. The banner automatically adjusts -- GDPR requires opt-in consent while CCPA requires opt-out."
+      answer: "The builder has modes for Canada, the EU, and California. Pro can show a different mode to a country you pick. There is no Brazil mode. A mode does not make the app compliant."
     },
   ]
 
   const articleData = {
     title: "React Cookie Banner: Free Copy-Paste Example (2026)",
     description:
-      "Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, under 10KB. App Router, Vite, and CRA examples. GDPR and PIPEDA.",
+      "Copy-paste a free React or Next.js cookie banner: one script tag, no npm install, about 28 KB gzipped. App Router, Vite, and CRA examples. GDPR and PIPEDA.",
     datePublished: "2025-01-15",
     dateModified: "2026-03-16"
   }
@@ -139,7 +139,7 @@ export default function ReactIntegrationPage() {
                   </span>
                   <br />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 via-foreground to-foreground/90">
-                    No npm Install. Under 10KB.
+                    No npm Install. About 28 KB gzipped.
                   </span>
                 </h1>
 
@@ -199,13 +199,13 @@ export default function ReactIntegrationPage() {
               >
                 <div className="space-y-6 text-muted-foreground">
                   <p className="text-lg leading-relaxed">
-                    If you are building a React application that serves users in the EU, Canada, California, or Brazil, you need a <strong className="text-foreground">react cookie consent</strong> solution. GDPR, PIPEDA, CCPA, and LGPD all require informed consent before setting non-essential cookies -- violations can result in fines up to 4% of your annual revenue.
+                    If a React app sets non-essential cookies for people in the EU, Canada, or California, the banner can use a mode for that audience. There is no Brazil mode. A banner does not make the app compliant, and it does not set a fine.
                   </p>
                   <p className="text-lg leading-relaxed">
                     Traditional npm cookie consent packages like <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">react-cookie-consent</code> add 15-50KB to your bundle, require manual updates when privacy laws change, need custom CSS to match your brand, and often lack proper consent management for third-party scripts like Google Analytics or Facebook Pixel.
                   </p>
                   <p className="text-lg leading-relaxed">
-                    Our approach is different. Instead of a <strong className="text-foreground">cookie consent npm</strong> package, we provide a hosted script that loads asynchronously from a global CDN. Zero impact on your bundle size. No dependency maintenance. Instant updates when you change your banner design or compliance settings. It is the <strong className="text-foreground">lightweight cookie consent for React apps</strong> that developers actually want.
+                    The install is a hosted script, not an npm package. It is not inside your app bundle. The browser still downloads about 28 KB gzipped. A design change publishes from the dashboard. That is not a performance score.
                   </p>
                 </div>
               </motion.div>
@@ -315,7 +315,7 @@ export default function ReactIntegrationPage() {
 
               <div className="space-y-6 text-muted-foreground mb-12">
                 <p className="text-lg leading-relaxed">
-                  Unlike traditional <strong className="text-foreground">cookie consent npm</strong> packages that require <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">npm install react-cookie-consent</code> followed by component imports and configuration objects, our approach is radically simpler. You add a single async script tag and the banner just works. The hosted script is under 10KB gzipped, loads asynchronously so it never blocks rendering, and gets served from a global CDN with edge caching.
+                  Unlike traditional <strong className="text-foreground">cookie consent npm</strong> packages that require <code className="bg-foreground/95 text-background font-mono px-2 py-1 rounded text-sm">npm install react-cookie-consent</code> followed by component imports and configuration objects, our approach is radically simpler. You add a single async script tag and the banner just works. The hosted script is about 28 KB gzipped, loads asynchronously so it never blocks rendering, and gets served from a global CDN with edge caching.
                 </p>
               </div>
 
@@ -400,7 +400,7 @@ export default function ReactIntegrationPage() {
                         <Badge variant="outline">No redeployment needed</Badge>
                         <Badge variant="outline">Instant updates</Badge>
                         <Badge variant="outline">Zero maintenance</Badge>
-                        <Badge variant="outline">Under 10KB gzipped</Badge>
+                        <Badge variant="outline">About 28 KB gzipped</Badge>
                       </div>
                     </CardContent>
                   </Card>
@@ -859,7 +859,7 @@ export default function DashboardLayout({
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-4">
-                        * Our solution adds 0 KB to your bundle because the script loads externally. The external script itself is under 10KB gzipped and cached on a global CDN.
+                        * Our solution adds 0 KB to your bundle because the script loads externally. The external script itself is about 28 KB gzipped and cached on a global CDN.
                       </p>
                     </CardContent>
                   </Card>
@@ -870,17 +870,17 @@ export default function DashboardLayout({
                     {
                       icon: Zap,
                       title: 'Async Loading',
-                      desc: 'The script loads asynchronously and never blocks your critical rendering path. Your LCP score stays unaffected.',
+                      desc: 'The script uses async, so it does not block HTML parsing. That is not an LCP promise.',
                     },
                     {
                       icon: Globe,
                       title: 'Global CDN',
-                      desc: 'Served from edge locations worldwide. Users load the script from the nearest server, typically in under 50ms.',
+                      desc: 'The script is hosted. A design change does not need a new deploy of your app. We do not publish a latency number.',
                     },
                     {
                       icon: Shield,
-                      title: 'No CLS Impact',
-                      desc: 'The banner overlays your content rather than pushing it down. Zero Cumulative Layout Shift.',
+                      title: 'Layout',
+                      desc: 'Whether the banner shifts the page depends on the layout you pick. We do not promise a CLS score.',
                     },
                   ].map((item, i) => {
                     const ItemIcon = item.icon
@@ -1096,7 +1096,7 @@ export default function DashboardLayout({
               </h2>
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
-                Build your cookie banner in the visual builder, copy one script tag, and your React app is compliant. Under 10KB, async loading, zero bundle impact.
+                Build your cookie banner in the visual builder, copy one script tag, and your React app is compliant. About 28 KB gzipped, async loading, zero bundle impact.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

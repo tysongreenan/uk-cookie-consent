@@ -117,8 +117,7 @@ export default function SupportPage() {
                     Is my banner GDPR compliant?
                   </h3>
                   <p className="text-muted-foreground">
-                    Yes! All banners generated through our platform are designed to meet GDPR, PIPEDA, CASL, and Quebec Law 25 requirements. 
-                    We regularly update our templates to stay current with changing privacy laws.
+                    The banner can use Canada, EU, or California modes, including French. It does not make a site GDPR, PIPEDA, or Law 25 compliant, and it does not cover CASL. Check the scripts you added and the copy on the banner.
                   </p>
                 </div>
 

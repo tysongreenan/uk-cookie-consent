@@ -52,7 +52,7 @@ const cardVariants = {
 const faqData = [
   {
     question: "What is the best Termly alternative in 2026?",
-    answer: "Cookie-Banner.ca is a strong Termly alternative if your primary need is cookie consent. Termly bundles cookie consent with legal document generators, but if you only need a cookie banner, you are paying for features you do not use. Cookie-Banner.ca offers a free plan with 1 banner, 4 layouts, and unlimited pages, or a $99 one-time Pro plan with unlimited banners, 11 layouts, 10-language auto-translate, and analytics."
+    answer: "Cookie-Banner.ca is a strong Termly alternative if your primary need is cookie consent. Termly bundles cookie consent with legal document generators, but if you only need a cookie banner, you are paying for features you do not use. Cookie-Banner.ca offers a free plan with 1 banner, 7 layouts, and unlimited pages, or a $99 one-time Pro plan with unlimited banners, 14 layouts, 16 languages, and analytics."
   },
   {
     question: "How much does Termly cost per year?",
@@ -64,7 +64,7 @@ const faqData = [
   },
   {
     question: "How do I migrate from Termly to Cookie-Banner.ca?",
-    answer: "Migrating from Termly takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the Termly cookie consent script with our lightweight embed code (under 10KB), 4) Remove the old Termly script. Note: if you use Termly for privacy policy or terms generation, you will need a separate solution for those documents."
+    answer: "Migrating from Termly takes about 5 minutes: 1) Sign up for a free Cookie-Banner.ca account, 2) Use the visual builder to customize your banner design and consent categories, 3) Replace the Termly cookie consent script with our lightweight embed code (about 28 KB gzipped), 4) Remove the old Termly script. Note: if you use Termly for privacy policy or terms generation, you will need a separate solution for those documents."
   },
   {
     question: "Termly vs Cookiebot: which is better for cookie consent?",
@@ -76,11 +76,11 @@ const faqData = [
   },
   {
     question: "Is Termly good for cookie consent specifically?",
-    answer: "Termly is a jack-of-all-trades platform -- it handles privacy policies, terms of service, disclaimers, and cookie consent. The cookie consent component works, but it is not Termly's primary focus. Cookie-Banner.ca is built exclusively for cookie consent, which means more layout options, lighter scripts, better performance, and features like 10-language auto-translate that Termly does not offer."
+    answer: "Termly is a jack-of-all-trades platform -- it handles privacy policies, terms of service, disclaimers, and cookie consent. The cookie consent component works, but it is not Termly's primary focus. Cookie-Banner.ca is built exclusively for cookie consent, which means more layout options, lighter scripts, better performance, and features like 16 languages that Termly does not offer."
   },
   {
     question: "Does Termly work with Shopify?",
-    answer: "Yes, Termly offers Shopify integration through a script embed. However, Termly's script is heavier than dedicated cookie consent tools, which can impact your store's loading speed. Cookie-Banner.ca also works with Shopify with a script under 10KB that loads asynchronously, and setup takes under 5 minutes."
+    answer: "Yes, Termly offers Shopify integration through a script embed. However, Termly's script is heavier than dedicated cookie consent tools, which can impact your store's loading speed. Cookie-Banner.ca also works with Shopify with a script about 28 KB gzipped that loads asynchronously, and setup takes under 5 minutes."
   },
   {
     question: "Is Termly GDPR and PIPEDA compliant?",
@@ -158,7 +158,7 @@ export default function TermlyAlternativePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Termly bundles cookie consent with privacy policy generators for $10-35/month. If you just need a cookie banner, Cookie-Banner.ca does it better -- with 10-language auto-translate, a lighter script, and a one-time $99 Pro plan.
+                  Termly bundles cookie consent with privacy policy generators for $10-35/month. If you just need a cookie banner, Cookie-Banner.ca does it better -- with 16 languages, a lighter script, and a one-time $99 Pro plan.
                 </p>
               </motion.div>
 
@@ -328,7 +328,7 @@ export default function TermlyAlternativePage() {
                       <td className="py-4 px-4 font-semibold text-primary">Cookie-Banner.ca Pro</td>
                       <td className="py-4 px-4 text-primary font-bold text-lg">$99 once</td>
                       <td className="py-4 px-4 text-primary font-bold text-lg">$99 total</td>
-                      <td className="py-4 px-4 text-foreground font-semibold text-sm">Unlimited banners, 11 layouts, 10 languages, analytics</td>
+                      <td className="py-4 px-4 text-foreground font-semibold text-sm">Unlimited banners, 14 layouts, 16 languages, analytics</td>
                     </tr>
                   </tbody>
                 </table>
@@ -409,7 +409,7 @@ export default function TermlyAlternativePage() {
                     { feature: "No Monthly Subscription", termly: false, ours: "$99 one-time Pro" },
                     { feature: "Banner Layouts", termly: "2-3 options", ours: "4 free / 11 Pro" },
                     { feature: "Visual Banner Builder", termly: "Basic", ours: "Full builder + live preview" },
-                    { feature: "Script Size", termly: "~45KB+", ours: "Under 10KB" },
+                    { feature: "Script Size", termly: "~45KB+", ours: "About 28 KB gzipped" },
                     { feature: "Async Loading", termly: false, ours: true },
                     { feature: "Auto-Translation (10 langs)", termly: false, ours: "Pro" },
                     { feature: "Consent Analytics", termly: "Standard+", ours: "Pro" },
@@ -488,12 +488,12 @@ export default function TermlyAlternativePage() {
 
                 <h3 className="font-heading text-foreground">No Auto-Translation</h3>
                 <p>
-                  Termly does not auto-translate cookie banners. If your site has international visitors, you need to manually configure translations. Cookie-Banner.ca Pro includes <strong className="text-foreground">10-language auto-translate</strong> that detects visitor language and shows the banner in their language automatically -- English, French, Spanish, German, Portuguese, Italian, Dutch, Japanese, Korean, and Chinese.
+                  The banner ships in 16 languages: English, French, Spanish, German, Portuguese, Japanese, Chinese, Korean, Arabic, Hindi, Dutch, Swedish, Norwegian, Danish, Italian, and Finnish. It can follow the browser language. That is not limited to Pro, and it is not a translation of your whole site.
                 </p>
 
                 <h3 className="font-heading text-foreground">Performance Impact</h3>
                 <p>
-                  Termly&apos;s script carries code for its broader compliance platform, resulting in a heavier load. Cookie-Banner.ca&apos;s script is <strong className="text-foreground">under 10KB gzipped</strong> and loads asynchronously, meaning zero impact on your page rendering speed. For sites where Core Web Vitals matter, this is significant.
+                  Cookie-Banner.ca&apos;s script is <strong className="text-foreground">about 28 KB gzipped</strong> and loads asynchronously, so it does not block HTML parsing. That is not a Core Web Vitals promise. We have not published a measurement of Termly&apos;s script.
                 </p>
               </motion.div>
 
@@ -539,9 +539,9 @@ export default function TermlyAlternativePage() {
                         'Free forever, or $99 one-time Pro',
                         'Focused exclusively on cookie consent',
                         'Cookie consent is the only product',
-                        '11 layouts with visual builder (Pro)',
-                        '10-language auto-translate (Pro)',
-                        'Under 10KB, async loading',
+                        '14 layouts with visual builder (Pro)',
+                        '16 languages (Pro)',
+                        'About 28 KB gzipped, async loading',
                       ].map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
@@ -565,7 +565,7 @@ export default function TermlyAlternativePage() {
                   <div>
                     <h3 className="font-heading font-semibold text-foreground text-lg mb-2">The Verdict: Termly vs Cookie-Banner.ca</h3>
                     <p className="text-muted-foreground">
-                      If you need a bundled solution for privacy policies, terms of service, and cookie consent, Termly provides that convenience. But if your primary need is cookie consent, Cookie-Banner.ca is the better choice -- focused, lightweight, more customizable, with 10-language auto-translate and a one-time $99 price that saves you hundreds over Termly&apos;s subscriptions.
+                      If you need a bundled solution for privacy policies, terms of service, and cookie consent, Termly provides that convenience. But if your primary need is cookie consent, Cookie-Banner.ca is the better choice -- focused, lightweight, more customizable, with 16 languages and a one-time $99 price that saves you hundreds over Termly&apos;s subscriptions.
                     </p>
                   </div>
                 </div>
@@ -589,7 +589,7 @@ export default function TermlyAlternativePage() {
                   What Makes Cookie-Banner.ca a Good Termly Alternative?
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  A closer look at what 1,000+ websites get when they switch
+                  A closer look at what you get when you switch
                 </p>
               </motion.div>
 
@@ -598,22 +598,22 @@ export default function TermlyAlternativePage() {
                   {
                     icon: DollarSign,
                     title: 'Free Plan + $99 Pro',
-                    desc: 'No subscription. The free plan includes 1 banner, 4 layouts, GDPR/CCPA compliance, and unlimited pages with "Powered by" branding. Pro ($99 one-time) adds unlimited banners, 11 layouts, analytics, and more.',
+                    desc: 'No subscription. The free plan includes 1 banner, 7 layouts, GDPR/CCPA compliance, and unlimited pages with "Powered by" branding. Pro ($99 one-time) adds unlimited banners, 14 layouts, analytics, and more.',
                   },
                   {
                     icon: Zap,
-                    title: 'Lightweight Script (Under 10KB)',
-                    desc: 'Our script is under 10KB and loads asynchronously. Termly loads 45KB+ because it carries code for its broader compliance platform. Lighter scripts mean better performance.',
+                    title: 'Lightweight Script (About 28 KB gzipped)',
+                    desc: 'Our script is about 28 KB gzipped and loads asynchronously. Termly loads 45KB+ because it carries code for its broader compliance platform. Lighter scripts mean better performance.',
                   },
                   {
                     icon: Globe,
                     title: '10-Language Auto-Translate',
-                    desc: 'Pro plan auto-detects visitor language and displays your banner in English, French, Spanish, German, Portuguese, Italian, Dutch, Japanese, Korean, or Chinese.',
+                    desc: '16 banner languages, including English and French. The banner can follow the browser language. Not limited to Pro.',
                   },
                   {
                     icon: Shield,
                     title: 'Complete Compliance',
-                    desc: 'Full GDPR, CCPA/CPRA, PIPEDA, and Law 25 compliance. Google Consent Mode v2 and IAB TCF 2.2 support built in -- even on the free plan.',
+                    desc: 'Modes for GDPR, CCPA, PIPEDA, and a Pro geo rule for Quebec Law 25. Google Consent Mode v2 can start denied. An IAB TCF v2.2 toggle exists on Pro, not on the free plan. Not a Google-certified CMP.',
                   },
                   {
                     icon: Rocket,
@@ -623,7 +623,7 @@ export default function TermlyAlternativePage() {
                   {
                     icon: Users,
                     title: 'Analytics & Team (Pro)',
-                    desc: 'Pro plan includes consent rate analytics, A/B testing insights, and unlimited team members with role-based permissions.',
+                    desc: 'Pro includes consent analytics and team roles (owner, admin, editor, viewer). There is no banner A/B test. Consent logs are on Pro Annual and Enterprise.',
                   },
                 ].map((item, i) => {
                   const Icon = item.icon
@@ -690,7 +690,7 @@ export default function TermlyAlternativePage() {
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">03</span>
-                    <span><strong className="text-foreground">Replace the cookie consent script</strong> -- remove Termly&apos;s consent banner script and paste our lightweight embed code (under 10KB)</span>
+                    <span><strong className="text-foreground">Replace the cookie consent script</strong> -- remove Termly&apos;s consent banner script and paste our lightweight embed code (about 28 KB gzipped)</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="font-mono text-xs text-muted-foreground mt-1">04</span>

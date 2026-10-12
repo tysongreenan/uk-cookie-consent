@@ -8,15 +8,15 @@ import { Footer } from '@/components/landing/footer'
 import { MapPin, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, FileText, Scale, Building, Flag } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2026',
+  title: 'What Is the EU Cookie Law? ePrivacy Directive (2026)',
   description:
-    'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, Cookie Law, Data Protection Authorities, and multi-language support across 27 EU countries.',
+    'The EU cookie law is the ePrivacy Directive. Non-essential cookies need consent before they are stored or read. The six GDPR consent rules are on the GDPR cookie consent page.',
   keywords:
-    'eu cookie consent, gdpr compliance, eprivacy directive, cookie law eu, eu data protection, dpa enforcement, multi-language cookie banner',
+    'eu cookie law, eu cookie directive, eu cookie compliance, eu cookie consent, eprivacy directive, cookie law eu, gdpr cookie consent',
   openGraph: {
-    title: 'EU Cookie Consent | GDPR & ePrivacy Directive Guide 2026',
+    title: 'What Is the EU Cookie Law? ePrivacy Directive (2026)',
     description:
-      'Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, and multi-language support.',
+      'The EU cookie law is the ePrivacy Directive. Non-essential cookies need consent before they are stored or read.',
     type: 'article',
   },
   robots: { index: true, follow: true },
@@ -36,20 +36,23 @@ export default function EUCompliancePage() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-4 bg-blue-500 text-white">EU Compliance</Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              EU Cookie Consent
-              <span className="block text-blue-200">GDPR + ePrivacy Directive</span>
+              What Is the EU Cookie Law?
+              <span className="block text-blue-200">The ePrivacy Directive</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Complete guide to EU cookie consent compliance. GDPR requirements, ePrivacy Directive, Cookie Law, Data Protection Authorities, and multi-language support across 27 EU countries.
+              The EU cookie law is the ePrivacy Directive. Non-essential cookies need consent before they are stored or read. The six GDPR consent rules are on the GDPR cookie consent page.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                <MapPin className="mr-2 h-5 w-5" />
-                Get EU Solution
+              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
+                <Link href="/blog/gdpr-cookie-consent-requirements">
+                  <FileText className="mr-2 h-5 w-5" />
+                  Read the six GDPR rules
+                </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <FileText className="mr-2 h-5 w-5" />
-                Download GDPR Guide
+              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Link href="/builder">
+                  Build a banner
+                </Link>
               </Button>
             </div>
           </div>
@@ -907,19 +910,22 @@ export default function EUCompliancePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready for EU Privacy Compliance?
+              Read the Six GDPR Rules
             </h2>
             <p className="text-xl text-blue-100 mb-8">
-              Join EU organizations using our GDPR and ePrivacy Directive compliant cookie consent solution. Multi-language support, DPA guidance compliance, and EU privacy expertise.
+              The six consent rules are on the GDPR page. A banner can record a choice. It does not make the site compliant.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                <MapPin className="mr-2 h-5 w-5" />
-                Get EU Solution
+              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
+                <Link href="/blog/gdpr-cookie-consent-requirements">
+                  <FileText className="mr-2 h-5 w-5" />
+                  Read the six GDPR rules
+                </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <FileText className="mr-2 h-5 w-5" />
-                Download GDPR Guide
+              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Link href="/builder">
+                  Build a banner
+                </Link>
               </Button>
             </div>
           </div>

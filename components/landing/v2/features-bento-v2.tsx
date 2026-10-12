@@ -10,7 +10,7 @@ export function FeaturesBentoV2() {
         <SectionHead
           eyebrow="Everything in the box"
           title={<>The boring stuff,<br />handled.</>}
-          lede="Compliance, performance, accessibility, audit trails. The kind of thing nobody wants to think about — until they get a letter from a regulator."
+          lede="Consent modes, one hosted script, 16 languages, and an accessibility menu. Consent logs are on Pro Annual and Enterprise."
         />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:[grid-auto-rows:minmax(260px,auto)]">
@@ -51,7 +51,7 @@ function ComplianceCard() {
           One toggle each.
         </h3>
         <p className="mt-2 max-w-[380px] text-sm leading-relaxed text-muted-foreground">
-          Switch frameworks per banner. We rewrite the legal copy, set the right consent expiry, and adjust opt-in/opt-out behaviour automatically.
+          Modes for Canada, the EU, and California change the default copy and whether the banner waits for opt-in. Quebec Law 25 is a Pro geo rule you set. You choose how long the choice is stored. A mode is not a legal opinion.
         </p>
       </div>
 
@@ -162,8 +162,7 @@ function CodeCard() {
         className="mt-4 overflow-hidden rounded-xl bg-[#0F1A1D] px-4 py-3.5 font-mono text-xs leading-[1.6] text-[#B6E3EB] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
         aria-label="Install snippet"
       >
-{`<!-- cookie-banner.ca -->
-<script async src="https://cdn.cookie-banner.ca/v2/banner.js" data-id="brk_8f2c"></script>`}
+{`<script src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID" async></script>`}
       </pre>
     </article>
   )
@@ -210,7 +209,7 @@ function ConsentAnalyticsCard() {
           See what's working.
         </h3>
         <p className="mt-2 max-w-[380px] text-sm leading-relaxed text-muted-foreground">
-          Live counts of accepts, rejects, and partial consents — broken down by region, device, and banner variant.
+          Example only, not live customer data. Pro analytics can split accepts and rejects by country and device. There is no banner A/B test.
         </p>
       </div>
       <div className="mt-4 flex gap-2">
@@ -253,7 +252,7 @@ function GeoCard() {
       { left: '18%', top: '45%', text: 'California · CCPA', region: 'c-na' },
       { left: '23%', top: '32%', text: 'Quebec · Law 25', region: 'c-na' },
       { left: '52%', top: '32%', text: 'Germany · GDPR', region: 'c-eu' },
-      { left: '74%', top: '36%', text: 'Japan · APPI', region: 'c-as' },
+      { left: '48%', top: '28%', text: 'Canada · PIPEDA', region: 'c-eu' },
     ]
     let i = 0
     let timer: ReturnType<typeof setInterval> | null = null
@@ -296,7 +295,7 @@ function GeoCard() {
           right region.
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Show GDPR in the EU, CCPA in California, Law 25 in Quebec — automatically.
+          Pro only. You write the rule, for example Quebec, the EU, or California. The banner does not detect a statute on its own.
         </p>
       </div>
 
@@ -324,7 +323,7 @@ function GeoCard() {
 
 /* -------- 5. Languages -------- */
 function LanguagePillsCard() {
-  const codes = ['EN', 'FR', 'ES', 'DE', 'IT', 'PT', 'NL', 'PL', 'SV', 'DA', 'FI', 'JA', 'ZH', 'KO', 'AR', 'HE']
+  const codes = ['EN', 'FR', 'ES', 'DE', 'PT', 'JA', 'ZH', 'KO', 'AR', 'HI', 'NL', 'SV', 'NB', 'DA', 'IT', 'FI']
   return (
     <article className={`${baseCard} md:col-span-2`}>
       <div>
@@ -333,7 +332,7 @@ function LanguagePillsCard() {
           EN, FR, plus 14 languages.
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Required by Law 25. Auto-detects browser locale.
+          English, French, and 14 more. The banner can follow the browser language. French text alone does not satisfy Law 25.
         </p>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-1.5">
@@ -369,7 +368,7 @@ function PerformanceCard() {
     const animate = () => {
       if (started) return
       started = true
-      const target = 9.3
+      const target = 28
       const dur = 1400
       const t0 = performance.now()
       const ease = (t: number) => 1 - Math.pow(1 - t, 3)
@@ -401,16 +400,16 @@ function PerformanceCard() {
       <div>
         <CardEyebrow>Performance</CardEyebrow>
         <h3 className="mt-2 font-heading text-[22px] font-semibold leading-[1.18] tracking-[-0.02em] text-foreground">
-          Under 10 KB,
+          About 28 KB,
           <br />
-          loads async.
+          loaded async.
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Zero impact on Core Web Vitals. Deferred analytics. Scripts gated by consent.
+          One script tag, so it does not block HTML parsing. Scripts you add stay gated by consent.
         </p>
       </div>
       <div className="mt-auto flex items-baseline gap-1 pt-2 font-heading text-[64px] font-bold leading-none tracking-[-0.04em] text-foreground">
-        <span>{n.toFixed(1)}</span>
+        <span>{Math.round(n)}</span>
         <span className="text-xl font-medium text-muted-foreground">kb</span>
       </div>
     </article>

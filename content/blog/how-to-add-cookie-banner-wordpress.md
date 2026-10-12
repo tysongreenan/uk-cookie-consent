@@ -1,8 +1,8 @@
 ---
 title: "How to Add a Cookie Banner to WordPress (Free, No Plugin)"
-description: "Add a GDPR-compliant cookie banner to WordPress in under 5 minutes — no plugin required. Generate the snippet, paste it in, and Start free today."
+description: "Paste one async script tag. You do not need a WordPress cookie plugin. The script is about 28 KB gzipped. That is not a Core Web Vitals promise."
 date: "2025-01-16"
-updatedDate: "2026-09-15"
+updatedDate: "2026-10-11"
 heroCta:
   primary:
     label: "Start a free banner"
@@ -27,7 +27,7 @@ keywords:
 ---
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> To add a cookie banner to WordPress, you can use a cookie consent platform (like Cookie Banner Generator), install a WordPress plugin, or build a custom solution. The fastest method is using a cookie consent platform: create your banner, copy the generated code, and paste it into your WordPress theme's header.php file or use a code injection plugin. The entire process takes about 10 minutes and requires no coding knowledge.
+<strong>Direct Answer:</strong> Paste one async script tag: <code>https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID</code>. You do not need a cookie plugin. The script is about 28 KB gzipped. That is not a Core Web Vitals promise.
 
 [Get started with Cookie Banner Generator →](/free-cookie-banner)
 </div>
@@ -74,15 +74,14 @@ There are three main methods to add a cookie banner to WordPress:
 
 ### Method 1: Cookie Consent Platform (Recommended)
 
-**Best for:** Anyone who wants unlimited cookie banners, full customization, and no monthly fees.
+**Best for:** Anyone who wants one async script and no cookie plugin.
 
 **Pros:**
-- ✅ No WordPress plugin required
-- ✅ Unlimited cookie banners
-- ✅ Fully branded (match your site's design)
-- ✅ GDPR, PIPEDA, and CASL compliant
-- ✅ Works with any WordPress theme
-- ✅ First 1,000 accounts free forever
+- No WordPress plugin required
+- Free plan: one banner. Pro: unlimited banners and branding removal
+- Works with any WordPress theme
+- Scripts you add can stay off until a choice. The banner cannot block cookies other code sets
+- About 28 KB gzipped. That is not a Core Web Vitals promise
 
 **Cons:**
 - Requires copying and pasting code (takes 2 minutes)
@@ -360,7 +359,7 @@ Use this checklist to ensure your setup is complete:
 - [ ] Footer link to reopen cookie settings
 - [ ] Tested in multiple browsers
 - [ ] Tested on mobile devices
-- [ ] Page speed impact is minimal (< 0.3s to LCP)
+- [ ] The script loads async. That is not a Core Web Vitals promise
 
 ---
 
@@ -373,7 +372,7 @@ Use this checklist to ensure your setup is complete:
 3. Copy the code and paste it into WordPress
 4. You're done!
 
-**First 1,000 accounts are free forever.**
+The free plan is one banner. Pro is $99 once or $99 a year.
 
 ### Option 2: WordPress Plugin
 
@@ -394,16 +393,16 @@ Use this checklist to ensure your setup is complete:
 ## Conclusion / TL;DR
 
 **Key Takeaways:**
-- **WordPress sites need cookie banners** if they use tracking tools like Google Analytics or Facebook Pixel
-- **Three main methods:** Cookie consent platform (recommended), WordPress plugin, or manual coding
-- **Cookie Banner Generator is the fastest option** — 10 minutes to set up, unlimited banners, free for first 1,000 accounts
-- **Compliance is critical** — Block cookies until consent, provide granular choices, link to privacy policy
-- **Test thoroughly** — Verify cookies don't load before consent, test on mobile, check page speed
+- **Paste one async script.** You do not need a WordPress cookie plugin.
+- **Free plan is one banner.** Pro is $99 once or $99 a year.
+- **Scripts you add can stay off until a choice.** The banner cannot block cookies other code sets.
+- **About 28 KB gzipped** is not a Core Web Vitals promise.
+- **A banner does not make the site compliant.**
 
 **Next Steps:**
 1. Choose your method (platform, plugin, or custom)
 2. Install and customize your cookie banner
-3. Test that cookies only load after consent
+3. Confirm scripts you added have not run before a choice
 4. Update your privacy policy
 5. Add footer link to cookie settings
 

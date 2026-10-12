@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
   description:
-    'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods: HTML widget, functions.php, or header plugin. Under 10 KB, 3-minute setup.',
+    'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods: HTML widget, functions.php, or header plugin. About 28 KB gzipped, 3-minute setup.',
   keywords: [
     'brizy cookie consent',
     'brizy wordpress cookie banner',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
     description:
-      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, under 10 KB, 3-minute setup.',
+      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, about 28 KB gzipped, 3-minute setup.',
     type: 'article',
     url: 'https://www.cookie-banner.ca/integrations/brizy',
   },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Brizy Cookie Consent | Cookie Banner for Brizy',
     description:
-      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, under 10 KB.',
+      'Add a GDPR-compliant cookie banner to your Brizy WordPress site. Three install methods, about 28 KB gzipped.',
   },
   alternates: {
     canonical: '/integrations/brizy',

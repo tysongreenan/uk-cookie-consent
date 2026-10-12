@@ -66,7 +66,7 @@ const faqData = [
   {
     question: 'Will the cookie banner slow down my Brizy pages?',
     answer:
-      'No. The script is under 10 KB gzipped and loads with the defer attribute, so it never blocks your page render. Brizy pages already load a page builder runtime — our banner adds virtually zero overhead on top of that.',
+      'The script is about 28 KB gzipped and uses the async attribute, so it does not block HTML parsing. That is not a Core Web Vitals promise.',
   },
   {
     question: 'Can I style the cookie banner to match my Brizy design?',
@@ -111,9 +111,8 @@ const installMethods = [
     icon: Blocks,
     code: `<!-- Inside a Brizy HTML element (Global Header) -->
 <script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  async>
 </script>`,
     steps: [
       'Open the Brizy editor on any page',
@@ -132,17 +131,16 @@ const installMethods = [
   {
     number: '02',
     title: 'WordPress functions.php',
-    badge: 'Best Performance',
+    badge: 'Child theme',
     description:
-      'Add the script to your child theme. This bypasses the page builder entirely and loads the banner directly from WordPress — the fastest option.',
+      'Add the same async script from a child theme so it is not inside a Brizy block.',
     icon: Code,
     code: `// Add to your child theme's functions.php
 function add_cookie_banner_script() {
     ?>
     <script
-      src="https://cdn.cookie-banner.ca/banner.js"
-      data-site-id="YOUR_SITE_ID"
-      defer>
+      src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+      async>
     </script>
     <?php
 }
@@ -154,7 +152,7 @@ add_action('wp_head', 'add_cookie_banner_script');`,
       'Click Update File',
     ],
     pros: [
-      'Best performance — no plugin overhead',
+      'Same hosted script, loaded from the theme',
       'Loads on every page automatically',
       'Survives Brizy plugin updates',
     ],
@@ -169,9 +167,8 @@ add_action('wp_head', 'add_cookie_banner_script');`,
     icon: FileText,
     code: `<!-- Paste into the "Header Scripts" field -->
 <script
-  src="https://cdn.cookie-banner.ca/banner.js"
-  data-site-id="YOUR_SITE_ID"
-  defer>
+  src="https://www.cookie-banner.ca/api/v1/banner.js?id=YOUR_BANNER_ID"
+  async>
 </script>`,
     steps: [
       'Install "WPCode" from the WordPress plugin directory',
@@ -312,7 +309,7 @@ export default function BrizyIntegrationPage() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-foreground" />
-                  Under 10 KB
+                  About 28 KB gzipped
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-foreground" />
@@ -602,7 +599,7 @@ export default function BrizyIntegrationPage() {
 
               <p className="mb-8 text-lg text-muted-foreground sm:mb-10">
                 Build your cookie banner in the visual editor. Paste 1 script tag
-                into your Brizy site. Done. Under 10 KB, $99 one-time, no subscription.
+                into your Brizy site. Done. About 28 KB gzipped, $99 one-time, no subscription.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

@@ -779,7 +779,7 @@ export default function Law25CookieBannerPage() {
                       <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
                       <div>
                         <h3 className="font-semibold text-foreground mb-1">Zero Performance Impact</h3>
-                        <p className="text-muted-foreground text-sm">Under 10KB script. Loads async with no impact on Core Web Vitals or page speed.</p>
+                        <p className="text-muted-foreground text-sm">About 28 KB gzipped script. Loads async with does not block HTML parsing.</p>
                       </div>
                     </div>
                   </CardContent>
