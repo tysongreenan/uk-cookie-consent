@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Search, FileText } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { FileText } from 'lucide-react'
 
 export interface HelpSearchItem {
   title: string
@@ -13,6 +14,7 @@ export interface HelpSearchItem {
 }
 
 export function HelpSearch({ items }: { items: HelpSearchItem[] }) {
+  const router = useRouter()
   const [query, setQuery] = useState('')
 
   const results = useMemo(() => {
@@ -27,29 +29,43 @@ export function HelpSearch({ items }: { items: HelpSearchItem[] }) {
   const hasQuery = query.trim().length > 0
 
   return (
-    <div className="relative mx-auto w-full max-w-2xl">
+    <form
+      role="search"
+      className="relative w-full max-w-2xl"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (results[0]) router.push(results[0].href)
+      }}
+    >
       <label htmlFor="help-search" className="sr-only">
-        Search help articles
+        Search the help center
       </label>
-      <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-      <input
-        id="help-search"
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for answers, e.g. banner not showing"
-        autoComplete="off"
-        className="h-14 w-full rounded-xl border bg-background pl-12 pr-4 text-base shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
+      <div className="flex rounded-lg bg-white p-1.5 shadow-lg">
+        <input
+          id="help-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search the help center..."
+          autoComplete="off"
+          className="h-12 min-w-0 flex-1 bg-transparent px-4 text-base text-neutral-900 outline-none placeholder:text-neutral-500"
+        />
+        <button
+          type="submit"
+          className="rounded-md bg-neutral-900 px-6 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+        >
+          Search
+        </button>
+      </div>
 
       {hasQuery && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-xl border bg-background text-left shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-lg border bg-background text-left shadow-xl">
           {results.length > 0 ? (
             <ul className="max-h-96 divide-y overflow-y-auto">
               {results.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/60">
-                    <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
                     <span>
                       <span className="block font-medium text-foreground">{item.title}</span>
                       <span className="block text-xs text-muted-foreground">{item.categoryTitle}</span>
@@ -69,6 +85,6 @@ export function HelpSearch({ items }: { items: HelpSearchItem[] }) {
           )}
         </div>
       )}
-    </div>
+    </form>
   )
 }

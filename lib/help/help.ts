@@ -163,3 +163,14 @@ export function getActiveHelpCategories(): (HelpCategory & { articleCount: numbe
 export function helpArticlePath(article: Pick<HelpArticleMeta, 'category' | 'slug'>): string {
   return `/help/${article.category}/${article.slug}`
 }
+
+/** Search index shared by every help page's search box */
+export function getHelpSearchItems() {
+  return getAllHelpArticles().map((a) => ({
+    title: a.title,
+    description: a.description,
+    keywords: a.keywords,
+    href: helpArticlePath(a),
+    categoryTitle: getHelpCategory(a.category)?.title || '',
+  }))
+}

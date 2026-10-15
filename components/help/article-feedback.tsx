@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ThumbsUp, ThumbsDown } from 'lucide-react'
 import { captureEvent } from '@/lib/analytics'
 
 export function ArticleFeedback({ slug }: { slug: string }) {
@@ -13,44 +12,40 @@ export function ArticleFeedback({ slug }: { slug: string }) {
     captureEvent('help_article_feedback', { slug, helpful: value === 'yes' })
   }
 
-  if (answer) {
-    return (
-      <div className="rounded-xl border bg-muted/30 p-6 text-center" role="status">
-        <p className="font-medium text-foreground">Thanks for letting us know.</p>
-        {answer === 'no' && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            Still stuck?{' '}
-            <Link href="/support" className="font-medium text-primary hover:underline">
-              Contact support
-            </Link>{' '}
-            and we&apos;ll sort it out with you.
-          </p>
-        )}
-      </div>
-    )
-  }
-
   return (
-    <div className="rounded-xl border bg-muted/30 p-6 text-center">
-      <p className="font-medium text-foreground">Was this article helpful?</p>
-      <div className="mt-3 flex justify-center gap-3">
-        <button
-          type="button"
-          onClick={() => vote('yes')}
-          className="inline-flex items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          <ThumbsUp className="h-4 w-4" aria-hidden="true" />
-          Yes
-        </button>
-        <button
-          type="button"
-          onClick={() => vote('no')}
-          className="inline-flex items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          <ThumbsDown className="h-4 w-4" aria-hidden="true" />
-          No
-        </button>
-      </div>
+    <div className="flex flex-wrap items-center gap-3 border-y py-6" role="status" aria-live="polite">
+      {answer ? (
+        <p className="text-foreground">
+          <span className="font-semibold">Thanks for your feedback.</span>
+          {answer === 'no' && (
+            <span className="text-muted-foreground">
+              {' '}Still stuck?{' '}
+              <Link href="/support" className="font-medium text-primary hover:underline">
+                Contact support
+              </Link>{' '}
+              and we&apos;ll sort it out with you.
+            </span>
+          )}
+        </p>
+      ) : (
+        <>
+          <span className="font-semibold text-foreground">Was this article helpful?</span>
+          <button
+            type="button"
+            onClick={() => vote('yes')}
+            className="rounded-md bg-primary px-5 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            onClick={() => vote('no')}
+            className="rounded-md bg-primary px-5 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            No
+          </button>
+        </>
+      )}
     </div>
   )
 }
