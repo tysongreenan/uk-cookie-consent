@@ -571,9 +571,52 @@ export async function GET(request: NextRequest) {
   ${consentLoggingJs}
 
   // 2. Inject CSS
+  // A strict Content-Security-Policy (style-src without 'unsafe-inline') blocks
+  // both our <style> tag and every style="" attribute in the banner markup,
+  // leaving the banner unstyled. Styles applied through the CSSOM are not
+  // subject to CSP, so when we detect the block we fall back to a constructed
+  // stylesheet and copy each style attribute into element.style.
+  var _cbStyleBlocked = (function() {
+    try {
+      var probe = document.createElement('style');
+      probe.textContent = '#cb-csp-probe{color:red}';
+      document.head.appendChild(probe);
+      var blocked = !(probe.sheet && probe.sheet.cssRules && probe.sheet.cssRules.length);
+      probe.parentNode.removeChild(probe);
+      return blocked;
+    } catch (e) { return false; }
+  })();
+  function _cbApplyInlineStyles(root) {
+    if (!root || root.nodeType !== 1) return;
+    var nodes = root.hasAttribute('style') ? [root] : [];
+    var inner = root.querySelectorAll('[style]');
+    for (var i = 0; i < inner.length; i++) nodes.push(inner[i]);
+    for (var j = 0; j < nodes.length; j++) nodes[j].style.cssText = nodes[j].getAttribute('style');
+  }
+  if (_cbStyleBlocked && typeof MutationObserver !== 'undefined') {
+    // Markup the banner JS injects later (preferences modal, floating button)
+    new MutationObserver(function(mutations) {
+      for (var m = 0; m < mutations.length; m++) {
+        var added = mutations[m].addedNodes;
+        for (var n = 0; n < added.length; n++) {
+          var el = added[n];
+          if (el.nodeType === 1 && (/^(cookie-|cb-|gpc-)/.test(el.id || '') || (el.closest && el.closest('[id^="cookie-"],[id^="cb-"],[id^="gpc-"]')))) {
+            _cbApplyInlineStyles(el);
+          }
+        }
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   var style = document.createElement('style');
   style.textContent = ${JSON.stringify(css)};
-  document.head.appendChild(style);
+  if (_cbStyleBlocked && typeof CSSStyleSheet !== 'undefined' && document.adoptedStyleSheets) {
+    var _cbSheet = new CSSStyleSheet();
+    _cbSheet.replaceSync(style.textContent);
+    document.adoptedStyleSheets = document.adoptedStyleSheets.concat([_cbSheet]);
+  } else {
+    document.head.appendChild(style);
+  }
 
   // 3. Inject HTML
   // Uses retry logic and MutationObserver for compatibility with page builders
@@ -627,6 +670,9 @@ export async function GET(request: NextRequest) {
     // Create a container and parse the server-generated banner markup
     var container = document.createElement('div');
     container.innerHTML = bannerHTMLContent;
+    // Apply before the banner JS touches element.style, which would overwrite
+    // the CSP-blocked attribute text we copy from.
+    if (_cbStyleBlocked) _cbApplyInlineStyles(container);
 
     // Append all child elements to body
     while (container.firstChild) {
