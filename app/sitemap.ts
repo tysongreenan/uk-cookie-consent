@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAllPosts } from '@/lib/blog/blog'
+import { getActiveHelpCategories, getAllHelpArticles, helpArticlePath } from '@/lib/help/help'
 
 /**
  * Optimized sitemap.xml for Google crawl budget
@@ -206,6 +207,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/support`,
       lastModified: staticDate,
       changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/help`,
+      lastModified: staticDate,
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
@@ -422,6 +429,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     console.warn('Could not load blog posts for sitemap:', error)
   }
 
+  // Help center categories and articles
+  let helpPages: MetadataRoute.Sitemap = []
+  try {
+    helpPages = [
+      ...getActiveHelpCategories().map((c) => ({
+        url: `${baseUrl}/help/${c.slug}`,
+        lastModified: staticDate,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      })),
+      ...getAllHelpArticles().map((a) => ({
+        url: `${baseUrl}${helpArticlePath(a)}`,
+        lastModified: a.updated ? new Date(`${a.updated}T12:00:00Z`) : staticDate,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      })),
+    ]
+  } catch (error) {
+    console.warn('Could not load help articles for sitemap:', error)
+  }
+
   // Combine all pages in priority order, dropping duplicate URLs
   const combined = [
     ...homepage,
@@ -431,6 +459,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...solutionPages,
     ...locationPages,
     ...blogPosts,
+    ...helpPages,
     ...legalPages,
   ]
 

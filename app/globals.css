@@ -730,3 +730,57 @@ select:-webkit-autofill:focus {
   .cb-orbit-r1, .cb-orbit-r2, .cb-core, .cb-shield,
   .cb-attack-tl, .cb-attack-tr, .cb-attack-bl, .cb-attack-br { animation: none; }
 }
+
+/* Help Center articles - compact support-doc styling (separate from blog .prose) */
+.help-article {
+  color: hsl(var(--foreground) / 0.9);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.help-article > :first-child { margin-top: 0; }
+.help-article h2 {
+  font-size: 1.375rem;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: hsl(var(--foreground));
+  margin: 2.5rem 0 0.75rem;
+  scroll-margin-top: 6rem;
+}
+.help-article h3 {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin: 2rem 0 0.5rem;
+  scroll-margin-top: 6rem;
+}
+.help-article p { margin: 0.875rem 0; }
+.help-article ul, .help-article ol { margin: 0.875rem 0; padding-left: 1.5rem; }
+.help-article ul { list-style: disc; }
+.help-article ol { list-style: decimal; }
+.help-article li { margin: 0.375rem 0; padding-left: 0.25rem; }
+.help-article li > ul, .help-article li > ol { margin: 0.375rem 0; }
+.help-article strong { font-weight: 600; color: hsl(var(--foreground)); }
+.help-article a { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 2px; }
+.help-article a:hover { text-decoration-thickness: 2px; }
+.help-article code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  background: hsl(var(--muted));
+  border-radius: 4px;
+  padding: 0.125rem 0.375rem;
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+.help-article pre {
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  background: hsl(var(--foreground) / 0.95);
+  color: hsl(var(--background));
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.help-article pre code { background: none; padding: 0; color: inherit; font-size: inherit; overflow-wrap: normal; }
