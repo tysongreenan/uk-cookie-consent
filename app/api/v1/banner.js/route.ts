@@ -594,13 +594,16 @@ export async function GET(request: NextRequest) {
     for (var j = 0; j < nodes.length; j++) nodes[j].style.cssText = nodes[j].getAttribute('style');
   }
   if (_cbStyleBlocked && typeof MutationObserver !== 'undefined') {
-    // Markup the banner JS injects later (preferences modal, floating button)
+    // Markup the banner JS injects later (preferences modal, floating button).
+    // Only our own containers: copying style attributes on host-page elements
+    // would undo the site's CSP for content we don't control.
+    var _cbOwnRoots = '#cookie-consent-banner,#cookie-preferences-modal,#cookie-settings-float,#gpc-acknowledgment,#gpc-modal-notice';
     new MutationObserver(function(mutations) {
       for (var m = 0; m < mutations.length; m++) {
         var added = mutations[m].addedNodes;
         for (var n = 0; n < added.length; n++) {
           var el = added[n];
-          if (el.nodeType === 1 && (/^(cookie-|cb-|gpc-)/.test(el.id || '') || (el.closest && el.closest('[id^="cookie-"],[id^="cb-"],[id^="gpc-"]')))) {
+          if (el.nodeType === 1 && el.closest && el.closest(_cbOwnRoots)) {
             _cbApplyInlineStyles(el);
           }
         }
