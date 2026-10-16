@@ -7,6 +7,7 @@ import { A11yMenuPreview } from '@/components/banner/a11y-menu-preview'
 import { A11yTriggerPreview } from '@/components/banner/a11y-trigger-preview'
 import { PreferencesModal } from '@/components/cookie-consent/preferences-modal'
 import { resolveButtonPlacement } from '@/lib/banner-placement'
+import { getFloatingButtonCssProperties, getFloatingButtonStyle } from '@/lib/floating-button-style'
 
 interface BannerConfig {
   name: string
@@ -97,68 +98,7 @@ interface BannerPreviewProps {
 
 // Helper function to generate floating button preview styles
 function generateFloatingButtonPreviewStyles(safeConfig: any): React.CSSProperties {
-  const floatingStyle = safeConfig.branding?.footerLink?.floatingStyle || {}
-  const shape = floatingStyle.shape || 'pill'
-  const size = floatingStyle.size || 'small'
-  const useCustomColors = floatingStyle.useCustomColors || false
-  const customColors = floatingStyle.customColors || {}
-  
-  // Size mapping
-  const sizeMap = {
-    small: { width: '40px', height: '40px', padding: '8px', fontSize: '12px' },
-    medium: { width: '48px', height: '48px', padding: '12px', fontSize: '14px' },
-    large: { width: '56px', height: '56px', padding: '16px', fontSize: '16px' }
-  }
-  
-  const sizeProps = sizeMap[size as keyof typeof sizeMap] || sizeMap.small
-  
-  // Shape-specific styles
-  let borderRadius = '6px'
-  let width = 'auto'
-  let height = 'auto'
-  let padding = sizeProps.padding
-  
-  if (shape === 'circle') {
-    borderRadius = '50%'
-    width = sizeProps.width
-    height = sizeProps.height
-    padding = '0'
-  } else if (shape === 'square') {
-    borderRadius = '8px'
-    width = sizeProps.width
-    height = sizeProps.height
-    padding = '0'
-  }
-  
-  // Color handling
-  let backgroundColor = 'rgba(107, 114, 128, 0.9)'
-  let color = '#ffffff'
-  let border = 'none'
-  
-  if (useCustomColors) {
-    backgroundColor = customColors.background || 'rgba(107, 114, 128, 0.9)'
-    color = customColors.text || '#ffffff'
-    if (customColors.border) {
-      border = `1px solid ${customColors.border}`
-    }
-  } else {
-    // Use banner button colors
-    backgroundColor = safeConfig.colors?.button || '#3b82f6'
-    color = safeConfig.colors?.buttonText || '#ffffff'
-  }
-  
-  return {
-    background: backgroundColor,
-    color: color,
-    border: border,
-    padding: padding,
-    borderRadius: borderRadius,
-    width: width,
-    height: height,
-    fontSize: sizeProps.fontSize,
-    fontWeight: 500,
-    textAlign: 'center' as const
-  }
+  return getFloatingButtonCssProperties(safeConfig) as React.CSSProperties
 }
 
 // Helper function to generate floating button preview content
@@ -172,10 +112,10 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
   const iconStyle: 'cookie' | 'logo' | 'auto' = floatingStyle.iconStyle || 'auto'
 
   const cookieAcceptedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>cookie</span>
+    <span className="material-symbols-outlined" style={{ fontSize: `${getFloatingButtonStyle(safeConfig).iconSize}px` }}>cookie</span>
   )
   const cookieRejectedIcon = (
-    <span className="material-symbols-outlined" style={{fontSize: '20px'}}>cookie_off</span>
+    <span className="material-symbols-outlined" style={{ fontSize: `${getFloatingButtonStyle(safeConfig).iconSize}px` }}>cookie_off</span>
   )
 
   const consentState = typeof window !== 'undefined'
@@ -199,7 +139,7 @@ function generateFloatingButtonPreviewContent(safeConfig: any): React.ReactNode 
     return <span style={{ display: 'inline-flex', alignItems: 'center' }}>{iconNode}</span>
   }
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
       {iconNode}
       <span>{text}</span>
     </span>

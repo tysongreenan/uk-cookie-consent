@@ -1,3 +1,4 @@
+import { getFloatingButtonStyle, FLOATING_BUTTON_SHADOW } from '@/lib/floating-button-style'
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { cookieDomainRuntimeJs, serializeCookieDomainConfig } from '@/lib/cookie-domain'
@@ -38,68 +39,27 @@ function generateCookieIconSvg(path: string, fillColor: string): string {
 
 // Helper function to generate floating button styles
 function generateFloatingButtonStyles(config: any): string {
-  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
-  const shape = floatingStyle.shape || 'pill'
-  const size = floatingStyle.size || 'small'
-  const useCustomColors = floatingStyle.useCustomColors || false
-  const customColors = floatingStyle.customColors || {}
-  
-  // Size mapping
-  const sizeMap = {
-    small: { width: '40px', height: '40px', padding: '8px', fontSize: '12px' },
-    medium: { width: '48px', height: '48px', padding: '12px', fontSize: '14px' },
-    large: { width: '56px', height: '56px', padding: '16px', fontSize: '16px' }
-  }
-  
-  const sizeProps = sizeMap[size as keyof typeof sizeMap] || sizeMap.small
-  
-  // Shape-specific styles
-  let borderRadius = '6px'
-  let width = 'auto'
-  let height = 'auto'
-  let padding = sizeProps.padding
-  
-  if (shape === 'circle') {
-    borderRadius = '50%'
-    width = sizeProps.width
-    height = sizeProps.height
-    padding = '0'
-  } else if (shape === 'square') {
-    borderRadius = '8px'
-    width = sizeProps.width
-    height = sizeProps.height
-    padding = '0'
-  }
-  
-  // Color handling
-  let backgroundColor = 'rgba(107, 114, 128, 0.9)'
-  let color = '#ffffff'
-  let border = 'none'
-  
-  if (useCustomColors) {
-    backgroundColor = customColors.background || 'rgba(107, 114, 128, 0.9)'
-    color = customColors.text || '#ffffff'
-    if (customColors.border) {
-      border = `1px solid ${customColors.border}`
-    }
-  } else {
-    // Use banner button colors
-    backgroundColor = config.colors?.button || '#3b82f6'
-    color = config.colors?.buttonText || '#ffffff'
-  }
-  const safeBorder = border === 'none' ? 'none' : escapeHtml(border)
-  
+  const style = getFloatingButtonStyle(config)
+  const border = style.border === 'none' ? 'none' : escapeHtml(style.border)
+
   return `
-    background: ${escapeHtml(backgroundColor)} !important;
-    color: ${escapeHtml(color)} !important;
-    border: ${safeBorder} !important;
-    padding: ${padding} !important;
-    border-radius: ${borderRadius} !important;
-    width: ${width} !important;
-    height: ${height} !important;
-    font-size: ${sizeProps.fontSize} !important;
-    font-weight: 500 !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    background: ${escapeHtml(style.background)} !important;
+    color: ${escapeHtml(style.color)} !important;
+    border: ${border} !important;
+    padding: ${style.padding} !important;
+    border-radius: ${style.borderRadius} !important;
+    width: ${style.width} !important;
+    height: ${style.height} !important;
+    font-family: ${escapeHtml(style.fontFamily)} !important;
+    font-size: ${style.fontSize} !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    line-height: 1 !important;
+    letter-spacing: -0.01em !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    gap: 6px !important;
+    box-shadow: ${FLOATING_BUTTON_SHADOW} !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -107,6 +67,7 @@ function generateFloatingButtonStyles(config: any): string {
     box-sizing: border-box !important;
     margin: 0 !important;
     overflow: hidden !important;
+    -webkit-font-smoothing: antialiased;
   `
 }
 
@@ -159,7 +120,8 @@ function generateFloatingButtonContent(config: any): string {
 
   const userAcceptedIcon = config.branding?.footerLink?.icons?.accepted
   const acceptedIconUrl = userAcceptedIcon || generateCookieIconSvg(COOKIE_ICON_PATH, iconColor)
-  const cookieAcceptedIcon = `<img src="${escapeHtml(acceptedIconUrl)}" alt="" style="width: 20px; height: 20px; display: inline-flex;" />`
+  const iconSize = getFloatingButtonStyle(config).iconSize
+  const cookieAcceptedIcon = `<img src="${escapeHtml(acceptedIconUrl)}" alt="" style="width: ${iconSize}px; height: ${iconSize}px; display: block; flex-shrink: 0; margin: 0;" />`
 
   let content = ''
   
@@ -170,12 +132,12 @@ function generateFloatingButtonContent(config: any): string {
     // Pill and square respect the showText setting
     if (showText && hasLogo) {
       // Show logo + text when both are enabled
-      content = `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" />`
+      content = `<img src="${escapeHtml(config.branding.logo.url)}" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; display: block; flex-shrink: 0;" />`
       content += `<span>${text}</span>`
     } else if (showText && !hasLogo) {
       // Show icon + text when text is enabled but no logo
       content = `${cookieAcceptedIcon}`
-      content += `<span style="margin-left: 4px;">${text}</span>`
+      content += `<span>${text}</span>`
     } else {
       // Show only icon when text is disabled (regardless of logo setting)
       content = `${cookieAcceptedIcon}`
@@ -925,11 +887,8 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   ${generateFloatingButtonStyles(config)}
   cursor: pointer;
   pointer-events: auto;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  opacity: 0.9;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+">
   ${generateFloatingButtonContent(config)}
 </div>` : ''
 
@@ -986,8 +945,13 @@ export const generateBannerCSS = (config: BannerConfig) => {
 }
 
 #cookie-settings-float:hover {
-  opacity: 1 !important;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.1) !important;
+}
+
+#cookie-settings-float:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 #cookie-consent-banner {
@@ -1784,7 +1748,8 @@ function trackConsentEvent(action, consentCategories) {
   const userRejectedIconJs = config.branding?.footerLink?.icons?.rejected
   const acceptedIconUrl = userAcceptedIconJs || generateCookieIconSvg(COOKIE_ICON_PATH, jsIconColor)
   const rejectedIconUrl = userRejectedIconJs || generateCookieIconSvg(COOKIE_OFF_ICON_PATH, jsIconColor)
-  const iconStyle = 'width: 20px; height: 20px; display: inline-flex;'
+  const floatIconSize = getFloatingButtonStyle(config).iconSize
+  const iconStyle = `width: ${floatIconSize}px; height: ${floatIconSize}px; display: block; flex-shrink: 0; margin: 0;`
   const acceptedIconMarkup = `<img src="${escapeHtml(acceptedIconUrl)}" alt="" style="${iconStyle}" />`
   const effectiveRejectedIconUrl = rejectedIconUrl || acceptedIconUrl
   const rejectedIconMarkup = `<img src="${escapeHtml(effectiveRejectedIconUrl)}" alt="" style="${iconStyle}" />`
@@ -2931,10 +2896,10 @@ function updateFloatingButtonIcon(consent) {
     // This ensures the rejected state is clearly visible with the rejected icon
     if (shouldShowText && hasLogo && logoUrl && hasAcceptedNonEssential) {
       // Show logo + text
-      floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; margin-right: 4px;" /><span>' + text + '</span>';
+      floatBtn.innerHTML = '<img src="' + logoUrl + '" alt="Logo" style="width: 16px; height: 16px; object-fit: contain; display: block; flex-shrink: 0;" /><span>' + text + '</span>';
     } else if (shouldShowText) {
       // Show icon + text (Icon handles both rejected state and no-logo state)
-      floatBtn.innerHTML = icon + '<span style="margin-left: 4px;">' + text + '</span>';
+      floatBtn.innerHTML = icon + '<span>' + text + '</span>';
     } else {
       // Show only icon
       floatBtn.innerHTML = icon;

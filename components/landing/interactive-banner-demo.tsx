@@ -26,6 +26,7 @@ import { UpgradePrompt } from '@/components/dashboard/upgrade-prompt'
 import { canAccessFeature, getStandardLayouts, getProLayouts, canUseLayout } from '@/lib/plan-restrictions'
 import { detectFrameworkFromUrl } from '@/lib/compliance-detection'
 import { captureEvent } from '@/lib/analytics'
+import { getFloatingButtonCssProperties, getFloatingButtonStyle } from '@/lib/floating-button-style'
 
 // Helper function to generate inline footer link HTML
 function generateInlineFooterLinkHTML(footerLink: any): string {
@@ -62,63 +63,7 @@ function generateInlineFooterLinkHTML(footerLink: any): string {
 
 // Helper functions for live preview
 function generateFloatingButtonPreviewStyles(config: any): React.CSSProperties {
-  const floatingStyle = config.branding?.footerLink?.floatingStyle || {}
-  const shape = floatingStyle.shape || 'pill'
-  const size = floatingStyle.size || 'small'
-  const showText = floatingStyle.showText ?? true
-  const useCustomColors = floatingStyle.useCustomColors || false
-  const customColors = floatingStyle.customColors || {}
-  
-  // Size mapping
-  const sizeMap = {
-    small: { width: '40px', height: '40px', padding: '8px', fontSize: '12px' },
-    medium: { width: '48px', height: '48px', padding: '12px', fontSize: '14px' },
-    large: { width: '56px', height: '56px', padding: '16px', fontSize: '16px' }
-  }
-  
-  const sizeConfig = sizeMap[size as keyof typeof sizeMap] || sizeMap.small
-  
-  // Shape-based styles
-  let borderRadius = '4px'
-  if (shape === 'circle') {
-    borderRadius = '50%'
-  } else if (shape === 'pill') {
-    borderRadius = '20px'
-  }
-  
-  // Colors
-  const backgroundColor = useCustomColors && customColors.background 
-    ? customColors.background 
-    : config.branding?.primaryColor || '#3b82f6'
-  const textColor = useCustomColors && customColors.text 
-    ? customColors.text 
-    : '#ffffff'
-  const borderColor = useCustomColors && customColors.border 
-    ? customColors.border 
-    : backgroundColor
-  
-  return {
-    backgroundColor,
-    color: textColor,
-    border: `1px solid ${borderColor}`,
-    borderRadius,
-    padding: showText ? sizeConfig.padding : '8px',
-    width: showText ? 'auto' : sizeConfig.width,
-    height: showText ? 'auto' : sizeConfig.height,
-    minWidth: showText ? 'auto' : sizeConfig.width,
-    minHeight: showText ? 'auto' : sizeConfig.height,
-    fontSize: sizeConfig.fontSize,
-    fontWeight: '500',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    cursor: 'pointer',
-    userSelect: 'none',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-    transition: 'all 0.2s ease',
-    gap: '6px'
-  }
+  return getFloatingButtonCssProperties(config) as React.CSSProperties
 }
 
 function generateFloatingButtonPreviewContent(config: any): React.ReactNode {
