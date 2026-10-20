@@ -1026,6 +1026,38 @@ export const generateBannerCSS = (config: BannerConfig) => {
   float: none !important;
 }
 
+/* Host themes style headings and buttons globally (e.g. h3 { font-family: proxima-nova },
+   button { text-transform: uppercase }). Keep the banner's own font and casing. */
+#cookie-consent-banner h1,
+#cookie-consent-banner h2,
+#cookie-consent-banner h3,
+#cookie-consent-banner p,
+#cookie-consent-banner button,
+#cookie-preferences-modal h1,
+#cookie-preferences-modal h2,
+#cookie-preferences-modal h3,
+#cookie-preferences-modal h4,
+#cookie-preferences-modal p,
+#cookie-preferences-modal label,
+#cookie-preferences-modal button {
+  font-family: inherit !important;
+  text-transform: none !important;
+}
+
+/* Beat theme-wide rules like div { text-align:center } or button { letter-spacing:.1em }.
+   No !important, so the modal's own inline styles still win. */
+#cookie-preferences-modal :where(div, h1, h2, h3, h4, p, label, span) {
+  text-align: left;
+  letter-spacing: normal;
+}
+#cookie-preferences-modal button {
+  letter-spacing: normal;
+}
+
+#cookie-preferences-modal {
+  font-family: ${config.fontFamily ? `'${escapeHtml(config.fontFamily)}', ` : ''}-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
 #cookie-consent-banner[data-cb-logo="center"],
 #cookie-consent-banner[data-cb-logo="center"] .cb-banner-body,
 #cookie-consent-banner[data-cb-logo="center"] .cb-banner-brand,
