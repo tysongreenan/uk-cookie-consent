@@ -2909,7 +2909,9 @@ function BannerBuilderContent() {
                   } : {}),
                   ...(value === 'inline' && !config.branding?.footerLink?.inlineStyle ? {
                     inlineStyle: { linkType: 'plain', includeIcon: false, includeLogo: false }
-                  } : {})
+                  } : {}),
+                  // New inline setups get the zero-code footer link by default
+                  ...(value === 'inline' && config.branding?.footerLink?.autoPlace === undefined ? { autoPlace: true } : {})
                 }
               })}
             >
@@ -3119,8 +3121,32 @@ function BannerBuilderContent() {
             <section className="space-y-6 pt-8 border-t">
               <div>
                 <h3 className="text-base font-semibold tracking-tight">Inline Footer Link</h3>
-                <p className="text-sm text-muted-foreground mt-1 max-w-prose">An HTML snippet you paste into your site footer.</p>
+                <p className="text-sm text-muted-foreground mt-1 max-w-prose">
+                  A &ldquo;Cookie Settings&rdquo; link in your site footer so visitors can change their choice later.
+                </p>
               </div>
+
+              {config.branding?.footerLink?.style === 'inline' && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      id="inline-auto-place"
+                      checked={config.branding?.footerLink?.autoPlace ?? false}
+                      onCheckedChange={(checked) => updateConfig('branding', {
+                        footerLink: { ...(config.branding?.footerLink || {}), autoPlace: checked }
+                      })}
+                    />
+                    <Label htmlFor="inline-auto-place" className="cursor-pointer">Add the link to my footer automatically</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground max-w-prose">
+                    No code needed. If your site has no footer, we show the floating button instead, so visitors can always reopen their settings.
+                  </p>
+                </div>
+              )}
+
+              <p className="text-sm text-muted-foreground max-w-prose">
+                Want it in a specific spot? Link any menu item or link to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">#cookie-settings</code> and it will open the settings. No code needed.
+              </p>
 
               <div className="max-w-md">
                 <Label htmlFor="inline-link-type">Link Style</Label>
@@ -3204,7 +3230,7 @@ function BannerBuilderContent() {
                   </Button>
                 </div>
                 <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs font-mono overflow-x-auto">{generateInlineFooterLinkHTML(config.branding?.footerLink)}</pre>
-                <p className="text-xs text-muted-foreground mt-2">Paste this into your site footer where you want the link to appear.</p>
+                <p className="text-xs text-muted-foreground mt-2">Or paste this HTML wherever you want the link to appear.</p>
               </div>
             </section>
           )}

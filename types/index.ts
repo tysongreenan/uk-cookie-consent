@@ -138,6 +138,9 @@ export interface BannerConfig {
       position: 'floating' | 'inline'
       floatingPosition?: 'bottom-left' | 'bottom-right'
       style?: 'floating' | 'inline' | 'both'
+      // Inline only: add the link to the site footer automatically, or fall back to the
+      // floating button when there's no footer. Missing = off (existing banners unchanged).
+      autoPlace?: boolean
       floatingStyle?: {
         shape: 'circle' | 'pill' | 'square'
         size: 'small' | 'medium' | 'large'

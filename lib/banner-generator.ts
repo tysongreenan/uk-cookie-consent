@@ -72,6 +72,12 @@ function generateFloatingButtonStyles(config: any): string {
 }
 
 // Helper function to generate inline footer link HTML
+// Inline Cookie Settings link that the script places in the site footer itself.
+function isInlineAutoPlace(config: any): boolean {
+  const fl = config.branding?.footerLink
+  return Boolean(fl?.enabled && fl?.style === 'inline' && fl?.autoPlace === true)
+}
+
 function generateInlineFooterLinkHTML(footerLink: any, config: any): string {
   const text = escapeHtml(footerLink.text || 'Cookie Settings')
   const linkType = footerLink.inlineStyle?.linkType || 'plain'
@@ -879,8 +885,10 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   </div>
 </div>` : ''
 
-  // Floating button HTML (separate from main banner)
-  const floatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both') ? `
+  // Floating button HTML (separate from main banner). Inline + autoPlace also renders it,
+  // hidden, as the fallback when the script can't place a link in the site footer.
+  const inlineAutoPlace = isInlineAutoPlace(config)
+  const floatingButton = config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'floating' || (config as any).branding.footerLink.style === 'both' || inlineAutoPlace) ? `
 
 <!-- Floating Cookie Settings Button (separate from banner) -->
 <div id="cookie-settings-float" style="
@@ -888,6 +896,7 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   ${config.branding.footerLink.floatingPosition === 'bottom-right' ? 'bottom: 16px; right: 16px;' : 'bottom: 16px; left: 16px;'}
   z-index: 999998;
   ${generateFloatingButtonStyles(config)}
+  ${inlineAutoPlace ? 'display: none !important; /* fallback only: shown if no footer link */' : ''}
   cursor: pointer;
   pointer-events: auto;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -2580,6 +2589,101 @@ window.showCookiePreferences = function() {
 };
 ` : ''}
 
+// Any link to #cookie-settings (or element with data-cookie-settings) opens preferences.
+// Lets site owners add "Cookie Settings" from a CMS menu with no code.
+document.addEventListener('click', function(e) {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  var t = e.target;
+  if (!t || !t.closest) return;
+  var trigger = t.closest('a[href*="#cookie-settings"], [data-cookie-settings]');
+  if (!trigger) return;
+  // Only same-page links: /cookies#cookie-settings on another page should still navigate.
+  if (trigger.tagName === 'A' && trigger.getAttribute('href') !== '#cookie-settings') {
+    try {
+      var u = new URL(trigger.href, location.href);
+      if (u.hash !== '#cookie-settings' || u.origin !== location.origin || u.pathname !== location.pathname) return;
+    } catch (err) { return; }
+  }
+  if (!document.getElementById('cookie-preferences-modal')) return;
+  e.preventDefault();
+  showPreferencesModal();
+}, true);
+
+${isInlineAutoPlace(config) ? `
+// Inline + autoPlace: put a Cookie Settings link in the site footer ourselves.
+// No usable footer (or a JS framework that would wipe our node) -> floating button.
+var cbInlineState = 'pending'; // 'placed' | 'fallback'
+var cbInlineWrap = null;
+var CB_SETTINGS_TEXT = ${JSON.stringify(config.branding.footerLink.text || '')};
+
+function cbHasSettingsLink() {
+  var els = document.querySelectorAll('a[href$="#cookie-settings"], [data-cookie-settings], .cookie-settings-link, .cookie-settings-btn, [onclick*="showCookiePreferences"]');
+  for (var i = 0; i < els.length; i++) {
+    if (els[i].getClientRects().length) return true; // ignore copies in hidden menus/templates
+  }
+  return false;
+}
+function cbIsFrameworkSite() {
+  return !!(window.__NEXT_DATA__ || window.__NUXT__ || document.getElementById('__next') || document.getElementById('__nuxt') ||
+    document.querySelector('[data-reactroot], [ng-version], [data-v-app]'));
+}
+function cbFindFooter() {
+  var preferred = document.querySelectorAll('body > footer, [role="contentinfo"]');
+  var list = preferred.length ? preferred : document.querySelectorAll('footer');
+  for (var i = list.length - 1; i >= 0; i--) {
+    var f = list[i];
+    if (f.closest('article, aside, blockquote, #cookie-consent-banner, #cookie-preferences-modal')) continue;
+    if (!f.getClientRects().length) continue;
+    return f;
+  }
+  return null;
+}
+function cbSetPlaced() {
+  var was = cbInlineState;
+  cbInlineState = 'placed';
+  if (was === 'fallback') hideFloatingButton();
+}
+function cbPlaceInlineLink() {
+  // Site builders (Wix, Shopify, Webflow...) can rebuild the footer and drop our link.
+  if (cbInlineState === 'placed' && cbInlineWrap && !cbInlineWrap.isConnected) {
+    cbInlineWrap = null;
+    cbInlineState = 'pending';
+  }
+  if (cbInlineState === 'placed') return;
+  if (cbHasSettingsLink()) { cbSetPlaced(); return; }
+  var footer = cbIsFrameworkSite() ? null : cbFindFooter();
+  if (footer) {
+    var lang = detectLanguage();
+    var trans = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    var wrap = document.createElement('div');
+    wrap.id = 'cb-inline-settings';
+    wrap.style.cssText = 'text-align:center;padding:12px 0;font-size:13px;line-height:1.4;';
+    var a = document.createElement('a');
+    a.href = '#cookie-settings';
+    a.className = 'cookie-settings-link';
+    a.textContent = (lang === 'en' && CB_SETTINGS_TEXT) ? CB_SETTINGS_TEXT : (trans.footerLink || CB_SETTINGS_TEXT || 'Cookie Settings');
+    a.style.cssText = 'color:inherit;text-decoration:underline;cursor:pointer;';
+    wrap.appendChild(a);
+    footer.appendChild(wrap);
+    cbInlineWrap = wrap;
+    cbSetPlaced();
+    return;
+  }
+  cbInlineState = 'fallback';
+  // Show whenever the banner isn't open (covers consent given and dismiss-on-scroll).
+  var banner = document.getElementById('cookie-consent-banner');
+  if (!banner || banner.style.display === 'none') showFloatingButton();
+}
+// After load so server-rendered markup has settled; re-check for late or rebuilt footers.
+function cbScheduleInlineLink() {
+  setTimeout(cbPlaceInlineLink, 0);
+  setTimeout(cbPlaceInlineLink, 1500);
+  setTimeout(cbPlaceInlineLink, 4000);
+}
+if (document.readyState === 'complete') cbScheduleInlineLink();
+else window.addEventListener('load', cbScheduleInlineLink);
+` : ''}
+
 ${config.branding.footerLink.enabled && ((config as any).branding.footerLink.style === 'inline' || (config as any).branding.footerLink.style === 'both') ? `
 // Initialize floating button icon on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -2884,6 +2988,7 @@ function showPreferencesModal() {
 }
 
 function showFloatingButton() {
+  ${isInlineAutoPlace(config) ? "if (cbInlineState !== 'fallback') return;" : ''}
   var floatBtn = document.getElementById('cookie-settings-float');
   if (floatBtn) {
     floatBtn.classList.add('show');
