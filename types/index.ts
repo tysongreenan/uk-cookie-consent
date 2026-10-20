@@ -104,6 +104,8 @@ export interface BannerConfig {
     autoShow: boolean
     dismissOnScroll: boolean
     showPreferences: boolean
+    // Delete declined categories' first-party cookies (incl. ones set before install). Missing = off.
+    cookieCleanup?: boolean
     cookieExpiry: number // days
     // Button layout controls
     buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'

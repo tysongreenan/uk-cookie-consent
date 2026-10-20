@@ -4047,6 +4047,20 @@ function BannerBuilderContent() {
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
                         <Switch
+                          id="cookie-cleanup"
+                          checked={config.behavior.cookieCleanup ?? false}
+                          onCheckedChange={(checked) => updateConfig('behavior', { cookieCleanup: checked })}
+                        />
+                        <Label htmlFor="cookie-cleanup">Remove declined cookies</Label>
+                      </div>
+                      <p className="text-xs text-muted-foreground ml-11">
+                        When a visitor declines a category, delete its cookies from your domain, including ones set before you installed the banner. Covers the cookies you list in each category plus common tools like Google Analytics, Meta and TikTok. Strictly necessary cookies are never removed. Tracking tags hardcoded into your site can set cookies again, so load them through the banner.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <Switch
                           id="show-preferences"
                           checked={config.behavior.showPreferences}
                           onCheckedChange={(checked) => updateConfig('behavior', { showPreferences: checked })}

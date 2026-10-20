@@ -1,3 +1,4 @@
+import { buildCookieCleanupMap } from '@/lib/cookie-cleanup'
 import { getFloatingButtonStyle, FLOATING_BUTTON_SHADOW } from '@/lib/floating-button-style'
 import { BannerConfig, BannerConfigWithGeoOverrides, TrackingScript } from '@/types'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
@@ -2723,10 +2724,64 @@ function dispatchConsentUpdate(consent) {
   } catch(e) {}
 }
 
+${config.behavior?.cookieCleanup ? (() => {
+  const { map, protectedNames } = buildCookieCleanupMap(config)
+  return `
+// Remove declined categories' first-party cookies (incl. ones set before the banner was installed).
+// A cookie is only removed if no accepted category also claims it. Best effort: HttpOnly cookies
+// can't be seen by JS, and tags hardcoded in the site can set cookies again.
+var CB_CLEANUP = ${JSON.stringify(map)};
+var CB_PROTECTED = ${JSON.stringify(protectedNames)};
+function cbCookieMatch(name, pat) {
+  return pat.charAt(pat.length - 1) === '*' ? name.indexOf(pat.slice(0, -1)) === 0 : name === pat;
+}
+function cbMatchesAny(name, list) {
+  for (var i = 0; i < list.length; i++) if (cbCookieMatch(name, list[i])) return true;
+  return false;
+}
+function cbExpireCookie(name) {
+  var past = '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0' + (location.protocol === 'https:' ? '; Secure' : '');
+  var labels = location.hostname.split('.');
+  var domains = [''];
+  for (var i = 0; i < labels.length - 1; i++) {
+    var d = labels.slice(i).join('.');
+    domains.push('; domain=' + d, '; domain=.' + d);
+  }
+  var paths = ['/'];
+  var segs = location.pathname.split('/'), acc = '';
+  for (var j = 1; j < segs.length && j < 6; j++) { if (!segs[j]) continue; acc += '/' + segs[j]; paths.push(acc); }
+  for (var a = 0; a < domains.length; a++)
+    for (var b = 0; b < paths.length; b++)
+      document.cookie = name + past + '; path=' + paths[b] + domains[a];
+}
+function cbCleanupDeclinedCookies(consent) {
+  if (!consent) return;
+  var declined = [], accepted = [];
+  var cats = { functionality: consent.functionality, analytics: consent.analytics, marketing: consent.marketing };
+  for (var k in cats) {
+    // Only an explicit "no" counts; missing fields (old/partial cookies) are left alone.
+    var target = cats[k] === false ? declined : (cats[k] === true ? accepted : null);
+    if (!target) continue;
+    var pats = CB_CLEANUP[k] || [];
+    for (var p = 0; p < pats.length; p++) target.push(pats[p]);
+  }
+  if (!declined.length) return;
+  var jar = document.cookie ? document.cookie.split(';') : [];
+  var removed = [];
+  for (var i = 0; i < jar.length; i++) {
+    var name = jar[i].split('=')[0].trim();
+    if (!name || cbMatchesAny(name, CB_PROTECTED)) continue;
+    if (cbMatchesAny(name, declined) && !cbMatchesAny(name, accepted)) { cbExpireCookie(name); removed.push(name); }
+  }
+  if (removed.length) console.log('[CookieBanner] Removed declined cookies:', removed.join(', '));
+}
+`
+})() : ''}
 function saveConsent(consent, tcfPurposes) {
   setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
   dispatchConsentUpdate(consent);
   loadScripts(consent);
+  ${config.behavior?.cookieCleanup ? 'cbCleanupDeclinedCookies(consent);' : ''}
   showFloatingButton();
   updateFloatingButtonIcon(consent);
   if (consent.analytics) {
@@ -3456,6 +3511,7 @@ function init() {
   // All handlers are now set up above, so banner will work when reopened
   if (existingConsent) {
     loadScripts(existingConsent);
+    ${config.behavior?.cookieCleanup ? 'cbCleanupDeclinedCookies(existingConsent);' : ''}
 
     // Initialize GA4 if analytics was accepted
     if (existingConsent.analytics) {
