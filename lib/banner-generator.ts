@@ -470,7 +470,10 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
 
   // text-align:left is inline + !important in CSS — host themes (Webflow/Elementor)
   // often set h1–h3 { text-align:center }, which otherwise centers "We use cookies".
-  const logoPos = config.branding.logo.position || 'left'
+  // Logo position only matters when a logo is shown (matches the dashboard preview).
+  // Otherwise a leftover 'center' centers the copy while the buttons stay left.
+  const logoShown = Boolean(config.branding.logo.enabled && config.branding.logo.url)
+  const logoPos = logoShown ? (config.branding.logo.position || 'left') : 'left'
   const copyAlign = logoPos === 'center' ? 'center' : 'left'
 
   const titleHtml = hasTitle
