@@ -78,7 +78,7 @@ git push origin develop  # or master
 
 - Issues? Check `/STRIPE_SETUP.md` for detailed troubleshooting
 - Deployment help? See `/DEPLOYMENT_CHECKLIST.md`
-- Full details? Read `/PAYMENT_IMPLEMENTATION_SUMMARY.md`
+- Payments? See `/STRIPE_SETUP.md`
 
 ---
 
