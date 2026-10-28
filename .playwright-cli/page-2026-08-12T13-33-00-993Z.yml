@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - dialog "Cookie consent" [ref=e4]:
+    - generic [ref=e5]:
+      - button "Close" [ref=e6] [cursor=pointer]: ×
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - img "Logo" [ref=e9]
+          - generic [ref=e10]:
+            - heading "We use cookies" [level=3] [ref=e11]
+            - paragraph [ref=e12]:
+              - text: This website uses cookies to enhance your browsing experience and provide personalized content.
+              - link "Privacy Policy" [ref=e13] [cursor=pointer]:
+                - /url: https://www.cookie-banner.ca/privacy
+            - link "Powered by cookie-banner.ca" [ref=e15] [cursor=pointer]:
+              - /url: https://cookie-banner.ca/?ref=banner
+        - generic [ref=e16]:
+          - button "Accept All" [ref=e17] [cursor=pointer]
+          - button "Preferences" [ref=e18] [cursor=pointer]
+  - link "Cookie consent by cookie-banner.ca" [ref=e20] [cursor=pointer]:
+    - /url: https://cookie-banner.ca/?ref=banner
+  - alert [ref=e21]

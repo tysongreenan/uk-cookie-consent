@@ -14,12 +14,12 @@ Keep this list current. Each item points at the plan or doc that owns the detail
   - [ ] **A.** Ops before launch: `privacy@cookie-banner.ca` mailbox, designate Privacy Officer, lawyer review of `app/privacy-policy/page.tsx`, hyperlink Terms → `/privacy-policy`, commit + deploy the uncommitted policy PR
   - [ ] **B.** Short internal breach-response procedure + 24-month breach register (`policies/breach-register.md`)
   - [ ] **C.** Customer-facing DPA + subprocessor list
-  - [ ] **D.** Montreal migration via dump/restore (not Prisma-only); carry hand-applied SQL; decide whether to split websitefeedback.ca; then update policy §7
+  - [ ] **D.** Montreal cutover — execute [docs/MONTREAL-CUTOVER-ROADMAP.md](docs/MONTREAL-CUTOVER-ROADMAP.md) (cookie → Montreal, comment-tool stays Ohio)
   - [ ] **E.** After D is live: flip "Data Residency Info — Coming Soon"; add **"stored at rest in Canada"** (never "processed in Canada") to `/locations/canada` and `/compliance/pipeda`
 
 ### Do not start until the plan says so
 
-- Montreal cutover is **paused**. Re-authorize Supabase MCP and read Phase D of the PIPEDA plan before touching production.
+- Montreal cutover: follow [docs/MONTREAL-CUTOVER-ROADMAP.md](docs/MONTREAL-CUTOVER-ROADMAP.md). Do not copy live cookie data except in the weekend window. Do not write Ohio.
 - Do not claim Canadian processing. Vercel / Stripe / Resend stay US.
 
 ### Other tracks

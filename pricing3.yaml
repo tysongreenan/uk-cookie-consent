@@ -1,0 +1,240 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e23]:
+    - generic:
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+      - generic:
+        - img
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - img [ref=e30]
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - 'heading "🎉 Major Update: v2.0.1 is Here!" [level=2] [ref=e37]'
+            - generic:
+              - img
+              - text: NEW
+          - paragraph [ref=e38]: Perfect icon centering, bulletproof CSS, and enhanced banner timing! Try it now →
+      - generic [ref=e39]:
+        - link "Try Latest Updates" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard/builder
+          - text: Try Latest Updates
+          - img [ref=e42]
+        - button [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+  - generic [ref=e2]:
+    - banner [ref=e49]:
+      - generic [ref=e50]:
+        - link "Cookie Banner Generator" [ref=e51] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e52]
+        - generic [ref=e53]:
+          - navigation [ref=e54]:
+            - link "Pricing" [ref=e55] [cursor=pointer]:
+              - /url: /pricing
+            - link "Integrations" [ref=e56] [cursor=pointer]:
+              - /url: /integrations
+            - link "Compliance" [ref=e57] [cursor=pointer]:
+              - /url: /compliance
+            - link "Support" [ref=e58] [cursor=pointer]:
+              - /url: /support
+          - generic [ref=e59]:
+            - link "Sign In" [ref=e60] [cursor=pointer]:
+              - /url: /auth/signin
+            - link "Start Building" [ref=e61] [cursor=pointer]:
+              - /url: /builder
+    - generic [ref=e62]:
+      - img [ref=e63]
+      - heading "Upgrade to Pro" [level=1] [ref=e65]
+      - paragraph [ref=e66]: Sign up for a free account first, then upgrade
+      - link "Create Free Account & Upgrade" [ref=e67] [cursor=pointer]:
+        - /url: /auth/signup?callbackUrl=/upgrade
+      - paragraph [ref=e68]:
+        - text: Already have an account?
+        - link "Sign in" [ref=e69] [cursor=pointer]:
+          - /url: /auth/signin?callbackUrl=/upgrade
+      - paragraph [ref=e70]:
+        - text: Want to see what's coming?
+        - link "Browse the product roadmap" [ref=e71] [cursor=pointer]:
+          - /url: /roadmap
+    - contentinfo [ref=e72]:
+      - generic [ref=e73]:
+        - link "Cookie Banner Generator" [ref=e75] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e76]
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - heading "Product & Tools" [level=3] [ref=e80]
+            - list [ref=e81]:
+              - listitem [ref=e82]:
+                - link "Dashboard" [ref=e83] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e84]:
+                - link "Banner Builder" [ref=e85] [cursor=pointer]:
+                  - /url: /dashboard/builder
+              - listitem [ref=e86]:
+                - link "Analytics" [ref=e87] [cursor=pointer]:
+                  - /url: /dashboard/analytics
+              - listitem [ref=e88]:
+                - link "Integrations" [ref=e89] [cursor=pointer]:
+                  - /url: /dashboard/integrations
+              - listitem [ref=e90]:
+                - link "Cookie Scanner" [ref=e91] [cursor=pointer]:
+                  - /url: /tools/cookie-scanner
+              - listitem [ref=e92]:
+                - link "Privacy Policy Generator" [ref=e93] [cursor=pointer]:
+                  - /url: /tools/privacy-policy
+              - listitem [ref=e94]:
+                - link "Live Demo" [ref=e95] [cursor=pointer]:
+                  - /url: /demo
+              - listitem [ref=e96]:
+                - link "Webflow Free" [ref=e97] [cursor=pointer]:
+                  - /url: /webflow-cookie-consent-free
+          - generic [ref=e98]:
+            - heading "Compliance & Legal" [level=3] [ref=e99]
+            - list [ref=e100]:
+              - listitem [ref=e101]:
+                - link "GDPR Compliance" [ref=e102] [cursor=pointer]:
+                  - /url: /compliance/gdpr
+              - listitem [ref=e103]:
+                - link "PIPEDA Compliance" [ref=e104] [cursor=pointer]:
+                  - /url: /compliance/pipeda
+              - listitem [ref=e105]:
+                - link "CCPA Compliance" [ref=e106] [cursor=pointer]:
+                  - /url: /compliance/ccpa
+              - listitem [ref=e107]:
+                - link "Canada Privacy Laws" [ref=e108] [cursor=pointer]:
+                  - /url: /locations/canada
+              - listitem [ref=e109]:
+                - link "EU Privacy Laws" [ref=e110] [cursor=pointer]:
+                  - /url: /locations/eu
+              - listitem [ref=e111]:
+                - link "US Privacy Laws" [ref=e112] [cursor=pointer]:
+                  - /url: /locations/us
+              - listitem [ref=e113]:
+                - link "Privacy Policy" [ref=e114] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e115]:
+                - link "Terms of Service" [ref=e116] [cursor=pointer]:
+                  - /url: /terms
+          - generic [ref=e117]:
+            - heading "Integrations" [level=3] [ref=e118]
+            - list [ref=e119]:
+              - listitem [ref=e120]:
+                - link "WordPress" [ref=e121] [cursor=pointer]:
+                  - /url: /integrations/wordpress
+              - listitem [ref=e122]:
+                - link "Webflow" [ref=e123] [cursor=pointer]:
+                  - /url: /integrations/webflow
+              - listitem [ref=e124]:
+                - link "Shopify" [ref=e125] [cursor=pointer]:
+                  - /url: /integrations/shopify
+              - listitem [ref=e126]:
+                - link "Squarespace" [ref=e127] [cursor=pointer]:
+                  - /url: /integrations/squarespace
+              - listitem [ref=e128]:
+                - link "Wix" [ref=e129] [cursor=pointer]:
+                  - /url: /integrations/wix
+              - listitem [ref=e130]:
+                - link "React" [ref=e131] [cursor=pointer]:
+                  - /url: /integrations/react
+              - listitem [ref=e132]:
+                - link "Google Tag Manager" [ref=e133] [cursor=pointer]:
+                  - /url: /integrations/google-tag-manager
+          - generic [ref=e134]:
+            - heading "Solutions" [level=3] [ref=e135]
+            - list [ref=e136]:
+              - listitem [ref=e137]:
+                - link "E-commerce" [ref=e138] [cursor=pointer]:
+                  - /url: /solutions/ecommerce
+              - listitem [ref=e139]:
+                - link "SaaS Platforms" [ref=e140] [cursor=pointer]:
+                  - /url: /solutions/saas
+              - listitem [ref=e141]:
+                - link "Healthcare" [ref=e142] [cursor=pointer]:
+                  - /url: /solutions/healthcare
+              - listitem [ref=e143]:
+                - link "Finance" [ref=e144] [cursor=pointer]:
+                  - /url: /solutions/finance
+              - listitem [ref=e145]:
+                - link "Education" [ref=e146] [cursor=pointer]:
+                  - /url: /solutions/education
+              - listitem [ref=e147]:
+                - link "Cookiebot Alternative" [ref=e148] [cursor=pointer]:
+                  - /url: /compare/cookiebot-alternative
+          - generic [ref=e149]:
+            - heading "Company & Support" [level=3] [ref=e150]
+            - list [ref=e151]:
+              - listitem [ref=e152]:
+                - link "About Us" [ref=e153] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e154]:
+                - link "Blog" [ref=e155] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e156]:
+                - link "Documentation" [ref=e157] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e158]:
+                - link "Support" [ref=e159] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e160]:
+                - link "Pricing" [ref=e161] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e162]:
+                - link "Roadmap" [ref=e163] [cursor=pointer]:
+                  - /url: /roadmap
+              - listitem [ref=e164]:
+                - link "Upgrade" [ref=e165] [cursor=pointer]:
+                  - /url: /upgrade
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - paragraph [ref=e171]: © 2026 Cookie Banner Generator. Made with ❤️ in Canada.
+            - generic [ref=e172]:
+              - generic [ref=e173]: Your Privacy Choices
+              - generic [ref=e174]:
+                - generic [ref=e176]: ✓
+                - generic [ref=e177]: ✓
+          - generic [ref=e178]:
+            - link "Sitemap" [ref=e179] [cursor=pointer]:
+              - /url: /sitemap.xml
+            - generic [ref=e180]: "|"
+            - link "Privacy Policy" [ref=e181] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e182]: "|"
+            - link "Terms of Use" [ref=e183] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e184]: "|"
+            - link "Accessibility" [ref=e185] [cursor=pointer]:
+              - /url: /support
+  - dialog "Cookie consent" [ref=e4]:
+    - generic [ref=e5]:
+      - button "Close" [ref=e6] [cursor=pointer]: ×
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - img "Logo" [ref=e9]
+          - generic [ref=e10]:
+            - heading "We use cookies" [level=3] [ref=e11]
+            - paragraph [ref=e12]:
+              - text: This website uses cookies to enhance your browsing experience and provide personalized content.
+              - link "Privacy Policy" [ref=e13] [cursor=pointer]:
+                - /url: https://www.cookie-banner.ca/privacy
+            - link "Powered by cookie-banner.ca" [ref=e15] [cursor=pointer]:
+              - /url: https://cookie-banner.ca/?ref=banner
+        - generic [ref=e16]:
+          - button "Accept All" [ref=e17] [cursor=pointer]
+          - button "Preferences" [ref=e18] [cursor=pointer]
+  - link "Cookie consent by cookie-banner.ca" [ref=e20] [cursor=pointer]:
+    - /url: https://cookie-banner.ca/?ref=banner
+  - alert [ref=e21]

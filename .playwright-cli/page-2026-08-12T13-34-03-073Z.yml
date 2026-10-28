@@ -1,0 +1,567 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e396]:
+    - generic [ref=e397]:
+      - img [ref=e400]
+      - generic [ref=e405]:
+        - generic [ref=e406]:
+          - 'heading "🎉 Major Update: v2.0.1 is Here!" [level=2] [ref=e407]'
+          - generic [ref=e408]:
+            - img [ref=e409]
+            - text: NEW
+        - paragraph [ref=e411]: Perfect icon centering, bulletproof CSS, and enhanced banner timing! Try it now →
+    - generic [ref=e412]:
+      - link "Try Latest Updates" [ref=e414] [cursor=pointer]:
+        - /url: /dashboard/builder
+        - text: Try Latest Updates
+        - img [ref=e415]
+      - button [ref=e418] [cursor=pointer]:
+        - img [ref=e419]
+  - generic [ref=e422]:
+    - banner [ref=e423]:
+      - generic [ref=e424]:
+        - link "Cookie Banner Generator" [ref=e425] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e426]
+        - generic [ref=e427]:
+          - navigation [ref=e428]:
+            - link "Pricing" [ref=e429] [cursor=pointer]:
+              - /url: /pricing
+            - link "Integrations" [ref=e430] [cursor=pointer]:
+              - /url: /integrations
+            - link "Compliance" [ref=e431] [cursor=pointer]:
+              - /url: /compliance
+            - link "Support" [ref=e432] [cursor=pointer]:
+              - /url: /support
+          - generic [ref=e433]:
+            - link "Sign In" [ref=e434] [cursor=pointer]:
+              - /url: /auth/signin
+            - link "Start Building" [ref=e435] [cursor=pointer]:
+              - /url: /builder
+    - generic [ref=e441]:
+      - generic [ref=e442]:
+        - img [ref=e443]
+        - text: Product Roadmap
+      - heading "Shape What We Build Next" [level=1] [ref=e445]:
+        - text: Shape What
+        - generic [ref=e446]: We Build
+        - text: Next
+      - paragraph [ref=e448]: Vote on the features that matter most to you, or suggest something new. Your feedback directly influences our priorities.
+      - generic [ref=e449]:
+        - button "Suggest a Feature (Login)" [ref=e450] [cursor=pointer]:
+          - img [ref=e451]
+          - text: Suggest a Feature
+          - generic [ref=e453]: (Login)
+        - link "Vote on Features" [ref=e454] [cursor=pointer]:
+          - /url: "#board"
+          - img [ref=e455]
+          - text: Vote on Features
+    - generic [ref=e459]:
+      - generic [ref=e460]:
+        - generic [ref=e461]:
+          - paragraph [ref=e462]: The Board
+          - heading "Feature Pipeline" [level=2] [ref=e463]
+        - generic [ref=e464]:
+          - generic [ref=e467]: Planned
+          - generic [ref=e470]: Building
+          - generic [ref=e473]: Shipped
+      - generic [ref=e474]:
+        - generic [ref=e475]:
+          - generic [ref=e476]:
+            - img [ref=e478]
+            - heading "Planned" [level=3] [ref=e480]
+            - generic [ref=e481]: "5"
+          - generic [ref=e482]:
+            - generic [ref=e484]:
+              - button "2" [ref=e485] [cursor=pointer]:
+                - img [ref=e486]
+                - generic [ref=e488]: "2"
+              - generic [ref=e489]:
+                - generic [ref=e490]:
+                  - heading "A/B Testing Framework" [level=4] [ref=e491]
+                  - img [ref=e493]
+                - paragraph [ref=e495]: Test different banner designs and messages to optimize conversion rates.
+                - generic [ref=e496]:
+                  - generic [ref=e497]:
+                    - generic "Sway" [ref=e498]:
+                      - img "Sway" [ref=e499]
+                    - generic "ArobisAI" [ref=e500]:
+                      - img "ArobisAI" [ref=e501]
+                  - generic [ref=e502]: Sway, ArobisAI
+                - generic [ref=e503]:
+                  - generic [ref=e505]: Optimization
+                  - button "Discuss" [ref=e506] [cursor=pointer]:
+                    - img [ref=e507]
+                    - text: Discuss
+            - generic [ref=e510]:
+              - button "2" [ref=e511] [cursor=pointer]:
+                - img [ref=e512]
+                - generic [ref=e514]: "2"
+              - generic [ref=e515]:
+                - generic [ref=e516]:
+                  - heading "A/B Testing Framework" [level=4] [ref=e517]
+                  - img [ref=e519]
+                - paragraph [ref=e521]: Test different banner designs and messages to optimize conversion rates.
+                - generic [ref=e522]:
+                  - generic [ref=e523]:
+                    - generic "Sway" [ref=e524]:
+                      - img "Sway" [ref=e525]
+                    - generic "ArobisAI" [ref=e526]:
+                      - img "ArobisAI" [ref=e527]
+                  - generic [ref=e528]: Sway, ArobisAI
+                - generic [ref=e529]:
+                  - generic [ref=e531]: Optimization
+                  - button "Discuss" [ref=e532] [cursor=pointer]:
+                    - img [ref=e533]
+                    - text: Discuss
+            - generic [ref=e536]:
+              - button "2" [ref=e537] [cursor=pointer]:
+                - img [ref=e538]
+                - generic [ref=e540]: "2"
+              - generic [ref=e541]:
+                - generic [ref=e542]:
+                  - heading "Data Export" [level=4] [ref=e543]
+                  - img [ref=e545]
+                - paragraph [ref=e547]: Export consent logs and analytics data as CSV or JSON for compliance auditing and reporting.
+                - generic [ref=e548]:
+                  - generic [ref=e549]:
+                    - generic "Andrea Budden" [ref=e550]: A
+                    - generic "Sway" [ref=e551]:
+                      - img "Sway" [ref=e552]
+                  - generic [ref=e553]: Andrea, Sway
+                - generic [ref=e554]:
+                  - generic [ref=e556]: Analytics
+                  - button "Discuss" [ref=e557] [cursor=pointer]:
+                    - img [ref=e558]
+                    - text: Discuss
+            - generic [ref=e561]:
+              - button "2" [ref=e562] [cursor=pointer]:
+                - img [ref=e563]
+                - generic [ref=e565]: "2"
+              - generic [ref=e566]:
+                - generic [ref=e567]:
+                  - heading "Data Export" [level=4] [ref=e568]
+                  - img [ref=e570]
+                - paragraph [ref=e572]: Export consent logs and analytics data as CSV or JSON for compliance auditing and reporting.
+                - generic [ref=e573]:
+                  - generic [ref=e574]:
+                    - generic "Andrea Budden" [ref=e575]: A
+                    - generic "Sway" [ref=e576]:
+                      - img "Sway" [ref=e577]
+                  - generic [ref=e578]: Andrea, Sway
+                - generic [ref=e579]:
+                  - generic [ref=e581]: Analytics
+                  - button "Discuss" [ref=e582] [cursor=pointer]:
+                    - img [ref=e583]
+                    - text: Discuss
+            - generic [ref=e586]:
+              - button "1" [ref=e587] [cursor=pointer]:
+                - img [ref=e588]
+                - generic [ref=e590]: "1"
+              - generic [ref=e591]:
+                - generic [ref=e592]:
+                  - heading "Google CMP Certification" [level=4] [ref=e593]
+                  - img [ref=e595]
+                - paragraph [ref=e597]: Become a Google-certified Consent Management Platform with GTM Gallery template and Chrome user-choice prompt integration.
+                - generic [ref=e598]:
+                  - generic "Andrea Budden" [ref=e600]: A
+                  - generic [ref=e601]: Andrea
+                - generic [ref=e602]:
+                  - generic [ref=e604]: Compliance
+                  - button "Discuss" [ref=e605] [cursor=pointer]:
+                    - img [ref=e606]
+                    - text: Discuss
+        - generic [ref=e608]:
+          - generic [ref=e609]:
+            - img [ref=e611]
+            - heading "In Progress" [level=3] [ref=e616]
+            - generic [ref=e617]: "0"
+          - paragraph [ref=e620]: Nothing in progress
+        - generic [ref=e621]:
+          - generic [ref=e622]:
+            - img [ref=e624]
+            - heading "Shipped" [level=3] [ref=e630]
+            - generic [ref=e631]: "8"
+          - generic [ref=e632]:
+            - generic [ref=e633]:
+              - img [ref=e636]
+              - generic [ref=e639]:
+                - button "2" [ref=e640] [cursor=pointer]:
+                  - img [ref=e641]
+                  - generic [ref=e643]: "2"
+                - generic [ref=e644]:
+                  - generic [ref=e645]:
+                    - heading "Multi-Language Support" [level=4] [ref=e646]
+                    - img [ref=e648]
+                  - paragraph [ref=e651]: Full English/French bilingual support with automatic browser language detection. All banner text, preference modal, and cookie categories translate automatically.
+                  - generic [ref=e652]:
+                    - generic [ref=e653]:
+                      - generic "Jean Michael" [ref=e654]:
+                        - img "Jean Michael" [ref=e655]
+                      - generic "Sway" [ref=e656]:
+                        - img "Sway" [ref=e657]
+                    - generic [ref=e658]: Jean, Sway
+                  - generic [ref=e659]:
+                    - generic [ref=e661]: Localization
+                    - button "Discuss" [ref=e662] [cursor=pointer]:
+                      - img [ref=e663]
+                      - text: Discuss
+            - generic [ref=e665]:
+              - img [ref=e668]
+              - generic [ref=e671]:
+                - button "2" [ref=e672] [cursor=pointer]:
+                  - img [ref=e673]
+                  - generic [ref=e675]: "2"
+                - generic [ref=e676]:
+                  - generic [ref=e677]:
+                    - heading "Multi-Language Support" [level=4] [ref=e678]
+                    - img [ref=e680]
+                  - paragraph [ref=e683]: Full English/French bilingual support with automatic browser language detection. All banner text, preference modal, and cookie categories translate automatically.
+                  - generic [ref=e684]:
+                    - generic [ref=e685]:
+                      - generic "Jean Michael" [ref=e686]:
+                        - img "Jean Michael" [ref=e687]
+                      - generic "Sway" [ref=e688]:
+                        - img "Sway" [ref=e689]
+                    - generic [ref=e690]: Jean, Sway
+                  - generic [ref=e691]:
+                    - generic [ref=e693]: Localization
+                    - button "Discuss" [ref=e694] [cursor=pointer]:
+                      - img [ref=e695]
+                      - text: Discuss
+            - generic [ref=e697]:
+              - img [ref=e700]
+              - generic [ref=e703]:
+                - button "1" [ref=e704] [cursor=pointer]:
+                  - img [ref=e705]
+                  - generic [ref=e707]: "1"
+                - generic [ref=e708]:
+                  - generic [ref=e709]:
+                    - heading "GA4 Integration" [level=4] [ref=e710]
+                    - img [ref=e712]
+                  - paragraph [ref=e714]: Deep Google Analytics 4 integration with consent event tracking, Measurement ID configuration, and Google Consent Mode v2 support. Consent data passes directly to your GA4 property.
+                  - generic [ref=e715]:
+                    - generic "Sway" [ref=e717]:
+                      - img "Sway" [ref=e718]
+                    - generic [ref=e719]: Sway
+                  - generic [ref=e720]:
+                    - generic [ref=e722]: Analytics
+                    - button "Discuss" [ref=e723] [cursor=pointer]:
+                      - img [ref=e724]
+                      - text: Discuss
+            - generic [ref=e726]:
+              - img [ref=e729]
+              - generic [ref=e732]:
+                - button "1" [ref=e733] [cursor=pointer]:
+                  - img [ref=e734]
+                  - generic [ref=e736]: "1"
+                - generic [ref=e737]:
+                  - generic [ref=e738]:
+                    - heading "Geo-Targeting Rules" [level=4] [ref=e739]
+                    - img [ref=e741]
+                  - paragraph [ref=e743]: Server-side visitor location detection with region-specific consent behavior. Includes Quebec Law 25 preset with one-click setup for stricter opt-in rules and French language override.
+                  - generic [ref=e744]:
+                    - generic "Sway" [ref=e746]:
+                      - img "Sway" [ref=e747]
+                    - generic [ref=e748]: Sway
+                  - generic [ref=e749]:
+                    - generic [ref=e751]: Compliance
+                    - button "Discuss" [ref=e752] [cursor=pointer]:
+                      - img [ref=e753]
+                      - text: Discuss
+            - generic [ref=e755]:
+              - img [ref=e758]
+              - generic [ref=e761]:
+                - button "0" [ref=e762] [cursor=pointer]:
+                  - img [ref=e763]
+                  - generic [ref=e765]: "0"
+                - generic [ref=e766]:
+                  - generic [ref=e767]:
+                    - heading "Advanced Analytics Dashboard" [level=4] [ref=e768]
+                    - img [ref=e770]
+                  - paragraph [ref=e772]: Full consent analytics dashboard with impressions, accepts, rejects, dismissals, decision time, device/country/source breakdowns, and daily aggregation.
+                  - generic [ref=e773]:
+                    - generic [ref=e775]: Analytics
+                    - button "Discuss" [ref=e776] [cursor=pointer]:
+                      - img [ref=e777]
+                      - text: Discuss
+            - generic [ref=e779]:
+              - img [ref=e782]
+              - generic [ref=e785]:
+                - button "0" [ref=e786] [cursor=pointer]:
+                  - img [ref=e787]
+                  - generic [ref=e789]: "0"
+                - generic [ref=e790]:
+                  - generic [ref=e791]:
+                    - heading "Team Collaboration Features" [level=4] [ref=e792]
+                    - img [ref=e794]
+                  - paragraph [ref=e799]: Workspace system with team invitations, role-based access (owner, admin, editor, viewer), and up to 5 team members on Pro.
+                  - generic [ref=e800]:
+                    - generic [ref=e802]: Collaboration
+                    - button "Discuss" [ref=e803] [cursor=pointer]:
+                      - img [ref=e804]
+                      - text: Discuss
+            - generic [ref=e806]:
+              - img [ref=e809]
+              - generic [ref=e812]:
+                - button "0" [ref=e813] [cursor=pointer]:
+                  - img [ref=e814]
+                  - generic [ref=e816]: "0"
+                - generic [ref=e817]:
+                  - generic [ref=e818]:
+                    - heading "Advanced Compliance Tools" [level=4] [ref=e819]
+                    - img [ref=e821]
+                  - paragraph [ref=e823]: PIPEDA, Quebec Law 25, GDPR, and CCPA compliance frameworks with geo-targeting rules for region-specific consent behavior.
+                  - generic [ref=e824]:
+                    - generic [ref=e826]: Compliance
+                    - button "Discuss" [ref=e827] [cursor=pointer]:
+                      - img [ref=e828]
+                      - text: Discuss
+            - generic [ref=e830]:
+              - img [ref=e833]
+              - generic [ref=e836]:
+                - button "0" [ref=e837] [cursor=pointer]:
+                  - img [ref=e838]
+                  - generic [ref=e840]: "0"
+                - generic [ref=e841]:
+                  - generic [ref=e842]:
+                    - heading "Custom CSS Editor" [level=4] [ref=e843]
+                    - img [ref=e845]
+                  - paragraph [ref=e848]: Custom CSS editor in the Advanced tab for full styling control beyond the visual builder.
+                  - generic [ref=e849]:
+                    - generic [ref=e851]: Design
+                    - button "Discuss" [ref=e852] [cursor=pointer]:
+                      - img [ref=e853]
+                      - text: Discuss
+    - generic [ref=e859]:
+      - generic [ref=e860]:
+        - generic [ref=e861]:
+          - img [ref=e862]
+          - text: Continuous Delivery
+        - heading "New Features, Continuously Delivered" [level=2] [ref=e865]
+        - paragraph [ref=e866]: Annual subscribers unlock every feature as it ships. One-time purchasers keep everything available at their purchase date.
+      - generic [ref=e867]:
+        - generic [ref=e868]:
+          - generic [ref=e870]:
+            - generic [ref=e871]:
+              - img [ref=e873]
+              - generic [ref=e875]: Recommended
+            - heading "Pro Annual" [level=3] [ref=e876]
+          - generic [ref=e877]:
+            - generic [ref=e878]:
+              - generic [ref=e879]: $99
+              - generic [ref=e880]: /year
+            - paragraph [ref=e881]: Always up to date. Every new feature, automatically.
+            - generic [ref=e882]:
+              - generic [ref=e883]:
+                - img [ref=e885]
+                - generic [ref=e888]: Every feature on the roadmap
+              - generic [ref=e889]:
+                - img [ref=e891]
+                - generic [ref=e894]: New features as they ship
+              - generic [ref=e895]:
+                - img [ref=e897]
+                - generic [ref=e900]: Priority support
+              - generic [ref=e901]:
+                - img [ref=e903]
+                - generic [ref=e906]: Consent Logs included
+            - button "Upgrade to Annual" [ref=e907] [cursor=pointer]:
+              - text: Upgrade to Annual
+              - img [ref=e908]
+        - generic [ref=e911]:
+          - generic [ref=e913]:
+            - img [ref=e916]
+            - heading "Pro Lifetime" [level=3] [ref=e919]
+          - generic [ref=e920]:
+            - generic [ref=e921]:
+              - generic [ref=e922]: $99
+              - generic [ref=e923]: once
+            - paragraph [ref=e924]: Lock in today's features forever.
+            - generic [ref=e925]:
+              - generic [ref=e926]:
+                - img [ref=e928]
+                - generic [ref=e931]: All current features
+              - generic [ref=e935]: Frozen at purchase date
+              - generic [ref=e939]: No future feature updates
+              - generic [ref=e943]: Standard support
+            - button "View One-Time Option" [ref=e944] [cursor=pointer]
+    - generic [ref=e950]:
+      - heading "Have an Idea?" [level=2] [ref=e951]
+      - paragraph [ref=e952]: We'd love to hear your suggestions and feedback
+      - generic [ref=e953]:
+        - button "Suggest Feature (Login)" [ref=e954] [cursor=pointer]:
+          - img [ref=e955]
+          - text: Suggest Feature
+          - generic [ref=e957]: (Login)
+        - link "Contact Us" [ref=e958] [cursor=pointer]:
+          - /url: mailto:support@cookie-banner.ca
+          - img [ref=e959]
+          - text: Contact Us
+    - contentinfo [ref=e961]:
+      - generic [ref=e962]:
+        - link "Cookie Banner Generator" [ref=e964] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e965]
+        - generic [ref=e967]:
+          - generic [ref=e968]:
+            - heading "Product & Tools" [level=3] [ref=e969]
+            - list [ref=e970]:
+              - listitem [ref=e971]:
+                - link "Dashboard" [ref=e972] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e973]:
+                - link "Banner Builder" [ref=e974] [cursor=pointer]:
+                  - /url: /dashboard/builder
+              - listitem [ref=e975]:
+                - link "Analytics" [ref=e976] [cursor=pointer]:
+                  - /url: /dashboard/analytics
+              - listitem [ref=e977]:
+                - link "Integrations" [ref=e978] [cursor=pointer]:
+                  - /url: /dashboard/integrations
+              - listitem [ref=e979]:
+                - link "Cookie Scanner" [ref=e980] [cursor=pointer]:
+                  - /url: /tools/cookie-scanner
+              - listitem [ref=e981]:
+                - link "Privacy Policy Generator" [ref=e982] [cursor=pointer]:
+                  - /url: /tools/privacy-policy
+              - listitem [ref=e983]:
+                - link "Live Demo" [ref=e984] [cursor=pointer]:
+                  - /url: /demo
+              - listitem [ref=e985]:
+                - link "Webflow Free" [ref=e986] [cursor=pointer]:
+                  - /url: /webflow-cookie-consent-free
+          - generic [ref=e987]:
+            - heading "Compliance & Legal" [level=3] [ref=e988]
+            - list [ref=e989]:
+              - listitem [ref=e990]:
+                - link "GDPR Compliance" [ref=e991] [cursor=pointer]:
+                  - /url: /compliance/gdpr
+              - listitem [ref=e992]:
+                - link "PIPEDA Compliance" [ref=e993] [cursor=pointer]:
+                  - /url: /compliance/pipeda
+              - listitem [ref=e994]:
+                - link "CCPA Compliance" [ref=e995] [cursor=pointer]:
+                  - /url: /compliance/ccpa
+              - listitem [ref=e996]:
+                - link "Canada Privacy Laws" [ref=e997] [cursor=pointer]:
+                  - /url: /locations/canada
+              - listitem [ref=e998]:
+                - link "EU Privacy Laws" [ref=e999] [cursor=pointer]:
+                  - /url: /locations/eu
+              - listitem [ref=e1000]:
+                - link "US Privacy Laws" [ref=e1001] [cursor=pointer]:
+                  - /url: /locations/us
+              - listitem [ref=e1002]:
+                - link "Privacy Policy" [ref=e1003] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e1004]:
+                - link "Terms of Service" [ref=e1005] [cursor=pointer]:
+                  - /url: /terms
+          - generic [ref=e1006]:
+            - heading "Integrations" [level=3] [ref=e1007]
+            - list [ref=e1008]:
+              - listitem [ref=e1009]:
+                - link "WordPress" [ref=e1010] [cursor=pointer]:
+                  - /url: /integrations/wordpress
+              - listitem [ref=e1011]:
+                - link "Webflow" [ref=e1012] [cursor=pointer]:
+                  - /url: /integrations/webflow
+              - listitem [ref=e1013]:
+                - link "Shopify" [ref=e1014] [cursor=pointer]:
+                  - /url: /integrations/shopify
+              - listitem [ref=e1015]:
+                - link "Squarespace" [ref=e1016] [cursor=pointer]:
+                  - /url: /integrations/squarespace
+              - listitem [ref=e1017]:
+                - link "Wix" [ref=e1018] [cursor=pointer]:
+                  - /url: /integrations/wix
+              - listitem [ref=e1019]:
+                - link "React" [ref=e1020] [cursor=pointer]:
+                  - /url: /integrations/react
+              - listitem [ref=e1021]:
+                - link "Google Tag Manager" [ref=e1022] [cursor=pointer]:
+                  - /url: /integrations/google-tag-manager
+          - generic [ref=e1023]:
+            - heading "Solutions" [level=3] [ref=e1024]
+            - list [ref=e1025]:
+              - listitem [ref=e1026]:
+                - link "E-commerce" [ref=e1027] [cursor=pointer]:
+                  - /url: /solutions/ecommerce
+              - listitem [ref=e1028]:
+                - link "SaaS Platforms" [ref=e1029] [cursor=pointer]:
+                  - /url: /solutions/saas
+              - listitem [ref=e1030]:
+                - link "Healthcare" [ref=e1031] [cursor=pointer]:
+                  - /url: /solutions/healthcare
+              - listitem [ref=e1032]:
+                - link "Finance" [ref=e1033] [cursor=pointer]:
+                  - /url: /solutions/finance
+              - listitem [ref=e1034]:
+                - link "Education" [ref=e1035] [cursor=pointer]:
+                  - /url: /solutions/education
+              - listitem [ref=e1036]:
+                - link "Cookiebot Alternative" [ref=e1037] [cursor=pointer]:
+                  - /url: /compare/cookiebot-alternative
+          - generic [ref=e1038]:
+            - heading "Company & Support" [level=3] [ref=e1039]
+            - list [ref=e1040]:
+              - listitem [ref=e1041]:
+                - link "About Us" [ref=e1042] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e1043]:
+                - link "Blog" [ref=e1044] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e1045]:
+                - link "Documentation" [ref=e1046] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e1047]:
+                - link "Support" [ref=e1048] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e1049]:
+                - link "Pricing" [ref=e1050] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e1051]:
+                - link "Roadmap" [ref=e1052] [cursor=pointer]:
+                  - /url: /roadmap
+              - listitem [ref=e1053]:
+                - link "Upgrade" [ref=e1054] [cursor=pointer]:
+                  - /url: /upgrade
+        - generic [ref=e1058]:
+          - generic [ref=e1059]:
+            - paragraph [ref=e1060]: © 2026 Cookie Banner Generator. Made with ❤️ in Canada.
+            - generic [ref=e1061]:
+              - generic [ref=e1062]: Your Privacy Choices
+              - generic [ref=e1063]:
+                - generic [ref=e1065]: ✓
+                - generic [ref=e1066]: ✓
+          - generic [ref=e1067]:
+            - link "Sitemap" [ref=e1068] [cursor=pointer]:
+              - /url: /sitemap.xml
+            - generic [ref=e1069]: "|"
+            - link "Privacy Policy" [ref=e1070] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e1071]: "|"
+            - link "Terms of Use" [ref=e1072] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e1073]: "|"
+            - link "Accessibility" [ref=e1074] [cursor=pointer]:
+              - /url: /support
+  - dialog "Cookie consent" [ref=e374]:
+    - generic [ref=e375]:
+      - button "Close" [ref=e376] [cursor=pointer]: ×
+      - generic [ref=e377]:
+        - generic [ref=e378]:
+          - img "Logo" [ref=e379]
+          - generic [ref=e380]:
+            - heading "We use cookies" [level=3] [ref=e381]
+            - paragraph [ref=e382]:
+              - text: This website uses cookies to enhance your browsing experience and provide personalized content.
+              - link "Privacy Policy" [ref=e383] [cursor=pointer]:
+                - /url: https://www.cookie-banner.ca/privacy
+            - link "Powered by cookie-banner.ca" [ref=e385] [cursor=pointer]:
+              - /url: https://cookie-banner.ca/?ref=banner
+        - generic [ref=e386]:
+          - button "Accept All" [ref=e387] [cursor=pointer]
+          - button "Preferences" [ref=e388] [cursor=pointer]
+  - link "Cookie consent by cookie-banner.ca" [ref=e390] [cursor=pointer]:
+    - /url: https://cookie-banner.ca/?ref=banner
+  - alert [ref=e391]: Roadmap - Cookie Banner Generator

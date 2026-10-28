@@ -1,0 +1,874 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Cookie Banner Generator" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e6]
+        - generic [ref=e7]:
+          - navigation [ref=e8]:
+            - link "Pricing" [ref=e9] [cursor=pointer]:
+              - /url: /pricing
+            - link "Integrations" [ref=e10] [cursor=pointer]:
+              - /url: /integrations
+            - link "Compliance" [ref=e11] [cursor=pointer]:
+              - /url: /compliance
+            - link "Support" [ref=e12] [cursor=pointer]:
+              - /url: /support
+          - generic [ref=e13]:
+            - link "Sign In" [ref=e14] [cursor=pointer]:
+              - /url: /auth/signin
+            - link "Start Building" [ref=e15] [cursor=pointer]:
+              - /url: /builder
+    - main [ref=e16]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - heading "Free Cookie Banner Generator for Canada." [level=1] [ref=e21]:
+            - text: Free Cookie Banner
+            - generic [ref=e22]: Generator
+            - text: for Canada.
+          - paragraph [ref=e23]:
+            - text: Generate a
+            - strong [ref=e24]: PIPEDA, Law 25, GDPR & CCPA compliant
+            - text: cookie consent banner in 5 minutes. Match your brand. Works on
+            - link "WordPress" [ref=e25] [cursor=pointer]:
+              - /url: /integrations/wordpress
+            - text: ","
+            - link "Shopify" [ref=e26] [cursor=pointer]:
+              - /url: /integrations/shopify
+            - text: ","
+            - link "Webflow" [ref=e27] [cursor=pointer]:
+              - /url: /integrations/webflow
+            - text: "& any platform. Free plan available — Pro for $99 one-time."
+          - generic [ref=e28]:
+            - textbox "Your website" [ref=e29]:
+              - /placeholder: yourdomain.com
+            - button "Build my banner — free" [ref=e30] [cursor=pointer]:
+              - text: Build my banner — free
+              - img [ref=e31]
+          - generic [ref=e33]:
+            - generic [ref=e34]: ✓No signup
+            - generic [ref=e35]: ✓No credit card
+            - generic [ref=e36]: ✓Copy-paste install
+          - generic [ref=e37]:
+            - text: Used by
+            - strong [ref=e41]: 1,000+
+            - text: Canadian websites
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - generic [ref=e44]: PIPEDA
+            - generic [ref=e45]: We use cookies
+            - generic [ref=e46]: To analyze traffic and remember your preferences across visits.
+            - generic [ref=e47]:
+              - generic [ref=e48]: Accept all
+              - generic [ref=e49]: Reject
+          - generic [ref=e50]:
+            - generic [ref=e51]: GDPR
+            - generic [ref=e52]: Privacy choices
+            - generic [ref=e53]: Customize how this site uses cookies.
+            - generic [ref=e54]:
+              - generic [ref=e55]: Allow all
+              - generic [ref=e56]: Manage
+          - generic [ref=e57]:
+            - generic [ref=e58]: LAW 25
+            - generic [ref=e59]: Nous utilisons des témoins
+            - generic [ref=e60]: Pour personnaliser votre expérience sur ce site.
+            - generic [ref=e61]:
+              - generic [ref=e62]: Accepter
+              - generic [ref=e63]: Refuser
+          - generic [ref=e64]:
+            - generic [ref=e65]: CCPA
+            - generic [ref=e66]: Do Not Sell My Info
+            - generic [ref=e67]: Manage how your data is shared with partners.
+            - generic [ref=e68]:
+              - generic [ref=e69]: Got it
+              - generic [ref=e70]: Settings
+      - region "Platforms supported" [ref=e71]:
+        - generic [ref=e72]:
+          - paragraph [ref=e73]: Works on every platform you ship to
+          - list [ref=e74]:
+            - listitem [ref=e75]:
+              - img [ref=e77]
+              - generic [ref=e79]: WordPress
+            - listitem [ref=e80]:
+              - img [ref=e82]
+              - generic [ref=e84]: Shopify
+            - listitem [ref=e85]:
+              - img [ref=e87]
+              - generic [ref=e89]: Webflow
+            - listitem [ref=e90]:
+              - img [ref=e92]
+              - generic [ref=e94]: Squarespace
+            - listitem [ref=e95]:
+              - img [ref=e97]
+              - generic [ref=e99]: Wix
+            - listitem [ref=e100]:
+              - img [ref=e102]
+              - generic [ref=e105]: Custom HTML
+      - region "Banner builder introduction" [ref=e106]:
+        - generic [ref=e107]:
+          - heading "Build your first cookie banner in 60 seconds." [level=2] [ref=e108]
+          - paragraph [ref=e109]: Pick a layout, type your company name, drop in brand colours. The preview is the real banner — what you see is what gets installed.
+      - generic [ref=e112]:
+        - generic [ref=e114]:
+          - generic [ref=e116]:
+            - generic [ref=e117]: Step 1 of 4
+            - generic [ref=e118]: 25%
+          - navigation [ref=e121]:
+            - generic [ref=e122]: Quick Setup
+            - button "Brand & Preview" [ref=e123] [cursor=pointer]:
+              - img [ref=e124]
+              - generic [ref=e130]: Brand & Preview
+            - button "Customize" [ref=e131] [cursor=pointer]:
+              - img [ref=e132]
+              - generic [ref=e134]: Customize
+            - button "Scripts" [ref=e135] [cursor=pointer]:
+              - img [ref=e136]
+              - generic [ref=e140]: Scripts
+            - button "Get Code" [ref=e141] [cursor=pointer]:
+              - img [ref=e142]
+              - generic [ref=e145]: Get Code
+            - button "Advanced Settings" [ref=e146] [cursor=pointer]:
+              - img [ref=e147]
+              - generic [ref=e150]: Advanced Settings
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - heading "Choose Compliance Framework" [level=2] [ref=e153]
+            - paragraph [ref=e154]: Select the privacy law that applies to your website. This will configure your banner's requirements and legal text.
+            - generic [ref=e155]:
+              - button "Design" [ref=e156] [cursor=pointer]
+              - button "Compliance" [ref=e157] [cursor=pointer]
+          - tabpanel [ref=e159]:
+            - generic [ref=e161]:
+              - button "PIPEDA Canada" [ref=e162] [cursor=pointer]:
+                - img [ref=e164]
+                - generic [ref=e167]: PIPEDA
+                - generic [ref=e168]: Canada
+                - img [ref=e169]
+              - button "GDPR European Union" [ref=e171] [cursor=pointer]:
+                - img [ref=e173]
+                - generic [ref=e175]: GDPR
+                - generic [ref=e176]: European Union
+              - button "CCPA California, USA" [ref=e177] [cursor=pointer]:
+                - img [ref=e179]
+                - generic [ref=e182]: CCPA
+                - generic [ref=e183]: California, USA
+              - button "TCF IAB TCF v2.2" [ref=e184] [cursor=pointer]:
+                - img [ref=e186]
+                - generic [ref=e195]: TCF
+                - generic [ref=e196]: IAB TCF v2.2
+              - button "CUSTOM Custom Requirements" [ref=e197] [cursor=pointer]:
+                - img [ref=e199]
+                - generic [ref=e201]: CUSTOM
+                - generic [ref=e202]: Custom Requirements
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - heading "Live Preview" [level=3] [ref=e208]:
+                - img [ref=e209]
+                - text: Live Preview
+              - generic [ref=e212]:
+                - generic [ref=e213]:
+                  - img [ref=e214]
+                  - text: NEW
+                - img [ref=e217]
+            - paragraph [ref=e219]: ✨ Try clicking the "Preferences" button to see the new modal!
+          - generic [ref=e221]:
+            - generic [ref=e234]:
+              - button "Close" [ref=e235] [cursor=pointer]: ×
+              - generic [ref=e236]:
+                - generic [ref=e237]:
+                  - heading "We use cookies" [level=3] [ref=e238]
+                  - paragraph [ref=e239]: This website uses cookies to enhance your browsing experience and provide personalized content.
+                - generic [ref=e240]:
+                  - button "Accept All" [ref=e241] [cursor=pointer]
+                  - button "Reject" [ref=e242] [cursor=pointer]
+                  - button "Preferences" [ref=e243] [cursor=pointer]
+            - generic [ref=e244]:
+              - paragraph [ref=e245]: "Position: bottom"
+              - paragraph [ref=e246]: "Theme: dark"
+              - paragraph [ref=e247]: "Auto-show: Yes"
+              - paragraph [ref=e248]: "Cookie expiry: 182 days"
+              - generic [ref=e249]:
+                - paragraph [ref=e250]: "Cookie Settings: ✓ Enabled"
+                - paragraph [ref=e251]: "Floating: pill (small)"
+      - generic [ref=e253]:
+        - generic [ref=e254]:
+          - generic [ref=e255]:
+            - generic [ref=e256]: Everything in the box
+            - heading "The boring stuff, handled." [level=2] [ref=e257]:
+              - text: The boring stuff,
+              - text: handled.
+          - paragraph [ref=e258]: Compliance, performance, accessibility, audit trails. The kind of thing nobody wants to think about — until they get a letter from a regulator.
+        - generic [ref=e259]:
+          - article [ref=e260]:
+            - generic [ref=e261]:
+              - text: Compliance
+              - heading "Four privacy laws. One toggle each." [level=3] [ref=e262]:
+                - text: Four privacy laws.
+                - text: One toggle each.
+              - paragraph [ref=e263]: Switch frameworks per banner. We rewrite the legal copy, set the right consent expiry, and adjust opt-in/opt-out behaviour automatically.
+            - generic [ref=e264]:
+              - generic: Regulator letter
+              - generic: $50k fine
+              - generic: Class action
+              - generic: Audit notice
+              - generic [ref=e265]:
+                - img [ref=e267]
+                - strong [ref=e275]: PIPEDA
+                - strong [ref=e278]: Law 25
+                - strong [ref=e281]: GDPR
+                - strong [ref=e284]: CCPA
+          - article [ref=e285]:
+            - generic [ref=e286]:
+              - text: 5-minute install
+              - heading "Paste one line. Done." [level=3] [ref=e287]
+              - paragraph [ref=e288]:
+                - text: Drop the snippet before
+                - code [ref=e289]: </body>
+                - text: . Works on WordPress, Shopify, Webflow, raw HTML.
+            - generic "Install snippet" [ref=e290]: <!-- cookie-banner.ca --> <script async src="https://cdn.cookie-banner.ca/v2/banner.js" data-id="brk_8f2c"></script>
+          - article [ref=e291]:
+            - generic [ref=e292]:
+              - text: Consent analytics
+              - heading "See what's working." [level=3] [ref=e293]
+              - paragraph [ref=e294]: Live counts of accepts, rejects, and partial consents — broken down by region, device, and banner variant.
+            - generic [ref=e295]:
+              - generic [ref=e296]:
+                - strong [ref=e297]: 72.4%
+                - text: Accept all
+              - generic [ref=e298]:
+                - strong [ref=e299]: 14.1%
+                - text: Reject
+              - generic [ref=e300]:
+                - strong [ref=e301]: 13.5%
+                - text: Custom
+          - article [ref=e302]:
+            - generic [ref=e303]:
+              - text: Geo-targeting
+              - heading "Right banner, right region." [level=3] [ref=e304]:
+                - text: Right banner,
+                - text: right region.
+              - paragraph [ref=e305]: Show GDPR in the EU, CCPA in California, Law 25 in Quebec — automatically.
+            - generic [ref=e306]:
+              - img
+              - generic: Quebec · Law 25
+          - article [ref=e307]:
+            - generic [ref=e308]:
+              - text: Bilingual + 14 more
+              - heading "EN, FR, plus 14 languages." [level=3] [ref=e309]
+              - paragraph [ref=e310]: Required by Law 25. Auto-detects browser locale.
+            - generic [ref=e311]:
+              - generic [ref=e312]: EN
+              - generic [ref=e313]: FR
+              - generic [ref=e314]: ES
+              - generic [ref=e315]: DE
+              - generic [ref=e316]: IT
+              - generic [ref=e317]: PT
+              - generic [ref=e318]: NL
+              - generic [ref=e319]: PL
+              - generic [ref=e320]: SV
+              - generic [ref=e321]: DA
+              - generic [ref=e322]: FI
+              - generic [ref=e323]: JA
+              - generic [ref=e324]: ZH
+              - generic [ref=e325]: KO
+              - generic [ref=e326]: AR
+              - generic [ref=e327]: HE
+          - article [ref=e328]:
+            - generic [ref=e329]:
+              - text: Performance
+              - heading "Under 10 KB, loads async." [level=3] [ref=e330]:
+                - text: Under 10 KB,
+                - text: loads async.
+              - paragraph [ref=e331]: Zero impact on Core Web Vitals. Deferred analytics. Scripts gated by consent.
+            - generic [ref=e332]:
+              - generic [ref=e333]: "0.0"
+              - generic [ref=e334]: kb
+      - generic [ref=e336]:
+        - generic [ref=e337]:
+          - generic [ref=e338]:
+            - generic [ref=e339]: Global coverage
+            - heading "One banner, 16 languages." [level=2] [ref=e340]:
+              - text: One banner,
+              - text: 16 languages.
+          - paragraph [ref=e341]: Your cookie banner automatically detects your visitor's browser language and displays in their native tongue. No configuration needed — it just works.
+        - generic [ref=e342]:
+          - generic [ref=e343]:
+            - generic [ref=e344]: EN
+            - generic [ref=e345]: English
+            - generic [ref=e346]: We use cookies
+          - generic [ref=e347]:
+            - generic [ref=e348]: FR
+            - generic [ref=e349]: Français
+            - generic [ref=e350]: Nous utilisons des cookies
+          - generic [ref=e351]:
+            - generic [ref=e352]: ES
+            - generic [ref=e353]: Español
+            - generic [ref=e354]: Usamos cookies
+          - generic [ref=e355]:
+            - generic [ref=e356]: DE
+            - generic [ref=e357]: Deutsch
+            - generic [ref=e358]: Wir verwenden Cookies
+          - generic [ref=e359]:
+            - generic [ref=e360]: PT
+            - generic [ref=e361]: Português
+            - generic [ref=e362]: Utilizamos cookies
+          - generic [ref=e363]:
+            - generic [ref=e364]: IT
+            - generic [ref=e365]: Italiano
+            - generic [ref=e366]: Utilizziamo i cookie
+          - generic [ref=e367]:
+            - generic [ref=e368]: NL
+            - generic [ref=e369]: Nederlands
+            - generic [ref=e370]: Wij gebruiken cookies
+          - generic [ref=e371]:
+            - generic [ref=e372]: SV
+            - generic [ref=e373]: Svenska
+            - generic [ref=e374]: Vi använder cookies
+          - generic [ref=e375]:
+            - generic [ref=e376]: DA
+            - generic [ref=e377]: Dansk
+            - generic [ref=e378]: Vi bruger cookies
+          - generic [ref=e379]:
+            - generic [ref=e380]: JA
+            - generic [ref=e381]: 日本語
+            - generic [ref=e382]: Cookieの使用について
+          - generic [ref=e383]:
+            - generic [ref=e384]: ZH
+            - generic [ref=e385]: 中文
+            - generic [ref=e386]: 我们使用Cookie
+          - generic [ref=e387]:
+            - generic [ref=e388]: KO
+            - generic [ref=e389]: 한국어
+            - generic [ref=e390]: 쿠키를 사용합니다
+          - generic [ref=e391]:
+            - generic [ref=e392]: AR
+            - generic [ref=e393]: العربية
+            - generic [ref=e394]: نستخدم ملفات تعريف
+          - generic [ref=e395]:
+            - generic [ref=e396]: HI
+            - generic [ref=e397]: हिन्दी
+            - generic [ref=e398]: हम कुकीज़ का उपयोग करते हैं
+          - generic [ref=e399]:
+            - generic [ref=e400]: NB
+            - generic [ref=e401]: Norsk
+            - generic [ref=e402]: Vi bruker informasjonskapsler
+          - generic [ref=e403]:
+            - generic [ref=e404]: FI
+            - generic [ref=e405]: Suomi
+            - generic [ref=e406]: Käytämme evästeitä
+      - generic [ref=e408]:
+        - generic [ref=e409]:
+          - generic [ref=e410]:
+            - generic [ref=e411]: The honest comparison
+            - heading "$99 once. Or $40 every month, forever." [level=2] [ref=e412]:
+              - text: $99 once. Or $40
+              - text: every month, forever.
+          - paragraph [ref=e413]: Most CMPs charge a monthly subscription per domain. We charge once. Here's the receipt.
+        - generic [ref=e415]:
+          - generic [ref=e416]:
+            - generic [ref=e418]:
+              - text: cookie-banner.ca
+              - generic [ref=e419]: YOU
+            - generic [ref=e420]: Cookiebot
+            - generic [ref=e421]: OneTrust
+            - generic [ref=e422]: CookieYes
+          - generic [ref=e423]:
+            - generic [ref=e424]: Free tier with no watermark
+            - generic [ref=e426]:
+              - generic [ref=e427]: ●
+              - text: "Yes"
+            - generic [ref=e429]:
+              - generic [ref=e430]: ○
+              - text: Watermarked
+            - generic [ref=e432]:
+              - generic [ref=e433]: ○
+              - text: No free tier
+            - generic [ref=e435]:
+              - generic [ref=e436]: ○
+              - text: Watermarked
+          - generic [ref=e437]:
+            - generic [ref=e438]: Configure before signup
+            - generic [ref=e440]:
+              - generic [ref=e441]: ●
+              - text: In-page builder
+            - generic [ref=e443]:
+              - generic [ref=e444]: ○
+              - text: Trial signup
+            - generic [ref=e446]:
+              - generic [ref=e447]: ○
+              - text: Sales call
+            - generic [ref=e449]:
+              - generic [ref=e450]: ○
+              - text: Account required
+          - generic [ref=e451]:
+            - generic [ref=e452]: Pro plan starting at
+            - generic [ref=e453]: $99 once
+            - generic [ref=e454]: $11/mo per domain
+            - generic [ref=e455]: $30+ /mo, custom
+            - generic [ref=e456]: $10/mo per domain
+          - generic [ref=e457]:
+            - generic [ref=e458]: 5-year cost (1 site)
+            - generic [ref=e459]: $99
+            - generic [ref=e460]: ~$660
+            - generic [ref=e461]: ~$1,800+
+            - generic [ref=e462]: ~$600
+          - generic [ref=e463]:
+            - generic [ref=e464]: Unlimited domains
+            - generic [ref=e466]:
+              - generic [ref=e467]: ●
+              - text: Yes (Pro)
+            - generic [ref=e469]:
+              - generic [ref=e470]: ○
+              - text: Per-domain pricing
+            - generic [ref=e472]:
+              - generic [ref=e473]: ○
+              - text: Per-domain pricing
+            - generic [ref=e475]:
+              - generic [ref=e476]: ○
+              - text: Per-domain pricing
+          - generic [ref=e477]:
+            - generic [ref=e478]: Setup time
+            - generic [ref=e480]:
+              - generic [ref=e481]: ●
+              - text: ~5 min
+            - generic [ref=e482]: ~30 min
+            - generic [ref=e483]: Days, sales-led
+            - generic [ref=e484]: ~20 min
+        - paragraph [ref=e485]: Pricing as of Apr 2026, public list prices. Comparison is our reading of public pages — verify before switching.
+        - generic [ref=e486]:
+          - heading "And the things a price table can't show." [level=3] [ref=e487]
+          - list [ref=e488]:
+            - listitem [ref=e489]:
+              - text: ✓
+              - strong [ref=e490]: No subscription, ever.
+              - text: One $99 charge replaces $40/month — no auto-renewal, no card on file.
+            - listitem [ref=e491]:
+              - text: ✓
+              - strong [ref=e492]: Unlimited domains on Pro.
+              - text: Run it on every site you own without per-domain math.
+            - listitem [ref=e493]:
+              - text: ✓
+              - strong [ref=e494]: Canadian-first compliance.
+              - text: PIPEDA + CASL + Quebec Law 25 are defaults, not bolt-ons.
+            - listitem [ref=e495]:
+              - text: ✓
+              - strong [ref=e496]: Bilingual EN/FR by default.
+              - text: Plus 14 other languages with auto-detect.
+          - list [ref=e497]:
+            - listitem [ref=e498]:
+              - text: ✓
+              - strong [ref=e499]: 9.3 KB, async, zero CWV impact.
+              - text: Won't slow your LCP or your sales pages.
+            - listitem [ref=e500]:
+              - text: ✓
+              - strong [ref=e501]: No signup wall.
+              - text: Build the banner first, decide later.
+            - listitem [ref=e502]:
+              - text: ✓
+              - strong [ref=e503]: Lifetime updates & same-day support
+              - text: on every plan, free included.
+            - listitem [ref=e504]:
+              - text: ✓
+              - strong [ref=e505]: You own your consent logs.
+              - text: Export the audit trail anytime — no lock-in.
+      - generic [ref=e507]:
+        - generic [ref=e508]:
+          - generic [ref=e509]:
+            - generic [ref=e510]: Pricing
+            - heading "Free forever. Pro is $99 — your call how." [level=2] [ref=e511]:
+              - text: Free forever.
+              - text: Pro is $99 — your call how.
+          - paragraph [ref=e512]: Pick once. No seats, no per-domain math, no enterprise sales unless you actually need it.
+        - generic [ref=e513]:
+          - article [ref=e514]:
+            - generic [ref=e515]: Free
+            - generic [ref=e516]:
+              - generic [ref=e517]: $0
+              - generic [ref=e518]: forever
+            - paragraph [ref=e519]: Everything most small sites need, with a small "powered by" badge.
+            - list [ref=e520]:
+              - listitem [ref=e521]:
+                - generic [ref=e522]: ✓
+                - generic [ref=e523]: 1 banner
+              - listitem [ref=e524]:
+                - generic [ref=e525]: ✓
+                - generic [ref=e526]: 7 layouts
+              - listitem [ref=e527]:
+                - generic [ref=e528]: ✓
+                - generic [ref=e529]: PIPEDA · Law 25 · GDPR · CCPA
+              - listitem [ref=e530]:
+                - generic [ref=e531]: ✓
+                - generic [ref=e532]: EN / FR + 14 languages
+              - listitem [ref=e533]:
+                - generic [ref=e534]: ✓
+                - generic [ref=e535]: Privacy policy generator (copy free)
+              - listitem [ref=e536]:
+                - generic [ref=e537]: ✓
+                - generic [ref=e538]: Copy-paste install
+              - listitem [ref=e539]:
+                - generic [ref=e540]: –
+                - generic [ref=e541]: "\"Powered by\" badge"
+              - listitem [ref=e542]:
+                - generic [ref=e543]: –
+                - generic [ref=e544]: Standard support
+            - link "Start free" [ref=e545] [cursor=pointer]:
+              - /url: /builder
+          - article [ref=e546]:
+            - generic [ref=e547]: Pro · One-time
+            - generic [ref=e548]:
+              - generic [ref=e549]: $99
+              - generic [ref=e550]: USD once
+            - paragraph [ref=e551]: Lock in today's features forever. Security patches, no new features.
+            - list [ref=e552]:
+              - listitem [ref=e553]:
+                - generic [ref=e554]: ✓
+                - generic [ref=e555]: 14 layouts
+              - listitem [ref=e556]:
+                - generic [ref=e557]: ✓
+                - generic [ref=e558]: Unlimited banners & domains
+              - listitem [ref=e559]:
+                - generic [ref=e560]: ✓
+                - generic [ref=e561]: No "powered by" badge
+              - listitem [ref=e562]:
+                - generic [ref=e563]: ✓
+                - generic [ref=e564]: Hosted privacy policies + custom URL
+              - listitem [ref=e565]:
+                - generic [ref=e566]: ✓
+                - generic [ref=e567]: Consent analytics
+              - listitem [ref=e568]:
+                - generic [ref=e569]: ✓
+                - generic [ref=e570]: Geo-targeting
+              - listitem [ref=e571]:
+                - generic [ref=e572]: ✓
+                - generic [ref=e573]: Team seats (up to 5)
+              - listitem [ref=e574]:
+                - generic [ref=e575]: ✓
+                - generic [ref=e576]: Security patches forever
+            - link "See what you're missing →" [ref=e577] [cursor=pointer]:
+              - /url: /roadmap
+            - link "Buy once · $99" [ref=e578] [cursor=pointer]:
+              - /url: /pricing
+          - article [ref=e579]:
+            - generic [ref=e580]: Recommended
+            - generic [ref=e581]: Pro · Annual
+            - generic [ref=e582]:
+              - generic [ref=e583]: $99
+              - generic [ref=e584]: USD / year
+            - paragraph [ref=e585]: Pro + every new feature we ship. Cancel anytime.
+            - list [ref=e586]:
+              - listitem [ref=e587]:
+                - generic [ref=e588]: ✓
+                - strong [ref=e589]: Everything in Pro
+              - listitem [ref=e590]:
+                - generic [ref=e591]: ✓
+                - generic [ref=e592]: Consent logs (audit trail)
+              - listitem [ref=e593]:
+                - generic [ref=e594]: ✓
+                - generic [ref=e595]: Privacy policy version history
+              - listitem [ref=e596]:
+                - generic [ref=e597]: ✓
+                - generic [ref=e598]: Auto categorization (AI)
+              - listitem [ref=e599]:
+                - generic [ref=e600]: ✓
+                - generic [ref=e601]: A/B testing on banners
+              - listitem [ref=e602]:
+                - generic [ref=e603]: ✓
+                - generic [ref=e604]: IAB TCF 2.2
+              - listitem [ref=e605]:
+                - generic [ref=e606]: ✓
+                - generic [ref=e607]: Google CMP certified
+              - listitem [ref=e608]:
+                - generic [ref=e609]: ✓
+                - generic [ref=e610]: Every future feature
+            - link "See what's coming →" [ref=e611] [cursor=pointer]:
+              - /url: /roadmap
+            - link "Get Pro Annual" [ref=e612] [cursor=pointer]:
+              - /url: /pricing
+          - article [ref=e613]:
+            - generic [ref=e614]: Enterprise
+            - generic [ref=e616]: Custom
+            - paragraph [ref=e617]: For agencies & teams managing 100+ domains, with SSO & an SLA.
+            - list [ref=e618]:
+              - listitem [ref=e619]:
+                - generic [ref=e620]: ✓
+                - generic [ref=e621]: Everything in Pro Annual
+              - listitem [ref=e622]:
+                - generic [ref=e623]: ✓
+                - generic [ref=e624]: SSO (SAML / OIDC)
+              - listitem [ref=e625]:
+                - generic [ref=e626]: ✓
+                - generic [ref=e627]: Dedicated support
+              - listitem [ref=e628]:
+                - generic [ref=e629]: ✓
+                - generic [ref=e630]: Custom DPA & SLA
+              - listitem [ref=e631]:
+                - generic [ref=e632]: ✓
+                - generic [ref=e633]: White-label option
+              - listitem [ref=e634]:
+                - generic [ref=e635]: ✓
+                - generic [ref=e636]: Onboarding assistance
+            - link "Talk to sales" [ref=e637] [cursor=pointer]:
+              - /url: /contact
+        - paragraph [ref=e638]:
+          - text: All plans include
+          - strong [ref=e639]: PIPEDA, Law 25, GDPR & CCPA
+          - text: compliance. 30-day money-back guarantee on Pro plans. All prices in US dollars (USD).
+          - link "See the product roadmap" [ref=e640] [cursor=pointer]:
+            - /url: /roadmap
+          - text: for what's shipping next.
+      - generic [ref=e643]:
+        - generic [ref=e644]:
+          - generic [ref=e645]:
+            - generic [ref=e646]: "07"
+            - text: Questions
+          - heading "Frequently asked." [level=2] [ref=e647]:
+            - text: Frequently
+            - text: asked.
+          - paragraph [ref=e648]:
+            - text: Don't see yours? Email
+            - link "hi@cookie-banner.ca" [ref=e649] [cursor=pointer]:
+              - /url: mailto:hi@cookie-banner.ca
+            - text: — we reply same-day.
+        - generic [ref=e650]:
+          - article [ref=e651]:
+            - button "Do I need a cookie banner in Canada?" [expanded] [ref=e652] [cursor=pointer]:
+              - text: Do I need a cookie banner in Canada?
+              - img [ref=e653]
+            - generic [ref=e656]: Yes. Under PIPEDA and CASL, Canadian websites must disclose and gain consent for tracking cookies — just like under GDPR. If you collect any personal information through cookies or track user behavior, you need to inform visitors and get their consent first.
+          - article [ref=e657]:
+            - button "Is this tool compliant with GDPR?" [ref=e658] [cursor=pointer]:
+              - text: Is this tool compliant with GDPR?
+              - img [ref=e659]
+          - article [ref=e660]:
+            - button "Will it match my site's design?" [ref=e661] [cursor=pointer]:
+              - text: Will it match my site's design?
+              - img [ref=e662]
+          - article [ref=e663]:
+            - button "How do I install the cookie banner?" [ref=e664] [cursor=pointer]:
+              - text: How do I install the cookie banner?
+              - img [ref=e665]
+          - article [ref=e666]:
+            - button "What's the difference between Pro One-Time and Pro Annual?" [ref=e667] [cursor=pointer]:
+              - text: What's the difference between Pro One-Time and Pro Annual?
+              - img [ref=e668]
+          - article [ref=e669]:
+            - button "Does it support Quebec Law 25 (bilingual)?" [ref=e670] [cursor=pointer]:
+              - text: Does it support Quebec Law 25 (bilingual)?
+              - img [ref=e671]
+          - article [ref=e672]:
+            - button "What about PIPEDA, CASL, GDPR, and CCPA?" [ref=e673] [cursor=pointer]:
+              - text: What about PIPEDA, CASL, GDPR, and CCPA?
+              - img [ref=e674]
+          - article [ref=e675]:
+            - button "Will it slow down my site?" [ref=e676] [cursor=pointer]:
+              - text: Will it slow down my site?
+              - img [ref=e677]
+          - article [ref=e678]:
+            - button "Can I manage my tracking scripts through the banner?" [ref=e679] [cursor=pointer]:
+              - text: Can I manage my tracking scripts through the banner?
+              - img [ref=e680]
+          - article [ref=e681]:
+            - button "Does the tool block non-essential cookies until consent is given?" [ref=e682] [cursor=pointer]:
+              - text: Does the tool block non-essential cookies until consent is given?
+              - img [ref=e683]
+          - article [ref=e684]:
+            - button "Does the tool provide audit / records of consent?" [ref=e685] [cursor=pointer]:
+              - text: Does the tool provide audit / records of consent?
+              - img [ref=e686]
+          - article [ref=e687]:
+            - button "Does it integrate with Google Tag Manager?" [ref=e688] [cursor=pointer]:
+              - text: Does it integrate with Google Tag Manager?
+              - img [ref=e689]
+          - article [ref=e690]:
+            - button "Can I use it on multiple websites?" [ref=e691] [cursor=pointer]:
+              - text: Can I use it on multiple websites?
+              - img [ref=e692]
+          - article [ref=e693]:
+            - button "Do you offer support?" [ref=e694] [cursor=pointer]:
+              - text: Do you offer support?
+              - img [ref=e695]
+          - article [ref=e696]:
+            - button "How long does it take to set up?" [ref=e697] [cursor=pointer]:
+              - text: How long does it take to set up?
+              - img [ref=e698]
+      - generic [ref=e701]:
+        - heading "Stop renting compliance. Build it once, in 5 minutes." [level=2] [ref=e702]:
+          - text: Stop renting compliance.
+          - text: Build it once, in 5 minutes.
+        - paragraph [ref=e703]: No signup, no credit card. The free plan covers PIPEDA, Law 25, GDPR & CCPA — and you can always upgrade later.
+        - generic [ref=e704]:
+          - link "Build my banner — free" [ref=e705] [cursor=pointer]:
+            - /url: "#builder"
+          - link "See pricing" [ref=e706] [cursor=pointer]:
+            - /url: "#pricing"
+    - contentinfo [ref=e707]:
+      - generic [ref=e708]:
+        - link "Cookie Banner Generator" [ref=e710] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e711]
+        - generic [ref=e713]:
+          - generic [ref=e714]:
+            - heading "Product & Tools" [level=3] [ref=e715]
+            - list [ref=e716]:
+              - listitem [ref=e717]:
+                - link "Dashboard" [ref=e718] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e719]:
+                - link "Banner Builder" [ref=e720] [cursor=pointer]:
+                  - /url: /dashboard/builder
+              - listitem [ref=e721]:
+                - link "Analytics" [ref=e722] [cursor=pointer]:
+                  - /url: /dashboard/analytics
+              - listitem [ref=e723]:
+                - link "Integrations" [ref=e724] [cursor=pointer]:
+                  - /url: /dashboard/integrations
+              - listitem [ref=e725]:
+                - link "Cookie Scanner" [ref=e726] [cursor=pointer]:
+                  - /url: /tools/cookie-scanner
+              - listitem [ref=e727]:
+                - link "Privacy Policy Generator" [ref=e728] [cursor=pointer]:
+                  - /url: /tools/privacy-policy
+              - listitem [ref=e729]:
+                - link "Live Demo" [ref=e730] [cursor=pointer]:
+                  - /url: /demo
+              - listitem [ref=e731]:
+                - link "Webflow Free" [ref=e732] [cursor=pointer]:
+                  - /url: /webflow-cookie-consent-free
+          - generic [ref=e733]:
+            - heading "Compliance & Legal" [level=3] [ref=e734]
+            - list [ref=e735]:
+              - listitem [ref=e736]:
+                - link "GDPR Compliance" [ref=e737] [cursor=pointer]:
+                  - /url: /compliance/gdpr
+              - listitem [ref=e738]:
+                - link "PIPEDA Compliance" [ref=e739] [cursor=pointer]:
+                  - /url: /compliance/pipeda
+              - listitem [ref=e740]:
+                - link "CCPA Compliance" [ref=e741] [cursor=pointer]:
+                  - /url: /compliance/ccpa
+              - listitem [ref=e742]:
+                - link "Canada Privacy Laws" [ref=e743] [cursor=pointer]:
+                  - /url: /locations/canada
+              - listitem [ref=e744]:
+                - link "EU Privacy Laws" [ref=e745] [cursor=pointer]:
+                  - /url: /locations/eu
+              - listitem [ref=e746]:
+                - link "US Privacy Laws" [ref=e747] [cursor=pointer]:
+                  - /url: /locations/us
+              - listitem [ref=e748]:
+                - link "Privacy Policy" [ref=e749] [cursor=pointer]:
+                  - /url: /privacy
+              - listitem [ref=e750]:
+                - link "Terms of Service" [ref=e751] [cursor=pointer]:
+                  - /url: /terms
+          - generic [ref=e752]:
+            - heading "Integrations" [level=3] [ref=e753]
+            - list [ref=e754]:
+              - listitem [ref=e755]:
+                - link "WordPress" [ref=e756] [cursor=pointer]:
+                  - /url: /integrations/wordpress
+              - listitem [ref=e757]:
+                - link "Webflow" [ref=e758] [cursor=pointer]:
+                  - /url: /integrations/webflow
+              - listitem [ref=e759]:
+                - link "Shopify" [ref=e760] [cursor=pointer]:
+                  - /url: /integrations/shopify
+              - listitem [ref=e761]:
+                - link "Squarespace" [ref=e762] [cursor=pointer]:
+                  - /url: /integrations/squarespace
+              - listitem [ref=e763]:
+                - link "Wix" [ref=e764] [cursor=pointer]:
+                  - /url: /integrations/wix
+              - listitem [ref=e765]:
+                - link "React" [ref=e766] [cursor=pointer]:
+                  - /url: /integrations/react
+              - listitem [ref=e767]:
+                - link "Google Tag Manager" [ref=e768] [cursor=pointer]:
+                  - /url: /integrations/google-tag-manager
+          - generic [ref=e769]:
+            - heading "Solutions" [level=3] [ref=e770]
+            - list [ref=e771]:
+              - listitem [ref=e772]:
+                - link "E-commerce" [ref=e773] [cursor=pointer]:
+                  - /url: /solutions/ecommerce
+              - listitem [ref=e774]:
+                - link "SaaS Platforms" [ref=e775] [cursor=pointer]:
+                  - /url: /solutions/saas
+              - listitem [ref=e776]:
+                - link "Healthcare" [ref=e777] [cursor=pointer]:
+                  - /url: /solutions/healthcare
+              - listitem [ref=e778]:
+                - link "Finance" [ref=e779] [cursor=pointer]:
+                  - /url: /solutions/finance
+              - listitem [ref=e780]:
+                - link "Education" [ref=e781] [cursor=pointer]:
+                  - /url: /solutions/education
+              - listitem [ref=e782]:
+                - link "Cookiebot Alternative" [ref=e783] [cursor=pointer]:
+                  - /url: /compare/cookiebot-alternative
+          - generic [ref=e784]:
+            - heading "Company & Support" [level=3] [ref=e785]
+            - list [ref=e786]:
+              - listitem [ref=e787]:
+                - link "About Us" [ref=e788] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e789]:
+                - link "Blog" [ref=e790] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e791]:
+                - link "Documentation" [ref=e792] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e793]:
+                - link "Support" [ref=e794] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e795]:
+                - link "Pricing" [ref=e796] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e797]:
+                - link "Roadmap" [ref=e798] [cursor=pointer]:
+                  - /url: /roadmap
+              - listitem [ref=e799]:
+                - link "Upgrade" [ref=e800] [cursor=pointer]:
+                  - /url: /upgrade
+        - generic [ref=e804]:
+          - generic [ref=e805]:
+            - paragraph [ref=e806]: © 2026 Cookie Banner Generator. Made with ❤️ in Canada.
+            - generic [ref=e807]:
+              - generic [ref=e808]: Your Privacy Choices
+              - generic [ref=e809]:
+                - generic [ref=e811]: ✓
+                - generic [ref=e812]: ✓
+          - generic [ref=e813]:
+            - link "Sitemap" [ref=e814] [cursor=pointer]:
+              - /url: /sitemap.xml
+            - generic [ref=e815]: "|"
+            - link "Privacy Policy" [ref=e816] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e817]: "|"
+            - link "Terms of Use" [ref=e818] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e819]: "|"
+            - link "Accessibility" [ref=e820] [cursor=pointer]:
+              - /url: /support
+  - dialog "Cookie consent" [ref=e821]:
+    - generic [ref=e822]:
+      - button "Close" [ref=e823] [cursor=pointer]: ×
+      - generic [ref=e824]:
+        - generic [ref=e825]:
+          - img "Logo" [ref=e826]
+          - generic [ref=e827]:
+            - heading "We use cookies" [level=3] [ref=e828]
+            - paragraph [ref=e829]:
+              - text: This website uses cookies to enhance your browsing experience and provide personalized content.
+              - link "Privacy Policy" [ref=e830] [cursor=pointer]:
+                - /url: https://www.cookie-banner.ca/privacy
+            - link "Powered by cookie-banner.ca" [ref=e832] [cursor=pointer]:
+              - /url: https://cookie-banner.ca/?ref=banner
+        - generic [ref=e833]:
+          - button "Accept All" [ref=e834] [cursor=pointer]
+          - button "Preferences" [ref=e835] [cursor=pointer]
+  - link "Cookie consent by cookie-banner.ca" [ref=e837] [cursor=pointer]:
+    - /url: https://cookie-banner.ca/?ref=banner
+  - alert [ref=e838]

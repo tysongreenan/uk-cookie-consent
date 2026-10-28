@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Midnight Lime — Cookie Banner Skin (Prototype)</title>
+<style>
+  /* ---------------------------------------------------------------
+     MIDNIGHT LIME — design-style prototype
+     A faithful, COMPLIANT re-creation of the reference dark/lime skin.
+     Standalone: no build step, just open in a browser.
+     --------------------------------------------------------------- */
+  :root {
+    --ml-bg:           #0a0a0a;   /* page / scrim base            */
+    --ml-surface:      #0e0e0e;   /* banner + modal card          */
+    --ml-surface-2:    #141414;   /* inset boxes / pill button    */
+    --ml-border:       rgba(255,255,255,0.14);
+    --ml-border-soft:  rgba(255,255,255,0.08);
+    --ml-text:         #ffffff;
+    --ml-text-dim:     rgba(255,255,255,0.62);
+    --ml-lime:         #c6f24e;   /* primary accent               */
+    --ml-lime-ink:     #0a0a0a;   /* text/icon on lime            */
+    --ml-radius:       18px;
+    --ml-radius-sm:    10px;
+    --ml-font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: var(--ml-font);
+    background: #050505;
+    color: #e6e6e6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- faux site behind, just for context ---- */
+  .site {
+    min-height: 100%;
+    padding: 48px 6vw;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(198,242,78,0.06), transparent 60%),
+      linear-gradient(180deg, #0b0b0b, #050505);
+  }
+  .site h1 { font-size: clamp(28px, 5vw, 56px); letter-spacing: -0.02em; margin: 0 0 12px; color: #fff; }
+  .site p  { max-width: 540px; color: #8a8a8a; line-height: 1.6; }
+  .site .reopen {
+    margin-top: 28px; background: var(--ml-surface-2); color: #cfcfcf;
+    border: 1px solid var(--ml-border); padding: 10px 16px; border-radius: 999px;
+    font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .site .reopen:hover { border-color: var(--ml-lime); color: #fff; }
+
+  /* =====================================================================
+     COMPACT BANNER  (bottom-left card)
+     ===================================================================== */
+  .ml-banner {
+    position: fixed; bottom: 22px; left: 22px; width: 440px; max-width: calc(100vw - 44px);
+    background: var(--ml-surface);
+    border: 1px solid var(--ml-border);
+    border-radius: var(--ml-radius);
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.4);
+    color: var(--ml-text);
+    z-index: 10000;
+    padding: 22px;
+    animation: ml-rise .42s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes ml-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .ml-banner { animation: none; } }
+
+  .ml-banner__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .ml-banner__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+
+  .ml-overview-btn {
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    background: var(--ml-surface-2); color: #e9e9e9;
+    border: 1px solid var(--ml-border); border-radius: 999px;
+    padding: 8px 13px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .ml-overview-btn:hover { border-color: var(--ml-lime); color: #fff; }
+  .ml-overview-btn svg { width: 15px; height: 15px; }
+
+  .ml-banner__body { margin: 14px 0 18px; font-size: 13.5px; line-height: 1.6; color: var(--ml-text-dim); }
+  .ml-banner__body b { color: #fff; font-weight: 600; }
+
+  /* ---- inline category toggles (pill switches) ---- */
+  .ml-toggles { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 20px; }
+  .ml-toggle { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; color: #fff; }
+
+  .ml-switch { position: relative; display: inline-flex; }
+  .ml-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .ml-switch .track {
+    width: 46px; height: 26px; border-radius: 999px;
+    background: #2a2a2a; border: 1px solid var(--ml-border);
+    display: inline-flex; align-items: center; transition: background .2s, border-color .2s;
+  }
+  .ml-switch .thumb {
+    width: 20px; height: 20px; border-radius: 50%; background: #8a8a8a;
+    margin-left: 3px; display: inline-flex; align-items: center; justify-content: center;
+    transition: transform .2s, background .2s; color: var(--ml-lime-ink);
+  }
+  .ml-switch .thumb svg { width: 12px; height: 12px; opacity: 0; transition: opacity .15s; }
+  /* checked */
+  .ml-switch input:checked + .track { background: var(--ml-lime); border-color: var(--ml-lime); }
+  .ml-switch input:checked + .track .thumb { transform: translateX(20px); background: var(--ml-lime-ink); color: var(--ml-lime); }
+  .ml-switch input:checked + .track .thumb svg { opacity: 1; }
+  /* locked (strictly necessary) — on + non-interactive */
+  .ml-switch.is-locked input { cursor: not-allowed; }
+  .ml-switch.is-locked .track { background: var(--ml-lime); border-color: var(--ml-lime); opacity: .85; }
+  .ml-switch.is-locked .thumb { transform: translateX(20px); background: var(--ml-lime-ink); color: var(--ml-lime); }
+  .ml-switch.is-locked .thumb svg { opacity: 1; }
+  .ml-toggle .lockword { font-size: 11px; color: var(--ml-text-dim); margin-left: 2px; }
+  .ml-switch input:focus-visible + .track { outline: 2px solid var(--ml-lime); outline-offset: 2px; }
+
+  /* ---- 3-button row ---- */
+  .ml-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .ml-btn {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    border-radius: 12px; padding: 13px 10px; text-align: center; transition: transform .08s, filter .15s, background .15s;
+  }
+  .ml-btn:active { transform: scale(.98); }
+  .ml-btn--ghost { background: transparent; color: #fff; border: 1px solid var(--ml-border); }
+  .ml-btn--ghost:hover { border-color: rgba(255,255,255,0.4); }
+  .ml-btn--primary { background: var(--ml-lime); color: var(--ml-lime-ink); border: 1px solid var(--ml-lime); }
+  .ml-btn--primary:hover { filter: brightness(1.05); }
+  @media (max-width: 420px) {
+    .ml-actions { grid-template-columns: 1fr; }
+  }
+
+  /* =====================================================================
+     OVERVIEW MODAL  (full-screen)
+     ===================================================================== */
+  .ml-modal { position: fixed; inset: 0; z-index: 10001; display: none; }
+  .ml-modal.is-open { display: block; }
+  .ml-modal__scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(2px); }
+  .ml-modal__panel {
+    position: absolute; inset: 0; overflow-y: auto;
+    background: var(--ml-bg); color: var(--ml-text);
+    padding: 40px clamp(20px, 6vw, 88px) 80px;
+    animation: ml-fade .25s ease;
+  }
+  @keyframes ml-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .ml-modal__head {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto 8px; gap: 16px;
+  }
+  .ml-modal__brand { font-size: clamp(20px, 3vw, 26px); font-weight: 700; letter-spacing: -0.01em; }
+  .ml-close {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    background: var(--ml-surface-2); border: 1px solid var(--ml-border); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .ml-close:hover { border-color: var(--ml-lime); }
+  .ml-close svg { width: 20px; height: 20px; }
+
+  .ml-section { max-width: 1200px; margin: 0 auto; padding-top: 28px; }
+  .ml-section__title { font-size: 22px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .ml-section__desc { font-size: 15px; line-height: 1.65; color: var(--ml-text-dim); margin: 0 0 18px; max-width: 940px; }
+
+  .ml-vendors { border: 1px solid var(--ml-border); border-radius: 14px; overflow: hidden; }
+  .ml-vendor + .ml-vendor { border-top: 1px solid var(--ml-border-soft); }
+  .ml-vendor__row {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    width: 100%; background: transparent; border: 0; color: #fff; font: inherit;
+    padding: 20px 22px; cursor: pointer; text-align: left;
+  }
+  .ml-vendor__row:hover { background: rgba(255,255,255,0.03); }
+  .ml-vendor__name { font-size: 16px; }
+  .ml-vendor__expand {
+    width: 34px; height: 34px; flex-shrink: 0; border-radius: 7px;
+    border: 1px solid var(--ml-border); display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; transition: transform .2s, border-color .15s;
+  }
+  .ml-vendor__row:hover .ml-vendor__expand { border-color: var(--ml-lime); }
+  .ml-vendor__expand svg { width: 16px; height: 16px; }
+  .ml-vendor.is-open .ml-vendor__expand { transform: rotate(90deg); border-color: var(--ml-lime); }
+  .ml-vendor__detail {
+    display: none; padding: 0 22px 22px; color: var(--ml-text-dim);
+    font-size: 13.5px; line-height: 1.6;
+  }
+  .ml-vendor.is-open .ml-vendor__detail { display: block; }
+  .ml-vendor__detail .meta { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 10px; }
+  .ml-vendor__detail .chip {
+    font-size: 12px; color: #cfcfcf; background: var(--ml-surface-2);
+    border: 1px solid var(--ml-border-soft); border-radius: 999px; padding: 4px 10px;
+  }
+
+  /* sticky footer action inside modal — solid bar so content never bleeds through */
+  .ml-modal__foot {
+    position: sticky; bottom: 0; margin: 44px -88px -80px;
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    padding: 18px clamp(20px, 6vw, 88px);
+    background: linear-gradient(180deg, rgba(10,10,10,0) 0%, var(--ml-bg) 22%);
+  }
+  .ml-modal__foot-inner {
+    width: 100%; max-width: 1200px; margin: 0 auto;
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .ml-modal__foot .ml-btn { padding: 13px 22px; }
+  @media (max-width: 600px) { .ml-modal__foot { margin: 44px -20px -80px; } }
+</style>
+</head>
+<body>
+
+<!-- faux site content for context -->
+<div class="site">
+  <h1>App.byq.supply</h1>
+  <p>This is a stand-in page so you can see the Midnight Lime cookie skin in real context. The banner sits bottom-left; the “Overview” button opens the full-screen consent overview.</p>
+  <button class="reopen" onclick="MLBanner.open()">Re-open banner</button>
+</div>
+
+<!-- =================== COMPACT BANNER =================== -->
+<div class="ml-banner" id="mlBanner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+  <div class="ml-banner__head">
+    <h2 class="ml-banner__title">Our website uses cookies</h2>
+    <button class="ml-overview-btn" onclick="MLBanner.openOverview()" aria-haspopup="dialog">
+      <!-- cookie icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Z"/><circle cx="8.5" cy="11.5" r=".6" fill="currentColor"/><circle cx="13" cy="15" r=".6" fill="currentColor"/><circle cx="15.5" cy="10.5" r=".6" fill="currentColor"/></svg>
+      Overview
+    </button>
+  </div>
+
+  <p class="ml-banner__body">
+    We use cookies to remember your preferences (<b>Functional</b>), measure traffic
+    (<b>Analytics</b>), and personalise content and ads (<b>Marketing</b>). You can change
+    or withdraw your consent at any time.
+  </p>
+
+  <!-- inline category toggles -->
+  <div class="ml-toggles">
+    <span class="ml-toggle">
+      <label class="ml-switch is-locked">
+        <input type="checkbox" checked disabled aria-label="Functional (always on)" />
+        <span class="track"><span class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span>
+      </label>
+      Functional <span class="lockword">Always on</span>
+    </span>
+
+    <span class="ml-toggle">
+      <label class="ml-switch">
+        <input type="checkbox" data-cat="analytics" aria-label="Analytics" />
+        <span class="track"><span class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span>
+      </label>
+      Analytics
+    </span>
+
+    <span class="ml-toggle">
+      <label class="ml-switch">
+        <input type="checkbox" data-cat="marketing" aria-label="Marketing &amp; Social Media" />
+        <span class="track"><span class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></span>
+      </label>
+      Marketing &amp; Social
+    </span>
+  </div>
+
+  <!-- 3-button row -->
+  <div class="ml-actions">
+    <button class="ml-btn ml-btn--ghost"   onclick="MLBanner.reject()">Reject all</button>
+    <button class="ml-btn ml-btn--ghost"   onclick="MLBanner.acceptSelection()">Accept Selection</button>
+    <button class="ml-btn ml-btn--primary" onclick="MLBanner.acceptAll()">Accept all</button>
+  </div>
+</div>
+
+<!-- =================== OVERVIEW MODAL =================== -->
+<div class="ml-modal" id="mlModal" role="dialog" aria-modal="true" aria-label="Cookie overview">
+  <div class="ml-modal__scrim" onclick="MLBanner.closeOverview()"></div>
+  <div class="ml-modal__panel">
+    <div class="ml-modal__head">
+      <div class="ml-modal__brand">App.byq.supply</div>
+      <button class="ml-close" onclick="MLBanner.closeOverview()" aria-label="Close overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- categories are rendered from a JS data array that mirrors the
+         BannerConfig.scripts.* arrays in the real product -->
+    <div id="mlOverviewSections"></div>
+
+    <div class="ml-modal__foot">
+      <div class="ml-modal__foot-inner">
+        <button class="ml-btn ml-btn--ghost"   onclick="MLBanner.reject()">Reject all</button>
+        <button class="ml-btn ml-btn--ghost"   onclick="MLBanner.acceptSelection(); MLBanner.closeOverview()">Accept Selection</button>
+        <button class="ml-btn ml-btn--primary" onclick="MLBanner.acceptAll()">Accept all</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* -----------------------------------------------------------------------
+   In the real generator this data comes from BannerConfig.scripts.*
+   (each TrackingScript has a `name`). Here it is hard-coded to mirror
+   the reference screenshot.
+   ----------------------------------------------------------------------- */
+const ML_CATEGORIES = [
+  {
+    key: 'functional',
+    title: 'Functional',
+    locked: true,
+    desc: 'Cookies and similar technologies that are strictly necessary for the website to work, such as remembering your preferences, security, enabling log-in or processing forms.',
+    vendors: [
+      { name: 'Vallonic B.V.', purpose: 'Core application session & preferences.', retention: 'Session' },
+      { name: 'Cloudflare',    purpose: 'Security, bot mitigation and content delivery.', retention: '30 days' },
+      { name: 'Google',        purpose: 'reCAPTCHA / login infrastructure.', retention: '6 months' },
+      { name: 'Crisp',         purpose: 'In-app support chat widget.', retention: '6 months' },
+    ],
+  },
+  {
+    key: 'analytics',
+    title: 'Analytics',
+    locked: false,
+    desc: 'These cookies and similar technologies collect information about how visitors use our website, such as which pages are visited most, whether errors occur, and how users interact, to help us measure performance and improve the site.',
+    vendors: [
+      { name: 'Google', purpose: 'Google Analytics 4 — aggregate usage measurement.', retention: '14 months' },
+    ],
+  },
+  {
+    key: 'marketing',
+    title: 'Marketing & Social Media',
+    locked: false,
+    desc: 'These cookies and similar technologies help advertising and social media partners personalise your experience, show you relevant ads, measure campaign results, and enable sharing features.',
+    vendors: [
+      { name: 'Google',   purpose: 'Ads conversion & remarketing.', retention: '13 months' },
+      { name: 'Facebook', purpose: 'Meta Pixel — ad measurement & audiences.', retention: '90 days' },
+      { name: 'Reddit',   purpose: 'Reddit Pixel — campaign measurement.', retention: '90 days' },
+    ],
+  },
+];
+
+const MLBanner = {
+  el: () => document.getElementById('mlBanner'),
+  modal: () => document.getElementById('mlModal'),
+
+  open() { this.el().style.display = ''; },
+  hide() { this.el().style.display = 'none'; },
+
+  openOverview() {
+    this.renderSections();
+    this.modal().classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  },
+  closeOverview() {
+    this.modal().classList.remove('is-open');
+    document.body.style.overflow = '';
+  },
+
+  renderSections() {
+    const host = document.getElementById('mlOverviewSections');
+    host.innerHTML = ML_CATEGORIES.map((c, ci) => `
+      <section class="ml-section">
+        <h3 class="ml-section__title">${c.title}${c.locked ? ' <span style="font-size:13px;font-weight:500;color:var(--ml-text-dim)">· Always on</span>' : ''}</h3>
+        <p class="ml-section__desc">${c.desc}</p>
+        <div class="ml-vendors">
+          ${c.vendors.map((v, vi) => `
+            <div class="ml-vendor" id="v-${ci}-${vi}">
+              <button class="ml-vendor__row" onclick="MLBanner.toggleVendor(${ci},${vi})" aria-expanded="false">
+                <span class="ml-vendor__name">${v.name}</span>
+                <span class="ml-vendor__expand" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                </span>
+              </button>
+              <div class="ml-vendor__detail">
+                ${v.purpose}
+                <div class="meta">
+                  <span class="chip">Provider: ${v.name}</span>
+                  <span class="chip">Retention: ${v.retention}</span>
+                  <span class="chip">Category: ${c.title}</span>
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </section>`).join('');
+  },
+
+  toggleVendor(ci, vi) {
+    const node = document.getElementById(`v-${ci}-${vi}`);
+    const btn = node.querySelector('.ml-vendor__row');
+    const open = node.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', String(open));
+  },
+
+  /* --- consent actions (prototype only logs) --- */
+  reject() {
+    this._set({ analytics: false, marketing: false });
+    this._done('Rejected all non-essential');
+  },
+  acceptSelection() {
+    const sel = {};
+    document.querySelectorAll('#mlBanner [data-cat]').forEach(i => sel[i.dataset.cat] = i.checked);
+    this._done('Saved selection: ' + JSON.stringify(sel));
+  },
+  acceptAll() {
+    this._set({ analytics: true, marketing: true });
+    this._done('Accepted all');
+  },
+  _set(state) {
+    document.querySelectorAll('#mlBanner [data-cat]').forEach(i => {
+      if (i.dataset.cat in state) i.checked = state[i.dataset.cat];
+    });
+  },
+  _done(msg) {
+    console.log('[consent]', msg);
+    this.hide();
+    this.closeOverview();
+  },
+};
+
+/* Esc closes the overview */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') MLBanner.closeOverview();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,3760 @@
+[
+ {
+  "id": "8a9fde8b-8d41-4663-be68-653a7b22504d",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-06-16T06:47:07.586Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "Nous utilisons des cookies",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation et fournir du contenu personnalisé.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#8f5d1f",
+    "text": "#cc9220",
+    "button": "#eca923",
+    "background": "#fff1d2",
+    "buttonText": "#fff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "tracking-1781586273404",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "G-EY2SBJH5RC"
+     },
+     {
+      "id": "tracking-1781586918940",
+      "name": "Google Tag Manager",
+      "enabled": true,
+      "bodyCode": "<!-- Google Tag Manager (noscript) -->\n<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id=GTM-N6L9W5B6\"\nheight=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>\n<!-- End Google Tag Manager (noscript) -->",
+      "category": "tracking-performance",
+      "scriptCode": "<!-- Google Tag Manager -->\n<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':\nnew Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\nj=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n})(window,document,'script','dataLayer','GTM-N6L9W5B6');</script>\n<!-- End Google Tag Manager -->"
+     },
+     {
+      "id": "tracking-1781587031347",
+      "name": "Microsoft Clarity",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script type=\"text/javascript\">\n    (function(c,l,a,r,i,t,y){\n        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};\n        t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;\n        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);\n    })(window, document, \"clarity\", \"script\", \"x5sgrl0jzt\");\n</script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "soft-consent",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": false
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": true,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "auto",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "lastUpdated": "2026-06-16T06:47:07.889Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "0a88e464-f25d-44ea-ab27-3868ca7c1010",
+  "name": "KMag Cookie Banner",
+  "updatedAt": "2026-07-28T20:44:08.299Z",
+  "config": {
+   "name": "KMag Cookie Banner",
+   "text": {
+    "title": "Nous respectons votre vie privée.",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation, fournir du contenu personnalisé et analyser notre trafic.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "light",
+   "colors": {
+    "link": "#1d4ed8",
+    "text": "#1f2937",
+    "button": "#97a629",
+    "background": "#ffffff",
+    "buttonText": "#1f2937"
+   },
+   "layout": {
+    "width": "container",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "tracking-1784560972283",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": false,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "button",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://www.kmag.ca/politique-de-confidentialite",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "a1719ae0-49ed-44f6-b685-abeea43e930b",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "fr",
+   "position": "modal-bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-07-28T20:44:04.701Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "e41211a6-1564-49d0-9c0d-5bf483c8146f",
+  "name": "Nature sauvage",
+  "updatedAt": "2026-07-28T20:46:22.404Z",
+  "config": {
+   "name": "Nature sauvage",
+   "text": {
+    "title": "Nous respectons votre vie privée.",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation, fournir du contenu personnalisé et analyser notre trafic.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "light",
+   "colors": {
+    "link": "#005EAE",
+    "text": "#1f2937",
+    "button": "#678f31",
+    "background": "#ffffff",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "container",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": false,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://www.naturesauvage.ca/wp-content/uploads/2020/02/Nature_sauvage_logo-New550C@2x.png",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Réglages des cookies",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "button",
+      "includeIcon": true,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "iconStyle": "cookie",
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://www.naturesauvage.ca/politique-de-confidentialite/",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "03fd518d-f0a8-45af-aad0-d991af44f7c4",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "fr",
+   "position": "modal-bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-07-28T20:46:19.031Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "45184369-04d5-41ac-b0d2-3d84609e834b",
+  "name": "Forge Keeper tech",
+  "updatedAt": "2026-08-23T12:54:04.653Z",
+  "config": {
+   "name": "Forge Keeper tech",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#60a5fa",
+    "text": "#f9fafb",
+    "button": "#3b82f6",
+    "background": "#1f2937",
+    "buttonText": "#ffffff",
+    "rejectButton": "transparent",
+    "rejectButtonText": "#f7f7f7"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-08-23T12:54:03.349Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "e9df04ea-2cd5-4fa6-bfad-f7024af925b7",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-02-14T20:07:41.392Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience.  ",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "dark",
+   "colors": {
+    "link": "#ffffff",
+    "text": "#ffffff",
+    "button": "#ffffff",
+    "background": "#000000",
+    "buttonText": "#000000"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 100,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 0
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": false,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://www.strategic-designs.com/privacy-policy",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    }
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "lastUpdated": "2026-02-14T20:07:41.219Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": true,
+     "anonymizeIp": true,
+     "measurementId": "G-YC9WDJ12Y8'",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "60aafc20-f193-482b-8774-97af32402572",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-09-12T15:20:10.702Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#60a5fa",
+    "text": "#f9fafb",
+    "button": "#3b82f6",
+    "background": "#1f2937",
+    "buttonText": "#ffffff",
+    "rejectButton": "transparent",
+    "rejectButtonText": "#1f2937"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "tracking-1789225995225",
+      "name": "",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script>\n  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');\n  ga('create', 'UA-29888540-1', 'auto');\n  ga('send', 'pageview');\n\t</script>\t\n<!-- Google tag (gtag.js) -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-2EJ5XX2YD2\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', 'G-2EJ5XX2YD2');\n</script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": true,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": false,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://theseniorpaper.com/privacypolicy.html",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-09-12T15:20:09.996Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "0abf18e8-8eb6-4392-baee-45e1b83b7549",
+  "name": "Farvel Smerte",
+  "updatedAt": "2026-05-04T13:00:53.332Z",
+  "config": {
+   "name": "Farvel Smerte",
+   "text": {
+    "title": "Vi bruger cookies",
+    "message": "Denne hjemmeside bruger cookies til at forbedre din browsingoplevelse og levere personligt indhold.",
+    "acceptButton": "Accepter alle",
+    "rejectButton": "Afvis",
+    "preferencesButton": "Indstillinger"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#585858",
+    "text": "#585858",
+    "button": "#43ba7f",
+    "background": "#ffffff",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1777899041167-inn6im9vi",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-FE1Z81SETP\"></script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 30,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://cdn.prod.website-files.com/6880f3999e10555519fb9e7b/6886803dff23fbbaea116c1d_New%20Project.png",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://www.farvelsmerte.dk/betingelser-og-coockie",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "da",
+   "position": "bottom",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "fontFamily": "",
+   "lastUpdated": "2026-05-04T13:00:45.040Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "60f336d3-8ca4-4ea9-9fc2-2ba2bd2d64df",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-03-25T20:21:15.471Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#072017",
+    "text": "#072017",
+    "button": "#072017",
+    "background": "#fdfcfb",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "small",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 1
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1774462004017-xh9o3kf1q",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script>\n// CRITICAL: Initialize consent mode BEFORE any trackers load\n// This MUST be synchronous and run immediately to block trackers\n// Place this script FIRST in your <head> section, before any other scripts\n(function() {\n  'use strict';\n  \n  // Initialize dataLayer immediately (for GTM/GA4)\n  window.dataLayer = window.dataLayer || [];\n\n  // Initialize gtag function immediately\n  function gtag(){dataLayer.push(arguments);}\n  window.gtag = window.gtag || gtag;\n\n  // GTM Template callback registration\n  // Allows the Cookie Banner Generator GTM template to listen for consent changes\n  window.__cbConsentCallbacks = window.__cbConsentCallbacks || [];\n  window.__cbRegisterConsentCallback = function(cb) {\n    if (typeof cb === 'function') {\n      window.__cbConsentCallbacks.push(cb);\n    }\n  };\n  \n  // Set consent defaults to DENIED before any trackers load\n  // This blocks ALL trackers (GTM, GA4, Meta Pixel, Google Ads, etc.) until user grants consent\n  gtag('consent', 'default', {\n    'analytics_storage': 'denied',\n    'ad_storage': 'denied',\n    'ad_user_data': 'denied',\n    'ad_personalization': 'denied',\n    'wait_for_update': 500  // Wait 500ms for consent update before allowing trackers\n  });\n  \n  // Also push to dataLayer for GTM compatibility\n  window.dataLayer.push({\n    'event': 'cookie_consent_default',\n    'analytics_storage': 'denied',\n    'ad_storage': 'denied',\n    'ad_user_data': 'denied',\n    'ad_personalization': 'denied'\n  });\n})();\n</script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 365,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "auto",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "fontFamily": "",
+   "lastUpdated": "2026-03-25T20:21:12.459Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "12e60623-7c74-4907-b0e2-137c29721963",
+  "name": "BigCommerce Sandbox",
+  "updatedAt": "2026-09-17T13:53:39.766Z",
+  "config": {
+   "name": "BigCommerce Sandbox",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#6B6B6B",
+    "text": "#303030",
+    "button": "#303030",
+    "background": "#ffffff",
+    "buttonText": "#fff",
+    "rejectButton": "transparent",
+    "rejectButtonText": "#303030"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 7,
+    "shadow": "large",
+    "padding": 26,
+    "maxWidth": 1200,
+    "animation": "slide",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://well.ca/privacy.html",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "ce043c39-3ed0-4649-aba2-2b0876328a67",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "auto",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-09-17T13:53:39.093Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "b17c5612-ac1a-44e1-aa30-f28eb67a96f5",
+  "name": "Chester the Jester",
+  "updatedAt": "2026-09-15T03:33:36.585Z",
+  "config": {
+   "name": "Chester the Jester",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "I understand",
+    "rejectButton": "Decline",
+    "preferencesButton": "Customize"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#1b3764",
+    "text": "#1b3764",
+    "button": "#1b3764",
+    "background": "#ffffff",
+    "buttonText": "#ffffff",
+    "rejectButton": "transparent",
+    "rejectButtonText": "#1f2937"
+   },
+   "layout": {
+    "width": "container",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1789437810974-3orwfzqyv",
+      "name": "Google Analytics 4",
+      "source": "scanner",
+      "enabled": true,
+      "category": "tracking-performance",
+      "sourceUrl": "",
+      "confidence": "high",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-YYS4ML8XP6\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n  gtag('config', 'G-YYS4ML8XP6');\n</script>",
+      "detectedVendor": "Google Analytics 4"
+     },
+     {
+      "id": "headless-microsoft-clarity",
+      "name": "Microsoft Clarity",
+      "source": "scanner",
+      "enabled": true,
+      "category": "tracking-performance",
+      "sourceUrl": "https://www.clarity.ms/tag/yighycfhkw?ref=Webflow",
+      "confidence": "high",
+      "scriptCode": "<script type=\"text/javascript\">\n    (function(c,l,a,r,i,t,y){\n        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};\n        t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;\n        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);\n    })(window, document, \"clarity\", \"script\", \"yighycfhkw\");\n</script>",
+      "detectedVendor": "Microsoft Clarity"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://bamunfrbhopzrjobowfx.supabase.co/storage/v1/object/public/logos/540f112c-9ce9-4e25-bf53-cfa2d25c1bad/1789421312440.png",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "ccpa",
+    "maxPenalty": "$7,500 per violation",
+    "consentExpiry": 12,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-09-15T03:33:35.996Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": true,
+     "anonymizeIp": true,
+     "measurementId": "G-YYS4ML8XP6",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "6f3366e0-aa2f-44fe-b4d8-a1a62063c228",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-05-16T19:23:27.863Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#525252",
+    "text": "#171717",
+    "button": "#171717",
+    "background": "#fafafa",
+    "buttonText": "#fafafa"
+   },
+   "layout": {
+    "width": "custom",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1777938957882-kd7j5mrwv",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-VYP4M5CCVC\"></script>"
+     },
+     {
+      "id": "script-1777938963466-gjf8quked",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-VYP4M5CCVC\"></script>"
+     },
+     {
+      "id": "script-1777939653661-rxp99dd7q",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-VYP4M5CCVC\"></script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": true,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://roadshowantiquesmall.com/privacy-policy/",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "floating-bottom-left",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "fontFamily": "Arial",
+   "lastUpdated": "2026-05-16T19:23:25.921Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": true,
+     "anonymizeIp": true,
+     "measurementId": "G-417690091",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "5de87ecb-5db7-4684-98ed-abfb1b97a5a4",
+  "name": "Staging  Banner",
+  "updatedAt": "2026-09-28T20:37:24.657Z",
+  "config": {
+   "name": "Staging  Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept",
+    "rejectButton": "Decline",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#6B6B6B",
+    "text": "#303030",
+    "button": "#303030",
+    "background": "#ffffff",
+    "buttonText": "#fff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 7,
+    "shadow": "large",
+    "padding": 26,
+    "maxWidth": 1200,
+    "animation": "slide",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     },
+     {
+      "id": "strict-1789048340430",
+      "name": "well_id",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048358762",
+      "name": "bkd",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048365859",
+      "name": "cookie_test",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048373732",
+      "name": "ctd",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048380556",
+      "name": "BrowserId",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048387244",
+      "name": "__cf_bm",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048392673",
+      "name": "__cflb",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048402539",
+      "name": "X-Salesforce-CHAT",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048407251",
+      "name": "LSKey-c$CookieConsentPolicy",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048412640",
+      "name": "NoCookie",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048417157",
+      "name": "_cfuvid",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1789048425856",
+      "name": "X-Salesforce-CHAT",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627446828",
+      "name": "_ju_dn",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627459871",
+      "name": "_ju_dm",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627467117",
+      "name": "_ju_v",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627536647",
+      "name": "__rcmp",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627541559",
+      "name": "__rslct",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627546221",
+      "name": "__rpck",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627746416",
+      "name": "__ruid",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627794506",
+      "name": "__rutmb",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627798825",
+      "name": "__rutma",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790627807090",
+      "name": "__rpckx",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1776877207909-ewja2tmlr",
+      "name": "Google Analytics (Universal)",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script>\n\tvar _gaq = _gaq || [];\n\t\t_gaq.push(['_setAccount', 'UA-5639890-1']);\n\t_gaq.push(['_setDomainName', 'well.ca']);\n    _gaq.push(['_setAllowLinker', true]);\n\n    \t_gaq.push(['_trackPageview']);\n\t_gaq.push(['_trackPageLoadTime']);\n\n    \t(function() {\n\t\tvar ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;\n\t\tga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\n\t\tvar s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);\n\t})();\n\n    dataLayer = [];\n</script>"
+     },
+     {
+      "id": "script-1776877207910-o4bh9v8ng",
+      "name": "Google Tag Manager",
+      "enabled": true,
+      "bodyCode": "<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id=GTM-T87HMV\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>",
+      "category": "tracking-performance",
+      "scriptCode": "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-T87HMV');</script>"
+     },
+     {
+      "id": "tracking-1789048485272",
+      "name": "BVBRANDID",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048515369",
+      "name": "BVBRANDSID",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048523188",
+      "name": "__utmb",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048533152",
+      "name": "__utmz",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048537773",
+      "name": "_ga_xxxxxxxxxx",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048543666",
+      "name": "_ga",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048547946",
+      "name": "__utma",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048554370",
+      "name": "_utmv#########",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048560286",
+      "name": "_uetvid",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048565858",
+      "name": "bv_metrics",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048572061",
+      "name": "__utmc",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1789048577068",
+      "name": "__rsev",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     }
+    ],
+    "targetingAdvertising": [
+     {
+      "id": "targeting-1789048720041",
+      "name": "__eoi",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048737219",
+      "name": "_gdxxxxxxxxxxxxx",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048745844",
+      "name": "_rdt_uuid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048750619",
+      "name": "cto_tld_test",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048755238",
+      "name": "ttcsid_XXXXXXXXXXXXXXXXXXXXCategory",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048759968",
+      "name": "__gpi",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048765479",
+      "name": "_gcl_au",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048770066",
+      "name": "ttcsid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048775788",
+      "name": "_tt_enable_cookie",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048932293",
+      "name": "_ttp",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048940416",
+      "name": "rmStore",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048942753",
+      "name": "__gads",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048951374",
+      "name": "_uetsid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1789048956102",
+      "name": "cto_bundle",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     }
+    ]
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "center",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": false,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://well.ca/privacy.html",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "a8c6933a-3db6-479f-bf27-d673f142298e",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "auto",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-09-28T20:37:24.035Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "7b5411fe-2676-4ea2-952d-bcdfb0a07877",
+  "name": "GagnezVotreAchat.com",
+  "updatedAt": "2026-04-10T00:27:28.203Z",
+  "config": {
+   "name": "GagnezVotreAchat.com",
+   "text": {
+    "title": "Nous utilisons des cookies",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation et fournir du contenu personnalisé.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#FCC683",
+    "text": "#000000",
+    "button": "#525FE1",
+    "background": "#ffffff",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "soft-consent",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": false
+   },
+   "branding": {
+    "logo": {
+     "url": "https://gagnezvotreachat.com/images/logo_gva_small_fr.png",
+     "enabled": true,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "icon-text",
+      "includeIcon": true,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://gagnezvotreachat.com/fr/politique-confidentialite",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "fr",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "fontFamily": "var(--bs-font-sans-serif)",
+   "lastUpdated": "2026-04-10T00:27:29.201Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "b2890f7a-d27a-4a98-b7b8-b2d5fc591df3",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-05-25T08:23:14.895Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": " ",
+    "message": "Ми використовуємо файли соokіе для покращення користувацького досвіду. Продовжуючи перегляд, ви погоджуєтесь на використання файлів соokіе.",
+    "acceptButton": "Гаразд",
+    "rejectButton": "Відхилити",
+    "preferencesButton": "Налаштувати"
+   },
+   "theme": "dark",
+   "colors": {
+    "link": "#FFDD00",
+    "text": "#ffffff",
+    "button": "#FFDD00",
+    "background": "#000000",
+    "buttonText": "#000000",
+    "rejectButton": "#000000",
+    "rejectButtonText": "#FFDD00"
+   },
+   "layout": {
+    "width": "custom",
+    "margin": 20,
+    "shadow": "none",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 1
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "lastUpdated": "2026-05-25T08:23:14.416Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "1425ce86-a119-437a-be22-2a537fc69169",
+  "name": "GéoPleinAir Cookie Banner",
+  "updatedAt": "2026-07-28T20:46:00.886Z",
+  "config": {
+   "name": "GéoPleinAir Cookie Banner",
+   "text": {
+    "title": "Nous respectons votre vie privée.",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation, fournir du contenu personnalisé et analyser notre trafic.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "light",
+   "colors": {
+    "link": "#0054a6",
+    "text": "#1f2937",
+    "button": "#00aeef",
+    "background": "#ffffff",
+    "buttonText": "#1f2937"
+   },
+   "layout": {
+    "width": "container",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": false,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "button",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://www.geopleinair.com/politique-de-confidentialite",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "4e6734eb-9e44-45e4-9d81-2843b3fa7835",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "fr",
+   "position": "modal-bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-07-28T20:45:57.487Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "1e81741d-a984-49b8-b30e-219295f4aff3",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-06-15T13:34:38.625Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#ff6600",
+    "text": "#ffffff",
+    "button": "#aaaaaa",
+    "background": "#003366",
+    "buttonText": "#111111"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "soft-consent",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": false
+   },
+   "branding": {
+    "logo": {
+     "url": "https://math-drills.com/apple-touch-icon.008.png",
+     "enabled": true,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://math-drills.com/privacy.php",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "custom",
+    "maxPenalty": "Varies by jurisdiction",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": false
+   },
+   "fontFamily": "inherit",
+   "lastUpdated": "2026-06-15T13:34:38.208Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "04d58765-9fe6-4c97-8eeb-13324beacc82",
+  "name": "Kildonan Crossing Dental Centre",
+  "updatedAt": "2026-09-15T03:37:38.664Z",
+  "config": {
+   "name": "Kildonan Crossing Dental Centre",
+   "text": {
+    "title": "We use cookies",
+    "message": "We use cookies to keep our website running smoothly, understand how visitors use it, and make it easier to find the dental care and information they’re looking for.",
+    "acceptButton": "I understand",
+    "rejectButton": "Decline",
+    "preferencesButton": "Customize"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#393939",
+    "text": "#393939",
+    "button": "#4aa851",
+    "background": "#e3edeb",
+    "buttonText": "#ffffff",
+    "rejectButton": "#e3edeb",
+    "rejectButtonText": "#878787"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 1,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 1
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 365,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://cdn.prod.website-files.com/677abe926a8e56243c52bde6/677abe926a8e56243c52c01c_kcdc-2021_favicon-32x32.png",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "fontFamily": "",
+   "lastUpdated": "2026-09-15T03:37:38.162Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": true,
+     "anonymizeIp": true,
+     "measurementId": "G-4R9DVVCMVG",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "98e8f209-69da-421e-a286-538bdff0acca",
+  "name": "Integ Banner",
+  "updatedAt": "2026-08-17T09:53:07.206Z",
+  "config": {
+   "name": "Integ Banner",
+   "text": {
+    "title": "We use cookies",
+    "message": "The continued use of this website will set cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners.",
+    "acceptButton": "Accept All",
+    "rejectButton": "Reject",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "light",
+   "colors": {
+    "link": "#1a4d7c",
+    "text": "#1f2937",
+    "button": "#1a4d7c",
+    "background": "#ffffff",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [],
+    "targetingAdvertising": []
+   },
+   "version": "2.1.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "soft-consent",
+    "cookieExpiry": 24,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": false
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://integ.partsavatar.ca/online-privacy-shop-autoparts",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "e460152a-db7e-4fc5-9758-d668debba4c9",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-08-17T09:53:06.585Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "d96fd2f8-9d11-47ba-8741-05f2a3acfa93",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-09-19T01:24:50.392Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "Nous utilisons des cookies",
+    "message": "Ce site web utilise des cookies pour améliorer votre expérience de navigation et fournir du contenu personnalisé.",
+    "acceptButton": "Accepter tout",
+    "rejectButton": "Rejeter",
+    "preferencesButton": "Préférences"
+   },
+   "theme": "light",
+   "colors": {
+    "link": "#000000",
+    "text": "#000000",
+    "button": "#000000",
+    "background": "#ffffff",
+    "buttonText": "#ffffff",
+    "rejectButton": "#ffffff",
+    "rejectButtonText": "#000000"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "tracking-1789780962561",
+      "name": "Google Analytics 4",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<!-- Google tag (gtag.js) -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-GYST88SS2X\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', 'G-GYST88SS2X');\n</script>"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 182,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "fr",
+   "position": "floating-bottom-left",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-09-19T01:24:49.758Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   },
+   "accessibility": {
+    "panel": {
+     "theme": "auto"
+    },
+    "enabled": false,
+    "trigger": {
+     "icon": "universal-access",
+     "size": "medium",
+     "label": "",
+     "shape": "circle",
+     "offset": {
+      "x": 20,
+      "y": 20
+     },
+     "position": "bottom-left",
+     "hideOnMobile": false,
+     "customSelector": "",
+     "useBannerColors": true
+    },
+    "features": {},
+    "shortcut": "none",
+    "statementUrl": "",
+    "feedbackEmail": "",
+    "disableColorFilters": false
+   }
+  }
+ },
+ {
+  "id": "888005ac-1ec6-41a7-b212-cce769e94432",
+  "name": "My Cookie Banner",
+  "updatedAt": "2026-10-06T10:24:04.385Z",
+  "config": {
+   "name": "My Cookie Banner",
+   "text": {
+    "title": "Wir verwenden Cookies",
+    "message": "Diese Website verwendet Cookies, um Dein Surferlebnis zu verbessern und personalisierte Inhalte bereitzustellen.",
+    "acceptButton": "Alle akzeptieren",
+    "rejectButton": "Ablehnen",
+    "preferencesButton": "Einstellungen"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#e6aa22",
+    "text": "#000000",
+    "button": "#00349a",
+    "background": "#ffffff",
+    "buttonText": "#ffffff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "tracking-1790346868840",
+      "name": "Google Tag Manager",
+      "enabled": true,
+      "bodyCode": "<!-- Google Tag Manager (noscript) -->\n<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id=GTM-PZX8QB8T\"\nheight=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>\n<!-- End Google Tag Manager (noscript) -->",
+      "category": "tracking-performance",
+      "scriptCode": "<!-- Google Tag Manager -->\n<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':\nnew Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\nj=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n})(window,document,'script','dataLayer','GTM-PZX8QB8T');</script>\n<!-- End Google Tag Manager -->"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 12,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://cdn.prod.website-files.com/6a341badb5c3107177cffa68/6a437ec88d38c0236445274f_Favicon.png",
+     "enabled": true,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": true
+   },
+   "language": "de",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "gdpr",
+    "maxPenalty": "€20 million or 4% of annual revenue",
+    "consentExpiry": 12,
+    "requiresOptIn": true,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": true,
+    "requiresGranularConsent": true,
+    "requiresDataRetentionPolicy": true
+   },
+   "lastUpdated": "2026-10-06T10:24:03.554Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "344ca542-58a8-4bd0-ba4a-071e16647984",
+  "name": "Well.ca - Prod",
+  "updatedAt": "2026-09-28T20:57:01.726Z",
+  "config": {
+   "name": "Well.ca - Prod",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "Accept",
+    "rejectButton": "Decline",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#6B6B6B",
+    "text": "#303030",
+    "button": "#303030",
+    "background": "#ffffff",
+    "buttonText": "#fff"
+   },
+   "layout": {
+    "width": "full",
+    "margin": 20,
+    "shadow": "large",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "slide",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "strict-1778005173342",
+      "name": "",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     },
+     {
+      "id": "strict-1790015247221",
+      "name": "well_id",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015254313",
+      "name": "bkd",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015258088",
+      "name": "cookie_test",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015261941",
+      "name": "ctd",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015265918",
+      "name": "BrowserId",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015273134",
+      "name": "__cf_bm",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015300019",
+      "name": "__cflb",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015304033",
+      "name": "X-Salesforce-CHAT",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015309666",
+      "name": "LSKey-c$CookieConsentPolicy",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015313512",
+      "name": "NoCookie",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790015316430",
+      "name": "_cfuvid",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628681031",
+      "name": "_ju_dn",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628685787",
+      "name": "_ju_dm",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628689993",
+      "name": "_ju_v",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628704912",
+      "name": "__rcmp",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628717573",
+      "name": "__rslct",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628727027",
+      "name": "__rpck",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628736884",
+      "name": "__ruid",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628740926",
+      "name": "__rutmb",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628747362",
+      "name": "__rutma",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     },
+     {
+      "id": "strict-1790628756422",
+      "name": "__rpckx",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": ""
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1776706582930-ltpkfu7ed",
+      "name": "Google Analytics (Universal)",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": "<script>\n\tvar _gaq = _gaq || [];\n\t\t_gaq.push(['_setAccount', 'UA-5639890-1']);\n\t_gaq.push(['_setDomainName', 'well.ca']);\n    _gaq.push(['_setAllowLinker', true]);\n\n    \t_gaq.push(['_trackPageview']);\n\t_gaq.push(['_trackPageLoadTime']);\n\n    \t(function() {\n\t\tvar ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;\n\t\tga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\n\t\tvar s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);\n\t})();\n\n    dataLayer = [];\n</script>"
+     },
+     {
+      "id": "script-1776706582930-goqrdydlp",
+      "name": "Google Tag Manager",
+      "enabled": true,
+      "bodyCode": "<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id=GTM-T87HMV\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>",
+      "category": "tracking-performance",
+      "scriptCode": "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-T87HMV');</script>"
+     },
+     {
+      "id": "tracking-1790015429916",
+      "name": "BVBRANDID",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015464125",
+      "name": "BVBRANDSID",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015468812",
+      "name": "__utmb",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015477234",
+      "name": "__utmz",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015481211",
+      "name": "_ga_xxxxxxxxxx",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015487613",
+      "name": "_ga",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015493097",
+      "name": "__utma",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015496726",
+      "name": "_utmv#########",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015503386",
+      "name": "_uetvid",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015508680",
+      "name": "bv_metrics",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015520050",
+      "name": "__utmc",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     },
+     {
+      "id": "tracking-1790015523899",
+      "name": "__rsev",
+      "enabled": true,
+      "category": "tracking-performance",
+      "scriptCode": ""
+     }
+    ],
+    "targetingAdvertising": [
+     {
+      "id": "targeting-1790012620909",
+      "name": "__eoi",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012634411",
+      "name": "_gdxxxxxxxxxxxxx",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012655324",
+      "name": "_rdt_uuid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012667893",
+      "name": "cto_tld_test",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012678557",
+      "name": "ttcsid_XXXXXXXXXXXXXXXXXXXXCategory",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012687753",
+      "name": "__gpi",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012695725",
+      "name": "_gcl_au",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012700682",
+      "name": "ttcsid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012708242",
+      "name": "_tt_enable_cookie",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012719132",
+      "name": "_ttp",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012725508",
+      "name": "rmStore",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012729468",
+      "name": "__gads",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012735939",
+      "name": "_uetsid",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     },
+     {
+      "id": "targeting-1790012743627",
+      "name": "cto_bundle",
+      "enabled": true,
+      "category": "targeting-advertising",
+      "scriptCode": ""
+     }
+    ]
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "gpc": {
+     "mode": "auto",
+     "enabled": true
+    },
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 365,
+    "dismissOnScroll": false,
+    "showPreferences": true,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "https://d2i6p126yvrgeu.cloudfront.net/images/icons/apple-touch-icon.png",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "plain",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "https://well.ca/privacy.html",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "geoRules": [
+    {
+     "id": "dabe1613-59c7-43de-980e-f129bff381d3",
+     "name": "Quebec - Law 25",
+     "region": "QC",
+     "country": "CA",
+     "enabled": true,
+     "overrides": {
+      "language": "fr",
+      "requiresOptIn": true,
+      "dismissOnScroll": false,
+      "showRejectButton": true
+     }
+    }
+   ],
+   "language": "auto",
+   "position": "floating-bottom-right",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "fontFamily": "",
+   "lastUpdated": "2026-09-28T20:57:00.217Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": false,
+     "anonymizeIp": true,
+     "measurementId": "",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ },
+ {
+  "id": "9194aca7-e97c-461d-816f-bf9ee8c7b621",
+  "name": "City Collections",
+  "updatedAt": "2026-10-14T19:46:19.996Z",
+  "config": {
+   "name": "City Collections",
+   "text": {
+    "title": "We use cookies",
+    "message": "This website uses cookies to enhance your browsing experience and provide personalized content.",
+    "acceptButton": "I understand",
+    "rejectButton": "Decline",
+    "preferencesButton": "Preferences"
+   },
+   "theme": "custom",
+   "colors": {
+    "link": "#c8c8c8",
+    "text": "#000000",
+    "button": "#cccccc",
+    "background": "#ffffff",
+    "buttonText": "#111111",
+    "rejectButton": "transparent",
+    "rejectButtonText": "#1f2937"
+   },
+   "layout": {
+    "width": "container",
+    "margin": 20,
+    "shadow": "medium",
+    "padding": 20,
+    "maxWidth": 1200,
+    "animation": "fade",
+    "customWidth": 400,
+    "borderRadius": 8
+   },
+   "scripts": {
+    "functionality": [],
+    "strictlyNecessary": [
+     {
+      "id": "session-management",
+      "name": "Session Management",
+      "enabled": true,
+      "category": "strictly-necessary",
+      "scriptCode": "// Essential session management\nif (!sessionStorage.getItem('sessionId')) {\n  sessionStorage.setItem('sessionId', Date.now().toString());\n}"
+     }
+    ],
+    "trackingPerformance": [
+     {
+      "id": "script-1791967523059-oi2gmc6xw",
+      "name": "Google Analytics 4",
+      "source": "scanner",
+      "enabled": true,
+      "category": "tracking-performance",
+      "sourceUrl": "",
+      "confidence": "high",
+      "scriptCode": "<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-PXJR73868Y\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n  gtag('config', 'G-PXJR73868Y');\n</script>",
+      "detectedVendor": "Google Analytics 4"
+     },
+     {
+      "id": "script-1791967523059-icufgbxr3",
+      "name": "Microsoft Clarity",
+      "source": "scanner",
+      "enabled": true,
+      "category": "tracking-performance",
+      "sourceUrl": "https://www.clarity.ms/tag/",
+      "confidence": "medium",
+      "scriptCode": "<script src=\"https://www.clarity.ms/tag/\"></script>",
+      "detectedVendor": "Microsoft Clarity"
+     }
+    ],
+    "targetingAdvertising": []
+   },
+   "version": "2.2.0",
+   "advanced": {
+    "customJS": "",
+    "customCSS": "",
+    "performance": {
+     "inlineCriticalCSS": true,
+     "lazyLoadAnalytics": true,
+     "useRequestIdleCallback": true,
+     "deferNonCriticalScripts": true
+    },
+    "googleConsentMode": true
+   },
+   "behavior": {
+    "autoShow": true,
+    "buttonLayout": "standard",
+    "cookieExpiry": 360,
+    "dismissOnScroll": false,
+    "showPreferences": false,
+    "showRejectButton": true
+   },
+   "branding": {
+    "logo": {
+     "url": "",
+     "enabled": false,
+     "maxWidth": 120,
+     "position": "left",
+     "maxHeight": 40
+    },
+    "footerLink": {
+     "text": "Cookie Settings",
+     "style": "inline",
+     "enabled": true,
+     "position": "floating",
+     "inlineStyle": {
+      "linkType": "custom",
+      "includeIcon": false,
+      "includeLogo": false
+     },
+     "floatingStyle": {
+      "size": "small",
+      "shape": "pill",
+      "showText": true,
+      "useCustomColors": false
+     },
+     "floatingPosition": "bottom-left"
+    },
+    "privacyPolicy": {
+     "url": "",
+     "text": "Privacy Policy",
+     "required": false,
+     "openInNewTab": true
+    },
+    "showPoweredBy": false
+   },
+   "language": "auto",
+   "position": "bottom",
+   "compliance": {
+    "framework": "pipeda",
+    "maxPenalty": "Reputation damage and Privacy Commissioner findings",
+    "consentExpiry": 24,
+    "requiresOptIn": false,
+    "requiresPrivacyPolicy": true,
+    "requiresExplicitConsent": false,
+    "requiresGranularConsent": false,
+    "requiresDataRetentionPolicy": false
+   },
+   "lastUpdated": "2026-10-14T19:46:21.345Z",
+   "integrations": {
+    "googleAnalytics": {
+     "enabled": true,
+     "anonymizeIp": true,
+     "measurementId": "G-PXJR73868Y",
+     "trackImpressions": true,
+     "trackConsentEvents": true
+    }
+   }
+  }
+ }
+]

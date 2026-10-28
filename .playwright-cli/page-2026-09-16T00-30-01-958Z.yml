@@ -1,0 +1,310 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Cookie Banner Generator" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e6]
+        - button "Toggle menu" [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+    - main [ref=e9]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - heading "Set up with AI" [level=1] [ref=e14]
+          - paragraph [ref=e15]: Sign in, pick your editor, copy one prompt. We mint a secret key into it — the agent installs the MCP and sets up the banner.
+          - paragraph [ref=e16]:
+            - link "Or use the visual builder" [ref=e17] [cursor=pointer]:
+              - /url: /builder
+        - generic [ref=e18]:
+          - img
+          - generic [ref=e24]: Claude
+          - generic [ref=e27]: Cursor
+          - generic [ref=e30]: Grok
+          - generic [ref=e33]: ChatGPT
+          - img "Cookie Banner" [ref=e36]
+      - list [ref=e40]:
+        - listitem [ref=e41]:
+          - generic [ref=e43]: "1"
+          - generic [ref=e44]:
+            - heading "Connect your account" [level=3] [ref=e45]
+            - paragraph [ref=e47]: Checking your session…
+        - listitem [ref=e48]:
+          - generic [ref=e50]: "2"
+          - heading "Add it to your editor" [level=3] [ref=e52]
+      - generic [ref=e54]:
+        - heading "What the agent actually does" [level=2] [ref=e55]
+        - paragraph [ref=e56]: One prompt. The MCP creates the hosted banner, wires consent-gated scripts, and hands back the snippet.
+        - list [ref=e57]:
+          - listitem [ref=e58]:
+            - heading "Creates the banner" [level=3] [ref=e67]
+            - paragraph [ref=e68]: A hosted consent banner lands in your cookie-banner.ca dashboard, already tied to your account.
+          - listitem [ref=e69]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - generic [ref=e73]: GA4
+                - generic [ref=e74]: GTM
+                - generic [ref=e75]: Meta
+                - generic [ref=e76]: Clarity
+                - generic [ref=e77]: Hotjar
+              - paragraph [ref=e78]: Blocked until consent
+            - heading "Attaches your trackers" [level=3] [ref=e79]
+            - paragraph [ref=e80]: GA4, GTM, Meta, Clarity, and the rest stay blocked until the visitor consents.
+          - listitem [ref=e81]:
+            - generic [ref=e83]:
+              - paragraph [ref=e84]: app/layout.tsx
+              - code [ref=e85]: <script src="https://cdn.cookie-banner.ca/b.js">
+            - heading "Pastes the snippet" [level=3] [ref=e86]
+            - paragraph [ref=e87]: The agent writes the header tag into the repo and strips duplicate analytics tags.
+      - generic [ref=e89]:
+        - heading "Scripts the agent can attach" [level=2] [ref=e90]
+        - paragraph [ref=e91]: Each one is categorized and blocked until the visitor consents. On Pro, GA4 uses the native Consent Mode integration.
+        - list [ref=e92]:
+          - listitem [ref=e93]:
+            - paragraph [ref=e94]: Google Analytics 4
+            - paragraph [ref=e95]: Consent-gated GA4. Pro uses the native integration; Free stores the gtag snippet as a script.
+            - code [ref=e96]: measurementId · G-XXXXXXXXXX
+          - listitem [ref=e97]:
+            - paragraph [ref=e98]: Google Tag Manager
+            - paragraph [ref=e99]: Loads the GTM container after analytics consent.
+            - code [ref=e100]: containerId · GTM-XXXXXXX
+          - listitem [ref=e101]:
+            - paragraph [ref=e102]: Meta Pixel
+            - paragraph [ref=e103]: Meta / Facebook advertising pixel. Loads after marketing consent.
+            - code [ref=e104]: pixelId · 123456789012345
+          - listitem [ref=e105]:
+            - paragraph [ref=e106]: Microsoft Clarity
+            - paragraph [ref=e107]: Session recordings and heatmaps. Loads after analytics consent.
+            - code [ref=e108]: projectId · tmo89p0av9
+          - listitem [ref=e109]:
+            - paragraph [ref=e110]: Hotjar
+            - paragraph [ref=e111]: Heatmaps and recordings. Loads after analytics consent.
+            - code [ref=e112]: siteId · 1778278
+          - listitem [ref=e113]:
+            - paragraph [ref=e114]: LinkedIn Insight Tag
+            - paragraph [ref=e115]: LinkedIn conversion tracking. Loads after marketing consent.
+            - code [ref=e116]: partnerId · 1234567
+          - listitem [ref=e117]:
+            - paragraph [ref=e118]: TikTok Pixel
+            - paragraph [ref=e119]: TikTok advertising pixel. Loads after marketing consent.
+            - code [ref=e120]: pixelId · CXXXXXXXXXXXX
+          - listitem [ref=e121]:
+            - paragraph [ref=e122]: Google Ads
+            - paragraph [ref=e123]: Google Ads conversion tag. Loads after marketing consent.
+            - code [ref=e124]: conversionId · AW-123456789
+          - listitem [ref=e125]:
+            - paragraph [ref=e126]: Intercom
+            - paragraph [ref=e127]: Customer messaging widget. Loads after functionality consent.
+            - code [ref=e128]: appId · abcd1234
+      - generic [ref=e130]:
+        - heading "Questions" [level=2] [ref=e131]
+        - generic [ref=e132]:
+          - heading "How does the agent get into my account?" [level=3] [ref=e134]:
+            - button "How does the agent get into my account?" [ref=e135] [cursor=pointer]:
+              - text: How does the agent get into my account?
+              - img [ref=e136]
+          - heading "What is the Cookie Banner MCP?" [level=3] [ref=e139]:
+            - button "What is the Cookie Banner MCP?" [ref=e140] [cursor=pointer]:
+              - text: What is the Cookie Banner MCP?
+              - img [ref=e141]
+          - heading "Will the agent paste the snippet into my repo?" [level=3] [ref=e144]:
+            - button "Will the agent paste the snippet into my repo?" [ref=e145] [cursor=pointer]:
+              - text: Will the agent paste the snippet into my repo?
+              - img [ref=e146]
+          - heading "Which trackers can it attach?" [level=3] [ref=e149]:
+            - button "Which trackers can it attach?" [ref=e150] [cursor=pointer]:
+              - text: Which trackers can it attach?
+              - img [ref=e151]
+          - heading "Is this a replacement for the visual builder?" [level=3] [ref=e154]:
+            - button "Is this a replacement for the visual builder?" [ref=e155] [cursor=pointer]:
+              - text: Is this a replacement for the visual builder?
+              - img [ref=e156]
+      - generic [ref=e159]:
+        - heading "Prefer to click instead of prompt?" [level=2] [ref=e160]
+        - paragraph [ref=e161]: The builder still creates the same hosted snippet. Use whichever path is faster for the site in front of you.
+        - generic [ref=e162]:
+          - link "Set up with AI" [ref=e163] [cursor=pointer]:
+            - /url: "#connect"
+            - text: Set up with AI
+            - img [ref=e164]
+          - link "Open the builder" [ref=e166] [cursor=pointer]:
+            - /url: /builder
+            - text: Open the builder
+            - img [ref=e167]
+    - contentinfo [ref=e169]:
+      - generic [ref=e170]:
+        - link "Cookie Banner Generator" [ref=e172] [cursor=pointer]:
+          - /url: /
+          - img "Cookie Banner Generator" [ref=e173]
+        - generic [ref=e175]:
+          - generic [ref=e176]:
+            - heading "Product & Tools" [level=3] [ref=e177]
+            - list [ref=e178]:
+              - listitem [ref=e179]:
+                - link "Dashboard" [ref=e180] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e181]:
+                - link "Banner Builder" [ref=e182] [cursor=pointer]:
+                  - /url: /dashboard/builder
+              - listitem [ref=e183]:
+                - link "Analytics" [ref=e184] [cursor=pointer]:
+                  - /url: /dashboard/analytics
+              - listitem [ref=e185]:
+                - link "Integrations" [ref=e186] [cursor=pointer]:
+                  - /url: /dashboard/integrations
+              - listitem [ref=e187]:
+                - link "Features" [ref=e188] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e189]:
+                - link "Free Tools" [ref=e190] [cursor=pointer]:
+                  - /url: /tools
+              - listitem [ref=e191]:
+                - link "Cookie Scanner" [ref=e192] [cursor=pointer]:
+                  - /url: /tools/cookie-scanner
+              - listitem [ref=e193]:
+                - link "Privacy Policy Generator" [ref=e194] [cursor=pointer]:
+                  - /url: /tools/privacy-policy
+              - listitem [ref=e195]:
+                - link "Live Demo" [ref=e196] [cursor=pointer]:
+                  - /url: /demo
+          - generic [ref=e197]:
+            - heading "Compliance & Legal" [level=3] [ref=e198]
+            - list [ref=e199]:
+              - listitem [ref=e200]:
+                - link "Compliance Overview" [ref=e201] [cursor=pointer]:
+                  - /url: /compliance
+              - listitem [ref=e202]:
+                - link "GDPR Compliance" [ref=e203] [cursor=pointer]:
+                  - /url: /compliance/gdpr
+              - listitem [ref=e204]:
+                - link "PIPEDA Compliance" [ref=e205] [cursor=pointer]:
+                  - /url: /compliance/pipeda
+              - listitem [ref=e206]:
+                - link "CCPA Compliance" [ref=e207] [cursor=pointer]:
+                  - /url: /compliance/ccpa
+              - listitem [ref=e208]:
+                - link "Canada Privacy Laws" [ref=e209] [cursor=pointer]:
+                  - /url: /locations/canada
+              - listitem [ref=e210]:
+                - link "EU Privacy Laws" [ref=e211] [cursor=pointer]:
+                  - /url: /locations/eu
+              - listitem [ref=e212]:
+                - link "US Privacy Laws" [ref=e213] [cursor=pointer]:
+                  - /url: /locations/us
+              - listitem [ref=e214]:
+                - link "Privacy Policy" [ref=e215] [cursor=pointer]:
+                  - /url: /privacy-policy
+              - listitem [ref=e216]:
+                - link "Terms of Service" [ref=e217] [cursor=pointer]:
+                  - /url: /terms
+          - generic [ref=e218]:
+            - heading "Integrations" [level=3] [ref=e219]
+            - list [ref=e220]:
+              - listitem [ref=e221]:
+                - link "All Platforms" [ref=e222] [cursor=pointer]:
+                  - /url: /integrations
+              - listitem [ref=e223]:
+                - link "WordPress" [ref=e224] [cursor=pointer]:
+                  - /url: /integrations/wordpress
+              - listitem [ref=e225]:
+                - link "Shopify" [ref=e226] [cursor=pointer]:
+                  - /url: /integrations/shopify
+              - listitem [ref=e227]:
+                - link "Squarespace" [ref=e228] [cursor=pointer]:
+                  - /url: /integrations/squarespace
+              - listitem [ref=e229]:
+                - link "Wix" [ref=e230] [cursor=pointer]:
+                  - /url: /integrations/wix
+              - listitem [ref=e231]:
+                - link "React" [ref=e232] [cursor=pointer]:
+                  - /url: /integrations/react
+              - listitem [ref=e233]:
+                - link "Google Tag Manager" [ref=e234] [cursor=pointer]:
+                  - /url: /integrations/google-tag-manager
+              - listitem [ref=e235]:
+                - link "Set up with AI" [ref=e236] [cursor=pointer]:
+                  - /url: /integrations/ai
+          - generic [ref=e237]:
+            - heading "Solutions" [level=3] [ref=e238]
+            - list [ref=e239]:
+              - listitem [ref=e240]:
+                - link "E-commerce" [ref=e241] [cursor=pointer]:
+                  - /url: /solutions/ecommerce
+              - listitem [ref=e242]:
+                - link "SaaS Platforms" [ref=e243] [cursor=pointer]:
+                  - /url: /solutions/saas
+              - listitem [ref=e244]:
+                - link "Healthcare" [ref=e245] [cursor=pointer]:
+                  - /url: /solutions/healthcare
+              - listitem [ref=e246]:
+                - link "Finance" [ref=e247] [cursor=pointer]:
+                  - /url: /solutions/finance
+              - listitem [ref=e248]:
+                - link "Education" [ref=e249] [cursor=pointer]:
+                  - /url: /solutions/education
+              - listitem [ref=e250]:
+                - link "Cookiebot Alternative" [ref=e251] [cursor=pointer]:
+                  - /url: /compare/cookiebot-alternative
+          - generic [ref=e252]:
+            - heading "Company & Support" [level=3] [ref=e253]
+            - list [ref=e254]:
+              - listitem [ref=e255]:
+                - link "About Us" [ref=e256] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e257]:
+                - link "Blog" [ref=e258] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e259]:
+                - link "Documentation" [ref=e260] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e261]:
+                - link "Support" [ref=e262] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e263]:
+                - link "Pricing" [ref=e264] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e265]:
+                - link "Roadmap" [ref=e266] [cursor=pointer]:
+                  - /url: /roadmap
+              - listitem [ref=e267]:
+                - link "Upgrade" [ref=e268] [cursor=pointer]:
+                  - /url: /upgrade
+        - generic [ref=e272]:
+          - generic [ref=e273]:
+            - paragraph [ref=e274]: © 2026 Cookie Banner Generator. Made with ❤️ in Canada.
+            - generic [ref=e275]:
+              - generic [ref=e276]: Your Privacy Choices
+              - generic [ref=e277]:
+                - generic [ref=e279]: ✓
+                - generic [ref=e280]: ✓
+          - generic [ref=e281]:
+            - link "Sitemap" [ref=e282] [cursor=pointer]:
+              - /url: /sitemap.xml
+            - generic [ref=e283]: "|"
+            - link "Privacy Policy" [ref=e284] [cursor=pointer]:
+              - /url: /privacy-policy
+            - generic [ref=e285]: "|"
+            - link "Terms of Use" [ref=e286] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e287]: "|"
+            - link "Accessibility" [ref=e288] [cursor=pointer]:
+              - /url: /support
+  - alert [ref=e289]
+  - dialog "Cookie consent" [ref=e290]:
+    - generic [ref=e291]:
+      - button "Close" [ref=e292] [cursor=pointer]: ×
+      - generic [ref=e293]:
+        - generic [ref=e294]:
+          - img "Logo" [ref=e295]
+          - generic [ref=e296]:
+            - heading "We use cookies" [level=3] [ref=e297]
+            - paragraph [ref=e298]:
+              - text: This website uses cookies to enhance your browsing experience and provide personalized content.
+              - link "Privacy Policy" [ref=e299] [cursor=pointer]:
+                - /url: https://www.cookie-banner.ca/privacy
+            - link "Powered by cookie-banner.ca" [ref=e301] [cursor=pointer]:
+              - /url: https://cookie-banner.ca/?ref=banner
+        - generic [ref=e302]:
+          - button "Accept All" [ref=e303] [cursor=pointer]
+          - button "Preferences" [ref=e304] [cursor=pointer]
+  - link "Cookie consent by cookie-banner.ca" [ref=e306] [cursor=pointer]:
+    - /url: https://cookie-banner.ca/?ref=banner

@@ -1,0 +1,55 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "lib/banner-generator.ts"
+    ],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "*",
+        "files": [
+          "types/index.ts"
+        ],
+        "createdAt": "2026-09-11T15:08:26.935Z",
+        "reason": "Pre-existing TS union of banner animation option names ('bounce' is an existing product option), not an easing value"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "*",
+        "files": [
+          "components/banner/banner-preview.tsx"
+        ],
+        "createdAt": "2026-09-11T16:25:59.841Z",
+        "reason": "Pre-existing owner-selectable banner animation enum ('bounce') predates the widget work"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "app/dashboard/builder/page.tsx"
+        ],
+        "createdAt": "2026-09-13T17:38:18.416Z",
+        "reason": "Pre-existing builder styling (L1161/L1172/L3839/L4432) predates the accessibility work; not in scope"
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "*",
+        "files": [
+          "app/dashboard/builder/page.tsx"
+        ],
+        "createdAt": "2026-09-13T17:38:18.464Z",
+        "reason": "Pre-existing builder styling (L1161/L1172/L3839/L4432) predates the accessibility work; not in scope"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "app/dashboard/dashboard-client.tsx"
+        ],
+        "createdAt": "2026-09-14T19:17:49.442Z",
+        "reason": "False positive: L339 is a loading spinner ring (border-b-2), not a rounded card with an accent border"
+      }
+    ]
+  }
+}
