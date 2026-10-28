@@ -17,6 +17,7 @@ import { CURRENT_BANNER_VERSION } from '@/lib/banner-migration'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Breadcrumbs } from '@/components/dashboard/breadcrumbs'
 import { BannerCard } from '@/components/dashboard/banner-card'
+import { ComplianceReadinessWidget } from '@/components/dashboard/compliance-readiness-widget'
 
 interface Banner {
   id: string
@@ -303,7 +304,9 @@ export function DashboardClient() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="relative space-y-6 p-6 lg:pr-[25rem]">
+        <ComplianceReadinessWidget name={session.user.name} />
+
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Cookie Banner' }]} />
 
