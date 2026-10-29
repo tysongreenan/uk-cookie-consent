@@ -134,14 +134,14 @@ If you discover any security issues:
 
 ## Addendum — October 29, 2026
 
-**Status**: ⚠️ Credential rotation pending
+**Status**: ✅ Credentials rotated 2026-10-29 (leaked password and service key verified rejected)
 
 ### CRITICAL: `VERCEL_ENV_COPY_PASTE.md` was tracked in git
 Committed in `f32b5d9` with the live Postgres password, the `sb_secret_` service role key and the anon key. Removed from tracking and added to `.gitignore` on 2026-10-29. The secrets remain in git history.
 
 **Action required (dashboard only)**:
-- [ ] Rotate the database password (Supabase → Settings → Database), update `DATABASE_URL`/`DIRECT_URL` in Vercel and `.env.local`
-- [ ] Rotate the service role key (Supabase → Settings → API Keys), update `SUPABASE_SERVICE_ROLE_KEY` in Vercel and `.env.local`
+- [x] Rotate the database password (Supabase → Settings → Database), update `DATABASE_URL`/`DIRECT_URL` in Vercel and `.env.local`
+- [x] Rotate the service role key (Supabase → Settings → API Keys), update `SUPABASE_SERVICE_ROLE_KEY` in Vercel and `.env.local`
 - [ ] Optionally purge the file from history with `git filter-repo` and force-push
 
 ### HIGH: anon could execute SECURITY DEFINER RPCs (RESOLVED)
