@@ -136,3 +136,6 @@ working-header.html
 
 # Local sandbox pages
 public/sandbox-*.html
+
+# Local env dumps (contained live secrets once)
+VERCEL_ENV_COPY_PASTE.md

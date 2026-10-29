@@ -130,3 +130,25 @@ If you discover any security issues:
 **Last Updated**: October 8, 2025  
 **Next Review**: January 8, 2026
 
+---
+
+## Addendum — October 29, 2026
+
+**Status**: ⚠️ Credential rotation pending
+
+### CRITICAL: `VERCEL_ENV_COPY_PASTE.md` was tracked in git
+Committed in `f32b5d9` with the live Postgres password, the `sb_secret_` service role key and the anon key. Removed from tracking and added to `.gitignore` on 2026-10-29. The secrets remain in git history.
+
+**Action required (dashboard only)**:
+- [ ] Rotate the database password (Supabase → Settings → Database), update `DATABASE_URL`/`DIRECT_URL` in Vercel and `.env.local`
+- [ ] Rotate the service role key (Supabase → Settings → API Keys), update `SUPABASE_SERVICE_ROLE_KEY` in Vercel and `.env.local`
+- [ ] Optionally purge the file from history with `git filter-repo` and force-push
+
+### HIGH: anon could execute SECURITY DEFINER RPCs (RESOLVED)
+Supabase grants EXECUTE on new public functions to `anon` directly, so earlier `REVOKE ... FROM PUBLIC` migrations had no effect. ~19 definer functions (`get_banners_simple`, `update_banner_simple`, `delete_banner_simple`, `toggle_banner_active`, `get_visitor_breakdown`, `comment_tool_spend_ai_credits`, …) were callable with the browser-shipped publishable key, scoped only by a caller-supplied `user_id`.
+
+Fixed by `supabase/migrations/20261029000001_revoke_anon_rpc_execute.sql` (applied to prod 2026-10-29): anon/PUBLIC revoked on all public functions, `authenticated` revoked on this app's functions, default privileges changed so new functions are not anon-callable. `comment_tool_*` functions (websitefeedback.ca, shared DB) keep `authenticated` access and still lack caller checks — that app's owner should add `auth.uid()` guards.
+
+### Known, accepted
+- `RoadmapVote` and `FeatureSuggestion` are anon-readable by policy and expose `userId`.
+- Storage buckets `logos`, `comment-attachments`, `comment-tool-workspaces` are public.
