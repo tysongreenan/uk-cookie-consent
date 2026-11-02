@@ -21,10 +21,18 @@ function SignInContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const [error, setError] = useState('')
-  
   const router = useRouter()
   const searchParams = useSearchParams()
+  const authError = searchParams.get('error')
+  const [error, setError] = useState(
+    !authError
+      ? ''
+      : authError === 'OAuthAccountNotLinked'
+        ? 'This email is already registered with a password. Sign in with your email and password instead.'
+        : authError === 'AccessDenied'
+          ? 'Sign in was denied. If this keeps happening, contact support@cookie-banner.ca.'
+          : 'We couldn\'t sign you in. Please try again, or contact support@cookie-banner.ca if it keeps happening.'
+  )
   const rawCallbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   const callbackUrl = rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//') ? rawCallbackUrl : '/dashboard'
   const signupUrl = `/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`

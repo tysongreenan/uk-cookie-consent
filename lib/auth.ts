@@ -499,6 +499,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
-    error: '/auth/error',
+    // No dedicated error page: NextAuth appends ?error=<code> and the sign-in page shows it.
+    error: '/auth/signin',
   },
 }

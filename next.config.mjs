@@ -55,6 +55,8 @@ const nextConfig = {
   // 301 redirects for renamed content (preserve SEO equity)
   async redirects() {
     return [
+      { source: '/login', destination: '/auth/signin', permanent: false },
+      { source: '/signin', destination: '/auth/signin', permanent: false },
       {
         // Permanent redirect so Google consolidates ranking signals on 2026.
         // Absolute destination avoids any host/relative ambiguity.
