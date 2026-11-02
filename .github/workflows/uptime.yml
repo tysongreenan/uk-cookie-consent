@@ -1,0 +1,50 @@
+name: Uptime check
+
+# Loads a real customer-facing banner every 5 minutes. A failed run means
+# banners are down for every customer (bad Supabase key, DB outage, broken
+# deploy). GitHub emails the repo owner when a scheduled run fails.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: uptime
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Banner script loads
+        run: |
+          # sway.ca banner. nocache=1 skips the CDN so the check hits the database.
+          url="https://www.cookie-banner.ca/api/v1/banner.js?id=ff60f214-29ac-456f-9912-aec252d02c06&nocache=1"
+          for attempt in 1 2 3; do
+            code=$(curl -s -o body.js -w '%{http_code}' --max-time 20 "$url" || echo 000)
+            size=$(wc -c < body.js 2>/dev/null || echo 0)
+            if [ "$code" = "200" ] && [ "$size" -gt 10000 ] && ! grep -q "No banner found" body.js; then
+              echo "OK: $code, $size bytes"
+              exit 0
+            fi
+            echo "Attempt $attempt failed: HTTP $code, $size bytes"
+            head -c 300 body.js || true
+            sleep 15
+          done
+          echo "::error::banner.js is failing for customers"
+          exit 1
+
+      - name: Google sign-in starts
+        run: |
+          curl -s -c jar -b jar --max-time 20 https://www.cookie-banner.ca/api/auth/csrf -o csrf.json
+          token=$(python3 -c 'import json;print(json.load(open("csrf.json"))["csrfToken"])')
+          curl -s -c jar -b jar --max-time 20 -X POST https://www.cookie-banner.ca/api/auth/signin/google \
+            -d "csrfToken=$token&callbackUrl=https://www.cookie-banner.ca/dashboard&json=true" -o signin.json
+          if grep -q "accounts.google.com" signin.json; then
+            echo "OK"
+          else
+            echo "::error::Google sign-in is not redirecting to Google"
+            cat signin.json
+            exit 1
+          fi
