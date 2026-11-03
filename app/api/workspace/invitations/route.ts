@@ -11,7 +11,7 @@ import {
   inviteEmailDisplayNames,
   publicInviteBaseUrl,
 } from '@/lib/team-invitations'
-import { requireTeamPermission } from '@/lib/team-permissions'
+import { requireTeamPermission, resolveEffectivePlan } from '@/lib/team-permissions'
 import { PlanTier } from '@/types'
 
 const supabase = createClient(
@@ -76,8 +76,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user has Pro plan
-    const userPlan = (session.user.planTier || 'free') as PlanTier
+    // Admins inherit the workspace owner's plan, not their own personal plan
+    const { planTier } = await resolveEffectivePlan(session.user.id, teamIdForPermission)
+    const userPlan = planTier as PlanTier
     if (!canAccessFeature(userPlan, 'hasTeamCollaboration')) {
       return NextResponse.json(
         { 
