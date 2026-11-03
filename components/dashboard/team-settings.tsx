@@ -313,7 +313,7 @@ export function TeamSettings() {
               <span>{teamInfo.name}</span>
             </CardTitle>
             <CardDescription>
-              {teamInfo.memberCount} of 5 members • You are the {teamInfo.userRole}
+              {teamInfo.memberCount} {teamInfo.memberCount === 1 ? 'member' : 'members'} • You are the {teamInfo.userRole}
             </CardDescription>
           </CardHeader>
         </Card>

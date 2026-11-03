@@ -96,27 +96,6 @@ export async function POST(request: NextRequest) {
 
     const teamId = teamIdForPermission
 
-    // Check workspace member limit (max 5 people)
-    const { count: memberTotal, error: countError } = await supabase
-      .from('TeamMember')
-      .select('*', { count: 'exact', head: true })
-      .eq('team_id', teamId)
-
-    if (countError) {
-      console.error('Error checking member count:', countError)
-      return NextResponse.json(
-        { error: 'Failed to check workspace capacity' },
-        { status: 500 }
-      )
-    }
-
-    if (memberTotal != null && memberTotal >= 5) {
-      return NextResponse.json(
-        { error: 'Workspace is at capacity (maximum 5 members). Upgrade to invite more collaborators.' },
-        { status: 400 }
-      )
-    }
-
     // Check if the invitee is already a member of this workspace.
     // Do this in two explicit queries because TeamMember has two User
     // relationships, which makes embedded User joins ambiguous in PostgREST.
