@@ -4404,6 +4404,26 @@ function BannerBuilderContent() {
 
                                 <div className="flex items-start gap-3">
                                   <Switch
+                                    checked={!!rule.overrides.impliedConsent && !rule.overrides.requiresOptIn}
+                                    disabled={rule.overrides.requiresOptIn}
+                                    onCheckedChange={(checked) => {
+                                      setConfig((prev: BannerConfig) => ({
+                                        ...prev,
+                                        geoRules: (prev.geoRules || []).map((r: GeoRule) =>
+                                          r.id === rule.id ? { ...r, overrides: { ...r.overrides, impliedConsent: checked } } : r
+                                        )
+                                      }))
+                                    }}
+                                    className="mt-0.5"
+                                  />
+                                  <div>
+                                    <Label className="text-sm">Implied consent (granted by default)</Label>
+                                    <p className="text-xs text-muted-foreground">Google Consent Mode starts as granted and your scripts load before a choice. Visitors can still reject. Not for Quebec or the EU.</p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-3">
+                                  <Switch
                                     checked={rule.overrides.showRejectButton}
                                     disabled={rule.overrides.requiresOptIn}
                                     onCheckedChange={(checked) => {

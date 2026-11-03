@@ -38,6 +38,7 @@ export interface GeoRule {
   enabled: boolean
   overrides: {
     requiresOptIn: boolean // true = strict opt-in, no implied consent
+    impliedConsent?: boolean // true = Consent Mode defaults to granted and scripts load before a choice (ignored when requiresOptIn)
     showRejectButton: boolean // force showing reject button
     dismissOnScroll: boolean // override scroll dismiss behavior
     language?: 'en' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ar' | 'hi' | 'nl' | 'sv' | 'nb' | 'da' | 'it' | 'fi' | 'auto' // override language
@@ -323,6 +324,7 @@ export interface AccessibilityConfig {
 // Internal config type used at serving time — includes runtime overrides not persisted to DB
 export interface BannerConfigWithGeoOverrides extends BannerConfig {
   _geoRequiresOptIn?: boolean
+  _geoImpliedConsent?: boolean
 }
 
 export interface TrackingScript {

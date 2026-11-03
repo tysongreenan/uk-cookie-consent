@@ -1690,13 +1690,16 @@ function initGA4Default() {
   function gtag(){dataLayer.push(arguments);}
   window.gtag = window.gtag || gtag;
 
-  gtag('consent', 'default', {
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': 500
-  });
+  // Consent default is already set by the consent init block; only fall back if it didn't run
+  if (!window.__cbConsentDefault) {
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'wait_for_update': 500
+    });
+  }
 
   gtag('js', new Date());
 }
@@ -1812,6 +1815,7 @@ ${cookieDomainRuntimeJs(cookieDomain.mode, cookieDomain.custom)}
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
 var GEO_REQUIRES_OPT_IN = ${Boolean(config._geoRequiresOptIn)};
+var GEO_IMPLIED_CONSENT = ${Boolean(config._geoImpliedConsent && !config._geoRequiresOptIn)};
 var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
 // Detect GPC via client-side DOM property OR server-side Sec-GPC header (defense-in-depth per W3C spec)
 var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
@@ -3534,6 +3538,15 @@ function init() {
     return;
   }
   
+  // Implied consent region (e.g. Canada outside Quebec): run scripts before a choice,
+  // but don't save a cookie so the visitor can still accept/reject from the banner.
+  if (GEO_IMPLIED_CONSENT) {
+    var impliedConsent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
+    loadScripts(impliedConsent);
+    initGA4();
+    dispatchConsentUpdate(impliedConsent);
+  }
+
   // No existing consent - show banner
   // Apply GPC state to modal toggles for first-time visitors
   if (GPC_ACTIVE) applyGpcModalState();
@@ -3574,8 +3587,10 @@ if (document.readyState === 'loading') {
 })();`
 }
 
-export const generateConsentInitScript = (config?: BannerConfig) => {
+export const generateConsentInitScript = (config?: BannerConfigWithGeoOverrides) => {
   const tcfEnabled = config?.integrations?.tcf?.enabled === true
+  const implied = config?._geoImpliedConsent === true
+  const gpcEnabled = config?.behavior?.gpc?.enabled ?? true
 
   return `<script>
 // CRITICAL: Initialize consent mode BEFORE any trackers load
@@ -3605,23 +3620,27 @@ export const generateConsentInitScript = (config?: BannerConfig) => {
     }
   };
   
-  // Set consent defaults to DENIED before any trackers load
-  // This blocks ALL trackers (GTM, GA4, Meta Pixel, Google Ads, etc.) until user grants consent
-  gtag('consent', 'default', {
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': 500  // Wait 500ms for consent update before allowing trackers
-  });
-  
+  // Consent Mode defaults. DENIED unless the visitor's geo rule allows implied consent
+  // (e.g. Canada outside Quebec). GPC still keeps ad signals denied under implied consent.
+  var __cbAd = ${implied ? `${gpcEnabled ? "navigator.globalPrivacyControl ? 'denied' : " : ''}'granted'` : "'denied'"};
+  window.__cbConsentDefault = {
+    'analytics_storage': ${implied ? "'granted'" : "'denied'"},
+    'ad_storage': __cbAd,
+    'ad_user_data': __cbAd,
+    'ad_personalization': __cbAd
+  };
+  var __cbDefault = {};
+  for (var __k in window.__cbConsentDefault) __cbDefault[__k] = window.__cbConsentDefault[__k];
+  __cbDefault.wait_for_update = 500; // Wait 500ms for consent update before allowing trackers
+  gtag('consent', 'default', __cbDefault);
+
   // Also push to dataLayer for GTM compatibility
   window.dataLayer.push({
     'event': 'cookie_consent_default',
-    'analytics_storage': 'denied',
-    'ad_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied'
+    'analytics_storage': window.__cbConsentDefault.analytics_storage,
+    'ad_storage': __cbAd,
+    'ad_user_data': __cbAd,
+    'ad_personalization': __cbAd
   });
 })();
 </script>`

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { applyGeoRule } from '@/lib/geo-rules'
 import { generateBannerHTML, generateBannerCSS, generateBannerJS, generateConsentInitScript } from '@/lib/banner-generator'
 import { hardenBannerConfig } from '@/lib/banner-config-security'
 import { RateLimit } from '@/lib/rate-limit'
@@ -313,33 +314,7 @@ export async function GET(request: NextRequest) {
     const visitorCountry = request.headers.get('x-vercel-ip-country') || ''
     const visitorRegion = request.headers.get('x-vercel-ip-country-region') || ''
     const geoRules = ownerPlanTier !== 'free' ? (config.geoRules || []) : []
-    // Try specific match (country + region) first, then fall back to country-only match
-    const matchedGeoRule = geoRules.find((rule: any) => {
-      if (!rule.enabled) return false
-      return rule.country === visitorCountry && rule.region && rule.region === visitorRegion
-    }) || geoRules.find((rule: any) => {
-      if (!rule.enabled) return false
-      return rule.country === visitorCountry && !rule.region
-    })
-
-    if (matchedGeoRule) {
-      const overrides = matchedGeoRule.overrides
-      if (overrides.showRejectButton !== undefined) {
-        config.behavior.showRejectButton = overrides.showRejectButton
-      }
-      if (overrides.dismissOnScroll !== undefined) {
-        config.behavior.dismissOnScroll = overrides.dismissOnScroll
-      }
-      if (overrides.language) {
-        config.language = overrides.language
-      }
-      if (overrides.requiresOptIn) {
-        // Strict opt-in: force reject button, disable scroll dismiss, hide close button
-        config.behavior.showRejectButton = true
-        config.behavior.dismissOnScroll = false
-        config._geoRequiresOptIn = true
-      }
-    }
+    applyGeoRule(config, geoRules, visitorCountry, visitorRegion)
 
     // Accessibility Menu (server-side plan enforcement, same pattern as TCF).
     // Every tier gets the menu; only Pro Annual / Enterprise get customization and
