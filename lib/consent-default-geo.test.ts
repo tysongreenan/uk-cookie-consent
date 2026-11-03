@@ -4,9 +4,9 @@ import { generateConsentInitScript } from './banner-generator'
 import { applyGeoRule } from './geo-rules'
 
 // Runs the consent init block and returns the gtag('consent','default') payload.
-function runDefault(config: any, gpc = false) {
+function runDefault(config: any, gpc = false, serverGpc = false) {
   const js = generateConsentInitScript(config).replace(/<\/?script[^>]*>/gi, '')
-  const window: any = {}
+  const window: any = { __cbServerGpc: serverGpc }
   window.dataLayer = []
   vm.runInNewContext(js, { window, dataLayer: window.dataLayer, navigator: { globalPrivacyControl: gpc } })
   const call = window.dataLayer.find((a: any) => a[0] === 'consent' && a[1] === 'default')
@@ -22,6 +22,10 @@ describe('consent mode defaults by geo', () => {
 
   it('grants everything in an implied-consent region', () => {
     expect(runDefault({ _geoImpliedConsent: true })).toMatchObject({ analytics_storage: 'granted', ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' })
+  })
+
+  it('keeps ad signals denied under implied consent with only the Sec-GPC header', () => {
+    expect(runDefault({ _geoImpliedConsent: true }, false, true)).toMatchObject({ analytics_storage: 'granted', ad_storage: 'denied' })
   })
 
   it('keeps ad signals denied under implied consent when GPC is on', () => {

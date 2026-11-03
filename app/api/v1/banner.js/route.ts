@@ -536,7 +536,8 @@ export async function GET(request: NextRequest) {
     // Combine into a single executable script
     const combinedScript = `
 (function() {
-  // 1. Initialize Consent Mode (Critical)
+  // 1. Initialize Consent Mode (Critical). Server GPC flag first so implied-consent defaults honor Sec-GPC.
+  window.__cbServerGpc = ${secGpc};
   ${consentInitJs}
 
   // 1b. Internal Analytics

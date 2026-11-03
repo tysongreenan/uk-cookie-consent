@@ -3622,7 +3622,7 @@ export const generateConsentInitScript = (config?: BannerConfigWithGeoOverrides)
   
   // Consent Mode defaults. DENIED unless the visitor's geo rule allows implied consent
   // (e.g. Canada outside Quebec). GPC still keeps ad signals denied under implied consent.
-  var __cbAd = ${implied ? `${gpcEnabled ? "navigator.globalPrivacyControl ? 'denied' : " : ''}'granted'` : "'denied'"};
+  var __cbAd = ${implied ? `${gpcEnabled ? "(navigator.globalPrivacyControl || window.__cbServerGpc) ? 'denied' : " : ''}'granted'` : "'denied'"};
   window.__cbConsentDefault = {
     'analytics_storage': ${implied ? "'granted'" : "'denied'"},
     'ad_storage': __cbAd,
