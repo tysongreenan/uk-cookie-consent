@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import vm from 'node:vm'
-import { generateConsentInitScript } from './banner-generator'
+import { generateBannerJS, generateConsentInitScript } from './banner-generator'
 import { applyGeoRule } from './geo-rules'
 
 // Runs the consent init block and returns the gtag('consent','default') payload.
@@ -52,4 +52,28 @@ describe('applyGeoRule (Well.ca setup: CA implied, CA-QC strict)', () => {
   })
   it('Canada with unknown region stays denied', () => expect(served('CA', '')._geoImpliedConsent).toBeUndefined())
   it('outside Canada stays denied', () => expect(served('US', 'NY')._geoImpliedConsent).toBeUndefined())
+})
+
+describe('geo language override (Quebec French)', () => {
+  const owner = {
+    compliance: {}, name: 'Test', position: 'bottom', theme: 'light', language: 'auto',
+    colors: { background: '#fff', text: '#111', button: '#3b82f6', buttonText: '#ffffff', link: '#3b82f6' },
+    text: { title: 'We use cookies', message: 'This website uses cookies.', acceptButton: 'Accept', rejectButton: 'Decline', preferencesButton: 'Preferences' },
+    behavior: { autoShow: true, dismissOnScroll: false, showPreferences: true, cookieExpiry: 365 },
+    branding: { logo: { enabled: false, url: '', position: 'left', maxWidth: 120, maxHeight: 40 }, privacyPolicy: { url: '', text: '', openInNewTab: true, required: false }, footerLink: { enabled: true, text: 'Cookie Settings', position: 'floating', floatingPosition: 'bottom-left', style: 'floating' } },
+    layout: { width: 'full', borderRadius: 8, padding: 20, margin: 20, shadow: 'medium', animation: 'fade' },
+    scripts: { strictlyNecessary: [], functionality: [], trackingPerformance: [], targetingAdvertising: [] },
+    advanced: { googleConsentMode: true, customCSS: '', customJS: '' },
+  }
+  const quebec: any[] = [{ id: '2', name: 'Quebec', country: 'CA', region: 'QC', enabled: true, overrides: { requiresOptIn: true, language: 'fr' } }]
+
+  it("shows French text in Quebec instead of the owner's English copy", () => {
+    const config: any = structuredClone(owner)
+    applyGeoRule(config, quebec, 'CA', 'QC')
+    const js = generateBannerJS(config)
+    const t = new Function(`return ${js.match(/var TRANSLATIONS = (\{[\s\S]*?\n\});\n/)![1]}`)()
+    expect(js).toMatch(/function detectLanguage\(\) \{\s*return "fr";/)
+    expect(t.fr).toMatchObject({ title: 'Nous utilisons des cookies', acceptButton: 'Accepter tout' })
+    expect(t.en).toMatchObject({ title: 'We use cookies', acceptButton: 'Accept' })
+  })
 })

@@ -3,6 +3,7 @@ import type {
   A11yTriggerPosition,
   AccessibilityConfig,
   BannerConfig,
+  BannerConfigWithGeoOverrides,
 } from '@/types'
 import {
   A11Y_INLINE_LANGUAGES,
@@ -213,7 +214,7 @@ export function bannerFontStack(family: unknown): string {
  * Returns null when the menu is disabled for this banner.
  */
 export function resolveA11yRuntimeConfig(
-  bannerConfig: BannerConfig,
+  bannerConfig: BannerConfigWithGeoOverrides,
   options: ResolveA11yOptions,
 ): A11yRuntimeConfig | null {
   const a11y = withA11yDefaults(bannerConfig.accessibility)
@@ -251,7 +252,8 @@ export function resolveA11yRuntimeConfig(
     strings[code] = A11Y_TRANSLATIONS[code]
     languageNames[code] = A11Y_LANGUAGE_NAMES[code]
   }
-  const requestedLang = a11y.panel.language || bannerConfig.language || 'en'
+  // A geo rule's language (e.g. French in Quebec) applies to the widget too, unless the panel sets its own.
+  const requestedLang = a11y.panel.language || bannerConfig._geoLanguage || bannerConfig.language || 'en'
   const lang = requestedLang === 'auto' || strings[requestedLang] ? requestedLang : 'en'
 
   return {

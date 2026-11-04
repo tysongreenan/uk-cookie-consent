@@ -20,7 +20,9 @@ export function applyGeoRule(config: any, geoRules: GeoRule[], visitorCountry: s
       config.behavior.dismissOnScroll = overrides.dismissOnScroll
     }
     if (overrides.language) {
-      config.language = overrides.language
+      // Don't overwrite config.language: it says which language the owner's custom text is in.
+      // Overwriting it served English custom copy as the "French" banner in Quebec.
+      config._geoLanguage = overrides.language
     }
     if (overrides.requiresOptIn) {
       // Strict opt-in: force reject button, disable scroll dismiss, hide close button

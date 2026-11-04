@@ -325,6 +325,8 @@ export interface AccessibilityConfig {
 export interface BannerConfigWithGeoOverrides extends BannerConfig {
   _geoRequiresOptIn?: boolean
   _geoImpliedConsent?: boolean
+  /** Language a geo rule shows the visitor. `language` stays the owner's, the language their custom text is in. */
+  _geoLanguage?: string
 }
 
 export interface TrackingScript {

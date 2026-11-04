@@ -1835,6 +1835,8 @@ var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
 // Detect GPC via client-side DOM property OR server-side Sec-GPC header (defense-in-depth per W3C spec)
 var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
 window.__cbGpcActive = GPC_ACTIVE;
+// What implied consent (e.g. Canada outside Quebec) grants before a choice. GPC keeps marketing off.
+function impliedConsent() { return { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE }; }
 
 ${ga4Integration}
 
@@ -2499,7 +2501,7 @@ var CATEGORY_OWNER_SELECTION = ${JSON.stringify((() => {
 })())};
 
 function detectLanguage() {
-  ${config.language === 'auto' ? `
+  ${(config._geoLanguage || config.language) === 'auto' ? `
   var htmlLang = (document.documentElement.lang || '').toLowerCase();
   var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
   var lang = htmlLang || browserLang;
@@ -2520,7 +2522,7 @@ function detectLanguage() {
   if (lang.startsWith('fi')) return 'fi';
   return 'en';
   ` : `
-  return ${JSON.stringify(config.language)};
+  return ${JSON.stringify(config._geoLanguage || config.language)};
   `}
 }
 
@@ -2534,6 +2536,12 @@ function applyTranslations() {
     container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
     if (lang === 'ar') container.style.textAlign = 'right';
   }
+
+  // Declare the shown language so screen readers read a French banner on an English page as French.
+  ['cookie-consent-banner', 'cookie-preferences-modal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.lang = lang;
+  });
 
   // Helper to set text by ID without destroying child HTML
   function setText(id, text) {
@@ -3061,6 +3069,9 @@ function showPreferencesModal() {
     loadConsentIntoModal(currentConsent);
   } else if (bannerConsent) {
     loadConsentIntoModal(bannerConsent);
+  } else if (GEO_IMPLIED_CONSENT) {
+    // No choice yet, but implied consent is already running scripts: show that, not "all off"
+    loadConsentIntoModal(impliedConsent());
   } else {
     loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
   }
@@ -3240,7 +3251,9 @@ function applyGpcModalState() {
     lockIcon.style.cssText = 'flex-shrink:0;';
     var noticeText = document.createElement('span');
     noticeText.style.cssText = 'font-size:13px;font-weight:500;';
-    noticeText.textContent = 'Global Privacy Control is active. Marketing cookies are automatically disabled.';
+    noticeText.textContent = detectLanguage() === 'fr'
+      ? 'Global Privacy Control est actif. Les cookies marketing sont désactivés automatiquement.'
+      : 'Global Privacy Control is active. Marketing cookies are automatically disabled.';
     noticeInner.appendChild(lockIcon);
     noticeInner.appendChild(noticeText);
     notice.appendChild(noticeInner);
@@ -3320,7 +3333,8 @@ function init() {
   // Geo-targeting: strict opt-in enforcement
   // When a geo rule requires opt-in, hide the close button so visitors must explicitly choose
   if (GEO_REQUIRES_OPT_IN && closeBtn) {
-    closeBtn.style.display = 'none';
+    // !important: the mobile stylesheet forces the X to display:flex !important
+    closeBtn.style.setProperty('display', 'none', 'important');
   }
 
   // Apply language translations
@@ -3568,10 +3582,10 @@ function init() {
   // Implied consent region (e.g. Canada outside Quebec): run scripts before a choice,
   // but don't save a cookie so the visitor can still accept/reject from the banner.
   if (GEO_IMPLIED_CONSENT) {
-    var impliedConsent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
-    loadScripts(impliedConsent);
+    var implied = impliedConsent();
+    loadScripts(implied);
     initGA4();
-    dispatchConsentUpdate(impliedConsent);
+    dispatchConsentUpdate(implied);
   }
 
   // No existing consent - show banner
