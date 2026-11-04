@@ -163,6 +163,10 @@ const alreadyOnPageCheck = (code: string): string | null => {
   if (gtm) return `document.querySelector('script[src*="gtm.js?id=${gtm}"]') || (window.google_tag_manager && window.google_tag_manager['${gtm}'])`
   const clarity = code.match(/["']clarity["']\s*,\s*["']script["']\s*,\s*["']([a-z0-9]+)["']/i)?.[1]
   if (clarity) return `document.querySelector('script[src*="clarity.ms/tag/${clarity}"]')`
+  // GA4 / Google Ads gtag snippet: skip if the site already loads this ID itself, or a second config sends duplicate page views.
+  const gtag = code.match(/gtag\/js\?id=([A-Z]{1,3}-[A-Z0-9]+)/i)?.[1]
+  // The dataLayer check also catches sites serving gtag from a first-party path (Google tag gateway).
+  if (gtag) return `document.querySelector('script[src*="gtag/js?id=${gtag}"]:not([data-cookie-banner-src])') || (window.google_tag_manager && window.google_tag_manager['${gtag}']) || (window.dataLayer || []).some(function(e) { return e && e[0] === 'config' && e[1] === '${gtag}'; })`
   return null
 }
 
@@ -189,14 +193,34 @@ const generateScriptLoaders = (
       // (GTM's j.src='…gtm.js?id='+i, Clarity's t.src="…/tag/"+i) or a <noscript><img src> is not a file.
       const srcMatch = script.scriptCode.match(/<script\b[^>]*\ssrc\s*=\s*["']([^"']+)["']/i)
       if (srcMatch) {
-        const srcLiteral = JSON.stringify(srcMatch[1])
         const nameLiteral = JSON.stringify(script.name)
+        // Snippets like GA4/Google Ads pair the <script src> with inline setup (gtag('config', …)).
+        // Without that inline part the library loads but never sends anything, so run it too, in the
+        // snippet's order: each inline part runs after the files before it have loaded
+        // (Vendor.init(…) needs its library), and each file loads after the code before it.
+        // split() with a capture group gives [code, src, code, src, …, code].
+        const parts = script.scriptCode.split(/<script\b[^>]*\ssrc\s*=\s*["']([^"']+)["'][^>]*>[\s\S]*?<\/script>/i)
+        const inject = (code: string, i: number) => {
+          const enc = encodeScriptCode(code)
+          return enc ? `injectInlineScript(${JSON.stringify(enc)}, ${nameLiteral}, ${JSON.stringify(`${varName}_${i}`)}); ` : ''
+        }
+        let load = inject(parts[parts.length - 1], parts.length - 1)
+        for (let i = parts.length - 2; i > 0; i -= 2) {
+          const src = JSON.stringify(parts[i])
+          load = load
+            ? `loadExternalScript(${src}, ${nameLiteral}, function() { ${load}}); `
+            : `loadExternalScript(${src}, ${nameLiteral}); `
+          load = inject(parts[i - 1], i - 1) + load
+        }
+        load = load.trim()
+        const onPage = alreadyOnPageCheck(script.scriptCode)
+        if (onPage) load = `if (${onPage}) { console.log('Already on the page, not loaded again:', ${nameLiteral}); } else { ${load} }`
 
         if (useLazy) {
           return `      // ${script.name} (External, scheduled)
     scheduleTask(function() {
       try {
-        loadExternalScript(${srcLiteral}, ${nameLiteral});
+        ${load}
       } catch(e) {
         console.error('Error scheduling external script ${script.name}:', e);
       }
@@ -205,7 +229,7 @@ const generateScriptLoaders = (
 
         return `      // ${script.name} (External)
     try {
-      loadExternalScript(${srcLiteral}, ${nameLiteral});
+      ${load}
     } catch(e) {
       console.error('Error loading external script ${script.name}:', e);
     }`
@@ -1998,8 +2022,20 @@ function scheduleTask(fn) {
   }
 }
 
-function loadExternalScript(src, name) {
-  if (injectedExternalScripts[src]) {
+// externalScriptState[src] is 'loading' until the file has run, then 'loaded'. Callbacks wait for
+// 'loaded', so init code never runs before its library, even when two snippets share a URL.
+// Own keys rather than injectedExternalScripts: an older banner.js on the same page sets that to
+// true before the file has loaded, so it can't say whether it's safe to run init code yet.
+var externalScriptState = window.__cookieBannerExternalState || (window.__cookieBannerExternalState = {});
+var externalScriptWaiters = window.__cookieBannerExternalWaiters || (window.__cookieBannerExternalWaiters = {});
+
+function loadExternalScript(src, name, onLoaded) {
+  if (externalScriptState[src] === 'loaded') {
+    if (onLoaded) onLoaded();
+    return;
+  }
+  if (onLoaded) (externalScriptWaiters[src] = externalScriptWaiters[src] || []).push(onLoaded);
+  if (externalScriptState[src] === 'loading') {
     return;
   }
 
@@ -2008,12 +2044,21 @@ function loadExternalScript(src, name) {
   scriptEl.src = src;
   scriptEl.setAttribute('data-cookie-banner-src', src);
   scriptEl.onload = function() {
+    externalScriptState[src] = 'loaded';
     injectedExternalScripts[src] = true;
+    var waiting = externalScriptWaiters[src] || [];
+    delete externalScriptWaiters[src];
+    for (var i = 0; i < waiting.length; i++) {
+      try { waiting[i](); } catch (e) { console.error('Error running code after', name, e); }
+    }
   };
   scriptEl.onerror = function(error) {
     delete injectedExternalScripts[src];
+    delete externalScriptState[src];
+    delete externalScriptWaiters[src];
     console.error('Error loading external script:', name, error);
   };
+  externalScriptState[src] = 'loading';
   injectedExternalScripts[src] = true;
   document.head.appendChild(scriptEl);
   console.log('Loading external script:', name);
@@ -3606,7 +3651,7 @@ function init() {
   hideFloatingButton();
   ` : ''}
   
-  ${config.behavior.dismissOnScroll ? `
+  ${config.behavior.dismissOnScroll && !(config.compliance?.requiresOptIn || config.compliance?.requiresExplicitConsent || config._geoRequiresOptIn) ? `
   var scrolled = false;
   window.addEventListener('scroll', function() {
     if (!scrolled && window.pageYOffset > 100) {
