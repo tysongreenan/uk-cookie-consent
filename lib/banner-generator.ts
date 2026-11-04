@@ -2008,11 +2008,23 @@ function injectInlineScript(encoded, name, cacheKey) {
   }
 
   try {
+    var dl = window.dataLayer;
     var scriptEl = document.createElement('script');
     scriptEl.setAttribute('data-cookie-banner-inline', cacheKey);
     scriptEl.textContent = atob(encoded);
     document.head.appendChild(scriptEl);
     injectedScripts[cacheKey] = true;
+    // Old pasted GA/GTM snippets end in "dataLayer = []", which wipes queued consent and GTM
+    // events and cuts GTM off the page. Keep the original array; carry over what the snippet queued.
+    if (Array.isArray(dl) && window.dataLayer !== dl) {
+      var fresh = window.dataLayer;
+      window.dataLayer = dl;
+      if (Array.isArray(fresh)) {
+        for (var i = 0; i < fresh.length; i++) {
+          if (dl.indexOf(fresh[i]) === -1) dl.push(fresh[i]);
+        }
+      }
+    }
     console.log('Loaded script:', name);
   } catch (error) {
     console.error('Error injecting inline script', name, error);
