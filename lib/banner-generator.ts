@@ -1835,6 +1835,8 @@ var GPC_ENABLED = ${Boolean(config.behavior?.gpc?.enabled ?? true)};
 // Detect GPC via client-side DOM property OR server-side Sec-GPC header (defense-in-depth per W3C spec)
 var GPC_ACTIVE = GPC_ENABLED && (!!navigator.globalPrivacyControl || !!window.__cbServerGpc);
 window.__cbGpcActive = GPC_ACTIVE;
+// What implied consent (e.g. Canada outside Quebec) grants before a choice. GPC keeps marketing off.
+function impliedConsent() { return { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE }; }
 
 ${ga4Integration}
 
@@ -3067,6 +3069,9 @@ function showPreferencesModal() {
     loadConsentIntoModal(currentConsent);
   } else if (bannerConsent) {
     loadConsentIntoModal(bannerConsent);
+  } else if (GEO_IMPLIED_CONSENT) {
+    // No choice yet, but implied consent is already running scripts: show that, not "all off"
+    loadConsentIntoModal(impliedConsent());
   } else {
     loadConsentIntoModal({ essential: true, functionality: false, analytics: false, marketing: false });
   }
@@ -3328,7 +3333,8 @@ function init() {
   // Geo-targeting: strict opt-in enforcement
   // When a geo rule requires opt-in, hide the close button so visitors must explicitly choose
   if (GEO_REQUIRES_OPT_IN && closeBtn) {
-    closeBtn.style.display = 'none';
+    // !important: the mobile stylesheet forces the X to display:flex !important
+    closeBtn.style.setProperty('display', 'none', 'important');
   }
 
   // Apply language translations
@@ -3576,10 +3582,10 @@ function init() {
   // Implied consent region (e.g. Canada outside Quebec): run scripts before a choice,
   // but don't save a cookie so the visitor can still accept/reject from the banner.
   if (GEO_IMPLIED_CONSENT) {
-    var impliedConsent = { essential: true, functionality: true, analytics: true, marketing: !GPC_ACTIVE };
-    loadScripts(impliedConsent);
+    var implied = impliedConsent();
+    loadScripts(implied);
     initGA4();
-    dispatchConsentUpdate(impliedConsent);
+    dispatchConsentUpdate(implied);
   }
 
   // No existing consent - show banner
