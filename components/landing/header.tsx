@@ -83,6 +83,12 @@ export function Header() {
             >
               Support
             </Link>
+            <Link
+              href="/status"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Status
+            </Link>
           </nav>
           
           <div className="flex items-center space-x-2">
@@ -151,6 +157,13 @@ export function Header() {
               className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
             >
               Support
+            </Link>
+            <Link
+              href="/status"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-4 py-3 text-base font-medium hover:bg-accent"
+            >
+              Status
             </Link>
             
             <div className="flex flex-col gap-2 pt-4">
