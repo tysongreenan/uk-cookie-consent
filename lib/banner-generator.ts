@@ -193,20 +193,27 @@ const generateScriptLoaders = (
       // (GTM's j.src='…gtm.js?id='+i, Clarity's t.src="…/tag/"+i) or a <noscript><img src> is not a file.
       const srcMatch = script.scriptCode.match(/<script\b[^>]*\ssrc\s*=\s*["']([^"']+)["']/i)
       if (srcMatch) {
-        const srcLiteral = JSON.stringify(srcMatch[1])
         const nameLiteral = JSON.stringify(script.name)
         // Snippets like GA4/Google Ads pair the <script src> with inline setup (gtag('config', …)).
         // Without that inline part the library loads but never sends anything, so run it too, in the
-        // snippet's order: code before the tag runs first (config vars), code after it once the file
-        // has loaded (Vendor.init(…) needs the library).
-        const [before, ...afterParts] = script.scriptCode.split(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/i)
-        const pre = encodeScriptCode(before)
-        const post = encodeScriptCode(afterParts.join('\n').replace(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/gi, ''))
+        // snippet's order: each inline part runs after the files before it have loaded
+        // (Vendor.init(…) needs its library), and each file loads after the code before it.
+        // split() with a capture group gives [code, src, code, src, …, code].
+        const parts = script.scriptCode.split(/<script\b[^>]*\ssrc\s*=\s*["']([^"']+)["'][^>]*>[\s\S]*?<\/script>/i)
+        const inject = (code: string, i: number) => {
+          const enc = encodeScriptCode(code)
+          return enc ? `injectInlineScript(${JSON.stringify(enc)}, ${nameLiteral}, ${JSON.stringify(`${varName}_${i}`)}); ` : ''
+        }
+        let load = inject(parts[parts.length - 1], parts.length - 1)
+        for (let i = parts.length - 2; i > 0; i -= 2) {
+          const src = JSON.stringify(parts[i])
+          load = load
+            ? `loadExternalScript(${src}, ${nameLiteral}, function() { ${load}}); `
+            : `loadExternalScript(${src}, ${nameLiteral}); `
+          load = inject(parts[i - 1], i - 1) + load
+        }
+        load = load.trim()
         const onPage = alreadyOnPageCheck(script.scriptCode)
-        let load = post
-          ? `loadExternalScript(${srcLiteral}, ${nameLiteral}, function() { injectInlineScript(${JSON.stringify(post)}, ${nameLiteral}, ${JSON.stringify(varName)}); });`
-          : `loadExternalScript(${srcLiteral}, ${nameLiteral});`
-        if (pre) load = `injectInlineScript(${JSON.stringify(pre)}, ${nameLiteral}, ${JSON.stringify(varName + '_pre')}); ${load}`
         if (onPage) load = `if (${onPage}) { console.log('Already on the page, not loaded again:', ${nameLiteral}); } else { ${load} }`
 
         if (useLazy) {
@@ -2015,9 +2022,17 @@ function scheduleTask(fn) {
   }
 }
 
+// injectedExternalScripts[src] is 'loading' until the file has run, then 'loaded'. Callbacks wait for
+// 'loaded', so init code never runs before its library, even when two snippets share a URL.
+var externalScriptWaiters = window.__cookieBannerExternalWaiters || (window.__cookieBannerExternalWaiters = {});
+
 function loadExternalScript(src, name, onLoaded) {
-  if (injectedExternalScripts[src]) {
+  if (injectedExternalScripts[src] === 'loaded' || injectedExternalScripts[src] === true) {
     if (onLoaded) onLoaded();
+    return;
+  }
+  if (onLoaded) (externalScriptWaiters[src] = externalScriptWaiters[src] || []).push(onLoaded);
+  if (injectedExternalScripts[src] === 'loading') {
     return;
   }
 
@@ -2026,14 +2041,19 @@ function loadExternalScript(src, name, onLoaded) {
   scriptEl.src = src;
   scriptEl.setAttribute('data-cookie-banner-src', src);
   scriptEl.onload = function() {
-    injectedExternalScripts[src] = true;
-    if (onLoaded) onLoaded();
+    injectedExternalScripts[src] = 'loaded';
+    var waiting = externalScriptWaiters[src] || [];
+    delete externalScriptWaiters[src];
+    for (var i = 0; i < waiting.length; i++) {
+      try { waiting[i](); } catch (e) { console.error('Error running code after', name, e); }
+    }
   };
   scriptEl.onerror = function(error) {
     delete injectedExternalScripts[src];
+    delete externalScriptWaiters[src];
     console.error('Error loading external script:', name, error);
   };
-  injectedExternalScripts[src] = true;
+  injectedExternalScripts[src] = 'loading';
   document.head.appendChild(scriptEl);
   console.log('Loading external script:', name);
 }

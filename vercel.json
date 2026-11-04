@@ -22,6 +22,9 @@
     },
     "app/api/scripts/discover/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/cron/banner-health/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [

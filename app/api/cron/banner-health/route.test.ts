@@ -1,77 +1,108 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const sent: string[] = []
-const logged: string[] = []
-let dbRow: { id: string } | null = { id: 'b1' }
+// In-memory stand-ins for the DB, the audit log and email.
+let rows: { id: number; action: string; created_at: string }[] = []
+let nextId = 1
 let dbDown = false
-let recentAlerts: object[] = []
-vi.mock('@/lib/email', () => ({ sendEmail: async (o: { to: string }) => { sent.push(o.to); return true } }))
+let insertFails = false
+let emailWorks = true
+const sent: string[] = []
+vi.mock('@/lib/email', () => ({ sendEmail: async (o: { to: string; subject: string }) => { if (emailWorks) sent.push(o.subject); return emailWorks } }))
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: (table: string) => {
       const q: any = {}
-      for (const m of ['select', 'eq', 'gte', 'order', 'limit', 'abortSignal']) q[m] = () => q
-      q.maybeSingle = async () => (dbDown ? { data: null, error: { message: 'invalid api key' } } : { data: dbRow, error: dbRow ? null : { message: 'none' } })
-      // audit_log reads are awaited straight off the builder
-      q.then = (ok: (v: unknown) => unknown) => ok(dbDown ? { data: null, error: { message: 'invalid api key' } } : { data: table === 'audit_log' ? recentAlerts : [], error: null })
-      q.insert = (row: { action: string }) => { logged.push(row.action); return Promise.resolve({ error: null }) }
-      return q
+      for (const m of ['select', 'eq', 'in', 'order', 'limit', 'abortSignal', 'single']) q[m] = () => q
+      const fail = { data: null, error: { message: 'invalid api key' } }
+      q.maybeSingle = async () => (dbDown ? fail : { data: { id: 'b1' }, error: null })
+      q.then = (ok: (v: unknown) => unknown) => ok(dbDown ? fail : { data: [...rows].reverse().slice(0, 1), error: null })
+      q.insert = (row: { action: string }) => {
+        const r = { then: (ok: (v: unknown) => unknown) => {
+          if (dbDown || insertFails) return ok(fail)
+          const rec = { id: nextId++, action: row.action, created_at: new Date().toISOString() }
+          rows.push(rec)
+          return ok({ data: { id: rec.id }, error: null })
+        } } as any
+        r.select = () => r; r.single = () => r
+        return r
+      }
+      q.delete = () => ({ eq: (_c: string, id: number) => { rows = rows.filter((r) => r.id !== id); return Promise.resolve({ error: null }) } })
+      return table === 'audit_log' || table === 'SimpleBanners' ? q : q
     },
   }),
 }))
 
-const call = async () => {
+const run = async (at: string, bannerUp: boolean) => {
+  vi.setSystemTime(new Date(at))
+  vi.stubGlobal('fetch', async () => (bannerUp ? new Response('document.getElementById("cookie-consent-banner")') : new Response('nope', { status: 404 })))
   const { GET } = await import('./route')
   const { NextRequest } = await import('next/server')
-  return GET(new NextRequest('https://x/api/cron/banner-health', { headers: { authorization: 'Bearer s' } }))
+  return (await GET(new NextRequest('https://x/api/cron/banner-health', { headers: { authorization: 'Bearer s' } }))).status
 }
+const failed = () => sent.filter((s) => s.includes('failed')).length
+const recovered = () => sent.filter((s) => s.includes('again')).length
 
 describe('banner health cron', () => {
   beforeEach(() => {
-    sent.length = 0
-    logged.length = 0
-    dbRow = { id: 'b1' }
-    dbDown = false
-    recentAlerts = []
-    Object.assign(process.env, { CRON_SECRET: 's', ADMIN_EMAILS: 'a@x.com, b@x.com', NEXT_PUBLIC_SUPABASE_URL: 'https://s', SUPABASE_SERVICE_ROLE_KEY: 'k' })
+    vi.useFakeTimers({ toFake: ['Date'] })
+    rows = []; nextId = 1; dbDown = false; insertFails = false; emailWorks = true; sent.length = 0
+    Object.assign(process.env, { CRON_SECRET: 's', ADMIN_EMAILS: 'a@x.com', NEXT_PUBLIC_SUPABASE_URL: 'https://s', SUPABASE_SERVICE_ROLE_KEY: 'k' })
   })
   afterEach(() => vi.useRealTimers())
 
-  it('stays quiet when banner.js serves a banner', async () => {
-    vi.stubGlobal('fetch', async () => new Response('var x; document.getElementById("cookie-consent-banner")'))
-    expect((await call()).status).toBe(200)
+  it('stays quiet while healthy', async () => {
+    expect(await run('2026-11-04T12:00:00Z', true)).toBe(200)
     expect(sent).toEqual([])
   })
 
-  it('emails every admin once when banner.js fails, and records the alert', async () => {
-    vi.stubGlobal('fetch', async () => new Response('not found', { status: 404 }))
-    expect((await call()).status).toBe(500)
-    expect(sent).toEqual(['a@x.com', 'b@x.com'])
-    expect(logged).toEqual(['health.banner_alert'])
+  it('alerts once per incident, reminds after 6 hours, and sends an all-clear', async () => {
+    expect(await run('2026-11-04T12:00:00Z', false)).toBe(500)
+    await run('2026-11-04T12:10:00Z', false)
+    await run('2026-11-04T17:50:00Z', false)
+    expect(failed()).toBe(1)
+    await run('2026-11-04T18:10:00Z', false)
+    expect(failed()).toBe(2)
+    expect(await run('2026-11-04T18:20:00Z', true)).toBe(200)
+    expect(recovered()).toBe(1)
   })
 
-  it('does not email again within 6 hours of the last alert', async () => {
-    vi.stubGlobal('fetch', async () => new Response('not found', { status: 404 }))
-    recentAlerts = [{ created_at: new Date().toISOString() }]
-    expect((await call()).status).toBe(500)
-    expect(sent).toEqual([])
+  it('alerts again for a new outage right after a recovery', async () => {
+    await run('2026-11-04T12:00:00Z', false)
+    await run('2026-11-04T12:10:00Z', true)
+    await run('2026-11-04T12:20:00Z', false)
+    expect(failed()).toBe(2)
+  })
+
+  it('retries next run when the email did not go out', async () => {
+    emailWorks = false
+    await run('2026-11-04T12:00:00Z', false)
+    emailWorks = true
+    await run('2026-11-04T12:10:00Z', false)
+    expect(failed()).toBe(1)
+  })
+
+  it('falls back to one email an hour when the log cannot be written', async () => {
+    insertFails = true
+    await run('2026-11-04T12:05:00Z', false)
+    await run('2026-11-04T12:15:00Z', false)
+    await run('2026-11-04T12:25:00Z', false)
+    await run('2026-11-04T13:05:00Z', false)
+    expect(failed()).toBe(2)
+  })
+
+  it('falls back to one email an hour when the database is down', async () => {
+    dbDown = true
+    await run('2026-11-04T15:05:00Z', true)
+    await run('2026-11-04T15:25:00Z', true)
+    expect(failed()).toBe(1)
   })
 
   it('treats a hung banner.js as a failure', async () => {
+    vi.setSystemTime(new Date('2026-11-04T12:00:00Z'))
     vi.stubGlobal('fetch', async () => { throw new DOMException('The operation was aborted due to timeout', 'TimeoutError') })
-    expect((await call()).status).toBe(500)
-    expect(sent).toHaveLength(2)
-  })
-
-  it('when the database is down, emails on the first run of each hour only', async () => {
-    dbDown = true
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-11-04T15:05:00Z'))
-    expect((await call()).status).toBe(500)
-    expect(sent).toHaveLength(2)
-    sent.length = 0
-    vi.setSystemTime(new Date('2026-11-04T15:25:00Z'))
-    expect((await call()).status).toBe(500)
-    expect(sent).toEqual([])
+    const { GET } = await import('./route')
+    const { NextRequest } = await import('next/server')
+    expect((await GET(new NextRequest('https://x/api/cron/banner-health', { headers: { authorization: 'Bearer s' } }))).status).toBe(500)
+    expect(failed()).toBe(1)
   })
 })

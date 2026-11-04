@@ -110,6 +110,34 @@ describe('pasted script loaders', () => {
     expect(w.calls).toEqual(['window._v = { id: 1 };', 'EXTERNAL https://cdn.example.com/v.js', 'Vendor.init(window._v);'])
   })
 
+  it('loads every file of a multi-file snippet, each after the one before it', () => {
+    const multi = `<script src="https://cdn.example.com/core.js"></script><script src="https://cdn.example.com/plugin.js"></script><script>Plugin.init();</script>`
+    const js2 = generateBannerJS({ ...config, scripts: { ...config.scripts, trackingPerformance: [script('Multi', multi)] } } as unknown as BannerConfig)
+    const fn = js2.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
+    const w = (globalThis as any).jsdom.window
+    w.eval(`var calls = [];
+      function injectInlineScript(enc, name) { calls.push(decodeURIComponent(escape(atob(enc)))); }
+      function loadExternalScript(src, name, onLoaded) { calls.push('EXTERNAL ' + src); if (onLoaded) onLoaded(); }
+      function scheduleTask(fn) { fn(); }
+      ${fn}
+      loadScripts({ essential: true, functionality: true, analytics: true, marketing: true });`)
+    expect(w.calls).toEqual(['EXTERNAL https://cdn.example.com/core.js', 'EXTERNAL https://cdn.example.com/plugin.js', 'Plugin.init();'])
+  })
+
+  it('holds init code until a shared file has actually loaded', () => {
+    const w = (globalThis as any).jsdom.window
+    const loader = js.match(/var externalScriptWaiters[\s\S]*?\nfunction injectInlineScript/)![0].replace(/\nfunction injectInlineScript$/, '')
+    w.eval(`var injectedExternalScripts = {}; var order = []; window.__cookieBannerExternalWaiters = {};
+      ${loader}
+      loadExternalScript('https://cdn.example.com/shared.js', 'A', function() { order.push('A init'); });
+      loadExternalScript('https://cdn.example.com/shared.js', 'B', function() { order.push('B init'); });
+      order.push('before load');
+      document.querySelector('script[data-cookie-banner-src="https://cdn.example.com/shared.js"]').onload();
+      loadExternalScript('https://cdn.example.com/shared.js', 'C', function() { order.push('C init'); });`)
+    expect(w.order).toEqual(['before load', 'A init', 'B init', 'C init'])
+    expect(w.document.querySelectorAll('script[data-cookie-banner-src]').length).toBe(1)
+  })
+
   it('skips a GA4 snippet when the site already loads that tag itself', () => {
     const calls = load('<script async src="https://www.googletagmanager.com/gtag/js?id=G-FULL123"></script>')
     expect(calls['GA4 full']).toBeUndefined()
