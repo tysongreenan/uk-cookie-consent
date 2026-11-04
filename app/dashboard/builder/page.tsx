@@ -4038,10 +4038,16 @@ function BannerBuilderContent() {
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="dismiss-scroll"
-                        checked={config.behavior.dismissOnScroll}
+                        checked={config.behavior.dismissOnScroll && !config.compliance?.requiresOptIn}
+                        disabled={!!config.compliance?.requiresOptIn}
                         onCheckedChange={(checked) => updateConfig('behavior', { dismissOnScroll: checked })}
                       />
-                      <Label htmlFor="dismiss-scroll">Dismiss on scroll</Label>
+                      <Label htmlFor="dismiss-scroll">
+                        Dismiss on scroll
+                        {config.compliance?.requiresOptIn && (
+                          <span className="ml-1 text-xs text-muted-foreground">(off: scrolling isn&apos;t consent under opt-in rules)</span>
+                        )}
+                      </Label>
                     </div>
 
                     <div className="space-y-1">

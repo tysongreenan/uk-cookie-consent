@@ -36,6 +36,10 @@
     {
       "path": "/api/cron/consent-partitions",
       "schedule": "0 4 20 * *"
+    },
+    {
+      "path": "/api/cron/banner-health",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

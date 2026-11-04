@@ -163,6 +163,10 @@ const alreadyOnPageCheck = (code: string): string | null => {
   if (gtm) return `document.querySelector('script[src*="gtm.js?id=${gtm}"]') || (window.google_tag_manager && window.google_tag_manager['${gtm}'])`
   const clarity = code.match(/["']clarity["']\s*,\s*["']script["']\s*,\s*["']([a-z0-9]+)["']/i)?.[1]
   if (clarity) return `document.querySelector('script[src*="clarity.ms/tag/${clarity}"]')`
+  // GA4 / Google Ads gtag snippet: skip if the site already loads this ID itself, or a second config sends duplicate page views.
+  const gtag = code.match(/gtag\/js\?id=([A-Z]{1,3}-[A-Z0-9]+)/i)?.[1]
+  // The dataLayer check also catches sites serving gtag from a first-party path (Google tag gateway).
+  if (gtag) return `document.querySelector('script[src*="gtag/js?id=${gtag}"]:not([data-cookie-banner-src])') || (window.google_tag_manager && window.google_tag_manager['${gtag}']) || (window.dataLayer || []).some(function(e) { return e && e[0] === 'config' && e[1] === '${gtag}'; })`
   return null
 }
 
@@ -191,12 +195,19 @@ const generateScriptLoaders = (
       if (srcMatch) {
         const srcLiteral = JSON.stringify(srcMatch[1])
         const nameLiteral = JSON.stringify(script.name)
+        // Snippets like GA4/Google Ads pair the <script src> with inline setup (gtag('config', …)).
+        // Without that inline part the library loads but never sends anything, so run it too.
+        const inlineRest = encodeScriptCode(script.scriptCode.replace(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/gi, ''))
+        const onPage = alreadyOnPageCheck(script.scriptCode)
+        let load = `loadExternalScript(${srcLiteral}, ${nameLiteral});`
+        if (inlineRest) load = `injectInlineScript(${JSON.stringify(inlineRest)}, ${nameLiteral}, ${JSON.stringify(varName)}); ${load}`
+        if (onPage) load = `if (${onPage}) { console.log('Already on the page, not loaded again:', ${nameLiteral}); } else { ${load} }`
 
         if (useLazy) {
           return `      // ${script.name} (External, scheduled)
     scheduleTask(function() {
       try {
-        loadExternalScript(${srcLiteral}, ${nameLiteral});
+        ${load}
       } catch(e) {
         console.error('Error scheduling external script ${script.name}:', e);
       }
@@ -205,7 +216,7 @@ const generateScriptLoaders = (
 
         return `      // ${script.name} (External)
     try {
-      loadExternalScript(${srcLiteral}, ${nameLiteral});
+      ${load}
     } catch(e) {
       console.error('Error loading external script ${script.name}:', e);
     }`
@@ -3606,7 +3617,7 @@ function init() {
   hideFloatingButton();
   ` : ''}
   
-  ${config.behavior.dismissOnScroll ? `
+  ${config.behavior.dismissOnScroll && !(config.compliance?.requiresOptIn || config.compliance?.requiresExplicitConsent || config._geoRequiresOptIn) ? `
   var scrolled = false;
   window.addEventListener('scroll', function() {
     if (!scrolled && window.pageYOffset > 100) {

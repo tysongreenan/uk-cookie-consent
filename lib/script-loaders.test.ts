@@ -10,6 +10,15 @@ const GTM = `<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':n
 const CLARITY = `<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "abc123xyz0");</script>`
 const LINKEDIN = `<script type="text/javascript">_linkedin_partner_id = "123456"; window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || []; window._linkedin_data_partner_ids.push(_linkedin_partner_id);</script><script type="text/javascript">(function(l) { if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])}; window.lintrk.q=[]} var s = document.getElementsByTagName("script")[0]; var b = document.createElement("script"); b.type = "text/javascript";b.async = true; b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js"; s.parentNode.insertBefore(b, s);})(window.lintrk);</script><noscript><img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=123456&fmt=gif" /></noscript>`
 const GA4 = `<script async src="https://www.googletagmanager.com/gtag/js?id=G-ABC1234"></script>`
+// Google's standard GA4 snippet: the library plus the inline config that makes it send anything.
+const GA4_FULL = `<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FULL123"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FULL123');
+</script>`
 
 const script = (name: string, scriptCode: string) => ({ id: name, name, scriptCode, enabled: true, category: 'trackingPerformance' }) as unknown as TrackingScript
 
@@ -31,7 +40,7 @@ const config = {
   scripts: {
     strictlyNecessary: [],
     functionality: [],
-    trackingPerformance: [script('GTM', GTM), script('Clarity', CLARITY), script('LinkedIn', LINKEDIN), script('GA4', GA4)],
+    trackingPerformance: [script('GTM', GTM), script('Clarity', CLARITY), script('LinkedIn', LINKEDIN), script('GA4', GA4), script('GA4 full', GA4_FULL)],
     targetingAdvertising: [],
   },
   advanced: { googleConsentMode: true, customCSS: '', customJS: '' },
@@ -42,7 +51,9 @@ const js = generateBannerJS(config)
 // Run the generated loadScripts in the page and record what it would load.
 function load(pageHtml = '') {
   const w = (globalThis as any).jsdom.window
+  w.dataLayer = undefined
   w.document.head.innerHTML = pageHtml
+  for (const el of w.document.head.querySelectorAll('script:not([src])')) w.eval(el.textContent)
   const fn = js.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
   w.eval(`var calls = [];
     function injectInlineScript(enc, name) { calls.push([name, decodeURIComponent(escape(atob(enc)))]); }
@@ -50,7 +61,9 @@ function load(pageHtml = '') {
     function scheduleTask(fn) { fn(); }
     ${fn}
     loadScripts({ essential: true, functionality: true, analytics: true, marketing: true });`)
-  return Object.fromEntries(w.calls as [string, string][])
+  const out: Record<string, string> = {}
+  for (const [name, what] of w.calls as [string, string][]) out[name] = out[name] ? out[name] + '\n' + what : what
+  return out
 }
 
 describe('pasted script loaders', () => {
@@ -72,5 +85,35 @@ describe('pasted script loaders', () => {
     expect(calls.GTM).toBeUndefined()
     expect(calls.Clarity).toBeUndefined()
     expect(calls.LinkedIn).toContain('insight.min.js')
+  })
+
+  it('runs the inline gtag config of a GA4 snippet as well as loading gtag.js', () => {
+    const [inline, external] = load()['GA4 full'].split('\n' + 'EXTERNAL ')
+    expect(inline).toContain("gtag('config', 'G-FULL123')")
+    expect(inline).not.toContain('<script')
+    expect(external).toBe('https://www.googletagmanager.com/gtag/js?id=G-FULL123')
+  })
+
+  it('skips a GA4 snippet when the site already loads that tag itself', () => {
+    const calls = load('<script async src="https://www.googletagmanager.com/gtag/js?id=G-FULL123"></script>')
+    expect(calls['GA4 full']).toBeUndefined()
+    expect(calls.GA4).toBe('EXTERNAL https://www.googletagmanager.com/gtag/js?id=G-ABC1234')
+  })
+
+  it('skips a GA4 snippet when the site already configured that ID from a first-party gtag path', () => {
+    const calls = load(
+      `<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-FULL123');</script>`,
+    )
+    expect(calls['GA4 full']).toBeUndefined()
+  })
+})
+
+describe('dismiss on scroll', () => {
+  const withScroll = (compliance: object) =>
+    generateBannerJS({ ...config, compliance, behavior: { ...config.behavior, dismissOnScroll: true } } as unknown as BannerConfig)
+
+  it('never hides an opt-in banner on scroll, since scrolling is not consent', () => {
+    expect(withScroll({ framework: 'gdpr', requiresOptIn: true })).not.toContain('window.pageYOffset > 100')
+    expect(withScroll({ framework: 'pipeda', requiresOptIn: false })).toContain('window.pageYOffset > 100')
   })
 })
