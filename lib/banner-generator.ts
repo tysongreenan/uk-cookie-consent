@@ -9,9 +9,10 @@ import { resolveButtonPlacement } from '@/lib/banner-placement'
 const encodeScriptCode = (scriptCode: string): string => {
   if (!scriptCode || !scriptCode.trim()) return ''
   
-  // Remove HTML comments and script tags
+  // Remove HTML comments, <noscript> fallbacks (HTML, not JS) and script tags
   let clean = scriptCode
     .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, '')
     .replace(/<script[^>]*>/gi, '')
     .replace(/<\/script>/gi, '')
     .trim()
@@ -154,6 +155,17 @@ function generateFloatingButtonContent(config: any): string {
   return content
 }
 
+// JS condition that is true when the page already loads this tag itself. Many sites hard-code the
+// same GTM container or Clarity project they pasted here; running it twice double-counts page views.
+// shortcut: only GTM and Clarity are detected (the duplicates seen in production); add vendors as they show up.
+const alreadyOnPageCheck = (code: string): string | null => {
+  const gtm = code.includes('gtm.js') ? code.match(/GTM-[A-Z0-9]+/)?.[0] : undefined
+  if (gtm) return `document.querySelector('script[src*="gtm.js?id=${gtm}"]') || (window.google_tag_manager && window.google_tag_manager['${gtm}'])`
+  const clarity = code.match(/["']clarity["']\s*,\s*["']script["']\s*,\s*["']([a-z0-9]+)["']/i)?.[1]
+  if (clarity) return `document.querySelector('script[src*="clarity.ms/tag/${clarity}"]')`
+  return null
+}
+
 // Helper function to generate script loading code
 const generateScriptLoaders = (
   scripts: TrackingScript[],
@@ -173,8 +185,9 @@ const generateScriptLoaders = (
     const isExternalScript = script.scriptCode.includes('src=') || script.scriptCode.includes('http')
     
     if (isExternalScript) {
-      // Handle external scripts
-      const srcMatch = script.scriptCode.match(/src=["']([^"']+)["']/)
+      // Handle external scripts. Only a <script src> attribute counts: a src= inside inline JS
+      // (GTM's j.src='…gtm.js?id='+i, Clarity's t.src="…/tag/"+i) or a <noscript><img src> is not a file.
+      const srcMatch = script.scriptCode.match(/<script\b[^>]*\ssrc\s*=\s*["']([^"']+)["']/i)
       if (srcMatch) {
         const srcLiteral = JSON.stringify(srcMatch[1])
         const nameLiteral = JSON.stringify(script.name)
@@ -200,26 +213,28 @@ const generateScriptLoaders = (
     }
     
     // Handle inline scripts - decode Base64 and execute
+    const encodedLiteral = JSON.stringify(escaped)
+    const nameLiteral = JSON.stringify(script.name)
+    const cacheLiteral = JSON.stringify(varName)
+    const onPage = alreadyOnPageCheck(script.scriptCode)
+    const inject = onPage
+      ? `if (${onPage}) { console.log('Already on the page, not loaded again:', ${nameLiteral}); } else { injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral}); }`
+      : `injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral});`
+
     if (useLazy) {
-      const encodedLiteral = JSON.stringify(escaped)
-      const nameLiteral = JSON.stringify(script.name)
-      const cacheLiteral = JSON.stringify(varName)
       return `      // ${script.name} (scheduled)
     scheduleTask(function() {
       try {
-        injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral});
+        ${inject}
       } catch(e) {
         console.error('Error scheduling ${script.name}:', e);
       }
     });`
     }
 
-    const encodedLiteral = JSON.stringify(escaped)
-    const nameLiteral = JSON.stringify(script.name)
-    const cacheLiteral = JSON.stringify(varName)
     return `      // ${script.name}
     try {
-      injectInlineScript(${encodedLiteral}, ${nameLiteral}, ${cacheLiteral});
+      ${inject}
     } catch(e) {
       console.error('Error loading ${script.name}:', e);
     }`
