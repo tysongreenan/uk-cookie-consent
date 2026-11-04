@@ -196,11 +196,17 @@ const generateScriptLoaders = (
         const srcLiteral = JSON.stringify(srcMatch[1])
         const nameLiteral = JSON.stringify(script.name)
         // Snippets like GA4/Google Ads pair the <script src> with inline setup (gtag('config', …)).
-        // Without that inline part the library loads but never sends anything, so run it too.
-        const inlineRest = encodeScriptCode(script.scriptCode.replace(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/gi, ''))
+        // Without that inline part the library loads but never sends anything, so run it too, in the
+        // snippet's order: code before the tag runs first (config vars), code after it once the file
+        // has loaded (Vendor.init(…) needs the library).
+        const [before, ...afterParts] = script.scriptCode.split(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/i)
+        const pre = encodeScriptCode(before)
+        const post = encodeScriptCode(afterParts.join('\n').replace(/<script\b[^>]*\ssrc\s*=[^>]*>[\s\S]*?<\/script>/gi, ''))
         const onPage = alreadyOnPageCheck(script.scriptCode)
-        let load = `loadExternalScript(${srcLiteral}, ${nameLiteral});`
-        if (inlineRest) load = `injectInlineScript(${JSON.stringify(inlineRest)}, ${nameLiteral}, ${JSON.stringify(varName)}); ${load}`
+        let load = post
+          ? `loadExternalScript(${srcLiteral}, ${nameLiteral}, function() { injectInlineScript(${JSON.stringify(post)}, ${nameLiteral}, ${JSON.stringify(varName)}); });`
+          : `loadExternalScript(${srcLiteral}, ${nameLiteral});`
+        if (pre) load = `injectInlineScript(${JSON.stringify(pre)}, ${nameLiteral}, ${JSON.stringify(varName + '_pre')}); ${load}`
         if (onPage) load = `if (${onPage}) { console.log('Already on the page, not loaded again:', ${nameLiteral}); } else { ${load} }`
 
         if (useLazy) {
@@ -2009,8 +2015,9 @@ function scheduleTask(fn) {
   }
 }
 
-function loadExternalScript(src, name) {
+function loadExternalScript(src, name, onLoaded) {
   if (injectedExternalScripts[src]) {
+    if (onLoaded) onLoaded();
     return;
   }
 
@@ -2020,6 +2027,7 @@ function loadExternalScript(src, name) {
   scriptEl.setAttribute('data-cookie-banner-src', src);
   scriptEl.onload = function() {
     injectedExternalScripts[src] = true;
+    if (onLoaded) onLoaded();
   };
   scriptEl.onerror = function(error) {
     delete injectedExternalScripts[src];

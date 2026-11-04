@@ -57,7 +57,7 @@ function load(pageHtml = '') {
   const fn = js.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
   w.eval(`var calls = [];
     function injectInlineScript(enc, name) { calls.push([name, decodeURIComponent(escape(atob(enc)))]); }
-    function loadExternalScript(src, name) { calls.push([name, 'EXTERNAL ' + src]); }
+    function loadExternalScript(src, name, onLoaded) { calls.push([name, 'EXTERNAL ' + src]); if (onLoaded) onLoaded(); }
     function scheduleTask(fn) { fn(); }
     ${fn}
     loadScripts({ essential: true, functionality: true, analytics: true, marketing: true });`)
@@ -87,11 +87,27 @@ describe('pasted script loaders', () => {
     expect(calls.LinkedIn).toContain('insight.min.js')
   })
 
-  it('runs the inline gtag config of a GA4 snippet as well as loading gtag.js', () => {
-    const [inline, external] = load()['GA4 full'].split('\n' + 'EXTERNAL ')
+  it('runs the inline gtag config of a GA4 snippet once gtag.js has loaded', () => {
+    const out = load()['GA4 full']
+    const external = out.slice(0, out.indexOf('\n'))
+    const inline = out.slice(out.indexOf('\n') + 1)
+    expect(external).toBe('EXTERNAL https://www.googletagmanager.com/gtag/js?id=G-FULL123')
     expect(inline).toContain("gtag('config', 'G-FULL123')")
     expect(inline).not.toContain('<script')
-    expect(external).toBe('https://www.googletagmanager.com/gtag/js?id=G-FULL123')
+  })
+
+  it('keeps snippet order: setup before the tag runs first, init after it runs after the file loads', () => {
+    const vendor = `<script>window._v = { id: 1 };</script><script src="https://cdn.example.com/v.js"></script><script>Vendor.init(window._v);</script>`
+    const js2 = generateBannerJS({ ...config, scripts: { ...config.scripts, trackingPerformance: [script('Vendor', vendor)] } } as unknown as BannerConfig)
+    const fn = js2.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
+    const w = (globalThis as any).jsdom.window
+    w.eval(`var calls = [];
+      function injectInlineScript(enc, name) { calls.push(decodeURIComponent(escape(atob(enc)))); }
+      function loadExternalScript(src, name, onLoaded) { calls.push('EXTERNAL ' + src); if (onLoaded) onLoaded(); }
+      function scheduleTask(fn) { fn(); }
+      ${fn}
+      loadScripts({ essential: true, functionality: true, analytics: true, marketing: true });`)
+    expect(w.calls).toEqual(['window._v = { id: 1 };', 'EXTERNAL https://cdn.example.com/v.js', 'Vendor.init(window._v);'])
   })
 
   it('skips a GA4 snippet when the site already loads that tag itself', () => {
