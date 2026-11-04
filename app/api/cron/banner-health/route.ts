@@ -65,17 +65,19 @@ async function lastIncidentRow(supabase: SupabaseClient | null) {
   }
 }
 
-/** Writes an incident row; returns its id, or null if the write failed. */
-async function record(supabase: SupabaseClient | null, action: string, problem?: string): Promise<number | null> {
-  if (!supabase) return null
+/**
+ * Writes an incident row tagged with a unique token. 'saved' and 'failed' are definite; 'unknown'
+ * means it timed out and may still commit later, so callers must not treat it as either.
+ */
+async function record(supabase: SupabaseClient | null, action: string, token: string, problem?: string): Promise<'saved' | 'failed' | 'unknown'> {
+  if (!supabase) return 'failed'
   try {
-    const { data, error } = await withTimeout(
-      supabase.from('audit_log').insert({ user_id: null, action, metadata: problem ? { problem } : {} }).select('id').single(),
-      { data: null, error: { message: 'timeout' } } as any,
+    return await withTimeout<'saved' | 'failed' | 'unknown'>(
+      supabase.from('audit_log').insert({ user_id: null, action, metadata: { token, ...(problem ? { problem } : {}) } }).then(({ error }) => (error ? 'failed' : 'saved')),
+      'unknown',
     )
-    return error || !data ? null : (data as { id: number }).id
   } catch {
-    return null
+    return 'failed'
   }
 }
 
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
   const last = await lastIncidentRow(supabase)
 
   if (!problem) {
-    if (last?.action === ALERT && (await record(supabase, RECOVERED)) !== null) {
+    if (last?.action === ALERT && (await record(supabase, RECOVERED, crypto.randomUUID())) === 'saved') {
       await notify('cookie-banner.ca: banners are loading again', `The banner health check passes again as of ${now.toISOString()}.`)
     }
     return NextResponse.json({ ok: true })
@@ -120,9 +122,11 @@ export async function GET(request: NextRequest) {
 
   // Claim the alert first. If the log can't be read or written (often the DB is what's broken),
   // fall back to the clock: only the run in the first 10 minutes of each hour emails.
+  // A claim that timed out may still commit, so email anyway: a duplicate beats silence.
   // shortcut: a late or overlapping cron run can skip or repeat that hourly email.
-  const claimId = last === undefined ? null : await record(supabase, ALERT, problem)
-  if (claimId === null && now.getUTCMinutes() >= 10) {
+  const token = crypto.randomUUID()
+  const claim = last === undefined ? 'failed' : await record(supabase, ALERT, token, problem)
+  if (claim === 'failed' && now.getUTCMinutes() >= 10) {
     return NextResponse.json({ ok: false, problem, alerted: false }, { status: 500 })
   }
 
@@ -131,8 +135,9 @@ export async function GET(request: NextRequest) {
     `${problem}\n\nCustomer banners may not be loading. Checked ${now.toISOString()}. You'll get a reminder every 6 hours while this keeps failing, and an all-clear when it recovers.`,
   )
   // Nobody got it: drop the claim so the next run tries again.
-  if (!delivered && claimId !== null && supabase) {
-    await withTimeout(supabase.from('audit_log').delete().eq('id', claimId), null)
+  // shortcut: a timed-out claim that commits after this delete still mutes alerts for 6 hours (needs a >6s insert and a failed email).
+  if (!delivered && claim !== 'failed' && supabase) {
+    await withTimeout(supabase.from('audit_log').delete().eq('metadata->>token', token), null)
   }
   return NextResponse.json({ ok: false, problem, alerted: delivered }, { status: 500 })
 }

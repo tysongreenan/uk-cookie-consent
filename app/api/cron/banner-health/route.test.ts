@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // In-memory stand-ins for the DB, the audit log and email.
-let rows: { id: number; action: string; created_at: string }[] = []
+let rows: { id: number; action: string; created_at: string; token: string }[] = []
 let nextId = 1
 let dbDown = false
 let insertFails = false
+let insertHangs = false
 let emailWorks = true
 const sent: string[] = []
 vi.mock('@/lib/email', () => ({ sendEmail: async (o: { to: string; subject: string }) => { if (emailWorks) sent.push(o.subject); return emailWorks } }))
@@ -16,17 +17,15 @@ vi.mock('@supabase/supabase-js', () => ({
       const fail = { data: null, error: { message: 'invalid api key' } }
       q.maybeSingle = async () => (dbDown ? fail : { data: { id: 'b1' }, error: null })
       q.then = (ok: (v: unknown) => unknown) => ok(dbDown ? fail : { data: [...rows].reverse().slice(0, 1), error: null })
-      q.insert = (row: { action: string }) => {
-        const r = { then: (ok: (v: unknown) => unknown) => {
+      q.insert = (row: { action: string; metadata: { token: string } }) => ({
+        then: (ok: (v: unknown) => unknown) => {
+          if (insertHangs) return new Promise(() => {})
           if (dbDown || insertFails) return ok(fail)
-          const rec = { id: nextId++, action: row.action, created_at: new Date().toISOString() }
-          rows.push(rec)
-          return ok({ data: { id: rec.id }, error: null })
-        } } as any
-        r.select = () => r; r.single = () => r
-        return r
-      }
-      q.delete = () => ({ eq: (_c: string, id: number) => { rows = rows.filter((r) => r.id !== id); return Promise.resolve({ error: null }) } })
+          rows.push({ id: nextId++, action: row.action, created_at: new Date().toISOString(), token: row.metadata.token })
+          return ok({ error: null })
+        },
+      })
+      q.delete = () => ({ eq: (_c: string, token: string) => { rows = rows.filter((r) => r.token !== token); return Promise.resolve({ error: null }) } })
       return table === 'audit_log' || table === 'SimpleBanners' ? q : q
     },
   }),
@@ -45,7 +44,7 @@ const recovered = () => sent.filter((s) => s.includes('again')).length
 describe('banner health cron', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] })
-    rows = []; nextId = 1; dbDown = false; insertFails = false; emailWorks = true; sent.length = 0
+    rows = []; nextId = 1; dbDown = false; insertFails = false; insertHangs = false; emailWorks = true; sent.length = 0
     Object.assign(process.env, { CRON_SECRET: 's', ADMIN_EMAILS: 'a@x.com', NEXT_PUBLIC_SUPABASE_URL: 'https://s', SUPABASE_SERVICE_ROLE_KEY: 'k' })
   })
   afterEach(() => vi.useRealTimers())
@@ -96,6 +95,12 @@ describe('banner health cron', () => {
     await run('2026-11-04T15:25:00Z', true)
     expect(failed()).toBe(1)
   })
+
+  it('still emails when saving the alert times out, whatever the minute', async () => {
+    insertHangs = true
+    await run('2026-11-04T12:20:00Z', false)
+    expect(failed()).toBe(1)
+  }, 15000)
 
   it('treats a hung banner.js as a failure', async () => {
     vi.setSystemTime(new Date('2026-11-04T12:00:00Z'))

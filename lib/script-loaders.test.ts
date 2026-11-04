@@ -126,8 +126,10 @@ describe('pasted script loaders', () => {
 
   it('holds init code until a shared file has actually loaded', () => {
     const w = (globalThis as any).jsdom.window
-    const loader = js.match(/var externalScriptWaiters[\s\S]*?\nfunction injectInlineScript/)![0].replace(/\nfunction injectInlineScript$/, '')
-    w.eval(`var injectedExternalScripts = {}; var order = []; window.__cookieBannerExternalWaiters = {};
+    const loader = js.match(/var externalScriptState[\s\S]*?\nfunction injectInlineScript/)![0].replace(/\nfunction injectInlineScript$/, '')
+    // An older banner.js on the page already marked the file as injected (before it loaded).
+    w.eval(`var injectedExternalScripts = { 'https://cdn.example.com/shared.js': true }; var order = [];
+      window.__cookieBannerExternalWaiters = {}; window.__cookieBannerExternalState = {};
       ${loader}
       loadExternalScript('https://cdn.example.com/shared.js', 'A', function() { order.push('A init'); });
       loadExternalScript('https://cdn.example.com/shared.js', 'B', function() { order.push('B init'); });

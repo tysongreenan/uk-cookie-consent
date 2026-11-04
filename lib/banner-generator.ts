@@ -2022,17 +2022,20 @@ function scheduleTask(fn) {
   }
 }
 
-// injectedExternalScripts[src] is 'loading' until the file has run, then 'loaded'. Callbacks wait for
+// externalScriptState[src] is 'loading' until the file has run, then 'loaded'. Callbacks wait for
 // 'loaded', so init code never runs before its library, even when two snippets share a URL.
+// Own keys rather than injectedExternalScripts: an older banner.js on the same page sets that to
+// true before the file has loaded, so it can't say whether it's safe to run init code yet.
+var externalScriptState = window.__cookieBannerExternalState || (window.__cookieBannerExternalState = {});
 var externalScriptWaiters = window.__cookieBannerExternalWaiters || (window.__cookieBannerExternalWaiters = {});
 
 function loadExternalScript(src, name, onLoaded) {
-  if (injectedExternalScripts[src] === 'loaded' || injectedExternalScripts[src] === true) {
+  if (externalScriptState[src] === 'loaded') {
     if (onLoaded) onLoaded();
     return;
   }
   if (onLoaded) (externalScriptWaiters[src] = externalScriptWaiters[src] || []).push(onLoaded);
-  if (injectedExternalScripts[src] === 'loading') {
+  if (externalScriptState[src] === 'loading') {
     return;
   }
 
@@ -2041,7 +2044,8 @@ function loadExternalScript(src, name, onLoaded) {
   scriptEl.src = src;
   scriptEl.setAttribute('data-cookie-banner-src', src);
   scriptEl.onload = function() {
-    injectedExternalScripts[src] = 'loaded';
+    externalScriptState[src] = 'loaded';
+    injectedExternalScripts[src] = true;
     var waiting = externalScriptWaiters[src] || [];
     delete externalScriptWaiters[src];
     for (var i = 0; i < waiting.length; i++) {
@@ -2050,10 +2054,12 @@ function loadExternalScript(src, name, onLoaded) {
   };
   scriptEl.onerror = function(error) {
     delete injectedExternalScripts[src];
+    delete externalScriptState[src];
     delete externalScriptWaiters[src];
     console.error('Error loading external script:', name, error);
   };
-  injectedExternalScripts[src] = 'loading';
+  externalScriptState[src] = 'loading';
+  injectedExternalScripts[src] = true;
   document.head.appendChild(scriptEl);
   console.log('Loading external script:', name);
 }
