@@ -263,6 +263,8 @@ describe('resolveA11yRuntimeConfig', () => {
     expect(resolveA11yRuntimeConfig(de, { customization: false, baseUrl: 'https://x' })!.lang).toBe('en')
     const auto = banner({ language: 'auto', accessibility: { ...DEFAULT_A11Y_CONFIG, enabled: true } })
     expect(resolveA11yRuntimeConfig(auto, { customization: false, baseUrl: 'https://x' })!.lang).toBe('auto')
+    // A geo rule's language (French in Quebec) wins over the banner's own language
+    expect(resolveA11yRuntimeConfig({ ...auto, _geoLanguage: 'fr' }, { customization: false, baseUrl: 'https://x' })!.lang).toBe('fr')
   })
 })
 

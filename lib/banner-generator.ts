@@ -2499,7 +2499,7 @@ var CATEGORY_OWNER_SELECTION = ${JSON.stringify((() => {
 })())};
 
 function detectLanguage() {
-  ${config.language === 'auto' ? `
+  ${(config._geoLanguage || config.language) === 'auto' ? `
   var htmlLang = (document.documentElement.lang || '').toLowerCase();
   var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
   var lang = htmlLang || browserLang;
@@ -2520,7 +2520,7 @@ function detectLanguage() {
   if (lang.startsWith('fi')) return 'fi';
   return 'en';
   ` : `
-  return ${JSON.stringify(config.language)};
+  return ${JSON.stringify(config._geoLanguage || config.language)};
   `}
 }
 
@@ -2534,6 +2534,12 @@ function applyTranslations() {
     container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
     if (lang === 'ar') container.style.textAlign = 'right';
   }
+
+  // Declare the shown language so screen readers read a French banner on an English page as French.
+  ['cookie-consent-banner', 'cookie-preferences-modal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.lang = lang;
+  });
 
   // Helper to set text by ID without destroying child HTML
   function setText(id, text) {
@@ -3240,7 +3246,9 @@ function applyGpcModalState() {
     lockIcon.style.cssText = 'flex-shrink:0;';
     var noticeText = document.createElement('span');
     noticeText.style.cssText = 'font-size:13px;font-weight:500;';
-    noticeText.textContent = 'Global Privacy Control is active. Marketing cookies are automatically disabled.';
+    noticeText.textContent = detectLanguage() === 'fr'
+      ? 'Global Privacy Control est actif. Les cookies marketing sont désactivés automatiquement.'
+      : 'Global Privacy Control is active. Marketing cookies are automatically disabled.';
     noticeInner.appendChild(lockIcon);
     noticeInner.appendChild(noticeText);
     notice.appendChild(noticeInner);
