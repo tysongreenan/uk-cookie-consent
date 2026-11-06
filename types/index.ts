@@ -108,6 +108,8 @@ export interface BannerConfig {
     // Delete declined categories' first-party cookies (incl. ones set before install). Missing = off.
     cookieCleanup?: boolean
     cookieExpiry: number // days
+    // Bump to discard every visitor's saved choice so the banner asks again. Missing/0 = off.
+    consentVersion?: number
     // Button layout controls
     buttonLayout?: ButtonLayout // 'standard' | 'soft-consent' | 'accept-only'
     showRejectButton?: boolean // Granular control - defaults to true for backward compatibility

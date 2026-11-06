@@ -1850,6 +1850,8 @@ function trackConsentEvent(action, consentCategories) {
 
 var COOKIE_NAME = 'cookie_consent';
 var COOKIE_EXPIRY = ${Number(config.behavior.cookieExpiry) || 182};
+// Bumping consentVersion makes every visitor choose again: older saved choices are discarded.
+var CONSENT_VERSION = ${Number(config.behavior?.consentVersion) || 0};
 ${cookieDomainRuntimeJs(cookieDomain.mode, cookieDomain.custom)}
 var USE_LAZY_LOADER = ${useLazyLoader};
 var USE_IDLE_CALLBACK = ${useIdleCallback};
@@ -2784,6 +2786,10 @@ function getConsent() {
   if (cookie) {
     try {
       var parsed = JSON.parse(cookie);
+      if (CONSENT_VERSION && (!parsed || parsed._v !== CONSENT_VERSION)) {
+        setCookie(COOKIE_NAME, '', -1);
+        return null;
+      }
       // TCF: also load euconsent-v2 data and populate __tcfapi
       if (TCF_ENABLED && typeof loadTcfConsentOnPageLoad === 'function') {
         loadTcfConsentOnPageLoad();
@@ -2862,6 +2868,7 @@ function cbCleanupDeclinedCookies(consent) {
 `
 })() : ''}
 function saveConsent(consent, tcfPurposes) {
+  if (CONSENT_VERSION) consent._v = CONSENT_VERSION;
   setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
   dispatchConsentUpdate(consent);
   loadScripts(consent);
