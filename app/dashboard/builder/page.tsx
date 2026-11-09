@@ -43,6 +43,13 @@ import { FONT_PRESETS } from '@/lib/font-presets'
 import { getPostHogRequestHeaders } from '@/lib/analytics'
 import { copyToClipboard } from '@/lib/utils'
 import { hasInstallSnippetCopied, hostedInstallSnippet } from '@/lib/install-snippet'
+import {
+  builderProgress,
+  shouldOpenInstallAfterFirstCreate,
+  shouldPinInstallNav,
+  shouldShowInstallCallout,
+} from '@/lib/first-banner-install'
+import { InstallStepCallout, InstallStepNavButton } from '@/components/banner/install-step-prompt'
 import { customCookieDomainError, hostnameFromUrl } from '@/lib/cookie-domain'
 import { persistThenCopySnippet } from '@/lib/banner-copy-persist'
 import {
@@ -544,6 +551,8 @@ function BannerBuilderContent() {
   const buttonPlacement = resolveButtonPlacement(config.position, config.layout?.buttonPlacement)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('compliance')
+  const [hasCopiedInstall, setHasCopiedInstall] = useState(false)
+  const userChoseTabRef = useRef(false)
   // null = use auto-derived view from activeTab; otherwise user has clicked a preview tab and wants to lock it
   const [previewView, setPreviewView] = useState<'banner' | 'preferences' | 'floating' | 'accessibility' | null>(null)
   // Desktop vs phone frame width for the live preview pane
@@ -607,6 +616,10 @@ function BannerBuilderContent() {
   })
 
   useEffect(() => {
+    setHasCopiedInstall(activeBannerId ? hasInstallSnippetCopied(activeBannerId) : false)
+  }, [activeBannerId])
+
+  useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin')
     } else if (status === 'authenticated' && session) {
@@ -628,6 +641,7 @@ function BannerBuilderContent() {
 
     const hasConsentBanner =
       (session.user as { hasConsentBanner?: boolean }).hasConsentBanner ?? true
+    let cancelled = false
     void ensureDefaultBanner({
       config: configRef.current,
       hasQueryBannerId: false,
@@ -637,7 +651,7 @@ function BannerBuilderContent() {
       hasEverCreatedBanner: readHasEverCreatedBanner(session.user?.id),
       headers: getPostHogRequestHeaders(),
     }).then((id) => {
-      if (!id) return
+      if (cancelled || !id) return
       if (isCreateNewBannerQuery(searchParams.get('new'))) return
       // Keep createdThisDraftRef in sync so #36's new-draft reset does not
       // wipe the minted id before ?id= is in the URL.
@@ -646,8 +660,26 @@ function BannerBuilderContent() {
       markHasEverCreatedBanner(session.user?.id)
       setBannerId(id)
       setIsEditing(true)
+      // The row already exists (banner_created). Open install unless they
+      // picked a section or the URL named one. Save-after-mint is an update,
+      // so it does not reach the "started without an id" path below.
+      if (
+        shouldOpenInstallAfterFirstCreate({
+          bannerId: id,
+          explicitTab: searchParams.get('tab'),
+          userChoseTab: userChoseTabRef.current,
+          snippetAlreadyCopied: hasInstallSnippetCopied(id),
+        })
+      ) {
+        // Keep the header on screen. The tab-change scroller is for clicks.
+        skipTabScrollRef.current = true
+        setActiveTab('code')
+      }
       router.replace(`/dashboard/builder?id=${id}`)
     })
+    return () => {
+      cancelled = true
+    }
   }, [status, session, searchParams, urlId, urlEdit, urlNew, router])
 
   useEffect(() => {
@@ -1211,6 +1243,7 @@ function BannerBuilderContent() {
         },
       })
       setSnippetCopied(true)
+      setHasCopiedInstall(true)
       setActiveTab('code')
       if (!showedHelp) {
         toast.success(
@@ -1286,6 +1319,26 @@ function BannerBuilderContent() {
     cookieDomainSiteHost,
   )
 
+  const chooseTab = (tab: string) => {
+    userChoseTabRef.current = true
+    if (activeBannerId && hasInstallSnippetCopied(activeBannerId)) {
+      setHasCopiedInstall(true)
+    }
+    setActiveTab(tab)
+  }
+
+  const installPending = Boolean(activeBannerId) && !hasCopiedInstall
+  const installSnippet = activeBannerId
+    ? hostedInstallSnippet(activeBannerId, {
+        showBranding: (session?.user?.planTier || 'free') === 'free',
+      })
+    : ''
+  const progress = builderProgress({ activeTab, snippetCopied: hasCopiedInstall })
+  const pinInstallNav = shouldPinInstallNav({
+    hasBannerId: Boolean(activeBannerId),
+    snippetCopied: hasCopiedInstall,
+  })
+
   if (status !== 'authenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -1315,15 +1368,15 @@ function BannerBuilderContent() {
       {/* Header */}
       <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center space-x-3">
               <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
                 <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
               </Button>
               <div className="h-6 w-px bg-border"></div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex min-w-0 items-center gap-1.5">
                   <Input
                     value={config.name}
                     onChange={(e) => { setIsDirty(true); setConfig(prev => ({ ...prev, name: e.target.value })) }}
@@ -1333,21 +1386,22 @@ function BannerBuilderContent() {
                   <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button onClick={handleSave} disabled={isLoading} size="sm" variant="outline">
                 <Save className="h-4 w-4" />
                 {isLoading ? 'Saving...' : 'Save Draft'}
               </Button>
-              <Button onClick={handleCopyInstallSnippet} size="sm">
+              <Button onClick={handleCopyInstallSnippet} size={installPending ? 'default' : 'sm'}>
                 {snippetCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                {snippetCopied ? 'Copied!' : 'Copy snippet'}
+                {snippetCopied ? 'Copied!' : 'Copy install snippet'}
               </Button>
               {isEditing && (
                 <Button 
                   onClick={handlePushLive} 
                   disabled={isPushing || isLoading} 
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700"
+                  variant={installPending ? 'outline' : 'default'}
+                  className={installPending ? undefined : 'bg-green-600 hover:bg-green-700'}
                 >
                   {isPushing ? (
                     <>
@@ -1371,39 +1425,34 @@ function BannerBuilderContent() {
       <main className="container mx-auto px-4 py-8">
         {/* Configuration Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Sidebar Navigation */}
-            <div className="lg:col-span-2">
+            {/* Sidebar Navigation. On a phone, show the install step before this long list. */}
+            <div className={`lg:col-span-2 ${installPending ? 'order-2 lg:order-none' : ''}`}>
               <div className="sticky top-6">
                 {/* Progress */}
                 <div className="mb-6">
-                  {(() => {
-                    const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
-                    const idx = Math.max(0, stepOrder.indexOf(activeTab))
-                    const total = stepOrder.length
-                    const pct = Math.round(((idx + 1) / total) * 100)
-                    return (
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-muted-foreground">Step {idx + 1} of {total}</span>
-                        <span className="text-xs text-muted-foreground">{pct}%</span>
-                      </div>
-                    )
-                  })()}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-muted-foreground">{progress.label}</span>
+                    <span className="text-xs text-muted-foreground">{progress.detail}</span>
+                  </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${(() => {
-                          const stepOrder = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
-                          const idx = Math.max(0, stepOrder.indexOf(activeTab))
-                          return Math.round(((idx + 1) / stepOrder.length) * 100)
-                        })()}%`
-                      }}
+                      style={{ width: `${progress.percent}%` }}
                     ></div>
                   </div>
                 </div>
 
                 {/* Navigation Menu */}
                 <nav className="space-y-1" role="tablist" aria-label="Banner builder sections">
+                  {pinInstallNav && (
+                    <div className="mb-3">
+                      <InstallStepNavButton
+                        active={activeTab === 'code'}
+                        pending={installPending}
+                        onSelect={() => chooseTab('code')}
+                      />
+                    </div>
+                  )}
                   <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     Configuration Steps
                   </div>
@@ -1413,7 +1462,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'compliance'}
                     aria-controls="compliance-panel"
-                    onClick={() => setActiveTab('compliance')}
+                    onClick={() => chooseTab('compliance')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'compliance'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1430,7 +1479,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'brand'}
                     aria-controls="brand-panel"
-                    onClick={() => setActiveTab('brand')}
+                    onClick={() => chooseTab('brand')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'brand'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1447,7 +1496,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'design'}
                     aria-controls="design-panel"
-                    onClick={() => setActiveTab('design')}
+                    onClick={() => chooseTab('design')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'design'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1464,7 +1513,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'content'}
                     aria-controls="content-panel"
-                    onClick={() => setActiveTab('content')}
+                    onClick={() => chooseTab('content')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'content'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1481,7 +1530,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'language'}
                     aria-controls="language-panel"
-                    onClick={() => setActiveTab('language')}
+                    onClick={() => chooseTab('language')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'language'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1498,7 +1547,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'scripts'}
                     aria-controls="scripts-panel"
-                    onClick={() => setActiveTab('scripts')}
+                    onClick={() => chooseTab('scripts')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'scripts'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1515,7 +1564,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'cookie-settings'}
                     aria-controls="cookie-settings-panel"
-                    onClick={() => setActiveTab('cookie-settings')}
+                    onClick={() => chooseTab('cookie-settings')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'cookie-settings'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1533,7 +1582,7 @@ function BannerBuilderContent() {
                     id="accessibility-tab"
                     aria-selected={activeTab === 'accessibility'}
                     aria-controls="accessibility-panel"
-                    onClick={() => setActiveTab('accessibility')}
+                    onClick={() => chooseTab('accessibility')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'accessibility'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1550,7 +1599,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'behavior'}
                     aria-controls="behavior-panel"
-                    onClick={() => setActiveTab('behavior')}
+                    onClick={() => chooseTab('behavior')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'behavior'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1567,7 +1616,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'geo-targeting'}
                     aria-controls="geo-targeting-panel"
-                    onClick={() => setActiveTab('geo-targeting')}
+                    onClick={() => chooseTab('geo-targeting')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'geo-targeting'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1584,7 +1633,7 @@ function BannerBuilderContent() {
                     role="tab"
                     aria-selected={activeTab === 'analytics'}
                     aria-controls="analytics-panel"
-                    onClick={() => setActiveTab('analytics')}
+                    onClick={() => chooseTab('analytics')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
                       activeTab === 'analytics'
                         ? 'bg-primary text-primary-foreground shadow-sm'
@@ -1596,28 +1645,31 @@ function BannerBuilderContent() {
                     {isStepComplete('analytics') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
                   </button>
                   
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={activeTab === 'code'}
-                    aria-controls="code-panel"
-                    onClick={() => setActiveTab('code')}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
-                      activeTab === 'code'
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    <Code className="h-4 w-4" />
-                    <span className="flex-1 text-left">Install snippet</span>
-                    {isStepComplete('code') && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
-                  </button>
+                  {!pinInstallNav && (
+                    <InstallStepNavButton
+                      active={activeTab === 'code'}
+                      pending={false}
+                      onSelect={() => chooseTab('code')}
+                    />
+                  )}
                 </nav>
               </div>
             </div>
 
             {/* Main Content Area */}
-            <div className="lg:col-span-6" id="builder-main-panel">
+            <div className={`lg:col-span-6 ${installPending ? 'order-1 lg:order-none' : ''}`} id="builder-main-panel">
+              {shouldShowInstallCallout({
+                hasBannerId: Boolean(activeBannerId),
+                activeTab,
+                snippetCopied: hasCopiedInstall,
+              }) && (
+                <InstallStepCallout
+                  snippet={installSnippet}
+                  copied={snippetCopied}
+                  onCopy={() => { void handleCopyInstallSnippet() }}
+                  onShowInstallStep={() => chooseTab('code')}
+                />
+              )}
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-foreground capitalize">
                   {activeTab === 'compliance' ? 'Choose Compliance Framework' :
@@ -1630,7 +1682,8 @@ function BannerBuilderContent() {
                    activeTab === 'behavior' ? 'Set Banner Behavior' :
                    activeTab === 'geo-targeting' ? 'Geo-Targeting Rules' :
                    activeTab === 'accessibility' ? 'Accessibility Menu' :
-                   activeTab === 'analytics' ? 'Analytics Integration' : 'Get your install snippet'}
+                   activeTab === 'analytics' ? 'Analytics Integration' :
+                   installPending ? 'Install your banner' : 'Get your install snippet'}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-prose">
                   {activeTab === 'compliance' ? 'Select the privacy law that applies to your website. This will configure your banner\'s requirements and legal text.' :
@@ -1648,7 +1701,7 @@ function BannerBuilderContent() {
                 </p>
               </div>
               
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={chooseTab} className="w-full">
 
               {/* Compliance Tab */}
               <TabsContent value="compliance" className="space-y-12" id="compliance-panel" role="tabpanel" aria-labelledby="compliance-tab">
@@ -5099,6 +5152,7 @@ function BannerBuilderContent() {
                       planTier={session?.user?.planTier || 'free'}
                       detectedCmpVendor={detectedCmpVendor || undefined}
                       onEnsureSaved={() => persistBanner({ silent: true })}
+                      onInstallCopied={() => setHasCopiedInstall(true)}
                     />
                   </CardContent>
                 </Card>
@@ -5107,7 +5161,7 @@ function BannerBuilderContent() {
             </div>
 
             {/* Live Preview Area */}
-            <div className="lg:col-span-4">
+            <div className={`lg:col-span-4 ${installPending ? 'order-3 lg:order-none' : ''}`}>
               <div className="sticky top-6">
                 <Card>
                   <CardHeader className="space-y-3">
@@ -5164,8 +5218,8 @@ function BannerBuilderContent() {
                               type="button"
                               onClick={() => {
                                 setPreviewView(v)
-                                if (v === 'floating') setActiveTab('cookie-settings')
-                                if (v === 'accessibility') setActiveTab('accessibility')
+                                if (v === 'floating') chooseTab('cookie-settings')
+                                if (v === 'accessibility') chooseTab('accessibility')
                               }}
                               aria-pressed={effective === v}
                               className={`px-3 py-1.5 rounded transition-colors ${
