@@ -55,7 +55,7 @@ function load(pageHtml = '') {
   w.document.head.innerHTML = pageHtml
   for (const el of w.document.head.querySelectorAll('script:not([src])')) w.eval(el.textContent)
   const fn = js.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
-  w.eval(`var calls = [];
+  w.eval(`var calls = [], CB_RAN = {};
     function injectInlineScript(enc, name) { calls.push([name, decodeURIComponent(escape(atob(enc)))]); }
     function loadExternalScript(src, name, onLoaded) { calls.push([name, 'EXTERNAL ' + src]); if (onLoaded) onLoaded(); }
     function scheduleTask(fn) { fn(); }
@@ -101,7 +101,7 @@ describe('pasted script loaders', () => {
     const js2 = generateBannerJS({ ...config, scripts: { ...config.scripts, trackingPerformance: [script('Vendor', vendor)] } } as unknown as BannerConfig)
     const fn = js2.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
     const w = (globalThis as any).jsdom.window
-    w.eval(`var calls = [];
+    w.eval(`var calls = [], CB_RAN = {};
       function injectInlineScript(enc, name) { calls.push(decodeURIComponent(escape(atob(enc)))); }
       function loadExternalScript(src, name, onLoaded) { calls.push('EXTERNAL ' + src); if (onLoaded) onLoaded(); }
       function scheduleTask(fn) { fn(); }
@@ -115,7 +115,7 @@ describe('pasted script loaders', () => {
     const js2 = generateBannerJS({ ...config, scripts: { ...config.scripts, trackingPerformance: [script('Multi', multi)] } } as unknown as BannerConfig)
     const fn = js2.match(/function loadScripts\(consent\) \{[\s\S]*?\n\}\n/)![0]
     const w = (globalThis as any).jsdom.window
-    w.eval(`var calls = [];
+    w.eval(`var calls = [], CB_RAN = {};
       function injectInlineScript(enc, name) { calls.push(decodeURIComponent(escape(atob(enc)))); }
       function loadExternalScript(src, name, onLoaded) { calls.push('EXTERNAL ' + src); if (onLoaded) onLoaded(); }
       function scheduleTask(fn) { fn(); }
