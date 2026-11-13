@@ -2946,14 +2946,10 @@ function mirrorCategoryToggle(inputId, checked) {
   if (inputId === 'cookie-func-toggle-modal') setChecked('cb-cat-preferences', checked);
   if (inputId === 'cb-cat-statistics') setChecked('cookie-performance-toggle-modal', checked);
   if (inputId === 'cookie-performance-toggle-modal') setChecked('cb-cat-statistics', checked);
-  if (inputId === 'cb-cat-marketing') {
-    setChecked('cookie-targeting-toggle-modal', checked);
-    setChecked('cookie-social-toggle-modal', checked);
-  }
-  if (inputId === 'cookie-targeting-toggle-modal' || inputId === 'cookie-social-toggle-modal') {
-    var targeting = document.getElementById('cookie-targeting-toggle-modal');
-    var social = document.getElementById('cookie-social-toggle-modal');
-    setChecked('cb-cat-marketing', !!((targeting && targeting.checked) || (social && social.checked)));
+  // Targeting and Social are one stored category (marketing), so the switches move together
+  var marketingIds = ['cb-cat-marketing', 'cookie-targeting-toggle-modal', 'cookie-social-toggle-modal'];
+  if (marketingIds.indexOf(inputId) !== -1) {
+    marketingIds.forEach(function(id) { setChecked(id, checked); });
   }
 }
 

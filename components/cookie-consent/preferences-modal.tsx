@@ -98,9 +98,13 @@ export function PreferencesModal({
 
   const handleToggle = (category: keyof typeof cookiePreferences) => {
     if (category === 'strictlyNecessary') return
+    // Targeting and Social are one stored category (marketing), so they move together like the live banner
+    const linked = category === 'targetingAdvertising' || category === 'socialMedia'
     setCookiePreferences((prev) => ({
       ...prev,
-      [category]: !prev[category],
+      ...(linked
+        ? { targetingAdvertising: !prev[category], socialMedia: !prev[category] }
+        : { [category]: !prev[category] }),
     }))
   }
 
