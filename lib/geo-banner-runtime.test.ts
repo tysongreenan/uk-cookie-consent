@@ -41,6 +41,17 @@ describe('geo rules at runtime', () => {
     expect(switches(w)).toEqual([false, false, false])
   })
 
+  it('Targeting and Social switches move together, since they are one stored category', async () => {
+    const w = await visit({})
+    w.showCookiePreferences()
+    const targeting = w.document.getElementById('cookie-targeting-toggle-modal')
+    const social = w.document.getElementById('cookie-social-toggle-modal')
+    targeting.click()
+    expect([targeting.checked, social.checked]).toEqual([true, true])
+    social.click()
+    expect([targeting.checked, social.checked]).toEqual([false, false])
+  })
+
   it('strict opt-in hides the X with !important so the mobile stylesheet cannot show it', async () => {
     const x = (await visit({ _geoRequiresOptIn: true })).document.getElementById('cookie-close-btn')
     expect(x.style.getPropertyValue('display')).toBe('none')
