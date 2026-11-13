@@ -293,7 +293,7 @@ const CATEGORY_BAR_COPY: Record<string, {
   fi: { necessary: 'Välttämättömät', preferences: 'Asetukset', statistics: 'Tilastot', marketing: 'Markkinointi', selection: 'Salli valinta', details: 'Näytä tiedot' },
 }
 
-export const generateBannerHTML = (config: BannerConfig, options?: { showBranding?: boolean }) => {
+export const generateBannerHTML = (config: BannerConfigWithGeoOverrides, options?: { showBranding?: boolean }) => {
   hardenBannerConfig(config)
 
   // Defensive defaults for optional nested objects (older banners may lack these)
@@ -539,9 +539,11 @@ export const generateBannerHTML = (config: BannerConfig, options?: { showBrandin
   const detailsLabel = genericPrefs.has((config.text.preferencesButton || '').trim())
     ? barCopy.details
     : (config.text.preferencesButton || barCopy.details)
-  // Opt-in laws start the optional switches off. Others match the common
-  // declaration bar, where every category begins on.
-  const optionalOn = !(config.compliance?.requiresOptIn || config.compliance?.requiresExplicitConsent)
+  // Opt-in laws (banner-wide or from the visitor's geo rule) start the optional switches off.
+  // Others match the common declaration bar, where every category begins on. Implied consent
+  // starts them on, since those scripts are already running.
+  const optionalOn = Boolean(config._geoImpliedConsent && !config._geoRequiresOptIn) ||
+    !(config.compliance?.requiresOptIn || config.compliance?.requiresExplicitConsent || config._geoRequiresOptIn)
 
   const catSwitch = (id: string, labelId: string, label: string, checked: boolean, disabled = false) => {
     const onColor = escapeHtml(config.colors.button)
@@ -1945,6 +1947,8 @@ function getTcfConsent() {
 }
 
 function saveTcfConsent(purposes, vendors) {
+  // GPC opts out of marketing, so the TC record must not grant the advertising purposes either
+  if (GPC_ACTIVE) { purposes[2] = false; purposes[3] = false; purposes[4] = false; }
   var now = Date.now();
   var record = {
     purposes: purposes,
@@ -1972,19 +1976,7 @@ function saveTcfConsent(purposes, vendors) {
   tcfData.purpose.legitimateInterests = purposeLI;
   tcfData.vendor = { consents: vendors || {}, legitimateInterests: {} };
 
-  // Map TCF purposes to Google Consent Mode signals
-  var analyticsGranted = !!purposes[7] || !!purposes[8] || !!purposes[9];
-  var adGranted = !!purposes[2] || !!purposes[3] || !!purposes[4];
-  var personalizationGranted = !!purposes[3] || !!purposes[4] || !!purposes[5] || !!purposes[6];
-
-  if (typeof gtag !== 'undefined') {
-    gtag('consent', 'update', {
-      'analytics_storage': analyticsGranted ? 'granted' : 'denied',
-      'ad_storage': adGranted ? 'granted' : 'denied',
-      'ad_user_data': adGranted ? 'granted' : 'denied',
-      'ad_personalization': personalizationGranted ? 'granted' : 'denied'
-    });
-  }
+  // Google Consent Mode is sent by loadScripts(consent), the same mapping a returning visitor gets.
 
   // Notify all TCF listeners
   tcfNotifyListeners('useractioncomplete');
@@ -2868,6 +2860,7 @@ function cbCleanupDeclinedCookies(consent) {
 `
 })() : ''}
 function saveConsent(consent, tcfPurposes) {
+  var withdrew = (CB_RAN.functionality && !consent.functionality) || (CB_RAN.analytics && !consent.analytics) || (CB_RAN.marketing && !consent.marketing);
   if (CONSENT_VERSION) consent._v = CONSENT_VERSION;
   setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_EXPIRY);
   dispatchConsentUpdate(consent);
@@ -2890,6 +2883,9 @@ function saveConsent(consent, tcfPurposes) {
       try { cb(consent); } catch(e) {}
     });
   }
+
+  // Delay so the consent-log beacon (sent after an async hash) leaves before the page unloads
+  if (withdrew) setTimeout(function() { location.reload(); }, 500);
 }
 
 // Toggle switches and consent loading - must be in outer scope
@@ -3192,6 +3188,10 @@ function updateFloatingButtonIcon(consent) {
   }
 }
 
+// Categories whose scripts ran on this page. Scripts can't be unloaded, so turning one of
+// these off reloads the page (see saveConsent).
+var CB_RAN = {};
+
 function loadScripts(consent) {
   console.log('Loading scripts with consent:', consent);
   
@@ -3200,17 +3200,17 @@ ${strictlyNecessaryLoaders || '    // No strictly necessary scripts configured'}
   
   // Functionality scripts
   if (consent.functionality) {
-${functionalityLoaders || '      // No functionality scripts configured'}
+${functionalityLoaders ? '      CB_RAN.functionality = true;\n' : ''}${functionalityLoaders || '      // No functionality scripts configured'}
   }
   
   // Analytics scripts  
   if (consent.analytics) {
-${analyticsLoaders || '      // No analytics scripts configured'}
+${analyticsLoaders ? '      CB_RAN.analytics = true;\n' : ''}${analyticsLoaders || '      // No analytics scripts configured'}
   }
   
   // Marketing scripts
   if (consent.marketing) {
-${marketingLoaders || '      // No marketing scripts configured'}
+${marketingLoaders ? '      CB_RAN.marketing = true;\n' : ''}${marketingLoaders || '      // No marketing scripts configured'}
   }
   
   // Google Consent Mode v2 - ALWAYS update consent (required for GDPR compliance)
@@ -3434,6 +3434,8 @@ function init() {
   if (closeBtn && !closeBtn.dataset.handlerAttached && !GEO_REQUIRES_OPT_IN) {
     closeBtn.addEventListener('click', function() {
       banner.style.display = 'none';
+      showFloatingButton();
+      updateFloatingButtonIcon(GEO_IMPLIED_CONSENT ? impliedConsent() : { functionality: false, analytics: false, marketing: false });
       trackConsentEvent('dismiss');
     });
     closeBtn.dataset.handlerAttached = 'true';
