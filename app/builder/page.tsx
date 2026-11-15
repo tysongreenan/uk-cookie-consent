@@ -29,20 +29,20 @@ function BuilderContent() {
 
     try {
       const config = JSON.parse(savedConfig)
-      fetch('/api/banners', {
+      fetch('/api/banners/simple', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: config.name || 'My Cookie Banner',
-          config: config,
-          isActive: true
+          config,
+          isActive: true,
         })
       }).then(async (response) => {
         localStorage.removeItem('pendingBannerConfig')
         if (response.ok) {
           const data = await response.json()
-          if (data.banner?.id) {
-            router.push(`/dashboard/builder?id=${data.banner.id}`)
+          if (data.bannerId) {
+            router.push(`/dashboard/builder?id=${data.bannerId}`)
             return
           }
         }
