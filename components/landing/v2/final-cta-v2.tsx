@@ -7,12 +7,12 @@ export function FinalCtaV2() {
         <div className="relative overflow-hidden rounded-[28px] bg-foreground px-8 py-16 text-center text-background sm:px-14 sm:py-20 lg:px-16 lg:py-[80px]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
+            className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] dark:[background-image:radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.08)_1px,transparent_0)]"
           />
           <h2 className="relative mx-auto max-w-3xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.035em] text-background sm:text-5xl lg:text-6xl">
             Stop renting compliance.
             <br />
-            Build it once, in <span className="text-[#6FCDDC]">5 minutes</span>.
+            Build it once, in <span className="text-[#6FCDDC] dark:text-[#0E768C]">5 minutes</span>.
           </h2>
           <p className="relative mx-auto mt-5 max-w-xl text-lg text-background/70">
             No signup, no credit card. The free plan covers PIPEDA, Law 25, GDPR &amp; CCPA — and you can always upgrade later.
@@ -26,7 +26,7 @@ export function FinalCtaV2() {
             </Link>
             <Link
               href="#pricing"
-              className="inline-flex h-[52px] items-center justify-center rounded-[12px] border border-white/20 bg-white/5 px-6 text-[15.5px] font-semibold text-background transition-colors hover:bg-white/10"
+              className="inline-flex h-[52px] items-center justify-center rounded-[12px] border border-white/20 bg-white/5 px-6 text-[15.5px] font-semibold text-background transition-colors hover:bg-white/10 dark:border-black/15 dark:bg-black/5 dark:hover:bg-black/10"
             >
               See pricing
             </Link>
