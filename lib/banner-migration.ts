@@ -415,6 +415,24 @@ export function withCurrentBannerVersion<T extends object>(
 }
 
 /**
+ * A stored config can miss whole sections (colors, layout, text...). The
+ * builder reads them on every render, so fill each top-level section from
+ * the defaults before the config reaches state.
+ */
+export function withBannerConfigDefaults(defaults: BannerConfig, loaded: any): BannerConfig {
+  const isObject = (value: unknown): value is Record<string, unknown> =>
+    !!value && typeof value === 'object' && !Array.isArray(value)
+  if (!isObject(loaded)) return defaults
+
+  const merged: Record<string, unknown> = { ...defaults, ...loaded }
+  for (const [key, value] of Object.entries(defaults)) {
+    if (!isObject(value)) continue
+    merged[key] = isObject(loaded[key]) ? { ...value, ...loaded[key] } : value
+  }
+  return merged as unknown as BannerConfig
+}
+
+/**
  * Gets migration notes for users about what was updated
  */
 export function getMigrationNotes(oldVersion: string, newVersion: string): string[] {
