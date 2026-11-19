@@ -22,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { BannerConfig, TrackingScript, ComplianceFramework, BrandDiscoveryResult, BrandLogoSuggestion, ConsentBanner, GeoRule, PlanTier } from '@/types'
 import { applyTranslations } from '@/lib/translations'
 import { scriptTemplates, getTemplatesByCategory } from '@/lib/script-templates'
-import { migrateBannerConfig, needsMigration, CURRENT_BANNER_VERSION, withCurrentBannerVersion } from '@/lib/banner-migration'
+import { migrateBannerConfig, needsMigration, CURRENT_BANNER_VERSION, withBannerConfigDefaults, withCurrentBannerVersion } from '@/lib/banner-migration'
 import { resolveButtonPlacement } from '@/lib/banner-placement'
 import { ComplianceSelector } from '@/components/banner/compliance-selector'
 import { getBannerTemplate } from '@/lib/banner-templates'
@@ -673,12 +673,21 @@ function BannerBuilderContent() {
       loadedBannerRef.current = editId
       loadBannerForEdit(editId)
     }
+  }, [searchParams, session])
+
+  // Apply ?tab= once per URL. Re-applying it on a session refetch (window
+  // focus) sent users back to the deep-linked tab after they picked another.
+  const appliedTabUrlRef = useRef<string | null>(null)
+  useEffect(() => {
+    const urlKey = searchParams.toString()
+    if (appliedTabUrlRef.current === urlKey) return
+    appliedTabUrlRef.current = urlKey
     const tab = searchParams.get('tab')
     const knownTabs = ['compliance','brand','design','content','language','scripts','cookie-settings','accessibility','behavior','geo-targeting','analytics','code']
     if (tab && knownTabs.includes(tab)) {
       setActiveTab(tab)
     }
-  }, [searchParams, session])
+  }, [searchParams])
 
   useEffect(() => {
     const prefill = resolveScanPrefillUrl({
@@ -768,7 +777,7 @@ function BannerBuilderContent() {
           }
         }
         
-        setConfig(bannerConfig)
+        setConfig(withBannerConfigDefaults(defaultConfig, bannerConfig))
         setIsEditing(true)
         setBannerId(id)
         // Store updatedAt for cache-busting in script URLs
