@@ -1245,18 +1245,18 @@ function BannerBuilderContent() {
         return false // Always has defaults, no meaningful completion to show
       case 'brand':
         return (
-          config.colors?.background !== '#1f2937' ||
-          config.colors?.text !== '#f9fafb' ||
-          config.colors?.button !== '#3b82f6' ||
-          config.colors?.buttonText !== '#ffffff' ||
-          config.colors?.link !== '#60a5fa'
+          config.colors.background !== '#1f2937' ||
+          config.colors.text !== '#f9fafb' ||
+          config.colors.button !== '#3b82f6' ||
+          config.colors.buttonText !== '#ffffff' ||
+          config.colors.link !== '#60a5fa'
         )
       case 'design':
         return (
           config.position !== 'bottom' ||
-          config.layout?.borderRadius !== 8 ||
-          config.layout?.padding !== 20 ||
-          config.layout?.margin !== 20
+          config.layout.borderRadius !== 8 ||
+          config.layout.padding !== 20 ||
+          config.layout.margin !== 20
         )
       case 'content':
         return config.text.title !== 'We use cookies'
