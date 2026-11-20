@@ -4,11 +4,12 @@ import { generateBannerJS, generateConsentInitScript } from './banner-generator'
 import { applyGeoRule } from './geo-rules'
 
 // Runs the consent init block and returns the gtag('consent','default') payload.
-function runDefault(config: any, gpc = false, serverGpc = false) {
+function runDefault(config: any, gpc = false, serverGpc = false, cookie?: any) {
   const js = generateConsentInitScript(config).replace(/<\/?script[^>]*>/gi, '')
   const window: any = { __cbServerGpc: serverGpc }
   window.dataLayer = []
-  vm.runInNewContext(js, { window, dataLayer: window.dataLayer, navigator: { globalPrivacyControl: gpc } })
+  const doc = { cookie: cookie ? 'cookie_consent=' + encodeURIComponent(JSON.stringify(cookie)) : '' }
+  vm.runInNewContext(js, { window, document: doc, dataLayer: window.dataLayer, navigator: { globalPrivacyControl: gpc } })
   const call = window.dataLayer.find((a: any) => a[0] === 'consent' && a[1] === 'default')
   return { ...call[2] }
 }
@@ -30,6 +31,38 @@ describe('consent mode defaults by geo', () => {
 
   it('keeps ad signals denied under implied consent when GPC is on', () => {
     expect(runDefault({ _geoImpliedConsent: true }, true)).toMatchObject({ analytics_storage: 'granted', ad_storage: 'denied', ad_personalization: 'denied' })
+  })
+})
+
+describe('consent mode default from a saved choice', () => {
+  const none = { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' }
+
+  it('applies a saved Accept at load, with no wait_for_update', () => {
+    const d = runDefault({}, false, false, { analytics: true, marketing: true })
+    expect(d).toMatchObject({ analytics_storage: 'granted', ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' })
+    expect(d.wait_for_update).toBeUndefined()
+  })
+
+  it('applies a saved Reject, overriding an implied-consent region', () => {
+    expect(runDefault({ _geoImpliedConsent: true }, false, false, { analytics: false, marketing: false })).toMatchObject(none)
+  })
+
+  it('keeps marketing denied under GPC', () => {
+    expect(runDefault({}, true, false, { analytics: true, marketing: true, gpc_auto: true })).toMatchObject({ analytics_storage: 'granted', ad_storage: 'denied' })
+  })
+
+  it('ignores a saved choice from before a consent version bump', () => {
+    const d = runDefault({ behavior: { consentVersion: 2 } }, false, false, { analytics: true, marketing: true, _v: 1 })
+    expect(d).toMatchObject(none)
+    expect(d.wait_for_update).toBe(500)
+  })
+
+  it('applies a saved choice that matches the version', () => {
+    expect(runDefault({ behavior: { consentVersion: 2 } }, false, false, { analytics: true, marketing: false, _v: 2 })).toMatchObject({ analytics_storage: 'granted', ad_storage: 'denied' })
+  })
+
+  it('ignores a GPC-era cookie once GPC is off', () => {
+    expect(runDefault({}, false, false, { analytics: true, marketing: false, gpc_auto: true })).toMatchObject(none)
   })
 })
 

@@ -3720,9 +3720,30 @@ export const generateConsentInitScript = (config?: BannerConfigWithGeoOverrides)
     'ad_user_data': __cbAd,
     'ad_personalization': __cbAd
   };
+  // Returning visitor: fold their saved choice into the default so GTM sees the real state when it
+  // loads (init() applies it only after DOMContentLoaded, too late for GA4 modelling / Advanced Consent Mode).
+  // Mirrors getConsent() + GPC reconciliation in the banner JS; read-only, init() still cleans up the cookie.
+  var __cbStored = false;
+  try {
+    var __m = document.cookie.match(/(^| )cookie_consent=([^;]+)/);
+    var __c = __m && JSON.parse(decodeURIComponent(__m[2]));
+    var __gpc = ${gpcEnabled ? '!!(navigator.globalPrivacyControl || window.__cbServerGpc)' : 'false'};
+    var __v = ${Number(config?.behavior?.consentVersion) || 0};
+    if (__c && typeof __c === 'object' && (!__v || __c._v === __v) && (__gpc || !__c.gpc_auto)) {
+      var __mk = __c.marketing && !__gpc ? 'granted' : 'denied';
+      window.__cbConsentDefault = {
+        'analytics_storage': __c.analytics ? 'granted' : 'denied',
+        'ad_storage': __mk,
+        'ad_user_data': __mk,
+        'ad_personalization': __mk
+      };
+      __cbAd = __mk;
+      __cbStored = true;
+    }
+  } catch (e) {}
   var __cbDefault = {};
   for (var __k in window.__cbConsentDefault) __cbDefault[__k] = window.__cbConsentDefault[__k];
-  __cbDefault.wait_for_update = 500; // Wait 500ms for consent update before allowing trackers
+  if (!__cbStored) __cbDefault.wait_for_update = 500; // Wait 500ms for consent update before allowing trackers
   gtag('consent', 'default', __cbDefault);
 
   // Also push to dataLayer for GTM compatibility
