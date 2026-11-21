@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   authUrlForUpgrade,
+  checkoutBillingCycle,
   resolveBillingCycle,
   shouldAutoStartCheckout,
   upgradeReturnPath,
@@ -17,6 +18,18 @@ describe('resolveBillingCycle', () => {
 
   it('keeps annual when asked for', () => {
     expect(resolveBillingCycle('annual')).toBe('annual')
+  })
+})
+
+describe('checkoutBillingCycle', () => {
+  it('sends lifetime and legacy Pro owners to annual even though lifetime is the default', () => {
+    expect(checkoutBillingCycle('pro_lifetime', 'one_time')).toBe('annual')
+    expect(checkoutBillingCycle('pro', 'one_time')).toBe('annual')
+  })
+
+  it('keeps the pick for everyone else', () => {
+    expect(checkoutBillingCycle('free', 'one_time')).toBe('one_time')
+    expect(checkoutBillingCycle(null, 'annual')).toBe('annual')
   })
 })
 

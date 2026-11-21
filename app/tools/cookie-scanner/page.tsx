@@ -10,18 +10,18 @@ import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from '
 
 export const metadata: Metadata = {
   title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
-  description: 'Paste any URL and see every cookie the page sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. Free, no signup.',
+  description: 'Paste any URL and see the cookies the page sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. Free, no signup.',
   keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner, website cookie checker, cookie scanning',
   openGraph: {
     title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
-    description: 'See every cookie a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
+    description: 'See the cookies a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
-    description: 'See every cookie a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
+    description: 'See the cookies a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
@@ -193,7 +193,7 @@ export default function CookieScannerPage() {
                 Free Cookie Scanner &amp; Checker
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6">
-                Paste a URL. See every cookie it sets, sorted by category, in about 30 seconds. No signup.
+                Paste a URL. See the cookies it sets, sorted by category, in about 30 seconds. No signup.
               </p>
 
               <CookieScanner />

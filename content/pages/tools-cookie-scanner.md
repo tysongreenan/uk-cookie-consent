@@ -1,6 +1,6 @@
 ---
 title: "Cookie Scanner & Checker: Free, No Signup, Results in 30s"
-description: "Free cookie scanner and checker: paste any public URL to see every cookie it sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. No signup."
+description: "Free cookie scanner and checker: paste any public URL to see the cookies it sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. No signup."
 ---
 
 The interactive scanner on this page needs a browser. This markdown page is the agent-readable version: what the tool does, how to run it, and what the report contains.

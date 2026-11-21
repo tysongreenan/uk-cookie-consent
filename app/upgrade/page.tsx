@@ -9,14 +9,13 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { captureEvent } from '@/lib/analytics'
-import { authUrlForUpgrade, resolveBillingCycle, shouldAutoStartCheckout } from '@/lib/upgrade-flow'
+import { authUrlForUpgrade, checkoutBillingCycle, resolveBillingCycle, shouldAutoStartCheckout } from '@/lib/upgrade-flow'
 
 function UpgradeContent() {
   const { data: session, status } = useSession()
   const searchParams = useSearchParams()
-  const router = useRouter()
   const initialBilling = resolveBillingCycle(searchParams.get('billing'))
   const [billingCycle, setBillingCycle] = useState<'one_time' | 'annual'>(initialBilling)
   const autoCheckoutFired = useRef(false)
@@ -31,10 +30,12 @@ function UpgradeContent() {
       return
     }
 
+    const cycle = checkoutBillingCycle(session.user.planTier, billingCycle)
+
     setIsLoading(true)
     setError('')
     captureEvent('checkout_started', {
-      billing_cycle: billingCycle,
+      billing_cycle: cycle,
       current_plan: session.user.planTier || 'free',
     })
 
@@ -42,14 +43,14 @@ function UpgradeContent() {
       const response = await fetch('/api/upgrade/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: session.user.id, billingCycle }),
+        body: JSON.stringify({ userId: session.user.id, billingCycle: cycle }),
       })
 
       const data = await response.json()
 
       if (data.error) {
         captureEvent('checkout_failed', {
-          billing_cycle: billingCycle,
+          billing_cycle: cycle,
           failure_type: 'response',
         })
         setError(data.error)
@@ -60,14 +61,14 @@ function UpgradeContent() {
         window.location.href = data.url
       } else {
         captureEvent('checkout_failed', {
-          billing_cycle: billingCycle,
+          billing_cycle: cycle,
           failure_type: 'response',
         })
         setError('Failed to create checkout session. Please try again.')
       }
     } catch {
       captureEvent('checkout_failed', {
-        billing_cycle: billingCycle,
+        billing_cycle: cycle,
         failure_type: 'request',
       })
       setError('An error occurred. Please try again.')
@@ -88,10 +89,10 @@ function UpgradeContent() {
     })
     if (!go) return
     autoCheckoutFired.current = true
-    // Drop the flag so Back from Stripe does not loop into checkout again.
-    router.replace(`/upgrade?billing=${billingCycle}`)
+    // Drop the flag synchronously so Back from Stripe does not loop into checkout.
+    window.history.replaceState(window.history.state, '', `/upgrade?billing=${billingCycle}`)
     void handleUpgrade()
-  }, [status, session, billingCycle, searchParams, router, handleUpgrade])
+  }, [status, session, billingCycle, searchParams, handleUpgrade])
 
   const proFeatures = [
     { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', desc: 'Create as many banners as you need' },

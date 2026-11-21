@@ -8,6 +8,11 @@ export function resolveBillingCycle(raw: string | null | undefined): BillingCycl
   return raw === 'annual' ? 'annual' : 'one_time'
 }
 
+/** Lifetime / legacy Pro owners can only buy annual; everyone else gets their pick. */
+export function checkoutBillingCycle(planTier: string | null | undefined, picked: BillingCycle): BillingCycle {
+  return planTier === 'pro_lifetime' || planTier === 'pro' ? 'annual' : picked
+}
+
 /**
  * Where sign-in / sign-up should send a signed-out buyer afterwards: back to
  * /upgrade with their plan kept and checkout started for them.
