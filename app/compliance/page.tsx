@@ -78,7 +78,7 @@ const frameworks = [
       'California\'s privacy law uses an opt-out model for cookies. Cookies can load by default, but you must provide a "Do Not Sell or Share" link and honor Global Privacy Control signals from browsers.',
     consentModel: 'Opt-out',
     consentDetail: 'Cookies can load by default, but users must be able to opt out of data sale and sharing at any time.',
-    fines: 'Up to $7,500 per intentional violation',
+    fines: 'Up to $7,988 per intentional violation',
     appliesWhen: 'For-profit business serves CA residents and meets revenue or data thresholds',
     highlights: [
       '"Do Not Sell or Share My Personal Information" link required',
@@ -143,7 +143,7 @@ const comparisonRows = [
   {
     label: 'Maximum Fines',
     gdpr: 'Up to \u20AC20M / 4%',
-    ccpa: 'Up to $7,500/violation',
+    ccpa: 'Up to $7,988/violation',
     pipeda: '$100K offence cap / QC up to $25M or 4%',
   },
   {
@@ -173,7 +173,7 @@ const faqData = [
   {
     question: 'What happens if I do not have a cookie banner?',
     answer:
-      'The consequences depend on the law. EU GDPR fines can reach 20 million euros or 4% of global annual turnover. UK PECR fines, including for cookies, have matched that scale since 5 February 2026: up to £17.5 million or 4% of global annual turnover. CCPA penalties are $2,500 per violation and $7,500 per intentional violation, and each consumer can be a separate count. PIPEDA does not fine per cookie. Specified offences, such as failing to report a breach that creates a real risk of significant harm, can draw a fine of up to $100,000. Quebec Law 25 administrative penalties can reach $10 million or 2% of worldwide turnover, and penal fines can reach $25 million or 4%.',
+      'The consequences depend on the law. EU GDPR fines can reach 20 million euros or 4% of global annual turnover. UK PECR fines, including for cookies, have matched that scale since 5 February 2026: up to £17.5 million or 4% of global annual turnover. CCPA penalties are $2,663 per violation and $7,988 per intentional violation, and each consumer can be a separate count. PIPEDA does not fine per cookie. Specified offences, such as failing to report a breach that creates a real risk of significant harm, can draw a fine of up to $100,000. Quebec Law 25 administrative penalties can reach $10 million or 2% of worldwide turnover, and penal fines can reach $25 million or 4%.',
   },
   {
     question: 'Are essential cookies exempt from consent requirements?',

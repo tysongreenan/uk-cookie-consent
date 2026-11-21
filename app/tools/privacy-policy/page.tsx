@@ -271,7 +271,7 @@ export default function PrivacyPolicyPage() {
                 <ul className="space-y-3 list-none pl-0">
                   <li className="flex items-start gap-3">
                     <Scale className="h-5 w-5 text-red-500 mt-1 flex-shrink-0" />
-                    <span><strong>Legal penalties</strong> -- GDPR fines up to 4% of annual revenue, PIPEDA penalties up to CAD $10 million, CCPA fines up to $7,500 per violation.</span>
+                    <span><strong>Legal penalties</strong> -- GDPR fines up to 4% of annual revenue, for specified PIPEDA offences up to CAD $10,000 on summary conviction or $100,000 on indictment, Quebec Law 25 penalties up to $25 million, CCPA fines up to $7,988 per violation.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Shield className="h-5 w-5 text-red-500 mt-1 flex-shrink-0" />

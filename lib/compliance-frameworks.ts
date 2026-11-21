@@ -28,7 +28,7 @@ export const COMPLIANCE_FRAMEWORKS: Record<ComplianceFramework, ComplianceRequir
     requiresGranularConsent: true, // CCPA requires granular controls
     requiresPrivacyPolicy: true,
     requiresDataRetentionPolicy: false,
-    maxPenalty: '$7,500 per violation',
+    maxPenalty: '$7,988 per violation',
     consentExpiry: 12, // 12 months for CCPA
   },
   tcf: {
@@ -84,7 +84,7 @@ export const COMPLIANCE_FEATURES: Record<ComplianceFramework, string[]> = {
     'Right to delete personal information',
     'Right to opt-out of sale',
     'Non-discrimination protection',
-    '$7,500 per violation'
+    '$7,988 per violation'
   ],
   tcf: [
     'IAB TCF v2.2 compliant',

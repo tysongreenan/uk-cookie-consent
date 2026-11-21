@@ -1899,7 +1899,7 @@ function BannerBuilderContent() {
                           <td className="py-3">Max Penalty</td>
                           <td className="text-center py-3 text-xs">Reputation</td>
                           <td className="text-center py-3 text-xs">€20M</td>
-                          <td className="text-center py-3 text-xs">$7,500</td>
+                          <td className="text-center py-3 text-xs">$7,988</td>
                           <td className="text-center py-3 text-xs">Varies</td>
                         </tr>
                         <tr>

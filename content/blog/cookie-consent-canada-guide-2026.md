@@ -2,7 +2,7 @@
 title: "Is Cookie Consent Required in Canada? PIPEDA and Law 25 (2026)"
 description: "Canada has no single cookie statute. PIPEDA expects meaningful consent. Quebec Law 25 expects express consent. CASL is the anti-spam law, not a cookie-banner rule."
 date: "2025-01-15"
-updatedDate: "2026-10-11"
+updatedDate: "2026-11-21"
 heroCta:
   primary:
     label: "Scan your site"
@@ -96,7 +96,7 @@ Cookie consent in Canada means telling people what a cookie does and getting the
 
 Two privacy laws set the cookie choice. **PIPEDA** is federal. **Quebec's Law 25** is stricter. **CASL** is the anti-spam law, listed here so it is not confused with a cookie statute.
 
-### What Is PIPEDA and How Does It Apply to Cookies?
+### PIPEDA and cookies
 
 PIPEDA (Personal Information Protection and Electronic Documents Act) is Canada's federal privacy law that applies to private-sector organizations. Under PIPEDA, you must:
 
@@ -107,11 +107,11 @@ PIPEDA (Personal Information Protection and Electronic Documents Act) is Canada'
 
 **What this means for cookies:** If a cookie collects personal information, you need meaningful consent. For non-sensitive analytics, clear notice can be enough. Sensitive tracking and marketing need a clearer yes. Read [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/) from the Office of the Privacy Commissioner of Canada.
 
-### What Is CASL and How Does It Apply to Cookies?
+### CASL and cookies
 
 CASL regulates commercial electronic messages and, in some cases, installing a computer program. It is not the statute that tells you whether a cookie banner must be opt-in. This product does not send email and has no CASL mode. Use PIPEDA, and Law 25 for Quebec visitors, for the cookie choice. CRTC guidance is on the [CASL site](https://crtc.gc.ca/eng/internet/anti.htm).
 
-### What Is Quebec's Law 25 and How Is It Different?
+### Quebec's Law 25: stricter than PIPEDA
 
 Quebec has its own privacy law, Bill 64 (Law 25), which is the **strictest privacy law in Canada**. It goes further than PIPEDA in several ways:
 
@@ -131,9 +131,9 @@ If you have users in Quebec, you need to follow the stricter standard. Learn mor
 
 The category decides which rule applies. Strictly necessary cookies are disclosed. Analytics depend on the visitor. Marketing needs a clearer yes.
 
-### Do Strictly Necessary Cookies Require Consent?
+### Strictly necessary cookies
 
-**No.** These cookies are essential for your website to function properly:
+These don't need consent. They are essential for your website to function properly:
 
 **Examples:**
 - Session management (keeping users logged in)
@@ -144,7 +144,7 @@ The category decides which rule applies. Strictly necessary cookies are disclose
 
 **Key Point:** You don't need consent for these, but you must still disclose them in your privacy policy.
 
-### Do Functional Cookies Require Consent?
+### Functional cookies
 
 **Recommended, but not always required.** These enhance user experience but aren't strictly necessary:
 
@@ -182,14 +182,14 @@ The category decides which rule applies. Strictly necessary cookies are disclose
 
 ## How Do I Make My Cookie Banner Compliant?
 
-### How Do I Make My Banner Visible and Clear?
+### Make the banner visible and clear
 
 Your cookie banner must be:
 - Shown before cookies are set
 - Written in plain language
 - Easy to understand and dismiss
 
-### How Do I Provide Granular Cookie Choices?
+### Offer granular choices
 
 Users must be able to:
 - Accept all cookies
@@ -199,22 +199,22 @@ Users must be able to:
 **Bad example:** "By continuing to browse, you consent to cookies."
 **Good example:** "We use cookies for analytics and advertising. You can accept all or customize your preferences."
 
-### Can I Use Pre-Ticked Consent Boxes?
+### No pre-ticked boxes
 
-**No.** Under PIPEDA and Law 25:
+Under PIPEDA and Law 25:
 - Pre-ticked consent boxes are not valid
 - Users must actively opt-in to non-essential cookies
 
-### How Do I Make It Easy to Withdraw Consent?
+### Make withdrawing consent easy
 
 Users must be able to:
 - Change their cookie preferences anytime
 - Find cookie settings easily (footer link is common)
 - Revoke consent without penalty
 
-### Do I Need to Keep Consent Records?
+### Keep consent records
 
-**Yes.** You should document:
+Document:
 - When consent was given
 - What the user consented to
 - Version of your cookie policy at the time
@@ -223,35 +223,35 @@ Users must be able to:
 
 ## What Are Common Cookie Consent Mistakes to Avoid?
 
-### What Happens If I Load Cookies Before Consent?
+### Loading cookies before consent
 
 Many websites load Google Analytics or Facebook Pixel immediately, then show a cookie banner. This is not compliant.
 
 **Solution:** Use a consent management platform that only loads tracking scripts after user consent.
 
-### Can I Use "Scroll = Consent" Banners?
+### Treating scrolling as consent
 
-**No.** Banners that imply scrolling equals consent are not valid under Canadian law.
+Banners that imply scrolling equals consent are not valid under Canadian law.
 
 **Solution:** Require explicit action (button click) to accept cookies.
 
-### Can I Hide the Reject Button?
+### Hiding the reject button
 
-**No.** Making the "Accept" button prominent while hiding or de-emphasizing the "Reject" option is a dark pattern and may violate PIPEDA.
+Making the "Accept" button prominent while hiding or de-emphasizing the "Reject" option is a dark pattern and may violate PIPEDA.
 
 **Solution:** Make both accept and reject options equally visible.
 
-### Do I Need a Cookie Policy?
+### Skipping the cookie policy
 
-**Yes.** A banner alone isn't enough. You need a detailed cookie policy that explains:
+A banner alone isn't enough. You need a detailed cookie policy that explains:
 - What cookies you use
 - Why you use them
 - How long they last
 - How users can control them
 
-### Can I Copy a US or EU Banner?
+### Copying a US or EU banner
 
-**Not recommended.** US websites often have weaker cookie consent requirements. EU banners (GDPR) are closer but still different from Canadian requirements.
+Avoid it. US websites often have weaker cookie consent requirements. EU banners (GDPR) are closer but still different from Canadian requirements.
 
 **Solution:** Match the banner to the visitor. PIPEDA can use a clear notice for non-sensitive analytics. Quebec and marketing need express consent.
 
@@ -259,25 +259,26 @@ Many websites load Google Analytics or Facebook Pixel immediately, then show a c
 
 ## What Are the Penalties for Non-Compliance?
 
-### What Are PIPEDA Penalties?
+### PIPEDA penalties
 
 While PIPEDA historically focused on complaints rather than fines, the **Privacy Commissioner of Canada** can:
 - Issue public findings against your organization
 - Damage your reputation and trust
 - Refer cases to Federal Court (which can award damages)
 
-### What Are CASL Penalties?
+Fines apply only to specific offences in [section 28](https://laws-lois.justice.gc.ca/eng/acts/P-8.6/section-28.html), such as knowingly failing to report or record a breach or obstructing the Commissioner: up to $10,000 on summary conviction or $100,000 on indictment.
+
+### CASL penalties
 
 CASL has **serious teeth**:
 - Up to **$10 million per violation** for businesses
 - Up to **$1 million per violation** for individuals
-- No warnings required — fines can be issued immediately
 
-### What Are Quebec Law 25 Penalties?
+### Quebec Law 25 penalties
 
 Under Bill 64:
-- Up to **$25 million** or **4% of global revenue** (whichever is greater)
-- Administrative penalties of **$10,000 per individual** and **$50,000 per company**
+- Penal fines for companies up to **$25 million** or **4% of worldwide turnover** for the preceding fiscal year, whichever is greater
+- Administrative monetary penalties for companies up to **$10 million** or **2% of worldwide turnover** for the preceding fiscal year, whichever is greater, and up to **$50,000** for individuals
 
 **The takeaway:** Non-compliance is expensive and risky.
 
@@ -285,24 +286,24 @@ Under Bill 64:
 
 ## How Do I Implement a Compliant Cookie Banner?
 
-### Should I Use a Canadian-Focused Tool?
+### Using a Canadian-focused tool
 
-**Yes, for most businesses.** Look for cookie banner tools that:
+For most businesses, a tool built for Canadian rules is the simplest route. Look for cookie banner tools that:
 - Can be set for PIPEDA meaningful consent, and a stricter choice for Quebec visitors. There is no CASL mode.
 - Can keep scripts you add in the builder off until the visitor opts in. It cannot block cookies that other code sets.
 - Offer granular controls
 - Are easy to customize and brand
 
-### Can I Build My Own Cookie Banner?
+### Building your own banner
 
-**Not recommended.** Building your own cookie banner requires:
+Usually not worth it. Building your own cookie banner requires:
 - Deep knowledge of Canadian privacy laws
 - Technical skills to block cookies until consent
 - Ongoing maintenance as laws change
 
 **Most businesses are better off using a specialized tool.**
 
-### What Should I Look for in a Cookie Banner Tool?
+### What to look for in a banner tool
 
 Use this checklist to evaluate cookie banner solutions:
 

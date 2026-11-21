@@ -2,7 +2,7 @@
 title: "GDPR Cookie Consent Requirements: The 6 Rules (2026)"
 description: "Six GDPR cookie rules — freely given, specific, informed, unambiguous, prior, and easy to withdraw — plus a free checklist. Fines can reach €20 million."
 date: "2025-01-17"
-updatedDate: "2026-10-11"
+updatedDate: "2026-11-21"
 heroCta:
   primary:
     label: "Scan your site"
@@ -673,7 +673,7 @@ GDPR is not the only privacy law that governs cookies. Understanding how it comp
 | Scope | EU/EEA residents | California residents |
 | Cookie consent required | Yes, explicit | Not specifically for cookies |
 | Right to delete | Yes | Yes |
-| Fines | Up to 20M euros or 4% revenue | Up to $7,500 per violation |
+| Fines | Up to 20M euros or 4% revenue | Up to $7,988 per violation |
 
 ### GDPR vs PIPEDA (Canada)
 
