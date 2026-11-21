@@ -2,6 +2,7 @@
 title: "Multi-Language Cookie Banners: How to Show Cookie Consent in 10 Languages Automatically"
 description: "Learn how to create cookie consent banners that auto-detect visitor language and display in their native tongue. Covers 10 languages including Japanese, Arabic, German, and more."
 date: "2026-04-04"
+updatedDate: "2026-11-21"
 author: "cookie-banner-team"
 tags: ["Multi-Language", "Cookie Consent", "GDPR", "Compliance", "International"]
 published: true
@@ -35,7 +36,7 @@ schema:
 
 - [Why multi-language matters for cookie consent](#why-multi-language-matters-for-cookie-consent)
 - [The legal argument: informed consent](#the-legal-argument-informed-consent)
-- [10 languages that cover 80% of the internet](#10-languages-that-cover-80-of-the-internet)
+- [The 10 languages the banner supports](#the-10-languages-the-banner-supports)
 - [How auto-detect works](#how-auto-detect-works)
 - [RTL support for Arabic](#rtl-support-for-arabic)
 - [Geo-targeting vs auto-detect](#geo-targeting-vs-auto-detect)
@@ -50,16 +51,13 @@ If your website gets traffic from multiple countries, your cookie banner is the 
 
 This isn't just a UX problem. It's a compliance problem.
 
-**Key stats:**
-- 75% of internet users prefer content in their native language
-- Cookie consent rates increase 15-25% when shown in the visitor's language
-- GDPR requires "informed" consent — informed means understood
+GDPR requires "informed" consent, and a visitor can't be informed by text they can't read.
 
 ---
 
 ## The legal argument: informed consent
 
-Under GDPR Article 7, consent must be:
+Under GDPR (Article 4(11), with the conditions in Article 7), consent must be:
 - **Freely given** — not forced
 - **Specific** — for a clear purpose
 - **Informed** — the user understands what they're agreeing to
@@ -67,30 +65,30 @@ Under GDPR Article 7, consent must be:
 
 The "informed" requirement is where language matters. If a German visitor can't read your English cookie banner, can their consent truly be "informed"?
 
-While GDPR doesn't explicitly require banners in every language, **data protection authorities have fined companies for consent mechanisms that users couldn't reasonably understand.**
+GDPR doesn't require a banner in every language, but [Article 7(2)](https://gdpr-info.eu/art-7-gdpr/) says a consent request must use **clear and plain language** the visitor can understand.
 
 **Best practice:** Match the cookie banner language to the website content language. If your site is available in German, your banner should be too.
 
 ---
 
-## 10 languages that cover 80% of the internet
+## The 10 languages the banner supports
 
-These 10 languages cover the vast majority of global internet users:
+The banner switches to these automatically. It also covers Dutch, Swedish, Norwegian, Danish, Italian and Finnish.
 
-| Language | Internet Users | Code |
-|----------|---------------|------|
-| English | 1.5 billion | en |
-| Chinese | 1.1 billion | zh |
-| Spanish | 400 million | es |
-| Arabic | 280 million | ar |
-| Portuguese | 270 million | pt |
-| French | 260 million | fr |
-| Japanese | 120 million | ja |
-| German | 100 million | de |
-| Korean | 80 million | ko |
-| Hindi | 75 million | hi |
+| Language | Code |
+|----------|------|
+| English | en |
+| Chinese | zh |
+| Spanish | es |
+| Arabic | ar |
+| Portuguese | pt |
+| French | fr |
+| Japanese | ja |
+| German | de |
+| Korean | ko |
+| Hindi | hi |
 
-Supporting all 10 means your cookie banner can be understood by over **4 billion internet users**.
+Together they cover most of the world's internet users.
 
 ---
 

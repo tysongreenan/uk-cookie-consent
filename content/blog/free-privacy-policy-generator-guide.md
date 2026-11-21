@@ -2,6 +2,7 @@
 title: "Free Privacy Policy Generator: Create a Legally Compliant Policy in 5 Minutes"
 description: "Use our free privacy policy generator to create a GDPR, PIPEDA, CCPA, and Law 25 compliant privacy policy. No signup required. Copy-paste ready."
 date: "2026-04-05"
+updatedDate: "2026-11-21"
 author: "cookie-banner-team"
 tags: ["Privacy Policy", "GDPR", "PIPEDA", "Compliance", "Free Tools"]
 published: true
@@ -78,10 +79,9 @@ If your website collects **any** personal data, you need a privacy policy. This 
 | Risk | Consequence |
 |------|-------------|
 | **GDPR violation** | Fines up to 4% of global annual revenue or €20 million |
-| **PIPEDA violation** | Fines up to CAD $10 million per violation |
-| **CCPA violation** | Fines up to $7,500 per intentional violation |
+| **PIPEDA violation** | Fines up to CAD $100,000 per offence for knowingly breaking breach-reporting rules ([PIPEDA s. 28](https://laws-lois.justice.gc.ca/eng/acts/P-8.6/section-28.html)) |
+| **CCPA violation** | Fines up to $7,988 per intentional violation |
 | **Platform restrictions** | Google, Apple, Facebook may suspend your accounts |
-| **Lost customers** | 87% of consumers won't do business with a company with poor privacy practices |
 
 A privacy policy isn't just a legal checkbox — it's a trust signal. Users look for it before submitting personal information.
 

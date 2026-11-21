@@ -2,7 +2,7 @@
 title: "Cookie Scanner: The Complete Guide to Auditing Your Website's Cookies"
 description: "Use a cookie scanner to audit your website for compliance. Compare free and paid cookie scanning tools, understand scan results, and fix issues fast."
 date: "2026-03-16"
-updatedDate: "2026-09-15"
+updatedDate: "2026-11-21"
 heroCta:
   primary:
     label: "Scan your site"
@@ -118,7 +118,7 @@ Cookies can appear on your site without your knowledge through:
 - **CDN and hosting providers** — services like Cloudflare or AWS may set performance cookies
 - **Analytics tools** — Google Analytics alone sets 4-6 cookies per visitor
 
-Without running a cookie scan, you are almost certainly non-compliant. Under [GDPR cookie consent requirements](/blog/gdpr-cookie-consent-requirements), failing to disclose cookies can result in fines of up to 4% of global revenue or 20 million euros. Under [PIPEDA and Quebec's Law 25](/blog/cookie-consent-canada-guide-2026), penalties reach $25 million. And under the [CCPA](/compliance/ccpa), consumers can sue for $100-$750 per incident for certain violations.
+If you have never scanned your site, you probably don't have a full list of the cookies it sets, and most privacy laws expect you to disclose them. Under [GDPR cookie consent requirements](/blog/gdpr-cookie-consent-requirements), fines can reach 4% of global revenue or 20 million euros. Under [Quebec's Law 25](/blog/cookie-consent-canada-guide-2026), penal fines can reach $25 million CAD or 4% of worldwide turnover. And under the [CCPA](/compliance/ccpa), consumers can sue for $107–$799 per incident for certain violations.
 
 **The bottom line:** You cannot write an accurate cookie policy, configure a compliant consent banner, or respond to a regulator's inquiry without first knowing what cookies your website sets. A cookie scanner gives you that visibility.
 
@@ -160,7 +160,7 @@ The scanner generates a report listing every cookie found, including its name, d
 
 Not all **cookie scanning tools** are created equal. The best scanners offer:
 
-- **JavaScript rendering** — catches cookies set by dynamically loaded scripts (roughly 40% of tracking cookies are set this way)
+- **JavaScript rendering** — catches cookies set by scripts after the page loads, which is how most analytics and ad tags work
 - **Multi-page crawling** — scans beyond the homepage to find cookies on login pages, checkout flows, and subdomains
 - **Cookie database matching** — automatically identifies known cookies (like `_ga` for Google Analytics) instead of just listing unknown entries
 - **Regular re-scanning** — compliance is not a one-time event; your cookie landscape changes every time you update a plugin or add a new tool
@@ -322,7 +322,7 @@ Your website's cookies change every time you:
 - **Change ad networks or analytics providers** — switching from Universal Analytics to GA4, for example, changed cookie names and behavior
 - **Embed third-party content** — YouTube videos, social media feeds, and maps all set cookies
 
-According to research by Cookiebot, the average website's cookie inventory changes by **15-25% per quarter** due to plugin updates, script changes, and third-party modifications.
+Any of these can add cookies you haven't disclosed, which is why a one-time scan goes stale.
 
 ### Recommended Scanning Schedule
 
@@ -408,21 +408,21 @@ Schedule regular scans to catch new cookies as they appear. Document each scan w
 
 ## How Cookie-Banner.ca's Free Cookie Scanner Works
 
-The [cookie-banner.ca cookie scanner](/tools/cookie-scanner) is designed to give website owners a fast, accurate view of their cookie compliance status — at no cost.
+The [cookie-banner.ca cookie scanner](/tools/cookie-scanner) lists the cookies a public page sets, for free, in about 30 seconds.
 
 ### What Our Scanner Does
 
 1. **Enter your URL** — type your website address and click "Scan"
 2. **Automated crawl** — our scanner visits your site in a headless browser, rendering JavaScript just like a real visitor would
 3. **Full detection** — we capture HTTP cookies, JavaScript cookies, and third-party requests
-4. **Instant categorization** — each cookie is matched against our database of 50,000+ known cookies and categorized automatically
-5. **Compliance report** — you receive a clear breakdown of cookies by category, with flagged compliance issues
+4. **Categorization** — known cookies (like `_ga` or `_fbp`) are sorted into necessary, functional, analytics, or marketing; unknown ones are flagged as likely non-essential
+5. **Report** — you get the cookies grouped by category, with duration and first- or third-party. It does not decide whether your site is compliant
 
 ### Why Website Owners Choose Our Scanner
 
 - **No signup required** — scan instantly without creating an account
 - **Accurate JavaScript rendering** — catches cookies that basic crawlers miss
-- **Privacy-first** — we do not store your scan data or share it with third parties
+- **Nothing to install** — it runs in your browser against any public URL
 - **Actionable results** — every issue includes a clear explanation and fix recommendation
 - **Seamless next step** — connect your scan results directly to our [cookie banner builder](/builder) to create a compliant consent banner pre-configured with the exact cookies your site uses
 

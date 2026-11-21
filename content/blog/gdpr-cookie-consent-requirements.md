@@ -673,7 +673,7 @@ GDPR is not the only privacy law that governs cookies. Understanding how it comp
 | Scope | EU/EEA residents | California residents |
 | Cookie consent required | Yes, explicit | Not specifically for cookies |
 | Right to delete | Yes | Yes |
-| Fines | Up to 20M euros or 4% revenue | Up to $7,500 per violation |
+| Fines | Up to 20M euros or 4% revenue | Up to $7,988 per violation |
 
 ### GDPR vs PIPEDA (Canada)
 

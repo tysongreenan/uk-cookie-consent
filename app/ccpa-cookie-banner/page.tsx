@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 const faqItems = [
   {
     question: "Do I need a CCPA cookie banner?",
-    answer: 'If your business collects personal information from California residents and meets CCPA thresholds (annual gross revenue over $25 million, buys/sells data of 100,000+ consumers, or derives 50%+ of revenue from selling personal information), you need a CCPA-compliant cookie banner with a "Do Not Sell My Personal Information" link.'
+    answer: 'If your business collects personal information from California residents and meets CCPA thresholds (annual gross revenue over $26.625 million, buys/sells data of 100,000+ consumers, or derives 50%+ of revenue from selling personal information), you need a CCPA-compliant cookie banner with a "Do Not Sell My Personal Information" link.'
   },
   {
     question: "What is the difference between CCPA and CPRA?",
@@ -57,7 +57,7 @@ const faqItems = [
   },
   {
     question: "What are CCPA penalties for non-compliance?",
-    answer: "CCPA violations can result in fines of $2,500 per unintentional violation and $7,500 per intentional violation. The California Attorney General and the California Privacy Protection Agency (CPPA) can enforce these penalties. Consumers can also sue for data breaches, with statutory damages of $100-$750 per consumer per incident."
+    answer: "CCPA violations can result in fines of $2,663 per unintentional violation and $7,988 per intentional violation. The California Attorney General and the California Privacy Protection Agency (CPPA) can enforce these penalties. Consumers can also sue for data breaches, with statutory damages of $107–$799 per consumer per incident."
   },
   {
     question: "Does the CCPA require opt-in or opt-out consent?",
@@ -254,7 +254,7 @@ export default function CCPACookieBannerPage() {
                     </tr>
                     <tr className="border-b border-border bg-muted/30">
                       <td className="py-4 px-6 font-medium text-foreground">Fines</td>
-                      <td className="py-4 px-6 text-center">$2,500–$7,500 per violation</td>
+                      <td className="py-4 px-6 text-center">$2,663–$7,988 per violation</td>
                       <td className="py-4 px-6 text-center">Up to 4% of global revenue</td>
                     </tr>
                     <tr className="border-b border-border">
@@ -264,7 +264,7 @@ export default function CCPACookieBannerPage() {
                     </tr>
                     <tr className="border-b border-border bg-muted/30">
                       <td className="py-4 px-6 font-medium text-foreground">Revenue Threshold</td>
-                      <td className="py-4 px-6 text-center">$25M+ annual revenue</td>
+                      <td className="py-4 px-6 text-center">$26.6M+ annual revenue</td>
                       <td className="py-4 px-6 text-center">No threshold</td>
                     </tr>
                   </tbody>
@@ -299,7 +299,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <DollarSign className="h-8 w-8 text-destructive" />
                     </div>
-                    <CardTitle className="text-3xl font-bold text-destructive">$2,500</CardTitle>
+                    <CardTitle className="text-3xl font-bold text-destructive">$2,663</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="font-medium text-foreground mb-2">Per Unintentional Violation</p>
@@ -314,7 +314,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <AlertTriangle className="h-8 w-8 text-destructive" />
                     </div>
-                    <CardTitle className="text-3xl font-bold text-destructive">$7,500</CardTitle>
+                    <CardTitle className="text-3xl font-bold text-destructive">$7,988</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="font-medium text-foreground mb-2">Per Intentional Violation</p>
@@ -470,7 +470,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <DollarSign className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-3xl font-bold text-foreground mb-2">$25M+</p>
+                    <p className="text-3xl font-bold text-foreground mb-2">$26.6M+</p>
                     <p className="text-muted-foreground">Annual gross revenue</p>
                   </CardContent>
                 </Card>

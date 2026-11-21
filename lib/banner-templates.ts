@@ -193,7 +193,7 @@ export const CCPA_TEMPLATE: BannerConfig = {
     requiresGranularConsent: true,
     requiresPrivacyPolicy: true,
     requiresDataRetentionPolicy: false,
-    maxPenalty: '$7,500 per violation',
+    maxPenalty: '$7,988 per violation',
     consentExpiry: 12,
   },
   name: 'CCPA Compliant Banner',

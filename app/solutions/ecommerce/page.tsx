@@ -137,7 +137,7 @@ export default function EcommerceSolutionPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Compliance Fines</h3>
                 <p className="text-gray-600">
-                  GDPR fines up to 4% of annual revenue, CCPA penalties up to $7,500 per violation, plus legal costs.
+                  GDPR fines up to 4% of annual revenue, CCPA penalties up to $7,988 per violation, plus legal costs.
                 </p>
               </Card>
 
@@ -768,7 +768,7 @@ export default function EcommerceSolutionPage() {
                       </div>
                       <div className="flex justify-between">
                         <span>CCPA Penalty</span>
-                        <span className="font-bold text-red-600">$2,500-7,500 per violation</span>
+                        <span className="font-bold text-red-600">$2,663–$7,988 per violation</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Legal Costs</span>

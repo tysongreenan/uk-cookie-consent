@@ -1,6 +1,6 @@
 ---
 title: "CCPA Cookie Compliance: The Complete CCPA & CPRA Cookie Guide (2026)"
-description: "CCPA and CPRA require a Do Not Sell or Share opt-out for tracking cookies. Fines up to $7,500 per violation. Scan your site or start a free cookie banner."
+description: "CCPA and CPRA require a Do Not Sell or Share opt-out for tracking cookies. Fines up to $7,988 per violation. Scan your site or start a free cookie banner."
 date: "2026-03-16"
 heroCta:
   primary:
@@ -13,7 +13,7 @@ author: "cookie-banner-team"
 tags: ["CCPA", "CPRA", "California", "Privacy Law", "Cookie Consent", "Cookie Banner", "Do Not Sell"]
 published: true
 canonical: "/blog/ccpa-cpra-cookie-compliance-guide"
-updatedDate: "2026-05-26"
+updatedDate: "2026-11-21"
 keywords:
   - "ccpa cookie compliance"
   - "ccpa cookies"
@@ -60,12 +60,12 @@ schema:
       name: "What are the penalties for CCPA cookie non-compliance?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "CCPA violations can result in fines of $2,500 per unintentional violation and $7,500 per intentional violation, enforced by the California Attorney General and the California Privacy Protection Agency. Consumers can also sue for data breaches involving $100 to $750 per consumer per incident."
+        text: "CCPA violations can result in fines of $2,663 per unintentional violation and $7,988 per intentional violation, enforced by the California Attorney General and the California Privacy Protection Agency. Consumers can also sue for data breaches involving $107 to $799 per consumer per incident."
     - "@type": "Question"
       name: "Does the CCPA apply to my website?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "The CCPA applies if you do business in California and meet any of these thresholds: annual gross revenue over $25 million, buy/sell/share personal information of 100,000 or more consumers or households, or derive 50% or more of annual revenue from selling or sharing personal information."
+        text: "The CCPA applies if you do business in California and meet any of these thresholds: annual gross revenue over $26.625 million, buy/sell/share personal information of 100,000 or more consumers or households, or derive 50% or more of annual revenue from selling or sharing personal information."
     - "@type": "Question"
       name: "How does CCPA cookie consent differ from GDPR?"
       acceptedAnswer:
@@ -74,7 +74,7 @@ schema:
 ---
 
 <div class="direct-answer">
-<strong>Direct Answer:</strong> CCPA cookie compliance means an opt-out of sale or share, plus a Do Not Sell or Share link. It is not the EU opt-in. The CPRA expanded this to sharing for cross-context advertising. Fines can reach $7,500 per violation. Whether you need a banner is answered on the <a href="/compliance/ccpa">CCPA cookie compliance page</a>.
+<strong>Direct Answer:</strong> CCPA cookie compliance means an opt-out of sale or share, plus a Do Not Sell or Share link. It is not the EU opt-in. The CPRA expanded this to sharing for cross-context advertising. Fines can reach $7,988 per violation. Whether you need a banner is answered on the <a href="/compliance/ccpa">CCPA cookie compliance page</a>.
 </div>
 
 <div class="article-cta">
@@ -109,7 +109,7 @@ The CCPA was signed into law in 2018 and took effect on January 1, 2020. The CPR
 
 **Who must comply?** The CCPA applies to for-profit businesses that do business in California and meet at least one of these thresholds:
 
-- Annual gross revenue exceeding **$25 million**
+- Annual gross revenue exceeding **$26.625 million**
 - Buy, sell, or share the personal information of **100,000 or more** California consumers, households, or devices annually
 - Derive **50% or more** of annual revenue from selling or sharing consumers' personal information
 
@@ -129,7 +129,7 @@ Understanding the difference between CCPA and CPRA is critical for cookie compli
 | **"Sharing" definition** | Not defined | Sharing personal information for **cross-context behavioral advertising**, including through cookies and pixels |
 | **Sensitive personal information** | Not a separate category | New category with additional opt-out rights (precise geolocation, race, health data, etc.) |
 | **Enforcement body** | California Attorney General only | New **California Privacy Protection Agency (CPPA)** plus the Attorney General |
-| **Penalties** | $2,500/$7,500 per violation | Same fines, but **$7,500 for violations involving minors' data** and a **dedicated enforcement agency** |
+| **Penalties** | $2,663/$7,988 per violation | Same fines, but **$7,988 for violations involving minors' data** and a **dedicated enforcement agency** |
 | **Consent for minors** | Opt-in required for under-16 | Extended to include opt-in for **known children under 16**; businesses must wait **12 months** before asking again after opt-out |
 | **Global Privacy Control** | Not addressed | Businesses **must honor** GPC signals as valid opt-out requests |
 | **Data minimization** | Not required | Businesses must limit data collection to what is **reasonably necessary** |
@@ -295,7 +295,7 @@ If your website serves both California and European users, you need to understan
 | **Children's data** | Opt-in for under 16 | Opt-in for under 16 (varies by country) |
 | **Scope** | California residents | Anyone in EU/EEA |
 | **Browser signals** | Must honor GPC | Varies; no uniform requirement yet |
-| **Fines** | $2,500-$7,500 per violation | Up to 4% of global revenue or EUR 20 million |
+| **Fines** | $2,663-$7,988 per violation | Up to 4% of global revenue or EUR 20 million |
 
 **Practical implications:** If you serve both GDPR and CCPA audiences, the simplest approach is to default to GDPR's stricter opt-in standard for EU users and implement the CCPA's opt-out mechanism for California users. A geolocation-aware consent management platform can serve the appropriate banner based on the visitor's location.
 
@@ -313,7 +313,7 @@ Use this checklist to verify your website meets all CCPA and CPRA cookie require
 - [ ] **Categorize each cookie** as strictly necessary, functional, analytics, or advertising/marketing
 - [ ] **Identify which cookies involve "selling" or "sharing"** personal information with third parties
 - [ ] **Document the purpose, duration, and provider** for each cookie
-- [ ] **Determine if you meet CCPA thresholds** ($25M revenue, 100K consumers, or 50% revenue from data)
+- [ ] **Determine if you meet CCPA thresholds** ($26.6M revenue, 100K consumers, or 50% revenue from data)
 
 ### Cookie Banner and Opt-Out
 
@@ -383,12 +383,12 @@ The California Privacy Protection Agency has stated publicly that it is investig
 
 | Violation Type | Fine Amount |
 |---------------|-------------|
-| Unintentional violation | **$2,500** per violation |
-| Intentional violation | **$7,500** per violation |
-| Violations involving minors' data (CPRA) | **$7,500** per violation |
-| Consumer private right of action (data breaches) | **$100 — $750** per consumer per incident |
+| Unintentional violation | **$2,663** per violation |
+| Intentional violation | **$7,988** per violation |
+| Violations involving minors' data (CPRA) | **$7,988** per violation |
+| Consumer private right of action (data breaches) | **$107 — $799** per consumer per incident |
 
-The "per violation" structure is significant. If you are collecting data through non-compliant cookies from thousands of California consumers, each instance can count as a separate violation. A website with 10,000 affected California users could theoretically face fines ranging from **$25 million to $75 million**.
+Amounts are the California Privacy Protection Agency's [inflation-adjusted figures, effective January 1, 2025](https://cppa.ca.gov/announcements/2024/20241217.html). They are maximums per violation, not automatic fines. Each affected consumer can count as a separate violation, so exposure grows with the number of California visitors.
 
 ---
 
@@ -477,11 +477,11 @@ Third-party advertising cookies, retargeting pixels, cross-site tracking cookies
 
 ### What are the penalties for CCPA cookie non-compliance?
 
-CCPA violations carry fines of **$2,500 per unintentional violation** and **$7,500 per intentional violation**, enforced by the California Attorney General and the California Privacy Protection Agency. Violations involving minors' data are automatically treated as $7,500 per violation under the CPRA. Consumers can also sue for data breaches involving their personal information, with statutory damages of $100 to $750 per consumer per incident.
+CCPA violations carry fines of **$2,663 per unintentional violation** and **$7,988 per intentional violation**, enforced by the California Attorney General and the California Privacy Protection Agency. Violations involving minors' data are automatically treated as $7,988 per violation under the CPRA. Consumers can also sue for data breaches involving their personal information, with statutory damages of $107 to $799 per consumer per incident.
 
 ### Does the CCPA apply to my website?
 
-The CCPA applies to for-profit businesses that do business in California and meet at least one threshold: annual gross revenue over $25 million, buying/selling/sharing personal information of 100,000 or more consumers or households annually, or deriving 50% or more of annual revenue from selling or sharing personal information. Non-profit organizations and government agencies are exempt.
+The CCPA applies to for-profit businesses that do business in California and meet at least one threshold: annual gross revenue over $26.625 million, buying/selling/sharing personal information of 100,000 or more consumers or households annually, or deriving 50% or more of annual revenue from selling or sharing personal information. Non-profit organizations and government agencies are exempt.
 
 ### How does CCPA cookie consent differ from GDPR?
 
