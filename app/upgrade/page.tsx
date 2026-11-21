@@ -90,7 +90,7 @@ function UpgradeContent() {
     if (!go) return
     autoCheckoutFired.current = true
     // Drop the flag synchronously so Back from Stripe does not loop into checkout.
-    window.history.replaceState(window.history.state, '', `/upgrade?billing=${billingCycle}`)
+    window.history.replaceState(null, '', `/upgrade?billing=${billingCycle}`)
     void handleUpgrade()
   }, [status, session, billingCycle, searchParams, handleUpgrade])
 
