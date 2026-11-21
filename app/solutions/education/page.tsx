@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { GraduationCap, Shield, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, BookOpen, Laptop, UserCheck } from 'lucide-react'
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: '/solutions/education',
+  },
   title: 'Education Cookie Consent | FERPA COPPA Compliance Solution 2025',
   description: 'Complete education cookie consent solution for schools, universities, and EdTech platforms. FERPA compliance, COPPA for children under 13, student data protection, LMS integration.',
   keywords: 'school website cookies, edtech privacy compliance, FERPA cookie consent, COPPA compliance, student data protection, university privacy',

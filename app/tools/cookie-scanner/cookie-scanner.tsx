@@ -9,7 +9,6 @@ import {
   Check,
   Shield,
   Zap,
-  Activity,
   AlertTriangle,
   Download,
   FileText,
@@ -633,10 +632,7 @@ export function CookieScanner() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <Activity className="h-3.5 w-3.5" /> 47,000+ scans run
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Shield className="h-3.5 w-3.5" /> 4 privacy laws checked
+              <Shield className="h-3.5 w-3.5" /> No signup
             </span>
             <span className="flex items-center gap-1.5">
               <Zap className="h-3.5 w-3.5" /> Results in &lt;30s

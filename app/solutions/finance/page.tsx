@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { DollarSign, Shield, Lock, Users, Globe, CheckCircle, AlertTriangle, ExternalLink, Download, CreditCard, TrendingUp } from 'lucide-react'
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: '/solutions/finance',
+  },
   title: 'Financial Cookie Consent | Banking GDPR Compliance Solution 2025',
   description: 'Complete financial cookie consent solution for banks, fintech, and investment platforms. GLBA, PCI-DSS + cookie law compliance, fraud prevention, security-focused cookie management.',
   keywords: 'financial website cookies, banking gdpr compliance, fintech privacy, investment platform cookies, financial data protection',

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,22 +9,25 @@ import { Header } from '@/components/landing/header'
 import { Footer } from '@/components/landing/footer'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { captureEvent } from '@/lib/analytics'
+import { authUrlForUpgrade, resolveBillingCycle, shouldAutoStartCheckout } from '@/lib/upgrade-flow'
 
 function UpgradeContent() {
   const { data: session, status } = useSession()
   const searchParams = useSearchParams()
-  const initialBilling = searchParams.get('billing') === 'one_time' ? 'one_time' : 'annual'
+  const router = useRouter()
+  const initialBilling = resolveBillingCycle(searchParams.get('billing'))
   const [billingCycle, setBillingCycle] = useState<'one_time' | 'annual'>(initialBilling)
+  const autoCheckoutFired = useRef(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const isLifetimeUser = session?.user?.planTier === 'pro_lifetime' || session?.user?.planTier === 'pro'
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = useCallback(async () => {
     if (!session?.user?.id) {
-      window.location.href = '/auth/signin?callbackUrl=/upgrade'
+      window.location.href = authUrlForUpgrade('signin', billingCycle)
       return
     }
 
@@ -71,7 +74,24 @@ function UpgradeContent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [session, billingCycle])
+
+  // Buyers who were sent to sign-in / sign-up come back with `checkout=1`:
+  // take them straight to Stripe instead of making them find the button again.
+  useEffect(() => {
+    if (autoCheckoutFired.current || status !== 'authenticated') return
+    const go = shouldAutoStartCheckout({
+      checkoutParam: searchParams.get('checkout'),
+      signedIn: Boolean(session?.user?.id),
+      planTier: session?.user?.planTier,
+      billing: billingCycle,
+    })
+    if (!go) return
+    autoCheckoutFired.current = true
+    // Drop the flag so Back from Stripe does not loop into checkout again.
+    router.replace(`/upgrade?billing=${billingCycle}`)
+    void handleUpgrade()
+  }, [status, session, billingCycle, searchParams, router, handleUpgrade])
 
   const proFeatures = [
     { icon: <Crown className="h-5 w-5" />, title: 'Unlimited Banners', desc: 'Create as many banners as you need' },
@@ -97,20 +117,26 @@ function UpgradeContent() {
         <Header />
         <div className="pt-20 pb-12 px-4 max-w-2xl mx-auto text-center">
           <Crown className="h-16 w-16 mx-auto mb-6 text-primary" />
-          <h1 className="text-4xl font-bold mb-4">Upgrade to Pro</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            {billingCycle === 'annual' ? 'Pro Annual — $99 USD/year' : 'Pro Lifetime — $99 USD once'}
+          </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Sign up for a free account first, then upgrade
+            Pro attaches to your account, so make a free one first (about a minute). You go straight to secure Stripe checkout after.
           </p>
           <Button size="lg" className="w-full max-w-md" asChild>
-            <Link href={`/auth/signup?callbackUrl=/upgrade${billingCycle !== 'annual' ? `%3Fbilling%3D${billingCycle}` : ''}`}>
-              Create Free Account & Upgrade
+            <Link href={authUrlForUpgrade('signup', billingCycle)}>
+              Continue to checkout
+              <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
             Already have an account?{' '}
-            <Link href="/auth/signin?callbackUrl=/upgrade" className="text-primary hover:underline">
-              Sign in
+            <Link href={authUrlForUpgrade('signin', billingCycle)} className="text-primary hover:underline">
+              Sign in and pay
             </Link>
+          </p>
+          <p className="text-xs text-muted-foreground mt-4">
+            30-day money-back guarantee. All prices in US dollars.
           </p>
           <p className="text-sm text-muted-foreground mt-6">
             Want to see what&apos;s coming?{' '}
@@ -147,28 +173,34 @@ function UpgradeContent() {
         {/* Billing toggle (hide for lifetime users — they only see annual) */}
         {!isLifetimeUser && (
           <div className="flex justify-center mb-10">
-            <div className="inline-flex items-center rounded-full border p-1">
-              <button
-                onClick={() => setBillingCycle('annual')}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                  billingCycle === 'annual'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                $99/year
-                <span className="ml-1 text-[10px] font-normal opacity-80">recommended</span>
-              </button>
-              <button
-                onClick={() => setBillingCycle('one_time')}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                  billingCycle === 'one_time'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                $99 one-time
-              </button>
+            <div className="flex flex-col items-center gap-3">
+              <div className="inline-flex items-center rounded-full border p-1" role="group" aria-label="Choose a plan">
+                <button
+                  onClick={() => setBillingCycle('one_time')}
+                  aria-pressed={billingCycle === 'one_time'}
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                    billingCycle === 'one_time'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Lifetime · $99 once
+                </button>
+                <button
+                  onClick={() => setBillingCycle('annual')}
+                  aria-pressed={billingCycle === 'annual'}
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                    billingCycle === 'annual'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Annual · $99/year
+                </button>
+              </div>
+              <p className="text-sm text-muted-foreground text-center max-w-md">
+                Same price, same Pro features today. Lifetime keeps them forever. Annual also adds every new feature we ship while you&apos;re subscribed.
+              </p>
             </div>
           </div>
         )}
@@ -181,8 +213,8 @@ function UpgradeContent() {
                 <Crown className="h-5 w-5 text-primary" />
                 {isLifetimeUser ? 'Pro Annual' : billingCycle === 'annual' ? 'Pro Annual' : 'Pro Lifetime'}
               </CardTitle>
-              {(billingCycle === 'annual' || isLifetimeUser) && (
-                <Badge className="bg-primary text-primary-foreground">Recommended</Badge>
+              {billingCycle === 'one_time' && !isLifetimeUser && (
+                <Badge className="bg-primary text-primary-foreground">Most popular</Badge>
               )}
             </div>
             <CardDescription>

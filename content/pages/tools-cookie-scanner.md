@@ -1,6 +1,6 @@
 ---
-title: "Cookie Scanner: Free, No Signup, Any URL in 30s"
-description: "Free cookie scanner and checker: paste any public URL and get cookies, categories, plus GDPR, CCPA, PIPEDA and Law 25 notes in about 30 seconds. No signup."
+title: "Cookie Scanner & Checker: Free, No Signup, Results in 30s"
+description: "Free cookie scanner and checker: paste any public URL to see every cookie it sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. No signup."
 ---
 
 The interactive scanner on this page needs a browser. This markdown page is the agent-readable version: what the tool does, how to run it, and what the report contains.
@@ -10,7 +10,7 @@ The interactive scanner on this page needs a browser. This markdown page is the 
 1. Open https://www.cookie-banner.ca/tools/cookie-scanner
 2. Enter a publicly reachable URL (any WordPress, Shopify, Wix, or custom site).
 3. Click Scan.
-4. Review cookies, categories, security flags, and the compliance summary.
+4. Review cookies, categories, security flags, and the notes.
 
 Most scans finish in under 30 seconds. The scanner loads the site in a real headless browser so it sees cookies set by JavaScript after page load.
 
@@ -19,10 +19,10 @@ Most scans finish in under 30 seconds. The scanner loads the site in a real head
 - First-party and third-party cookies
 - Categories: necessary, functional, analytics, marketing
 - Security attributes: Secure, HttpOnly, SameSite
-- Checks against GDPR, CCPA/CPRA, PIPEDA, and Quebec Law 25
+- Notes on which cookies GDPR, CCPA/CPRA, PIPEDA and Quebec Law 25 usually treat as needing consent. The scan does not decide whether a site is compliant.
 - Optional email or PDF export from the results screen
 
-Used for 47,000+ scans. Unlimited free scans, no account required.
+Unlimited free scans, no account required.
 
 ## After the scan
 

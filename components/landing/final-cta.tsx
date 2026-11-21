@@ -67,7 +67,7 @@ export function FinalCTA() {
                   <div className="flex flex-col gap-3">
                     <Input
                       type="url"
-                      placeholder="millerwaste.ca"
+                      placeholder="example.com"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       required
