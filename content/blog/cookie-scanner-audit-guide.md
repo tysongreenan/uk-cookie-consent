@@ -118,7 +118,7 @@ Cookies can appear on your site without your knowledge through:
 - **CDN and hosting providers** — services like Cloudflare or AWS may set performance cookies
 - **Analytics tools** — Google Analytics alone sets 4-6 cookies per visitor
 
-If you have never scanned your site, you probably don't have a full list of the cookies it sets, and most privacy laws expect you to disclose them. Under [GDPR cookie consent requirements](/blog/gdpr-cookie-consent-requirements), fines can reach 4% of global revenue or 20 million euros. Under [Quebec's Law 25](/blog/cookie-consent-canada-guide-2026), penal fines can reach $25 million CAD or 4% of worldwide turnover. And under the [CCPA](/compliance/ccpa), consumers can sue over data breaches caused by a failure to keep reasonable security, for $107–$799 per consumer per incident.
+If you have never scanned your site, you probably don't have a full list of the cookies it sets, and most privacy laws expect you to disclose them. Under [GDPR cookie consent requirements](/blog/gdpr-cookie-consent-requirements), fines can reach 4% of global revenue or 20 million euros. Under [Quebec's Law 25](/blog/cookie-consent-canada-guide-2026), penal fines can reach $25 million CAD or 4% of worldwide turnover. And under the [CCPA](/compliance/ccpa), consumers can sue over data breaches of certain personal information caused by a failure to keep reasonable security (§ 1798.150), for $107–$799 per consumer per incident.
 
 **The bottom line:** You cannot write an accurate cookie policy, configure a compliant consent banner, or respond to a regulator's inquiry without first knowing what cookies your website sets. A cookie scanner gives you that visibility.
 

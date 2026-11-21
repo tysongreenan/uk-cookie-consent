@@ -470,7 +470,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <DollarSign className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-3xl font-bold text-foreground mb-2">$26,625,000+</p>
+                    <p className="text-3xl font-bold text-foreground mb-2">Over $26,625,000</p>
                     <p className="text-muted-foreground">Annual gross revenue</p>
                   </CardContent>
                 </Card>

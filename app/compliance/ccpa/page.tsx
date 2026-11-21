@@ -792,7 +792,7 @@ export default function CCPACompliancePage() {
                     Penalty calculations escalate quickly
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Fines are capped at $7,988 per intentional violation, and regulators can count each affected consumer separately, so exposure grows with traffic. Actual settlements are negotiated below the maximums. Private individuals can also sue under CCPA Section 1798.150 over a data breach caused by a failure to keep reasonable security, with statutory damages of $107 to $799 per consumer per incident.
+                    Fines are capped at $7,988 per intentional violation, and regulators can count each affected consumer separately, so exposure grows with traffic. Actual settlements are negotiated below the maximums. Private individuals can also sue under CCPA Section 1798.150 over a qualifying data breach of certain personal information caused by a failure to keep reasonable security, with statutory damages of $107 to $799 per consumer per incident.
                   </p>
                 </div>
               </motion.div>

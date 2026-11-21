@@ -104,7 +104,7 @@ Auto-detect checks the page's own `lang` attribute first, so the banner matches 
 
 ```javascript
 // Page language first, then the browser's
-var lang = document.documentElement.lang || navigator.language; // e.g. "ja", "de-DE", "fr-CA"
+var lang = (document.documentElement.lang || navigator.language).toLowerCase(); // e.g. "ja", "de-de", "fr-ca"
 
 // Match to a supported language
 if (lang.startsWith('ja')) return 'ja';

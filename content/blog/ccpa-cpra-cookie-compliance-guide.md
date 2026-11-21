@@ -60,7 +60,7 @@ schema:
       name: "What are the penalties for CCPA cookie non-compliance?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "CCPA violations can result in fines of $2,663 per unintentional violation and $7,988 per intentional violation, enforced by the California Attorney General and the California Privacy Protection Agency. Consumers can also sue over data breaches caused by a failure to keep reasonable security, for $107 to $799 per consumer per incident."
+        text: "CCPA violations can result in fines of up to $2,663 per violation, or up to $7,988 per intentional violation or violation involving consumers the business knows are under 16, enforced by the California Attorney General and the California Privacy Protection Agency. Consumers can also sue over data breaches of certain personal information caused by a failure to keep reasonable security (§ 1798.150), for $107 to $799 per consumer per incident."
     - "@type": "Question"
       name: "Does the CCPA apply to my website?"
       acceptedAnswer:
@@ -386,7 +386,7 @@ The California Privacy Protection Agency has stated publicly that it is investig
 | Unintentional violation | **$2,663** per violation |
 | Intentional violation | **$7,988** per violation |
 | Violations involving consumers the business knows are under 16 (CPRA) | **$7,988** per violation |
-| Consumer private right of action (breaches from a failure to keep reasonable security) | **$107 — $799** per consumer per incident |
+| Consumer private right of action (qualifying breaches of certain personal information, § 1798.150) | **$107 — $799** per consumer per incident |
 
 Amounts are the California Privacy Protection Agency's [inflation-adjusted figures, effective January 1, 2025](https://cppa.ca.gov/announcements/2024/20241217.html). They are maximums per violation, not automatic fines. Each affected consumer can count as a separate violation, so exposure grows with the number of California visitors.
 
@@ -477,7 +477,7 @@ Third-party advertising cookies, retargeting pixels, cross-site tracking cookies
 
 ### What are the penalties for CCPA cookie non-compliance?
 
-CCPA violations carry fines of **$2,663 per unintentional violation** and **$7,988 per intentional violation**, enforced by the California Attorney General and the California Privacy Protection Agency. The higher $7,988 cap also applies to violations involving consumers the business knows are under 16. These are maximums per violation. Consumers can also sue over data breaches caused by a failure to keep reasonable security, with statutory damages of $107 to $799 per consumer per incident.
+CCPA violations carry fines of **$2,663 per unintentional violation** and **$7,988 per intentional violation**, enforced by the California Attorney General and the California Privacy Protection Agency. The higher $7,988 cap also applies to violations involving consumers the business knows are under 16. These are maximums per violation. Consumers can also sue over data breaches of certain personal information caused by a failure to keep reasonable security (§ 1798.150), with statutory damages of $107 to $799 per consumer per incident.
 
 ### Does the CCPA apply to my website?
 
