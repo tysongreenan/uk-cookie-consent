@@ -408,7 +408,7 @@ export const FAQ_US = [
   {
     question: 'Do I need a cookie banner for a US website?',
     answer:
-      'If you sell to California residents and meet CCPA thresholds (over $26.625 million revenue, buy/sell data of 100,000+ consumers, or derive 50%+ of revenue from selling personal information), you need a “Do Not Sell or Share” mechanism and a clear privacy notice. Many other states now require an opt-out of targeted advertising even if you are under the California thresholds. A geo-aware banner is the practical way to cover visitors from every state.',
+      'If you sell to California residents and meet CCPA thresholds (over $26,625,000 revenue, buy/sell data of 100,000+ consumers, or derive 50%+ of revenue from selling personal information), you need a “Do Not Sell or Share” mechanism and a clear privacy notice. Many other states now require an opt-out of targeted advertising even if you are under the California thresholds. A geo-aware banner is the practical way to cover visitors from every state.',
   },
   {
     question: 'Is US cookie consent opt-in or opt-out?',

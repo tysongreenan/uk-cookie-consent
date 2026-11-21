@@ -2,7 +2,7 @@
 title: "GDPR Cookie Consent Requirements: The 6 Rules (2026)"
 description: "Six GDPR cookie rules — freely given, specific, informed, unambiguous, prior, and easy to withdraw — plus a free checklist. Fines can reach €20 million."
 date: "2025-01-17"
-updatedDate: "2026-10-11"
+updatedDate: "2026-11-21"
 heroCta:
   primary:
     label: "Scan your site"

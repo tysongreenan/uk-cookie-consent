@@ -79,7 +79,7 @@ If your website collects **any** personal data, you need a privacy policy. This 
 | Risk | Consequence |
 |------|-------------|
 | **GDPR violation** | Fines up to 4% of global annual revenue or €20 million |
-| **PIPEDA violation** | Fines up to CAD $100,000 per offence for knowingly breaking breach-reporting rules ([PIPEDA s. 28](https://laws-lois.justice.gc.ca/eng/acts/P-8.6/section-28.html)) |
+| **PIPEDA violation** | For specific offences, such as knowingly failing to report or record a breach: up to CAD $10,000 on summary conviction or $100,000 on indictment ([PIPEDA s. 28](https://laws-lois.justice.gc.ca/eng/acts/P-8.6/section-28.html)) |
 | **CCPA violation** | Fines up to $7,988 per intentional violation |
 | **Platform restrictions** | Google, Apple, Facebook may suspend your accounts |
 

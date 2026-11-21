@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 const faqItems = [
   {
     question: "Do I need a CCPA cookie banner?",
-    answer: 'If your business collects personal information from California residents and meets CCPA thresholds (annual gross revenue over $26.625 million, buys/sells data of 100,000+ consumers, or derives 50%+ of revenue from selling personal information), you need a CCPA-compliant cookie banner with a "Do Not Sell My Personal Information" link.'
+    answer: 'If your business collects personal information from California residents and meets CCPA thresholds (annual gross revenue over $26,625,000, buys/sells data of 100,000+ consumers, or derives 50%+ of revenue from selling personal information), you need a CCPA-compliant cookie banner with a "Do Not Sell My Personal Information" link.'
   },
   {
     question: "What is the difference between CCPA and CPRA?",
@@ -264,7 +264,7 @@ export default function CCPACookieBannerPage() {
                     </tr>
                     <tr className="border-b border-border bg-muted/30">
                       <td className="py-4 px-6 font-medium text-foreground">Revenue Threshold</td>
-                      <td className="py-4 px-6 text-center">$26.6M+ annual revenue</td>
+                      <td className="py-4 px-6 text-center">Over $26,625,000 annual revenue</td>
                       <td className="py-4 px-6 text-center">No threshold</td>
                     </tr>
                   </tbody>
@@ -329,7 +329,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Users className="h-8 w-8 text-destructive" />
                     </div>
-                    <CardTitle className="text-3xl font-bold text-destructive">$100–$750</CardTitle>
+                    <CardTitle className="text-3xl font-bold text-destructive">$107–$799</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="font-medium text-foreground mb-2">Per Consumer (Data Breach)</p>
@@ -470,7 +470,7 @@ export default function CCPACookieBannerPage() {
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <DollarSign className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-3xl font-bold text-foreground mb-2">$26.6M+</p>
+                    <p className="text-3xl font-bold text-foreground mb-2">$26,625,000+</p>
                     <p className="text-muted-foreground">Annual gross revenue</p>
                   </CardContent>
                 </Card>

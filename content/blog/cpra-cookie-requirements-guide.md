@@ -42,12 +42,12 @@ schema:
       name: "What are the penalties for violating CPRA cookie requirements?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "CPRA fines can reach $2,663 per unintentional violation and $7,988 per intentional violation or any violation involving a minor's data. The California Privacy Protection Agency (CPPA) can enforce these penalties without giving businesses a 30-day cure period, which was available under the original CCPA."
+        text: "CPRA fines can reach $2,663 per unintentional violation and up to $7,988 for intentional violations or violations involving consumers the business knows are under 16. The California Privacy Protection Agency (CPPA) can enforce these penalties without giving businesses a 30-day cure period, which was available under the original CCPA."
     - "@type": "Question"
       name: "Does the CPRA apply to my business?"
       acceptedAnswer:
         "@type": "Answer"
-        text: "The CPRA applies to for-profit businesses that collect California consumers' personal information and meet at least one threshold: annual gross revenue over $26.625 million, buying, selling, or sharing personal information of 100,000 or more consumers or households, or deriving 50% or more of annual revenue from selling or sharing personal information."
+        text: "The CPRA applies to for-profit businesses that collect California consumers' personal information and meet at least one threshold: annual gross revenue over $26,625,000, buying, selling, or sharing personal information of 100,000 or more consumers or households, or deriving 50% or more of annual revenue from selling or sharing personal information."
     - "@type": "Question"
       name: "What counts as sensitive personal information under the CPRA?"
       acceptedAnswer:
@@ -102,7 +102,7 @@ Understanding the differences between the CCPA and CPRA is essential for CPRA co
 | **Cure period** | 30-day cure period for violations | No cure period required |
 | **Data minimization** | No requirement | Must limit collection to what is "reasonably necessary" |
 | **Consumer threshold** | 50,000 consumers/devices | 100,000 consumers/households (devices removed) |
-| **Revenue threshold** | $25 million | $25 million, CPI-adjusted to $26.625 million from January 1, 2025 |
+| **Revenue threshold** | $25 million (original) | $25 million, CPI-adjusted to $26,625,000 from January 1, 2025 |
 | **Cookie-based sharing** | Not explicitly covered | Cross-context behavioral advertising covered |
 
 ### What Does "Share" Mean Under the CPRA?
@@ -169,7 +169,7 @@ The CPRA strengthened protections for minors. Businesses must obtain:
 - **Opt-in consent from parents or guardians** for consumers under 13
 - **Opt-in consent directly from the consumer** for those aged 13-15
 
-These opt-in requirements apply to selling or sharing personal information through cookies. The CPRA also moved violations involving minors' data into the higher fine tier, now **$7,988 per violation** after the 2025 inflation adjustment.
+These opt-in requirements apply to selling or sharing personal information through cookies. The CPRA also moved violations involving consumers the business knows are under 16 into the higher fine tier, now **$7,988 per violation** after the 2025 inflation adjustment.
 
 ---
 
@@ -246,7 +246,7 @@ CPRA fines are a serious financial risk. The law created the California Privacy 
 |---------------|-------------|
 | Unintentional violation | **$2,663 per violation** |
 | Intentional violation | **$7,988 per violation** |
-| Violation involving a minor's data | **$7,988 per violation** |
+| Violation involving a consumer the business knows is under 16 | **$7,988 per violation** |
 
 Amounts are the California Privacy Protection Agency's [inflation-adjusted figures, effective January 1, 2025](https://cppa.ca.gov/announcements/2024/20241217.html). They are maximums per violation, not automatic fines. Regulators can count each affected consumer as a separate violation, so exposure grows with traffic.
 
@@ -347,11 +347,11 @@ The CPRA does not mandate a cookie consent banner the way GDPR does. However, yo
 
 ### What are the penalties for violating CPRA cookie requirements?
 
-CPRA fines reach $2,663 per unintentional violation and $7,988 per intentional violation or any violation involving a minor's data. The California Privacy Protection Agency can enforce these penalties without offering a 30-day cure period. Because fines are assessed per violation per consumer, a single non-compliant cookie on a high-traffic site can generate substantial cumulative liability.
+CPRA fines reach $2,663 per unintentional violation and up to $7,988 for intentional violations or violations involving consumers the business knows are under 16. The California Privacy Protection Agency can enforce these penalties without offering a 30-day cure period. Because fines are assessed per violation per consumer, a single non-compliant cookie on a high-traffic site can generate substantial cumulative liability.
 
 ### Does the CPRA apply to my business?
 
-The CPRA applies to for-profit businesses that collect California consumers' personal information and meet at least one of three thresholds: annual gross revenue exceeding $26.625 million, buying, selling, or sharing the personal information of 100,000 or more California consumers or households annually, or deriving 50% or more of annual revenue from selling or sharing consumer personal information.
+The CPRA applies to for-profit businesses that collect California consumers' personal information and meet at least one of three thresholds: annual gross revenue exceeding $26,625,000, buying, selling, or sharing the personal information of 100,000 or more California consumers or households annually, or deriving 50% or more of annual revenue from selling or sharing consumer personal information.
 
 ### What counts as sensitive personal information under the CPRA?
 

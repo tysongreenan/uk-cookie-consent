@@ -1,6 +1,6 @@
 ---
-title: "Multi-Language Cookie Banners: How to Show Cookie Consent in 10 Languages Automatically"
-description: "Learn how to create cookie consent banners that auto-detect visitor language and display in their native tongue. Covers 10 languages including Japanese, Arabic, German, and more."
+title: "Multi-Language Cookie Banners: How to Show Cookie Consent in 16 Languages Automatically"
+description: "Learn how to create cookie consent banners that auto-detect visitor language and display in their native tongue. Covers 16 languages including Japanese, Arabic, German, and more."
 date: "2026-04-04"
 updatedDate: "2026-11-21"
 author: "cookie-banner-team"
@@ -12,7 +12,7 @@ schema:
   mainEntity:
     - name: "How many languages do cookie banners need to support?"
       acceptedAnswer:
-        text: "It depends on your audience. At minimum, support English and the primary languages of your users. For global sites, covering the top 10 languages (English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, Hindi) reaches over 4 billion internet users."
+        text: "It depends on your audience. At minimum, support English and the primary languages of your users. For global sites, covering the top 10 languages (English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, Hindi) is a good start."
     - name: "Is a translated cookie banner legally required?"
       acceptedAnswer:
         text: "Under GDPR, consent must be informed — meaning users need to understand what they're consenting to. If your site serves visitors in a specific language, showing a cookie banner in that language helps meet the 'informed consent' requirement. It's not always legally mandated, but it's best practice."
@@ -36,7 +36,7 @@ schema:
 
 - [Why multi-language matters for cookie consent](#why-multi-language-matters-for-cookie-consent)
 - [The legal argument: informed consent](#the-legal-argument-informed-consent)
-- [The 10 languages the banner supports](#the-10-languages-the-banner-supports)
+- [Supported languages](#supported-languages)
 - [How auto-detect works](#how-auto-detect-works)
 - [RTL support for Arabic](#rtl-support-for-arabic)
 - [Geo-targeting vs auto-detect](#geo-targeting-vs-auto-detect)
@@ -71,9 +71,9 @@ GDPR doesn't require a banner in every language, but [Article 7(2)](https://gdpr
 
 ---
 
-## The 10 languages the banner supports
+## Supported languages
 
-The banner switches to these automatically. It also covers Dutch, Swedish, Norwegian, Danish, Italian and Finnish.
+With the banner language set to Auto, it picks one of these:
 
 | Language | Code |
 |----------|------|
@@ -87,23 +87,29 @@ The banner switches to these automatically. It also covers Dutch, Swedish, Norwe
 | German | de |
 | Korean | ko |
 | Hindi | hi |
+| Dutch | nl |
+| Swedish | sv |
+| Norwegian | nb |
+| Danish | da |
+| Italian | it |
+| Finnish | fi |
 
-Together they cover most of the world's internet users.
+Anything else falls back to English.
 
 ---
 
 ## How auto-detect works
 
-The auto-detect system reads the visitor's browser language preference — a built-in browser setting that every browser exposes via JavaScript:
+Auto-detect checks the page's own `lang` attribute first, so the banner matches your site's language. If the page has none, it uses the visitor's browser language:
 
 ```javascript
-// The browser tells us the visitor's language
-var browserLang = navigator.language; // e.g., "ja", "de-DE", "fr-CA"
+// Page language first, then the browser's
+var lang = document.documentElement.lang || navigator.language; // e.g. "ja", "de-DE", "fr-CA"
 
-// Match to our supported languages
-if (browserLang.startsWith('ja')) return 'ja';
-if (browserLang.startsWith('de')) return 'de';
-if (browserLang.startsWith('fr')) return 'fr';
+// Match to a supported language
+if (lang.startsWith('ja')) return 'ja';
+if (lang.startsWith('de')) return 'de';
+if (lang.startsWith('fr')) return 'fr';
 // ... and so on
 ```
 
@@ -183,7 +189,7 @@ That's it. No extra configuration, no language files to upload, no server-side d
 
 ### How many languages do cookie banners need to support?
 
-**Answer:** It depends on your audience. At minimum, support English and the primary languages of your users. For global sites, the top 10 languages (English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, Hindi) cover over 4 billion internet users.
+**Answer:** It depends on your audience. At minimum, support English and the primary languages of your users. For global sites, the top 10 languages (English, Spanish, French, German, Portuguese, Japanese, Chinese, Korean, Arabic, Hindi) is a good start.
 
 ### Is a translated cookie banner legally required?
 

@@ -76,7 +76,7 @@ const STATE_ROWS = [
   {
     name: 'California — CCPA / CPRA',
     meta: 'Jan 2020 · CPRA Jan 2023',
-    body: 'Right to know, delete, correct, and opt out of sale and sharing. Honor GPC. “Do Not Sell or Share My Personal Information” must be obvious. CPPA and the Attorney General enforce; consumers can sue after certain data breaches ($100–$750 statutory damages).',
+    body: 'Right to know, delete, correct, and opt out of sale and sharing. Honor GPC. “Do Not Sell or Share My Personal Information” must be obvious. CPPA and the Attorney General enforce; consumers can sue after certain data breaches ($107–$799 per consumer per incident).',
   },
   {
     name: 'Virginia — VCDPA',
