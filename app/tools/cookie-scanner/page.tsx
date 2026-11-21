@@ -9,19 +9,19 @@ import { CookieScanner } from './cookie-scanner'
 import { CheckCircle, Shield, Zap, BarChart, Lock, FileText, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-  description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance. Paste a URL. No signup.',
+  title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
+  description: 'Paste any URL and see the cookies the page sets, sorted by category, with duration and first- or third-party. Useful context for GDPR, PIPEDA, Law 25 and CCPA. Free, no signup.',
   keywords: 'cookie scanner, cookie audit tool, cookie scan, cookie scanning tools, website cookie scanner, free cookie scanner, cookie checker, best cookie audit tool, web cookie scanner, free cookies audit software, cookie compliance checker, gdpr cookie scanner, online cookie scanner, website cookie checker, cookie scanning',
   openGraph: {
-    title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-    description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.',
+    title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
+    description: 'See the cookies a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
     type: 'website',
     url: 'https://www.cookie-banner.ca/tools/cookie-scanner',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cookie Scanner: Free, No Signup, Any URL in 30s',
-    description: 'A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.',
+    title: 'Cookie Scanner & Checker: Free, No Signup, Results in 30s',
+    description: 'See the cookies a page sets, sorted by category, with duration and first- or third-party. Free, no signup, about 30 seconds.',
   },
   alternates: {
     canonical: '/tools/cookie-scanner',
@@ -49,7 +49,7 @@ export default function CookieScannerPage() {
       "name": "Cookie Banner",
       "url": "https://www.cookie-banner.ca"
     },
-    "description": "A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.",
+    "description": "Free cookie scanner and checker. Paste a public URL to list the cookies the page sets, sorted by category, with duration and first- or third-party.",
     "featureList": [
       "Lists cookies a public page sets",
       "Sorts cookies into categories",
@@ -190,10 +190,10 @@ export default function CookieScannerPage() {
                 Free &mdash; No Signup Required
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold tracking-tight mb-2">
-                Free Cookie Scanner — Any URL in 30s
+                Free Cookie Scanner &amp; Checker
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6">
-                A cookie audit tool lists the cookies a public page sets and sorts them. This scan does not block cookies and does not decide compliance.
+                Paste a URL. See the cookies it sets, sorted by category, in about 30 seconds. No signup.
               </p>
 
               <CookieScanner />
@@ -222,12 +222,8 @@ export default function CookieScannerPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 text-center">
               <div>
-                <div className="text-2xl font-bold text-foreground">47,000+</div>
-                <div className="text-xs text-muted-foreground">Cookie scans run</div>
-              </div>
-              <div>
                 <div className="text-2xl font-bold text-foreground">4</div>
-                <div className="text-xs text-muted-foreground">Privacy laws checked</div>
+                <div className="text-xs text-muted-foreground">Cookie categories sorted</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-foreground">&lt;30s</div>
@@ -440,7 +436,7 @@ export default function CookieScannerPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      Generates a comprehensive cookie audit report with prioritized recommendations you can share with your development team or compliance officer.
+                      Lists every cookie with its category, duration and party, so you can share it with your developer or privacy lead. It does not decide whether the site is compliant.
                     </p>
                   </CardContent>
                 </Card>
@@ -479,169 +475,6 @@ export default function CookieScannerPage() {
                 <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Marketing &amp; Advertising Cookies</h3>
                 <p>
                   Marketing cookies track users across websites to build advertising profiles. These include Facebook Pixel (_fbp), Google Ads (IDE, _gcl_*), and programmatic advertising cookies. Marketing cookies always require explicit opt-in consent under GDPR and trigger the &quot;Do Not Sell or Share&quot; disclosure under CCPA. These are typically the highest-risk cookies on any website and should be blocked by default until consent is granted.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Why You Need a Website Cookie Scanner */}
-        <section className="py-12 md:py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">
-                Why You Need a Website Cookie Scanner
-              </h2>
-              <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
-                <p>
-                  If your website has any visitors from the EU, California, Canada, or the UK, you are subject to cookie consent laws. A <strong>website cookie scanner</strong> is not just a nice-to-have -- it is a fundamental compliance requirement. Here is why every website owner needs to perform regular cookie scans:
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Legal Compliance Requirements</h3>
-                <p>
-                  Under the{' '}
-                  <Link href="/compliance/gdpr" className="text-primary hover:underline font-medium">GDPR</Link>,
-                  websites must obtain informed, specific consent before setting non-essential cookies. To provide informed consent, you need to know exactly which cookies your site uses -- their names, purposes, durations, and whether they share data with third parties. A cookie scan gives you this information.
-                </p>
-                <p>
-                  The{' '}
-                  <Link href="/compliance/ccpa" className="text-primary hover:underline font-medium">CCPA (California Consumer Privacy Act)</Link>{' '}
-                  requires businesses to disclose the categories of personal information they collect, including data gathered through cookies. If your cookie scanner reveals marketing or advertising cookies, you must provide a &quot;Do Not Sell or Share My Personal Information&quot; link on your website.
-                </p>
-                <p>
-                  Canada&apos;s{' '}
-                  <Link href="/compliance/pipeda" className="text-primary hover:underline font-medium">PIPEDA</Link>{' '}
-                  and Quebec&apos;s Law 25 impose similar requirements. Law 25 penalties can reach{' '}
-                  <strong>$25 million CAD</strong> or 4% of worldwide turnover. See the{' '}
-                  <Link href="/blog/cookie-consent-canada-guide-2026" className="text-primary hover:underline font-medium">Canada cookie consent guide</Link>{' '}
-                  for federal and provincial rules. Regular cookie audits using a <strong>cookie scanning tool</strong> help you stay compliant as your website evolves and third-party scripts change.
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Hidden Cookies You Do Not Know About</h3>
-                <p>
-                  Most website owners are surprised by the results of their first <strong>cookie scan</strong>. Websites commonly have 20 to 50 or more cookies, yet only a handful are intentionally placed by the site owner. The rest come from:
-                </p>
-                <ul className="space-y-2 list-disc pl-6">
-                  <li><strong>Analytics platforms</strong> like Google Analytics, Hotjar, or Mixpanel that set multiple tracking cookies</li>
-                  <li><strong>Advertising networks</strong> including Google Ads, Facebook Pixel, and programmatic ad scripts</li>
-                  <li><strong>Social media widgets</strong> such as share buttons, embedded posts, and comment systems</li>
-                  <li><strong>Live chat tools</strong> like Intercom, Drift, or Zendesk that track visitor behavior</li>
-                  <li><strong>CMS plugins</strong> and themes that include third-party scripts you may not be aware of</li>
-                  <li><strong>CDN and hosting providers</strong> that sometimes set their own performance cookies</li>
-                </ul>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">Accurate Cookie Consent Banners</h3>
-                <p>
-                  Your cookie consent banner is only as good as the data behind it. If your banner lists four categories of cookies but your site actually sets cookies in categories you have not disclosed, your consent mechanism is technically non-compliant. Running a <strong>cookie audit</strong> ensures your banner accurately reflects reality. After scanning, you can use the results to{' '}
-                  <Link href="/free-cookie-banner-generator" className="text-primary hover:underline font-medium">build a properly configured cookie banner</Link>{' '}
-                  that matches your actual cookie usage.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Free vs Paid Cookie Scanning Tools */}
-        <section className="py-12 md:py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">
-                Free vs Paid Cookie Scanning Tools
-              </h2>
-              <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
-                <p>
-                  When choosing a <strong>cookie scanning tool</strong>, you will find both free and paid options available. Here is an honest comparison of <strong>free cookie scanners</strong> versus paid alternatives like Cookiebot, OneTrust, and CookieYes.
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-8 mt-10">
-                <Card className="border-2 border-green-200 dark:border-green-800">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-green-700 dark:text-green-400">Free Cookie Scanners</CardTitle>
-                    <CardDescription>Like our tool -- best for auditing and awareness</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 text-sm text-muted-foreground">
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>On-demand website scanning at no cost</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Cookie detection and categorization</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>A list and categories. No compliance score</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>No account or signup required</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Instant results in under 30 seconds</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Downloadable audit reports</span></li>
-                      <li className="flex items-start gap-2"><span className="text-muted-foreground mt-0.5 flex-shrink-0">-</span><span>Manual re-scanning required for updates</span></li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-blue-200 dark:border-blue-800">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-blue-700 dark:text-blue-400">Paid Cookie Scanning Tools</CardTitle>
-                    <CardDescription>Cookiebot, OneTrust, CookieYes, etc.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 text-sm text-muted-foreground">
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Automated scheduled scanning</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Integrated consent management platform</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Multi-site and enterprise management</span></li>
-                      <li className="flex items-start gap-2"><span className="text-green-500 mt-0.5 flex-shrink-0">+</span><span>Continuous monitoring and alerts</span></li>
-                      <li className="flex items-start gap-2"><span className="text-muted-foreground mt-0.5 flex-shrink-0">-</span><span>Monthly fees from $10 to $500+/month</span></li>
-                      <li className="flex items-start gap-2"><span className="text-muted-foreground mt-0.5 flex-shrink-0">-</span><span>Page limits on lower tiers</span></li>
-                      <li className="flex items-start gap-2"><span className="text-muted-foreground mt-0.5 flex-shrink-0">-</span><span>Account creation and setup required</span></li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="mt-10 prose prose-lg max-w-none text-muted-foreground">
-                <p>
-                  For most small to medium websites, a <strong>free cookie scanner</strong> provides all the auditing capability you need. If you are looking for an affordable{' '}
-                  <Link href="/compare/cookiebot-alternative" className="text-primary hover:underline font-medium">alternative to Cookiebot</Link>,
-                  our platform offers cookie scanning plus a full consent management solution at a fraction of the cost.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Cookie Scanning Best Practices */}
-        <section className="py-12 md:py-16 bg-muted/50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">
-                Cookie Scanning Best Practices
-              </h2>
-              <div className="prose prose-lg max-w-none text-muted-foreground space-y-6">
-                <p>
-                  Running a <strong>cookie scan</strong> is just the first step. Follow these best practices to maintain ongoing compliance:
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">1. Scan Before and After Every Website Change</h3>
-                <p>
-                  Any change to your website can introduce new cookies. Adding a new analytics tool, installing a WordPress plugin, or embedding a video player can all result in additional cookies being set. Run a <strong>cookie scan</strong> before and after deployment to catch any new cookies.
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">2. Schedule Regular Quarterly Audits</h3>
-                <p>
-                  Even without intentional changes, cookies on your website can change. Third-party services update their tracking scripts, and CMS platforms push updates that may include new tracking. Set a calendar reminder to run a comprehensive <strong>cookie audit</strong> at least every quarter.
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">3. Test Multiple Pages</h3>
-                <p>
-                  Different pages on your website may set different cookies. Your checkout page might load payment processor scripts, your blog might embed social media widgets, and your contact page might load a third-party form builder.
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">4. Update Your Cookie Policy After Every Scan</h3>
-                <p>
-                  Your cookie policy must accurately reflect the cookies your website actually uses. After each <strong>cookie scan</strong>, compare the results against your published cookie policy and update it. You can use our{' '}
-                  <Link href="/cookie-policy-template" className="text-primary hover:underline font-medium">cookie policy template</Link>{' '}
-                  to get started.
-                </p>
-
-                <h3 className="text-2xl font-semibold text-foreground mt-10 mb-4">5. Verify Your Consent Banner Blocks Cookies</h3>
-                <p>
-                  This scan lists cookies a public page sets. It does not block them, and a scan does not prove a banner is holding scripts. To check a banner, open the site and confirm scripts you added have not run before a choice. The{' '}
-                  <Link href="/features/how-it-works" className="text-primary hover:underline">verification guide</Link>{' '}
-                  explains that check.
                 </p>
               </div>
             </div>

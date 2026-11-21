@@ -9,6 +9,9 @@ import { EcommerceBannerDemo } from '@/components/landing/visuals/solution/Ecomm
 import { SetupSpeedometer } from '@/components/landing/visuals/core/SetupSpeedometer'
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: '/solutions/ecommerce',
+  },
   title: 'E-commerce Cookie Consent | Shopify GDPR Compliance Solution 2025',
   description: 'Complete e-commerce cookie consent solution for online stores. Shopify, WooCommerce, Magento compliance with conversion optimization. Cart tracking, payment processors, advertising pixels.',
   keywords: 'ecommerce cookie consent, shopify gdpr compliance, woocommerce cookie banner, online store privacy compliance, e-commerce cookie tracking',

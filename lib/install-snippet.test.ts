@@ -32,7 +32,7 @@ describe('hostedInstallSnippet', () => {
     const snippet = hostedInstallSnippet('banner-123', { showBranding: true })
     expect(snippet).toContain('async></script>')
     expect(snippet).toContain('<noscript>')
-    expect(snippet).toContain('cookie-banner.ca/?ref=banner')
+    expect(snippet).toContain('https://www.cookie-banner.ca/?ref=banner')
   })
 })
 

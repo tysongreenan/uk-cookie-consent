@@ -13,7 +13,7 @@ export function hostedInstallSnippet(
   const base = (process.env.NEXT_PUBLIC_BASE_URL || 'https://cookie-banner.ca').replace(/\/$/, '')
   const script = `<script src="${base}/api/v1/banner.js?id=${bannerId}" async></script>`
   if (options?.showBranding) {
-    return `${script}\n<noscript><a href="https://cookie-banner.ca/?ref=banner" rel="noopener" style="font-size:10px;color:rgba(128,128,128,0.5);text-decoration:none;">Cookie consent by cookie-banner.ca</a></noscript>`
+    return `${script}\n<noscript><a href="https://www.cookie-banner.ca/?ref=banner" rel="noopener" style="font-size:10px;color:rgba(128,128,128,0.5);text-decoration:none;">Cookie consent by cookie-banner.ca</a></noscript>`
   }
   return script
 }

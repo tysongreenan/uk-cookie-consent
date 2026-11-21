@@ -29,6 +29,8 @@ describe('page markdown', () => {
     expect(page?.description).toContain('Law 25')
     expect(markdown).toContain('canonical_url: https://www.cookie-banner.ca/tools/cookie-scanner')
     expect(markdown).toContain('md_url: https://www.cookie-banner.ca/tools/cookie-scanner.md')
-    expect(markdown).toContain('47,000+')
+    expect(markdown).toContain('no account required')
+    // No unsourced usage numbers on the scanner page.
+    expect(markdown).not.toMatch(/\d{1,3},\d{3}\+ scans/)
   })
 })

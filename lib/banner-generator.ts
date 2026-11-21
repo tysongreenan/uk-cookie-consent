@@ -593,7 +593,7 @@ export const generateBannerHTML = (config: BannerConfigWithGeoOverrides, options
 
   const brandingHtml = showBranding
     ? `<div class="cb-powered" style="margin-top: 8px;">
-          <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.65;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Powered by cookie-banner.ca</a>
+          <a href="https://www.cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 11px; color: ${getSecondaryTextColor()}; text-decoration: none; opacity: 0.65;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Powered by cookie-banner.ca</a>
         </div>`
     : ''
 
@@ -962,7 +962,7 @@ ${generateInlineFooterLinkHTML(config.branding.footerLink, config)}
   const backlinkPosition = floatingIsLeft ? 'right: 0;' : 'left: 0;'
   const persistentBacklink = showBranding ? `
 <div id="cookie-banner-attribution" style="position: fixed; bottom: env(safe-area-inset-bottom, 0px); ${backlinkPosition} z-index: 9999; pointer-events: auto; padding: 2px 8px;">
-  <a href="https://cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 10px; color: rgba(128,128,128,0.5); text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.color='rgba(128,128,128,0.8)'" onmouseout="this.style.color='rgba(128,128,128,0.5)'">Cookie consent by cookie-banner.ca</a>
+  <a href="https://www.cookie-banner.ca/?ref=banner" target="_blank" rel="noopener" style="font-size: 10px; color: rgba(128,128,128,0.5); text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.color='rgba(128,128,128,0.8)'" onmouseout="this.style.color='rgba(128,128,128,0.5)'">Cookie consent by cookie-banner.ca</a>
 </div>` : ''
 
   // Return all components separately

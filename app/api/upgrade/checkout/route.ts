@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const commonParams: Record<string, unknown> = {
       success_url: `${BASE_URL}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${BASE_URL}/upgrade`,
+      cancel_url: `${BASE_URL}/upgrade?billing=${billingCycle}`,
       allow_promotion_codes: true,
       billing_address_collection: 'required' as const,
     }

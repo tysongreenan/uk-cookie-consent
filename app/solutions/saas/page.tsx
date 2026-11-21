@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Code, Database, Shield, Zap, Users, Globe, BarChart3, CheckCircle, AlertTriangle, ExternalLink, Download, Settings } from 'lucide-react'
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: '/solutions/saas',
+  },
   title: 'Cookie Consent for SaaS | One Script, No SDK',
   description: 'Paste one async cookie banner on a SaaS site. Consent modes for GDPR, CCPA, and PIPEDA. No SDK and no SSO. Free for one banner. Pro is $99 once or $99 a year.',
   keywords: 'cookie consent for saas, saas cookie banner, b2b cookie banner',
