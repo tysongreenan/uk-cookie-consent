@@ -3223,7 +3223,11 @@ ${marketingLoaders ? '      CB_RAN.marketing = true;\n' : ''}${marketingLoaders 
       'ad_personalization': consent.marketing ? 'granted' : 'denied'
     });
   }
-  
+
+  // Microsoft Advertising (UET) consent
+  window.uetq = window.uetq || [];
+  window.uetq.push('consent', 'update', { 'ad_storage': consent.marketing ? 'granted' : 'denied' });
+
   // Also update dataLayer for GTM compatibility.
   // Include Consent Mode strings (for Google tags) and boolean flags
   // (consent_analytics / consent_marketing) for Custom Event triggers
@@ -3724,6 +3728,32 @@ export const generateConsentInitScript = (config?: BannerConfigWithGeoOverrides)
   for (var __k in window.__cbConsentDefault) __cbDefault[__k] = window.__cbConsentDefault[__k];
   __cbDefault.wait_for_update = 500; // Wait 500ms for consent update before allowing trackers
   gtag('consent', 'default', __cbDefault);
+
+  // Microsoft Advertising (UET) consent default. uetq is a queue the UET tag reads when it loads.
+  window.uetq = window.uetq || [];
+  window.uetq.push('consent', 'default', { 'ad_storage': __cbAd });
+
+  // Returning visitor: send their saved choice now, before GTM loads, instead of after DOMContentLoaded.
+  // Mirrors init(): a stale consentVersion or a GPC-auto choice with GPC now off counts as no choice,
+  // and GPC forces ad signals off.
+  try {
+    var __cbM = document.cookie.match(/(^| )cookie_consent=([^;]+)/);
+    var __cbSaved = __cbM ? JSON.parse(decodeURIComponent(__cbM[2])) : null;
+    var __cbGpc = ${gpcEnabled ? '!!(navigator.globalPrivacyControl || window.__cbServerGpc)' : 'false'};
+    var __cbVer = ${Number(config?.behavior?.consentVersion) || 0};
+    if (__cbSaved && typeof __cbSaved === 'object' &&
+        !(__cbVer && __cbSaved._v !== __cbVer) &&
+        !(__cbSaved.gpc_auto && !__cbGpc)) {
+      var __cbSavedAd = (__cbSaved.marketing && !__cbGpc) ? 'granted' : 'denied';
+      gtag('consent', 'update', {
+        'analytics_storage': __cbSaved.analytics ? 'granted' : 'denied',
+        'ad_storage': __cbSavedAd,
+        'ad_user_data': __cbSavedAd,
+        'ad_personalization': __cbSavedAd
+      });
+      window.uetq.push('consent', 'update', { 'ad_storage': __cbSavedAd });
+    }
+  } catch (e) {}
 
   // Also push to dataLayer for GTM compatibility
   window.dataLayer.push({

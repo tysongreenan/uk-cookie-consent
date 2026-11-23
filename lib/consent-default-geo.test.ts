@@ -77,3 +77,51 @@ describe('geo language override (Quebec French)', () => {
     expect(t.en).toMatchObject({ title: 'We use cookies', acceptButton: 'Accept' })
   })
 })
+
+// Runs the consent init block with a saved cookie and returns everything it queued.
+function runInit(config: any, cookie: string, gpc = false) {
+  const js = generateConsentInitScript(config).replace(/<\/?script[^>]*>/gi, '')
+  const window: any = { __cbServerGpc: false }
+  window.dataLayer = []
+  vm.runInNewContext(js, { window, dataLayer: window.dataLayer, navigator: { globalPrivacyControl: gpc }, document: { cookie } })
+  const update = window.dataLayer.find((a: any) => a[0] === 'consent' && a[1] === 'update')
+  return { update: update ? { ...update[2] } : null, dl: window.dataLayer, uet: window.uetq }
+}
+const saved = (c: any) => 'other=1; cookie_consent=' + encodeURIComponent(JSON.stringify(c))
+
+describe('returning visitor consent is sent before GTM loads', () => {
+  it('sends the saved choice right after the default, before the dataLayer event', () => {
+    const { update, dl, uet } = runInit({}, saved({ essential: true, analytics: true, marketing: false }))
+    expect(update).toEqual({ analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' })
+    const iDefault = dl.findIndex((a: any) => a[1] === 'default')
+    const iUpdate = dl.findIndex((a: any) => a[1] === 'update')
+    expect(iDefault).toBeLessThan(iUpdate)
+    expect(uet).toEqual(['consent', 'default', { ad_storage: 'denied' }, 'consent', 'update', { ad_storage: 'denied' }])
+  })
+
+  it('grants ads to Microsoft and Google when marketing was accepted', () => {
+    const { update, uet } = runInit({}, saved({ analytics: true, marketing: true }))
+    expect(update!.ad_storage).toBe('granted')
+    expect(uet.slice(3)).toEqual(['consent', 'update', { ad_storage: 'granted' }])
+  })
+
+  it('sends no update for a first-time visitor (only the defaults)', () => {
+    const { update, uet } = runInit({}, 'other=1')
+    expect(update).toBeNull()
+    expect(uet).toEqual(['consent', 'default', { ad_storage: 'denied' }])
+  })
+
+  it('ignores a choice saved under an older consent version', () => {
+    expect(runInit({ behavior: { consentVersion: 2 } }, saved({ analytics: true, marketing: true, _v: 1 })).update).toBeNull()
+    expect(runInit({ behavior: { consentVersion: 2 } }, saved({ analytics: true, marketing: true, _v: 2 })).update).not.toBeNull()
+  })
+
+  it('keeps ads denied when GPC is on, and drops a GPC-auto choice once GPC is off', () => {
+    expect(runInit({}, saved({ analytics: true, marketing: true }), true).update!.ad_storage).toBe('denied')
+    expect(runInit({}, saved({ analytics: true, marketing: false, gpc_auto: true }), false).update).toBeNull()
+  })
+
+  it('survives a corrupt cookie', () => {
+    expect(runInit({}, 'cookie_consent=%7Bnot-json').update).toBeNull()
+  })
+})
