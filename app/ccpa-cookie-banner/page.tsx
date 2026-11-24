@@ -57,7 +57,7 @@ const faqItems = [
   },
   {
     question: "What are CCPA penalties for non-compliance?",
-    answer: "CCPA violations can result in fines of $2,663 per unintentional violation and $7,988 per intentional violation. The California Attorney General and the California Privacy Protection Agency (CPPA) can enforce these penalties. Consumers can also sue for data breaches, with statutory damages of $107–$799 per consumer per incident."
+    answer: "CCPA violations can result in fines of $2,663 per unintentional violation and $7,988 per intentional violation. The California Attorney General and the California Privacy Protection Agency (CPPA) can enforce these penalties. Consumers can also sue under § 1798.150 over a qualifying data breach of certain personal information caused by a failure to keep reasonable security, with statutory damages of $107–$799 per consumer per incident."
   },
   {
     question: "Does the CCPA require opt-in or opt-out consent?",
@@ -334,7 +334,7 @@ export default function CCPACookieBannerPage() {
                   <CardContent className="text-center">
                     <p className="font-medium text-foreground mb-2">Per Consumer (Data Breach)</p>
                     <p className="text-sm text-muted-foreground">
-                      Consumers can sue directly for data breaches resulting from failure to implement reasonable security.
+                      Consumers can sue under § 1798.150 over a qualifying data breach of certain personal information caused by a failure to keep reasonable security.
                     </p>
                   </CardContent>
                 </Card>
