@@ -243,7 +243,7 @@ const faqData = [
   {
     question: 'What are the fines for CCPA cookie violations?',
     answer:
-      'CCPA penalties are $2,663 per unintentional violation and $7,988 per intentional violation. Since each individual consumer interaction can be a separate violation, fines add up quickly. The California Privacy Protection Agency (CPPA) and the California Attorney General both have enforcement authority. There is also a private right of action for data breaches resulting from failure to maintain reasonable security.',
+      'CCPA penalties are $2,663 per unintentional violation and $7,988 per intentional violation. Since each individual consumer interaction can be a separate violation, fines add up quickly. The California Privacy Protection Agency (CPPA) and the California Attorney General both have enforcement authority. Consumers can also sue under § 1798.150 over a qualifying data breach of certain personal information caused by a failure to keep reasonable security, for $107 to $799 per consumer per incident.',
   },
   {
     question: 'How is CCPA different from GDPR for cookies?',
