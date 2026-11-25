@@ -32,9 +32,11 @@ interface CodeGeneratorProps {
   detectedCmpVendor?: string
   /** Persist an unsaved banner before copying a hosted snippet. */
   onEnsureSaved?: () => Promise<string | null>
+  /** Parent can hide the install prompt after a successful copy. Event payload stays the same. */
+  onInstallCopied?: () => void
 }
 
-export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, onEnsureSaved }: CodeGeneratorProps) {
+export function CodeGenerator({ config, bannerId, planTier, detectedCmpVendor, onEnsureSaved, onInstallCopied }: CodeGeneratorProps) {
   const showBranding = !planTier || planTier === 'free'
   const [activeTab, setActiveTab] = useState<'head' | 'body' | 'hosted'>('hosted')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -174,6 +176,7 @@ ${generateBannerHTML(config, { showBranding })}
               alreadyCopied: true,
             })
             showedHelp = result.showedHelp
+            onInstallCopied?.()
           },
         })
         setCopied(true)
@@ -197,6 +200,7 @@ ${generateBannerHTML(config, { showBranding })}
           planTier,
         })
         setCopied(true)
+        onInstallCopied?.()
         if (!showedHelp) {
           toast.success('Copied to clipboard!')
         }
@@ -212,6 +216,7 @@ ${generateBannerHTML(config, { showBranding })}
         plan_tier: planTier || 'free',
         source: 'builder_code_tab',
       })
+      onInstallCopied?.()
       setTimeout(() => setCopied(false), 3000)
     } catch (err) {
       const persistError = err instanceof BannerPersistError
@@ -251,6 +256,7 @@ ${generateBannerHTML(config, { showBranding })}
         plan_tier: planTier || 'free',
         source: 'builder_code_tab',
       })
+      onInstallCopied?.()
       setTimeout(() => setCopiedA11y(false), 3000)
     } catch (err) {
       captureException(err, { context: 'a11y_install_snippet_copy' })
@@ -353,7 +359,7 @@ ${generateBannerHTML(config, { showBranding })}
           {copied ? (
             <><Check className="mr-2 h-4 w-4" /> Copied!</>
           ) : (
-            <><Copy className="mr-2 h-4 w-4" /> Copy Script Tag</>
+            <><Copy className="mr-2 h-4 w-4" /> Copy install snippet</>
           )}
         </Button>
 
